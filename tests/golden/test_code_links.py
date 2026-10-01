@@ -67,3 +67,27 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
     assert linked[1]["place_id"] is None
     assert len(linked[1]["place_ids"]) == 2
     assert linked[0]["code"] == "ZZ-A"
+
+
+def test_subdivision_can_identify_a_separately_represented_territory(
+    tmp_path: Path,
+) -> None:
+    configured = policy() | {"sovereigns": {"YY": ["ZZ", "Nation"]}}
+    paths = {}
+    for cc in ("ZZ", "YY", "XX"):
+        shape = area(cc, cc, "country", (0, 0, 1, 1))
+        shape["country_code"] = cc
+        root = write_inputs(tmp_path / cc, geonames=[], divisions=[], areas=[shape])
+        output = build_country(
+            Workspace(tmp_path), root, cc, "inputs", configured, "test"
+        )
+        paths[cc] = {"path": str(output)}
+    index = CodeIndex(Inputs(paths, {}, {}, {}, "test"))
+    matched, _ = index.subdivision(
+        {"country_code": "ZZ", "code_system": "ISO-3166-2", "code": "ZZ-YY"}
+    )
+    unrelated, _ = index.subdivision(
+        {"country_code": "ZZ", "code_system": "ISO-3166-2", "code": "ZZ-XX"}
+    )
+    assert matched == ["country:YY"]
+    assert unrelated == []

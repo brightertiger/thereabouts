@@ -28,6 +28,11 @@ class CodeIndex:
                     e = unpack(data)
                     if role == "country":
                         self.countries.add(cc)
+                        if e.get("sovereign"):
+                            parent = e["sovereign"][0]
+                            self.codes.setdefault(f"iso:{parent}-{cc}", set()).add(
+                                identity
+                            )
                         continue
                     if e.get("code"):
                         self.codes.setdefault("iso:" + e["code"], set()).add(identity)
