@@ -1,5 +1,7 @@
 # Golden dataset (schema `golden-1`)
 
+V1 changes and measured rebuild status: [GOLDEN_V1.md](GOLDEN_V1.md). The historical pilot measurements below describe v0.
+
 The golden stage consumes committed reconciliation country checkpoints and acquired
 lookup manifests. It writes only beneath the supplied data directory. The H3
 reference key is **resolution 8**. A row's original coordinates are retained, but
@@ -64,7 +66,7 @@ golden/
   lookups/<static-kind>/<source-partition>.parquet
 work/golden/
   countries.json                 # expected countries and source component envelopes
-  blocks-<inputs-hash>.sqlite     # cached exact finest-centre envelopes/dependencies
+  blocks.sqlite                  # reusable finest-centre envelopes; hashed dependencies
   run.json, pilot.json            # progress and pilot evidence
 work/ledger.sqlite3               # shared golden.* checkpoints
 ```
@@ -108,6 +110,7 @@ Unknown values are null. A population of zero remains distinct from null.
 | `geonames_id` | string? | Linked GeoNames source identity |
 | `geonames_admin1` | string? | GeoNames source admin1 code, not an ISO subdivision inference |
 | `feature_code` | string? | Retained GeoNames/source classification |
+| `source_subtype`, `settlement_class`, `city_exclusion` | string? | Source role/class and recorded reason for retaining an administrative unit outside city selection |
 | `overture_ids` | list<string> | Overture identities on the canonical entity |
 | `wikidata_ids` | list<string> | Known Wikidata IDs from source evidence and retained GeoNames links |
 | `source_ids` | JSON string | Full source/identity list |
@@ -220,9 +223,15 @@ every table; point fields are present only where explicitly noted.
 The four code/phone tables add `country_id` (string?, direct country-code match),
 `place_id` (string?, unique target only), `place_ids` (list<string>, all code-derived
 candidates), and `link_status` (`matched`, `ambiguous`, `unmatched`, `pending`).
-Subdivisions use explicit ISO codes or the reconciled GeoNames state crosswalk.
-Phone prefixes join to countries through their supplied codes; descriptions are
-not fuzzy-matched to cities. An ambiguous multi-country prefix has all candidate
+Subdivisions first use explicit ISO codes or the reconciled GeoNames state
+crosswalk, then administrative GeoNames identity or exact country-scoped aliases
+of retained states/districts. Multiple matches remain ambiguous. `link_method`
+records the evidence. Names never manufacture ISO codes on canonical places.
+Phone prefixes narrow their supplied country codes with the pinned libphonenumber
+fixed-line patterns and leading digits. A candidate survives if some full number
+can extend the prefix; short shared prefixes remain ambiguous. Missing or
+contradictory pattern evidence retains the original candidates. The original
+`country_codes` column is unchanged; descriptions are not fuzzy-matched to cities. An ambiguous multi-country prefix has all candidate
 IDs and a null singular ID. Missing reconciled countries remain pending.
 
 ## Quality and limitations
@@ -230,15 +239,17 @@ IDs and a null singular ID. Missing reconciled countries remain pending.
 `quality.json` lists per-table rows and bytes, lookup status/disagreement counts,
 blocks built/waiting/remaining, stored cells per resolution and represented finest
 centres. Its checks repeat every named fixture from `RECONCILIATION.md` through
-`cells` and every GeoNames P observation at population >=15,000. Pending blocks
+`cells`, the sixteen additional metropolitan probes in `probes.json`, and every
+GeoNames P observation at population >=15,000. Pending blocks
 remain counted in the total and have an explicit pending count. State/city
 comparisons retain the original definitions, including PPLX/historical observations
 and the distinction between same identity and containing another city.
 
 The integrity report counts duplicate canonical IDs and missing cell, parent and
 sovereign references. Partial snapshots can lack a sovereign country still being
-reconciled. Dataset completion requires unique canonical IDs and no dangling cell
-place IDs. Source agreement is not independent accuracy. Country/state/city name
+reconciled. Dataset completion requires unique canonical IDs and no dangling cell, parent
+or sovereign place IDs. Country catalogue records can exist without assigning a
+spatial country polygon, as for Western Sahara under the selected perspective. Source agreement is not independent accuracy. Country/state/city name
 conventions, broad municipalities and unlinked locality limitations remain those
 of reconciliation. Quantization from the source coordinate to the r8 centre can
 change even a named fixture. Such results are reported, never patched by name.
@@ -288,3 +299,22 @@ These are unresolved source catalogue references, explicitly counted in quality;
 no replacement identity is invented. The partial spatial joins retain 983 source
 country disagreements: postal 795, airports 10, trade 67 and IP 111. These counts
 will change as the world build fills currently pending rows.
+
+
+## Incremental v1 rebuild
+
+`blocks.sqlite` caches the expensive actual H3 descendant envelopes independently
+of the reconciliation builder. Changed country envelopes or offshore policy
+recompute dependency intersections; unchanged normal roots reuse their stored
+bounds. A legacy `blocks-<hash>.sqlite` supplies bounds after a SQLite integrity
+check, with every dependency rechecked and seam roots enumerated again. The
+cell implementation fingerprint includes the cell Arrow schema separately from
+the place schema. Changing static links, reports or place-only columns does not
+invalidate cells. Cell fingerprints still include each required country's verified
+partition, land, runtime policy and spatial implementation. Unchanged source
+rows and timezone hardlinks remain reusable.
+
+Before replacing golden files, the controller publishes `completed: false`.
+Completion requires both `work/golden/run.json` and `golden/manifest.json` to say
+`completed: true`, with the integrity checks above passing. See the gated world
+controller and exact launch/resume commands in [GOLDEN_V1.md](GOLDEN_V1.md).

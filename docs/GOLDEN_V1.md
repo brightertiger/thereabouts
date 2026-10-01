@@ -75,4 +75,50 @@ territories without separate country entities.
 
 ## Implementation and rebuild
 
-Results and operational handoff are appended after the sample and validation.
+The general rule now requires settlement evidence, uses hierarchy and population
+to reject administrative containers of much larger linked city points, and gives
+the most specific classified linked municipality precedence. Separate suburb
+municipalities retain their own answers: a person inside a separately represented
+town should receive that town even when a larger metropolitan footprint overlaps
+it. Existing explicit Tokyo/London and city-state conventions remain data policy.
+An exact shared Wikidata identity between a region and an explicit, uniquely
+linked city can supply a missing city footprint; a capital/seat relationship or
+name resemblance cannot. No new country or city-name exceptions were introduced.
+
+Rejected administrative localities and source evidence remain in `places` as
+districts, with `source_subtype`, `settlement_class` and `city_exclusion` fields.
+A per-cell finer-unit column is deferred: carrying its extra boundaries through
+certification, compaction and every lookup join is a separate spatial/schema
+change. The existing cell-equivalence contract is retained.
+
+Refactoring separates area assignment, shared-identity footprints, catalogue
+checkpoints, state crosswalks, settlement scoring and country retirement. Scalar
+and vector city selection share one ordering function; both quality evaluators
+share one agreement definition. Canonical naming preference no longer discards
+additional source identities/provenance. Golden administrative and telephone
+linkers are separate modules. All reconciliation/golden modules remain under
+250 lines, with strict mypy and no broad exception handlers.
+
+Country references without an accepted border are created only from a unique
+source country/territory record. This fixes EH's catalogue reference without
+changing the selected territorial perspective. The golden completion gate now
+rejects dangling parent and sovereign references as well as dangling cell IDs.
+Historical AN/CS and non-geographic phone services are not invented as current
+countries.
+
+The first full validation passed 233 tests with 7 existing skips. A subsequent
+envelope-cache regression test also passes; final validation is recorded below.
+Tests cover independent municipalities, administrative containers, exact region
+identity, country-only catalogue entries, interrupted replacement and resumed
+cleanup, administrative alias ambiguity, numbering-prefix overlap, and exhaustive
+scalar/vector/compacted-cell equivalence including seams and pentagons.
+
+Country replacement archives the old manifest and marks the new generation
+incomplete. Each verified country replaces its predecessor; that country's
+extract and link SQLite are then removed. Retry verifies the final country first
+and skips rebuilding deleted intermediates. The source manifests and land index
+remain reusable. H3 descendant envelopes have a separate reusable cache;
+dependency intersections are rechecked when country envelopes change. Static
+joins and place-only schema changes do not invalidate spatial cell code.
+
+Operational results and the final detached-process state follow after the sample.

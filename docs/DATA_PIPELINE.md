@@ -506,3 +506,22 @@ checkpoints; `work/golden/run.json` records progress. Use the manifest's complet
 flag and table inventory, never an unrestricted glob. The full layout, all columns,
 certificate argument, checks and resumption commands are in
 [GOLDEN_DATASET.md](GOLDEN_DATASET.md). No new raw downloads are required.
+
+
+### Disk-neutral golden v1 replacement
+
+The v1 reconciliation rebuild replaces one verified country at a time and deletes
+that country's superseded SQLite file and extract/link intermediates immediately.
+The acquisition manifests and normalized sources remain immutable. The old
+reconciled manifest is archived under `work/reconcile/history/`; the active
+manifest is explicitly incomplete while the new generation builds. A verified
+country resumes without reconstructing its retired intermediates.
+
+`python -m build_data.rebuild_golden --data-dir data --sample-gate
+ data/work/v1/sample.json` runs world reconciliation followed by the golden stage.
+The sample gate must demonstrate improved exact identity, no aggregate country or
+state regression, and passing named fixtures for the exact source, policy and
+reconciliation builder. The existing full-pilot gate is also required. Logs and
+controller status live under `work/v1/`; `rebuild.json` is complete only after both
+stage completion markers pass. Run the same command to resume. See
+[GOLDEN_V1.md](GOLDEN_V1.md) for measured results and current process state.
