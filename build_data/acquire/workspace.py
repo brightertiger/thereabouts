@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 SOURCES = ("osm_land", "overture", "geonames", "geoboundaries")
-MIN_FREE_BYTES = 20_000_000_000
-MAX_WORKSPACE_BYTES = 45_000_000_000
+MIN_FREE_BYTES = 12_000_000_000
+MAX_WORKSPACE_BYTES = 60_000_000_000
 
 
 @dataclass(frozen=True)
@@ -58,14 +58,14 @@ class Workspace:
             self.normalized(source).mkdir(parents=True, exist_ok=True)
 
     def check_budget(self, required_bytes: int = 0) -> None:
-        """Refuse new work below 20 GB free or above the 45 GB workspace cap."""
+        """Refuse new work below 12 GB free or above the 60 GB workspace cap."""
         if required_bytes < 0:
             raise ValueError("required_bytes must be nonnegative")
         self.root.mkdir(parents=True, exist_ok=True)
         free = shutil.disk_usage(self.root).free
         if free - required_bytes < MIN_FREE_BYTES:
             raise OSError(
-                "Disk budget: preserve at least 20 GB free before starting a unit"
+                "Disk budget: preserve at least 12 GB free before starting a unit"
             )
         used = 0
         for path in self.root.rglob("*"):
@@ -77,7 +77,7 @@ class Workspace:
             if stat.S_ISREG(entry.st_mode):
                 used += entry.st_size
         if used + required_bytes > MAX_WORKSPACE_BYTES:
-            raise OSError("Disk budget: workspace would exceed 45 GB")
+            raise OSError("Disk budget: workspace would exceed 60 GB")
 
     @staticmethod
     def _check_source(source: str) -> None:
