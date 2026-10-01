@@ -11,6 +11,7 @@ from .ledger import read_units
 from .lookup_catalog import LOOKUP_SOURCES
 from .lookup_schemas import KINDS
 from .manifests import MANIFEST_VERSION, inventory_path
+from .offload import applies, state
 from .workspace import SOURCES, Workspace
 
 
@@ -126,7 +127,9 @@ def source_status(workspace: Workspace, source: str) -> dict[str, Any]:
         )
     return {
         "source": source,
-        "download": "complete"
+        "download": "offloaded"
+        if applies(workspace, source, manifest)
+        else "complete"
         if expected and len(complete) == len(expected)
         else "incomplete",
         "download_units": len(complete),
@@ -138,6 +141,7 @@ def source_status(workspace: Workspace, source: str) -> dict[str, Any]:
         "rows": dict(rows),
         "partitions": len(parts),
         "normalized_bytes": sum(parts.values()),
+        "offload": state(workspace, source),
     }
 
 

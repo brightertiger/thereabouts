@@ -10,6 +10,8 @@ from .lookup_catalog import LOOKUP_SOURCES
 from .lookup_download import download as lookup_download
 from .lookup_normalize import normalize as lookup_normalize
 from .lookup_timezones import normalize as timezone_normalize
+from .manifests import load_manifest
+from .offload import offload, restore, state
 from .status import print_status
 from .workspace import Workspace
 
@@ -36,7 +38,12 @@ ADAPTERS["timezones"] = (
 def main(argv: Sequence[str] | None = None) -> int:
     """Dispatch sequential source stages; adapters own per-unit checkpoint decisions."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("source", choices=[*ADAPTERS, "all", "status"])
+    parser.add_argument(
+        "source", choices=[*ADAPTERS, "all", "status", "offload", "restore"]
+    )
+    parser.add_argument("--sources", nargs="+", choices=list(ADAPTERS))
+    parser.add_argument("--remote", help="gs://bucket/raw prefix; source appended")
+    parser.add_argument("--record-existing", action="store_true")
     parser.add_argument(
         "--stage", choices=["download", "normalize", "all"], default="all"
     )
@@ -46,9 +53,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.source == "status":
         print_status(workspace)
         return 0
+    if args.source in ("offload", "restore"):
+        if not args.sources or (args.source == "offload" and not args.remote):
+            parser.error("offload/restore require --sources; offload needs --remote")
+        for source in args.sources:
+            if args.source == "offload":
+                offload(
+                    workspace,
+                    source,
+                    f"{args.remote.rstrip('/')}/{source}",
+                    record_existing=args.record_existing,
+                )
+            else:
+                restore(workspace, source)
+        return 0
     workspace.prepare()
     selected = list(ADAPTERS) if args.source == "all" else [args.source]
     for source in selected:
+        if state(workspace, source):
+            load_manifest(workspace, source)
+            print(
+                f"{source}: raw offloaded; verified normalized outputs; "
+                "restore to rebuild"
+            )
+            continue
         download, normalize = ADAPTERS[source]
         stages = {
             "download": (download,),
