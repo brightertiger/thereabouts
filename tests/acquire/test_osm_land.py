@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import shutil
-import sqlite3
 import struct
 import zipfile
 from pathlib import Path
@@ -17,9 +16,19 @@ import shapely
 from shapely.geometry import Polygon, box
 from shapely.geometry.polygon import orient
 
-from build_data.acquire import Ledger, Workspace, sha256_file, validate_parquet
+from build_data.acquire import (
+    Ledger,
+    Workspace,
+    osm_land_reader,
+    osm_land_rows,
+    osm_land_settings,
+    osm_land_units,
+    sha256_file,
+    validate_parquet,
+)
 from build_data.acquire import osm_land as source
 from build_data.acquire import osm_land_normalize as normal
+from build_data.acquire.runtime import single_run
 
 PRJ = 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984"],UNIT["Degree",0.0174532925199433]]'
 
@@ -46,7 +55,7 @@ def acquired(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Workspace:
     workspace = Workspace(tmp_path / "data")
     polygons = [
         box(x - 0.01, y - 0.01, x + 0.01, y + 0.01)
-        for x, y, land in normal.SPOT_CHECKS.values()
+        for x, y, land in osm_land_settings.SPOT_CHECKS.values()
         if land
     ]
     polygons.extend([box(20, 20, 21.1, 21), box(21, 20, 22, 21)])
@@ -131,7 +140,7 @@ def test_resume_verifies_but_does_not_transform_completed_units(
     def unexpected(*args: Any, **kwargs: Any) -> Any:
         pytest.fail("Completed geometry was transformed again")
 
-    monkeypatch.setattr(normal, "_row", unexpected)
+    monkeypatch.setattr(osm_land_units, "_row", unexpected)
     source.normalize(acquired)
     assert hashes == {path: sha256_file(path) for path in _outputs(acquired)}
 
@@ -148,7 +157,7 @@ def test_corrupt_partition_rebuilt_identically(acquired: Workspace) -> None:
 def test_interrupted_units_resume_without_duplicates(
     acquired: Workspace, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    original = normal._run_unit
+    original = osm_land_units._run_unit
     calls = 0
 
     def interrupted(*args: Any, **kwargs: Any) -> tuple[Path, Path]:
@@ -186,8 +195,11 @@ def test_holes_are_retained_and_not_filled(tmp_path: Path) -> None:
     )
     _shapefile(shp, [polygon])
     with shapefile.Reader(str(shp)) as reader:
-        row, audit = normal._row(
-            reader, 0, {"attribution": "OSM", "retrieved_at": "date"}, "0" * 64
+        row, audit = osm_land_rows._row(
+            *osm_land_reader._feature(reader, 0),
+            0,
+            {"attribution": "OSM", "retrieved_at": "date"},
+            "0" * 64,
         )
     assert shapely.from_wkb(cast(bytes, row["geometry"])).equals(polygon)
     assert audit is None
@@ -197,8 +209,11 @@ def test_invalid_polygon_repair_is_audited(tmp_path: Path) -> None:
     shp = tmp_path / "invalid.shp"
     _shapefile(shp, [Polygon([(0, 0), (1, 1), (1, 0), (0, 1), (0, 0)])])
     with shapefile.Reader(str(shp)) as reader:
-        row, audit = normal._row(
-            reader, 0, {"attribution": "OSM", "retrieved_at": "date"}, "0" * 64
+        row, audit = osm_land_rows._row(
+            *osm_land_reader._feature(reader, 0),
+            0,
+            {"attribution": "OSM", "retrieved_at": "date"},
+            "0" * 64,
         )
     assert audit is not None
     assert audit["repair"] == "shapely.make_valid"
@@ -212,7 +227,7 @@ def test_shx_corruption_detected(tmp_path: Path) -> None:
         stream.seek(100)
         stream.write(struct.pack(">i", 51))
     with pytest.raises(ValueError, match="Broken SHX"):
-        list(normal._records(shp))
+        list(osm_land_reader._records(shp))
 
 
 def test_unit_limits_keep_every_record(
@@ -220,14 +235,14 @@ def test_unit_limits_keep_every_record(
 ) -> None:
     shp, index = tmp_path / "source.shp", tmp_path / "index.sqlite3"
     _shapefile(shp, [box(i / 10, 0, i / 10 + 0.01, 0.01) for i in range(7)])
-    assert normal._build_index(shp, index) == 7
-    monkeypatch.setattr(normal, "MAX_UNIT_RECORDS", 2)
-    units = list(normal._units(index))
+    assert osm_land_reader._build_index(shp, index) == 7
+    monkeypatch.setattr(osm_land_reader, "MAX_UNIT_RECORDS", 2)
+    units = list(osm_land_reader._units(index))
     assert [ordinal for _, records, _ in units for ordinal in records] == list(range(7))
     assert all(len(records) <= 2 for _, records, _ in units)
-    monkeypatch.setattr(normal, "MAX_UNIT_RECORDS", 1000)
-    monkeypatch.setattr(normal, "MAX_UNIT_BYTES", 240)
-    assert all(len(records) == 1 for _, records, _ in normal._units(index))
+    monkeypatch.setattr(osm_land_reader, "MAX_UNIT_RECORDS", 1000)
+    monkeypatch.setattr(osm_land_reader, "MAX_UNIT_BYTES", 240)
+    assert all(len(records) == 1 for _, records, _ in osm_land_reader._units(index))
 
 
 @pytest.mark.parametrize(
@@ -241,29 +256,11 @@ def test_zip_paths_cannot_escape(tmp_path: Path, filename: str) -> None:
 def test_source_lock_rejects_duplicate_owner(tmp_path: Path) -> None:
     workspace = Workspace(tmp_path)
     with (
-        source._source_lock(workspace),
+        single_run(workspace, "osm_land"),
         pytest.raises(RuntimeError, match="owns the source lock"),
-        source._source_lock(workspace),
+        single_run(workspace, "osm_land"),
     ):
         pytest.fail("Second owner entered")
-
-
-def test_ledger_initialization_retries_only_locks(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    workspace = Workspace(tmp_path)
-    attempts = 0
-
-    def raced(path: Path) -> Ledger:
-        nonlocal attempts
-        attempts += 1
-        if attempts == 1:
-            raise sqlite3.OperationalError("database is locked")
-        return Ledger(path)
-
-    monkeypatch.setattr(source, "Ledger", raced)
-    assert source._ledger(workspace).path == workspace.ledger_path
-    assert attempts == 2
 
 
 def test_publisher_count_mismatch_blocks(tmp_path: Path) -> None:
@@ -271,7 +268,7 @@ def test_publisher_count_mismatch_blocks(tmp_path: Path) -> None:
         "2 Polygon features\nDate of the data used is date\n"
     )
     with pytest.raises(ValueError, match="counts disagree"):
-        normal._publisher_notice(tmp_path / "source.shp", 1)
+        osm_land_reader._publisher_notice(tmp_path / "source.shp", 1)
 
 
 def test_crc_failure_does_not_publish_member(
@@ -303,7 +300,7 @@ def test_unrecoverable_geometry_is_reported_and_blocks_publication(
         shapefile.Reader(str(shp)) as reader,
         pytest.raises(ValueError, match="cannot normalize losslessly"),
     ):
-        normal._run_unit(
+        osm_land_units._run_unit(
             workspace,
             reader,
             {"attribution": "OSM", "retrieved_at": "date"},

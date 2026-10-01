@@ -9,13 +9,13 @@ from collections.abc import Mapping
 from typing import cast
 
 from .geonames_download import BASE_URL, LICENSE_URL
+from .geonames_tsv import fields
 
 Row = dict[str, object]
 KEPT_CLASSES = frozenset({"A", "P"})
 LICENSE = "CC-BY-4.0"
 BUILDER_VERSION = "geonames-1"
 POLICY_VERSION = "all-P-and-A-all-aliases-1"
-MAX_LINE_BYTES = 1_000_000
 
 
 def text(value: str) -> str | None:
@@ -28,15 +28,6 @@ def integer(value: str, field: str, *, positive: bool = False) -> int:
     if number < (1 if positive else 0) or number > 2**63 - 1:
         raise ValueError(f"Invalid {field}: {value}")
     return number
-
-
-def fields(raw: bytes, count: int) -> list[str]:
-    if len(raw) > MAX_LINE_BYTES:
-        raise ValueError("TSV line exceeds the 1 MB audited row limit")
-    values = raw.decode("utf-8").rstrip("\r\n").split("\t")
-    if len(values) != count:
-        raise ValueError(f"Expected {count} fields, got {len(values)}")
-    return values
 
 
 def provenance(pin: Mapping[str, object], extra: Mapping[str, object]) -> str:

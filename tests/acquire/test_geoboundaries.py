@@ -13,10 +13,23 @@ import shapefile
 from shapely.geometry import MultiPolygon, Point, Polygon, box
 from shapely.ops import unary_union
 
-from build_data.acquire import Ledger, Workspace, fingerprint, sha256_file
+from build_data.acquire import (
+    Ledger,
+    Workspace,
+    fingerprint,
+    geoboundaries,
+    geoboundaries_config,
+    geoboundaries_http,
+    geoboundaries_pins,
+    geoboundaries_resolve,
+    geoboundaries_units,
+    sha256_file,
+)
 from build_data.acquire import geoboundaries as acquire
 from build_data.acquire import geoboundaries_normalize as normal
+from build_data.acquire.geometry import repair_geometry, split_geometry
 from build_data.acquire.io import write_json
+from build_data.acquire.runtime import single_run
 
 
 def _fixture(
@@ -58,15 +71,15 @@ def _fixture(
         "etag": '"pinned"',
         "size": 0,
     }
-    archive = acquire._archive_path(workspace, pin)
+    archive = geoboundaries_pins._archive_path(workspace, pin)
     archive.parent.mkdir(parents=True)
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as target:
         for path in source.iterdir():
             target.write(path, path.name)
     pin["size"] = archive.stat().st_size
-    write_json(workspace.raw(acquire.SOURCE) / "pins/GBR-ADM1.json", pin)
+    write_json(workspace.raw(geoboundaries_config.SOURCE) / "pins/GBR-ADM1.json", pin)
     write_json(
-        workspace.raw(acquire.SOURCE) / "inventory.json",
+        workspace.raw(geoboundaries_config.SOURCE) / "inventory.json",
         {
             "source_release": "test-snapshot",
             "layers": [metadata],
@@ -75,13 +88,14 @@ def _fixture(
         },
     )
     write_json(
-        workspace.raw(acquire.SOURCE) / "licenses.json", {"licenses": ["CC BY-SA 2.0"]}
+        workspace.raw(geoboundaries_config.SOURCE) / "licenses.json",
+        {"licenses": ["CC BY-SA 2.0"]},
     )
     ledger = Ledger(workspace.ledger_path)
     ledger.complete(
         "geoboundaries.download",
         "GBR-ADM1",
-        fingerprint({"pin": pin, "builder": acquire.DOWNLOAD_VERSION}),
+        fingerprint({"pin": pin, "builder": geoboundaries_config.DOWNLOAD_VERSION}),
         [archive],
     )
     return workspace, pin
@@ -91,8 +105,8 @@ def test_normalization_accounting_provenance_and_resume(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     workspace, _ = _fixture(tmp_path, monkeypatch)
-    acquire.normalize(workspace)
-    root = workspace.normalized(acquire.SOURCE)
+    geoboundaries.normalize(workspace)
+    root = workspace.normalized(geoboundaries_config.SOURCE)
     manifest = json.loads((root / "manifest.json").read_text())
     assert len(manifest["units"]) == 1
     summary = json.loads((root / "verification.json").read_text())
@@ -112,28 +126,27 @@ def test_normalization_accounting_provenance_and_resume(
     provenance = json.loads(row["provenance"])
     assert provenance["source_properties"]["shapeName"] == "Cafe\u0301   Test"
     assert provenance["layer_metadata"]["boundaryYearRepresented"] == "2017"
-    assert not list((workspace.work / acquire.SOURCE).iterdir())
+    assert not list((workspace.work / geoboundaries_config.SOURCE).iterdir())
     previous = {path: (path.stat().st_mtime_ns, sha256_file(path)) for path in parts}
 
     def no_conversion(*args: object, **kwargs: object) -> None:
         raise AssertionError("Completed units must not transform again")
 
     monkeypatch.setattr(normal, "_convert", no_conversion)
-    acquire.normalize(workspace)
+    geoboundaries.normalize(workspace)
     assert previous == {
         path: (path.stat().st_mtime_ns, sha256_file(path)) for path in parts
     }
 
 
 def test_split_preserves_area_and_holes(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(normal, "MAX_GEOMETRY_BYTES", 700)
     polygon = Point(0, 0).buffer(10, quad_segs=64).difference(box(-2, -2, 2, 2))
-    pieces = list(normal._bounded_geometry(polygon))
+    pieces = list(split_geometry(polygon, 700, flatten_intersections=True))
     assert len(pieces) > 1
     assert all(piece.is_valid and len(piece.wkb) <= 700 for piece in pieces)
     assert unary_union(pieces).symmetric_difference(polygon).area < 1e-10
     multi = MultiPolygon([box(i * 2, 0, i * 2 + 1, 1) for i in range(40)])
-    parts = list(normal._bounded_geometry(multi))
+    parts = list(split_geometry(multi, 700, flatten_intersections=True))
     assert unary_union(parts).equals(multi)
     assert all(len(part.wkb) <= 700 for part in parts)
 
@@ -143,22 +156,32 @@ def test_publisher_mismatch_blocks_manifest(
 ) -> None:
     workspace, pin = _fixture(tmp_path, monkeypatch)
     pin["metadata"]["admUnitCount"] = "4"
-    pin["archive_sha256"] = sha256_file(acquire._archive_path(workspace, pin))
+    pin["archive_sha256"] = sha256_file(
+        geoboundaries_pins._archive_path(workspace, pin)
+    )
     with pytest.raises(ValueError, match="Publisher feature count mismatch"):
-        normal._convert(
-            workspace, pin, "GB", "b" * 64, workspace.work / acquire.SOURCE / "test"
+        geoboundaries_units._convert(
+            workspace,
+            pin,
+            "GB",
+            "b" * 64,
+            workspace.work / geoboundaries_config.SOURCE / "test",
         )
-    assert not (workspace.normalized(acquire.SOURCE) / "manifest.json").exists()
+    assert not (
+        workspace.normalized(geoboundaries_config.SOURCE) / "manifest.json"
+    ).exists()
 
 
 def test_failed_download_is_not_empty_and_does_not_stop_other_units(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     workspace, _ = _fixture(tmp_path, monkeypatch)
-    inventory = acquire._read(workspace.raw(acquire.SOURCE) / "inventory.json")
+    inventory = geoboundaries_http._read(
+        workspace.raw(geoboundaries_config.SOURCE) / "inventory.json"
+    )
     inventory["layers"].append({"boundaryISO": "USA", "boundaryType": "ADM1"})
     monkeypatch.setattr(acquire, "_inventory", lambda workspace: inventory)
-    original_pin = acquire._pin
+    original_pin = geoboundaries_pins._pin
 
     def failing_pin(workspace: Workspace, layer: dict[str, Any]) -> dict[str, Any]:
         if layer["boundaryISO"] == "USA":
@@ -167,8 +190,10 @@ def test_failed_download_is_not_empty_and_does_not_stop_other_units(
 
     monkeypatch.setattr(acquire, "_pin", failing_pin)
     with pytest.raises(RuntimeError, match="1 geoBoundaries layers failed"):
-        acquire.download(workspace)
-    report = acquire._read(workspace.work / "geoboundaries-download-report.json")
+        geoboundaries.download(workspace)
+    report = geoboundaries_http._read(
+        workspace.work / "geoboundaries-download-report.json"
+    )
     assert list(report["completed"]) == ["GBR-ADM1"]
     assert report["failed"] == {"USA-ADM1": "OSError: Offline"}
     assert report["finished"]
@@ -177,19 +202,19 @@ def test_failed_download_is_not_empty_and_does_not_stop_other_units(
 def test_lock_prevents_duplicate_writers(tmp_path: Path) -> None:
     workspace = Workspace(tmp_path)
     with (
-        acquire._lock(workspace, "download"),
+        single_run(workspace, "geoboundaries"),
         pytest.raises(RuntimeError, match="Another geoboundaries"),
-        acquire._lock(workspace, "download"),
+        single_run(workspace, "geoboundaries"),
     ):
         pytest.fail("Duplicate writer was admitted")
 
 
 def test_bounds_and_empty_geometry_rejects() -> None:
     with pytest.raises(ValueError, match="Empty"):
-        normal._repair(Polygon())
+        repair_geometry(Polygon(), clip_roundoff=True)
     with pytest.raises(ValueError, match="outside WGS84"):
-        normal._repair(box(179, 0, 181, 1))
-    repaired, changes = normal._repair(box(179, 0, 180 + 1e-10, 1))
+        repair_geometry(box(179, 0, 181, 1), clip_roundoff=True)
+    repaired, changes = repair_geometry(box(179, 0, 180 + 1e-10, 1), clip_roundoff=True)
     assert repaired.bounds[2] == 180
     assert changes == ["clip_sub_1e-8_degree_world_bound_roundoff"]
 
@@ -213,23 +238,23 @@ def test_inventory_resolves_mislisted_layer_without_overwriting_evidence(
         "country_reference": {"IND": {"population": 1}, "ANT": {}, "SCG": {}},
     }
     monkeypatch.setattr(
-        acquire,
+        geoboundaries_resolve,
         "_metadata",
         lambda url, path: {"url": url, "body": json.dumps(replacement)},
     )
-    resolved = acquire._resolve_inventory(workspace, original)
-    assert [acquire._unit(layer) for layer in resolved["layers"]] == [
+    resolved = geoboundaries_resolve._resolve_inventory(workspace, original)
+    assert [geoboundaries_config._unit(layer) for layer in resolved["layers"]] == [
         "IND-ADM0",
         "IND-ADM1",
     ]
     assert resolved["missing_in_api"] == {"ADM0": [], "ADM1": []}
     assert resolved["inventory_corrections"][0]["original"] == faulty
     assert original["layers"] == [faulty, proper]
-    assert acquire._resolve_inventory(workspace, original) == resolved
-    path = workspace.raw(acquire.SOURCE) / "pins/IND-ADM1.json"
+    assert geoboundaries_resolve._resolve_inventory(workspace, original) == resolved
+    path = workspace.raw(geoboundaries_config.SOURCE) / "pins/IND-ADM1.json"
     write_json(path, {"metadata": faulty})
-    assert acquire._pin_path(workspace, proper) != path
-    assert acquire._read(path)["metadata"] == faulty
+    assert geoboundaries_pins._pin_path(workspace, proper) != path
+    assert geoboundaries_http._read(path)["metadata"] == faulty
 
 
 def test_split_failure_does_not_publish_partial_feature(
@@ -240,17 +265,23 @@ def test_split_failure_does_not_publish_partial_feature(
     from shapely.geometry.base import BaseGeometry
 
     workspace, pin = _fixture(tmp_path, monkeypatch)
-    pin["archive_sha256"] = sha256_file(acquire._archive_path(workspace, pin))
+    pin["archive_sha256"] = sha256_file(
+        geoboundaries_pins._archive_path(workspace, pin)
+    )
 
     def fail_after_part(
-        geometry: BaseGeometry, depth: int = 0
+        geometry: BaseGeometry, max_bytes: int, **kwargs: object
     ) -> Iterator[BaseGeometry]:
         yield box(0, 0, 1, 1)
         raise ValueError("Synthetic subdivision failure")
 
-    monkeypatch.setattr(normal, "_bounded_geometry", fail_after_part)
-    outputs, report = normal._convert(
-        workspace, pin, "GB", "c" * 64, workspace.work / acquire.SOURCE / "test"
+    monkeypatch.setattr(geoboundaries_units, "split_geometry", fail_after_part)
+    outputs, report = geoboundaries_units._convert(
+        workspace,
+        pin,
+        "GB",
+        "c" * 64,
+        workspace.work / geoboundaries_config.SOURCE / "test",
     )
     assert outputs == []
     assert report["reject_count"] == report["input_features"] == 3
@@ -272,7 +303,9 @@ def test_only_proven_range_routes_enter_worklist(
         "staticDownloadLink": "https://github.com/wmgeolab/geoBoundaries/raw/aaaaaaa/releaseData/gbOpen/GBR/ADM1/layer.zip",
     }
     monkeypatch.setattr(
-        acquire, "_metadata", lambda url, path: {"body": json.dumps({"sha": "a" * 40})}
+        geoboundaries_pins,
+        "_metadata",
+        lambda url, path: {"body": json.dumps({"sha": "a" * 40})},
     )
 
     class Response(io.BytesIO):
@@ -296,21 +329,21 @@ def test_only_proven_range_routes_enter_worklist(
         assert headers == {"Range": "bytes=0-31", "If-Range": '"strong"'}
         return cast(HTTPResponse, Response(range_status, b"x" * 32))
 
-    monkeypatch.setattr(acquire, "_request", request)
+    monkeypatch.setattr(geoboundaries_pins, "_request", request)
     if range_status == 206:
-        pin = acquire._pin(workspace, layer)
+        pin = geoboundaries_pins._pin(workspace, layer)
         assert pin["range_verified"] and pin["commit"] == "a" * 40
     else:
         with pytest.raises(ValueError, match="range probe"):
-            acquire._pin(workspace, layer)
-        assert not acquire._pin_path(workspace, layer).exists()
+            geoboundaries_pins._pin(workspace, layer)
+        assert not geoboundaries_pins._pin_path(workspace, layer).exists()
 
 
 def test_source_count_discrepancy_is_audited_when_formats_agree(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     workspace, pin = _fixture(tmp_path, monkeypatch)
-    archive = acquire._archive_path(workspace, pin)
+    archive = geoboundaries_pins._archive_path(workspace, pin)
     with zipfile.ZipFile(archive, "a") as target:
         target.writestr(
             "layer.geojson",
@@ -324,8 +357,12 @@ def test_source_count_discrepancy_is_audited_when_formats_agree(
         )
     pin["metadata"]["admUnitCount"] = "4"
     pin["archive_sha256"] = sha256_file(archive)
-    _, report = normal._convert(
-        workspace, pin, "GB", "d" * 64, workspace.work / acquire.SOURCE / "test"
+    _, report = geoboundaries_units._convert(
+        workspace,
+        pin,
+        "GB",
+        "d" * 64,
+        workspace.work / geoboundaries_config.SOURCE / "test",
     )
     assert report["published_feature_count"] == 4
     assert report["input_features"] == 3
@@ -374,6 +411,8 @@ def test_source_budget_includes_work_logs(
     workspace.work.mkdir()
     (workspace.work / "geoboundaries-download.log").write_bytes(b"12345")
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    monkeypatch.setattr(acquire, "SOURCE_BUDGET", 4)
-    with pytest.raises(OSError, match="12 GB budget"):
-        acquire._budget(workspace, 0)
+    from build_data.acquire.runtime import SOURCE_LIMITS, source_budget
+
+    monkeypatch.setitem(SOURCE_LIMITS, "geoboundaries", 4)
+    with pytest.raises(OSError, match="GB budget"):
+        source_budget(workspace, "geoboundaries", 0)

@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import fcntl
 import json
 import time
 import urllib.request
 import zipfile
-from collections.abc import Iterator
-from contextlib import contextmanager
 from datetime import UTC, datetime
 from http.client import HTTPException, HTTPResponse
 from pathlib import Path
@@ -17,6 +14,8 @@ from typing import cast
 from . import Ledger, Workspace, download_file, fingerprint, sha256_file
 from .download import RemoteChangedError
 from .io import write_json
+from .lifecycle import resume_download
+from .runtime import single_run, source_budget
 
 SOURCE = "geonames"
 BASE_URL = "https://download.geonames.org/export/dump/"
@@ -30,7 +29,6 @@ FILES = (
     "featureCodes_en.txt",
     "readme.txt",
 )
-BUDGET_BYTES = 10_000_000_000
 
 
 def now() -> str:
@@ -39,30 +37,6 @@ def now() -> str:
 
 def read_json(path: Path) -> dict[str, object]:
     return cast(dict[str, object], json.loads(path.read_text(encoding="utf-8")))
-
-
-@contextmanager
-def source_lock(workspace: Workspace, stage: str) -> Iterator[None]:
-    workspace.work.mkdir(parents=True, exist_ok=True)
-    with (workspace.work / f"geonames-{stage}.lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise RuntimeError(f"GeoNames {stage} already running") from error
-        yield
-
-
-def budget(workspace: Workspace, required: int = 0) -> None:
-    workspace.check_budget(required)
-    roots = [workspace.raw(SOURCE), workspace.normalized(SOURCE)]
-    roots.extend(workspace.work.glob("geonames*"))
-    used = 0
-    for root in roots:
-        for path in root.rglob("*") if root.is_dir() else [root]:
-            if path.is_file():
-                used += path.stat().st_size
-    if used + required > BUDGET_BYTES:
-        raise OSError("GeoNames would exceed its 10 GB disk budget")
 
 
 def _probe(url: str) -> dict[str, object]:
@@ -177,8 +151,9 @@ def _download_one(
         if ledger.is_complete("geonames.download", name, inputs_hash):
             print(f"Verified cached {name}", flush=True)
             return
-        budget(
+        source_budget(
             workspace,
+            SOURCE,
             max(
                 0,
                 int(str(pin["size"]))
@@ -211,7 +186,6 @@ def _download_one(
                 raise
             history = cast(list[object], inventory.setdefault("superseded", []))
             history.append({**pin, "superseded_at": now()})
-            path.with_name(name + ".part").unlink(missing_ok=True)
             del files[name]
             write_json(root / "inventory.json", inventory)
             print(f"Remote changed: restarting {name} with a fresh pin", flush=True)
@@ -237,7 +211,9 @@ def _download_one(
 
 def download(workspace: Workspace) -> None:
     """Acquire once, resume pinned bytes, and rotate changed partial daily objects."""
-    with source_lock(workspace, "download"):
+    with single_run(workspace, SOURCE):
+        if resume_download(workspace, SOURCE):
+            return
         root = workspace.raw(SOURCE)
         root.mkdir(parents=True, exist_ok=True)
         inventory_path = root / "inventory.json"

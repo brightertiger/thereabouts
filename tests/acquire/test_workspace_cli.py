@@ -110,12 +110,18 @@ def test_cli_twice_skips_all_completed_work_and_dispatches_stages(
     assert len(worked) == 8
 
 
-def test_stub_fails_honestly_without_claiming_completion(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+def test_adapter_failure_does_not_claim_completion(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    assert main(["osm_land", "--data-dir", str(tmp_path)]) == 2
-    assert "awaits its source agent" in capsys.readouterr().err
+
+    def fail(workspace: Workspace) -> None:
+        raise OSError("synthetic download failure")
+
+    monkeypatch.setitem(ADAPTERS, "osm_land", (fail, fail))
+    with pytest.raises(OSError, match="synthetic download failure"):
+        main(["osm_land", "--data-dir", str(tmp_path)])
     assert not (tmp_path / "work/ledger.sqlite3").exists()
 
 

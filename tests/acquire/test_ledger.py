@@ -100,3 +100,43 @@ def test_interruption_during_output_write_never_completes(tmp_path: Path) -> Non
         raise InterruptedError("interrupted")
     assert not output.exists()
     assert not ledger.is_complete("stage", "unit", "hash")
+
+
+def _open_in_process(path: str, number: int, barrier: object) -> None:
+    from typing import Any, cast
+
+    cast(Any, barrier).wait(timeout=20)
+    ledger = Ledger(Path(path))
+    digest = fingerprint({"process": number})
+    ledger.complete("parallel.normalize", str(number), digest, [])
+    assert ledger.is_complete("parallel.normalize", str(number), digest)
+
+
+def test_simultaneous_first_open_from_processes(tmp_path: Path) -> None:
+    import multiprocessing
+
+    # spawn exercises independent SQLite handles and module initialization.
+    context = multiprocessing.get_context("spawn")
+    for trial in range(3):
+        path = tmp_path / f"trial-{trial}.sqlite3"
+        barrier = context.Barrier(6)
+        processes = [
+            context.Process(target=_open_in_process, args=(str(path), n, barrier))
+            for n in range(6)
+        ]
+        for process in processes:
+            process.start()
+        try:
+            for process in processes:
+                process.join(timeout=30)
+                assert process.exitcode == 0
+            ledger = Ledger(path)
+            for n in range(6):
+                assert ledger.is_complete(
+                    "parallel.normalize", str(n), fingerprint({"process": n})
+                )
+        finally:
+            for process in processes:
+                if process.is_alive():
+                    process.terminate()
+                    process.join()

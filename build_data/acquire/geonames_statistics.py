@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import cast
 
 from . import Workspace, atomic_output, sha256_file
-from .geonames_download import budget, now, read_json
+from .geonames_download import now, read_json
 from .io import write_json
+from .runtime import source_budget
 
 URL = "https://www.geonames.org/statistics/total.html"
 MAX_BYTES = 2_000_000
@@ -74,7 +75,7 @@ def download_statistics(workspace: Workspace) -> None:
         if path.exists() and sha256_file(path) == saved["sha256"]:
             return
         raise ValueError("Pinned GeoNames statistics snapshot is corrupt")
-    budget(workspace, MAX_BYTES)
+    source_budget(workspace, "geonames", MAX_BYTES)
     with cast(HTTPResponse, urllib.request.urlopen(URL, timeout=60)) as response:
         content = response.read(MAX_BYTES + 1)
         if len(content) > MAX_BYTES:

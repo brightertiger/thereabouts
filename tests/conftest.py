@@ -1,7 +1,6 @@
 """Offline fixtures, including explicit synthetic topology and tie cases."""
 
 import os
-import socket
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -18,11 +17,9 @@ FIXTURE = Path(__file__).parent / "fixtures" / "benelux"
 
 @pytest.fixture(autouse=True)
 def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
-    def blocked(*args: object, **kwargs: object) -> None:
-        raise AssertionError("Tests must not access the network")
+    from tests.network_guard import install
 
-    monkeypatch.setattr(socket.socket, "connect", blocked)
-    monkeypatch.setattr(socket, "create_connection", blocked)
+    install(monkeypatch)
 
 
 @pytest.fixture

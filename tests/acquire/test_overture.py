@@ -13,10 +13,19 @@ import pytest
 import shapely
 from shapely.geometry import Polygon, box
 
-from build_data.acquire import Workspace, sha256_file, validate_table
-from build_data.acquire import overture_normalize as adapter
+from build_data.acquire import (
+    Workspace,
+    overture_areas,
+    overture_normalize,
+    overture_rows,
+    overture_settings,
+    sha256_file,
+    validate_table,
+)
+from build_data.acquire.geometry import split_geometry
 from build_data.acquire.io import write_json
 from build_data.acquire.schemas import SCHEMAS
+from build_data.acquire.writer import PartitionWriter
 
 CONTEXT = {"source_url": "https://example.test/object", "source_release": "test-1"}
 
@@ -72,7 +81,7 @@ def test_all_roles_names_and_nested_metadata_are_preserved() -> None:
         "future-subtype",
     ):
         raw = division(subtype=subtype)
-        row = adapter.place(raw, CONTEXT)
+        row = overture_rows.place(raw, CONTEXT)
         assert row["kind"] == subtype
         assert row["name"] == "Café 町"
         assert row["name_en"] == "Test Place"
@@ -82,18 +91,18 @@ def test_all_roles_names_and_nested_metadata_are_preserved() -> None:
         assert provenance["upstream"]["hierarchies"] == raw["hierarchies"]
         assert provenance["upstream"]["admin_level"] == 3
         validate_table(pa.Table.from_pylist([row], schema=SCHEMAS["places"]), "places")
-    aliases = list(adapter.names(raw, CONTEXT))
+    aliases = list(overture_rows.names(raw, CONTEXT))
     assert [row["name_kind"] for row in aliases] == ["primary", "common", "historic"]
     assert aliases[-1]["is_historic"] is True
     assert aliases[0]["language"] is None
-    assert aliases == list(adapter.names(raw, CONTEXT))
+    assert aliases == list(overture_rows.names(raw, CONTEXT))
     validate_table(pa.Table.from_pylist(aliases, schema=SCHEMAS["names"]), "names")
 
 
 def test_ascii_primary_is_not_assumed_english() -> None:
     raw = division()
     raw["names"] = {"primary": "ASCII name"}
-    assert adapter.place(raw, CONTEXT)["name_en"] is None
+    assert overture_rows.place(raw, CONTEXT)["name_en"] is None
 
 
 def test_repair_split_flags_ids_and_containment(
@@ -104,8 +113,10 @@ def test_repair_split_flags_ids_and_containment(
         [(-75, 40), (-73, 42), (-75, 42), (-73, 40), (-75, 40)]
     ).wkb
     stats: Counter[str] = Counter()
-    spots: dict[str, list[dict[str, Any]]] = {label: [] for label in adapter.SPOTS}
-    converted = list(adapter.areas(raw, CONTEXT, "parent-1", stats, spots))
+    spots: dict[str, list[dict[str, Any]]] = {
+        label: [] for label in overture_settings.SPOTS
+    }
+    converted = list(overture_areas.areas(raw, CONTEXT, "parent-1", stats, spots))
     assert stats["invalid_input"] == stats["repaired_input"] == 1
     assert all(
         row["source_id"] == "area-1" and row["entity_id"] == "point-1"
@@ -114,9 +125,8 @@ def test_repair_split_flags_ids_and_containment(
     assert converted[0]["parent_source_id"] == "parent-1"
     assert converted[0]["is_land"] and converted[0]["is_territorial"]
     validate_table(pa.Table.from_pylist(converted, schema=SCHEMAS["areas"]), "areas")
-    monkeypatch.setattr(adapter, "GEOMETRY_BYTES", 160)
     geometry = shapely.MultiPolygon([box(0, 0, 1, 1), box(2, 2, 3, 3)])
-    parts = list(adapter.split_geometry(geometry))
+    parts = list(split_geometry(geometry, 160, max_depth=24))
     assert len(parts) == 2
     assert shapely.unary_union(parts).equals(geometry)
 
@@ -164,7 +174,7 @@ def test_normalize_resume_corruption_and_manifest(
     workspace = Workspace(tmp_path)
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
     _fixture(workspace)
-    adapter.run(workspace)
+    overture_normalize.run(workspace)
     normalized = workspace.normalized("overture")
     report = json.loads((normalized / "verification.json").read_text())
     assert report["rows"] == {"places": 2, "areas": 1, "names": 6}
@@ -172,12 +182,12 @@ def test_normalize_resume_corruption_and_manifest(
     assert report["spot_checks"]["lower Manhattan"][0]["name"] == "Area"
     paths = list(normalized.rglob("*.parquet"))
     times = {path: path.stat().st_mtime_ns for path in paths}
-    adapter.run(workspace)
+    overture_normalize.run(workspace)
     assert {path: path.stat().st_mtime_ns for path in paths} == times
     target = paths[0]
     expected = sha256_file(target)
     target.write_bytes(b"corrupt")
-    adapter.run(workspace)
+    overture_normalize.run(workspace)
     assert sha256_file(target) == expected
     manifest = json.loads((normalized / "manifest.json").read_text())
     assert len(manifest["units"]) == 3
@@ -236,7 +246,7 @@ def test_rejects_account_for_every_source_row(
         path.with_name(path.name + ".download.json"),
         {"verified_sha256": sha256_file(path)},
     )
-    adapter.run(workspace)
+    overture_normalize.run(workspace)
     report = json.loads(
         (workspace.normalized("overture") / "verification.json").read_text()
     )
@@ -261,27 +271,27 @@ def test_writer_failure_is_not_counted_as_a_rejected_row(
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
     _fixture(workspace)
 
-    def fail(self: adapter.Sink, row: dict[str, Any]) -> None:
+    def fail(self: PartitionWriter, row: dict[str, Any]) -> None:
         raise ValueError("partition validation failed")
 
-    monkeypatch.setattr(adapter.Sink, "add", fail)
+    monkeypatch.setattr(PartitionWriter, "add", fail)
     with pytest.raises(ValueError, match="partition validation failed"):
-        adapter.run(workspace)
+        overture_normalize.run(workspace)
     assert not (workspace.normalized("overture") / "manifest.json").exists()
 
 
-def test_corrupt_parent_index_is_rebuilt_from_verified_raw(
+def test_completed_source_does_not_recreate_parent_index(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     workspace = Workspace(tmp_path)
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
     _fixture(workspace)
-    adapter.run(workspace)
-    path = workspace.work / "overture/entities.sqlite3"
-    path.write_bytes(b"damaged index")
-    adapter.run(workspace)
-    import sqlite3
+    overture_normalize.run(workspace)
+    assert not (workspace.work / "overture/entities.sqlite3").exists()
 
-    with sqlite3.connect(path) as db:
-        assert db.execute("SELECT COUNT(*) FROM entities").fetchone()[0] == 2
+    def unexpected(*args: object, **kwargs: object) -> None:
+        pytest.fail("Completed source rebuilt its deleted intermediate index")
+
+    monkeypatch.setattr(overture_normalize, "_entity_index", unexpected)
+    overture_normalize.run(workspace)

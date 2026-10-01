@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-import math
 from typing import Literal, cast
 
 import pyarrow as pa
 import shapely
 
+from .geometry import BBOX_COLUMNS, BOUND_TOLERANCE, check_bounds, validate_polygon
 from .workspace import SOURCES
 
 Kind = Literal["areas", "places", "names"]
@@ -111,25 +111,17 @@ def _provenance(row: dict[str, object]) -> None:
 
 
 def _area(row: dict[str, object]) -> None:
-    bounds = tuple(cast(float, row[c]) for c in ("xmin", "ymin", "xmax", "ymax"))
-    if (
-        not all(math.isfinite(v) for v in bounds)
-        or not -180 <= bounds[0] <= bounds[2] <= 180
-        or not -90 <= bounds[1] <= bounds[3] <= 90
-    ):
-        raise ValueError("Invalid WGS84 bounding box")
+    bounds = tuple(cast(float, row[c]) for c in BBOX_COLUMNS)
+    check_bounds(bounds)
     try:
         geometry = shapely.from_wkb(cast(bytes, row["geometry"]))
     except shapely.errors.GEOSException as error:
         raise ValueError("Invalid WKB") from error
-    if (
-        geometry.geom_type not in ("Polygon", "MultiPolygon")
-        or geometry.is_empty
-        or not geometry.is_valid
-        or shapely.get_coordinate_dimension(geometry) != 2
+    validate_polygon(geometry)
+    if any(
+        abs(a - b) > BOUND_TOLERANCE
+        for a, b in zip(bounds, geometry.bounds, strict=True)
     ):
-        raise ValueError("Expected valid nonempty 2D Polygon/MultiPolygon WKB")
-    if any(abs(a - b) > 1e-8 for a, b in zip(bounds, geometry.bounds, strict=True)):
         raise ValueError("Bounding box does not match geometry")
 
 

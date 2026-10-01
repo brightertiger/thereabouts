@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import json
 import time
@@ -10,8 +9,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from collections.abc import Iterator
-from contextlib import contextmanager
 from datetime import UTC, datetime
 from http.client import HTTPException, HTTPResponse
 from pathlib import Path
@@ -21,6 +18,8 @@ import pyarrow.parquet as pq
 
 from . import Ledger, Workspace, download_file, fingerprint
 from .io import write_json
+from .lifecycle import resume_download
+from .runtime import single_run, source_budget
 
 SOURCE = "overture"
 BUCKET = "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
@@ -28,7 +27,6 @@ LICENSE_URL = "https://opendatacommons.org/licenses/odbl/1-0/"
 ATTRIBUTION_URL = "https://docs.overturemaps.org/attribution/"
 RELEASE_NOTES_URL = "https://docs.overturemaps.org/blog/2026/09/23/release-notes/"
 PUBLISHED_COUNTS = {"2026-09-23.1": {"division": 4_688_229, "division_area": 1_080_667}}
-SOURCE_LIMIT = 25_000_000_000
 VERSION = "overture-acquire-1"
 TYPES = ("division", "division_area")
 NS = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
@@ -138,38 +136,12 @@ def _inventory(workspace: Workspace) -> dict[str, Any]:
     return inventory
 
 
-def _budget(workspace: Workspace, required: int = 0) -> None:
-    workspace.check_budget(required)
-    used = sum(
-        path.stat().st_size
-        for root in (
-            workspace.raw(SOURCE),
-            workspace.normalized(SOURCE),
-            workspace.work / SOURCE,
-        )
-        if root.exists()
-        for path in root.rglob("*")
-        if path.is_file()
-    )
-    if used + required > SOURCE_LIMIT:
-        raise OSError("Overture would exceed its 25 GB disk budget")
-
-
-@contextmanager
-def _lock(workspace: Workspace, stage: str) -> Iterator[None]:
-    workspace.work.mkdir(parents=True, exist_ok=True)
-    with (workspace.work / f"overture-{stage}.lock").open("a") as stream:
-        try:
-            fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as error:
-            raise RuntimeError(f"Overture {stage} is already running") from error
-        yield
-
-
 def download(workspace: Workspace) -> None:
     """Download one whole immutable Parquet object per verified ledger unit."""
     started = time.monotonic()
-    with _lock(workspace, "download"):
+    with single_run(workspace, SOURCE):
+        if resume_download(workspace, SOURCE):
+            return
         inventory = _inventory(workspace)
         ledger = Ledger(workspace.ledger_path)
         print(
@@ -184,7 +156,7 @@ def download(workspace: Workspace) -> None:
             if not ledger.is_complete("overture.download", obj["key"], inputs_hash):
                 part = destination.with_name(destination.name + ".part")
                 remaining = obj["size"] - (part.stat().st_size if part.exists() else 0)
-                _budget(workspace, max(0, remaining))
+                source_budget(workspace, SOURCE, max(0, remaining))
                 print(f"Downloading {obj['key']} ({obj['size']} bytes)", flush=True)
                 download_file(
                     obj["url"],

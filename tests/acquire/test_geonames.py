@@ -13,9 +13,19 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from build_data.acquire import Workspace, sha256_file, validate_parquet, write_partition
+from build_data.acquire import (
+    Workspace,
+    geonames_index,
+    geonames_normalize,
+    geonames_settings,
+    geonames_tsv,
+    geonames_units,
+    sha256_file,
+    validate_parquet,
+    write_partition,
+    writer,
+)
 from build_data.acquire import geonames_download as downloads
-from build_data.acquire import geonames_normalize as normalizer
 from build_data.acquire import geonames_statistics as statistics
 from build_data.acquire.download import RemoteChangedError
 from build_data.acquire.geonames_rows import alias, english_rank, place
@@ -85,9 +95,12 @@ def workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Workspace:
     monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
     workspace = Workspace(tmp_path / "data")
     workspace.prepare()
-    monkeypatch.setattr(normalizer, "CHUNK_BYTES", 200)
-    monkeypatch.setattr(normalizer, "BATCH_ROWS", 2)
-    monkeypatch.setattr(normalizer, "PARTITION_BYTES", 3000)
+    monkeypatch.setattr(geonames_settings, "CHUNK_BYTES", 200)
+    monkeypatch.setattr(geonames_tsv, "CHUNK_BYTES", 200)
+    monkeypatch.setattr(geonames_settings, "BATCH_ROWS", 2)
+    monkeypatch.setattr(geonames_units, "BATCH_ROWS", 2)
+    monkeypatch.setattr(geonames_settings, "PARTITION_BYTES", 3000)
+    monkeypatch.setattr(geonames_units, "PARTITION_BYTES", 3000)
     return workspace
 
 
@@ -192,7 +205,7 @@ def test_end_to_end_rejects_counts_english_and_resume(
         + alternate(10, 1)
         + b"malformed\n",
     )
-    normalizer.normalize(workspace)
+    geonames_normalize.normalize(workspace)
     points, names = rows(workspace, "places"), rows(workspace, "names")
     assert len(points) == 3 and len(names) == 4
     assert (
@@ -201,8 +214,9 @@ def test_end_to_end_rejects_counts_english_and_resume(
     )
     assert {row["source_id"] for row in names} == {"10", "11", "12", "13"}
     manifest_path = workspace.normalized("geonames") / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
-    counts = manifest["verification"]["counts"]
+    counts = json.loads((manifest_path.parent / "verification.json").read_text())[
+        "counts"
+    ]
     assert counts["places"]["input"] == 6
     assert counts["places"]["rejected"] == 2 and counts["places"]["excluded"] == 1
     assert counts["names"]["input"] == 8
@@ -213,8 +227,8 @@ def test_end_to_end_rejects_counts_english_and_resume(
     def no_work(*args: object, **kwargs: object) -> None:
         raise AssertionError("Completed units must not be transformed again")
 
-    monkeypatch.setattr(normalizer, "write_partition", no_work)
-    normalizer.normalize(workspace)
+    monkeypatch.setattr(writer, "write_partition", no_work)
+    geonames_normalize.normalize(workspace)
     assert {p: p.stat().st_mtime_ns for p in parquet} == mtimes
     monkeypatch.undo()
 
@@ -223,7 +237,7 @@ def test_resume_index_after_interruption(
     workspace: Workspace, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     snapshot(workspace, b"".join(feature(i) for i in range(1, 12)), alternate(1, 1))
-    original = normalizer._index_place
+    original = geonames_index._index_place
     calls = 0
 
     def interrupted(
@@ -239,11 +253,11 @@ def test_resume_index_after_interruption(
             raise RuntimeError("simulated interruption")
         return original(db, raw, offset, release, pin)
 
-    monkeypatch.setattr(normalizer, "_index_place", interrupted)
+    monkeypatch.setattr(geonames_index, "_index_place", interrupted)
     with pytest.raises(RuntimeError, match="simulated interruption"):
-        normalizer.normalize(workspace)
-    monkeypatch.setattr(normalizer, "_index_place", original)
-    normalizer.normalize(workspace)
+        geonames_normalize.normalize(workspace)
+    monkeypatch.setattr(geonames_index, "_index_place", original)
+    geonames_normalize.normalize(workspace)
     assert len(rows(workspace, "places")) == 11
 
 
@@ -279,7 +293,7 @@ def test_changed_validator_restarts_cleanly(
     monkeypatch.setattr(downloads, "download_file", transfer)
     downloads.download(workspace)
     assert calls[0] != calls[1]
-    assert not calls[0].with_name("readme.txt.part").exists()
+    assert calls[0].with_name("readme.txt.part").read_bytes() == b"x"
     inventory_path = workspace.raw("geonames") / "inventory.json"
     first = inventory_path.read_bytes()
     downloads.download(workspace)
@@ -293,7 +307,7 @@ def test_corrupt_input_is_never_published(workspace: Workspace) -> None:
     snapshot(workspace, feature(1), alternate(1, 1))
     (workspace.raw("geonames") / "allCountries.zip").write_bytes(b"broken")
     with pytest.raises(ValueError, match="checksum mismatch"):
-        normalizer.normalize(workspace)
+        geonames_normalize.normalize(workspace)
     assert not (workspace.normalized("geonames") / "manifest.json").exists()
 
 
@@ -308,7 +322,7 @@ def test_corrupt_partition_rebuilds_only_its_unit(
     workspace: Workspace, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     snapshot(workspace, b"".join(feature(i) for i in range(1, 8)), alternate(1, 1))
-    normalizer.normalize(workspace)
+    geonames_normalize.normalize(workspace)
     partitions = sorted(workspace.normalized("geonames").rglob("*.parquet"))
     mtimes = {path: path.stat().st_mtime_ns for path in partitions}
     broken = partitions[0]
@@ -321,8 +335,8 @@ def test_corrupt_partition_rebuilds_only_its_unit(
         replaced.append(path)
         write_partition(path, kind, batches)
 
-    monkeypatch.setattr(normalizer, "write_partition", tracked)
-    normalizer.normalize(workspace)
+    monkeypatch.setattr(writer, "write_partition", tracked)
+    geonames_normalize.normalize(workspace)
     assert broken in replaced
     for path in set(partitions) - set(replaced):
         assert path.stat().st_mtime_ns == mtimes[path]
@@ -337,7 +351,7 @@ def test_publication_failure_leaves_no_manifest(
     def failure(*args: object, **kwargs: object) -> None:
         raise OSError("simulated disk failure")
 
-    monkeypatch.setattr(normalizer, "write_partition", failure)
+    monkeypatch.setattr(writer, "write_partition", failure)
     with pytest.raises(OSError, match="simulated disk failure"):
-        normalizer.normalize(workspace)
+        geonames_normalize.normalize(workspace)
     assert not (workspace.normalized("geonames") / "manifest.json").exists()

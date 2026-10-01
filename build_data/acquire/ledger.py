@@ -2,13 +2,42 @@
 
 import json
 import sqlite3
+import time
 from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 from .io import sha256_file
+
+BUSY_TIMEOUT_SECONDS = 30
+INITIALIZATION_RETRY_SECONDS = 0.05
+
+
+def read_units(path: Path, stage: str) -> list[dict[str, Any]]:
+    """Inspect checkpoints without creating or initializing a ledger (status)."""
+    if not path.exists():
+        return []
+    db = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
+    try:
+        rows = db.execute(
+            "SELECT unit_id, inputs_hash, outputs, metadata FROM units "
+            "WHERE stage=? ORDER BY unit_id",
+            (stage,),
+        ).fetchall()
+        return [
+            {
+                "stage": stage,
+                "unit_id": unit,
+                "inputs_hash": digest,
+                "outputs": json.loads(outputs),
+                "metadata": json.loads(metadata),
+            }
+            for unit, digest, outputs, metadata in rows
+        ]
+    finally:
+        db.close()
 
 
 class Ledger:
@@ -17,20 +46,34 @@ class Ledger:
     def __init__(self, path: Path) -> None:
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
-            db.execute("PRAGMA journal_mode=WAL")
-            db.execute(
-                "CREATE TABLE IF NOT EXISTS units ("
-                "stage TEXT NOT NULL, unit_id TEXT NOT NULL, "
-                "inputs_hash TEXT NOT NULL, "
-                "outputs TEXT NOT NULL, metadata TEXT NOT NULL, "
-                "completed_at TEXT NOT NULL, "
-                "PRIMARY KEY (stage, unit_id))"
-            )
+        # WAL setup can return SQLITE_BUSY immediately despite busy_timeout,
+        # when several processes initialize a brand-new database together.
+        deadline = time.monotonic() + BUSY_TIMEOUT_SECONDS
+        while True:
+            try:
+                with self._connect() as db:
+                    db.execute("PRAGMA journal_mode=WAL")
+                    db.execute(
+                        "CREATE TABLE IF NOT EXISTS units ("
+                        "stage TEXT NOT NULL, unit_id TEXT NOT NULL, "
+                        "inputs_hash TEXT NOT NULL, "
+                        "outputs TEXT NOT NULL, metadata TEXT NOT NULL, "
+                        "completed_at TEXT NOT NULL, "
+                        "PRIMARY KEY (stage, unit_id))"
+                    )
+                break
+            except sqlite3.OperationalError as error:
+                code = getattr(error, "sqlite_errorcode", 0) & 0xFF
+                if (
+                    code not in (sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED)
+                    or time.monotonic() >= deadline
+                ):
+                    raise
+                time.sleep(INITIALIZATION_RETRY_SECONDS)
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
-        db = sqlite3.connect(self.path, timeout=30)
+        db = sqlite3.connect(self.path, timeout=BUSY_TIMEOUT_SECONDS)
         try:
             db.execute("PRAGMA synchronous=FULL")
             with db:

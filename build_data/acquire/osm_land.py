@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-import fcntl
 import json
 import shutil
-import sqlite3
 import time
 import zipfile
-from collections.abc import Iterator
-from contextlib import contextmanager
 from datetime import UTC, datetime
 from functools import partial
 from pathlib import Path, PurePosixPath
@@ -17,6 +13,8 @@ from typing import Any, cast
 
 from . import Ledger, Workspace, atomic_output, download_file, fingerprint, sha256_file
 from .io import write_json
+from .lifecycle import resume_download
+from .runtime import single_run, source_budget
 
 SOURCE = "osm_land"
 ARCHIVE = "land-polygons-split-4326.zip"
@@ -26,50 +24,9 @@ RELEASE = "2026-10-01T03:37:19Z"
 EXPECTED_SIZE = 927_857_432
 ETAG = '"374dfb18-65cbf220083e3"'
 LAST_MODIFIED = "Thu, 01 Oct 2026 03:37:19 GMT"
-SOURCE_BUDGET = 8_000_000_000
 BUILDER_VERSION = "osm-land-1"
 POLICY_VERSION = "preserve-all-split-land-1"
 COPY_BYTES = 1024 * 1024
-LEDGER_RETRY_SECONDS = 30
-
-
-def _ledger(workspace: Workspace) -> Ledger:
-    """Work around the shared layer's concurrent WAL-initialization race."""
-    deadline = time.monotonic() + LEDGER_RETRY_SECONDS
-    while True:
-        try:
-            return Ledger(workspace.ledger_path)
-        except sqlite3.OperationalError as exc:
-            if "locked" not in str(exc) or time.monotonic() >= deadline:
-                raise
-            time.sleep(0.1)
-
-
-@contextmanager
-def _source_lock(workspace: Workspace) -> Iterator[None]:
-    workspace.work.mkdir(parents=True, exist_ok=True)
-    with (workspace.work / "osm_land.lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError as exc:
-            raise RuntimeError("Another osm_land process owns the source lock") from exc
-        try:
-            yield
-        finally:
-            fcntl.flock(lock, fcntl.LOCK_UN)
-
-
-def _budget(workspace: Workspace, required_bytes: int = 0) -> None:
-    workspace.check_budget(required_bytes)
-    roots = (workspace.raw(SOURCE), workspace.normalized(SOURCE))
-    used = sum(
-        p.stat().st_size for root in roots for p in root.rglob("*") if p.is_file()
-    )
-    used += sum(
-        p.stat().st_size for p in workspace.work.glob("osm_land*") if p.is_file()
-    )
-    if used + required_bytes > SOURCE_BUDGET:
-        raise OSError("OSM land would exceed its 8 GB source budget")
 
 
 def _inventory(workspace: Workspace) -> dict[str, Any]:
@@ -150,7 +107,7 @@ def _extract(
             )
             if ledger.is_complete(f"{SOURCE}.download", unit_id, inputs_hash):
                 continue
-            _budget(workspace, member.file_size)
+            source_budget(workspace, SOURCE, member.file_size)
             with (
                 atomic_output(
                     target, partial(_verify_size, expected=member.file_size)
@@ -178,7 +135,9 @@ def _extract(
 def download(workspace: Workspace) -> None:
     """Download the plan's immutable pin and CRC-check/extract each ZIP member."""
     started = time.monotonic()
-    with _source_lock(workspace):
+    with single_run(workspace, SOURCE):
+        if resume_download(workspace, SOURCE):
+            return
         inventory = _inventory(workspace)
         archive = _snapshot(workspace) / ARCHIVE
         partial = archive.with_name(ARCHIVE + ".part")
@@ -187,7 +146,7 @@ def download(workspace: Workspace) -> None:
             if archive.exists()
             else EXPECTED_SIZE - (partial.stat().st_size if partial.exists() else 0)
         )
-        _budget(workspace, max(0, remaining))
+        source_budget(workspace, SOURCE, max(0, remaining))
         print(f"Downloading pinned {SOURCE_URL}, {EXPECTED_SIZE:,} bytes", flush=True)
         download_file(
             SOURCE_URL,
@@ -199,7 +158,7 @@ def download(workspace: Workspace) -> None:
             timeout=60,
         )
         checksum = sha256_file(archive)
-        ledger = _ledger(workspace)
+        ledger = Ledger(workspace.ledger_path)
         inputs_hash = fingerprint(
             {
                 "inventory": inventory,
