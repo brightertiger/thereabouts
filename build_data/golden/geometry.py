@@ -11,6 +11,7 @@ from numpy.typing import NDArray
 from shapely import STRtree
 from shapely.geometry.base import BaseGeometry
 
+from build_data.reconcile.classification import city_order
 from build_data.reconcile.common import Row
 
 Floats = NDArray[np.float64]
@@ -77,12 +78,7 @@ class Areas:
             elif r["role"] == "state":
                 key = (0, shape.area, r["id"])
             else:
-                key = (
-                    -r["priority"],
-                    -(r["population"] or 0) if r["geonames_id"] else 0,
-                    shape.area,
-                    r["id"],
-                )
+                key = city_order(r, r["priority"], shape.area)
             keys.append(key)
         order = sorted(range(len(keys)), key=lambda i: keys[i])
         self.order = np.array(order, dtype=np.int64)

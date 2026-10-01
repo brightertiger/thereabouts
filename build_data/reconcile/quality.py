@@ -199,7 +199,8 @@ def evaluate(
         workspace.root / "reconciled" / report_name,
         gate,
     )
-    if report_name == "pilot.json":
+    if full_pilot:
+        write_json(workspace.root / "reconciled" / "pilot.json", gate)
         ledger.complete(
             "reconcile.gate",
             "pilot",

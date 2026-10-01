@@ -9,13 +9,30 @@ from pathlib import Path
 import h3
 
 from build_data.reconcile.common import Row, connect, unpack
+from build_data.reconcile.evaluation import compare
 from build_data.reconcile.lookup import entity
 
 from .inputs import Inputs
-from .reader import Cells
+from .reader import Cells, Reader
 
 
-def named(reader: Cells, inputs: Inputs) -> list[Row]:
+def display_names(inputs: Inputs, answer: Row) -> Row:
+    cc = (answer.get("country_id") or "").removeprefix("country:")
+    if cc not in inputs.paths:
+        return {}
+    db = connect(inputs.paths[cc], readonly=True)
+    try:
+        return {
+            role: entity(db, answer[role + "_id"])["name"]
+            if answer.get(role + "_id")
+            else None
+            for role in ("country", "state", "city")
+        }
+    finally:
+        db.close()
+
+
+def named(reader: Reader, inputs: Inputs) -> list[Row]:
     fixtures = json.loads(
         (Path(__file__).parents[1] / "reconcile" / "fixtures.json").read_text()
     )
@@ -23,16 +40,8 @@ def named(reader: Cells, inputs: Inputs) -> list[Row]:
     for label, lat, lon, cc, city, state in fixtures:
         cell = h3.latlng_to_cell(lat, lon, 8)
         answer = reader.lookup(cell)
-        names: Row = {}
+        names = display_names(inputs, answer)
         code = (answer.get("country_id") or "").removeprefix("country:")
-        if code in inputs.paths:
-            db = connect(inputs.paths[code], readonly=True)
-            try:
-                for field in ("country", "state", "city"):
-                    identity = answer.get(f"{field}_id")
-                    names[field] = entity(db, identity)["name"] if identity else None
-            finally:
-                db.close()
         state_ok = (
             state == "*"
             or names.get("state") == state
@@ -52,7 +61,7 @@ def named(reader: Cells, inputs: Inputs) -> list[Row]:
     return output
 
 
-def settlements(reader: Cells, inputs: Inputs, country: str) -> Row:
+def settlements(reader: Reader, inputs: Inputs, country: str) -> Row:
     db = connect(inputs.paths[country], readonly=True)
     counts: Counter[str] = Counter()
     failures = []
@@ -75,29 +84,21 @@ def settlements(reader: Cells, inputs: Inputs, country: str) -> Row:
                 continue
             counts["evaluated"] += 1
             country_ok = answer.get("country_id") == f"country:{country}"
-            counts["answer"] += bool(answer.get("country_id"))
-            counts["country_agrees"] += country_ok
-            state_applicable = country not in inputs.policy["no_state"] and bool(
-                place["admin1_code"]
-            )
             state_code = codes.get(answer.get("state_id"))
-            state_ok = state_applicable and state_code == place["admin1_code"]
-            counts["state_applicable"] += state_applicable
-            counts["state_agrees"] += state_ok
-            counts["state_unmapped"] += state_applicable and state_code is None
             city_id = answer.get("city_id")
             city = entity(db, city_id) if city_id and country_ok else None
-            same = bool(city and city.get("geonames_id") == place["source_id"])
-            containing = bool(city and country_ok and answer["city_method"] == "area")
-            counts["city_present"] += bool(city_id)
-            counts["city_same_identity"] += same
-            counts["city_containing_other"] += containing and not same
-            counts["city_same_or_containing"] += same or containing
-            if (
-                not country_ok
-                or (state_applicable and not state_ok)
-                or not (same or containing)
-            ):
+            measures, checks = compare(
+                place,
+                country,
+                answer.get("country_id"),
+                (city or {}).get("geonames_id"),
+                bool(city_id),
+                answer.get("city_method"),
+                state_code,
+                inputs.policy,
+            )
+            counts.update(measures)
+            if not all(checks.values()):
                 failures.append(
                     {
                         "id": place["source_id"],
@@ -110,14 +111,31 @@ def settlements(reader: Cells, inputs: Inputs, country: str) -> Row:
                         "expected_admin1": place["admin1_code"],
                         "actual_admin1": state_code,
                         "answer": answer,
-                        "country_ok": country_ok,
-                        "state_ok": not state_applicable or state_ok,
-                        "city_ok": same or containing,
+                        **checks,
                     }
                 )
     finally:
         db.close()
     return {"country": country, "counts": dict(counts), "failures": failures}
+
+
+def probes(reader: Reader, inputs: Inputs) -> list[Row]:
+    points = json.loads(Path(__file__).with_name("probes.json").read_text())
+    output = []
+    for label, lat, lon in points:
+        cell = h3.latlng_to_cell(lat, lon, 8)
+        answer = reader.lookup(cell)
+        names = display_names(inputs, answer)
+        output.append(
+            {
+                "label": label,
+                "latitude": lat,
+                "longitude": lon,
+                "h3": cell,
+                "answer": {**answer, **names},
+            }
+        )
+    return output
 
 
 def evaluate(cells: list[Row], inputs: Inputs) -> Row:
@@ -130,6 +148,7 @@ def evaluate(cells: list[Row], inputs: Inputs) -> Row:
         totals.update(report["counts"])
     return {
         "named": named(reader, inputs),
+        "probes": probes(reader, inputs),
         "settlements": countries,
         "settlement_counts": dict(totals),
         "definition": "Every GeoNames class P record at population >=15000; "

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sqlite3
 
-from .common import Row, pack, unpack
+from .common import Row, encode, pack, unpack
 
 
 def create_entities(db: sqlite3.Connection) -> None:
@@ -50,6 +50,8 @@ def make_entity(
             "evidence": json.loads(row["provenance"]),
         }
     ]
+    if row.get("division_provenance"):
+        provenance[0]["evidence"]["division_provenance"] = row["division_provenance"]
     if match and source != "geonames":
         sources.append({"source": "geonames", "id": match["source_id"]})
         provenance.append(
@@ -83,6 +85,8 @@ def make_entity(
             "admin1_code"
         ),
         "feature_code": (match or row).get("feature_code"),
+        "source_subtype": row.get("subtype"),
+        "settlement_class": row.get("feature_class") if source == "overture" else None,
         "source_ids": sources,
         "provenance": provenance,
         "link": link,
@@ -99,13 +103,21 @@ def save_entity(db: sqlite3.Connection, entity: Row) -> None:
         old = unpack(previous[0])
         # Deterministic preference for explicitly English Overture names. All
         # attached division identities remain discoverable in divisions/areas.
-        if old["name_provenance"] == {"source": "overture", "language": "en"}:
-            return
-        if (
+        keep_old = old["name_provenance"] == {
+            "source": "overture",
+            "language": "en",
+        } or (
             entity["name_provenance"] == {"source": "geonames", "language": "en"}
             and old["name_provenance"]["source"] == "overture"
-        ):
-            return
+        )
+        chosen = dict(old if keep_old else entity)
+        for field in ("source_ids", "provenance"):
+            chosen[field] = list(
+                {
+                    encode(r): r for r in [*old.get(field, []), *entity.get(field, [])]
+                }.values()
+            )
+        entity = chosen
     db.execute(
         "INSERT OR REPLACE INTO entities VALUES(?,?,?)",
         (entity["id"], entity["role"], pack(entity)),
@@ -128,3 +140,24 @@ def fallback_points(db: sqlite3.Connection, country: str, policy: Row) -> None:
         save_entity(db, entity)
         add_point(db, entity["id"], row["longitude"], row["latitude"])
     db.commit()
+
+
+def ensure_country(db: sqlite3.Connection, country: str, policy: Row) -> None:
+    """Retain a catalogue identity even when default-perspective borders omit it."""
+    if db.execute("SELECT 1 FROM entities WHERE role='country'").fetchone():
+        return
+    candidates = [
+        unpack(data)
+        for (data,) in db.execute(
+            "SELECT data FROM geonames WHERE class='A' ORDER BY id"
+        )
+        if unpack(data)["feature_code"] in policy["country_reference_codes"]
+    ]
+    if len(candidates) == 1:
+        value = make_entity(candidates[0], "country", country, policy)
+        value["boundary_status"] = "catalogue only; no accepted country polygon"
+        save_entity(db, value)
+    elif db.execute("SELECT 1 FROM entities LIMIT 1").fetchone():
+        raise ValueError(
+            f"No unique source country identity for referenced country {country}"
+        )

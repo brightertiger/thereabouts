@@ -12,6 +12,7 @@ import shapely
 
 from build_data.acquire import Workspace
 
+from .classification import city_order
 from .common import Row, connect, unpack
 from .land import Land
 from .spatial import decode, distance, intersecting, windows
@@ -49,12 +50,7 @@ def choose_city(candidates: list[Row]) -> Row | None:
         return None
     return min(
         candidates,
-        key=lambda e: (
-            -e["area_priority"],
-            -(e["population"] or 0) if e.get("geonames_id") else 0,
-            e["area_degrees2"],
-            e["id"],
-        ),
+        key=lambda e: city_order(e, e["area_priority"], e["area_degrees2"]),
     )
 
 

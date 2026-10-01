@@ -8,15 +8,16 @@ import time
 from pathlib import Path
 
 from build_data.acquire import Ledger, Workspace
-from build_data.acquire.artifacts import read_json
+from build_data.acquire.artifacts import file_record, read_json
 from build_data.acquire.io import fingerprint, write_json
 from build_data.acquire.runtime import resources, single_run
 
-from .build import build_country
+from .build import build_country, country_output
 from .common import builder_hash, policy
 from .inputs import extract, query_engine, sovereigns, verified_inputs
 from .land import build_land
 from .manifest import publish, status
+from .retirement import begin, retire_country
 
 
 def main() -> None:
@@ -25,6 +26,7 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
     parser.add_argument("--countries", nargs="+")
     parser.add_argument("--world", action="store_true")
+    parser.add_argument("--improvement-gate", type=Path)
     parser.add_argument("--stage", choices=("all", "build", "quality"), default="all")
     args = parser.parse_args()
     workspace = Workspace(args.data_dir.resolve())
@@ -58,6 +60,17 @@ def main() -> None:
                 },
             )
             if args.world:
+                if args.improvement_gate:
+                    sample = read_json(args.improvement_gate)
+                    if (
+                        not sample.get("improved")
+                        or sample.get("builder") != builder
+                        or sample.get("policy_hash") != fingerprint(selected_policy)
+                        or sample.get("inputs") != inputs
+                    ):
+                        raise ValueError(
+                            "World run requires a current passing improvement gate"
+                        )
                 gate = read_json(workspace.root / "reconciled" / "pilot.json")
                 if (
                     not gate["passed"]
@@ -86,13 +99,24 @@ def main() -> None:
             land = build_land(
                 workspace, paths["osm_land_areas"], fingerprint(sources["osm_land"])
             )
+            begin(workspace, selected_policy, sources, file_record(land), builder)
             outputs: dict[str, Path] = {}
             for cc in countries:
+                if builder_hash() != builder:
+                    raise RuntimeError("Reconciliation code changed during run; resume")
                 workspace.check_budget()
-                root = extract(workspace, db, cc, inputs)
-                outputs[cc] = build_country(
-                    workspace, root, cc, inputs, selected_policy, builder
+                digest, output = country_output(
+                    workspace, cc, inputs, selected_policy, builder
                 )
+                if not Ledger(workspace.ledger_path).is_complete(
+                    "reconcile.country", cc, digest
+                ):
+                    root = extract(workspace, db, cc, inputs)
+                    output = build_country(
+                        workspace, root, cc, inputs, selected_policy, builder
+                    )
+                outputs[cc] = output
+                retire_country(workspace, cc, output, digest)
             reports: dict[str, Path] = {}
             if args.stage != "build":
                 from .quality import evaluate

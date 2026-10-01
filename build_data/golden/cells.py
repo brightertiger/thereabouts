@@ -41,6 +41,7 @@ def builder() -> str:
     modules.extend(
         (
             directory.parent / "hierarchy.py",
+            directory.parent / "reconcile/classification.py",
             directory.parent / "reference/sphere.py",
             directory.parents[1] / "src/pyofflinegeocoder/format.py",
         )

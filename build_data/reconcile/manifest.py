@@ -44,6 +44,7 @@ def publish(
                 raise ValueError(f"Unverified {stage} artifact: {output}")
     manifest: Row = {
         "version": 1,
+        "completed": True,
         "policy": policy,
         "builder": builder,
         "countries": {cc: file_record(p) for cc, p in countries.items()},
@@ -88,6 +89,10 @@ def load(workspace: Workspace) -> Row:
         "reconcile.manifest", "current", fingerprint(value)
     ):
         raise ValueError("Reconciled manifest is unsupported or uncommitted")
+    if not value.get("completed", True):
+        raise ValueError(
+            "Reconciliation generation is still building; use country checkpoints"
+        )
     verify_files(
         [value["land"], *value["countries"].values(), *value["reports"].values()]
     )

@@ -1,5 +1,5 @@
 {
-  "version": "reconciliation-1",
+  "version": "reconciliation-2",
   "perspective": "Overture default (exclude explicitly non-default claims)",
   "offshore_m": 1000,
   "nearest_m": 50000,
@@ -226,6 +226,28 @@
   "state_vote_minimum": 10,
   "state_vote_fraction": 0.95,
   "trusted_city_classes": [
+    "city"
+  ],
+  "settlement_classes": [
+    "city",
+    "town",
+    "village",
+    "hamlet"
+  ],
+  "hierarchy_city_classes": [
+    "city",
+    "town"
+  ],
+  "hierarchy_city_minimum": 15000,
+  "hierarchy_population_ratio": 5,
+  "country_reference_codes": [
+    "PCLI",
+    "PCLD",
+    "PCLF",
+    "PCLS",
+    "TERR"
+  ],
+  "region_city_classes": [
     "city"
   ]
 }

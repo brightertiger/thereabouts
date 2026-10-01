@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import sqlite3
 
-from .audit import state_crosswalk
 from .common import Row, pack, unpack
 from .spatial import containing
+from .state_codes import state_crosswalk
 
 
 def attach_parents(db: sqlite3.Connection, policy: Row) -> None:
@@ -20,7 +20,9 @@ def attach_parents(db: sqlite3.Connection, policy: Row) -> None:
     db.execute("CREATE TABLE state_codes(entity TEXT PRIMARY KEY, data BLOB)")
     for identity, match in crosswalk.items():
         db.execute("INSERT INTO state_codes VALUES(?,?)", (identity, pack(match)))
-    for identity, data in db.execute("SELECT id,data FROM entities WHERE role='city'"):
+    for identity, data in db.execute(
+        "SELECT id,data FROM entities WHERE role IN ('city','district')"
+    ):
         row: Row = unpack(data)
         options = by_code.get(row["geonames_admin1"], [])
         selected = options[0] if len(options) == 1 else None

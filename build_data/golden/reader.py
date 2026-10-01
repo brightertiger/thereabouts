@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from pathlib import Path
+from typing import Protocol
 
 import h3
 import pyarrow.parquet as pq
 
 from build_data.reconcile.common import Row
+
+
+class Reader(Protocol):
+    def lookup(self, cell: str | None) -> Row: ...
 
 
 class Cells:
