@@ -1,8 +1,9 @@
 # Source acquisition pipeline
 
-The four implemented adapters acquire pinned raw inputs and publish validated,
+The four primary adapters acquire pinned raw inputs and publish validated,
 bounded Parquet for [DATA_PLAN.md](DATA_PLAN.md). Reconciliation and H3 building
-are separate stages. Acquisition retains source identities, naming evidence,
+are separate stages for the primary sources. The seven additional lookup adapters
+below also produce their H3 keys during acquisition. Acquisition retains source identities, naming evidence,
 administrative roles and provenance; it does not decide which source wins.
 
 ## Commands
@@ -18,7 +19,8 @@ uv run python -m build_data.acquire geoboundaries
 ```
 
 With `.venv` activated, `python -m build_data.acquire all` is equivalent. Source
-keys are `osm_land`, `overture`, `geonames`, `geoboundaries`; `--stage` defaults to
+keys include `osm_land`, `overture`, `geonames`, `geoboundaries` and the additional
+lookups listed below; `--stage` defaults to
 `all`. Every command accepts `--data-dir /absolute/path`, defaulting to `data/`.
 The explicit source mapping in `__main__.py` runs stages sequentially.
 
@@ -51,6 +53,187 @@ CC BY-SA, CC0/public domain and country-specific terms. See
 `provenance.license_url`; gbOpen is not a single licence. Corrected inventory
 records and source-count discrepancies retain both the original evidence and
 corroborating unsimplified SHP/GeoJSON identities. Coverage gaps are reported.
+
+## Additional H3 lookup sources
+
+Run only these adapters when sharing the data directory with reconciliation:
+
+```sh
+LOOKUP_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+for source in postal codes airports unlocode timezones phone dbip; do
+  uv run --no-sync python -m build_data.acquire "$source" --data-dir "$LOOKUP_DATA"
+done
+uv run --no-sync python -m build_data.acquire status --data-dir "$LOOKUP_DATA"
+uv run --no-sync python -m build_data.acquire.lookup_verify --data-dir "$LOOKUP_DATA"
+```
+
+Repeat the loop for a fully verified no-work run. `--stage download` and
+`--stage normalize` work separately. Downloads can run detached with stdout/stderr
+redirected to `work/<source>-extra-download.log`; normalizers use the matching
+`*-extra-normalize.log`. Each source owns its own advisory lock and shares the
+existing checkpoint ledger. Do not run `all` merely to repeat these seven sources:
+`all` also dispatches the four primary sources.
+
+The reviewed pins are in `lookup_catalog.py`; inventories freeze HTTP validators,
+byte sizes, source URLs, licensing and retrieval dates before transferring bytes.
+The one-byte GET probe verifies Range support, including DB-IP's endpoint, which
+rejects HEAD requests. Git URLs use full commits; all 226 libphonenumber files
+also verify against their Git blob hashes. DB-IP's advertised MD5 is for the
+**decompressed CSV**, not its `.gz` transport. Raw ZIP CRCs and compressed-stream
+checksums are verified. A changed remote validator fails while preserving the
+partial file; choose a new inventory deliberately rather than mixing snapshots.
+The October 2026 DB-IP pin is intentional; updating months requires a new pin.
+GeoNames country/admin references are copied from the verified existing snapshot
+when available, otherwise downloaded. Their original directories are read only.
+
+| Source key | Download / pinned edition | Normalized contribution | Licence |
+| --- | --- | --- | --- |
+| `postal` | GeoNames `allCountries.zip`, `GB_full.csv.zip`, `NL_full.csv.zip`, `CA_full.csv.zip`, README; 2026-10-01 | 5,036,067 postal observations | CC BY 4.0; GB also retains the Royal Mail copyright/database-right 2022 notice |
+| `codes` | DataHub `2e9d6498…` (2026-10-01), pycountry `4c6a6992…` (2026-02-18), existing GeoNames reference files | 252 countries; 5,046 ISO subdivisions; 3,865 GeoNames admin1 codes | PDDL 1.0 + GeoNames CC BY 4.0; iso-codes/pycountry LGPL 2.1 or later |
+| `airports` | OurAirports CSV, 2026-10-01 | 86,154 airports, including closed sites and heliports | Public domain |
+| `unlocode` | DataHub `b1309b37…` (2026-07-27); package identifies data as **2024.2.0** | 116,213 locations; 92,874 located | PDDL 1.0, UNECE/DataHub attribution retained |
+| `timezones` | timezone-boundary-builder **2026d with oceans**, IANA **2026e** | 444 zones; 4,567,490 compact memberships; 821 IANA rows | ODbL 1.0 / OpenStreetMap attribution; IANA tables public domain |
+| `phone` | libphonenumber `0ae309f1…` (2026-09-24), all geographic-description languages | 254 territory/service metadata entries; 427,963 prefix descriptions | Apache 2.0 |
+| `dbip` | DB-IP Lite City **2026-10**, CSV gzip, IPv4 + IPv6 | 7,786,864 ranges: 3,620,434 IPv4 + 4,166,430 IPv6 | CC BY 4.0; “IP Geolocation by DB-IP” with https://db-ip.com attribution |
+
+Upstream source/licence evidence: [GeoNames postal README](https://download.geonames.org/export/zip/),
+[OurAirports data](https://ourairports.com/data/),
+[DataHub country codes](https://github.com/datasets/country-codes),
+[pycountry](https://github.com/pycountry/pycountry),
+[DataHub UN/LOCODE](https://github.com/datasets/un-locode),
+[timezone-boundary-builder](https://github.com/evansiroky/timezone-boundary-builder),
+[IANA](https://www.iana.org/time-zones),
+[libphonenumber](https://github.com/google/libphonenumber),
+[DB-IP Lite](https://db-ip.com/db/download/ip-to-city-lite).
+UNECE's direct download endpoint returned HTTP 403, so UN/LOCODE uses the openly
+licensed mirror above; it is older than UNECE's advertised 2025-1 release.
+DataHub's country-code README includes its upstream standards-rights caveat and
+is retained verbatim. No licence is inferred from a GitHub repository's visibility.
+
+### Verified extra-source snapshot (2026-10-02 IST)
+
+All seven new sources report download and normalization **complete**. Structural
+rejects are zero for each source. Every stored H3 index and point/cell agreement
+was validated during atomic Parquet publication; the final verification rechecked
+all manifest, input and output hashes. A second run performed no acquisition,
+normalization or report rewriting: **5,011 raw/normalized files** retained exactly
+the same sizes and modification times. Evidence is in
+`work/extra-lookups-rerun.json` and `work/extra-lookups-verification.json`.
+
+| Source | Retained raw bytes | Normalized Parquet bytes |
+| --- | ---: | ---: |
+| Postal | 44,700,758 | 188,037,213 |
+| Codes | 843,631 | 487,677 |
+| Airports | 12,734,002 | 10,212,926 |
+| UN/LOCODE | 7,297,966 | 9,191,072 |
+| Timezones | 89,226,948 | 179,887,498 |
+| Phone | 12,194,851 | 10,360,961 |
+| DB-IP | 85,827,400 | 360,258,499 |
+
+The additional sources, receipts, manifests and audits occupy **1,013,898,554
+bytes**; task logs/reports add about 0.18 MB. This excludes the pre-existing shared
+ledger and environment. The largest measured normalization RSS was **240,549,888
+bytes** (timezones). No task process remains detached after completion.
+
+Publisher comparisons: OurAirports' published 86,154-airport count matches;
+pycountry's documented 5,046 subdivisions match; all 444 timezone names in the
+release's names JSON match; DB-IP's 7,786,864 rows and decompressed CSV MD5 match.
+Postal inputs have no independent published row total: streamed counts are
+1,826,904 base rows + 900,676 CA + 1,839,678 GB + 468,809 NL. Phone normalization
+accounts for every data line in the 224 pinned geographic-prefix files plus all
+254 XML territories/services; comments are format metadata. The mirror's 116,213
+UN/LOCODE rows are accounted for, but equivalence to newer UNECE 2025-1 is unverified.
+
+Spot checks: US `10001` -> `882a100d25fffff` in Manhattan; BLR ->
+`8860169047fffff`, JFK -> `882a103b15fffff`, both matching their source coordinates.
+Bengaluru's `(12.9716,77.5946)` cell `8860145b49fffff` maps to `Asia/Kolkata`;
+New York's `(40.7128,-74.0060)` cell `882a107289fffff` maps to `America/New_York`.
+The ocean point `(0,-150)` maps to `Etc/GMT+10`. `8.8.8.8` is in
+`8.8.8.0–8.8.8.255`, US / Mountain View, cell `8828347509fffff`.
+
+**Upstream postal discrepancy:** all nine GeoNames `IN/560001` observations name
+Bengaluru but supply `(13.2257,77.575)`, cell `8860169523fffff`, about 28 km north
+of central Bengaluru. The requested central-Bengaluru spot check therefore fails.
+These original coordinates, names and accuracy values are retained, and the
+verifier records the discrepancy as a data-quality finding; it does not invent a
+correction or label that check passed. A wrong stored H3 key remains a hard error.
+
+The timezone interval audit covers all **691,776,122** valid resolution-8 cells,
+with **zero gaps** and 2,021,513 additional memberships from source overlaps.
+There are no zones without resolution-8 centers and no geometry repairs/rejects.
+These are cell-center coverage results, not a claim of exact boundary accuracy.
+
+Repository validation: `uv run --no-sync pytest` (184 passed, 7 existing skips),
+`uv run --no-sync ruff check`, `uv run --no-sync ruff format --check`, and
+`uv run --no-sync mypy`. Tests are synthetic and external networking remains
+blocked by the existing test guard.
+
+### Lookup schemas and cleaning
+
+All new kinds use the existing manifest-v2 contract and bounded Parquet writer.
+They add `lookup_schema_version=1` and `h3_reference_resolution=8` metadata;
+the original `areas`, `places`, `names` schema bytes and fingerprints are unchanged.
+Every row has the existing source identity, release, licence and JSON provenance
+fields. Provenance contains raw evidence, source and licence URLs, attribution,
+and retrieval time. Per-source `licenses-<inventory hash>.json` files are manifest
+auxiliaries. Distribute those notices with the derived tables.
+
+| Kind | Join keys and additional fields |
+| --- | --- |
+| `postal_codes` | Country + postal code + source variant; place, admin1/2/3 names/codes, original accuracy value; point/H3 fields |
+| `countries` | `country_code` alpha-2; alpha3, zero-padded ISO numeric/M49, UN region/subregion/intermediate codes and names, calling code, currency, languages, TLD, continent |
+| `subdivisions` | `(code_system, code)` distinguishes ISO-3166-2 from GeoNames-admin1; country, name/type, parent code, GeoNames ID and ASCII name where supplied |
+| `airports` | OurAirports `ident`, IATA/ICAO/GPS/local codes, type, municipality, country/region; point/H3 fields |
+| `trade_locations` | `locode`, country/location components, original function flags, subdivision, names, status, IATA, date/change/remarks; point/H3 fields |
+| `timezones` | `(tzid, part)`; valid WGS84 longitude-first WKB geometry and ocean indicator; large geometry parts split without simplification |
+| `timezone_cells` | `(h3, tzid)` membership, `h3_uint64`, actual `h3_resolution` from 0 through 8; geometry joins on `tzid` |
+| `zone_tables` | IANA `zone.tab`, `zone1970.tab`, `zonenow.tab`; zone, country associations, comments and original representative coordinates plus point/H3 fields |
+| `phone_metadata` | Territory (including non-geographical service code `001`) + country calling code; dialing prefixes, leading digits and metadata XML |
+| `phone_prefixes` | `(prefix, language)`; calling code, description, list of candidate territory codes |
+| `ip_ranges` | Inclusive start/end addresses, address family, 16-byte big-endian packed bounds (IPv4 left padded), country/region/city; point/H3 fields |
+
+Point/H3 fields are `latitude`, `longitude`, canonical lowercase `h3`,
+`h3_uint64: uint64` and `h3_resolution=8`. Unknown coordinates remain null;
+malformed coordinates retain the record, raw values and `coordinate_error` in
+provenance. They are counted separately from structural rejects. The UN/LOCODE
+snapshot has 23,339 unlocated rows, including 278 invalid coordinate strings
+(e.g. minutes >= 60). No guessed decimal-degree conversion is applied.
+DB-IP's source sentinel `ZZ` and supplied `(0,0)` remain as published, with raw
+provenance; an H3 key does not make a geolocation estimate authoritative.
+
+Postal partial and full variants coexist, preserving duplicate code/place
+observations. Consumers choose their preferred variant. GeoNames' additional
+country entries remain alongside the 249 ISO countries. Phone descriptions keep
+all 224 localized files; shared calling codes retain all candidate territories
+instead of inventing a unique country or geocoding their text. Prefixes have no
+H3 field; use longest-prefix matching and language selection in a later linker.
+
+Timezone cells represent **resolution-8 cell-center membership** in the source
+polygons. Interiors are stored as compacted ancestors; only boundary regions need
+fine cells. H3 logical descendants are not geometrically contained in the parent
+hexagon: the implementation uses conservative spherical child envelopes based
+on H3's maximum-edge bounds, then tests the original polygon at the finest level.
+It handles holes, poles and longitude wrap, and compacts complete sibling sets,
+including pentagons. Tests compare against exhaustive fine-cell membership.
+To look up a resolution-8 cell, compute its nine ancestors (resolutions 0..8) and
+join their keys to `timezone_cells`; no geometry test or global expansion is needed.
+This uses the builder's full historical zone IDs, not its merged `now` variant.
+Ocean `Etc/GMT±N` polygons are included as supplied (IANA's sign convention is
+reversed); source overlaps remain potentially multiple results. Near a boundary,
+a cell's center may differ from an arbitrary point in that cell. Geometry remains
+available for later exact-boundary handling. IANA table dates can be newer than
+the boundary release and do not silently relabel the polygons.
+
+Text normalization checkpoints at 10,000 input records and timezones checkpoint
+per zone. No global dataframe or decompressed postal/IP file is built. All seven
+sources together have an additional 6 GB disk admission cap. The original global
+45 GB workspace cap and 20 GB free-space reserve still apply. Row, batch and file
+bounds remain 8/32/128 MB. Temporary timezone shapefiles are removed only after
+manifest verification; a verified rerun skips extraction and transformation.
+`lookup_verify` validates manifests, source accounting and named spot checks,
+then measures global timezone coverage with dense descendant-rank intervals,
+without expanding hundreds of millions of fine cells. Its report is
+`work/extra-lookups-verification.json`.
 
 ## Files and module responsibilities
 
