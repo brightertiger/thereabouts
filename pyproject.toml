@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyofflinegeocoder"
+version = "0.1.0"
+description = "Offline administrative containment and nearest settlement reference engine"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0,<2.4", "shapely>=2.1,<3", "scipy>=1.14,<1.17"]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "types-shapely>=2.1", "pyshp>=2.3,<3"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyofflinegeocoder"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["world: requires an explicitly built world pack"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = ["docs", "graft", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "build_data", "benchmarks", "tests"]
+
+# SciPy spatial and the build-only pyshp reader do not ship typing.
+[[tool.mypy.overrides]]
+module = ["scipy.spatial", "shapefile"]
+ignore_missing_imports = true
