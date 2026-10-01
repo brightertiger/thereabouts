@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 from collections import Counter
-from collections.abc import Iterator
 from pathlib import Path
 
 import pyarrow as pa
@@ -14,80 +13,14 @@ from build_data.acquire.artifacts import file_record
 from build_data.acquire.io import fingerprint
 from build_data.acquire.ledger import read_units
 from build_data.acquire.manifests import load_manifest
-from build_data.reconcile.common import Row, connect, rows, unpack
+from build_data.reconcile.common import Row
 
+from .code_links import CodeIndex
+from .code_links import linked_rows as linked_rows
 from .inputs import Inputs
+from .phone import PhoneCountries
 from .schemas import strings
 from .storage import budget, parquet
-
-
-def code_map(inputs: Inputs) -> tuple[set[str], dict[str, set[str]]]:
-    countries: set[str] = set()
-    codes: dict[str, set[str]] = {}
-    for cc, path in inputs.paths.items():
-        db = connect(path, readonly=True)
-        try:
-            for identity, role, data in db.execute(
-                "SELECT id,role,data FROM entities WHERE role IN ('country','state')"
-            ):
-                e = unpack(data)
-                if role == "country":
-                    countries.add(cc)
-                elif e["code"]:
-                    codes.setdefault("iso:" + e["code"], set()).add(identity)
-            for identity, data in db.execute("SELECT entity,data FROM state_codes"):
-                code = unpack(data)["geonames_admin1"]
-                if code:
-                    codes.setdefault(f"geonames:{cc}.{code}", set()).add(identity)
-        finally:
-            db.close()
-    return countries, codes
-
-
-def linked_rows(
-    path: Path,
-    kind: str,
-    inputs: Inputs,
-    countries: set[str],
-    codes: dict[str, set[str]],
-) -> Iterator[Row]:
-    for row in rows(path):
-        cc = row.get("country_code", row.get("territory"))
-        country_id = f"country:{cc}" if cc in countries else None
-        options = []
-        if kind == "subdivisions":
-            system = "iso" if row["code_system"].startswith("ISO") else "geonames"
-            options = sorted(codes.get(f"{system}:{row['code']}", set()))
-        elif kind == "phone_prefixes":
-            options = [f"country:{c}" for c in row["country_codes"] if c in countries]
-        elif country_id:
-            options = [country_id]
-        expected = row.get("country_codes", [cc])
-        pending = any(
-            c
-            and c not in inputs.countries
-            and c != "001"
-            and (inputs.expected is None or c in inputs.expected)
-            for c in expected
-        )
-        if kind == "phone_prefixes" and len(options) == 1 and not pending:
-            country_id = options[0]
-        status = (
-            "pending"
-            if pending
-            else "matched"
-            if len(options) == 1
-            else "ambiguous"
-            if options
-            else "unmatched"
-        )
-        yield {
-            **row,
-            "country_id": country_id,
-            "place_id": options[0] if len(options) == 1 and not pending else None,
-            "place_ids": options,
-            "link_status": status,
-        }
 
 
 def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
@@ -97,7 +30,16 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
     previous = {
         r["unit_id"]: r for r in read_units(workspace.ledger_path, "golden.static")
     }
-    countries, codes = code_map(inputs)
+    index = CodeIndex(inputs)
+    countries, codes = index.countries, index.codes
+    phone_manifest = load_manifest(workspace, "phone")
+    phone = PhoneCountries(
+        [
+            Path(p["path"])
+            for p in phone_manifest["partitions"]
+            if p["kind"] == "phone_metadata"
+        ]
+    )
     result = []
     for source in ("timezones", "codes", "phone"):
         manifest = load_manifest(workspace, source)
@@ -110,7 +52,8 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
             digest = fingerprint(
                 {
                     "part": part,
-                    "static": 3,
+                    "static": 4,
+                    "phone_metadata": phone_manifest if source == "phone" else None,
                     "countries": inputs.countries if source != "timezones" else {},
                 }
             )
@@ -131,13 +74,21 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
             else:
                 schema = pq.read_schema(source_path)
                 for field in [
-                    *strings("country_id place_id link_status"),
+                    *strings("country_id place_id link_status link_method"),
                     pa.field("place_ids", pa.list_(pa.string())),
                 ]:
                     schema = schema.append(field)
                 record = parquet(
                     destination,
-                    linked_rows(source_path, kind, inputs, countries, codes),
+                    linked_rows(
+                        source_path,
+                        kind,
+                        inputs,
+                        countries,
+                        codes,
+                        index=index,
+                        phone=phone,
+                    ),
                     schema,
                 )
             record.update(kind=kind)

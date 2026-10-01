@@ -62,6 +62,9 @@ def entities(path: Path, policy: Row) -> Iterator[Row]:
                         "geonames_id",
                         "geonames_admin1",
                         "feature_code",
+                        "source_subtype",
+                        "settlement_class",
+                        "city_exclusion",
                     )
                 },
                 "place_id": e["id"],
@@ -92,7 +95,7 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
     }
     output = []
     for cc, record in sorted(inputs.countries.items()):
-        digest = fingerprint({"country": record, "places": 2, "policy": inputs.policy})
+        digest = fingerprint({"country": record, "places": 3, "policy": inputs.policy})
         if ledger.is_complete("golden.places", cc, digest):
             output.append(saved[cc]["metadata"]["table"])
             continue

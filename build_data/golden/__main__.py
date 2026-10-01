@@ -137,6 +137,8 @@ def cycle(workspace: Workspace, args: argparse.Namespace) -> bool:
         and set(country_inventory["expected"]) <= inputs.countries.keys()
         and checks["integrity"].get("missing_cell_place_ids", 0) == 0
         and checks["integrity"].get("duplicate_place_ids", 0) == 0
+        and checks["integrity"].get("missing_parent_rows", 0) == 0
+        and checks["integrity"].get("missing_sovereign_rows", 0) == 0
     )
     publish(workspace, inputs, independent + tables + lookup_tables, state, checks)
     write_json(work / "run.json", state)

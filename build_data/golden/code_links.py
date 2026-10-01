@@ -1,0 +1,143 @@
+"""Evidence-only administrative code and telephone links, with explicit ambiguity."""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Iterator
+from pathlib import Path
+
+from build_data.reconcile.common import Row, connect, key, rows, unpack
+
+from .inputs import Inputs
+from .phone import PhoneCountries
+
+
+class CodeIndex:
+    def __init__(self, inputs: Inputs) -> None:
+        self.countries: set[str] = set()
+        self.codes: dict[str, set[str]] = {}
+        self.names: dict[tuple[str, str], set[str]] = {}
+        self.geonames: dict[str, set[str]] = {}
+        for cc, path in inputs.paths.items():
+            db = connect(path, readonly=True)
+            try:
+                for identity, role, data in db.execute(
+                    "SELECT id,role,data FROM entities "
+                    "WHERE role IN ('country','state','district')"
+                ):
+                    e = unpack(data)
+                    if role == "country":
+                        self.countries.add(cc)
+                        continue
+                    if e.get("code"):
+                        self.codes.setdefault("iso:" + e["code"], set()).add(identity)
+                    if e.get("geonames_id"):
+                        # Administrative GeoNames identity only; a district's
+                        # settlement-seat link is not an ADM1 crosswalk.
+                        found = db.execute(
+                            "SELECT class FROM geonames WHERE id=?", (e["geonames_id"],)
+                        ).fetchone()
+                        if found == ("A",):
+                            self.geonames.setdefault(e["geonames_id"], set()).add(
+                                identity
+                            )
+                    names = {e.get("name"), e.get("local_name")}
+                    for p in e["provenance"]:
+                        evidence = p["evidence"]
+                        sources = [evidence]
+                        if evidence.get("division_provenance"):
+                            sources.append(json.loads(evidence["division_provenance"]))
+                        for source in sources:
+                            source_names = source.get("upstream", {}).get("names") or {}
+                            names.add(source_names.get("primary"))
+                            names.update(v for _, v in source_names.get("common") or [])
+                    for name in names:
+                        if key(name):
+                            self.names.setdefault((cc, key(name)), set()).add(identity)
+                for identity, data in db.execute("SELECT entity,data FROM state_codes"):
+                    code = unpack(data)["geonames_admin1"]
+                    if code:
+                        self.codes.setdefault(f"geonames:{cc}.{code}", set()).add(
+                            identity
+                        )
+            finally:
+                db.close()
+
+    def subdivision(self, row: Row) -> tuple[list[str], str]:
+        system = "iso" if row["code_system"].startswith("ISO") else "geonames"
+        direct = self.codes.get(f"{system}:{row['code']}", set())
+        if direct:
+            return sorted(direct), "explicit code or administrative crosswalk"
+        identity = self.geonames.get(row.get("geoname_id") or "", set())
+        if identity:
+            return sorted(identity), "GeoNames administrative identity"
+        # Exact normalized aliases within one country. Never fuzzily match a
+        # subdivision to an arbitrary city or claim a unique ambiguous alias.
+        matches = set().union(
+            *(
+                self.names.get((row["country_code"], key(row.get(field))), set())
+                for field in ("name", "name_ascii")
+            )
+        )
+        return sorted(matches), "exact country-scoped administrative alias"
+
+
+def code_map(inputs: Inputs) -> tuple[set[str], dict[str, set[str]]]:
+    index = CodeIndex(inputs)
+    return index.countries, index.codes
+
+
+def linked_rows(
+    path: Path,
+    kind: str,
+    inputs: Inputs,
+    countries: set[str],
+    codes: dict[str, set[str]],
+    *,
+    index: CodeIndex | None = None,
+    phone: PhoneCountries | None = None,
+) -> Iterator[Row]:
+    for row in rows(path):
+        cc = row.get("country_code", row.get("territory"))
+        country_id = f"country:{cc}" if cc in countries else None
+        options: list[str] = []
+        expected = row.get("country_codes", [cc])
+        method = "source country code"
+        if kind == "subdivisions":
+            if index is not None:
+                options, method = index.subdivision(row)
+            else:
+                system = "iso" if row["code_system"].startswith("ISO") else "geonames"
+                options = sorted(codes.get(f"{system}:{row['code']}", set()))
+        elif kind == "phone_prefixes":
+            if phone is not None:
+                expected, method = phone.resolve(row)
+            options = [f"country:{c}" for c in expected if c in countries]
+        elif country_id:
+            options = [country_id]
+        pending = any(
+            c
+            and c not in inputs.countries
+            and c != "001"
+            and (inputs.expected is None or c in inputs.expected)
+            for c in expected
+        )
+        if kind == "phone_prefixes" and len(options) == 1 and not pending:
+            country_id = options[0]
+        status = (
+            "pending"
+            if pending
+            else "matched"
+            if len(options) == 1
+            else "ambiguous"
+            if options
+            else "unmatched"
+        )
+        yield {
+            **row,
+            "country_id": country_id,
+            "place_id": options[0] if len(options) == 1 and not pending else None,
+            "place_ids": options,
+            "link_status": status,
+            "link_method": method,
+        }

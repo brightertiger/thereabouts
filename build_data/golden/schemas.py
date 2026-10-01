@@ -16,7 +16,10 @@ PLACES = pa.schema(
             "parent_id parent_method sovereign_id sovereign_code sovereign_name"
         ),
         pa.field("population", pa.int64()),
-        *strings("geonames_id geonames_admin1 feature_code"),
+        *strings(
+            "geonames_id geonames_admin1 feature_code "
+            "source_subtype settlement_class city_exclusion"
+        ),
         pa.field("overture_ids", pa.list_(pa.string())),
         pa.field("wikidata_ids", pa.list_(pa.string())),
         *strings("source_ids provenance name_provenance link"),
