@@ -148,3 +148,55 @@ def test_region_requires_exact_city_identity(
         assert answer["geonames_id"] == ("1" if same_identity else "2")
     finally:
         db.close()
+
+
+def test_shared_city_footprint_beats_unlinked_town_and_keeps_linked_town(
+    tmp_path: Path,
+) -> None:
+    city = place(
+        "county", "Metropolis", 0.5, 0.5, source="overture", subtype="county", qid="Q1"
+    )
+    weak = place("weak", "Unverified town", 0.2, 0.2, source="overture")
+    strong = place("strong", "Independent town", 0.7, 0.7, source="overture")
+    weak["feature_class"] = strong["feature_class"] = "town"
+    root = write_inputs(
+        tmp_path / "inputs",
+        geonames=[
+            place("1", "Metropolis", 0.5, 0.5, population=1000000),
+            place("2", "Independent town", 0.7, 0.7, population=20000),
+        ],
+        divisions=[city, weak, strong],
+        areas=[
+            area("nation", "Nation", "country", (0, 0, 1, 1)),
+            area("county", "Metropolis", "county", (0, 0, 1, 1)),
+            area("weak", "Unverified town", "locality", (0.1, 0.1, 0.3, 0.3)),
+            area("strong", "Independent town", "locality", (0.6, 0.6, 0.8, 0.8)),
+        ],
+        names=[
+            {
+                "source": "geonames",
+                "source_id": "alias",
+                "entity_source_id": "1",
+                "language": "wkdt",
+                "name": "Q1",
+                "is_historic": False,
+                "is_preferred": False,
+                "is_short": False,
+                "is_colloquial": False,
+                "source_release": "test",
+                "license": "CC BY 4.0",
+                "provenance": "{}",
+            }
+        ],
+    )
+    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    land = tmp_path / "land.sqlite"
+    db = connect(land)
+    create_areas(db)
+    shape = area("land", "Land", "land", (0, 0, 1, 1))
+    insert_area(db, "land", "land", 0, shape["geometry"], (0, 0, 1, 1), "test")
+    db.commit()
+    db.close()
+    with Locator({"ZZ": output}, land, policy()) as locator:
+        assert locator.locate(0.2, 0.2)["city"]["geonames_id"] == "1"
+        assert locator.locate(0.7, 0.7)["city"]["geonames_id"] == "2"

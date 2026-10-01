@@ -13,7 +13,9 @@ from .common import Row, unpack
 MUNICIPALITY_PRIORITY = 20
 REGION_CITY_PRIORITY = 15
 LINKED_LOCALITY_PRIORITY = 10
-PROMOTED_ADMIN_PRIORITY = -10
+# Exact city identity is stronger than an unlinked settlement classification,
+# while independently linked localities retain precedence over this footprint.
+PROMOTED_ADMIN_PRIORITY = 5
 POLICY_ROLLUP_PRIORITY = 50
 CITY_STATE_PRIORITY = 100
 
