@@ -404,7 +404,7 @@ plain values; dictionary/delta encodings are rejected before decoding. Large
 geometries are split by components and bounded bbox intersections, preserving
 holes and area; oversized raw shapes that cannot be safely read are audited.
 
-Admission checks preserve 20 GB free and cap the whole workspace at 45 GB
+Admission checks preserve 12 GB free and cap the whole workspace at 60 GB
 (decimal). Source caps are OSM 8 GB, Overture 25 GB, GeoNames 10 GB and
 geoBoundaries 12 GB. Run world stages sequentially as the CLI does. RSS/timing are
 recorded; admission checks are not reservations or a process-tree memory limit.
