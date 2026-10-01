@@ -9,7 +9,7 @@ from .city_identity import footprints
 from .classification import (
     CITY_STATE_PRIORITY,
     POLICY_ROLLUP_PRIORITY,
-    REGION_CITY_PRIORITY,
+    PROMOTED_ADMIN_PRIORITY,
     area_priority,
     dominated_localities,
 )
@@ -101,7 +101,9 @@ def assign_areas(
             city["id"] = f"city:country:{country}"
             _area(db, row, city, "city", CITY_STATE_PRIORITY)
         elif row["entity_id"] in city_regions:
-            _area(db, row, city_regions[row["entity_id"]], "city", REGION_CITY_PRIORITY)
+            _area(
+                db, row, city_regions[row["entity_id"]], "city", PROMOTED_ADMIN_PRIORITY
+            )
         elif kind in policy["city_subtypes"]:
             target = selected(row, rollups)
             if target:

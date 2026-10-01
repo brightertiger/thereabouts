@@ -145,7 +145,9 @@ def test_region_requires_exact_city_identity(
 
         answer = choose_city(covering(db, 0.51, 0.51, "city"))
         assert answer is not None
-        assert answer["geonames_id"] == ("1" if same_identity else "2")
+        assert answer["geonames_id"] == "2"  # Preserve a linked town inside a region.
+        outer = choose_city(covering(db, 0.2, 0.2, "city"))
+        assert (outer or {}).get("geonames_id") == ("1" if same_identity else None)
     finally:
         db.close()
 

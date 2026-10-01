@@ -11,7 +11,6 @@ from .common import Row, unpack
 # Shared by the scalar and vector oracles. These describe the stored priorities,
 # not the evaluation sample or particular cities.
 MUNICIPALITY_PRIORITY = 20
-REGION_CITY_PRIORITY = 15
 LINKED_LOCALITY_PRIORITY = 10
 # Exact city identity is stronger than an unlinked settlement classification,
 # while independently linked localities retain precedence over this footprint.
