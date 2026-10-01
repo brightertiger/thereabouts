@@ -10,6 +10,7 @@ import pyarrow.parquet as pq
 from .artifacts import file_record, file_records, read_json, verify_files
 from .io import fingerprint, write_json
 from .ledger import Ledger
+from .offload import verify_dependencies
 from .schemas import SCHEMAS, Kind
 from .workspace import Workspace
 
@@ -104,7 +105,7 @@ def load_manifest(workspace: Workspace, source: str) -> dict[str, Any]:
     expected_inventory = inventory_path(workspace, source).resolve()
     if Path(manifest["inventory"]["path"]).resolve() != expected_inventory:
         raise ValueError("Manifest refers to a superseded inventory")
-    verify_files([manifest["inventory"], *manifest["inputs"], *manifest["auxiliary"]])
+    verify_dependencies(workspace, source, manifest)
     if read_json(expected_inventory)["source_release"] != manifest["source_release"]:
         raise ValueError("Manifest release differs from pinned inventory")
     paths: set[Path] = set()
