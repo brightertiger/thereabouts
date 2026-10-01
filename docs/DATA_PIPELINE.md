@@ -444,3 +444,65 @@ Mypy is strict for the whole repository. Tests use synthetic inputs and loopback
 HTTP servers only. The root autouse network guard blocks external DNS, TCP
 connect/connect_ex and UDP destinations, including the real OSM download URL;
 there is no acquisition-specific override that enables outside networking.
+
+## Raw offload and restore
+
+Raw custody is explicit and independent of normalized completion. The acquisition
+CLI supports a non-destructive transfer and an already-verified-transfer record:
+
+```sh
+PIPELINE_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+uv run --no-sync python -m build_data.acquire offload \
+  --sources osm_land overture geonames geoboundaries \
+  --remote gs://pyofflinegeocoder-summer-sector-488705-m8/raw \
+  --record-existing --data-dir "$PIPELINE_DATA"
+uv run --no-sync python -m build_data.acquire status --data-dir "$PIPELINE_DATA"
+uv run --no-sync python -m build_data.acquire restore \
+  --sources overture --data-dir "$PIPELINE_DATA"
+```
+
+`offload` without `--record-existing` first verifies the local snapshot and runs
+`gcloud storage rsync --recursive <raw/source> <remote/source>`. Neither command
+deletes files. `--record-existing` records the operator's prior verification of
+remote file count and bytes; it does not pretend to have rechecked remote hashes.
+The source-scoped `work/offloaded/<source>.json` binds custody to the exact current
+normalized manifest and records the destination and evidence. The four original
+sources were recorded this way after their verified external transfer.
+
+`status` reports matching records as **offloaded**. `all`, or a source CLI command,
+verifies and reuses its completed normalized outputs without downloading those
+raw files. A missing/corrupt normalized output fails explicitly and requires
+restoration before rebuilding. `current_partitions` still verifies local inputs,
+auxiliary evidence, normalized checkpoints and hashes; only missing raw files
+covered by the exact offload record are allowed. Present but corrupt raw files
+are never excused. A changed manifest does not inherit a stale offload exemption.
+
+`restore` runs `gcloud storage rsync --recursive <recorded-remote> <raw/source>`,
+then verifies every pinned raw dependency and normalized artifact before clearing
+the offloaded marker. Interrupted/failed restores leave that marker intact.
+Existing resource guards still apply to restore admission. Keep small inventories,
+receipts and licence notices available locally for status and provenance.
+
+## Golden H3 dataset
+
+`build_data.golden` consumes canonical country checkpoints as they become ready,
+without waiting for a new reconciled world manifest. It exports canonical places,
+timezone memberships and code/phone links first. It then builds resolution-3 H3
+blocks whose actual r8 descendant envelopes touch only completed countries, using
+the reconciled lookup and conservative certificates. Postal, airport, trade and
+IP rows join their existing r8 key through the resulting compact cell table.
+Pending, unlocated, ineligible and unresolved rows remain distinguishable.
+
+```sh
+GOLDEN_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+uv run --no-sync python -m build_data.golden pilot --countries BE NL LU CA --workers 2 --data-dir "$GOLDEN_DATA"
+uv run --no-sync python -m build_data.golden run --workers 2 --watch --data-dir "$GOLDEN_DATA"
+uv run --no-sync python -m build_data.golden status --data-dir "$GOLDEN_DATA"
+```
+
+Outputs are Parquet beneath `golden/`, with `manifest.json`, `quality.json`,
+`DATA_LICENSES.md` and `DATASET_CARD.md`. The shared ledger owns `golden.*`
+checkpoints; `work/golden/run.json` records progress. Use the manifest's completion
+flag and table inventory, never an unrestricted glob. The full layout, all columns,
+certificate argument, checks and resumption commands are in
+[GOLDEN_DATASET.md](GOLDEN_DATASET.md). No new raw downloads are required.
