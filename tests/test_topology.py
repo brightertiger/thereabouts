@@ -1,65 +1,42 @@
-from pathlib import Path
+"""Build-only scalar and vector policy at overlaps, seams, holes and ties."""
 
-from shapely.geometry import box
+import numpy as np
+import pytest
 
-from build_data.pack import write_pack
-from pyofflinegeocoder import Geocoder
+from build_data.reference.oracle import Reference
+from pyofflinegeocoder import Location
 
 
-def test_shared_boundary_returns_all_candidates_in_stable_order(
-    synthetic: Geocoder,
+@pytest.mark.parametrize(
+    "point,expected",
+    [
+        ((1, 5), Location(None, "Left", "Alpha", "AA")),
+        ((3.5, 3.5), Location(None, None, "Enclave", "BB")),
+        ((1, 9.5), Location(None, "Right", "Alpha", "AA")),
+        ((19.005, 19.005), Location(None, None, "Alpha", "AA")),
+        ((5, 15), Location(None, None, None, None)),
+        ((30, 30), None),
+        ((1, 4), Location("Western", "Left", "Alpha", "AA")),
+    ],
+)
+def test_reference_policy(
+    synthetic: Reference, point: tuple[float, float], expected: Location | None
 ) -> None:
-    result = synthetic.reverse(1, 5)
-    assert result.admin1.status == "ambiguous"
-    assert result.admin1.value is None
-    assert [a.id for a in result.admin1.candidates] == ["test:L", "test:R"]
-    assert synthetic.reverse(1, 5 + 0.5e-9).admin1.status == "ambiguous"
-    assert synthetic.reverse(1, 5 + 2e-9).admin1.status == "matched"
+    assert synthetic.scalar(*point) == expected
+    assert synthetic.locations(synthetic.labels(np.array([point])))[0] == expected
 
 
-def test_overlapping_claims_are_ambiguous(synthetic: Geocoder) -> None:
-    result = synthetic.reverse(1, 9.5)
-    assert result.country.status == "ambiguous"
-    assert result.country.value is None
-    assert [a.id for a in result.country.candidates] == ["test:A", "test:C"]
+def test_nearest_cutoff_and_tie(synthetic: Reference) -> None:
+    # Exact co-location selects ID 10, while the equidistant point is >50 km away.
+    names, distance, _ = synthetic.nearest(np.array([[1, 4], [1, 5]], dtype=float))
+    assert synthetic.cities[int(names[0])] == "Western"
+    assert distance[0] == 0
+    assert names[1] == 0
 
 
-def test_enclave_and_tiny_multipart_island(synthetic: Geocoder) -> None:
-    enclave = synthetic.reverse(3.5, 3.5)
-    assert enclave.country.value is not None and enclave.country.value.id == "test:B"
-    island = synthetic.reverse(19.005, 19.005)
-    assert island.country.value is not None and island.country.value.id == "test:A"
-    assert island.land_status == "inside_mask"
-
-
-def test_missing_subdivision_and_explicit_nonapplicability_differ(
-    synthetic: Geocoder,
-) -> None:
-    assert synthetic.reverse(1, 13).admin1.status == "not_applicable"
-    missing = synthetic.reverse(1, 16)
-    assert missing.admin1.status == "no_coverage"
-    assert missing.country.value is not None and missing.country.value.code is None
-    gap = synthetic.reverse(17, 17)
-    assert gap.land_status == "inside_mask"
-    assert gap.country.status == gap.admin1.status == "no_coverage"
-
-
-def test_coincident_and_equidistant_places_use_smallest_geonames_id(
-    synthetic: Geocoder,
-) -> None:
-    for lon in (4, 5):
-        result = synthetic.reverse(1, lon, max_place_distance_km=None)
-        assert (
-            result.nearest_place is not None and result.nearest_place.geoname_id == 10
-        )
-        assert result.nearest_place.source_country_code == "ZZ"
-        assert result.country.value is not None and result.country.value.code == "AA"
-
-
-def test_land_without_settlements_has_no_place_coverage(tmp_path: Path) -> None:
-    path = tmp_path / "empty"
-    write_pack(path, [], [], [box(0, 0, 1, 1)], [], None, [], snapshot_id="empty-test")
-    with Geocoder(path) as geocoder:
-        geocoder.verify()
-        result = geocoder.reverse(0.5, 0.5)
-        assert result.place_status == "no_coverage" and result.nearest_place is None
+def test_admin1_only_coverage_does_not_create_a_row(synthetic: Reference) -> None:
+    assert synthetic.admin.layers["admin1"].query(30, 30)
+    assert not synthetic.admin.layers["country"].query(30, 30)
+    assert not synthetic.admin.layers["land"].query(30, 30)
+    assert synthetic.scalar(30, 30) is None
+    assert synthetic.labels(np.array([[30.0, 30.0]])).tolist() == [0]

@@ -1,4 +1,4 @@
-"""Offline original-coordinate administration and nearest settlement context."""
+"""Offline H3 table lookup; queries never download data."""
 
 from .api import Geocoder, reverse
 from .errors import (
@@ -8,33 +8,15 @@ from .errors import (
     GeocoderError,
     UnsupportedSchemaError,
 )
-from .models import (
-    Admin,
-    AdminMatch,
-    AdminMethod,
-    AdminStatus,
-    DatasetInfo,
-    LandStatus,
-    Place,
-    PlaceStatus,
-    ReverseResult,
-)
+from .models import Location
 
 __all__ = [
-    "Admin",
-    "AdminMatch",
-    "AdminMethod",
-    "AdminStatus",
     "ClosedGeocoderError",
     "DamagedPackError",
     "DataNotInstalledError",
-    "DatasetInfo",
     "Geocoder",
     "GeocoderError",
-    "LandStatus",
-    "Place",
-    "PlaceStatus",
-    "ReverseResult",
+    "Location",
     "UnsupportedSchemaError",
     "reverse",
 ]

@@ -7,9 +7,9 @@ from pathlib import Path
 import numpy as np
 import shapely
 
-from pyofflinegeocoder.schema import POLICY_ID, SCHEMA_VERSION
-
 from .normalize import Audit, BBox
+from .reference.schema import POLICY_ID, SCHEMA_VERSION
+from .settlements import settlement_policy
 from .sources import provenance, sha256
 
 
@@ -28,6 +28,7 @@ def write_manifest(
         "schema_version": SCHEMA_VERSION,
         "snapshot_id": snapshot_id,
         "policy_id": POLICY_ID,
+        "settlement_policy": settlement_policy(),
         "sources": provenance(),
         "files": files,
         "coverage_bbox": bounds,

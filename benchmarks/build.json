@@ -1,0 +1,20 @@
+{
+  "resolution": 8,
+  "build_seconds": 687.9286698750002,
+  "labelling_peak_process_rss_bytes": 246595584,
+  "centres_enumerated": 691776122,
+  "centres_labelled": 40319034,
+  "table_bytes": 50951071,
+  "rows": 20808748,
+  "catalog_bytes": 60604,
+  "snapshot_id": "ne5.1.1-geonames2026-10-01-world-v1-h3-r8",
+  "manifest_sha256": "35cc988def0b5b95b683444a4b72c2ed5ad74de4b4695038be1144746c9540a1",
+  "pack_bytes": 53056366,
+  "archive_bytes": 21347383,
+  "archive_contents": "all files in the pack; ZIP deflate level 9",
+  "build_scope": "combined table plus full verification; excludes source pack and ZIP",
+  "environment": {
+    "python": "3.12.8",
+    "platform": "macOS-27.0-arm64-arm-64bit"
+  }
+}

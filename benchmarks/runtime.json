@@ -1,0 +1,30 @@
+{
+  "snapshot_id": "ne5.1.1-geonames2026-10-01-world-v1-h3-r8",
+  "manifest_sha256": "35cc988def0b5b95b683444a4b72c2ed5ad74de4b4695038be1144746c9540a1",
+  "resolution": 8,
+  "warm_open_median_ms": 0.836542,
+  "first_query_ms_excluding_open": 1.262083,
+  "scalar": {
+    "median_us": 13.542,
+    "p99_us": 241.33342000000002
+  },
+  "single_point_vector_baseline": {
+    "median_us": 74.333,
+    "p99_us": 91.00166000000003
+  },
+  "batch_points_per_second": 436159.031823768,
+  "sample_count": 10000,
+  "points_sha256": "89d883c634d28a2f45f5b9e653c3c867349ed6fc56d88476b41a5cf60a507b1c",
+  "peak_process_rss_bytes": 101908480,
+  "pack_bytes": 53056366,
+  "cache": "warm OS cache; each scalar path has 1000 warmup calls on a fresh instance",
+  "environment": {
+    "python": "3.12.8",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "numpy": "2.3.5",
+    "h3": {
+      "c": "4.5.0",
+      "python": "4.5.0"
+    }
+  }
+}

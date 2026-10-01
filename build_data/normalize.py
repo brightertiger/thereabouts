@@ -17,6 +17,7 @@ from .records import AdminRecord
 
 BBox = tuple[float, float, float, float]
 Audit = list[dict[str, Any]]
+PARENT_AREA_TOLERANCE_DEG2 = 1e-12
 
 
 def features(path: Path) -> Iterator[tuple[dict[str, Any], BaseGeometry]]:
@@ -133,7 +134,7 @@ def validate_parents(
             continue
         geometry = shapely.union_all(child.parts)
         outside = geometry.difference(geometries[child.parent]).area
-        if outside > 1e-12:
+        if outside > PARENT_AREA_TOLERANCE_DEG2:
             audit.append(
                 {
                     "operation": "parent_geometry_mismatch",

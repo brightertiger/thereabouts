@@ -8,12 +8,11 @@ import shapely
 from numpy.typing import NDArray
 from shapely.geometry import Polygon
 
-from pyofflinegeocoder.schema import ADMIN_DTYPE, PLACE_DTYPE
-from pyofflinegeocoder.sphere import unit_vectors
-
 from .manifest import write_manifest
 from .normalize import Audit, BBox
 from .records import AdminRecord, Settlement
+from .reference.schema import ADMIN_DTYPE, PLACE_DTYPE
+from .reference.sphere import unit_vectors
 
 
 class TextPool:

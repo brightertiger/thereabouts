@@ -1,3 +1,10 @@
+> **Owner decision — 2026-10-01 (phase 2):** Use a single H3 resolution-8
+> cell-centre table for city, state and country, accepting quantization error.
+> Polygons and nearest-settlement searches are build/test tools only; runtime
+> uses H3 and NumPy. This supersedes the runtime architecture and public contract
+> below. See [the implemented table design](DESIGN.md) and the dated
+> measurements in [EVALUATION.md](EVALUATION.md). The original plan follows unchanged.
+
 # Implementation plan: offline administrative containment and settlement context
 
 Build a Python package whose default answer describes the **original coordinate**: containing country/admin1, plus a separate nearest settlement and its distance. Use a coarse H3 index to accelerate administrative containment only if it beats a direct polygon spatial index on the target workload. Boundary cells must retain original-point polygon checks. Do not materialize a global fine-resolution cell-to-city table.

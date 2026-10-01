@@ -10,6 +10,7 @@ from shapely.geometry import Polygon, box
 
 from build_data.pack import write_pack
 from build_data.records import AdminRecord, Settlement
+from build_data.reference.oracle import Reference
 from pyofflinegeocoder import Geocoder
 
 FIXTURE = Path(__file__).parent / "fixtures" / "benelux"
@@ -46,6 +47,7 @@ def synthetic_pack(tmp_path_factory: pytest.TempPathFactory) -> Path:
     subdivisions = [
         AdminRecord("test:L", "Left", "AA-L", 0, 0, [box(0, 0, 5, 3)]),
         AdminRecord("test:R", "Right", "AA-R", 0, 0, [box(5, 0, 10, 3)]),
+        AdminRecord("test:O", "Marine spill", "", -1, 0, [box(29, 29, 31, 31)]),
     ]
     places = [
         Settlement(10, "Western", "PPL", 1, 4, "ZZ", "99"),
@@ -66,9 +68,10 @@ def synthetic_pack(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture
-def synthetic(synthetic_pack: Path) -> Iterator[Geocoder]:
-    with Geocoder(synthetic_pack) as geocoder:
-        yield geocoder
+def synthetic(synthetic_pack: Path) -> Iterator[Reference]:
+    reference = Reference(synthetic_pack)
+    yield reference
+    reference.close()
 
 
 @pytest.fixture(scope="session")

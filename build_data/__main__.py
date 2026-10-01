@@ -1,87 +1,26 @@
-"""Explicitly acquire, verify and build an immutable local data directory."""
+"""Explicitly acquire source data, then build a bounded-memory H3 table."""
 
 import argparse
 import json
-import shutil
-import tempfile
-import time
 from pathlib import Path
 
-from pyofflinegeocoder import Geocoder
-
-from .normalize import Audit, BBox, administration, features, normalize
-from .pack import write_pack
-from .settlements import read_settlements, regional_candidates
-from .sources import acquire
-
-
-def build(output: Path, cache: Path, bounds: BBox | None) -> None:
-    if output.exists():
-        raise FileExistsError(f"Refusing to overwrite immutable pack: {output}")
-    started = time.perf_counter()
-    paths = acquire(cache)
-    audit: Audit = []
-    countries, admin1 = administration(paths, bounds, audit)
-    land = [
-        part
-        for i, (_, geometry) in enumerate(features(paths["land"]))
-        for part in normalize(geometry, f"land:{i}", audit, bounds)
-    ]
-    places = regional_candidates(read_settlements(paths["cities1000"]), bounds)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    temporary = Path(tempfile.mkdtemp(prefix=".pack-", dir=output.parent))
-    try:
-        pack = temporary / "pack"
-        region = (
-            "world" if bounds is None else "bbox-" + "-".join(f"{v:g}" for v in bounds)
-        )
-        write_pack(
-            pack,
-            countries,
-            admin1,
-            land,
-            places,
-            bounds,
-            audit,
-            snapshot_id=f"ne5.1.1-geonames2026-10-01-{region}-v1",
-        )
-        with Geocoder(pack) as geocoder:
-            geocoder.verify()
-        pack.rename(output)
-    finally:
-        shutil.rmtree(temporary)
-    print(
-        json.dumps(
-            {
-                "output": str(output),
-                "build_seconds": time.perf_counter() - started,
-                "pack_bytes": sum(p.stat().st_size for p in output.iterdir()),
-                "countries": len(countries),
-                "admin1": len(admin1),
-                "places": len(places),
-            }
-        )
-    )
+from .source_pack import build as build_reference
+from .table import build_table
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path("data/world"))
+    parser.add_argument("--output", type=Path, default=Path("data/h3-world"))
+    parser.add_argument("--reference", type=Path, default=Path("data/reference"))
     parser.add_argument("--cache", type=Path, default=Path("data/cache"))
-    parser.add_argument(
-        "--bbox", type=float, nargs=4, metavar=("WEST", "SOUTH", "EAST", "NORTH")
-    )
+    parser.add_argument("--resolution", type=int, choices=(6, 7, 8), default=8)
+    parser.add_argument("--metrics", type=Path)
     args = parser.parse_args()
-    bounds: BBox | None = None
-    if args.bbox:
-        w, s, e, n = args.bbox
-        if not (-180 <= w < e <= 180 and -90 <= s < n <= 90):
-            parser.error(
-                "bbox must satisfy -180 <= WEST < EAST <= 180 "
-                "and -90 <= SOUTH < NORTH <= 90"
-            )
-        bounds = (w, s, e, n)
-    build(args.output, args.cache, bounds)
+    if not args.reference.exists():
+        build_reference(args.reference, args.cache, None)
+    result = build_table(args.reference, args.output, args.resolution)
+    if args.metrics:
+        args.metrics.write_text(json.dumps(result, indent=2) + "\n")
 
 
 if __name__ == "__main__":

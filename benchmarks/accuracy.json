@@ -1,0 +1,36 @@
+{
+  "count_per_workload": 100000,
+  "seed": 20261001,
+  "nearby_radius_km": 5,
+  "nearby_selection": "uniform settlement, uniform-area spherical disk; reject outside reference land",
+  "snapshot_id": "ne5.1.1-geonames2026-10-01-world-v1-h3-r8",
+  "resolution": 8,
+  "manifest_sha256": "35cc988def0b5b95b683444a4b72c2ed5ad74de4b4695038be1144746c9540a1",
+  "reference_manifest_sha256": "0ae97d40d20bc9884e76122bceb999de51140b01188b86870c6879d0eb92383c",
+  "area_uniform_land": {
+    "mismatch_counts": {
+      "country": 83,
+      "state": 212,
+      "city": 763
+    },
+    "mismatch_percent": {
+      "country": 0.083,
+      "state": 0.212,
+      "city": 0.763
+    },
+    "no_row_count": 57
+  },
+  "settlement_nearby_land": {
+    "mismatch_counts": {
+      "country": 235,
+      "state": 606,
+      "city": 5212
+    },
+    "mismatch_percent": {
+      "country": 0.235,
+      "state": 0.606,
+      "city": 5.212
+    },
+    "no_row_count": 169
+  }
+}

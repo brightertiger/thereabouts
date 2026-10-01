@@ -7,9 +7,9 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from .errors import DamagedPackError
+from pyofflinegeocoder.errors import DamagedPackError
+
 from .manifest import read_manifest
-from .models import Admin, DatasetInfo
 from .schema import ARRAY_DTYPES, LAYERS
 
 Array = NDArray[Any]
@@ -84,29 +84,6 @@ class Pack:
             return self.arrays["text"][start:stop].tobytes().decode("utf-8")
         except UnicodeDecodeError as exc:
             raise DamagedPackError("Invalid UTF-8 in text pool") from exc
-
-    def admin(self, layer: str, index: int) -> Admin:
-        row = self.arrays["countries" if layer == "country" else "admin1"][index]
-        identity, name = self.text(int(row["id"])), self.text(int(row["name"]))
-        if not identity or not name:
-            raise DamagedPackError("Missing administrative identity or name")
-        return Admin(
-            identity,
-            name,
-            self.text(int(row["code"])) or None,
-            "Natural Earth",
-        )
-
-    def info(self) -> DatasetInfo:
-        m = self.manifest
-        return DatasetInfo(
-            m["snapshot_id"],
-            m["schema_version"],
-            tuple((s["name"], s["date"]) for s in m["sources"]),
-            m["policy_id"],
-            m["coverage_description"],
-            tuple(m["attribution"]),
-        )
 
     def verify(self) -> None:
         try:

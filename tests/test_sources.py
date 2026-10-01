@@ -8,8 +8,8 @@ import shapely
 from shapely.geometry import Point
 
 from build_data.normalize import features
+from build_data.reference.oracle import Reference
 from build_data.sources import acquire
-from pyofflinegeocoder import Geocoder
 
 
 def test_builder_rejects_cached_hash_mismatch_before_reading_source(
@@ -21,7 +21,8 @@ def test_builder_rejects_cached_hash_mismatch_before_reading_source(
 
 
 @pytest.mark.world
-def test_runtime_candidates_equal_direct_source_polygon_oracle(world: Geocoder) -> None:
+def test_reference_matches_direct_source_polygons(world_path: Path) -> None:
+    reference = Reference(Path("data/reference"))
     cache = Path("data/cache")
     if not all((cache / f"{layer}.zip").is_file() for layer in ("countries", "admin1")):
         pytest.skip("pinned source archives are required for the source oracle")
@@ -31,7 +32,7 @@ def test_runtime_candidates_equal_direct_source_polygon_oracle(world: Geocoder) 
         for lat, lon in rng.uniform([-89, -180], [89, 180], (300, 2))
     ]
     points.extend([(50.85, 4.35), (52.7, 5.4), (-16.8, -180), (66, 179.9)])
-    for layer, attribute in (("countries", "country"), ("admin1", "admin1")):
+    for layer in ("countries", "admin1"):
         source = []
         for row, geometry in features(cache / f"{layer}.zip"):
             if layer == "admin1" and ("+00?" in row["adm1_code"] or not row["name"]):
@@ -53,6 +54,61 @@ def test_runtime_candidates_equal_direct_source_polygon_oracle(world: Geocoder) 
             expected = set(ids[touching])
             if lon == -180:
                 expected.update(ids[shapely.intersects(geometries, Point(180, lat))])
-            result = world.reverse(lat, lon, include_place=False)
-            actual = getattr(result, attribute)
-            assert {candidate.id for candidate in actual.candidates} == expected
+            rows = reference.admin.layers[
+                "country" if layer == "countries" else layer
+            ].query(lat, lon)
+            table = reference.pack.arrays[layer]
+            actual = {reference.pack.text(int(table[row]["id"])) for row in rows}
+            assert actual == expected
+    reference.close()
+
+
+def test_settlement_ingestion_excludes_sections_and_former_places(
+    tmp_path: Path,
+) -> None:
+    import zipfile
+
+    from build_data.settlements import read_settlements
+
+    codes = [
+        "PPL",
+        "PPLC",
+        "PPLA5",
+        "PPLF",
+        "STLMT",
+        "PPLX",
+        "PPLH",
+        "PPLQ",
+        "PPLW",
+        "PPLCH",
+        "UNKNOWN",
+    ]
+    lines = []
+    for identity, feature in enumerate(codes):
+        fields = [
+            str(identity),
+            feature,
+            "",
+            "",
+            "1",
+            "2",
+            "P",
+            feature,
+            "AA",
+            "",
+            "01",
+            "",
+            "",
+            "",
+            "1000",
+            "",
+            "",
+            "UTC",
+            "2026-10-01",
+        ]
+        lines.append("\t".join(fields))
+    archive = tmp_path / "cities1000.zip"
+    with zipfile.ZipFile(archive, "w") as target:
+        target.writestr("cities1000.txt", "\n".join(lines))
+    places = read_settlements(archive)
+    assert [p.feature for p in places] == ["PPL", "PPLC", "PPLA5", "PPLF", "STLMT"]
