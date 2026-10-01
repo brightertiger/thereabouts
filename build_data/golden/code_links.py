@@ -31,6 +31,7 @@ class CodeIndex:
                         continue
                     if e.get("code"):
                         self.codes.setdefault("iso:" + e["code"], set()).add(identity)
+                    administrative_identity = False
                     if e.get("geonames_id"):
                         # Administrative GeoNames identity only; a district's
                         # settlement-seat link is not an ADM1 crosswalk.
@@ -38,9 +39,18 @@ class CodeIndex:
                             "SELECT class FROM geonames WHERE id=?", (e["geonames_id"],)
                         ).fetchone()
                         if found == ("A",):
+                            administrative_identity = True
                             self.geonames.setdefault(e["geonames_id"], set()).add(
                                 identity
                             )
+                    if (
+                        role == "district"
+                        and e.get("source_subtype") == "locality"
+                        and not administrative_identity
+                    ):
+                        # Retaining an uncertain locality outside city selection
+                        # does not prove that it is an ISO administrative unit.
+                        continue
                     names = {e.get("name"), e.get("local_name")}
                     for p in e["provenance"]:
                         evidence = p["evidence"]

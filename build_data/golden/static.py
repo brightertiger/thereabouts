@@ -22,6 +22,8 @@ from .phone import PhoneCountries
 from .schemas import strings
 from .storage import budget, parquet
 
+STATIC_VERSION = 5
+
 
 def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
     import pyarrow.parquet as pq
@@ -52,7 +54,7 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
             digest = fingerprint(
                 {
                     "part": part,
-                    "static": 4,
+                    "static": STATIC_VERSION,
                     "phone_metadata": phone_manifest if source == "phone" else None,
                     "countries": inputs.countries if source != "timezones" else {},
                 }

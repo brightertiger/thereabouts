@@ -26,6 +26,7 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
             area("district", "Isère", "county", (0, 0, 0.3, 1)),
             area("one", "Central", "county", (0.3, 0, 0.6, 1)),
             area("two", "Central", "county", (0.6, 0, 1, 1)),
+            area("unverified", "Unverified", "locality", (0.4, 0.4, 0.5, 0.5)),
         ],
     )
     output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
@@ -45,6 +46,7 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
                     ("ZZ-A", "Isere"),
                     ("ZZ-B", "Central"),
                     ("ZZ-C", "Unknown"),
+                    ("ZZ-D", "Unverified"),
                 ]
             ]
         ),
@@ -55,7 +57,12 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
             path, "subdivisions", inputs, index.countries, index.codes, index=index
         )
     )
-    assert [r["link_status"] for r in linked] == ["matched", "ambiguous", "unmatched"]
+    assert [r["link_status"] for r in linked] == [
+        "matched",
+        "ambiguous",
+        "unmatched",
+        "unmatched",
+    ]
     assert linked[0]["place_id"] == "district:overture:district"
     assert linked[1]["place_id"] is None
     assert len(linked[1]["place_ids"]) == 2
