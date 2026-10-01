@@ -220,5 +220,7 @@ __marimo__/
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 
-# Explicitly built packs and source archive cache.
-/data/
+# Build intermediates and the source archive cache; the exported world table
+# in data/h3-world is committed.
+/data/*
+!/data/h3-world/

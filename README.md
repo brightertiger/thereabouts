@@ -98,7 +98,8 @@ The build-size benchmark constructs and verifies the table, and writes its one
 result file. For a plain build use
 `uv run python -m build_data --reference data/reference --output data/h3-world`.
 The reference source pack is **data/reference**; the exported table is
-**data/h3-world**. Existing outputs are not overwritten: use fresh paths or remove
+**data/h3-world**, which is committed to this repository so a clone can run
+lookups without building. Existing outputs are not overwritten: use fresh paths or remove
 previous generated outputs before rebuilding. The reference pack is created if
 absent. Retain pinned source archives in `data/cache`: GeoNames' daily URL may no
 longer serve the frozen **2026-10-01** snapshot. A hash mismatch is an error.
