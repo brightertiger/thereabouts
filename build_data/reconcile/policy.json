@@ -1,0 +1,231 @@
+{
+  "version": "reconciliation-1",
+  "perspective": "Overture default (exclude explicitly non-default claims)",
+  "offshore_m": 1000,
+  "nearest_m": 50000,
+  "name_match_m": 10000,
+  "wikidata_match_m": 100000,
+  "minimum_population": 15000,
+  "pilot": [
+    "JP",
+    "GB",
+    "US",
+    "SG",
+    "NG",
+    "PH",
+    "FR",
+    "GF",
+    "RE",
+    "GP",
+    "MQ",
+    "YT",
+    "IN",
+    "XK",
+    "MC",
+    "HK",
+    "NL",
+    "BE"
+  ],
+  "settlement_codes": [
+    "PPL",
+    "PPLA",
+    "PPLA2",
+    "PPLA3",
+    "PPLA4",
+    "PPLA5",
+    "PPLC",
+    "PPLF",
+    "PPLG",
+    "PPLL",
+    "PPLR",
+    "PPLS",
+    "STLMT"
+  ],
+  "excluded_subtypes": [
+    "neighborhood",
+    "macrohood",
+    "microhood"
+  ],
+  "city_subtypes": [
+    "locality",
+    "localadmin",
+    "county"
+  ],
+  "city_states": [
+    "SG",
+    "MC",
+    "HK",
+    "MO"
+  ],
+  "no_state": [
+    "SG",
+    "MC",
+    "HK",
+    "MO",
+    "GF",
+    "RE",
+    "GP",
+    "MQ",
+    "YT"
+  ],
+  "sovereigns": {
+    "GF": [
+      "FR",
+      "France"
+    ],
+    "RE": [
+      "FR",
+      "France"
+    ],
+    "GP": [
+      "FR",
+      "France"
+    ],
+    "MQ": [
+      "FR",
+      "France"
+    ],
+    "YT": [
+      "FR",
+      "France"
+    ],
+    "HK": [
+      "CN",
+      "China"
+    ],
+    "MO": [
+      "CN",
+      "China"
+    ],
+    "SJ": [
+      "NO",
+      "Norway"
+    ]
+  },
+  "states": {
+    "GB": {
+      "source": "geoboundaries",
+      "level": "ADM1",
+      "reason": "Constituent countries; DATA_PLAN policy, reviewed gbOpen layer"
+    },
+    "PH": {
+      "source": "overture",
+      "level": "county",
+      "reason": "Province and province-equivalent independent city, below Overture regions; direct region-child localities are province-equivalent independent cities",
+      "include_direct_region_localities": true
+    }
+  },
+  "default_state": {
+    "source": "overture",
+    "level": "region",
+    "reason": "Principal semantic subdivision; missing whole layer falls back to gbOpen ADM1"
+  },
+  "compatible_gb_licenses": [
+    "CC BY 4.0",
+    "Creative Commons Attribution 4.0 (CC BY 4.0)",
+    "Open Data Commons Open Database License 1.0",
+    "ODbL-1.0",
+    "Public Domain",
+    "CC0",
+    "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication"
+  ],
+  "rollups": [
+    {
+      "country": "JP",
+      "subtype": "locality",
+      "region_code": "JP-13",
+      "local_name_suffix": "区",
+      "target_wikidata": "Q1490",
+      "expected_entities": 23,
+      "reason": "Tokyo special wards form the city convention; other Tokyo prefecture municipalities retain their own identities. DATA_PLAN city policy."
+    },
+    {
+      "country": "GB",
+      "subtype": "county",
+      "target_wikidata": "Q84",
+      "entity_ids": [
+        "10b4f1b5-9ed8-436f-8157-dd264cd31ade",
+        "98c4a68e-1020-498e-84f5-c629db5c288b",
+        "91fcf399-7510-498c-8112-4b5d9d8d34b1",
+        "223b2141-d782-41ad-88dd-e7b2d25853bf",
+        "f6cfaf46-bb61-4719-a4f0-adc851c6d61b",
+        "8c23aadd-d29c-41fe-8a5b-76db46347a8e",
+        "672c33d5-a755-423d-b0eb-d9cfe104fb40",
+        "29064d5c-c93d-4770-8d3b-46f19e16eb53",
+        "8c52b2b2-fa19-4d4d-8df7-64502e4860fc",
+        "b64871c3-3df7-478f-91a9-1b7ead142384",
+        "9912cc5a-2f3b-4437-933b-eb4902729d0a",
+        "ca828762-c4b3-40ff-a707-5d6bac5bcc1d",
+        "82865424-fadc-41ca-a422-600a14d7c3a9",
+        "fd629040-d8b1-481d-adad-6db19d068681",
+        "cf2fef61-a880-424f-bd56-e54e11753660",
+        "4a7c8136-de3a-4a6c-a69b-964f09bf27a8",
+        "e785ce65-348a-460f-9c90-c592c0a1d1ad",
+        "19317970-00e5-4f6f-a2a5-46a2be6e770a",
+        "cb8f16da-029e-4f8e-9e37-939160457ec5",
+        "754be612-f816-4eae-8661-1a503a0f86d0",
+        "f3920768-b2c4-41b6-8fbc-54f78bd95fd0",
+        "6dc78aa5-b687-4cac-a4f8-7d446c41eb49",
+        "b47d7b84-9b8c-4872-898e-4ea39c9d01b0",
+        "50fdc785-d1bb-461c-b467-fe1cb550a0d4",
+        "c1db38e0-d021-4188-a66f-92d178c0d354",
+        "d6a66966-ce2f-4ce4-b5b8-3cd5d74f42ff",
+        "aa664a5f-5532-484f-8e9a-a30ffa58fb9e",
+        "fee3fd74-1ed4-4567-b27f-1c0cad0e42c6",
+        "6955cc6e-5e0c-4b03-8b67-c9b6b7c6aeff",
+        "837a08ed-255c-47d1-89bf-ce195cb6c294",
+        "6f8902d3-c757-4573-94bd-dd930c546471",
+        "e47e3740-396b-44c7-a780-980f29849610",
+        "35097f38-1580-48a2-9e35-3b1b007b1aef"
+      ],
+      "members": {
+        "Croydon": "29064d5c-c93d-4770-8d3b-46f19e16eb53",
+        "Sutton": "6955cc6e-5e0c-4b03-8b67-c9b6b7c6aeff",
+        "Merton": "50fdc785-d1bb-461c-b467-fe1cb550a0d4",
+        "Kingston upon Thames": "f3920768-b2c4-41b6-8fbc-54f78bd95fd0",
+        "Enfield": "b64871c3-3df7-478f-91a9-1b7ead142384",
+        "Waltham Forest": "6f8902d3-c757-4573-94bd-dd930c546471",
+        "Haringey": "fd629040-d8b1-481d-adad-6db19d068681",
+        "Brent": "223b2141-d782-41ad-88dd-e7b2d25853bf",
+        "Harrow": "cf2fef61-a880-424f-bd56-e54e11753660",
+        "Barnet": "98c4a68e-1020-498e-84f5-c629db5c288b",
+        "Hillingdon": "e785ce65-348a-460f-9c90-c592c0a1d1ad",
+        "Richmond upon Thames": "aa664a5f-5532-484f-8e9a-a30ffa58fb9e",
+        "Hounslow": "19317970-00e5-4f6f-a2a5-46a2be6e770a",
+        "Ealing": "8c52b2b2-fa19-4d4d-8df7-64502e4860fc",
+        "Southwark": "fee3fd74-1ed4-4567-b27f-1c0cad0e42c6",
+        "Lambeth": "6dc78aa5-b687-4cac-a4f8-7d446c41eb49",
+        "Wandsworth": "e47e3740-396b-44c7-a780-980f29849610",
+        "Lewisham": "b47d7b84-9b8c-4872-898e-4ea39c9d01b0",
+        "Bexley": "91fcf399-7510-498c-8112-4b5d9d8d34b1",
+        "Greenwich": "9912cc5a-2f3b-4437-933b-eb4902729d0a",
+        "Newham": "c1db38e0-d021-4188-a66f-92d178c0d354",
+        "Havering": "4a7c8136-de3a-4a6c-a69b-964f09bf27a8",
+        "Barking and Dagenham": "10b4f1b5-9ed8-436f-8157-dd264cd31ade",
+        "Redbridge": "d6a66966-ce2f-4ce4-b5b8-3cd5d74f42ff",
+        "Bromley": "f6cfaf46-bb61-4719-a4f0-adc851c6d61b",
+        "Kensington and Chelsea": "754be612-f816-4eae-8661-1a503a0f86d0",
+        "Hammersmith and Fulham": "82865424-fadc-41ca-a422-600a14d7c3a9",
+        "City of London": "672c33d5-a755-423d-b0eb-d9cfe104fb40",
+        "Westminster": "35097f38-1580-48a2-9e35-3b1b007b1aef",
+        "Camden": "8c23aadd-d29c-41fe-8a5b-76db46347a8e",
+        "Islington": "cb8f16da-029e-4f8e-9e37-939160457ec5",
+        "Hackney": "ca828762-c4b3-40ff-a707-5d6bac5bcc1d",
+        "Tower Hamlets": "837a08ed-255c-47d1-89bf-ce195cb6c294"
+      },
+      "expected_entities": 33,
+      "reason": "London city convention over the 32 London boroughs and City of London. County area identities are pinned to the current Overture source, not fixture coordinates.",
+      "reference": "https://data.london.gov.uk/download/e55pw/f1d04c59-4590-4291-b4ea-3abc624156b7/London_Borough_Boundary_Map_A4.pdf"
+    }
+  ],
+  "notes": [
+    "XK is a user-assigned country code, not ISO 3166-1.",
+    "No output-size target; no H3 materialization."
+  ],
+  "state_vote_minimum": 10,
+  "state_vote_fraction": 0.95,
+  "trusted_city_classes": [
+    "city"
+  ]
+}

@@ -1,0 +1,112 @@
+[
+  [
+    "lower Manhattan",
+    40.7128,
+    -74.006,
+    "US",
+    "New York",
+    "New York"
+  ],
+  [
+    "Tokyo",
+    35.6895,
+    139.6917,
+    "JP",
+    "Tokyo",
+    "Tokyo"
+  ],
+  [
+    "Singapore",
+    1.3521,
+    103.8198,
+    "SG",
+    "Singapore",
+    null
+  ],
+  [
+    "Monaco",
+    43.7384,
+    7.4246,
+    "MC",
+    "Monaco",
+    null
+  ],
+  [
+    "Hong Kong Central",
+    22.2819,
+    114.1582,
+    "HK",
+    "Hong Kong",
+    null
+  ],
+  [
+    "Lagos",
+    6.4541,
+    3.3947,
+    "NG",
+    "Lagos",
+    [
+      "Lagos",
+      "Lagos State"
+    ]
+  ],
+  [
+    "London",
+    51.5074,
+    -0.1278,
+    "GB",
+    "London",
+    "England"
+  ],
+  [
+    "Cayenne",
+    4.9333,
+    -52.3333,
+    "GF",
+    "Cayenne",
+    null
+  ],
+  [
+    "Pristina",
+    42.6629,
+    21.1655,
+    "XK",
+    "Pristina",
+    "*"
+  ],
+  [
+    "Bengaluru",
+    12.9716,
+    77.5946,
+    "IN",
+    "Bengaluru",
+    "Karnataka"
+  ],
+  [
+    "Paris",
+    48.8566,
+    2.3522,
+    "FR",
+    "Paris",
+    "*"
+  ],
+  [
+    "Cagayan de Oro",
+    8.4542,
+    124.6319,
+    "PH",
+    "Cagayan de Oro",
+    "*"
+  ],
+  [
+    "Eindhoven",
+    51.4416,
+    5.4697,
+    "NL",
+    "Eindhoven",
+    [
+      "Noord-Brabant",
+      "North Brabant"
+    ]
+  ]
+]
