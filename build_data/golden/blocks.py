@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from h3.api import basic_int as h3
@@ -24,6 +26,7 @@ class Plan:
             "root TEXT PRIMARY KEY,bounds TEXT,countries TEXT)"
         )
         self.db.execute("CREATE TABLE IF NOT EXISTS version(number INTEGER)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS dependencies(identity TEXT)")
         self.dependencies = dependencies
 
     def close(self) -> None:
@@ -35,9 +38,14 @@ class Plan:
             for r in self.db.execute("SELECT root,bounds FROM blocks")
         }
         version = self.db.execute("SELECT number FROM version").fetchone()
+        dependency = self.db.execute("SELECT identity FROM dependencies").fetchone()
         for number, root in enumerate(blocks()):
             key = h3.int_to_str(root)
-            if key in existing and version == (3,):
+            if (
+                key in existing
+                and version == (3,)
+                and dependency == (self.dependencies.identity,)
+            ):
                 continue
             if key in existing and existing[key][2] - existing[key][0] <= 180:
                 bounds = tuple(existing[key])
@@ -63,6 +71,10 @@ class Plan:
                 print(f"plan: {number + 1:,} exact block envelopes", flush=True)
         self.db.execute("DELETE FROM version")
         self.db.execute("INSERT INTO version VALUES(3)")
+        self.db.execute("DELETE FROM dependencies")
+        self.db.execute(
+            "INSERT INTO dependencies VALUES(?)", (self.dependencies.identity,)
+        )
         self.db.commit()
 
     def rows(self, countries: list[str] | None = None) -> list[Row]:
@@ -77,3 +89,21 @@ class Plan:
                 {"root": root, "bounds": json.loads(bounds), "countries": required}
             )
         return result
+
+
+def cache_path(work: Path) -> Path:
+    """Reuse expensive H3 envelopes when only city policy or country code changes.
+
+    Legacy caches have no dependency identity: create() rechecks every country's
+    envelope intersection before reusing their bounds. Seam roots are enumerated
+    again because a single bounding rectangle loses their disconnected windows.
+    """
+    path = work / "blocks.sqlite"
+    if not path.exists():
+        legacy = sorted(work.glob("blocks-*.sqlite"))
+        if legacy:
+            with closing(sqlite3.connect(legacy[0])) as db:
+                if db.execute("PRAGMA quick_check").fetchone() != ("ok",):
+                    raise ValueError("Invalid legacy block envelope cache")
+            shutil.copyfile(legacy[0], path)
+    return path

@@ -14,7 +14,7 @@ from build_data.acquire.ledger import read_units
 from build_data.acquire.runtime import single_run
 
 from . import joins, places, static
-from .blocks import Plan
+from .blocks import Plan, cache_path
 from .inputs import discover
 from .metrics import measure
 from .planning import Dependencies, inventory
@@ -81,7 +81,7 @@ def cycle(workspace: Workspace, args: argparse.Namespace) -> bool:
     country_inventory = inventory(workspace, inputs)
     inputs.expected = set(country_inventory["expected"])
     plan = Plan(
-        work / f"blocks-{inputs.identity}.sqlite",
+        cache_path(work),
         Dependencies(country_inventory, inputs.policy["offshore_m"]),
     )
     try:
@@ -92,20 +92,20 @@ def cycle(workspace: Workspace, args: argparse.Namespace) -> bool:
         plan.close()
     if args.command == "plan":
         return True
+    publish(workspace, inputs, [], {"completed": False, "stage": "exporting places"})
     independent = places.export(workspace, inputs) + static.export(workspace, inputs)
-    if (
-        args.command == "static"
-        or not (workspace.root / "golden/manifest.json").exists()
-    ):
-        publish(
-            workspace,
-            inputs,
-            independent,
-            {"completed": False, "stage": "static"},
-        )
-        if args.command == "static":
-            write_json(work / "run.json", {"completed": False, "stage": "static"})
-            return True
+    publish(
+        workspace,
+        inputs,
+        independent,
+        {
+            "completed": False,
+            "stage": "static" if args.command == "static" else "building",
+        },
+    )
+    if args.command == "static":
+        write_json(work / "run.json", {"completed": False, "stage": "static"})
+        return True
     selected = args.countries or (
         ["BE", "NL", "LU", "AU"] if args.command == "pilot" else None
     )

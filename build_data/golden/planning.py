@@ -18,7 +18,14 @@ from .windows import expanded
 
 def inventory(workspace: Workspace, inputs: Inputs) -> Row:
     path = workspace.work / "golden" / "countries.json"
-    digest = fingerprint({"inputs": inputs.identity, "plan": 3})
+    digest = fingerprint(
+        {
+            "sources": inputs.sources,
+            "licenses": inputs.policy["compatible_gb_licenses"],
+            "perspective": inputs.policy.get("perspective"),
+            "plan": 3,
+        }
+    )
     ledger = Ledger(workspace.ledger_path)
     if ledger.is_complete("golden.plan", "countries", digest):
         return read_json(path)
@@ -78,6 +85,9 @@ def inventory(workspace: Workspace, inputs: Inputs) -> Row:
 
 class Dependencies:
     def __init__(self, inventory: Row, offshore_m: float) -> None:
+        self.identity = fingerprint(
+            {"bounds": inventory["bounds"], "offshore_m": offshore_m}
+        )
         self.codes = [r[0] for r in inventory["bounds"]]
         self.tree = STRtree([shapely.box(*r[1:]) for r in inventory["bounds"]])
         self.offshore_m = offshore_m

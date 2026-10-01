@@ -35,7 +35,6 @@ def builder() -> str:
             "offshore.py",
             "seam.py",
             "windows.py",
-            "schemas.py",
         )
     ]
     modules.extend(
@@ -48,6 +47,7 @@ def builder() -> str:
     )
     return fingerprint(
         {
+            "schema": str(CELLS),
             "code": {
                 str(p.relative_to(directory.parents[1])): sha256_file(p)
                 for p in modules
