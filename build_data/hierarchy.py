@@ -1,6 +1,7 @@
 """Bounded-memory refinement with exact descendant envelopes and sibling collapse."""
 
 from collections.abc import Iterator
+from typing import Protocol
 
 import numpy as np
 from h3.api import basic_int as h3
@@ -9,8 +10,14 @@ from numpy.typing import NDArray
 from pyofflinegeocoder.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
 from pyofflinegeocoder.hierarchy import addresses
 
-from .reference.oracle import FloatArray, Labels, Reference
+from .reference.oracle import FloatArray, Labels
 from .reference.schema import BOUNDARY_TOLERANCE_DEG
+
+
+class Labeller(Protocol):
+    def labels(self, coordinates: FloatArray) -> Labels: ...
+
+    def certify(self, bounds: FloatArray) -> tuple[Labels, NDArray[np.bool_]]: ...
 
 
 def blocks(bounds: list[float] | None = None, resolution: int = 8) -> Iterator[int]:
@@ -56,7 +63,7 @@ def groups(
 
 
 def label_block(
-    reference: Reference,
+    reference: Labeller,
     cells: NDArray[np.uint64],
     coordinates: FloatArray,
     resolution: int,

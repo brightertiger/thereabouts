@@ -26,13 +26,13 @@ def test_paths_and_reserve(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.setattr(
         shutil, "disk_usage", lambda p: usage._replace(free=MIN_FREE_BYTES - 1)
     )
-    with pytest.raises(OSError, match="20 GB"):
+    with pytest.raises(OSError, match="preserve at least"):
         workspace.check_budget()
     monkeypatch.setattr(
         shutil, "disk_usage", lambda p: usage._replace(free=MIN_FREE_BYTES)
     )
     workspace.check_budget()
-    with pytest.raises(OSError, match="20 GB"):
+    with pytest.raises(OSError, match="preserve at least"):
         workspace.check_budget(required_bytes=1)
     with pytest.raises(ValueError):
         workspace.raw("../escape")
@@ -48,7 +48,7 @@ def test_workspace_hard_cap(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     )
     monkeypatch.setattr(module, "MAX_WORKSPACE_BYTES", 4)
     (tmp_path / "some-data").write_bytes(b"12345")
-    with pytest.raises(OSError, match="45 GB"):
+    with pytest.raises(OSError, match="workspace would exceed"):
         workspace.check_budget()
 
 

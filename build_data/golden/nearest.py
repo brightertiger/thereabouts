@@ -1,0 +1,78 @@
+"""Bounded country point indexes and exact scalar handling at numerical ties."""
+
+from __future__ import annotations
+
+from functools import lru_cache
+from pathlib import Path
+
+import numpy as np
+from scipy.spatial import cKDTree
+
+from build_data.reconcile.common import connect
+from build_data.reconcile.spatial import EARTH_M, distance
+from build_data.reference.sphere import unit_vectors
+
+from .geometry import Floats, Ints
+
+
+class Nearest:
+    def __init__(self, path: Path) -> None:
+        db = connect(path, readonly=True)
+        try:
+            records = db.execute(
+                "SELECT DISTINCT entity,x,y FROM points ORDER BY entity,x,y"
+            ).fetchall()
+        finally:
+            db.close()
+        self.ids = [r[0] for r in records]
+        self.coordinates = np.array(
+            [(r[2], r[1]) for r in records], dtype=np.float64
+        ).reshape((-1, 2))
+        self.xyz = unit_vectors(self.coordinates)
+        self.tree = cKDTree(self.xyz) if len(records) else None
+
+    def query(self, coordinates: Floats, cutoff: float) -> tuple[Ints, Floats, Floats]:
+        n = len(coordinates)
+        if self.tree is None:
+            return (
+                np.full(n, -1, dtype=np.int64),
+                np.full(n, np.inf),
+                np.full(n, np.inf),
+            )
+        xyz = unit_vectors(coordinates)
+        chords, indices = self.tree.query(xyz, k=2)
+        chosen = indices[:, 0].astype(np.int64)
+        lat, lon = np.radians(coordinates).T
+        other_lat, other_lon = np.radians(self.coordinates[chosen]).T
+        h = (
+            np.sin((other_lat - lat) / 2) ** 2
+            + np.cos(lat) * np.cos(other_lat) * np.sin((other_lon - lon) / 2) ** 2
+        )
+        first = 2 * EARTH_M * np.arcsin(np.sqrt(np.minimum(1, h)))
+        second = np.where(
+            np.isfinite(chords[:, 1]),
+            2 * EARTH_M * np.arcsin(np.minimum(1, chords[:, 1] / 2)),
+            np.inf,
+        )
+        exceptional = np.flatnonzero(
+            (second - first < 1e-6) | (np.abs(first - cutoff) < 1e-6)
+        )
+        for i in exceptional:
+            candidates = self.tree.query_ball_point(xyz[i], float(chords[i, 0]) + 1e-12)
+            y, x = coordinates[i]
+            d, _, selected = min(
+                (
+                    distance(x, y, self.coordinates[j, 1], self.coordinates[j, 0]),
+                    self.ids[j],
+                    j,
+                )
+                for j in candidates
+            )
+            first[i], chosen[i] = d, selected
+        chosen[first > cutoff] = -1
+        return chosen, first, second
+
+
+@lru_cache(maxsize=3)
+def nearest(path: Path) -> Nearest:
+    return Nearest(path)
