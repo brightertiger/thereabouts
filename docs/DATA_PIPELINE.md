@@ -517,8 +517,12 @@ reconciled manifest is archived under `work/reconcile/history/`; the active
 manifest is explicitly incomplete while the new generation builds. A verified
 country resumes without reconstructing its retired intermediates.
 
-`python -m build_data.rebuild_golden --data-dir data --sample-gate
- data/work/v1/sample.json` runs world reconciliation followed by the golden stage.
+Run world reconciliation followed by the golden stage with:
+
+```sh
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --sample-gate data/work/v1/sample.json
+```
 The sample gate must demonstrate improved exact identity, no aggregate country or
 state regression, and passing named fixtures for the exact source, policy and
 reconciliation builder. The existing full-pilot gate is also required. Logs and

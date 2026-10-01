@@ -111,9 +111,8 @@ Linked untyped localities retain population ordering below those municipalities.
 County/localadmin promotion still requires a shared Wikidata settlement identity
 and has lower priority. A region may supply a city footprint only when it shares
 exactly the same Wikidata identity with a uniquely linked, explicit city-class
-locality; a state's capital or a similar name is insufficient. Such a footprint
-ranks above untyped administrative localities and below independently classified
-municipalities. No city names or probe coordinates enter these decisions.
+locality; a state's capital or a similar name is insufficient. All shared-identity administrative footprints rank below linked localities
+and above unlinked settlement classifications. No city names or probe coordinates enter these decisions.
 
 City-state footprints are SG/MC/HK/MO. The JP policy assigns precisely the 23 locality areas ending in 区 within JP-13 to the linked Q1490 city. A changed membership count fails the unit. Other Tokyo prefecture municipalities retain their own city identities. The GB policy assigns 33 pinned county identities (32 boroughs plus City of London) to Q84, using the [official borough map](https://data.london.gov.uk/download/e55pw/f1d04c59-4590-4291-b4ea-3abc624156b7/London_Borough_Boundary_Map_A4.pdf). No rule uses a fixture coordinate. Nearest fallback uses eligible GeoNames or unmatched Overture locality points, same country, ≤50 km inclusive, and is labelled `nearest`.
 

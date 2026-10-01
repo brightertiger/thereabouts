@@ -19,7 +19,7 @@ retained rather than labelling every containing city a correct suburb.
 
 | Class | Count | Largest concentrations (counts) |
 | --- | ---: | --- |
-| Untyped locality: ward or administrative area | 2,011 | PK 326, CN 292, VN 251, TH 123, IR 88, TN 88 |
+| Untyped locality chosen as city | 2,011 | PK 326, CN 292, VN 251, TH 123, IR 88, TN 88 |
 | Source-labelled suburb within a larger linked city | 1,657 | US 255, CA 210, AU 191, ES 189, RU 118, BR 99 |
 | Other linked containing city; identity unresolved | 1,170 | US 218, JP 193, IN 120, PH 71, CN 44, BR 43 |
 | Nearest neighbour changed by r8 centre displacement | 1,043 | IN 287, ID 153, CN 75, MY 53, US 46, UG 43 |
@@ -41,6 +41,15 @@ polygons underlie many other classes and are recorded independently as
 The 52 suspected link collisions are not 52 proven bad links. Same-name distinct
 GeoNames records and stale/contradictory Wikidata evidence require adjudication.
 
+Within the 2,011 untyped localities, a separate source-label audit finds **621
+explicit ward/borough/subdistrict labels** (CN 268, VN 178, TH 97, KE 52, IN 23),
+**378 district/county/tehsil labels** (PK 323, YE 24, JP 11), **113 municipal,
+commune or parish labels** (VN 70, SN 11, TH 11), and **899 unresolved labels**
+(TN 88, IR 87, DE 84, PT 75). These are descriptive source-label categories, not
+extra observations or runtime name rules. Overture hierarchy directly confirms
+that 1,025 of these administrative localities contain the expected linked
+settlement point. Evidence is in `admin-label-audit-v0.json`.
+
 Mumbai is one example of the widespread untyped-locality issue: its linked city
 point is a *child* of L Ward in Overture's containment hierarchy, and has no city
 polygon. Blindly rolling every child into its parent would preserve the error.
@@ -61,6 +70,13 @@ GeoNames-admin1** observations; the 8,911 denominator combines both systems.
 49 additional GeoNames admin1 observations have multiple candidate places.
 The v0 linker only indexes canonical states, omitting retained districts such as
 French departments and British local authorities.
+The new alias index includes administrative districts and their upstream names.
+An uncertain locality retained as a district is excluded from alias matching
+unless a GeoNames administrative identity supports it: its storage role alone
+does not establish an ISO subdivision. Ambiguous aliases remain multi-candidate.
+An exact sovereign/territory code pair can identify a separately represented
+country, such as `CN-HK` → `country:HK`. An unrelated country-code suffix is not
+sufficient evidence.
 
 Unmatched countries are EH, AN and CS. EH has a GeoNames TERR record but no
 accepted default-perspective country polygon; 49 retained cities consequently
@@ -73,6 +89,15 @@ patterns, so shared calling codes alone overstate ambiguity. Non-geographic
 001 service metadata has no geographic country; AC and TA are calling-plan
 territories without separate country entities.
 
+Numbering-language analysis leaves 44 candidate ambiguities: 37 Australian/
+Indian Ocean territory rows, four Morocco/Western Sahara rows, two Italy/Vatican
+rows, and one `134597` row unsupported by the pinned fixed-line patterns. The
+first 43 retain overlapping source languages; the last retains all source
+candidates rather than inventing support. Counts are rows, including translated
+descriptions. `phone-residual-language.json` records the exact prefixes and
+candidate sets. Stronger allocation evidence could resolve some of these; they
+are not asserted to be inherently unknowable.
+
 ## Implementation and rebuild
 
 The general rule now requires settlement evidence, uses hierarchy and population
@@ -84,6 +109,13 @@ it. Existing explicit Tokyo/London and city-state conventions remain data policy
 An exact shared Wikidata identity between a region and an explicit, uniquely
 linked city can supply a missing city footprint; a capital/seat relationship or
 name resemblance cannot. No new country or city-name exceptions were introduced.
+All shared-identity administrative footprints outrank unlinked town/village
+classifications, but stay below independently linked localities. The first sample
+exposed why both bounds matter: an unlinked town label displaced Karachi's
+established identity, while 153 linked Chinese settlements were absorbed by
+Shanghai or Chongqing's regional footprint. The final sample and world gate use
+the corrected ordering. The original comparison and regression evidence remain
+in `sample-first.json` and `sample-first-change-classes.json`.
 
 Rejected administrative localities and source evidence remain in `places` as
 districts, with `source_subtype`, `settlement_class` and `city_exclusion` fields.
@@ -106,12 +138,18 @@ rejects dangling parent and sovereign references as well as dangling cell IDs.
 Historical AN/CS and non-geographic phone services are not invented as current
 countries.
 
-The first full validation passed 233 tests with 7 existing skips. A subsequent
-envelope-cache regression test also passes; final validation is recorded below.
+Final code validation passed **236 tests with 7 existing skips**, including the
+envelope-cache regression test. Ruff lint, Ruff format (209 files) and strict
+mypy (206 source files) pass. Logs are `data/work/v1/{pytest-final,ruff-final,
+format-final,mypy-final}.log`.
 Tests cover independent municipalities, administrative containers, exact region
 identity, country-only catalogue entries, interrupted replacement and resumed
 cleanup, administrative alias ambiguity, numbering-prefix overlap, and exhaustive
 scalar/vector/compacted-cell equivalence including seams and pentagons.
+The first sample additionally passed certificate/direct-vector and compacted
+ancestor equivalence for all **487,403 r8 centres** in the 29 requested probe
+blocks, with **1,856 independent scalar checks**. This check is repeated for the
+final sample builder before the world run.
 
 Country replacement archives the old manifest and marks the new generation
 incomplete. Each verified country replaces its predecessor; that country's
