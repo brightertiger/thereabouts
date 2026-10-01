@@ -8,6 +8,8 @@ from typing import Any
 from .artifacts import read_json
 from .io import fingerprint
 from .ledger import read_units
+from .lookup_catalog import LOOKUP_SOURCES
+from .lookup_schemas import KINDS
 from .manifests import MANIFEST_VERSION, inventory_path
 from .workspace import SOURCES, Workspace
 
@@ -24,6 +26,8 @@ def _present(records: Sequence[dict[str, Any]]) -> bool:
 def _expected(
     source: str, inventory: dict[str, Any], downloaded: list[dict[str, Any]]
 ) -> set[str]:
+    if "specifications" in inventory:
+        return set(inventory["specifications"])
     if source == "overture":
         return {obj["key"] for obj in inventory["objects"]}
     if source == "geonames":
@@ -92,6 +96,12 @@ def source_status(workspace: Workspace, source: str) -> dict[str, Any]:
                     rows["areas"] += metadata.get("rows", 0)
                 elif source == "geoboundaries":
                     rows["areas"] += metadata.get("output_rows", 0)
+                elif source in LOOKUP_SOURCES:
+                    rows.update(metadata.get("output_rows", {}))
+                    if source == "timezones":
+                        rows["timezone_cells"] += metadata.get("cells", 0)
+                        rows["timezones"] += metadata.get("geometry_parts", 0)
+                        rows["zone_tables"] += metadata.get("rows", 0)
                 elif source == "overture":
                     rows.update(metadata.get("output_rows", {}))
                 elif "kind" in metadata:
@@ -136,7 +146,7 @@ def print_status(workspace: Workspace) -> None:
         state = source_status(workspace, source)
         rows = ", ".join(
             f"{state['rows'][kind]:,} {kind}"
-            for kind in ("areas", "places", "names")
+            for kind in ("areas", "places", "names", *KINDS)
             if kind in state["rows"]
         )
         print(

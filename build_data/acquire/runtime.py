@@ -8,9 +8,11 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
+from .lookup_catalog import LOOKUP_SOURCES
 from .workspace import Workspace
 
 SOURCE_LIMITS = {
+    **dict.fromkeys(LOOKUP_SOURCES, 6_000_000_000),
     "osm_land": 8_000_000_000,
     "overture": 25_000_000_000,
     "geonames": 10_000_000_000,
@@ -48,6 +50,19 @@ def disk_bytes(paths: Iterator[Path]) -> int:
 
 def source_budget(workspace: Workspace, source: str, required: int = 0) -> None:
     workspace.check_budget(required)
+    if source in LOOKUP_SOURCES:
+        roots_all = [
+            root
+            for name in LOOKUP_SOURCES
+            for root in (
+                workspace.raw(name),
+                workspace.normalized(name),
+                workspace.work / name,
+            )
+        ]
+        total = sum(disk_bytes(root.rglob("*")) for root in roots_all)
+        if total + required > 6_000_000_000:
+            raise OSError("Additional lookups would exceed their shared 6 GB budget")
     roots = (
         workspace.raw(source),
         workspace.normalized(source),

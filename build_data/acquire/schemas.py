@@ -10,9 +10,11 @@ import pyarrow as pa
 import shapely
 
 from .geometry import BBOX_COLUMNS, BOUND_TOLERANCE, check_bounds, validate_polygon
+from .lookup_schemas import LOOKUP_SCHEMAS, LookupKind
+from .lookup_validation import validate_lookup_batch
 from .workspace import SOURCES
 
-Kind = Literal["areas", "places", "names"]
+Kind = Literal["areas", "places", "names"] | LookupKind
 SCHEMA_VERSION = "1"
 MAX_BATCH_BYTES = 32_000_000
 MAX_ROW_BYTES = 8_000_000
@@ -92,7 +94,14 @@ NAMES = pa.schema(
     metadata=_METADATA,
 )
 
-SCHEMAS: dict[Kind, pa.Schema] = {"areas": AREAS, "places": PLACES, "names": NAMES}
+SCHEMAS: dict[Kind, pa.Schema] = {
+    "areas": AREAS,
+    "places": PLACES,
+    "names": NAMES,
+}
+for lookup_kind, lookup_schema in LOOKUP_SCHEMAS.items():
+    SCHEMAS[lookup_kind] = lookup_schema
+
 SCHEMA_HASHES: dict[Kind, str] = {
     kind: hashlib.sha256(schema.serialize().to_pybytes()).hexdigest()
     for kind, schema in SCHEMAS.items()
@@ -139,6 +148,9 @@ def validate_table(table: pa.Table | pa.RecordBatch, kind: Kind) -> None:
         table.to_batches(max_chunksize=1024) if isinstance(table, pa.Table) else [table]
     )
     for batch in batches:
+        if kind in LOOKUP_SCHEMAS:
+            validate_lookup_batch(batch, kind, SOURCES, _provenance, MAX_ROW_BYTES)
+            continue
         for index, row in enumerate(batch.to_pylist()):
             if batch.slice(index, 1).nbytes > MAX_ROW_BYTES:
                 raise ValueError(

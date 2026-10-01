@@ -104,10 +104,10 @@ def test_cli_twice_skips_all_completed_work_and_dispatches_stages(
     assert main([*args, "--stage", "download"]) == 0
     assert worked == [source + ".download" for source in ADAPTERS]
     assert main(args) == 0
-    assert len(worked) == 8
+    assert len(worked) == 2 * len(ADAPTERS)
     assert main(args) == 0
     assert main(["geonames", "--stage", "normalize", "--data-dir", str(tmp_path)]) == 0
-    assert len(worked) == 8
+    assert len(worked) == 2 * len(ADAPTERS)
 
 
 def test_adapter_failure_does_not_claim_completion(

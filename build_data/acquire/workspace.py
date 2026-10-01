@@ -6,7 +6,9 @@ import stat
 from dataclasses import dataclass
 from pathlib import Path
 
-SOURCES = ("osm_land", "overture", "geonames", "geoboundaries")
+from .lookup_catalog import LOOKUP_SOURCES
+
+SOURCES = ("osm_land", "overture", "geonames", "geoboundaries", *LOOKUP_SOURCES)
 MIN_FREE_BYTES = 20_000_000_000
 MAX_WORKSPACE_BYTES = 45_000_000_000
 
@@ -39,7 +41,9 @@ class Workspace:
         self, source: str, kind: str, unit_id: str, inputs_hash: str, part: int = 0
     ) -> Path:
         """Return a deterministic path; input changes cannot overwrite prior outputs."""
-        if kind not in ("areas", "places", "names") or part < 0:
+        from .lookup_schemas import KINDS
+
+        if kind not in ("areas", "places", "names", *KINDS) or part < 0:
             raise ValueError("Invalid partition kind or part number")
         if len(inputs_hash) != 64 or any(
             c not in "0123456789abcdef" for c in inputs_hash

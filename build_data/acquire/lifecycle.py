@@ -25,6 +25,7 @@ def _cleanup_verified(
     work = workspace.work / source
     patterns = {
         "osm_land": (),
+        "timezones": ("shapes/*.shp", "shapes/*.shx", "shapes/*.dbf", "shapes/*.prj"),
         "overture": ("entities.sqlite3", "entities.sqlite3-journal"),
         "geonames": (
             "extracted/*/allCountries.txt",
@@ -35,7 +36,7 @@ def _cleanup_verified(
         ),
         "geoboundaries": ("*/layer.shp", "*/layer.shx", "*/layer.dbf", "*/layer.prj"),
     }
-    for pattern in patterns[source]:
+    for pattern in patterns.get(source, ()):
         candidates.extend(work.glob(pattern))
     protected = {
         Path(record["path"]).resolve()
