@@ -151,3 +151,18 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string() -> None:
     row["postal_code"] = "\u00a0"
     with pytest.raises(ValueError, match="missing strings"):
         validate_table(pa.Table.from_pylist([row], schema=table.schema), "postal_codes")
+
+
+def test_upstream_postal_outlier_is_reported_without_falsifying_its_cell() -> None:
+    from build_data.acquire.lookup_verify import postal_check
+
+    source = (13.2257, 77.575)
+    result = postal_check(
+        [(*source, h3.latlng_to_cell(*source, 8))], (12.8, 13.2, 77.4, 77.8)
+    )
+    assert not result["expected_area_match"]
+    assert result["records"][0][:2] == source
+    with pytest.raises(ValueError, match="incorrect H3"):
+        postal_check(
+            [(*source, h3.latlng_to_cell(12.97, 77.59, 8))], (12.8, 13.2, 77.4, 77.8)
+        )

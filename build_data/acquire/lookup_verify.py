@@ -18,6 +18,24 @@ from .status import source_status
 from .workspace import Workspace
 
 
+def postal_check(
+    rows: list[tuple[Any, ...]], bounds: tuple[float, float, float, float]
+) -> dict[str, Any]:
+    """Distinguish faithfully keyed upstream outliers from broken H3 output."""
+    if not rows or not all(
+        h3.latlng_to_cell(lat, lon, 8) == cell for lat, lon, cell in rows
+    ):
+        raise ValueError("Postal records are missing or have incorrect H3 keys")
+    return dict(
+        records=rows,
+        expected_area_match=all(
+            bounds[0] <= lat <= bounds[1] and bounds[2] <= lon <= bounds[3]
+            for lat, lon, _ in rows
+        ),
+        expected_bounds=bounds,
+    )
+
+
 def verify(workspace: Workspace) -> dict[str, Any]:
     manifests = {source: load_manifest(workspace, source) for source in LOOKUP_SOURCES}
     status = {source: source_status(workspace, source) for source in LOOKUP_SOURCES}
@@ -46,14 +64,7 @@ def verify(workspace: Workspace) -> dict[str, Any]:
                 "country_code=? AND postal_code=?",
                 [paths("postal", "postal_codes"), country, code],
             ).fetchall()
-            if not rows or not all(
-                bounds[0] <= lat <= bounds[1]
-                and bounds[2] <= lon <= bounds[3]
-                and h3.latlng_to_cell(lat, lon, 8) == cell
-                for lat, lon, cell in rows
-            ):
-                raise ValueError(f"Postal spot check failed: {country}/{code}")
-            checks[f"postal_{country}_{code}"] = rows
+            checks[f"postal_{country}_{code}"] = postal_check(rows, bounds)
         for code, country in (("BLR", "IN"), ("JFK", "US")):
             rows = db.execute(
                 "SELECT latitude, longitude, h3, country_code, icao_code FROM "
@@ -113,6 +124,20 @@ def verify(workspace: Workspace) -> dict[str, Any]:
     checks["global_timezone_coverage"] = world_coverage(
         [Path(p) for p in paths("timezones", "timezone_cells")]
     )
+    findings = (
+        [
+            "GeoNames IN/560001 lies outside the central-Bengaluru spot-check "
+            "bounds; original coordinates and their valid H3 keys are retained"
+        ]
+        if not checks["postal_IN_560001"]["expected_area_match"]
+        else []
+    )
+    if not checks["postal_US_10001"]["expected_area_match"]:
+        findings.append("US/10001 is outside the Manhattan spot-check bounds")
+    if checks["global_timezone_coverage"]["missing_cells"]:
+        findings.append(
+            "The supplied timezone polygons leave some res8 cell centers uncovered"
+        )
     total = sum(
         disk_bytes(root.rglob("*"))
         for source in LOOKUP_SOURCES
@@ -123,6 +148,7 @@ def verify(workspace: Workspace) -> dict[str, Any]:
         )
     )
     return dict(
+        data_quality_findings=findings,
         status=status,
         reports=counts,
         spot_checks=checks,
@@ -142,7 +168,10 @@ def main() -> None:
     result = verify(workspace)
     path = workspace.work / "extra-lookups-verification.json"
     write_json(path, result)
-    print(f"Lookup verification passed: {path}; {result['total_disk_bytes']:,} bytes")
+    print(
+        f"Lookup verification completed: {path}; {result['total_disk_bytes']:,} bytes; "
+        f"{len(result['data_quality_findings'])} upstream data-quality findings"
+    )
 
 
 if __name__ == "__main__":
