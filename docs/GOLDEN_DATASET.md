@@ -108,8 +108,11 @@ work/ledger.sqlite3               # shared golden.* checkpoints
 ```
 
 The manifest records schema version, reference/block resolution, source policy,
-reconciliation and golden builders, country/land hashes and each table's absolute path, kind,
-row count, bytes and SHA256. Cell records also name their resolution-3 block.
+reconciliation and golden builders, country/land hashes and each table's path,
+kind, row count, bytes and SHA256. New golden manifests store artifact paths
+relative to the data root; `data_root` locates that root relative to the manifest's
+directory. `build_data.golden.paths.manifest(path)` resolves them for readers.
+Historical absolute records remain readable. Cell records also name their resolution-3 block.
 The manifest and its companion reports are committed as `golden.manifest/current`.
 Only use its listed files, never glob for a supposedly complete snapshot. Running
 updates replace files atomically; readers needing a stable verified snapshot
@@ -544,3 +547,47 @@ Completion requires both `work/golden/run.json` and `golden/manifest.json` to sa
 `completed: true`, with the integrity checks above passing. Both markers are true for the final v1 publication;
 [GOLDEN_V1.md](GOLDEN_V1.md#completed-rebuild-and-evidence) records completion and
 audit evidence.
+
+
+## Comparing regenerated datasets
+
+Record a content digest of each completed base and normalized dataset **before**
+rebuilding it. Use the same preserved inputs, policies and library versions.
+The digest command reads only manifest-listed Parquet partitions and writes its
+result to a separate JSON file:
+
+```sh
+python -m build_data.digest_golden data/golden --output before-base.json
+python -m build_data.digest_golden data/golden-v2 --output before-normalized.json
+# After regeneration, using the actual new output directories:
+python -m build_data.digest_golden data/golden --output after-base.json \
+  --compare before-base.json
+python -m build_data.digest_golden data/golden-v2 --output after-normalized.json \
+  --compare before-normalized.json
+```
+
+The result includes each logical table (`kind`), its columns/types, row count and
+SHA256, plus a dataset SHA256. It is independent of partition filenames, partition
+order, row order, compression, row-group layout, Arrow metadata and Parquet footer
+metadata. All row values remain significant, including timestamps stored as data,
+nulls, nested values and duplicate counts. NaN payloads share a canonical value;
+signed zero remains distinct. The command rejects incomplete manifests, duplicate
+partition references, inconsistent schemas and incorrect row counts. It does not
+substitute for the pipeline's integrity/quality verification.
+
+Rows are hashed in small batches. A disposable SQLite B-tree sorts the row hashes
+and retains duplicate multiplicities with bounded memory. Scratch disk grows with
+the number of distinct rows; `--temp-dir /path/to/scratch` chooses its location.
+The JSON contains no run timestamp or machine path. `--compare` exits nonzero on
+any difference and leaves the new per-table digests available for diagnosis.
+
+Rebuilt golden manifests, base snapshots, receipts, ledger output records and
+normalized unit keys use data-root-relative paths. The normalized implementation
+hash uses repository-relative code paths and still includes every `.py`/`.json`
+file in its original three directories. Moving those code/data roots therefore
+preserves their direct path inputs and output verification. Acquisition,
+reconciliation and city-normalization records still carry historical absolute
+paths and opaque hashes derived from them; their pilot reports and review bindings
+also remain location-sensitive. Moving an entire acquired workspace is not yet
+supported end to end. A future upstream migration/rebuild must address those
+records separately; never edit saved hashes to force acceptance.

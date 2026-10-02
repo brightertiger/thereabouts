@@ -5,14 +5,16 @@ from pathlib import Path
 
 import duckdb
 
-from build_data.acquire import Ledger, Workspace
+from build_data.acquire import Workspace
 from build_data.acquire.artifacts import file_record, read_json
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire.io import write_json
 from build_data.cities.engine import Engine
 from build_data.cities.evaluate import Comparison
 from build_data.cities.quality import country_report, named_checks
 from build_data.cities.urban import Urban
+from build_data.golden import paths as data_paths
 from build_data.golden.inputs import discover, verify_record
+from build_data.golden.ledger import Ledger
 from build_data.golden.metrics import measure
 from build_data.golden.reader import Cells
 from build_data.reconcile.common import Row
@@ -61,7 +63,7 @@ def reference_checks(tables: list[Row]) -> Row:
 
 
 def verify(workspace: Workspace, output: Path, review: Path | None = None) -> None:
-    manifest = read_json(output / "manifest.json")
+    manifest = data_paths.read(output / "manifest.json", workspace.root)
     if manifest.get("implementation") != implementation():
         raise ValueError("Build implementation changed; rebuild before verification")
     if manifest.get("completed"):
@@ -73,8 +75,8 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
     for table in manifest["tables"]:
         verify_record(table)
     normalized = manifest["normalization"]
-    base = read_json(Path(manifest["base_manifest"]))
-    if fingerprint(base) != manifest["base"]:
+    base = data_paths.read(Path(manifest["base_manifest"]), workspace.root)
+    if data_paths.digest(base, workspace.root) != manifest["base"]:
         raise ValueError("Base snapshot changed before final verification")
     urban = Urban(normalized["ghsl"]["partitions"])
     before, after = Cells(base["tables"]), Cells(manifest["tables"])
@@ -82,8 +84,10 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
         before, {}, normalized["policy"]["town_radius"]["enabled"], after
     )
     probes = read_json(Path(__file__).parents[1] / "cities/probes.json")
-    ledger = Ledger(workspace.ledger_path)
-    digest = fingerprint({"manifest": manifest, "implementation": implementation()})
+    ledger = Ledger(workspace)
+    digest = data_paths.digest(
+        {"manifest": manifest, "implementation": implementation()}, workspace.root
+    )
     totals: Counter[str] = Counter()
     reports = {}
     failed: dict[str, list[Row]] = {
@@ -97,7 +101,7 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
             Path(r["index"]["path"]), inputs.paths[cc], urban, normalized["policy"]
         )
         path = output / "quality" / f"{cc}.json"
-        unit = str(output.resolve()) + ":" + cc
+        unit = data_paths.relative(output, workspace.root) + ":" + cc
         if ledger.is_complete("normalize-cells.quality", unit, digest):
             report = read_json(path)
         else:
@@ -107,7 +111,7 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
         totals.update(report["diagnostic"]["counts"])
         for kind, rows_failed in failures([report], []).items():
             failed[kind].extend(rows_failed)
-        reports[cc] = str(path)
+        reports[cc] = data_paths.relative(path, workspace.root)
         write_json(
             workspace.work / "v2-run.json",
             {
@@ -130,7 +134,7 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
     exceptions = []
     if review:
         examined = read_json(review)
-        if examined.get("manifest") != fingerprint(manifest):
+        if examined.get("manifest") != data_paths.digest(manifest, workspace.root):
             raise ValueError("Final boundary review is stale")
         exceptions = examined.get("boundary_exceptions", [])
     boundary_losses = list(failed["all_boundaries"])
@@ -167,7 +171,7 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
         "WGS84 conversion and city allocation are modifications.\n"
     )
     (output / "DATASET_CARD.md").write_text(
-        "# Golden v2\n\nVerified country-checkpointed city normalization "
+        "# Thereabouts golden v2\n\nVerified country-checkpointed city normalization "
         "at H3 resolution 8.\n"
         f"{rows['places']:,} places; "
         f"{rows['canonical_cities']:,} absorbing cities/towns; "
@@ -192,10 +196,10 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
         )
     ]
     manifest["verification_artifacts"].extend(
-        file_record(Path(p)) for p in reports.values()
+        file_record(workspace.root / p) for p in reports.values()
     )
     manifest["completed"] = True
-    write_json(output / "manifest.json", manifest)
+    data_paths.write(output / "manifest.json", manifest, workspace.root)
     write_json(
         workspace.work / "v2-run.json",
         {"completed": True, "stage": "verified", "output": str(output)},

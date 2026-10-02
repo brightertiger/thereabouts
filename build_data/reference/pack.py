@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from pyofflinegeocoder.errors import DamagedPackError
+from thereabouts.errors import DamagedPackError
 
 from .manifest import read_manifest
 from .schema import ARRAY_DTYPES, LAYERS

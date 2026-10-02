@@ -44,7 +44,7 @@ def _probe(url: str) -> dict[str, object]:
         url,
         headers={
             "Accept-Encoding": "identity",
-            "User-Agent": "PyOfflineGeocoder/acquire",
+            "User-Agent": "Thereabouts/acquire",
         },
         method="HEAD",
     )

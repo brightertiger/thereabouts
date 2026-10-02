@@ -99,7 +99,7 @@ _default_lock = threading.RLock()
 
 
 def reverse(lat: float, lon: float) -> Location | None:
-    """Use the process-local table selected by PYOFFLINEGEOCODER_DATA."""
+    """Use the process-local table selected by THEREABOUTS_DATA."""
     global _default, _default_pid
     with _default_lock:
         if _default is None or _default_pid != os.getpid():

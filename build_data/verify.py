@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from pyofflinegeocoder.errors import DamagedPackError
-from pyofflinegeocoder.format import (
+from thereabouts.errors import DamagedPackError
+from thereabouts.format import (
     BITMAP_FLAG,
     BLOCK_RESOLUTION,
     CHILD_RADIX,
@@ -15,8 +15,8 @@ from pyofflinegeocoder.format import (
     VALUE_WIDTH_MASK,
     level_offset,
 )
-from pyofflinegeocoder.index import positions
-from pyofflinegeocoder.table import Layer, Table
+from thereabouts.index import positions
+from thereabouts.table import Layer, Table
 
 from .sources import sha256
 

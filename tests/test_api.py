@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from pyofflinegeocoder import ClosedGeocoderError, Geocoder, Location
+from thereabouts import ClosedGeocoderError, Geocoder, Location
 
 from .conftest import FIXTURE
 
@@ -95,13 +95,13 @@ def test_info_is_detached(geocoder: Geocoder) -> None:
 
 
 def test_discovery_and_default(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    from pyofflinegeocoder import DataNotInstalledError, api, reverse
+    from thereabouts import DataNotInstalledError, api, reverse
 
-    monkeypatch.delenv("PYOFFLINEGEOCODER_DATA", raising=False)
+    monkeypatch.delenv("THEREABOUTS_DATA", raising=False)
     for path in (None, tmp_path / "missing"):
         with pytest.raises(DataNotInstalledError, match="python -m build_data"):
             Geocoder(path)
-    monkeypatch.setenv("PYOFFLINEGEOCODER_DATA", str(FIXTURE))
+    monkeypatch.setenv("THEREABOUTS_DATA", str(FIXTURE))
     monkeypatch.setattr(api, "_default", None)
     monkeypatch.setattr(api, "_default_pid", None)
     assert reverse(52.37, 4.9)
@@ -109,6 +109,6 @@ def test_discovery_and_default(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) 
     api._default.close()
     with Geocoder() as selected:
         assert selected.reverse(52.37, 4.9)
-    monkeypatch.setenv("PYOFFLINEGEOCODER_DATA", str(tmp_path / "missing"))
+    monkeypatch.setenv("THEREABOUTS_DATA", str(tmp_path / "missing"))
     with Geocoder(FIXTURE) as explicit:
         assert explicit.reverse(52.37, 4.9)

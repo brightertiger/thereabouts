@@ -14,7 +14,7 @@ from typing import Any
 import numpy as np
 from h3.api import basic_int as h3
 
-from pyofflinegeocoder import Geocoder, Location
+from thereabouts import Geocoder, Location
 
 
 def scalar_times(

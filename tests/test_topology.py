@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from build_data.reference.oracle import Reference
-from pyofflinegeocoder import Location
+from thereabouts import Location
 
 
 @pytest.mark.parametrize(

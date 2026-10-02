@@ -9,7 +9,7 @@ from shapely.errors import GEOSException
 from shapely.geometry import LineString, Point, box
 from shapely.geometry.base import BaseGeometry
 
-from pyofflinegeocoder.errors import DamagedPackError
+from thereabouts.errors import DamagedPackError
 
 from .pack import Pack
 from .schema import BOUNDARY_TOLERANCE_DEG

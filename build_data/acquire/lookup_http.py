@@ -24,7 +24,7 @@ def probe(url: str) -> dict[str, Any]:
                 headers={
                     "Range": "bytes=0-0",
                     "Accept-Encoding": "identity",
-                    "User-Agent": "PyOfflineGeocoder/acquire",
+                    "User-Agent": "Thereabouts/acquire",
                 },
             )
             with cast(HTTPResponse, urllib.request.urlopen(request, timeout=60)) as r:

@@ -14,6 +14,7 @@ from build_data.cities.build import build_country
 from build_data.cities.common import builder, policy
 from build_data.cities.engine import Engine
 from build_data.cities.urban import Urban
+from build_data.golden import paths as data_paths
 from build_data.golden.inputs import discover, verify_record
 from build_data.reconcile.common import Row
 
@@ -26,7 +27,7 @@ from .tables import lookups, places
 def implementation() -> str:
     return fingerprint(
         {
-            str(p): sha256_file(p)
+            p.relative_to(Path(__file__).parents[2]).as_posix(): sha256_file(p)
             for folder in (
                 Path(__file__).parent,
                 Path(__file__).parents[1] / "golden",
@@ -52,14 +53,14 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
         inputs = discover(workspace)
         base_path, base = load(workspace, inputs)
         ghsl = load_manifest(workspace, "ghsl")
-        reviewed(gate, settings, inputs, base, ghsl)
+        reviewed(gate, settings, inputs, base, ghsl, root=workspace.root)
         existing = output / "manifest.json"
         if existing.exists():
-            previous = read_json(existing)
+            previous = data_paths.read(existing, workspace.root)
             if (
                 previous.get("completed")
                 and previous.get("implementation") == code
-                and previous.get("base") == fingerprint(base)
+                and previous.get("base") == data_paths.digest(base, workspace.root)
             ):
                 for artifact in [
                     *previous["tables"],
@@ -95,14 +96,15 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
             "ghsl": ghsl,
             "countries": reports,
         }
-        write_json(output / "normalization.json", normalized)
-        identity = fingerprint(
-            {"normalization": normalized, "implementation": implementation()}
+        data_paths.write(output / "normalization.json", normalized, workspace.root)
+        identity = data_paths.digest(
+            {"normalization": normalized, "implementation": implementation()},
+            workspace.root,
         )
         cache_path = workspace.work / "v2-base-block-countries.json"
-        if cache_path.exists() and read_json(cache_path).get("base") == fingerprint(
-            base
-        ):
+        if cache_path.exists() and read_json(cache_path).get(
+            "base"
+        ) == data_paths.digest(base, workspace.root):
             dependencies = read_json(cache_path)["blocks"]
         else:
             dependencies = {}
@@ -118,7 +120,13 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
                             if v
                         }
                     )
-            write_json(cache_path, {"base": fingerprint(base), "blocks": dependencies})
+            write_json(
+                cache_path,
+                {
+                    "base": data_paths.digest(base, workspace.root),
+                    "blocks": dependencies,
+                },
+            )
         cache: OrderedDict[str, Engine] = OrderedDict()
         cell_tables = []
         country_counts: dict[str, Row] = {}
@@ -179,20 +187,22 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
         tables.extend(cell_tables)
         if implementation() != code or builder() != normalization_code:
             raise ValueError("Build code changed during world run; rerun")
-        write_json(
+        data_paths.write(
             output / "manifest.json",
             {
                 "schema_version": "golden-2",
+                "data_root": data_paths.relative(workspace.root, output),
                 "completed": False,
                 "tables": tables,
                 "normalization": normalized,
-                "base": fingerprint(base),
+                "base": data_paths.digest(base, workspace.root),
                 "base_manifest": str(base_path),
                 "reference_resolution": 8,
                 "block_resolution": 3,
                 "builder": identity,
                 "implementation": code,
             },
+            workspace.root,
         )
         write_json(
             run_path,

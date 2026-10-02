@@ -10,7 +10,7 @@ from shapely.geometry import Polygon, box
 from build_data.pack import write_pack
 from build_data.records import AdminRecord, Settlement
 from build_data.reference.oracle import Reference
-from pyofflinegeocoder import Geocoder
+from thereabouts import Geocoder
 
 FIXTURE = Path(__file__).parent / "fixtures" / "benelux"
 
@@ -73,9 +73,9 @@ def synthetic(synthetic_pack: Path) -> Iterator[Reference]:
 
 @pytest.fixture(scope="session")
 def world_path() -> Path:
-    value = os.environ.get("PYOFFLINEGEOCODER_WORLD_DATA")
+    value = os.environ.get("THEREABOUTS_WORLD_DATA")
     if not value or not (Path(value) / "manifest.json").is_file():
-        pytest.skip("set PYOFFLINEGEOCODER_WORLD_DATA to a built world pack")
+        pytest.skip("set THEREABOUTS_WORLD_DATA to a built world pack")
     return Path(value)
 
 

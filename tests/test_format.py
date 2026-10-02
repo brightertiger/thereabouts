@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 
 from build_data.table import encode_keys
-from pyofflinegeocoder.errors import DamagedPackError
-from pyofflinegeocoder.format import BITMAP_FLAG, level_offset, pack_label, unpack_label
-from pyofflinegeocoder.index import position, positions
+from thereabouts.errors import DamagedPackError
+from thereabouts.format import BITMAP_FLAG, level_offset, pack_label, unpack_label
+from thereabouts.index import position, positions
 
 
 def test_label_codec_preserves_present_land_and_disk_fields() -> None:

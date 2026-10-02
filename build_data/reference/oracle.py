@@ -7,8 +7,8 @@ import numpy as np
 from numpy.typing import NDArray
 from scipy.spatial import cKDTree
 
-from pyofflinegeocoder.format import CITY_CUTOFF_KM, pack_label, unpack_label
-from pyofflinegeocoder.models import Location
+from thereabouts.format import CITY_CUTOFF_KM, pack_label, unpack_label
+from thereabouts.models import Location
 
 from .administration import Administration
 from .pack import Pack

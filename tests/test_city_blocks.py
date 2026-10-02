@@ -71,6 +71,23 @@ def test_compact_parent_splits_at_new_boundary_and_resumes(
     Path(table["path"]).write_bytes(b"interrupted/corrupt artifact")
     repaired = build(workspace, output, base, {"ZZ": engine}, "version-one", False)
     assert repaired["table"]["sha256"] == table["sha256"]
+    # The actual block key and receipt must also survive relocating the data root.
+    relocated = tmp_path.with_name(tmp_path.name + "-moved")
+    tmp_path.rename(relocated)
+    base = {**base, "path": str(relocated / "base.parquet")}
+
+    def unexpected_rebuild(*args: object) -> None:
+        raise AssertionError("Moving a completed block must not transform it again")
+
+    monkeypatch.setattr(
+        "build_data.normalize_cells.blocks.transform", unexpected_rebuild
+    )
+    resumed = build(
+        Workspace(relocated), relocated / "v2", base, {}, "version-one", False
+    )
+    assert resumed["table"]["sha256"] == repaired["table"]["sha256"]
+    assert Path(resumed["table"]["path"]).is_relative_to(relocated)
+    assert Path(resumed["table"]["path"]).is_file()
 
 
 def test_empty_ocean_block_does_not_enumerate_centres(

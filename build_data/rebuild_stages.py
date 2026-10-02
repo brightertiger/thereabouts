@@ -6,6 +6,7 @@ from build_data.acquire import Workspace
 from build_data.acquire.artifacts import read_json
 from build_data.acquire.manifests import load_manifest
 from build_data.golden.inputs import Inputs, discover
+from build_data.golden.paths import read
 from build_data.golden.planning import inventory
 from build_data.reconcile.common import builder_hash, policy
 from build_data.reconcile.inputs import KINDS
@@ -41,16 +42,23 @@ def reconciled(workspace: Workspace) -> Inputs | None:
 
 def completed_base(workspace: Workspace, inputs: Inputs) -> Path | None:
     """Find a valid explicit snapshot, or freeze a completed base-stage output."""
-    from build_data.normalize_cells.base import load, snapshot, validate
+    from build_data.normalize_cells.base import StaleBaseError, load, snapshot, validate
 
     if (workspace.root / "base_cells/current.json").exists():
         # Corruption is an error, never a reason to overwrite an active dataset.
-        return load(workspace, inputs)[0]
+        try:
+            return load(workspace, inputs)[0]
+        except StaleBaseError:
+            # Keep the old snapshot; a newly built base gets its own directory.
+            pass
     path = workspace.root / "golden/manifest.json"
     if not path.exists():
         return None
-    manifest = read_json(path)
+    manifest = read(path, workspace.root)
     if not manifest.get("completed"):
         return None
-    validate(manifest, inputs)
+    try:
+        validate(manifest, inputs)
+    except StaleBaseError:
+        return None
     return snapshot(workspace, path, inputs)

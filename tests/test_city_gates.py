@@ -78,10 +78,10 @@ def test_reviewed_gate_refuses_mutated_pilot_report(
     }
     gate = tmp_path / "gate.json"
     write_json(gate, decision)
-    reviewed(gate, settings, inputs, base, ghsl)
+    reviewed(gate, settings, inputs, base, ghsl, root=tmp_path)
     write_json(report_path, {"before": 1, "after": 0})
     with pytest.raises(ValueError, match="verification failed"):
-        reviewed(gate, settings, inputs, base, ghsl)
+        reviewed(gate, settings, inputs, base, ghsl, root=tmp_path)
 
 
 def test_boundary_exception_is_exact_and_explained() -> None:

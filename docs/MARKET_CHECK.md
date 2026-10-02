@@ -111,7 +111,7 @@ Here “strong” means direct evidence that someone has the stated problem or b
 ### Absent or unverified evidence
 
 - No verified request was found for **all** of lat/lon, spatial encodings, names, ISO/admin codes, postal codes, IPs, phones, airports, ports and timezone names in one offline library. The two-input examples above should not be stretched into that conclusion.
-- No buyer interview, installation trial, switching commitment, sponsor commitment, revenue, retention or willingness-to-pay evidence for **PyOfflineGeocoder** was obtained. No external outreach was performed.
+- No buyer interview, installation trial, switching commitment, sponsor commitment, revenue, retention or willingness-to-pay evidence for **Thereabouts** was obtained. No external outreach was performed.
 - No verified request from an air-gapped institution for this particular combination, and no verified AI-agent customer requesting a local Python all-hint resolver. Existing agent-oriented geospatial projects show supply and adjacent usage, not demand for this product.
 - Some relevant Reddit results, including a direct offline package request and an Immich neighbouring-village complaint, were available only as search-index excerpts when full opens failed. They were not used as independently inspected core evidence.
 

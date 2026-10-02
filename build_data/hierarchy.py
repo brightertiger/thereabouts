@@ -7,8 +7,8 @@ import numpy as np
 from h3.api import basic_int as h3
 from numpy.typing import NDArray
 
-from pyofflinegeocoder.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
-from pyofflinegeocoder.hierarchy import addresses
+from thereabouts.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
+from thereabouts.hierarchy import addresses
 
 from .reference.oracle import FloatArray, Labels
 from .reference.schema import BOUNDARY_TOLERANCE_DEG

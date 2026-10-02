@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pyarrow as pa
 
-from build_data.acquire import Ledger, Workspace
+from build_data.acquire import Workspace
 from build_data.acquire.artifacts import file_record
-from build_data.acquire.io import fingerprint
-from build_data.acquire.ledger import read_units
 from build_data.acquire.manifests import load_manifest
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger, units
 from build_data.reconcile.common import Row
 
 from .code_links import CodeIndex
@@ -28,10 +28,8 @@ STATIC_VERSION = 7
 def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
     import pyarrow.parquet as pq
 
-    ledger = Ledger(workspace.ledger_path)
-    previous = {
-        r["unit_id"]: r for r in read_units(workspace.ledger_path, "golden.static")
-    }
+    ledger = Ledger(workspace)
+    previous = {r["unit_id"]: r for r in units(workspace, "golden.static")}
     index = CodeIndex(inputs)
     countries, codes = index.countries, index.codes
     phone_manifest = load_manifest(workspace, "phone")
@@ -51,13 +49,14 @@ def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
                 continue  # Cell memberships and IANA evidence are the golden tables.
             source_path = Path(part["path"])
             unit = f"{kind}/{source_path.stem}"
-            digest = fingerprint(
+            digest = data_paths.digest(
                 {
                     "part": part,
                     "static": STATIC_VERSION,
                     "phone_metadata": phone_manifest if source == "phone" else None,
                     "countries": inputs.countries if source != "timezones" else {},
-                }
+                },
+                workspace.root,
             )
             if ledger.is_complete("golden.static", unit, digest):
                 result.append(previous[unit]["metadata"]["table"])

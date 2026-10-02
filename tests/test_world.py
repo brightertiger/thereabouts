@@ -8,8 +8,8 @@ from h3.api import basic_int as h3
 
 from build_data.hierarchy import descendants, label_block
 from build_data.reference.oracle import Reference
-from pyofflinegeocoder import Geocoder
-from pyofflinegeocoder.table import Table
+from thereabouts import Geocoder
+from thereabouts.table import Table
 
 pytestmark = pytest.mark.world
 

@@ -6,6 +6,7 @@ from build_data.acquire import Workspace
 from build_data.acquire.artifacts import read_json
 from build_data.acquire.io import fingerprint
 from build_data.cities.common import builder
+from build_data.golden import paths as data_paths
 from build_data.golden.inputs import Inputs, verify_record
 from build_data.reconcile.common import Row
 
@@ -33,15 +34,17 @@ def failures(reports: list[Row], named: list[Row]) -> Row:
     }
 
 
-def reviewed(gate: Path, settings: Row, inputs: Inputs, base: Row, ghsl: Row) -> None:
-    decision = read_json(gate)
+def reviewed(
+    gate: Path, settings: Row, inputs: Inputs, base: Row, ghsl: Row, *, root: Path
+) -> None:
+    decision = data_paths.read(gate, root)
     if (
         not decision.get("accepted")
         or decision.get("builder") != builder()
         or decision.get("policy") != fingerprint(settings)
         or decision.get("inputs") != inputs.identity
-        or decision.get("base") != fingerprint(base)
-        or decision.get("ghsl") != fingerprint(ghsl)
+        or decision.get("base") != data_paths.digest(base, root)
+        or decision.get("ghsl") != data_paths.digest(ghsl, root)
         or not decision.get("review")
         or decision.get("unresolved_losses", ["missing review"]) != []
     ):
@@ -97,7 +100,6 @@ def unreviewed(losses: list[Row], exceptions: list[Row]) -> list[Row]:
 def record(workspace: Workspace, notes: Path, destination: Path) -> None:
     """Bind a human pilot review to current artifacts; this never changes city rules."""
     from build_data.acquire.artifacts import file_record
-    from build_data.acquire.io import write_json
     from build_data.acquire.manifests import load_manifest
     from build_data.cities.common import policy
     from build_data.golden.inputs import discover
@@ -123,14 +125,21 @@ def record(workspace: Workspace, notes: Path, destination: Path) -> None:
         "builder": builder(),
         "policy": fingerprint(settings),
         "inputs": inputs.identity,
-        "base": fingerprint(base),
-        "ghsl": fingerprint(load_manifest(workspace, "ghsl")),
+        "base": data_paths.digest(base, workspace.root),
+        "ghsl": data_paths.digest(load_manifest(workspace, "ghsl"), workspace.root),
         "pilot_summary": file_record(summary_path),
         "normalization_manifest": file_record(normalized_path),
         "development": file_record(development_path),
     }
     # Validate a temporary receipt before replacing the previously reviewed gate.
     temporary = destination.with_suffix(".review.json")
-    write_json(temporary, decision)
-    reviewed(temporary, settings, inputs, base, load_manifest(workspace, "ghsl"))
+    data_paths.write(temporary, decision, workspace.root)
+    reviewed(
+        temporary,
+        settings,
+        inputs,
+        base,
+        load_manifest(workspace, "ghsl"),
+        root=workspace.root,
+    )
     temporary.replace(destination)

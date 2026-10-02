@@ -7,8 +7,10 @@ from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 
-from build_data.acquire import Ledger, Workspace
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire import Workspace
+from build_data.acquire.io import write_json
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger
 from build_data.reconcile.common import Row
 
 from .cells import builder
@@ -45,7 +47,7 @@ def publish(
     write_json(root / "quality.json", quality)
     (root / "DATA_LICENSES.md").write_text(LICENSES, encoding="utf-8")
     (root / "DATASET_CARD.md").write_text(
-        "# Golden dataset card — draft\n\n"
+        "# Thereabouts golden dataset card — draft\n\n"
         "Canonical reconciled places and a compact H3 resolution-8 reference table.\n"
         "Use the original r8 key and walk to a stored ancestor; converting a point\n"
         "directly at a coarse resolution changes the reference centre.\n\n"
@@ -69,6 +71,7 @@ def publish(
     )
     manifest = {
         "schema_version": "golden-1",
+        "data_root": data_paths.relative(workspace.root, root),
         "reference_resolution": 8,
         "block_resolution": 3,
         "created_at": datetime.now(UTC).isoformat(),
@@ -86,11 +89,11 @@ def publish(
         "license_summary": "DATA_LICENSES.md",
         "dataset_card": "DATASET_CARD.md",
     }
-    write_json(root / "manifest.json", manifest)
-    Ledger(workspace.ledger_path).complete(
+    data_paths.write(root / "manifest.json", manifest, workspace.root)
+    Ledger(workspace).complete(
         "golden.manifest",
         "current",
-        fingerprint(manifest),
+        data_paths.digest(manifest, workspace.root),
         [
             root / "manifest.json",
             root / "quality.json",
