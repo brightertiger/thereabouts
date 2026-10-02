@@ -1,0 +1,33 @@
+{
+  "blocks": 7,
+  "export_seconds": 1.3577153340011137,
+  "golden_sha256": "6564f038206b7e450aea213e7b8fee236e7dd4a0c86a9829f88823663f560dc9",
+  "h3": {
+    "c": "4.5.0",
+    "python": "4.5.0"
+  },
+  "installed_bytes": 208592,
+  "limitations": [
+    "Synthetic labels and five retained places; not a size forecast.",
+    "Lookup excludes coordinate conversion, public results and catalogue decoding.",
+    "RSS includes input generation; scratch sampled every 20 ms.",
+    "ZIP is a measurement artifact; no installer or archive contract exists yet."
+  ],
+  "machine": "macOS-27.0-arm64-arm-64bit",
+  "manifest_sha256": "72ca271b832af5790ce7289303281fe0c12487db22a6502f2ef85f4cb9b0a48d",
+  "payload_bytes": {
+    "catalogue": 1042,
+    "cells": 202680,
+    "notice": 118
+  },
+  "peak_process_rss_bytes": 116178944,
+  "places": 5,
+  "processor": "arm64",
+  "pyarrow": "23.0.1",
+  "python": "3.12.8",
+  "sampled_peak_scratch_bytes": 229611,
+  "stored_rows": 67230,
+  "warm_label_lookup_median_ns": 4417.0,
+  "warm_label_lookup_p99_ns": 6250,
+  "zip_bytes": 125752
+}
