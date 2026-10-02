@@ -1,0 +1,863 @@
+{
+  "countries.csv": {
+    "base": true
+  },
+  "vehicle-stock.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1377579042",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377579042",
+    "revision": 1377579042,
+    "sha256": "24511d6685aac4ec9bdb15f65290204aaa2bdd797a2b465d6109d5685ac86022",
+    "size": 339879,
+    "retrieved_at": "2026-10-02T15:27:50.616308+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1377579042"
+  },
+  "wiki-AD.json": {
+    "base": true
+  },
+  "wiki-AE.json": {
+    "base": true
+  },
+  "wiki-AF.json": {
+    "base": true
+  },
+  "wiki-AG.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1338001799",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338001799",
+    "revision": 1338001799,
+    "sha256": "e6c33bc34d2611ee2e0ddc0b73f17dae43a14f413b7aa37e25e5b6ed1b40dcd0",
+    "size": 41149,
+    "retrieved_at": "2026-10-02T15:30:40.578092+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1338001799"
+  },
+  "wiki-AI.json": {
+    "base": true
+  },
+  "wiki-AL.json": {
+    "base": true
+  },
+  "wiki-AM.json": {
+    "base": true
+  },
+  "wiki-AO.json": {
+    "base": true
+  },
+  "wiki-AR.json": {
+    "base": true
+  },
+  "wiki-AS.json": {
+    "base": true
+  },
+  "wiki-AT.json": {
+    "base": true
+  },
+  "wiki-AU.json": {
+    "base": true
+  },
+  "wiki-AW.json": {
+    "base": true
+  },
+  "wiki-AX-local.json": {
+    "base": true
+  },
+  "wiki-AZ.json": {
+    "base": true
+  },
+  "wiki-BA.json": {
+    "base": true
+  },
+  "wiki-BB.json": {
+    "base": true
+  },
+  "wiki-BD.json": {
+    "base": true
+  },
+  "wiki-BE.json": {
+    "base": true
+  },
+  "wiki-BF.json": {
+    "base": true
+  },
+  "wiki-BG.json": {
+    "base": true
+  },
+  "wiki-BH.json": {
+    "base": true
+  },
+  "wiki-BJ.json": {
+    "base": true
+  },
+  "wiki-BL-resolved.json": {
+    "base": true
+  },
+  "wiki-BM.json": {
+    "base": true
+  },
+  "wiki-BN.json": {
+    "base": true
+  },
+  "wiki-BO.json": {
+    "base": true
+  },
+  "wiki-BQ.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1345337205",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345337205",
+    "revision": 1345337205,
+    "sha256": "064af743f300da5523ca12d0fbbeab6bcaf5744a12e963b4e7a2554f144af192",
+    "size": 66097,
+    "retrieved_at": "2026-10-02T15:30:42.798254+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1345337205"
+  },
+  "wiki-BR.json": {
+    "base": true
+  },
+  "wiki-BS.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1358279279",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1358279279",
+    "revision": 1358279279,
+    "sha256": "e79ff54617126bb90176cadad79ad17702abbd6454a06f9eade58afedc2b664c",
+    "size": 41377,
+    "retrieved_at": "2026-10-02T15:30:41.688207+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1358279279"
+  },
+  "wiki-BT.json": {
+    "base": true
+  },
+  "wiki-BW.json": {
+    "base": true
+  },
+  "wiki-BY.json": {
+    "base": true
+  },
+  "wiki-BZ.json": {
+    "base": true
+  },
+  "wiki-CA-design.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1373784295",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1373784295",
+    "revision": 1373784295,
+    "sha256": "739358f21ab944786777d3740887870f43c76f794a7e3b23233464d078414c00",
+    "size": 107419,
+    "retrieved_at": "2026-10-02T15:30:38.333656+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1373784295"
+  },
+  "wiki-CD.json": {
+    "base": true
+  },
+  "wiki-CF.json": {
+    "base": true
+  },
+  "wiki-CG.json": {
+    "base": true
+  },
+  "wiki-CH.json": {
+    "base": true
+  },
+  "wiki-CI.json": {
+    "base": true
+  },
+  "wiki-CK-resolved.json": {
+    "base": true
+  },
+  "wiki-CL.json": {
+    "base": true
+  },
+  "wiki-CM.json": {
+    "base": true
+  },
+  "wiki-CN.json": {
+    "base": true
+  },
+  "wiki-CO.json": {
+    "base": true
+  },
+  "wiki-CR.json": {
+    "base": true
+  },
+  "wiki-CU.json": {
+    "base": true
+  },
+  "wiki-CV.json": {
+    "base": true
+  },
+  "wiki-CW.json": {
+    "base": true
+  },
+  "wiki-CX.json": {
+    "base": true
+  },
+  "wiki-CY.json": {
+    "base": true
+  },
+  "wiki-CZ.json": {
+    "base": true
+  },
+  "wiki-DE.json": {
+    "base": true
+  },
+  "wiki-DJ-uk.json": {
+    "kind": "wikipedia",
+    "url": "https://uk.wikipedia.org/w/index.php?oldid=36058050",
+    "download_url": "https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=36058050",
+    "revision": 36058050,
+    "sha256": "105e0b78f76548d2d7aafbcdbea1910aa87d7fcb4265597ba034987258cde657",
+    "size": 51918,
+    "retrieved_at": "2026-10-02T15:36:25.585972+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "uk.wikipedia.org contributors, revision 36058050"
+  },
+  "wiki-DK.json": {
+    "base": true
+  },
+  "wiki-DM-uk.json": {
+    "kind": "wikipedia",
+    "url": "https://uk.wikipedia.org/w/index.php?oldid=38199368",
+    "download_url": "https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=38199368",
+    "revision": 38199368,
+    "sha256": "3d60036456ead734dbe51be8071d4b11f45a731bc323c90f3c208ecb87f4acc9",
+    "size": 20337,
+    "retrieved_at": "2026-10-02T15:36:32.246573+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "uk.wikipedia.org contributors, revision 38199368"
+  },
+  "wiki-DZ.json": {
+    "base": true
+  },
+  "wiki-EC.json": {
+    "base": true
+  },
+  "wiki-EE.json": {
+    "base": true
+  },
+  "wiki-EG.json": {
+    "base": true
+  },
+  "wiki-ER-fr.json": {
+    "kind": "wikipedia",
+    "url": "https://fr.wikipedia.org/w/index.php?oldid=222874638",
+    "download_url": "https://fr.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=222874638",
+    "revision": 222874638,
+    "sha256": "4471299b17a6c6bed248cecef5ccee0d16b5a3e832277e9461f66a16f1dec1ab",
+    "size": 31812,
+    "retrieved_at": "2026-10-02T15:42:47.877334+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "fr.wikipedia.org contributors, revision 222874638"
+  },
+  "wiki-ES.json": {
+    "base": true
+  },
+  "wiki-ET.json": {
+    "base": true
+  },
+  "wiki-FI.json": {
+    "base": true
+  },
+  "wiki-FJ.json": {
+    "base": true
+  },
+  "wiki-FM.json": {
+    "base": true
+  },
+  "wiki-FO.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1338668056",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338668056",
+    "revision": 1338668056,
+    "sha256": "5668b19fb6f6a2ed5011a56387e6177dfd418443c42f17edc41edcbb7cdbcdbc",
+    "size": 78497,
+    "retrieved_at": "2026-10-02T15:30:43.908319+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1338668056"
+  },
+  "wiki-FR-fr.json": {
+    "base": true
+  },
+  "wiki-FR.json": {
+    "base": true
+  },
+  "wiki-GA.json": {
+    "base": true
+  },
+  "wiki-GB-ni.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1370151084",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1370151084",
+    "revision": 1370151084,
+    "sha256": "6960bf209ed936990d9b2fa60dc33f56f90c62bc97d6ad33ef157ce0121ffd54",
+    "size": 106513,
+    "retrieved_at": "2026-10-02T15:36:32.879071+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1370151084"
+  },
+  "wiki-GB.json": {
+    "base": true
+  },
+  "wiki-GD.json": {
+    "base": true
+  },
+  "wiki-GE-country.json": {
+    "base": true
+  },
+  "wiki-GG.json": {
+    "base": true
+  },
+  "wiki-GH.json": {
+    "base": true
+  },
+  "wiki-GI.json": {
+    "base": true
+  },
+  "wiki-GL.json": {
+    "base": true
+  },
+  "wiki-GM-resolved.json": {
+    "base": true
+  },
+  "wiki-GN.json": {
+    "base": true
+  },
+  "wiki-GQ.json": {
+    "base": true
+  },
+  "wiki-GR.json": {
+    "base": true
+  },
+  "wiki-GT.json": {
+    "base": true
+  },
+  "wiki-GU.json": {
+    "base": true
+  },
+  "wiki-GW-local.json": {
+    "base": true
+  },
+  "wiki-GY.json": {
+    "base": true
+  },
+  "wiki-HK.json": {
+    "base": true
+  },
+  "wiki-HN.json": {
+    "base": true
+  },
+  "wiki-HR.json": {
+    "base": true
+  },
+  "wiki-HT.json": {
+    "base": true
+  },
+  "wiki-HU.json": {
+    "base": true
+  },
+  "wiki-ID.json": {
+    "base": true
+  },
+  "wiki-IE.json": {
+    "base": true
+  },
+  "wiki-IL.json": {
+    "base": true
+  },
+  "wiki-IM.json": {
+    "base": true
+  },
+  "wiki-IN.json": {
+    "base": true
+  },
+  "wiki-IO-it.json": {
+    "kind": "wikipedia",
+    "url": "https://it.wikipedia.org/w/index.php?oldid=151111064",
+    "download_url": "https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=151111064",
+    "revision": 151111064,
+    "sha256": "41e2bd7a0136d099c09a167822c512f1aac062835d6c8b79fa6e48271c74e0ea",
+    "size": 387977,
+    "retrieved_at": "2026-10-02T15:36:21.165863+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "it.wikipedia.org contributors, revision 151111064"
+  },
+  "wiki-IQ.json": {
+    "base": true
+  },
+  "wiki-IR.json": {
+    "base": true
+  },
+  "wiki-IS.json": {
+    "base": true
+  },
+  "wiki-IT.json": {
+    "base": true
+  },
+  "wiki-JE.json": {
+    "base": true
+  },
+  "wiki-JM.json": {
+    "base": true
+  },
+  "wiki-JO.json": {
+    "base": true
+  },
+  "wiki-JP.json": {
+    "base": true
+  },
+  "wiki-KE.json": {
+    "base": true
+  },
+  "wiki-KG.json": {
+    "base": true
+  },
+  "wiki-KH.json": {
+    "base": true
+  },
+  "wiki-KI.json": {
+    "base": true
+  },
+  "wiki-KM-resolved.json": {
+    "base": true
+  },
+  "wiki-KN.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1338753711",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338753711",
+    "revision": 1338753711,
+    "sha256": "766a5350fd764208803457e089c3643a43fc076741bf9038372db125b48c6fb5",
+    "size": 32476,
+    "retrieved_at": "2026-10-02T15:30:46.128442+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1338753711"
+  },
+  "wiki-KP.json": {
+    "base": true
+  },
+  "wiki-KR.json": {
+    "base": true
+  },
+  "wiki-KW.json": {
+    "base": true
+  },
+  "wiki-KZ.json": {
+    "base": true
+  },
+  "wiki-LA.json": {
+    "base": true
+  },
+  "wiki-LB.json": {
+    "base": true
+  },
+  "wiki-LC.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1376852335",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1376852335",
+    "revision": 1376852335,
+    "sha256": "9c731dab2c2512682832f8a5c2fbc3614af3f995b084292c96d201737f495040",
+    "size": 38906,
+    "retrieved_at": "2026-10-02T15:30:47.238507+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1376852335"
+  },
+  "wiki-LI.json": {
+    "base": true
+  },
+  "wiki-LK.json": {
+    "base": true
+  },
+  "wiki-LS.json": {
+    "base": true
+  },
+  "wiki-LT.json": {
+    "base": true
+  },
+  "wiki-LU.json": {
+    "base": true
+  },
+  "wiki-LV.json": {
+    "base": true
+  },
+  "wiki-LY.json": {
+    "base": true
+  },
+  "wiki-MA.json": {
+    "base": true
+  },
+  "wiki-MC.json": {
+    "base": true
+  },
+  "wiki-MD.json": {
+    "base": true
+  },
+  "wiki-ME.json": {
+    "base": true
+  },
+  "wiki-MG.json": {
+    "base": true
+  },
+  "wiki-MH-resolved.json": {
+    "base": true
+  },
+  "wiki-MK.json": {
+    "base": true
+  },
+  "wiki-ML.json": {
+    "base": true
+  },
+  "wiki-MM.json": {
+    "base": true
+  },
+  "wiki-MN.json": {
+    "base": true
+  },
+  "wiki-MO.json": {
+    "base": true
+  },
+  "wiki-MP.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1344455877",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1344455877",
+    "revision": 1344455877,
+    "sha256": "b61b9160b8d30f0098dd2f81f7f53dfe70f3f0a1d7771dc0698bd858b6101bcb",
+    "size": 84710,
+    "retrieved_at": "2026-10-02T15:30:50.693718+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1344455877"
+  },
+  "wiki-MR.json": {
+    "base": true
+  },
+  "wiki-MS.json": {
+    "base": true
+  },
+  "wiki-MT.json": {
+    "base": true
+  },
+  "wiki-MU-de.json": {
+    "kind": "wikipedia",
+    "url": "https://de.wikipedia.org/w/index.php?oldid=223364766",
+    "download_url": "https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=223364766",
+    "revision": 223364766,
+    "sha256": "53dfd2321fd9698e1cd3988858ee84cf99c4e1772c74293cd4cc3001676381f7",
+    "size": 17134,
+    "retrieved_at": "2026-10-02T15:30:56.064370+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "de.wikipedia.org contributors, revision 223364766"
+  },
+  "wiki-MV.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1345469488",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345469488",
+    "revision": 1345469488,
+    "sha256": "4f53647618992f5cb68d4f2d2f9462fb1dec3f448c8b7651d24d2ef5000984fc",
+    "size": 40829,
+    "retrieved_at": "2026-10-02T15:30:45.018383+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1345469488"
+  },
+  "wiki-MX.json": {
+    "base": true
+  },
+  "wiki-MY.json": {
+    "base": true
+  },
+  "wiki-MZ.json": {
+    "base": true
+  },
+  "wiki-NA.json": {
+    "base": true
+  },
+  "wiki-NC.json": {
+    "base": true
+  },
+  "wiki-NE.json": {
+    "base": true
+  },
+  "wiki-NF.json": {
+    "base": true
+  },
+  "wiki-NG.json": {
+    "base": true
+  },
+  "wiki-NI.json": {
+    "base": true
+  },
+  "wiki-NL-current.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1377707144",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377707144",
+    "revision": 1377707144,
+    "sha256": "d95276582cb6c2ab5f0b353f8fec6137046013e3f8403c0e89447c74e0300318",
+    "size": 126208,
+    "retrieved_at": "2026-10-02T15:30:39.457682+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1377707144"
+  },
+  "wiki-NL.json": {
+    "base": true
+  },
+  "wiki-NO.json": {
+    "base": true
+  },
+  "wiki-NP.json": {
+    "base": true
+  },
+  "wiki-NR.json": {
+    "base": true
+  },
+  "wiki-NU.json": {
+    "base": true
+  },
+  "wiki-NZ.json": {
+    "base": true
+  },
+  "wiki-OM.json": {
+    "base": true
+  },
+  "wiki-PA.json": {
+    "base": true
+  },
+  "wiki-PE.json": {
+    "base": true
+  },
+  "wiki-PF.json": {
+    "base": true
+  },
+  "wiki-PG.json": {
+    "base": true
+  },
+  "wiki-PH.json": {
+    "base": true
+  },
+  "wiki-PK.json": {
+    "base": true
+  },
+  "wiki-PL.json": {
+    "base": true
+  },
+  "wiki-PM-resolved.json": {
+    "base": true
+  },
+  "wiki-PR.json": {
+    "base": true
+  },
+  "wiki-PS.json": {
+    "base": true
+  },
+  "wiki-PT.json": {
+    "base": true
+  },
+  "wiki-PY.json": {
+    "base": true
+  },
+  "wiki-QA.json": {
+    "base": true
+  },
+  "wiki-RO.json": {
+    "base": true
+  },
+  "wiki-RS.json": {
+    "base": true
+  },
+  "wiki-RU.json": {
+    "base": true
+  },
+  "wiki-RW.json": {
+    "base": true
+  },
+  "wiki-SA.json": {
+    "base": true
+  },
+  "wiki-SB.json": {
+    "base": true
+  },
+  "wiki-SC.json": {
+    "base": true
+  },
+  "wiki-SD.json": {
+    "base": true
+  },
+  "wiki-SE.json": {
+    "base": true
+  },
+  "wiki-SG.json": {
+    "base": true
+  },
+  "wiki-SI.json": {
+    "base": true
+  },
+  "wiki-SK.json": {
+    "base": true
+  },
+  "wiki-SM.json": {
+    "base": true
+  },
+  "wiki-SN.json": {
+    "base": true
+  },
+  "wiki-SO.json": {
+    "base": true
+  },
+  "wiki-SR.json": {
+    "base": true
+  },
+  "wiki-SS-it.json": {
+    "kind": "wikipedia",
+    "url": "https://it.wikipedia.org/w/index.php?oldid=148177462",
+    "download_url": "https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=148177462",
+    "revision": 148177462,
+    "sha256": "7d77c90ce0ebf3aafbebaf858e79395b151559c71c4cad10108fc830a43ae762",
+    "size": 38758,
+    "retrieved_at": "2026-10-02T15:42:48.938671+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "it.wikipedia.org contributors, revision 148177462"
+  },
+  "wiki-ST-resolved.json": {
+    "base": true
+  },
+  "wiki-SX.json": {
+    "base": true
+  },
+  "wiki-SY.json": {
+    "base": true
+  },
+  "wiki-SZ.json": {
+    "base": true
+  },
+  "wiki-TD.json": {
+    "base": true
+  },
+  "wiki-TG.json": {
+    "base": true
+  },
+  "wiki-TH.json": {
+    "base": true
+  },
+  "wiki-TJ.json": {
+    "base": true
+  },
+  "wiki-TL.json": {
+    "base": true
+  },
+  "wiki-TM.json": {
+    "base": true
+  },
+  "wiki-TN.json": {
+    "base": true
+  },
+  "wiki-TO.json": {
+    "base": true
+  },
+  "wiki-TR-fixed.json": {
+    "base": true
+  },
+  "wiki-TT-resolved.json": {
+    "base": true
+  },
+  "wiki-TV.json": {
+    "base": true
+  },
+  "wiki-TW.json": {
+    "base": true
+  },
+  "wiki-TZ.json": {
+    "base": true
+  },
+  "wiki-UA.json": {
+    "base": true
+  },
+  "wiki-US-ID.json": {
+    "base": true
+  },
+  "wiki-US-serials.json": {
+    "kind": "wikipedia",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1377655506",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377655506",
+    "revision": 1377655506,
+    "sha256": "fb05871583bd50f31daacc5c0dd63e5ae116cf91665f85658599247f59fde82f",
+    "size": 588212,
+    "retrieved_at": "2026-10-02T15:36:19.312753+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors, revision 1377655506"
+  },
+  "wiki-UY.json": {
+    "base": true
+  },
+  "wiki-UZ.json": {
+    "base": true
+  },
+  "wiki-VA.json": {
+    "base": true
+  },
+  "wiki-VC-resolved.json": {
+    "base": true
+  },
+  "wiki-VE.json": {
+    "base": true
+  },
+  "wiki-VG.json": {
+    "base": true
+  },
+  "wiki-VI.json": {
+    "base": true
+  },
+  "wiki-VN.json": {
+    "base": true
+  },
+  "wiki-VU.json": {
+    "base": true
+  },
+  "wiki-WF-resolved.json": {
+    "base": true
+  },
+  "wiki-WS.json": {
+    "base": true
+  },
+  "wiki-XK.json": {
+    "base": true
+  },
+  "wiki-YE.json": {
+    "base": true
+  },
+  "wiki-ZA.json": {
+    "base": true
+  },
+  "wiki-ZM-de.json": {
+    "kind": "wikipedia",
+    "url": "https://de.wikipedia.org/w/index.php?oldid=242232989",
+    "download_url": "https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=242232989",
+    "revision": 242232989,
+    "sha256": "582334d6ab3952081b18e2746b15e6a394da5d36b63ba2530e0762588b686161",
+    "size": 22417,
+    "retrieved_at": "2026-10-02T15:30:57.168429+00:00",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "de.wikipedia.org contributors, revision 242232989"
+  },
+  "wiki-ZW.json": {
+    "base": true
+  }
+}

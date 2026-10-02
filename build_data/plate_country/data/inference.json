@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "max_input_length": 64,
+  "code_separators": " -·•./",
+  "weights": {"known_code": 12, "fixed_mark": 4, "script": 2, "specificity": 1, "log_vehicle_prior": 0.5, "relaxed_penalty": 2},
+  "unknown_prior": "median_observed_vehicle_count",
+  "certainty": "abstain_open_world",
+  "script_patterns": {
+    "Latin": "[A-Za-zÀ-ž]", "ASCII digits": "[0-9]", "Arabic": "[ء-ي]", "Arabic-Indic digits": "[٠-٩]", "Persian digits": "[۰-۹]", "Cyrillic": "[Ѐ-ӿ]", "Greek": "[Ͱ-Ͽ]", "Han": "[㐀-鿿]", "Hiragana": "[ぁ-ゟ]", "Katakana": "[゠-ヿ]", "Hangul": "[가-힣]", "Thai": "[ก-๛]", "Bengali": "[ঀ-৿]", "Devanagari": "[ऀ-ॿ]", "Lao": "[຀-໿]", "Myanmar": "[က-႟]", "Ethiopic": "[ሀ-፼]", "Khmer": "[ក-៿]"
+  },
+  "levels": {
+    "registration_office": "place", "registration_office_seat": "place", "registration_area": "place", "district_or_city": "place", "county_or_city": "place", "district": "place", "county": "place", "regency_or_city": "place", "city": "place", "registration_city": "place", "municipality": "place", "local_government_area": "place", "town_or_region": "place", "free_trade_zone": "place",
+    "state": "state", "province": "state", "oblast": "state", "federal_subject": "state", "canton": "state", "governorate": "state", "department": "state", "region": "state", "division": "state", "island": "state", "state_or_division": "state", "province_or_city": "state", "prefecture": "state", "parish": "state", "registration_zone": "state", "registration_region": "state", "county_or_region": "state", "region_or_district": "state", "province_or_registration_district": "state"
+  },
+  "geography": {
+    "excluded_scopes": ["entity_association"],
+    "excluded_countries": ["US"],
+    "state_prefix": {"IN": 2, "CN": 1},
+    "unknown_status_eligible": false,
+    "block_if_non_geographic_format_matches": true,
+    "historic_requires_explicit_series": true
+  }
+}
