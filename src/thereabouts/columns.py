@@ -7,7 +7,7 @@ from types import MappingProxyType
 import numpy as np
 from numpy.typing import NDArray
 
-from .packs.address import cell_at
+from .reading.backend import StoredCell
 from .reading.batch import Hit
 from .reading.decode import place
 from .reading.pack import Pack
@@ -37,7 +37,9 @@ class Columns:
     errors: tuple[str | None, ...]
 
 
-def columns(pack: Pack, data: Data, hits: list[Hit], *, decode: bool) -> Columns:
+def columns(
+    pack: Pack, data: Data, hits: list[Hit], stored_cell: StoredCell, *, decode: bool
+) -> Columns:
     count = len(hits)
     cell = np.zeros(count, dtype=np.uint64)
     stored = np.zeros(count, dtype=np.uint64)
@@ -57,7 +59,7 @@ def columns(pack: Pack, data: Data, hits: list[Hit], *, decode: bool) -> Columns
         else:
             key, label = hit.found
             present[index] = True
-            stored[index] = cell_at(hit.block, key)
+            stored[index] = stored_cell(hit.block, key)
             labels[index] = label
             status[index] = "matched" if any(label[:3]) else "unassigned"
     places = None

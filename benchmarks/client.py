@@ -12,9 +12,10 @@ from h3.api import basic_int as h3
 
 from thereabouts.client import Geocoder
 from thereabouts.packs.jsonio import canonical
+from thereabouts.reading.backend import Backend
 
 
-def measure(pack: Path) -> dict[str, object]:
+def measure(pack: Path, backend: Backend = "auto") -> dict[str, object]:
     roots = [
         h3.latlng_to_cell(a, b, 3)
         for a, b in ((12.97, 77.59), (0, 0), (45, 45), (-45, -45))
@@ -25,7 +26,7 @@ def measure(pack: Path) -> dict[str, object]:
         for cell in h3.cell_to_children(root, 8)[::67]
     ]
     start: float = time.perf_counter_ns()
-    geo = Geocoder(pack)
+    geo = Geocoder(pack, backend=backend)
     opened = time.perf_counter_ns() - start
     with geo:
         start = time.perf_counter_ns()
@@ -51,6 +52,7 @@ def measure(pack: Path) -> dict[str, object]:
         pass
     verification = time.perf_counter() - start
     return {
+        "backend": info["backend"],
         "machine": platform.platform(),
         "processor": platform.machine(),
         "python": platform.python_version(),

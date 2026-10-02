@@ -102,6 +102,10 @@ mapping, replacing each on shard changes; there is no full-world object cache.
 
 ## Integrity and performance
 
+The default `backend="auto"` uses the optional Cython reconstruction kernel when
+installed; `backend="python"` forces the reference path. See
+[CLIENT_BUILD.md](CLIENT_BUILD.md) for profiling, parity and local wheel checks.
+
 Normal opening checks compatibility and all listed payload sizes. First access
 to a shard validates its container directory/bounds, and records are checked as
 decoded. This assumes a previously verified, immutable installation; it is not a

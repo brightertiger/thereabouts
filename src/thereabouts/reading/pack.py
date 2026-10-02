@@ -5,7 +5,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from ..errors import DataNotInstalledError
+from ..errors import ClosedGeocoderError, DataNotInstalledError
 from ..packs.catalogue import Catalogue
 from ..packs.errors import CorruptPackError
 from ..packs.jsonio import relative_file
@@ -20,6 +20,7 @@ class Pack:
     def __init__(self, root: Path, *, verify: bool) -> None:
         if not root.exists():
             raise DataNotInstalledError(f"No pack at {root}; install data explicitly")
+        self.closed = False
         self.root = root
         self.manifest = verify_pack(root) if verify else read_manifest(root)
         self.cells = [r for r in self.manifest["files"] if r["kind"] == "cells"]
@@ -36,6 +37,8 @@ class Pack:
         return deepcopy(self.manifest)
 
     def spatial_for(self, block: int) -> Spatial | None:
+        if self.closed:
+            raise ClosedGeocoderError("Geocoder is closed")
         index = bisect_right(self.block_starts, block) - 1
         if index < 0 or block > self.cells[index]["last_block"]:
             self._absent_block()
@@ -83,6 +86,8 @@ class Pack:
         ]
 
     def record(self, reference: int) -> dict[str, Any]:
+        if self.closed:
+            raise ClosedGeocoderError("Geocoder is closed")
         if not 1 <= reference <= self.manifest["place_count"]:
             raise CorruptPackError("Invalid global catalogue reference")
         index = bisect_right(self.place_starts, reference) - 1
@@ -109,6 +114,7 @@ class Pack:
         return identity
 
     def close(self) -> None:
+        self.closed = True
         if self.spatial is not None:
             self.spatial.close()
             self.spatial = None

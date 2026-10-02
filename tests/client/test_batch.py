@@ -154,3 +154,30 @@ def test_concurrent_reads_and_close_waits_for_active_chunk() -> None:
         closer.result()
     with pytest.raises(ClosedGeocoderError):
         geo.info()
+
+
+@pytest.mark.parametrize("columns", [False, True])
+def test_source_iterator_can_close_without_reopening_mappings(columns: bool) -> None:
+    geo = Geocoder(PACK)
+
+    def source() -> Iterator[object]:
+        yield (12.97, 77.59)
+        geo.close()
+
+    iterator = geo.reverse_columns(source()) if columns else geo.reverse_many(source())
+    with pytest.raises(ClosedGeocoderError):
+        next(iterator)
+    assert geo._pack.spatial is None and geo._pack.catalogue is None
+
+
+def test_numeric_input_callback_cannot_reopen_closed_reader() -> None:
+    geo = Geocoder(PACK)
+
+    class ClosingFloat(float):
+        def __float__(self) -> float:
+            geo.close()
+            return super().__float__()
+
+    with pytest.raises(ClosedGeocoderError):
+        next(geo.reverse_many([(ClosingFloat(12.97), 77.59)]))
+    assert geo._pack.spatial is None

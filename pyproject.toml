@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling>=1.27,<2"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=77,<81", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "thereabouts"
@@ -15,6 +15,9 @@ thereabouts = "thereabouts.cli:main"
 
 [dependency-groups]
 dev = [
+    "Cython==3.3.0",
+    "setuptools>=77,<81",
+    "types-setuptools",
     { include-group = "acquire" },
     "scipy>=1.14,<1.17",
     "pytest>=8,<10",
@@ -32,8 +35,28 @@ acquire = [
     "regex>=2024.11,<2027",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/thereabouts"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+thereabouts = ["py.typed", "reading/*.pyi"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.pyx", "*.c"]
+
+[tool.cibuildwheel]
+build = ["cp311-*", "cp312-*", "cp313-*", "cp314-*"]
+skip = ["*-musllinux_*"]
+test-command = "python {project}/tests/wheel_smoke.py {project}/tests/fixtures/serving cython"
+
+[tool.cibuildwheel.linux]
+archs = ["auto64"]
+
+[tool.cibuildwheel.macos]
+archs = ["auto"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -50,7 +73,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "build_data", "benchmarks", "tests"]
+files = ["src", "build_data", "benchmarks", "tests", "setup.py"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]

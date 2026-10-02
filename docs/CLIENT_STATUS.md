@@ -1,16 +1,58 @@
 # Thereabouts client implementation status
 
-Phases 1–3 are implemented on `feat/client`, locally only:
+Phases 1–4 are implemented on `feat/client`, locally only:
 
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
 * `bf90c3a` — Add offline Python golden reader and bounded public API.
-* Phase 3 commit — **Add pinned pack installation and JSON command line client**
+* `4689230` — Add pinned pack installation and JSON command line client.
+* Phase 4 commit — **Accelerate stored-cell reconstruction with optional Cython**
   (find its hash with `git log`).
 
-Phases 4–7 remain. `thereabouts.client.Geocoder` reads the new packs;
-the frozen top-level `thereabouts.Geocoder` still reads the original table.
+Phases 5–7 remain; phase 4 is the stopping boundary for this session.
+`thereabouts.client.Geocoder` reads the new packs; the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Optional Cython kernel and wheels (phase 4)
+
+[CLIENT_BUILD.md](CLIENT_BUILD.md) documents backend selection, profiling,
+local builds, wheel qualification and remaining performance limits. The native
+kernel reconstructs stored H3 cells without introducing geographic decisions.
+`backend="python"` forces the reference; default `auto` falls back only when the
+extension is missing. Native and fallback results are identical in exhaustive
+small-block and public scalar/batch/column tests.
+
+Seven alternating numeric-column runs measured a **39% median throughput gain**
+(108,381 → 150,991 points/s) on the same synthetic sample. Public scalar median
+was **195 µs** with the extension, p99 **283 µs**, and public-result batches
+**5,079 points/s**: the public performance targets remain unmet. Catalogue
+record decoding accounts for roughly **85%** of the public batch profile;
+profile a bounded decoded-place cache before adding further native code.
+[CLIENT_ACCELERATION_MEASUREMENTS.json](CLIENT_ACCELERATION_MEASUREMENTS.json)
+contains exact measurements and limitations. Combined process peak RSS was
+114,180,096 bytes; no world measurements were made.
+
+Cython generation is pinned to 3.3.0. Generated C is checked in and regenerated
+byte-identically; setuptools builds it without a Cython runtime requirement.
+Native and fallback wheels (72,937 / 49,628 bytes) and the 124,458-byte sdist were
+built locally. Both wheels passed real fixture lookups in separate clean local
+environments. Local pip selected the fallback wheel for simulated unsupported
+native tags. `cibuildwheel` configuration includes CPython 3.11–3.14 and an
+installed-wheel smoke test that requires the native backend. Only macOS arm64
+CPython 3.12 was built/run; other platforms, remote CI and dependency-wheel
+availability there remain unverified. Nothing was published.
+
+Final review also fixed reentrant close from a source iterator or numeric-input
+callback: closed readers cannot reopen mappings. Three regression cases cover it.
+The native full suite passes **381 tests, 7 skipped in 30.71 seconds**. The
+fallback full suite passes **379 tests, 9 skipped in 40.91 seconds** (the extra
+two skips require the intentionally absent native module). Ruff lint and formatting
+(332 files), strict mypy (325 source files including setup.py), both installed-wheel
+smoke tests, source-distribution contents and regenerated-C equality passed.
+All original runtime/pipeline files and phase 1 format/export modules remain
+byte-identical. Environment, caches and build output remain under **1.1 GiB**,
+even counting hard-linked environments/cache separately. Only small synthetic
+workloads ran; no main-checkout golden payload or ledger was opened.
 
 ### Installation and CLI (phase 3)
 
@@ -30,8 +72,8 @@ configured or contacted; external network access remains guarded in tests.
 A local install of the 208,592-byte synthetic pack took **0.427 seconds** including
 full verification; peak process RSS was **41,992,192 bytes**. See
 [CLIENT_INSTALL_MEASUREMENTS.json](CLIENT_INSTALL_MEASUREMENTS.json). CLI entry
-point rebuilding used this worktree's environment and cache, with `uv sync
---frozen --offline`. The installed command's help and full fixture verification
+point rebuilding used this worktree's environment and cache, with
+`uv sync --frozen --offline`. The installed command's help and full fixture verification
 passed. No code or dataset was uploaded.
 
 Phase 3 final checks: **374 passed, 7 skipped in 33.83 seconds**; whole-worktree
@@ -132,7 +174,8 @@ The report gives exact bytes, export elapsed time, process peak RSS, sampled pea
 scratch usage, and 10,000 warm internal label searches. The label timing excludes
 coordinate conversion, catalogue decoding and public result construction. It is
 not a public API benchmark. The ZIP uses deflate level 6 for size measurement;
-there is no installer/archive contract yet.
+this ZIP is a measurement artifact, not an installer input. The installer
+consumes unpacked directories or individually pinned URL artifacts.
 
 | Measurement | Result |
 | --- | ---: |
@@ -173,8 +216,8 @@ require explicitly selected world data; none were marked passed. Whole-worktree
 Ruff check and formatting (294 files), strict mypy (287 source files), and the
 build CLI's export/verify smoke test passed. No external CI was run. Original
 runtime/pipeline files were compared against the starting commit `d3b4d94` and
-are unchanged. Added environment, cache, tests and measurement artifacts occupy
-less than 0.9 GiB even when counting the hard-linked environment/cache separately.
+are unchanged. At phase 1, added environment, cache, tests and measurement artifacts
+occupied less than 0.9 GiB even when counting the hard-linked environment/cache separately.
 
 Phase 2 public API measurements are in
 [CLIENT_READER_MEASUREMENTS.json](CLIENT_READER_MEASUREMENTS.json). The same
@@ -182,30 +225,35 @@ Phase 2 public API measurements are in
 in four dense blocks. Warm scalar median/p99: **201.375 / 259.792 µs**;
 public-result batch: **4,724 points/s**; numeric columns: **102,433 points/s**.
 Peak process RSS was **111,919,104 bytes**, full verification **0.485 seconds**.
-The public-result performance targets are not met. Profile catalogue decoding
-and result construction before selecting a Cython kernel; numerical throughput
-must not be presented as public-result throughput. No cold-disk or world access
+Those public-result performance targets were not met; phase 4 profiling and
+measurements above separate catalogue decoding from the numeric kernel. No cold-disk or world access
 measurement was made. The machine/dependencies are the same as above.
 
 Phase 2 final checks: **348 passed, 7 skipped in 44.35 seconds**; whole-worktree
-Ruff lint, formatting (309 files) and strict mypy (302 source files) passed. Every original runtime/build-stage file
-still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
+Ruff lint, formatting (309 files) and strict mypy (302 source files) passed.
+Every original runtime/build-stage file still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
 
 ## Deliberately deferred and how to continue
 
 * Phase 3 follow-ups: signed release index/key rotation, byte-range resume,
   explicit pruning and Windows/power-loss qualification. Local/URL installation
   and file-level resume are complete; no remote release exists to qualify.
-* Phases 4–7: profiling-led Cython/wheels, postal and airport packs, independent
-  Node reader with shared public-result vectors, optional MCP integration.
+* Phases 5–7: postal and airport exporter/schema/API, independent Node reader
+  with shared public-result vectors, optional MCP integration. None is partially
+  implemented. Continue from this committed phase 4 boundary.
+* Remaining performance work: bounded decoded-place caching and representative
+  real-pack access measurements. The numeric Cython improvement does not satisfy
+  the public-result targets. Cross-platform wheels require native-runner CI
+  qualification before release; no remote CI or publication was attempted.
 * Ranked bitmaps and catalogue/layout optimization await representative real-data
   measurements. Format 1.0 intentionally specifies only sparse uint16 keys and
   the measured flat/dictionary label choice. Extending it requires an explicit
   supported format revision and conformance cases.
 * A completed real v2 export remains unverified. No real-world cells, catalogue,
   accuracy set, holdout, pack size, export disk bound or final quality gate was
-  evaluated here. Validate on a small verified real snapshot first; a full world
-  export is a separate resource-budgeted task. Arrow row batches and SQLite's
+  evaluated here. One read-only real export into this worktree is authorized
+  only after `integrate finished` and no active `build_data` process, with
+  memory under 1.5 GB and output under 3 GB. Those gates have not opened. Arrow row batches and SQLite's
   page cache are not process-wide memory limits. Temporary disk for the full
   catalogue index has not been measured at world scale.
 * Admitted-source licence completeness and redistribution rights still require
@@ -216,7 +264,8 @@ still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
 ## Frozen-file follow-ups
 
 All files that existed under `src/thereabouts/` and `build_data/` at task start
-remain byte-identical. New code lives in `src/thereabouts/packs/`, `src/thereabouts/reading/`, new
+remain byte-identical. New code lives in `src/thereabouts/packs/`,
+`src/thereabouts/reading/`, new
 client/result/column/store/CLI modules, `src/thereabouts/installing/`,
 `src/thereabouts/commandline/` and `build_data/serve/`; these are not hashed by
 the existing normalization stage. No pipeline entry point was modified or invoked.

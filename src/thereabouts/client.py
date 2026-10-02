@@ -10,6 +10,7 @@ from .client_errors import InvalidInputError
 from .columns import Columns, columns
 from .errors import ClosedGeocoderError
 from .packs.address import address
+from .reading.backend import Backend, select
 from .reading.batch import lookup_rows
 from .reading.decode import data_identity, resolution
 from .reading.inputs import BATCH_SIZE, Errors, batch_options, coordinates, h3_cell
@@ -32,10 +33,12 @@ class Geocoder:
         *,
         data_dir: str | Path | None = None,
         verify: bool = False,
+        backend: Backend = "auto",
     ) -> None:
         if pack is not None and data_dir is not None:
             raise InvalidInputError("Select a pack directory or a data store, not both")
         selected = installed_pack(data_dir) if pack is None else Path(pack)
+        self._backend, self._stored_cell = select(backend)
         self._lock = RLock()
         self._closed = False
         self._pack = Pack(selected, verify=verify)
@@ -60,7 +63,14 @@ class Geocoder:
         shard = self._pack.spatial_for(block)
         found = None if shard is None else shard.lookup(block, key)
         return resolution(
-            self._pack, self._data, query, cell, block, shard is not None, found
+            self._pack,
+            self._data,
+            query,
+            cell,
+            block,
+            shard is not None,
+            found,
+            self._stored_cell,
         )
 
     def reverse_many(
@@ -105,6 +115,7 @@ class Geocoder:
             with self._lock:
                 self._ensure_open()
                 chunk = list(islice(rows, chunk_size))
+                self._ensure_open()
                 if not chunk:
                     return
                 answers = self._chunk(chunk, kind, errors)
@@ -140,6 +151,7 @@ class Geocoder:
                     hit.block,
                     hit.covered,
                     hit.found,
+                    self._stored_cell,
                 )
             answers.append(answer)
         return answers
@@ -169,16 +181,19 @@ class Geocoder:
             with self._lock:
                 self._ensure_open()
                 chunk = list(islice(rows, chunk_size))
+                self._ensure_open()
                 if not chunk:
                     return
                 hits = lookup_rows(self._pack, chunk, "coordinates", errors)
-                result = columns(self._pack, self._data, hits, decode=decode)
+                result = columns(
+                    self._pack, self._data, hits, self._stored_cell, decode=decode
+                )
             yield result
 
     def info(self) -> dict[str, Any]:
         with self._lock:
             self._ensure_open()
-            return {"backend": "python", "pack": self._pack.info()}
+            return {"backend": self._backend, "pack": self._pack.info()}
 
     def explain(self, answer: Resolution) -> dict[str, Any]:
         """Return installed evidence and golden references, without fetching more."""

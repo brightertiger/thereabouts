@@ -2,7 +2,6 @@
 
 from h3.api import basic_int as h3
 
-from ..packs.address import cell_at
 from ..packs.layout import (
     CITY_METHOD_MASK,
     CITY_METHODS,
@@ -26,6 +25,7 @@ from ..results import (
     Warning,
     freeze,
 )
+from .backend import StoredCell
 from .pack import Pack
 
 BASIS = {
@@ -134,8 +134,9 @@ def resolution(
     block: int,
     covered: bool,
     found: tuple[int, Label] | None,
+    stored_cell: StoredCell,
 ) -> Resolution:
-    stored = cell_at(block, found[0]) if found is not None else None
+    stored = stored_cell(block, found[0]) if found is not None else None
     reference = Reference(
         h3=f"{cell:x}",
         resolution=8,
