@@ -36,7 +36,7 @@ def test_offshore_uses_city_on_projected_land(
                 "priority": 0,
                 "method": "city_polygon",
                 "geometry": shapely.box(
-                    -0.03, -0.03, 0.025 if original_boundary else 0.011, 0.03
+                    -0.03, -0.03, 0.025 if original_boundary else 0.0099999999, 0.03
                 ),
             }
         ],

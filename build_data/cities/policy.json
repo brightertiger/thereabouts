@@ -269,5 +269,6 @@
       "excluded_area_evidence": "Lanzhou New Area contains the separately retained Qinchuan and Shangchuan town polygons; its 1,789-cell source area is not a single-city footprint."
     }
   },
-  "anchor_urban_edge_m": 1000
+  "anchor_urban_edge_m": 1000,
+  "projected_edge_tolerance_degrees": 1e-09
 }

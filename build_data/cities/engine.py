@@ -77,9 +77,11 @@ class Engine:
         )
         self.rank = np.argsort(self.order)
 
-    def polygons(self, coordinates: Floats) -> NDArray[np.int64]:
+    def polygons(
+        self, coordinates: Floats, tolerance: float = 0.0
+    ) -> NDArray[np.int64]:
         points = shapely.points(coordinates[:, 1], coordinates[:, 0])
-        pairs = self.tree.query(points, predicate="intersects")
+        pairs = self.tree.query(points, predicate="dwithin", distance=tolerance)
         ranks = np.full(len(coordinates), len(self.footprints), dtype=np.int64)
         if pairs.size:
             np.minimum.at(ranks, pairs[0], self.rank[pairs[1]])
@@ -88,14 +90,16 @@ class Engine:
         result[hit] = self.order[ranks[hit]]
         return result
 
-    def overlay(self, coordinates: Floats, radius: bool) -> tuple[Objects, Objects]:
+    def overlay(
+        self, coordinates: Floats, radius: bool, tolerance: float = 0.0
+    ) -> tuple[Objects, Objects]:
         ids = np.full(len(coordinates), None, dtype=object)
         methods = ids.copy()
         if self.city_state is not None:
             ids[:] = self.city_state
             methods[:] = "policy_polygon"
             return cast(Objects, ids), cast(Objects, methods)
-        winners = self.polygons(coordinates)
+        winners = self.polygons(coordinates, tolerance)
         for i in np.unique(winners[winners >= 0]):
             mask = winners == i
             ids[mask] = self.footprints[i]["city_id"]
@@ -189,7 +193,13 @@ class Engine:
         # Project only otherwise unclaimed offshore cells before urban inference.
         inside = self.polygons(coordinates) >= 0
         projected[inside] = coordinates[inside]
-        ids, methods = self.overlay(projected, radius)
+        ids, methods = self.overlay(
+            projected,
+            radius,
+            self.policy["projected_edge_tolerance_degrees"]
+            if offshore is not None and offshore.any()
+            else 0.0,
+        )
         missing = ids == None  # noqa: E711
         repair = (
             missing

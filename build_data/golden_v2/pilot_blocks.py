@@ -1,6 +1,7 @@
 """Materialize pilot probe blocks and a real country catalogue beside frozen v1."""
 
 import argparse
+import json
 from collections import Counter
 from pathlib import Path
 
@@ -46,14 +47,17 @@ def main() -> None:
         for cc, report in normalized["countries"].items()
     }
     probes = read_json(Path(__file__).parents[1] / "cities/probes.json")
-    points = [(r[1], r[2]) for r in probes["named"]]
+    fixtures = json.loads(
+        (Path(__file__).parents[1] / "reconcile/fixtures.json").read_text()
+    )
+    points = [(r[1], r[2]) for r in [*probes["named"], *fixtures] if r[3] in engines]
     points.extend(
         (r["latitude"], r["longitude"])
         for cc, engine in engines.items()
         for r in engine.cities
         if r["city_id"] in probes["neighbours"].get(cc, {})
     )
-    roots = {h3.latlng_to_cell(y, x, 3) for y, x in points}
+    roots = {h3.cell_to_parent(h3.latlng_to_cell(y, x, 8), 3) for y, x in points}
     records = [
         r for r in base["tables"] if r["kind"] == "cells" and r["block"] in roots
     ]
@@ -102,7 +106,8 @@ def main() -> None:
             for r in named_checks(
                 Comparison(Cells(base["tables"]), {}, radius, reader), inputs
             )
-            if h3.latlng_to_cell(r["latitude"], r["longitude"], 3) in roots
+            if h3.cell_to_parent(h3.latlng_to_cell(r["latitude"], r["longitude"], 8), 3)
+            in roots
         ]
         if not all(r["passed"] for r in named):
             raise ValueError("Stored pilot named checks failed")
