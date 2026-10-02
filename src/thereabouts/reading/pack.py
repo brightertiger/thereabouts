@@ -8,12 +8,14 @@ from typing import Any
 from ..errors import ClosedGeocoderError, DataNotInstalledError
 from ..packs.catalogue import Catalogue
 from ..packs.errors import CorruptPackError
+from ..packs.exact import Exact
 from ..packs.jsonio import relative_file
 from ..packs.layout import PLACE, PLACES
 from ..packs.metadata import read_manifest
 from ..packs.spatial import Label, Spatial
 from ..packs.verify import verify as verify_pack
-from .places import DEFAULT_CACHE_BYTES, Places
+from .cache import DEFAULT_CACHE_BYTES, Cache
+from .places import Places
 from .spatial import SpatialIndex
 
 
@@ -35,7 +37,11 @@ class Pack:
         self.spatials: dict[int, Spatial] = {}
         self.indexes: dict[int, SpatialIndex] = {}
         self.catalogue_maps: dict[int, Catalogue] = {}
-        self.places = Places(self, cache_bytes)
+        self.cache = Cache(cache_bytes)
+        self.places = Places(self, self.cache)
+        self.exact_files = [r for r in self.manifest["files"] if r["kind"] == "exact"]
+        self.key_starts = [r["first_key"].encode("utf-8") for r in self.exact_files]
+        self.exacts: dict[int, Exact] = {}
 
     def ensure_open(self) -> None:
         if self.closed:
@@ -119,9 +125,33 @@ class Pack:
             raise CorruptPackError("Missing place identity")
         return identity
 
+    def exact_for(self, key: str) -> Exact | None:
+        self.ensure_open()
+        encoded = key.encode("utf-8")
+        index = bisect_right(self.key_starts, encoded) - 1
+        if index < 0 or encoded > self.exact_files[index]["last_key"].encode("utf-8"):
+            return None
+        if index not in self.exacts:
+            record = self.exact_files[index]
+            shard = Exact(
+                relative_file(self.root, record["path"]), record["max_record_bytes"]
+            )
+            if (
+                shard.count != record["count"]
+                or shard.key(0).decode() != record["first_key"]
+                or shard.key(shard.count - 1).decode() != record["last_key"]
+            ):
+                shard.close()
+                raise CorruptPackError("Exact-key directory differs from manifest")
+            self.exacts[index] = shard
+        return self.exacts[index]
+
     def close(self) -> None:
         self.closed = True
-        self.places.clear()
+        self.cache.clear()
+        for exact in self.exacts.values():
+            exact.close()
+        self.exacts.clear()
         for index in self.indexes.values():
             index.close()
         self.indexes.clear()

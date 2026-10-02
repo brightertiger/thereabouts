@@ -1,18 +1,67 @@
 # Thereabouts client implementation status
 
-Phases 1–4 are implemented on `feat/client`, locally only:
+Phases 1–5 are implemented on `feat/client`, locally only:
 
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
 * `bf90c3a` — Add offline Python golden reader and bounded public API.
 * `4689230` — Add pinned pack installation and JSON command line client.
 * `054d9bc` — Accelerate stored-cell reconstruction with optional Cython.
-* Read-path follow-up — **Cache decoded places and keep batch lookup columnar**
+* `fe5cad9` — Cache decoded places and keep batch lookup columnar.
+* Phase 5 — **Add standalone postal and airport serving packs**
   (this commit; find its hash with `git log`).
 
-Phases 5–7 remain; phase 5 is next after the read-path correction.
+Phases 6–7 remain; the Node reader is next.
 `thereabouts.client.Geocoder` reads the new packs; the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Postal and airport packs (phase 5)
+
+`python -m build_data.serve export --family postal|airports` exports verified
+source observations and their minimal canonical catalogue. The same installer,
+listing/verification commands and Python API support independent optional packs.
+Use `Geocoder(postal_path).postal("00100", country="AA")` or
+`Geocoder(airport_path).airport("ZZZ", scheme="iata")`. Select installed families
+with `Geocoder(data_dir=store, packs=["postal", "airports"])`, or explicit paths
+with `packs={family: path}`. Missing context is explicit; compatible multi-pack
+selection checks epoch, golden/policy digests and H3 version. `info()` now groups
+manifests and cache statistics by family. Full usage is in [CODE_PACKS.md](CODE_PACKS.md).
+
+Postal leading zeros, country-specific normalization, source editions, multiple
+cities per code and source-coordinate disagreements are preserved. Airports keep
+source identity, all five explicit schemes, country-scoped keys, duplicate
+observations, closed sites and missing locations. `selected` remains null on
+ambiguity; no candidate limit or first-row preference is hidden. Source fields,
+per-observation H3/method evidence and original labels remain in immutable
+results. Code candidates and places share the configured byte-bounded cache.
+
+The format specification now includes an exact-key container with binary sorted
+keys and independently compressed candidate records. Decompression bounds come
+from measured per-shard maximum record lengths. The reverse byte layout and
+original reverse fixture are unchanged. New synthetic compatible fixtures are
+under `tests/fixtures/codes`. New exporter logic lives in `build_data/serve_codes`;
+serving-stage dispatch and format validation were extended. Serving export
+fingerprints therefore change; original pipeline hashes/files do not.
+
+[CLIENT_CODE_MEASUREMENTS.json](CLIENT_CODE_MEASUREMENTS.json) records the sample:
+7 postal observations / **10,917 installed bytes**, 4 airport observations /
+**16,739 bytes**, exports **0.066 / 0.074 s**, and warm two-candidate median
+**3.042 / 2.625 µs** with cached decoding. Combined peak RSS **85,409,792 bytes**.
+This tiny code fixture is correctness evidence, not a world size or accuracy
+forecast. No real optional-pack export or independent quality review was run.
+
+The populated reverse sample was remeasured after multi-pack changes:
+**10.291 µs Cython / 12.750 µs Python** shuffled warm scalar median;
+**531,994 / 530,437 points/s** returning columns. Both requested targets remain
+met. Object batches were **107,068 / 82,296 results/s**. The report includes the
+full profiles, timings and pack identity. Main integration is still rebuilding
+and normalizing; no main golden data has been read.
+
+Phase 5 full native suite: **401 passed, 7 skipped**. Ruff check and formatting
+(**367 files**) and strict mypy (**353 source files**) pass. Full fallback suite: **399 passed, 9 skipped** (two native-only cases skipped). Tests additionally cover
+standalone optional installation, CLI JSON, compatibility rejection, unlocated
+packs with zero catalogue entries, source-join mismatch, provenance multiplicity,
+resume/idempotence/relocation, corruption, decompression bounds and cache parity.
 
 ### Read-path correction after phase 4
 
@@ -47,8 +96,8 @@ failure cleanup, input types and close behavior. Current full native checks:
 (the two additional skips require the intentionally absent native module).
 
 The main integration marker remains absent; a `build_data.digest_golden` process
-was active on the latest check. No main golden data was read. Original hashed
-runtime/stage files and phase 1 format/exporter files remain byte-identical.
+was active on the latest check. No main golden data was read. At `fe5cad9`, original hashed runtime/stage files and phase 1 format/exporter
+files remained byte-identical. Phase 5 extends only the new serving modules.
 
 ### Optional Cython kernel and wheels (phase 4, historical measurements)
 
@@ -276,9 +325,9 @@ Every original runtime/build-stage file still matches `d3b4d94`; phase 1 format/
 * Phase 3 follow-ups: signed release index/key rotation, byte-range resume,
   explicit pruning and Windows/power-loss qualification. Local/URL installation
   and file-level resume are complete; no remote release exists to qualify.
-* Phases 5–7: postal and airport exporter/schema/API, independent Node reader
-  with shared public-result vectors, optional MCP integration. None is partially
-  implemented. Continue with phase 5 after the committed read-path correction.
+* Phases 6–7: independent Node reader with shared public-result vectors, then
+  optional MCP integration. Neither is partially implemented. Continue with Node
+  after the committed optional-pack boundary.
 * Remaining performance work: representative real-pack access and cache-miss
   measurements. Warm synthetic targets are met; cold/world behavior is unverified.
   Cross-platform wheels require native-runner CI

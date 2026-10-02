@@ -30,8 +30,8 @@ integration. Use the explicit `thereabouts.client` import for these packs.
 Every lookup returns a frozen `Resolution`. `selected` is one candidate for
 `matched`, otherwise null; `candidates` is an ordered tuple. A coordinate/H3
 lookup has at most one candidate. `require_one()` returns it, returns None for no
-match, and raises `AmbiguousResultError` for an ambiguous envelope. Future exact
-code packs will supply multiple candidates; no first-row selection is implied.
+match, and raises `AmbiguousResultError` for an ambiguous envelope. Postal and airport code packs supply multiple candidates; no first-row
+selection is implied. See [CODE_PACKS.md](CODE_PACKS.md).
 
 The candidate's `city`, `state`, `country` and `sovereign` are nullable `Place`
 records with public IDs, names, settlement kind, relationships and local evidence.
@@ -68,7 +68,8 @@ an absent block is corruption, not outside coverage. `not_found` and `ambiguous`
 are reserved for resolvers with other candidate semantics.
 
 `to_dict()` returns detached JSON-compatible data, including provenance. `info()`
-returns a detached manifest with source releases, notices and its SHA256.
+returns detached manifests keyed by family, with source releases, notices and
+their SHA256 values.
 `explain(answer)` adds the explicit indication that full raw golden evidence is
 not installed. All three are local operations. Strings, results and explanations
 remain usable after the reader closes.
@@ -99,7 +100,8 @@ all later operations, including buffered iterators, fail with
 chunk. This is thread safety, not a parallel throughput promise. Each process
 must open its own handle. Shards map lazily and remain mapped until close.
 Decoded places use a byte-bounded LRU: `cache_bytes=32 * 1024 * 1024` by default;
-zero disables it. `info()["cache"]` reports its usage and hit/miss/eviction counts.
+zero disables it. `info()["cache"]["reverse"]` reports its usage and hit/miss/eviction counts.
+`info()["packs"]` contains manifests keyed by selected family.
 Mapped pages and objects retained by callers are outside that budget.
 
 ## Integrity and performance
@@ -122,8 +124,8 @@ in `thereabouts.packs.errors`. Their modules stay separate while original runtim
 files are frozen.
 
 [CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md) reports profiles and before/after
-measurements on 4,176 synthetic places, 308,032 stored rows and 64 blocks. Warm
-shuffled scalar medians are 9.375 µs with Cython and 11.917 µs in Python; numeric
-columns exceed 526,000 points/s in both modes. Cache-pressure runs and limitations
+measurements on 4,176 synthetic places, 308,032 stored rows and 64 blocks. The latest [regression measurement](CLIENT_CODE_MEASUREMENTS.json) after adding
+optional packs gives shuffled scalar medians of 10.291 µs with Cython and
+12.750 µs in Python; numeric columns exceed 530,000 points/s in both modes. Cache-pressure runs and limitations
 are included. These are warm working-set measurements, not real-world latency
 or geographic quality claims.

@@ -145,3 +145,13 @@ local install of the 208,592-byte synthetic sample on Apple M2, 8 GiB, macOS 27,
 Python 3.12.8: **0.427 seconds**, including full verification, with process peak
 RSS **41,992,192 bytes**. No cache eviction or world-scale inference is implied.
 Reproduce with `python -m benchmarks.install SOURCE --store FRESH_STORE --output REPORT`.
+
+
+## Optional code families
+
+The same local/pinned-URL installer accepts `postal` and `airports`. Each family
+has its own immutable path and active pointer. Transfer staging is locked by
+manifest digest, then publication/activation is locked by family. `data list`
+reports all families; `data verify --family postal --full` verifies an installed
+optional pack without reverse data. See [CODE_PACKS.md](CODE_PACKS.md) for exact
+resolver and multi-pack selection examples. No code pack has been hosted.

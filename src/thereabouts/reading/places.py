@@ -1,40 +1,13 @@
-"""Lazy decoded places, charged by retained bytes rather than entry count."""
+"""Lazy place decoding and public identity projection."""
 
-import sys
-from collections import OrderedDict
-from collections.abc import Mapping
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from ..results import Evidence, Place, freeze
+from .cache import Cache
 
 if TYPE_CHECKING:
     from .pack import Pack
-
-# The populated benchmark retains 4,176 evidence-bearing places in this budget.
-DEFAULT_CACHE_BYTES = 32 * 1024 * 1024
-
-
-def retained_bytes(value: object, seen: set[int] | None = None) -> int:
-    """Conservatively charge shared objects once per entry (not across entries)."""
-    if seen is None:
-        seen = set()
-    if id(value) in seen:
-        return 0
-    seen.add(id(value))
-    size = sys.getsizeof(value)
-    if is_dataclass(value) and not isinstance(value, type):
-        size += sum(retained_bytes(getattr(value, f.name), seen) for f in fields(value))
-    elif isinstance(value, Mapping):
-        # MappingProxyType doesn't include its backing dictionary in getsizeof.
-        size += sys.getsizeof(dict(value))
-        size += sum(
-            retained_bytes(key, seen) + retained_bytes(item, seen)
-            for key, item in value.items()
-        )
-    elif isinstance(value, tuple):
-        size += sum(retained_bytes(item, seen) for item in value)
-    return size
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,36 +17,18 @@ class Entry:
 
 
 class Places:
-    def __init__(self, pack: "Pack", budget: int) -> None:
-        self.pack = pack
-        self.budget = budget
-        self.entries: OrderedDict[int, tuple[Entry, int]] = OrderedDict()
-        self.bytes = 0
-        self.hits = self.misses = self.evictions = 0
+    def __init__(self, pack: "Pack", cache: Cache) -> None:
+        self.pack, self.cache = pack, cache
 
     def get(self, reference: int) -> Entry | None:
         if not reference:
             return None
-        cached = self.entries.get(reference)
+        cached = self.cache.get(reference)
         if cached is not None:
-            self.entries.move_to_end(reference)
-            self.hits += 1
-            return cached[0]
-        self.misses += 1
+            assert isinstance(cached, Entry)
+            return cached
         entry = self._decode(reference)
-        if self.budget:
-            size = retained_bytes((reference, entry, 0))
-            # Dictionary allocation is included separately, including spare slots.
-            self.entries[reference] = (entry, size)
-            self.bytes += size
-            while (
-                self.entries and self.bytes + sys.getsizeof(self.entries) > self.budget
-            ):
-                _, (_, removed) = self.entries.popitem(last=False)
-                self.bytes -= removed
-                self.evictions += 1
-            if not self.entries:
-                self.entries.clear()
+        self.cache.put(reference, entry)
         return entry
 
     def place(self, reference: int) -> Place | None:
@@ -107,18 +62,3 @@ class Places:
             ),
         )
         return Entry(place, row["sovereign_id"])
-
-    def info(self) -> dict[str, int]:
-        return {
-            "budget_bytes": self.budget,
-            "entries": len(self.entries),
-            "retained_bytes": self.bytes
-            + (sys.getsizeof(self.entries) if self.entries else 0),
-            "hits": self.hits,
-            "misses": self.misses,
-            "evictions": self.evictions,
-        }
-
-    def clear(self) -> None:
-        self.entries.clear()
-        self.bytes = 0

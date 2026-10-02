@@ -284,3 +284,181 @@ Consumers must keep installed files immutable while mapped. The Python
 the primitives under `thereabouts.packs` are internal and are not the planned
 public `Geocoder` API. Golden admission trusts the verified manifest and its
 quality records; it does not rerun geographic quality adjudication.
+
+## Optional exact-code packs
+
+Postal and airport packs are self-contained members of `thereabouts-pack-1`.
+Their catalogue uses the same records and local reference rules as reverse;
+they need no reverse installation. The spatial containers above are unchanged.
+The additional container kind and manifest family identify support: a reader
+supporting only reverse must reject these families before opening payloads.
+See [CODE_PACKS.md](CODE_PACKS.md) for API examples and export commands.
+
+### Manifest and normalization
+
+`family` is `postal` or `airports`, `coverage` is `keys`, and `dependencies` is
+empty. Other identity, source, nearest-band and notice fields retain their
+meanings above. `candidate_policy` is `source-observations-1`. `source_rows`
+counts all golden source rows; `unindexed_rows` counts rows with no usable
+country/postal pair or airport code. Such rows produce no queryable candidate;
+the count is explicit. All indexed observations, including duplicates and
+editions, are retained. No source-edition precedence is applied.
+
+`key_normalization` is an object with exactly `default` (an operation list) and
+`countries` (country code to operation list). Countries are two uppercase ASCII
+letters. Apply a country override if present, otherwise the default; apply its
+operations in order. Supported operations are:
+
+* `strip_ascii`: remove leading/trailing ASCII bytes 9–13 and 32.
+* `upper_ascii`: translate ASCII `a`–`z` to `A`–`Z`; other Unicode is unchanged.
+* `remove_ascii_spaces`: remove byte 32 everywhere, leaving other bytes intact.
+
+The exporter currently supplies strip/uppercase for all codes, with space
+removal additionally for Canadian and British postal keys. Airports have no
+country overrides. These are data-carried rules; readers must not embed country
+policy. Leading zeros and punctuation remain. Input must be a nonempty Unicode
+string without NUL, representable as UTF-8. Country input is stripped and ASCII
+uppercased and must then be two ASCII letters. No ISO-country membership is
+inferred. Unknown keys return `not_found`.
+
+Compound keys use literal NUL bytes as separators:
+
+* Postal: `COUNTRY + NUL + NORMALIZED_CODE`; country is required.
+* Airport: `SCHEME + NUL + COUNTRY_OR_EMPTY + NUL + NORMALIZED_CODE`.
+  Schemes are exactly `iata`, `icao`, `ident`, `gps`, `local`. Scheme is required;
+  `local` also requires country. All other schemes have a global index and
+  additional country-scoped indexes. Country scoping uses the **source** country,
+  independently of spatial country disagreement. No scheme is guessed from a
+  code's length or spelling.
+
+Keys sort by unsigned UTF-8 byte order, not locale or Unicode normalization.
+JSON manifest strings encode NUL as `\u0000`. An exact-file inventory record has
+`kind: "exact"`, `path`, `size`, `sha256`, `first_key`, `last_key`, `count` and
+`max_record_bytes`. Ranges are ordered, disjoint and inclusive. `count` is the
+number of distinct keys. `max_record_bytes` is the largest uncompressed record
+in that shard, measured during export; it bounds decompression before JSON
+parsing. A single complete key may exceed the configured shard target. The
+manifest is pinned by the installer, as for reverse data.
+
+### Exact container bytes
+
+Use the same 32-byte header and 32-byte section directory as above: magic
+`THEREPK\0`, format 1.0, flags zero, **kind 3**, three sections in this order.
+Sections start on eight-byte boundaries; gaps contain zeroes.
+
+| Section ID | Meaning | Record width |
+| --- | --- | ---: |
+| 8 | Exact-key directory | 40 bytes |
+| 9 | Concatenated UTF-8 compound keys | 1 byte |
+| 10 | Concatenated compressed candidate records | 1 byte |
+
+Each directory record is little-endian `<QIIQQQ>`:
+
+| Offset | Type | Meaning |
+| --- | --- | --- |
+| 0 | uint64 | Key offset relative to section 9 |
+| 8 | uint32 | Key byte length, positive |
+| 12 | uint32 | Distinct candidate count, positive |
+| 16 | uint64 | Compressed record offset relative to section 10 |
+| 24 | uint64 | Compressed byte length, positive |
+| 32 | uint64 | Exact uncompressed byte length, positive and ≤ `max_record_bytes` |
+
+Both byte spans are contiguous in directory order, starting at zero and ending
+at their section lengths. Directory count is positive and matches the inventory.
+Keys are unique and sorted. No terminator or per-record padding is stored.
+
+A candidate record is one **zlib-framed DEFLATE stream** (RFC 1950/1951; exporter
+level 6), whose decoded bytes are canonical UTF-8 JSON under the rules above.
+It must end exactly once: reject truncated streams, concatenated streams,
+trailing bytes and decoded-size mismatches. Bound inflation by the declared raw
+length plus one byte to detect overflow. The decoded object has exactly one
+property, `candidates`, whose list length equals the directory candidate count.
+There are no JavaScript-unsafe numeric identities in this JSON.
+
+### Candidate and observation records
+
+Every candidate has exactly these properties. Nullable values use JSON null;
+empty strings in original source fields are retained separately from null.
+
+| Property | Representation |
+| --- | --- |
+| `id` | Nonempty public identity string; candidates sorted uniquely by UTF-8 bytes |
+| `entity` | Airport source entity below, or null for postal candidates |
+| `refs` | Three uint32 catalogue references: country, state, city; zero is null |
+| `methods` | Object with `country`, `state`, `city`, `land` |
+| `distance` | Policy-band object below or null |
+| `observations` | Nonempty array preserving original source row multiplicity |
+| `warnings` | Sorted unique warning-code strings |
+
+Method values have the same meaning as reverse flags. Country/state are `area`
+or null; city is one of the seven method strings above or null; land is `land`,
+`offshore` or `unknown`. An aggregate reference/method is present only if all
+observations agree; a reference may remain while its method is null when methods
+differ. Each observation still carries its original full assignment. Distance
+is null except for an agreed nearest method; otherwise it has exactly
+`greater_than_m` (nullable integer), `at_most_m`, `cutoff_m` and `exact_m: null`,
+using the manifest's bands. It is not an exact source-point distance.
+
+A postal candidate identity is its canonical city ID if present, otherwise
+`postal:<escaped-source>:<escaped-source_id>`. Airport identity is always
+`airport:<escaped-source>:<escaped-source_id>`. Escape source components as UTF-8
+RFC 3986 percent encoding, with only `A–Z a–z 0–9 - . _ ~` unescaped and uppercase
+hex digits. This distinguishes source airport identity from a city association.
+
+Airport `entity` has exactly `id`, `name`, `role`, `country_code`, `codes`, `type`.
+`id` equals the candidate ID; `role` is `airport`. Name, source country and type
+are strings or null. `codes` maps all five scheme names to the original source
+code or null. Conflicting observations leave an aggregate entity field null.
+Types such as `closed` and `heliport` are source classifications, never filters.
+Municipality remains an original label; no "serves city" relationship is invented.
+
+Each observation has exactly:
+
+* `source`, `source_id`, `source_release`, `license`: nonempty original strings;
+  source/release/licence must match supplied release attribution at export.
+* `golden_table`: manifest-listed relative source table path.
+* `fields`: the entire original golden lookup row as a JSON object. The one
+  representation change is `h3_uint64`: decimal **string** or null, since an
+  arbitrary uint64 cannot be represented by a JavaScript Number. Coordinates
+  are finite JSON numbers or null; original labels, codes, variant, accuracy,
+  source provenance and join columns are retained.
+* `reference`: null for unlocated observations; otherwise exactly `h3` (valid
+  lowercase r8 hex string) and `stored_h3` (lowercase stored ancestor or null).
+  Stored resolution is 3–8 and it must be a logical ancestor of `h3`.
+* `refs`: country/state/city catalogue references, with zero nulls.
+* `flags`: the same uint32 method bits and null-agreement contract as reverse.
+* `cell_status`: `matched`, `unassigned`, `ineligible` or `unlocated`.
+* `country_disagrees`: original boolean or null, never a fabricated agreement.
+
+Observations sort by UTF-8 source, source release, source ID, golden table, then
+canonical observation bytes. Equal rows remain repeated; ordering expresses no
+preference. The exporter verifies the golden join against the recorded original
+r8 cell and its stored ancestor to recover methods. It never reruns geographic
+policy at a source coordinate or silently replaces a source label.
+
+Warnings include `source_country_disagrees`, `distant_nearest`, `inferred_extent`
+and `mixed_spatial_methods` as applicable to any observation. Readers decode
+these stored warnings. They do not select a candidate based on source order.
+
+### Public decoding and standalone operation
+
+Decode each canonical reference through this pack's catalogue. Public candidate
+`place` is the decoded source entity or null; `city/state/country/sovereign` are
+canonical place records. `relationship` is `source_association`; confidence is
+`{basis: "exact_code_link", calibrated_probability: null}`. This describes the
+key match, not geographic certainty. Accuracy remains null; a postal source
+accuracy code is preserved in observation fields and is not converted to metres.
+
+Public observations preserve the four source strings, table path and fields;
+convert references to public `country_id/state_id/city_id`; decode `flags` to
+methods. Land is `unknown` when there is no stored cell. Convert references to
+public `Reference` objects using the same quantization string as reverse. The
+outer `Resolution.reference` is null because a code may have multiple source
+points. The query has `kind: postal|airport`, normalized `value`, normalized or
+null `country`, and explicit or null `scheme`; coordinate/H3 query slots are null.
+
+Zero candidates mean `not_found`; one means `matched` and is `selected`; more
+than one means `ambiguous` and `selected` is null. Candidates are never silently
+truncated. Optional adapter pagination must retain the full ambiguity status.
+Packs opened together must match catalogue epoch, golden digest, policy digest
+and H3 version. Local integer references still cannot be joined across packs.

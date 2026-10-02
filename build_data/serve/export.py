@@ -6,6 +6,14 @@ from functools import partial
 from pathlib import Path
 
 from build_data.acquire.io import sync_directory
+from build_data.serve_codes.encoding import (
+    shards as code_shards,
+)
+from build_data.serve_codes.encoding import (
+    verify_source as verify_codes,
+)
+from build_data.serve_codes.index import CodeIndex
+from build_data.serve_codes.source import NORMALIZATION
 from thereabouts.packs.address import address
 from thereabouts.packs.jsonio import digest
 from thereabouts.packs.layout import (
@@ -100,13 +108,17 @@ def export(
     output: Path,
     *,
     shard_bytes: int = DEFAULT_SHARD_BYTES,
+    family: str = "reverse",
 ) -> Path:
     if type(shard_bytes) is not int or shard_bytes < PLACE.size:
         raise ValueError("Shard target must fit a place record")
+    if family not in ("reverse", "postal", "airports"):
+        raise ValueError("Unknown serving family")
     output = output.resolve()
     snapshot = read_snapshot(snapshot_path)
     release = release_metadata(metadata_path)
     export_identity = identity(snapshot, release, shard_bytes)
+    export_identity["family"] = family
     fingerprint = digest(export_identity)
     output.parent.mkdir(parents=True, exist_ok=True)
     with (output.parent / ".serve.lock").open("a+b") as lock:
@@ -124,9 +136,18 @@ def export(
         pack.mkdir(parents=True, exist_ok=True)
         index = CatalogueIndex(work / "catalogue.sqlite")
         try:
-            index.load(snapshot)
+            codes = None
+            if family == "reverse":
+                index.load(snapshot)
+            else:
+                codes = CodeIndex(index, snapshot, family)
+                codes.load(release)
             files = catalogue_shards(index, work, pack, fingerprint, shard_bytes)
-            files += cell_shards(snapshot, index, work, pack, fingerprint, shard_bytes)
+            files += (
+                cell_shards(snapshot, index, work, pack, fingerprint, shard_bytes)
+                if codes is None
+                else code_shards(codes, work, pack, fingerprint, shard_bytes)
+            )
             files += notices(snapshot, release, metadata_path, pack)
             coverage = (
                 "world"
@@ -136,14 +157,26 @@ def export(
             value = manifest(
                 snapshot, release, export_identity, files, index.count, coverage
             )
+            if codes is not None:
+                value.update(
+                    family=family,
+                    coverage="keys",
+                    key_normalization=NORMALIZATION[family],
+                    candidate_policy="source-observations-1",
+                    source_rows=codes.source_rows,
+                    unindexed_rows=codes.unindexed_rows,
+                )
             write_manifest(pack / "manifest.json", value)
             verify(pack)
-            verify_source(snapshot, pack, files, index)
+            if codes is None:
+                verify_source(snapshot, pack, files, index)
+            else:
+                verify_codes(codes, pack, files)
             snapshot.recheck()
-            if (
-                identity(snapshot, release_metadata(metadata_path), shard_bytes)
-                != export_identity
-            ):
+            if {
+                **identity(snapshot, release_metadata(metadata_path), shard_bytes),
+                "family": family,
+            } != export_identity:
                 raise ValueError(
                     "Exporter code or release metadata changed during export"
                 )

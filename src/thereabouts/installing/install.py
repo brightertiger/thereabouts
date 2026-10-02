@@ -19,6 +19,7 @@ from ..packs.jsonio import (
     sha256,
     string,
 )
+from ..packs.keys import FAMILIES
 from ..packs.verify import verify
 from ..store import data_directory, installation_path
 from .errors import DownloadError, InstallationError
@@ -34,11 +35,11 @@ def _source(value: str | Path, offline: bool) -> str | Path:
     return validate_url(value)
 
 
-def _inventory(path: Path) -> tuple[str, list[dict[str, Any]]]:
+def _inventory(path: Path) -> tuple[str, str, list[dict[str, Any]]]:
     try:
         value = parse(path.read_bytes())
-        if value["family"] != "reverse":
-            raise ValueError("Only reverse packs can be installed")
+        if value["family"] not in FAMILIES:
+            raise ValueError("Unsupported installation family")
         version = string(value["data_version"])
         records = value["files"]
         if not isinstance(records, list) or not records:
@@ -52,7 +53,7 @@ def _inventory(path: Path) -> tuple[str, list[dict[str, Any]]]:
             seen.add(name)
             integer(record["size"])
             checksum(record["sha256"])
-        return version, records
+        return value["family"], version, records
     except (ValueError, KeyError, TypeError) as exc:
         raise CorruptPackError(f"Invalid transfer inventory: {exc}") from exc
 
@@ -65,8 +66,9 @@ def _complete(root: Path, record: dict[str, Any]) -> bool:
     return True
 
 
-def _activate(root: Path, pack: Path, digest: str) -> None:
-    pointer = relative_file(root, "packs/reverse/current.json")
+def _activate(root: Path, pack: Path, digest: str, family: str) -> None:
+    pointer = relative_file(root, f"packs/{family}/current.json")
+    pointer.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         dir=pointer.parent, prefix=".current-", delete=False
     ) as stream:
@@ -122,7 +124,7 @@ def install(
     root = data_directory(data_dir).resolve()
     try:
         root.mkdir(parents=True, exist_ok=True)
-        lock = relative_file(root, "packs/reverse/install.lock")
+        lock = relative_file(root, f"staging/{manifest_sha256}.lock")
         with installation_lock(lock):
             return _install(origin, root, manifest_sha256, manifest_bytes, timeout)
     except ValueError as exc:
@@ -144,30 +146,31 @@ def _install(
         transfer(
             source, "manifest.json", manifest, size=size, digest=digest, timeout=timeout
         )
-    version, records = _inventory(manifest)
-    destination = installation_path(root, version, digest)
-    if destination.exists():
-        if verify(destination)["manifest_sha256"] != digest:
-            raise CorruptPackError("Existing installation has a different manifest")
-        shutil.rmtree(stage)
-        _activate(root, destination, digest)
+    family, version, records = _inventory(manifest)
+    with installation_lock(relative_file(root, f"packs/{family}/install.lock")):
+        destination = installation_path(root, version, digest, family)
+        if destination.exists():
+            if verify(destination)["manifest_sha256"] != digest:
+                raise CorruptPackError("Existing installation has a different manifest")
+            shutil.rmtree(stage)
+            _activate(root, destination, digest, family)
+            return destination
+        pending = [record for record in records if not _complete(stage, record)]
+        if shutil.disk_usage(root).free < sum(record["size"] for record in pending):
+            raise InstallationError("Insufficient disk space for pinned payloads")
+        for record in pending:
+            target = relative_file(stage, record["path"])
+            transfer(
+                source,
+                record["path"],
+                target,
+                size=record["size"],
+                digest=record["sha256"],
+                timeout=timeout,
+            )
+        if verify(stage)["manifest_sha256"] != digest or sha256(manifest) != digest:
+            raise CorruptPackError("Staged manifest changed during verification")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        stage.rename(destination)
+        _activate(root, destination, digest, family)
         return destination
-    pending = [record for record in records if not _complete(stage, record)]
-    if shutil.disk_usage(root).free < sum(record["size"] for record in pending):
-        raise InstallationError("Insufficient disk space for pinned payloads")
-    for record in pending:
-        target = relative_file(stage, record["path"])
-        transfer(
-            source,
-            record["path"],
-            target,
-            size=record["size"],
-            digest=record["sha256"],
-            timeout=timeout,
-        )
-    if verify(stage)["manifest_sha256"] != digest or sha256(manifest) != digest:
-        raise CorruptPackError("Staged manifest changed during verification")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    stage.rename(destination)
-    _activate(root, destination, digest)
-    return destination

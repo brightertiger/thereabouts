@@ -14,6 +14,7 @@ from .jsonio import (
     sha256,
     string,
 )
+from .keys import FAMILIES, normalization
 from .layout import BLOCK_COUNT, UINT32_MAX
 
 
@@ -56,8 +57,15 @@ def read_manifest(root: Path, *, full: bool = False) -> dict[str, Any]:
             "required_features": 0,
         }:
             raise UnsupportedPackError("Expected thereabouts-pack-1 format 1.0")
-        if value["family"] != "reverse":
-            raise UnsupportedPackError("Only reverse packs are supported")
+        if value["family"] not in FAMILIES:
+            raise UnsupportedPackError("Unsupported pack family")
+        exact = value["family"] != "reverse"
+        if exact:
+            normalization(value["key_normalization"])
+            if integer(value["unindexed_rows"]) > integer(value["source_rows"]):
+                raise ValueError("Invalid lookup source row accounting")
+            if value["candidate_policy"] != "source-observations-1":
+                raise UnsupportedPackError("Unsupported candidate policy")
         if (
             integer(value["reference_resolution"]) != 8
             or integer(value["block_resolution"]) != 3
@@ -108,7 +116,8 @@ def read_manifest(root: Path, *, full: bool = False) -> dict[str, Any]:
             raise ValueError("Missing payload inventory")
         seen: set[str] = set()
         next_place, last_block = 1, -1
-        spatial = 0
+        spatial = exact_shards = 0
+        last_key = b""
         for record in records:
             name = string(record["path"])
             if name in seen or name == "manifest.json":
@@ -122,7 +131,20 @@ def read_manifest(root: Path, *, full: bool = False) -> dict[str, Any]:
                 if first != next_place:
                     raise ValueError("Noncontiguous catalogue shard IDs")
                 next_place += rows
+            elif kind == "exact":
+                if not exact:
+                    raise ValueError("Exact payload in reverse pack")
+                first_key = string(record["first_key"]).encode("utf-8")
+                end_key = string(record["last_key"]).encode("utf-8")
+                if not last_key < first_key <= end_key:
+                    raise ValueError("Overlapping exact-key shards")
+                integer(record["count"], 1)
+                integer(record["max_record_bytes"], 1)
+                last_key = end_key
+                exact_shards += 1
             elif kind == "cells":
+                if exact:
+                    raise ValueError("Cell payload in exact-key pack")
                 first, last = (
                     integer(record["first_block"]),
                     integer(record["last_block"]),
@@ -133,9 +155,9 @@ def read_manifest(root: Path, *, full: bool = False) -> dict[str, Any]:
                 spatial += 1
             elif kind != "notice":
                 raise UnsupportedPackError(f"Unsupported artifact kind: {kind}")
-        if next_place != count + 1 or not spatial:
+        if next_place != count + 1 or not (exact_shards if exact else spatial):
             raise ValueError("Incomplete catalogue or spatial inventory")
-        if value["coverage"] not in ("world", "blocks"):
+        if value["coverage"] not in (("keys",) if exact else ("world", "blocks")):
             raise ValueError("Unknown coverage declaration")
         notices = value["notices"]
         if (

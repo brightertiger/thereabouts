@@ -23,7 +23,21 @@ def emit(value: Any) -> None:
     print(json.dumps(value, ensure_ascii=False, separators=(",", ":"), allow_nan=False))
 
 
-def _query(geo: Geocoder, kind: str, values: list[str]) -> Resolution:
+def _query(
+    geo: Geocoder,
+    kind: str,
+    values: list[str],
+    country: str | None = None,
+    scheme: str | None = None,
+) -> Resolution:
+    if kind in ("coordinates", "h3") and (country is not None or scheme is not None):
+        raise InvalidInputError("Coordinate and H3 queries do not accept code context")
+    if kind == "postal" and scheme is not None:
+        raise InvalidInputError("Postal queries do not accept an airport scheme")
+    if kind == "postal" and len(values) == 1:
+        return geo.postal(values[0], country=country)
+    if kind == "airport" and len(values) == 1:
+        return geo.airport(values[0], country=country, scheme=scheme)
     if kind == "h3" and len(values) == 1:
         return geo.from_h3(values[0])
     if kind == "coordinates" and len(values) == 2:
@@ -53,8 +67,14 @@ def _data(args: argparse.Namespace) -> int:
     else:
         from pathlib import Path
 
-        path = Path(args.pack) if args.pack else installed_pack(args.data_dir)
+        path = (
+            Path(args.pack)
+            if args.pack
+            else installed_pack(args.data_dir, family=args.family or "reverse")
+        )
         value = verify(path) if args.full else read_manifest(path)
+        if args.family is not None and value["family"] != args.family:
+            raise InvalidInputError("Selected pack has a different family")
         emit(
             {
                 "verified": "full" if args.full else "inventory",
@@ -67,13 +87,25 @@ def _data(args: argparse.Namespace) -> int:
 def _run(args: argparse.Namespace) -> int:
     if args.command == "data":
         return _data(args)
-    with Geocoder(args.pack, data_dir=args.data_dir) as geo:
+    kind = args.kind if args.command in ("resolve", "explain") else args.command
+    family = {"postal": "postal", "airport": "airports"}.get(kind, "reverse")
+    selection = None if args.pack else [family]
+    with Geocoder(args.pack, data_dir=args.data_dir, packs=selection) as geo:
         if args.command == "reverse":
             emit(geo.reverse(args.latitude, args.longitude).to_dict())
+        elif args.command in ("postal", "airport"):
+            answer = _query(
+                geo,
+                args.command,
+                [args.value],
+                args.country,
+                getattr(args, "scheme", None),
+            )
+            emit(answer.to_dict())
         elif args.command == "h3":
             emit(geo.from_h3(args.cell).to_dict())
         elif args.command in ("resolve", "explain"):
-            answer = _query(geo, args.kind, args.values)
+            answer = _query(geo, args.kind, args.values, args.country, args.scheme)
             emit(geo.explain(answer) if args.command == "explain" else answer.to_dict())
         elif args.command == "info":
             emit(geo.info())

@@ -17,11 +17,22 @@ def parser() -> argparse.ArgumentParser:
     reverse = commands.add_parser("reverse")
     reverse.add_argument("latitude", type=float)
     reverse.add_argument("longitude", type=float)
+    postal = commands.add_parser("postal")
+    postal.add_argument("value")
+    postal.add_argument("--country", required=True)
+    airport = commands.add_parser("airport")
+    airport.add_argument("value")
+    airport.add_argument(
+        "--scheme", choices=("iata", "icao", "ident", "gps", "local"), required=True
+    )
+    airport.add_argument("--country")
     cell = commands.add_parser("h3")
     cell.add_argument("cell")
     for name in ("resolve", "explain"):
         resolve = commands.add_parser(name)
-        resolve.add_argument("kind", choices=("coordinates", "h3"))
+        resolve.add_argument("kind", choices=("coordinates", "h3", "postal", "airport"))
+        resolve.add_argument("--country")
+        resolve.add_argument("--scheme")
         resolve.add_argument("values", nargs="+")
     commands.add_parser("info")
     batch = commands.add_parser(
@@ -52,6 +63,7 @@ def parser() -> argparse.ArgumentParser:
     installer.add_argument("--timeout", type=float, default=30.0)
     data.add_parser("list")
     verifier = data.add_parser("verify")
+    verifier.add_argument("--family", choices=("reverse", "postal", "airports"))
     verifier.add_argument(
         "--full", action="store_true", help="Verify all payload hashes and structures"
     )

@@ -2,6 +2,7 @@
 
 import platform
 import sqlite3
+import zlib
 from pathlib import Path
 
 import h3
@@ -17,6 +18,9 @@ def implementation() -> Row:
     root = Path(__file__).resolve().parents[2]
     files = [
         *Path(__file__).parent.glob("*.py"),
+        *(root / "build_data/serve_codes").glob("*.py"),
+        root / "build_data/golden/reader.py",
+        root / "build_data/acquire/lookup_schemas.py",
         *(root / "src/thereabouts/packs").glob("*.py"),
         root / "build_data/acquire/io.py",
         root / "build_data/golden/schemas.py",
@@ -36,6 +40,7 @@ def identity(snapshot: Snapshot, release: Row, shard_bytes: int) -> Row:
             "h3": h3.versions(),
             "pyarrow": pyarrow.__version__,
             "sqlite": sqlite3.sqlite_version,
+            "zlib": zlib.ZLIB_RUNTIME_VERSION,
         },
     }
 

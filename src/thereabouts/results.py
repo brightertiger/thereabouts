@@ -29,6 +29,10 @@ def freeze(value: Any) -> Json:
     raise TypeError("Expected JSON data")
 
 
+def freeze_object(value: dict[str, Any]) -> Mapping[str, Json]:
+    return MappingProxyType({key: freeze(item) for key, item in value.items()})
+
+
 def plain(value: object) -> Any:
     if is_dataclass(value) and not isinstance(value, type):
         return {
@@ -96,7 +100,7 @@ class Distance:
 @dataclass(frozen=True, slots=True)
 class Candidate:
     id: str
-    place: Place | None
+    place: "Place | SourcePlace | None"
     city: Place | None
     state: Place | None
     country: Place | None
@@ -106,14 +110,18 @@ class Candidate:
     confidence: Confidence
     distance: Distance | None
     accuracy_m: None = None
+    observations: tuple["Observation", ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
 class Query:
-    kind: Literal["coordinates", "h3"]
+    kind: Literal["coordinates", "h3", "postal", "airport"]
     latitude: float | None = None
     longitude: float | None = None
     h3: str | None = None
+    value: str | None = None
+    country: str | None = None
+    scheme: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -123,6 +131,33 @@ class Reference:
     stored_h3: str | None
     stored_resolution: int | None
     quantization: str = "r8-centre-logical-ancestors"
+
+
+@dataclass(frozen=True, slots=True)
+class SourcePlace:
+    id: str
+    name: str | None
+    role: str
+    country_code: str | None
+    codes: Mapping[str, Json]
+    type: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class Observation:
+    source: str
+    source_id: str
+    source_release: str
+    license: str
+    golden_table: str
+    fields: Mapping[str, Json]
+    reference: Reference | None
+    country_id: str | None
+    state_id: str | None
+    city_id: str | None
+    methods: Methods
+    cell_status: str
+    country_disagrees: bool | None
 
 
 @dataclass(frozen=True, slots=True)

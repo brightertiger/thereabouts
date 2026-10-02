@@ -9,3 +9,11 @@ class InvalidInputError(GeocoderError, ValueError):
 
 class AmbiguousResultError(GeocoderError):
     """More than one candidate remains; no selection is justified."""
+
+
+class ContextRequiredError(InvalidInputError):
+    """A code resolver needs an explicit country or identifier scheme."""
+
+
+class IncompatibleDataError(GeocoderError):
+    """Selected packs do not share a compatible catalogue and golden snapshot."""

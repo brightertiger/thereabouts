@@ -93,8 +93,8 @@ def test_immutable_detached_result() -> None:
     geo = Geocoder(PACK)
     answer = geo.from_h3(finest(BRANCHES[0]))
     info = geo.info()
-    info["pack"]["sources"].clear()
-    assert geo.info()["pack"]["sources"]
+    info["packs"]["reverse"]["sources"].clear()
+    assert geo.info()["packs"]["reverse"]["sources"]
     explanation = geo.explain(answer)
     geo.close()
     assert explanation["result"] == answer.to_dict()

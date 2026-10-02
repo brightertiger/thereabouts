@@ -48,7 +48,7 @@ def test_local_install_idempotence_discovery_and_retained_reader(
         assert second != first and first.is_dir()
         assert existing.reverse(12.97, 77.59) == expected
         with Geocoder(data_dir=root) as new:
-            assert new.info()["pack"]["data_version"] == "second"
+            assert new.info()["packs"]["reverse"]["data_version"] == "second"
     records = list_packs(root)
     assert len(records) == 2 and sum(r["active"] for r in records) == 1
     assert next(r for r in records if r["active"])["version"] == "second"

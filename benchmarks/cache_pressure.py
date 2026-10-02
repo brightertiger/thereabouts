@@ -31,7 +31,7 @@ def measure(root: Path) -> list[dict[str, object]]:
                     "budget_bytes": budget,
                     "scalar_median_ns": statistics.median(timings),
                     "scalar_p99_ns": sorted(timings)[4949],
-                    "cache": geo.info()["cache"],
+                    "cache": geo.info()["cache"]["reverse"],
                     "profile": profile(geo, points, False),
                 }
             )

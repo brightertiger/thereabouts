@@ -13,6 +13,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     build = commands.add_parser("export")
+    build.add_argument(
+        "--family", choices=("reverse", "postal", "airports"), default="reverse"
+    )
     build.add_argument("--manifest", type=Path, required=True)
     build.add_argument("--release", type=Path, required=True)
     build.add_argument("--output", type=Path, required=True)
@@ -29,7 +32,11 @@ def main() -> None:
     else:
         print(
             export(
-                args.manifest, args.release, args.output, shard_bytes=args.shard_bytes
+                args.manifest,
+                args.release,
+                args.output,
+                shard_bytes=args.shard_bytes,
+                family=args.family,
             )
         )
 

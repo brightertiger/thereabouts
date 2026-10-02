@@ -57,7 +57,7 @@ def measure(pack: Path, backend: Backend = "auto") -> dict[str, object]:
         "processor": platform.machine(),
         "python": platform.python_version(),
         "h3": h3.versions(),
-        "manifest_sha256": info["pack"]["manifest_sha256"],
+        "manifest_sha256": info["packs"]["reverse"]["manifest_sha256"],
         "installed_bytes": sum(
             p.stat().st_size for p in pack.rglob("*") if p.is_file()
         ),

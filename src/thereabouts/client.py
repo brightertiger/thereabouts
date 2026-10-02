@@ -12,13 +12,14 @@ from .errors import ClosedGeocoderError
 from .packs.address import address
 from .reading.backend import Backend, select
 from .reading.batch import lookup_rows
+from .reading.cache import DEFAULT_CACHE_BYTES
+from .reading.codes import lookup as lookup_code
 from .reading.decode import data_identity, resolution
 from .reading.inputs import BATCH_SIZE, Errors, batch_options, coordinates, h3_cell
 from .reading.objects import result
 from .reading.pack import Pack
-from .reading.places import DEFAULT_CACHE_BYTES
-from .results import Query, Resolution
-from .store import installed_pack
+from .reading.selection import Selection, open_packs, require
+from .results import Data, Query, Resolution
 
 
 class Geocoder:
@@ -37,17 +38,25 @@ class Geocoder:
         verify: bool = False,
         backend: Backend = "auto",
         cache_bytes: int = DEFAULT_CACHE_BYTES,
+        packs: Selection | None = None,
     ) -> None:
-        if pack is not None and data_dir is not None:
-            raise InvalidInputError("Select a pack directory or a data store, not both")
         if type(cache_bytes) is not int or cache_bytes < 0:
             raise InvalidInputError("cache_bytes must be a nonnegative integer")
-        selected = installed_pack(data_dir) if pack is None else Path(pack)
         self._backend, self._stored_cell = select(backend)
         self._lock = RLock()
         self._closed = False
-        self._pack = Pack(selected, verify=verify, cache_bytes=cache_bytes)
-        self._data = data_identity(self._pack)
+        self._packs = open_packs(pack, data_dir, packs, verify, cache_bytes)
+        self._identities = {
+            family: data_identity(reader) for family, reader in self._packs.items()
+        }
+
+    @property
+    def _pack(self) -> Pack:
+        return require(self._packs, "reverse")
+
+    @property
+    def _data(self) -> Data:
+        return self._identities["reverse"]
 
     def _ensure_open(self) -> None:
         if self._closed:
@@ -163,13 +172,31 @@ class Geocoder:
                 result = columns(self._pack, self._data, hits, decode=decode)
             yield result
 
+    def postal(self, value: str, *, country: str | None = None) -> Resolution:
+        with self._lock:
+            self._ensure_open()
+            pack = require(self._packs, "postal")
+            return lookup_code(pack, self._identities["postal"], value, country, None)
+
+    def airport(
+        self, value: str, *, scheme: str | None = None, country: str | None = None
+    ) -> Resolution:
+        with self._lock:
+            self._ensure_open()
+            pack = require(self._packs, "airports")
+            return lookup_code(
+                pack, self._identities["airports"], value, country, scheme
+            )
+
     def info(self) -> dict[str, Any]:
         with self._lock:
             self._ensure_open()
             return {
                 "backend": self._backend,
-                "pack": self._pack.info(),
-                "cache": self._pack.places.info(),
+                "packs": {family: pack.info() for family, pack in self._packs.items()},
+                "cache": {
+                    family: pack.cache.info() for family, pack in self._packs.items()
+                },
             }
 
     def explain(self, answer: Resolution) -> dict[str, Any]:
@@ -181,7 +208,8 @@ class Geocoder:
     def close(self) -> None:
         with self._lock:
             if not self._closed:
-                self._pack.close()
+                for pack in self._packs.values():
+                    pack.close()
                 self._closed = True
 
     def __enter__(self) -> "Geocoder":

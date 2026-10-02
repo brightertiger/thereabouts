@@ -46,7 +46,7 @@ def test_install_list_verify_and_lookup(
     assert main([*base, "h3", answer["reference"]["h3"]]) == 0
     assert json.loads(capsys.readouterr().out)["selected"] == answer["selected"]
     assert main([*base, "info"]) == 0
-    assert json.loads(capsys.readouterr().out)["pack"]["sources"]
+    assert json.loads(capsys.readouterr().out)["packs"]["reverse"]["sources"]
     assert main([*base, "explain", "h3", answer["reference"]["h3"]]) == 0
     assert json.loads(capsys.readouterr().out)["raw_evidence_installed"] is False
 
@@ -131,7 +131,7 @@ def test_store_selection_is_explicit_then_environment(
     with pytest.raises(DataNotInstalledError):
         Geocoder()
     with Geocoder(PACK) as geo:
-        assert geo.info()["pack"]["family"] == "reverse"
+        assert geo.info()["packs"]["reverse"]["family"] == "reverse"
     with pytest.raises(InvalidInputError):
         Geocoder(PACK, data_dir=tmp_path)
     monkeypatch.delenv("THEREABOUTS_DATA")
