@@ -6,6 +6,14 @@ are separate stages for the primary sources. The seven additional lookup adapter
 below also produce their H3 keys during acquisition. Acquisition retains source identities, naming evidence,
 administrative roles and provenance; it does not decide which source wins.
 
+The separate [`plates` source](PLATES.md) acquires vehicle registration evidence:
+a country/territory survey, geographic code associations and plate-format rules.
+It uses pinned Wikipedia revisions, Wikidata responses and reusable official
+lists. Its three Parquet kinds deliberately have no H3 keys or golden-place joins.
+Run `python -m build_data.acquire plates --data-dir data`; its raw snapshots,
+licences, partial coverage and offline regeneration procedure are documented in
+[PLATES.md](PLATES.md).
+
 ## Commands
 
 ```sh

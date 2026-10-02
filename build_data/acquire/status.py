@@ -97,7 +97,7 @@ def source_status(workspace: Workspace, source: str) -> dict[str, Any]:
                     rows["areas"] += metadata.get("rows", 0)
                 elif source == "geoboundaries":
                     rows["areas"] += metadata.get("output_rows", 0)
-                elif source in LOOKUP_SOURCES:
+                elif source in (*LOOKUP_SOURCES, "plates"):
                     rows.update(metadata.get("output_rows", {}))
                     if source == "timezones":
                         rows["timezone_cells"] += metadata.get("cells", 0)
