@@ -1207,7 +1207,8 @@
     "series": "ordinary; exceptions described in notes",
     "evidence_pattern": "ed\\ containing\\ the\\ letters\\ RKS\\ \\(Republic\\ of\\ Kosovo\\)\\ on\\ a\\ blue\\ field,\\ a\\ two\\ digit\\ number\\ corresponding\\ to\\ the\\ districts\\ of\\ Kosovo\\ ,\\ the\\ coat\\ of\\ arms\\ of\\ Kosovo\\ ,\\ a\\ three\\-digit\\ number\\ and\\ finally\\ two\\ serial\\ letters\\.\\ The\\ three\\-digit\\ number\\ starts\\ at\\ 101\\ and\\ the\\ serial\\ let",
     "coverage_status": "partial",
-    "notes": "Classification describes the cited series; special and personalised series need separate handling."
+    "notes": "Classification describes the cited series; special and personalised series need separate handling.",
+    "name": "Kosovo"
   },
   "AD": {
     "source": "wiki-AD.json",
@@ -2150,5 +2151,77 @@
     "coverage_status": "partial",
     "evidence_pattern": "Aqaba\\ Free\\ Trade\\ Zone\\ Red,\\ White\\ Text\\ سلطة\\ العقبة\\ AQ",
     "notes": "Special Aqaba Free Trade Zone plates encode a place. Ordinary numeric series identify vehicle category, not district; nationwide series must not be geocoded."
+  },
+  "GP": {
+    "source": "wiki-FR-fr.json",
+    "classification": "printed_not_encoded",
+    "unit_kind": "department_or_territory",
+    "code_position": "optional identity band; no place in SIV serial",
+    "series": "current SIV; historic territorial series incompletely surveyed",
+    "coverage_status": "partial",
+    "evidence_pattern": "La\\ Guadeloupe\\ ,\\ La\\ Réunion\\ et\\ Mayotte\\ sont\\ des\\ départements\\ et\\ des\\ régions\\ d’outre\\-mer\\ et\\ utilisent\\ le\\ format\\ SIV\\ comme\\ la\\ métropole\\ tout\\ comme\\ la\\ Guyane\\ et\\ la\\ Martinique",
+    "notes": "Current SIV has no encoded registration area; the chosen department band does not establish residence. Historic FNI or local territorial numbering needs separate interpretation and is not fully collected here."
+  },
+  "RE": {
+    "source": "wiki-FR-fr.json",
+    "classification": "printed_not_encoded",
+    "unit_kind": "department_or_territory",
+    "code_position": "optional identity band; no place in SIV serial",
+    "series": "current SIV; historic territorial series incompletely surveyed",
+    "coverage_status": "partial",
+    "evidence_pattern": "La\\ Guadeloupe\\ ,\\ La\\ Réunion\\ et\\ Mayotte\\ sont\\ des\\ départements\\ et\\ des\\ régions\\ d’outre\\-mer\\ et\\ utilisent\\ le\\ format\\ SIV\\ comme\\ la\\ métropole\\ tout\\ comme\\ la\\ Guyane\\ et\\ la\\ Martinique",
+    "notes": "Current SIV has no encoded registration area; the chosen department band does not establish residence. Historic FNI or local territorial numbering needs separate interpretation and is not fully collected here."
+  },
+  "GF": {
+    "source": "wiki-FR-fr.json",
+    "classification": "printed_not_encoded",
+    "unit_kind": "department_or_territory",
+    "code_position": "optional identity band; no place in SIV serial",
+    "series": "current SIV; historic territorial series incompletely surveyed",
+    "coverage_status": "partial",
+    "evidence_pattern": "La\\ Guadeloupe\\ ,\\ La\\ Réunion\\ et\\ Mayotte\\ sont\\ des\\ départements\\ et\\ des\\ régions\\ d’outre\\-mer\\ et\\ utilisent\\ le\\ format\\ SIV\\ comme\\ la\\ métropole\\ tout\\ comme\\ la\\ Guyane\\ et\\ la\\ Martinique",
+    "notes": "Current SIV has no encoded registration area; the chosen department band does not establish residence. Historic FNI or local territorial numbering needs separate interpretation and is not fully collected here."
+  },
+  "MQ": {
+    "source": "wiki-FR-fr.json",
+    "classification": "printed_not_encoded",
+    "unit_kind": "department_or_territory",
+    "code_position": "optional identity band; no place in SIV serial",
+    "series": "current SIV; historic territorial series incompletely surveyed",
+    "coverage_status": "partial",
+    "evidence_pattern": "La\\ Guadeloupe\\ ,\\ La\\ Réunion\\ et\\ Mayotte\\ sont\\ des\\ départements\\ et\\ des\\ régions\\ d’outre\\-mer\\ et\\ utilisent\\ le\\ format\\ SIV\\ comme\\ la\\ métropole\\ tout\\ comme\\ la\\ Guyane\\ et\\ la\\ Martinique",
+    "notes": "Current SIV has no encoded registration area; the chosen department band does not establish residence. Historic FNI or local territorial numbering needs separate interpretation and is not fully collected here."
+  },
+  "YT": {
+    "source": "wiki-FR-fr.json",
+    "classification": "printed_not_encoded",
+    "unit_kind": "department_or_territory",
+    "code_position": "optional identity band; no place in SIV serial",
+    "series": "current SIV; historic territorial series incompletely surveyed",
+    "coverage_status": "partial",
+    "evidence_pattern": "La\\ Guadeloupe\\ ,\\ La\\ Réunion\\ et\\ Mayotte\\ sont\\ des\\ départements\\ et\\ des\\ régions\\ d’outre\\-mer\\ et\\ utilisent\\ le\\ format\\ SIV\\ comme\\ la\\ métropole\\ tout\\ comme\\ la\\ Guyane\\ et\\ la\\ Martinique",
+    "notes": "Current SIV has no encoded registration area; the chosen department band does not establish residence. Historic FNI or local territorial numbering needs separate interpretation and is not fully collected here."
+  },
+  "MF": {
+    "source": "wiki-MF-resolved.json",
+    "classification": "historic_only",
+    "unit_kind": "former_department",
+    "code_position": "historic departmental suffix; current serial nationwide within territory",
+    "series": "pre-2009 Guadeloupe-linked; modern local serial",
+    "valid_to": "2009",
+    "coverage_status": "partial",
+    "evidence_pattern": "97\\-1\\ signifies\\ Guadeloupe\\ and\\ nearby\\ French\\ islands",
+    "notes": "Old 97-1 refers to the former Guadeloupe grouping, not a unique locality in present Saint Martin. Current local serial has no reviewed internal geographic split."
+  },
+  "PM": {
+    "source": "wiki-PM-resolved.json",
+    "classification": "none",
+    "unit_kind": "none",
+    "code_position": "none; SPM denotes the territory as a whole",
+    "series": "ordinary since 2000",
+    "valid_from": "2000",
+    "coverage_status": "reviewed",
+    "evidence_pattern": "Since\\ 2000,\\ all\\ numbers\\ have\\ begun\\ with\\ the\\ letters\\ SPM\\ followed\\ by\\ a\\ serial\\ number\\ and\\ serial\\ letter",
+    "notes": "The national/territorial prefix does not distinguish the islands. Earlier SPM suffix also denotes the territory as a whole."
   }
 }

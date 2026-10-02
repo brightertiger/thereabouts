@@ -11,7 +11,7 @@ from typing import Any
 from .plates_config import policy
 from .plates_html import Document
 from .plates_http import wiki_document
-from .plates_rules import evidence, list_rows, regex_rows, table_rows, text_rows
+from .plates_rules import codes, evidence, list_rows, regex_rows, table_rows, text_rows
 from .plates_schemas import PlateKind
 from .plates_text import fixed_rows, pdf_text
 from .plates_wikidata import rows as wikidata_rows
@@ -40,8 +40,11 @@ def country_rows(inventory: Row) -> list[Row]:
 
 def survey(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
     rules = policy("survey")
-    for raw in country_rows(inventory):
-        country = raw["ISO3166-1-Alpha-2"]
+    universe = {raw["ISO3166-1-Alpha-2"]: raw for raw in country_rows(inventory)}
+    for country, rule in rules.items():
+        if country not in universe:
+            universe[country] = {"CLDR display name": rule["name"]}
+    for country, raw in universe.items():
         rule = rules.get(country)
         source = rule["source"] if rule else "countries.csv"
         if rule:
@@ -62,16 +65,6 @@ def survey(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
             )
         row.update(country_code=country, name=raw["CLDR display name"])
         yield "plate_survey", row, source
-    if "XK" in rules:
-        rule = rules["XK"]
-        doc = document(inventory["files"][rule["source"]])
-        row = {k: v for k, v in rule.items() if k not in ("source", "evidence_pattern")}
-        row.update(
-            country_code="XK",
-            name="Kosovo",
-            evidence=evidence(doc, rule["evidence_pattern"]),
-        )
-        yield "plate_survey", row, rule["source"]
 
 
 def formats(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
@@ -103,7 +96,9 @@ def formats(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
             yield "plate_formats", row, source
 
 
-def records(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
+def records(
+    inventory: Row, rejections: list[Row] | None = None
+) -> Iterator[tuple[PlateKind, Row, str]]:
     rules = policy("rules")
     countries = {
         r["ISO3166-1-Alpha-2"]: r["wikidata_id"].rsplit("/", 1)[-1]
@@ -114,16 +109,42 @@ def records(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
     for source, pin in inventory["files"].items():
         country = pin.get("country_code")
         if pin["kind"] == "wikidata":
+            rejected: list[Row] = []
             for row in wikidata_rows(
-                Path(pin["path"]), countries[country], pin["retrieved_at"]
+                Path(pin["path"]),
+                countries[country],
+                pin["retrieved_at"],
+                policy("wikidata").get(country, {}),
+                rejected,
             ):
                 row["country_code"] = country
                 yield "plate_codes", row, source
+            if rejections is not None:
+                rejections.extend(
+                    dict(**r, source=source, country_code=country) for r in rejected
+                )
         if source not in rules:
             continue
         if pin["kind"] == "pdf":
             text = pdf_text(Path(pin["path"]))
             for rule in rules[source]:
+                if context := rule.get("prefix_source"):
+                    other = inventory["files"][context["source"]]
+                    other_text = pdf_text(Path(other["path"]))
+                    match = re.search(context["pattern"], other_text)
+                    if match is None:
+                        raise ValueError(f"Missing prefix evidence: {context}")
+                    rule = dict(
+                        **rule,
+                        parsed_prefixes=codes(match["prefixes"], context),
+                        parsed_name=match.groupdict().get("name"),
+                        prefix_evidence=dict(
+                            source=context["source"],
+                            url=other["url"],
+                            sha256=other["sha256"],
+                            text=match[0],
+                        ),
+                    )
                 pdf_parser = regex_rows if rule["parser"] == "text" else fixed_rows
                 count = 0
                 for row in pdf_parser(text, rule):

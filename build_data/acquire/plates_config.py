@@ -17,10 +17,17 @@ def policy(name: str) -> dict[str, Any]:
 
 def configuration() -> dict[str, Any]:
     return dict(
-        builder="plates-3",
+        builder="plates-4",
         policy={
             name: fingerprint(policy(name))
-            for name in ("sources", "rules", "survey", "formats", "coverage")
+            for name in (
+                "sources",
+                "rules",
+                "survey",
+                "formats",
+                "coverage",
+                "wikidata",
+            )
         },
         schemas={kind: SCHEMA_HASHES[kind] for kind in PLATE_KINDS},
     )

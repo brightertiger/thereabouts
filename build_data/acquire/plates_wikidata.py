@@ -28,7 +28,21 @@ def _date(bindings: list[Row], key: str) -> str | None:
     )
 
 
-def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
+def _codes(raw: str, rule: Row) -> list[str]:
+    parts = re.split(rule.get("split_pattern", r"\s*[,;/]\s*"), raw.strip())
+    pattern = rule.get("pattern", r"[^\W_]{1,8}(?:[- ][^\W_]{1,8})?")
+    if not all(re.fullmatch(pattern, part) for part in parts):
+        return []
+    return list(dict.fromkeys(parts))
+
+
+def rows(
+    path: Path,
+    country_item: str,
+    retrieved_at: str,
+    code_policy: Row | None = None,
+    rejected: list[Row] | None = None,
+) -> Iterator[Row]:
     data = json.loads(path.read_text(encoding="utf-8"))
     groups: dict[tuple[str, str, str], list[Row]] = defaultdict(list)
     for binding in data["results"]["bindings"]:
@@ -39,6 +53,21 @@ def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
             binding
         )
     for (item, statement, code), bindings in groups.items():
+        selected = _codes(code, code_policy or {})
+        if not selected or any(
+            b["code"].get("type", "literal") not in ("literal", "typed-literal")
+            for b in bindings
+        ):
+            if rejected is not None:
+                rejected.append(
+                    dict(
+                        wikidata_id=item,
+                        statement=statement,
+                        raw_code=code,
+                        reason="Not an atomic code or supported explicit code list",
+                    )
+                )
+            continue
         start, end = _date(bindings, "start"), _date(bindings, "end")
         coordinates = _values(bindings, "coord")
         lat = lon = None
@@ -58,7 +87,7 @@ def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
             for b in bindings
             if "name_local" in b
         }
-        yield dict(
+        row = dict(
             code=code,
             wikidata_id=item,
             name_en=_one(bindings, "name_en"),
@@ -87,6 +116,7 @@ def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
                     coordinates=coordinates,
                     start_assertions=_values(bindings, "start"),
                     end_assertions=_values(bindings, "end"),
+                    original_code=code,
                     warning=(
                         "P395 may repeat a district code on its municipalities; "
                         "no current-series assertion"
@@ -95,3 +125,5 @@ def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
                 ensure_ascii=False,
             ),
         )
+        for value in selected:
+            yield {**row, "code": value}

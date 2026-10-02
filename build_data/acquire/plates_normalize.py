@@ -53,7 +53,8 @@ def normalize(workspace: Workspace) -> None:
         identifiers: Counter[str] = Counter()
         formats: Counter[str] = Counter()
         examples: Counter[str] = Counter()
-        for kind, row, source in records(inventory):
+        rejections: list[Row] = []
+        for kind, row, source in records(inventory, rejections):
             pin = inventory["files"][source]
             raw = dict(row)
             raw["snapshot"] = dict(file=source, sha256=pin["sha256"])
@@ -110,6 +111,7 @@ def normalize(workspace: Workspace) -> None:
                 cc: {source: len(codes) for source, codes in data.items()}
                 for cc, data in source_codes.items()
             },
+            rejected_assertions=rejections,
         )
         summary = publish_report(workspace, "plates", report)
         licenses = workspace.normalized("plates") / f"licenses-{digest}.json"

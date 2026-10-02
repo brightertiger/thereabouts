@@ -81,6 +81,54 @@
     "sha256": "58d87a9e3c64fefa1ca8738c3b17e4c994cc7e49c9a2b897cbe6b9ba53e0df2e",
     "retrieved_at": "2026-10-02T11:33:08.951350+00:00"
   },
+  "pl-copyright-isap.pdf": {
+    "kind": "notice",
+    "country_code": "PL",
+    "url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "download_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "license": "LicenseRef-PD-Poland-Article4",
+    "license_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "attribution": "Republic of Poland, Journal of Laws; official normative texts excluded from copyright under Article 4(1)",
+    "size": 698585,
+    "sha256": "72ebe5a8ad6cef0a2aa018140fa0fed280c060149025c34229967f4e1a681989",
+    "retrieved_at": "2026-10-02T12:26:10.014202+00:00"
+  },
+  "pl-law2024.pdf": {
+    "kind": "pdf",
+    "country_code": "PL",
+    "url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20240001709/O/D20241709.pdf",
+    "download_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20240001709/O/D20241709.pdf",
+    "license": "LicenseRef-PD-Poland-Article4",
+    "license_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "attribution": "Republic of Poland, Journal of Laws; official normative texts excluded from copyright under Article 4(1)",
+    "size": 4561946,
+    "sha256": "908e6032f8f52886a83188022ee9853a8036da0f5e75749aa31e6f147150f51a",
+    "retrieved_at": "2026-10-02T12:25:17.017202+00:00"
+  },
+  "pl-law2025.pdf": {
+    "kind": "pdf",
+    "country_code": "PL",
+    "url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000939/O/D20250939.pdf",
+    "download_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000939/O/D20250939.pdf",
+    "license": "LicenseRef-PD-Poland-Article4",
+    "license_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "attribution": "Republic of Poland, Journal of Laws; official normative texts excluded from copyright under Article 4(1)",
+    "size": 158647,
+    "sha256": "7328598c6f0c259645b7649192eba152d49afb4fef83239e9d9592bfbf07ed03",
+    "retrieved_at": "2026-10-02T12:24:22.741247+00:00"
+  },
+  "pl-law2026-isap.pdf": {
+    "kind": "pdf",
+    "country_code": "PL",
+    "url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20260000891/O/D20260891.pdf",
+    "download_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20260000891/O/D20260891.pdf",
+    "license": "LicenseRef-PD-Poland-Article4",
+    "license_url": "https://isap.sejm.gov.pl/isap.nsf/download.xsp/WDU20250000024/O/D20250024.pdf",
+    "attribution": "Republic of Poland, Journal of Laws; official normative texts excluded from copyright under Article 4(1)",
+    "size": 165311,
+    "sha256": "5c1e2576203acc972fae27afbf1b10725852bde4f1a2f29a87ff5450d0aad787",
+    "retrieved_at": "2026-10-02T12:26:08.285717+00:00"
+  },
   "th-gazette.pdf": {
     "kind": "pdf",
     "country_code": "TH",
@@ -92,6 +140,19 @@
     "size": 236095,
     "sha256": "4ab3603a3f0ba9010b10c0137f08e80f2552a9872808ee1da1bb08e21a595e9c",
     "retrieved_at": "2026-10-02T11:33:08.457251+00:00"
+  },
+  "wd-AE.json": {
+    "kind": "wikidata",
+    "country_code": "AE",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ878%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22fa%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ878%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22fa%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q878; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\",\"fa\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 5185,
+    "sha256": "47d7101252ef1d448dedfaa67adf8a935aa5ec3c567caaa495f480142c2ea61b",
+    "retrieved_at": "2026-10-02T12:20:15.276882+00:00"
   },
   "wd-AF.json": {
     "kind": "wikidata",
@@ -131,6 +192,19 @@
     "size": 36786,
     "sha256": "dd5aad518f6e7532144a35c9d56ad8db2faf89d5512a8745742b18dad39d5706",
     "retrieved_at": "2026-10-02T11:34:40.254202+00:00"
+  },
+  "wd-AR.json": {
+    "kind": "wikidata",
+    "country_code": "AR",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ414%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ414%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q414; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 7300,
+    "sha256": "4e42136b545e6b03d8af9820db6be094494d76e21fadeefb5ecc1e67aaa3d1fc",
+    "retrieved_at": "2026-10-02T12:37:35.388542+00:00"
   },
   "wd-AT.json": {
     "kind": "wikidata",
@@ -210,6 +284,32 @@
     "sha256": "8e4436cdb4b226174a8f1f1ff97a32ad638f3a2b4d14d598efb853a53f1d4f32",
     "retrieved_at": "2026-10-02T11:04:20.084382+00:00"
   },
+  "wd-BO.json": {
+    "kind": "wikidata",
+    "country_code": "BO",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ750%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22qu%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ750%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22qu%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q750; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\",\"qu\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 7527,
+    "sha256": "194d39d20da755824af9bcd79460cd4f237ebd539a2718f20713c3cfec1f2f58",
+    "retrieved_at": "2026-10-02T12:27:50.316218+00:00"
+  },
+  "wd-BR.json": {
+    "kind": "wikidata",
+    "country_code": "BR",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ155%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22pt%22%2C%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ155%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22pt%22%2C%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q155; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"pt\",\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 27289,
+    "sha256": "85c046151f10fc795ecc5994e3974254b760a4b6f24193a424a2bafdda328144",
+    "retrieved_at": "2026-10-02T12:28:55.321902+00:00"
+  },
   "wd-BT.json": {
     "kind": "wikidata",
     "country_code": "BT",
@@ -275,6 +375,19 @@
     "sha256": "50eb7e48f137ad4799c4a80828004af5a66a6a3b3255b4e6fc5c2ecd4af29acd",
     "retrieved_at": "2026-10-02T11:56:20.422064+00:00"
   },
+  "wd-CL.json": {
+    "kind": "wikidata",
+    "country_code": "CL",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ298%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ298%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q298; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 9388,
+    "sha256": "7494c555ec7ea42a34a8f808ea0d1a776c60ab07e774ac324042e415ca4cbea9",
+    "retrieved_at": "2026-10-02T12:30:00.324271+00:00"
+  },
   "wd-CM.json": {
     "kind": "wikidata",
     "country_code": "CM",
@@ -300,6 +413,45 @@
     "size": 4176070,
     "sha256": "69e54c917f07cf857315ee1d53dfda8948841a0754da9fe32f46ca6c06f1f8d7",
     "retrieved_at": "2026-10-02T10:41:34.975912+00:00"
+  },
+  "wd-CO.json": {
+    "kind": "wikidata",
+    "country_code": "CO",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ739%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ739%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q739; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 14156,
+    "sha256": "86b14d29f20bfff1755c95dd5d80dafa1d1ab027fff469e96bbfb896247dccde",
+    "retrieved_at": "2026-10-02T12:31:05.329490+00:00"
+  },
+  "wd-CR.json": {
+    "kind": "wikidata",
+    "country_code": "CR",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ800%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ800%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q800; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 2612,
+    "sha256": "2b3cee2632c7cd73cee71ca3d721f5b028163a0186ebf5d2d679ebe610d3eb23",
+    "retrieved_at": "2026-10-02T12:40:50.419025+00:00"
+  },
+  "wd-CU.json": {
+    "kind": "wikidata",
+    "country_code": "CU",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ241%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22pap%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ241%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22pap%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q241; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\",\"pap\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 21762,
+    "sha256": "3ab06c4512e2b031592f013e3e300484b331d7db814733acefb0eeaa2488e8b9",
+    "retrieved_at": "2026-10-02T12:46:15.444488+00:00"
   },
   "wd-CZ.json": {
     "kind": "wikidata",
@@ -340,6 +492,19 @@
     "sha256": "b5c13546bce6a4a05b699024b7716dceb8b17ec9e0866d2ca6113121548a4b3b",
     "retrieved_at": "2026-10-02T11:18:25.176119+00:00"
   },
+  "wd-DO.json": {
+    "kind": "wikidata",
+    "country_code": "DO",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ786%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ786%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q786; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 6263,
+    "sha256": "b83b8f2223c6a7bba5b0f4b38d34d8b58c201f80be55af154ce838a7de39c899",
+    "retrieved_at": "2026-10-02T12:48:25.458645+00:00"
+  },
   "wd-DZ.json": {
     "kind": "wikidata",
     "country_code": "DZ",
@@ -352,6 +517,19 @@
     "size": 242014,
     "sha256": "e851022c4be843da4bcb41fc9f3040996b642eb53dc623cf4ea85ebf638df7d3",
     "retrieved_at": "2026-10-02T12:01:45.448456+00:00"
+  },
+  "wd-EC.json": {
+    "kind": "wikidata",
+    "country_code": "EC",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ736%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ736%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q736; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 31488,
+    "sha256": "b3c95f791c83354aa48a378436276f229a82ac671b464d002802f89d8e353fd5",
+    "retrieved_at": "2026-10-02T12:32:10.339873+00:00"
   },
   "wd-EE.json": {
     "kind": "wikidata",
@@ -483,6 +661,32 @@
     "sha256": "968f3c172c8136d15e98cf61f7ad717465a49a08a8bbd80e90a1ad69d0d350b8",
     "retrieved_at": "2026-10-02T11:10:50.118942+00:00"
   },
+  "wd-GT.json": {
+    "kind": "wikidata",
+    "country_code": "GT",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ774%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ774%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q774; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 5032,
+    "sha256": "2658fe9946c4c84e28419e2673e2c96659dd1657d50b890831b69aa5f8d84439",
+    "retrieved_at": "2026-10-02T12:41:55.421558+00:00"
+  },
+  "wd-HN.json": {
+    "kind": "wikidata",
+    "country_code": "HN",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ783%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22cab%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ783%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22cab%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q783; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\",\"cab\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 192,
+    "sha256": "9775065f0b63233e74a9d668a16b295fd164747231c6fbe39f49150805836e16",
+    "retrieved_at": "2026-10-02T12:43:00.427277+00:00"
+  },
   "wd-HR.json": {
     "kind": "wikidata",
     "country_code": "HR",
@@ -495,6 +699,19 @@
     "size": 417165,
     "sha256": "571c4fdcc20a157cdf477b31f66831bb41be903baa535db6d596eba1748479c4",
     "retrieved_at": "2026-10-02T11:07:35.102057+00:00"
+  },
+  "wd-HT.json": {
+    "kind": "wikidata",
+    "country_code": "HT",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ790%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ht%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ790%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ht%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q790; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ht\",\"fr\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 9655,
+    "sha256": "b1162a6bd931b4c0293f9c40c4082e19de761cfcbd6f5357c2f5ddaec85fe694",
+    "retrieved_at": "2026-10-02T12:49:30.468888+00:00"
   },
   "wd-HU.json": {
     "kind": "wikidata",
@@ -548,6 +765,19 @@
     "sha256": "aae16b2c06708c9847c99c9c18fbcdd399012b59dad98417c3498f8447bb3818",
     "retrieved_at": "2026-10-02T10:40:29.973125+00:00"
   },
+  "wd-IQ.json": {
+    "kind": "wikidata",
+    "country_code": "IQ",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ796%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22ku%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ796%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22ku%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q796; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\",\"ku\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 4993,
+    "sha256": "77fcfb61a32b534921626cdbeff54504bfaafe8f8933a2a00c1c13b2ca231d62",
+    "retrieved_at": "2026-10-02T12:21:20.284037+00:00"
+  },
   "wd-IR.json": {
     "kind": "wikidata",
     "country_code": "IR",
@@ -586,6 +816,32 @@
     "size": 21221870,
     "sha256": "3c5299f43768b1f21664b133b335283b2fa19449716d77301e8c63d822866cea",
     "retrieved_at": "2026-10-02T10:47:00.002577+00:00"
+  },
+  "wd-JM.json": {
+    "kind": "wikidata",
+    "country_code": "JM",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ766%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0A%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ766%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0A%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q766; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\n\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 1150,
+    "sha256": "411ac1b7a9fccd42814177b6f0125fb10c709cb6b5ae266b378fc26db1635f69",
+    "retrieved_at": "2026-10-02T12:47:20.457041+00:00"
+  },
+  "wd-JO.json": {
+    "kind": "wikidata",
+    "country_code": "JO",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ810%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ810%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q810; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 3813,
+    "sha256": "be5188d1b72ccfc558a82f49c923964286e426dce704ec08adb589344aa39221",
+    "retrieved_at": "2026-10-02T12:22:25.291242+00:00"
   },
   "wd-JP.json": {
     "kind": "wikidata",
@@ -626,6 +882,32 @@
     "sha256": "12314ba8f013600784d26467f39b37f8b8dc79e1dba6da11fded81faca0db79b",
     "retrieved_at": "2026-10-02T11:32:30.243272+00:00"
   },
+  "wd-KH.json": {
+    "kind": "wikidata",
+    "country_code": "KH",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ424%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22km%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ424%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22km%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q424; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"km\",\"fr\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 7466,
+    "sha256": "d7cdcf697e88878ee3a414f1d521296fa220ac018e99cc82dd48325f90d73eed",
+    "retrieved_at": "2026-10-02T12:12:35.503068+00:00"
+  },
+  "wd-KR.json": {
+    "kind": "wikidata",
+    "country_code": "KR",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ884%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ko%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ884%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ko%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q884; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ko\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 3836,
+    "sha256": "a55df43bc62bddb845a29b5bfcd2631abe4aa7d09d646f34e8ea0326bde02496",
+    "retrieved_at": "2026-10-02T12:15:50.514778+00:00"
+  },
   "wd-KZ.json": {
     "kind": "wikidata",
     "country_code": "KZ",
@@ -638,6 +920,32 @@
     "size": 539064,
     "sha256": "42368e3049349da5454f679b230dae142db4dff8638ed4ef932de2db8cc31c6b",
     "retrieved_at": "2026-10-02T11:29:15.226633+00:00"
+  },
+  "wd-LA.json": {
+    "kind": "wikidata",
+    "country_code": "LA",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ819%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22lo%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ819%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22lo%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q819; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"lo\",\"fr\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 12289,
+    "sha256": "2c158139532fd6f1b3cc6fd2441290340bec641826ab300c7ef47cb195b13a60",
+    "retrieved_at": "2026-10-02T12:13:40.508463+00:00"
+  },
+  "wd-LB.json": {
+    "kind": "wikidata",
+    "country_code": "LB",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ822%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ822%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%2C%22fr%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q822; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\",\"fr\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 7474,
+    "sha256": "5619ab0aeadc2151f18ab8a0b9c85e5f4c567369674123e48b6f7a6144f8621e",
+    "retrieved_at": "2026-10-02T12:23:30.296314+00:00"
   },
   "wd-LK.json": {
     "kind": "wikidata",
@@ -743,6 +1051,32 @@
     "sha256": "8bd6ceb6d0476d65134005564ad7b2660dd54c816e3d3376b905f41994e1b949",
     "retrieved_at": "2026-10-02T11:39:00.277573+00:00"
   },
+  "wd-MM.json": {
+    "kind": "wikidata",
+    "country_code": "MM",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ836%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22my%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ836%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22my%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q836; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"my\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 3836,
+    "sha256": "e94c33f1e36b0f180c743f97e4f976704ff3e6a8727cda9865ae5c2ed39eceea",
+    "retrieved_at": "2026-10-02T12:11:30.498002+00:00"
+  },
+  "wd-MN.json": {
+    "kind": "wikidata",
+    "country_code": "MN",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ711%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22mn%22%2C%22ru%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ711%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22mn%22%2C%22ru%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q711; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"mn\",\"ru\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 78358,
+    "sha256": "af4c7243217c73a964dafe04df23ce6e572b8a96697e4a52be25a60e856cf44e",
+    "retrieved_at": "2026-10-02T12:14:45.513701+00:00"
+  },
   "wd-MW.json": {
     "kind": "wikidata",
     "country_code": "MW",
@@ -755,6 +1089,19 @@
     "size": 5008,
     "sha256": "ec445d6b1ed600de204df1153a4571b0298bd8b6cfe50d1164f7c4108a3b21d6",
     "retrieved_at": "2026-10-02T11:49:50.376013+00:00"
+  },
+  "wd-MX.json": {
+    "kind": "wikidata",
+    "country_code": "MX",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ96%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ96%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q96; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 794942,
+    "sha256": "fc06d09f784b23948a47b4b74b2797c830c04511108aaef347c40925fe559987",
+    "retrieved_at": "2026-10-02T12:38:40.405269+00:00"
   },
   "wd-MY.json": {
     "kind": "wikidata",
@@ -808,6 +1155,19 @@
     "sha256": "d6730d3fc690b6de6a427b32bee7b390d2bd68f273eee0f39546c8dff823f450",
     "retrieved_at": "2026-10-02T11:42:15.308465+00:00"
   },
+  "wd-NI.json": {
+    "kind": "wikidata",
+    "country_code": "NI",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ811%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ811%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q811; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 15480,
+    "sha256": "18f2a1cbc92702c0c9944c315556c2921c27eaa367fd907068d4d535a8f514f9",
+    "retrieved_at": "2026-10-02T12:44:05.434106+00:00"
+  },
   "wd-NL.json": {
     "kind": "wikidata",
     "country_code": "NL",
@@ -846,6 +1206,45 @@
     "size": 7321,
     "sha256": "ada05cc791775f685e7ef49570ca398d167dee6cf2c13ce31ebdb3e0deef074b",
     "retrieved_at": "2026-10-02T12:08:15.482139+00:00"
+  },
+  "wd-OM.json": {
+    "kind": "wikidata",
+    "country_code": "OM",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ842%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ842%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q842; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 192,
+    "sha256": "9775065f0b63233e74a9d668a16b295fd164747231c6fbe39f49150805836e16",
+    "retrieved_at": "2026-10-02T12:24:35.301521+00:00"
+  },
+  "wd-PA.json": {
+    "kind": "wikidata",
+    "country_code": "PA",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ804%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ804%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q804; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 3827,
+    "sha256": "332d8a3db4e93a7d6cb7815794609cacd3dad9cc407f85350fbb821d7cc421dd",
+    "retrieved_at": "2026-10-02T12:39:45.415711+00:00"
+  },
+  "wd-PE.json": {
+    "kind": "wikidata",
+    "country_code": "PE",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ419%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22qu%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ419%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22qu%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q419; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\",\"qu\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 9251,
+    "sha256": "6a7d4e8875efc24f065b9e4cf65224b62ae9c949d7cbf939d9d6807456480dc7",
+    "retrieved_at": "2026-10-02T12:33:15.346136+00:00"
   },
   "wd-PK.json": {
     "kind": "wikidata",
@@ -886,6 +1285,19 @@
     "sha256": "e9dfde554cfb3c64f5b0f841edec2531bfc6aa879656bfee823685b4a1e11408",
     "retrieved_at": "2026-10-02T11:14:05.131931+00:00"
   },
+  "wd-PY.json": {
+    "kind": "wikidata",
+    "country_code": "PY",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ733%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22gn%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ733%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%2C%22gn%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q733; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\",\"gn\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 5023,
+    "sha256": "f9dc2b9e28e39ead206991598821d59d6bd8544ad8e5ce99c40e4260c2fdccf0",
+    "retrieved_at": "2026-10-02T12:34:20.368406+00:00"
+  },
   "wd-RO.json": {
     "kind": "wikidata",
     "country_code": "RO",
@@ -924,6 +1336,19 @@
     "size": 2176229,
     "sha256": "f277e2ae6c32e5eb487ec2acc135bd840eb1cecbeee4d1cf52e2f324d1d26269",
     "retrieved_at": "2026-10-02T10:45:54.997000+00:00"
+  },
+  "wd-SA.json": {
+    "kind": "wikidata",
+    "country_code": "SA",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ851%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ851%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q851; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 3874,
+    "sha256": "cc9b11fff3dcb8f0b14697858b6a79c288b7daf9780087bc040efba9cb0d9f88",
+    "retrieved_at": "2026-10-02T12:25:40.307568+00:00"
   },
   "wd-SD.json": {
     "kind": "wikidata",
@@ -1003,6 +1428,19 @@
     "sha256": "9775065f0b63233e74a9d668a16b295fd164747231c6fbe39f49150805836e16",
     "retrieved_at": "2026-10-02T12:05:00.465833+00:00"
   },
+  "wd-SV.json": {
+    "kind": "wikidata",
+    "country_code": "SV",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ792%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ792%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q792; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 2636,
+    "sha256": "80a3980cf4148ba69444083a5c973c3fb94cfc9b6db75d0b2ba46614b00f960c",
+    "retrieved_at": "2026-10-02T12:45:10.438375+00:00"
+  },
   "wd-TH.json": {
     "kind": "wikidata",
     "country_code": "TH",
@@ -1068,6 +1506,19 @@
     "sha256": "5af90d419d59180d345100bb280d5e75739a3ef56caf52b71800fbe3c2f0afa3",
     "retrieved_at": "2026-10-02T10:44:49.991737+00:00"
   },
+  "wd-TW.json": {
+    "kind": "wikidata",
+    "country_code": "TW",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ865%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22zh%22%2C%22zh%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ865%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22zh%22%2C%22zh%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q865; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"zh\",\"zh\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 192,
+    "sha256": "9775065f0b63233e74a9d668a16b295fd164747231c6fbe39f49150805836e16",
+    "retrieved_at": "2026-10-02T12:19:10.271585+00:00"
+  },
   "wd-TZ.json": {
     "kind": "wikidata",
     "country_code": "TZ",
@@ -1107,6 +1558,19 @@
     "sha256": "a7d8538e8ac6e7cf6f6f881ed6de1297a846fb9b445e4ed86ced8e6d18601683",
     "retrieved_at": "2026-10-02T11:46:35.343293+00:00"
   },
+  "wd-UY.json": {
+    "kind": "wikidata",
+    "country_code": "UY",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ77%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ77%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q77; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 14527,
+    "sha256": "1e3033eacd6136f85dde56591d71ef274b5a0dead6314e7a5da4e7ac38d81125",
+    "retrieved_at": "2026-10-02T12:35:25.376807+00:00"
+  },
   "wd-UZ.json": {
     "kind": "wikidata",
     "country_code": "UZ",
@@ -1120,6 +1584,19 @@
     "sha256": "8b5fc3471be051680b9ec75b521a7ee46238902863466eb2a5270470a25979d9",
     "retrieved_at": "2026-10-02T11:30:20.232210+00:00"
   },
+  "wd-VE.json": {
+    "kind": "wikidata",
+    "country_code": "VE",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ717%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ717%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22es%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q717; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"es\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 6559,
+    "sha256": "56a05f61c9984f3f221435b8ce1177067aa2f8479d17d81eff013f4a576e45dc",
+    "retrieved_at": "2026-10-02T12:36:30.380983+00:00"
+  },
   "wd-VN.json": {
     "kind": "wikidata",
     "country_code": "VN",
@@ -1132,6 +1609,19 @@
     "size": 9301,
     "sha256": "ec9bea2dfa3025d5e66477836b514ad25aaed56177c216dc839cae8a4f1d273b",
     "retrieved_at": "2026-10-02T10:51:20.024199+00:00"
+  },
+  "wd-YE.json": {
+    "kind": "wikidata",
+    "country_code": "YE",
+    "url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ805%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "download_url": "https://query.wikidata.org/sparql?query=SELECT+%3Fitem+%3Fstatement+%3Fcode+%3Frank+%3Fstart+%3Fend+%3Fname_en+%3Fname_local+%3Fiso+%3Fgeonames+%3Fcoord+%3Ftype+WHERE+%7B%0A%3Fitem+wdt%3AP17+wd%3AQ805%3B+p%3AP395+%3Fstatement.%0A%3Fstatement+ps%3AP395+%3Fcode%3B+wikibase%3Arank+%3Frank.%0AOPTIONAL+%7B%3Fstatement+pq%3AP580+%3Fstart%7D+OPTIONAL+%7B%3Fstatement+pq%3AP582+%3Fend%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_en+FILTER%28LANG%28%3Fname_en%29%3D%22en%22%29%7D%0AOPTIONAL+%7B%3Fitem+rdfs%3Alabel+%3Fname_local.+FILTER%28LANG%28%3Fname_local%29+IN+%28%22ar%22%29%29%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP300+%3Fiso%7D+OPTIONAL+%7B%3Fitem+wdt%3AP1566+%3Fgeonames%7D%0AOPTIONAL+%7B%3Fitem+wdt%3AP625+%3Fcoord%7D+OPTIONAL+%7B%3Fitem+wdt%3AP31+%3Ftype%7D%0A%7D&format=json",
+    "query": "SELECT ?item ?statement ?code ?rank ?start ?end ?name_en ?name_local ?iso ?geonames ?coord ?type WHERE {\n?item wdt:P17 wd:Q805; p:P395 ?statement.\n?statement ps:P395 ?code; wikibase:rank ?rank.\nOPTIONAL {?statement pq:P580 ?start} OPTIONAL {?statement pq:P582 ?end}\nOPTIONAL {?item rdfs:label ?name_en FILTER(LANG(?name_en)=\"en\")}\nOPTIONAL {?item rdfs:label ?name_local. FILTER(LANG(?name_local) IN (\"ar\"))}\nOPTIONAL {?item wdt:P300 ?iso} OPTIONAL {?item wdt:P1566 ?geonames}\nOPTIONAL {?item wdt:P625 ?coord} OPTIONAL {?item wdt:P31 ?type}\n}",
+    "license": "CC0-1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Wikidata contributors",
+    "size": 2598,
+    "sha256": "7347720fe561ebad5339069895cf4c742e79d09027ba211345b570b1ef054cba",
+    "retrieved_at": "2026-10-02T12:26:45.311122+00:00"
   },
   "wd-ZA.json": {
     "kind": "wikidata",
@@ -2317,6 +2807,20 @@
     "sha256": "5668b19fb6f6a2ed5011a56387e6177dfd418443c42f17edc41edcbb7cdbcdbc",
     "retrieved_at": "2026-10-02T10:57:54.127964+00:00"
   },
+  "wiki-FR-fr.json": {
+    "kind": "wikipedia",
+    "country_code": "FR",
+    "revision": 238942028,
+    "language": "fr",
+    "url": "https://fr.wikipedia.org/w/index.php?oldid=238942028",
+    "download_url": "https://fr.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=238942028",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "fr.wikipedia.org contributors; revision 238942028",
+    "size": 386901,
+    "sha256": "7f0d8a671e02777c1c420507a00d69d25faf9a89cdc9abf7c947e60df440478d",
+    "retrieved_at": "2026-10-02T12:24:25.099148+00:00"
+  },
   "wiki-FR-history.json": {
     "kind": "wikipedia",
     "country_code": "FR",
@@ -3352,6 +3856,20 @@
     "size": 107236,
     "sha256": "55aa5b789981c2674bee7eb41fb59799550ca6b2ede1c3d78a873ee8cfa2baae",
     "retrieved_at": "2026-10-02T10:43:54.491917+00:00"
+  },
+  "wiki-MF-resolved.json": {
+    "kind": "wikipedia",
+    "country_code": "MF",
+    "revision": 1338002783,
+    "language": "en",
+    "url": "https://en.wikipedia.org/w/index.php?oldid=1338002783",
+    "download_url": "https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338002783",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "attribution": "en.wikipedia.org contributors; revision 1338002783",
+    "size": 58896,
+    "sha256": "49eb07e9b4db509785dd72b7132628390e17ddc8555db076f87b47338080b94e",
+    "retrieved_at": "2026-10-02T12:24:26.592644+00:00"
   },
   "wiki-MG.json": {
     "kind": "wikipedia",

@@ -62,12 +62,17 @@ def codes(value: str, rule: Row) -> list[str]:
 
 
 def _row(code: str, name: str, raw: str, rule: Row, locator: str) -> Row:
+    name = rule.get("parsed_name") or name
     status = rule.get("series_status", "unknown")
     if rule.get("unknown_pattern") and re.search(rule["unknown_pattern"], raw, re.I):
         status = "unknown"
     if rule.get("historic_pattern") and re.search(rule["historic_pattern"], raw, re.I):
         status = "historic"
     name = re.sub(rule.get("name_remove", r"(?!)"), "", name)
+    dates = {}
+    for boundary in ("valid_from", "valid_to"):
+        found = re.search(rule.get(boundary + "_pattern", r"(?!)"), raw)
+        dates[boundary] = found["date"] if found else rule.get(boundary)
     return dict(
         code=clean_text(code),
         name_en=clean_text(name) if rule.get("name_language", "en") == "en" else None,
@@ -79,8 +84,7 @@ def _row(code: str, name: str, raw: str, rule: Row, locator: str) -> Row:
         else None,
         unit_kind=rule["unit_kind"],
         series_status=status,
-        valid_from=rule.get("valid_from"),
-        valid_to=rule.get("valid_to"),
+        **dates,
         series_id=rule.get("series_id", "ordinary"),
         evidence_locator=locator,
         notes=raw,
@@ -182,9 +186,24 @@ def regex_rows(text: str, rule: Row) -> Iterator[Row]:
         text = text[text.index(rule["start"]) :]
     if rule.get("stop"):
         text = text[: text.index(rule["stop"])]
+    for substitution in rule.get("text_substitutions", []):
+        text = re.sub(substitution["pattern"], substitution["replacement"], text)
     for match in re.finditer(rule["item_pattern"], text):
+        prefixes = rule.get("parsed_prefixes", [""])
+        if rule.get("code_prefix_group"):
+            prefixes = codes(
+                match[rule["code_prefix_group"]],
+                {"code_pattern": rule["prefix_pattern"]},
+            )
         for code in codes(match["codes"], rule):
-            yield _row(code, match["name"], match[0], rule, f"text:{match.start()}")
+            for prefix in prefixes:
+                for name in re.split(rule.get("name_split", r"(?!)"), match["name"]):
+                    if name.strip():
+                        row = _row(
+                            prefix + code, name, match[0], rule, f"text:{match.start()}"
+                        )
+                        row["prefix_evidence"] = rule.get("prefix_evidence")
+                        yield row
 
 
 def evidence(doc: Document, pattern: str) -> str:

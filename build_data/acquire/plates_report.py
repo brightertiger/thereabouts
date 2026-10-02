@@ -90,6 +90,10 @@ def report(workspace: Workspace) -> str:
         f"{verified['identifiers']['coordinates']:,} have source coordinates. "
         "Identifiers/names from different sources have not been joined.",
         "",
+        f"{len(verified['rejected_assertions'])} Wikidata assertions were excluded "
+        "as non-codes or unsupported compound expressions. Their original values "
+        "and statement IDs are retained in the verification report and raw files.",
+        "",
         "## Priority-country coverage",
         "",
         "Counts are distinct original-script code strings, including disagreements. "

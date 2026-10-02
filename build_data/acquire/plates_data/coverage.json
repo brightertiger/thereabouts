@@ -59,5 +59,16 @@
     "expected_codes": 433,
     "comparisons": [],
     "basis": "Entire published DVLA table, including continuation lines and ranges; I/Q/Z and explicitly reserved MN excluded; HW mapped using the Isle of Wight footnote. Wikipedia differs on select-issue reservations and NF. Northern Ireland and private transfers need separate interpretation."
+  },
+  "PL": {
+    "scope": "Ordinary statutory province/county prefixes in 2024 regulation plus 2025/2026 amendments",
+    "baseline": [
+      "pl-law2024.pdf",
+      "pl-law2025.pdf",
+      "pl-law2026-isap.pdf"
+    ],
+    "expected_codes": 689,
+    "comparisons": [],
+    "basis": "All 380 county/city rows in Annex 13 yield 677 allocated codes; 2025 amendment adds 4 and 2026 amendment adds 8. Shared provincial alternative letters are combined with county suffixes as prescribed by the table. Wikipedia omits many alternatives and additionally calls STY current; NOG is explicitly former and now historic. Completeness is limited to these published ordinary allocations, not all issued/special plates."
   }
 }

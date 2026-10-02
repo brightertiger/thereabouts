@@ -200,6 +200,7 @@ def plate_workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Workspac
     )
     write_json(config / "formats.json", {})
     write_json(config / "coverage.json", {})
+    write_json(config / "wikidata.json", {})
     return workspace
 
 

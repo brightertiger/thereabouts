@@ -352,7 +352,9 @@
       "series_status": "current",
       "tables": [
         4
-      ]
+      ],
+      "historic_pattern": "former",
+      "valid_to_pattern": "divided.* in (?P<date>\\d{4})"
     }
   ],
   "wiki-GB.json": [
@@ -1656,7 +1658,8 @@
       ],
       "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
       "unit_kind": "region",
-      "series_status": "historic"
+      "series_status": "historic",
+      "exclude": "Not used|Unused|Not assigned"
     },
     {
       "parser": "table",
@@ -1671,7 +1674,8 @@
       ],
       "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
       "unit_kind": "registration_zone",
-      "series_status": "current"
+      "series_status": "current",
+      "exclude": "Not used|Unused|Not assigned"
     }
   ],
   "wiki-PH.json": [
@@ -2673,6 +2677,279 @@
       "series_status": "current",
       "series_id": "aqaba-special",
       "valid_from": "2025-08"
+    }
+  ],
+  "wiki-AO.json": [
+    {
+      "parser": "text",
+      "item_pattern": "(?P<codes>LD) = (?P<name>Luanda)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1996",
+      "valid_to": "2024"
+    }
+  ],
+  "wiki-CV.json": [
+    {
+      "parser": "text",
+      "start": "The codes are:",
+      "stop": "The format is",
+      "item_pattern": "(?P<codes>[A-Z]{2}) - (?P<name>.*?)(?= [A-Z]{2} - |$)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "island",
+      "series_status": "current"
+    }
+  ],
+  "wiki-CM.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Regional coding",
+      "item_pattern": "(?P<codes>[A-Z]{2}) [–—-] (?P<name>.+)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-GQ.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Provinces",
+      "item_pattern": "(?P<codes>[A-Z]{2}) [–—-] (?P<name>.+)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-GH.json": [
+    {
+      "parser": "text",
+      "start": "Below are the codes",
+      "stop": "NB: Regions",
+      "item_pattern": "(?P<codes>[A-Z]{2}(?:, [A-Z]{2})*) = (?P<name>[\\w -]+ Region)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-KP.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          5
+        ]
+      ],
+      "code_pattern": "[가-힣]+",
+      "local_column": 2,
+      "local_language": "ko",
+      "unit_kind": "province_or_city",
+      "series_status": "current",
+      "header_contains": "Abbreviation"
+    }
+  ],
+  "wiki-NA.json": [
+    {
+      "parser": "list",
+      "section_pattern": "^Town codes$",
+      "item_pattern": "(?P<codes>[A-Z]{1,2})\\s*[–—-]\\s*(?P<name>.+)",
+      "code_pattern": "[A-Z]{1,2}",
+      "unit_kind": "town_or_region",
+      "series_status": "current",
+      "name_remove": "\\s*\\(since \\d{4}\\)| Capital of Namibia\\.",
+      "valid_from_pattern": "since (?P<date>\\d{4})"
+    },
+    {
+      "parser": "list",
+      "section_pattern": "^South West Africa$",
+      "item_pattern": "(?P<codes>[A-Z]{1,3})\\s*[–—-]\\s*(?P<name>.+)",
+      "code_pattern": "[A-Z]{1,3}",
+      "unit_kind": "town_or_region",
+      "series_status": "historic",
+      "valid_from": "1968",
+      "valid_to": "1990",
+      "name_remove": "(?i)\\s+now .*|\\. The Zambezi Region.*"
+    }
+  ],
+  "wiki-PG.json": [
+    {
+      "parser": "cell_lines",
+      "tables": [
+        1
+      ],
+      "section_pattern": "History",
+      "item_pattern": "(?P<codes>[A-Z]{1,3})=(?P<name>.+)",
+      "code_pattern": "[A-Z]{1,3}",
+      "unit_kind": "province",
+      "series_status": "current",
+      "exclude": "Reserved|Not issued|^Z"
+    }
+  ],
+  "wiki-SD.json": [
+    {
+      "parser": "text",
+      "item_pattern": "The letter (?P<codes>خ/KH) indicates (?P<name>Khartoum State)",
+      "code_pattern": "خ|KH",
+      "unit_kind": "state",
+      "series_status": "current"
+    }
+  ],
+  "wiki-BD.json": [
+    {
+      "parser": "text",
+      "item_pattern": "(?=(?P<name>ঢাকা মেট্রো))(?P<codes>ঢাকা মেট্রো)-গ",
+      "code_pattern": "ঢাকা মেট্রো",
+      "unit_kind": "registration_region",
+      "name_language": "bn",
+      "series_status": "current"
+    }
+  ],
+  "wiki-VI.json": [
+    {
+      "parser": "text",
+      "item_pattern": "'(?P<codes>C)' was used on (?P<name>St\\. Croix)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "island",
+      "series_status": "historic",
+      "valid_from": "1939",
+      "valid_to": "1975"
+    },
+    {
+      "parser": "text",
+      "item_pattern": "'(?P<codes>T)' on (?P<name>St\\. Thomas and St\\. John)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "island",
+      "series_status": "historic",
+      "valid_from": "1939",
+      "valid_to": "1975",
+      "name_split": " and "
+    },
+    {
+      "parser": "text",
+      "item_pattern": "'(?P<codes>J)' code introduced for (?P<name>St\\. John)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "island",
+      "series_status": "current",
+      "valid_from": "1975"
+    }
+  ],
+  "pl-law2024.pdf": [
+    {
+      "parser": "text",
+      "start": "Załącznik nr 13",
+      "item_pattern": "(?m)^[ \\t]+(?P<name>[^\\W\\d_][\\w .-]*?)[ \\t]{2,}(?P<prefixes>[A-Z](?:, [A-Z])?) ?(?P<codes>[A-Z]{1,2}(?:,[ \\t\\n]+[A-Z]{1,2})*)[ \\t]*$",
+      "code_prefix_group": "prefixes",
+      "prefix_pattern": "[A-Z]",
+      "code_pattern": "[A-Z]{1,2}",
+      "unit_kind": "county_or_city",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "2024-statutory-allocations",
+      "text_substitutions": [
+        {
+          "pattern": "(?m)^([ \\t]*)([\\w-]+)-([ \\t]{2,})([A-Z ,]+)\\n[ \\t]*-([\\w-]+)",
+          "replacement": "\\1\\2-\\5\\3\\4"
+        }
+      ],
+      "stop": "Załącznik nr 14"
+    }
+  ],
+  "pl-law2025.pdf": [
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>wrocławskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>wrocławski)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2025-07-30",
+      "valid_from": "2025-07-30"
+    },
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>lubelskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>lubelski)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2025-07-30",
+      "valid_from": "2025-07-30"
+    },
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>nyskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>nyski)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2025-07-30",
+      "valid_from": "2025-07-30"
+    }
+  ],
+  "pl-law2026-isap.pdf": [
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>chełmińskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>chełmiński)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2026-08-04",
+      "valid_from": "2026-08-04"
+    },
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>tarnogórskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>tarnogórski)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2026-08-04",
+      "valid_from": "2026-08-04"
+    },
+    {
+      "parser": "text",
+      "item_pattern": "powiatu (?P<name>olsztyńskiego) po literach „[A-Z]+” dodaje się przecinek i litery „(?P<codes>[A-Z, ]+)”",
+      "code_pattern": "[A-Z]{1,2}",
+      "prefix_source": {
+        "source": "pl-law2024.pdf",
+        "pattern": "(?m)^[ \\t]+(?P<name>olsztyński)[ \\t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\\b",
+        "code_pattern": "[A-Z]"
+      },
+      "unit_kind": "county",
+      "name_language": "pl",
+      "series_status": "current",
+      "series_id": "amendment-2026-08-04",
+      "valid_from": "2026-08-04"
     }
   ]
 }

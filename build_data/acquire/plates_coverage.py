@@ -11,7 +11,10 @@ def reviewed_scopes(
 ) -> dict[str, Any]:
     results: dict[str, Any] = {}
     for country, review in policy("coverage").items():
-        baseline = current_codes[country][review["baseline"]]
+        sources = review["baseline"]
+        if isinstance(sources, str):
+            sources = [sources]
+        baseline = set().union(*(current_codes[country][source] for source in sources))
         comparisons = []
         for other in review.get("comparisons", []):
             pool = current_codes if other["status"] == "current" else all_codes
