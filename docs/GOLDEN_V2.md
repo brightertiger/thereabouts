@@ -103,6 +103,11 @@ Offshore projection uses a 1e-9-degree numerical edge tolerance only for project
 water rows. The Mumbai development point exposed a 0.036 mm spherical/planar
 shoreline discrepancy; this tolerance repairs it without giving a city a buffer.
 Synthetic mixed-batch tests ensure land rows do not inherit that tolerance.
+Exact boundary queries use prepared polygon coverage (including boundary edges),
+not repeated zero-distance calculations against detailed outlines. Three Brazilian
+blocks reproduced identical compact rows and transitions in 0.073–0.085 seconds
+each, versus roughly 15 seconds with the distance predicate. The pilot was rerun
+after this performance change; old world checkpoints are invalidated by code hashes.
 
 ## Artifacts and columns
 
@@ -327,6 +332,6 @@ transition matrices are in `data/work/v2-pilot-blocks/report.json`.
 World build in progress. Counts, stored-output quality, joins, holdout, activation
 and final disk state are not yet verified. See `data/work/v2-progress.md`.
 
-Repository validation before the frozen world build: **265 passed, 7 skipped**;
+Repository validation before the frozen world build: **266 passed, 7 skipped**;
 whole-repository Ruff check, Ruff format check and strict mypy pass. No external
 CI, push, PR or remote publication is part of this work.

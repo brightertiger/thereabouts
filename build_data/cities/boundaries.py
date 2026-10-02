@@ -14,7 +14,11 @@ class BoundaryIndex:
 
     def __init__(self, footprints: list[Row]) -> None:
         self.footprints = footprints
-        self.tree = shapely.STRtree([r["geometry"] for r in footprints])
+        self.shapes: NDArray[np.object_] = np.array(
+            [r["geometry"] for r in footprints], dtype=object
+        )
+        shapely.prepare(self.shapes)
+        self.tree = shapely.STRtree(self.shapes)
         self.order = np.array(
             sorted(
                 range(len(footprints)),
@@ -28,8 +32,18 @@ class BoundaryIndex:
         self, coordinates: NDArray[np.float64], tolerance: float = 0.0
     ) -> NDArray[np.int64]:
         """Return footprint indices, or -1; tolerance is only for projected water."""
-        points = shapely.points(coordinates[:, 1], coordinates[:, 0])
-        pairs = self.tree.query(points, predicate="dwithin", distance=tolerance)
+        points = np.asarray(
+            shapely.points(coordinates[:, 1], coordinates[:, 0]), dtype=object
+        )
+        if tolerance:
+            pairs = self.tree.query(points, predicate="dwithin", distance=tolerance)
+        else:
+            # Query bounding boxes, then use the prepared polygon as the left
+            # operand. Repeated point-to-polygon distances rescan every vertex
+            # of large municipal boundaries, even when the distance is zero.
+            pairs = self.tree.query(points)
+            covered = shapely.covers(self.shapes[pairs[1]], points[pairs[0]])
+            pairs = pairs[:, covered]
         ranks = np.full(len(coordinates), len(self.footprints), dtype=np.int64)
         if pairs.size:
             np.minimum.at(ranks, pairs[0], self.rank[pairs[1]])

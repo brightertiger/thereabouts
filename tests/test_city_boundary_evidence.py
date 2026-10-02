@@ -3,12 +3,37 @@
 import sqlite3
 from pathlib import Path
 
+import numpy as np
 import pytest
 import shapely
 
+from build_data.cities.boundaries import BoundaryIndex
 from build_data.cities.footprints import screen
 from build_data.reconcile.common import pack
 from tests.test_city_normalization import city
+
+
+def test_prepared_boundaries_include_edges_but_exclude_holes() -> None:
+    ring = shapely.Polygon(
+        shapely.box(0, 0, 2, 2).exterior,
+        [shapely.box(0.5, 0.5, 1.5, 1.5).exterior],
+    )
+    index = BoundaryIndex(
+        [
+            {
+                "city_id": "town",
+                "method": "city_polygon",
+                "priority": 1,
+                "geometry": shapely.MultiPolygon([ring, shapely.box(3, 0, 4, 1)]),
+                "evidence": {},
+            }
+        ]
+    )
+    coordinates = np.array(
+        [[0, 0], [0.25, 0.25], [1, 1], [0.5, 1], [2 + 5e-10, 1], [0.5, 3.5]]
+    )
+    assert index.query(coordinates).tolist() == [0, 0, -1, 0, -1, 0]
+    assert index.query(coordinates, 1e-9).tolist() == [0, 0, -1, 0, 0, 0]
 
 
 @pytest.mark.parametrize("title", ["village", "hamlet", "town"])
