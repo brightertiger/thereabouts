@@ -8,7 +8,7 @@ import pyarrow.parquet as pq
 
 from build_data.acquire import Ledger, Workspace, atomic_output
 from build_data.acquire.artifacts import file_record, read_json
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire.io import fingerprint, sha256_file, write_json
 from build_data.cities.engine import Engine
 from build_data.cities.mapping import export as map_export
 from build_data.cities.urban import Urban
@@ -45,7 +45,13 @@ def places(
             link(Path(table["path"]), target)
             results.append({**table, **file_record(target)})
         digest = fingerprint(
-            {"base": record, "normalization": report["digest"], "mapping": mapping}
+            {
+                "base": record,
+                "normalization": report["digest"],
+                "mapping": mapping,
+                "publisher": sha256_file(Path(__file__)),
+                "duckdb": duckdb.__version__,
+            }
         )
         path = output / "places" / f"{cc}.parquet"
         receipt = output / "checkpoints" / f"places-{cc}.json"
@@ -55,8 +61,16 @@ def places(
             continue
         db = duckdb.connect()
         try:
-            db.execute("SET memory_limit='256MB'")
+            # Wide source provenance must stream through the joins. Retaining
+            # insertion order buffers wide rows and exhausts small-machine RAM.
+            db.execute("SET memory_limit='512MB'")
             db.execute("SET threads=1")
+            db.execute("SET preserve_insertion_order=false")
+            db.execute(
+                "SET temp_directory=?",
+                [str(workspace.work / "normalize-cells-spill")],
+            )
+            db.execute("SET max_temp_directory_size='512MB'")
             db.read_parquet(record["path"]).create_view("places")
             db.read_parquet(mapping["path"]).create_view("mapping")
             db.read_parquet(canonical["path"]).create_view("cities")

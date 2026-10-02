@@ -143,7 +143,12 @@ Accepted city boundaries own their original cell centres, including water.
 Otherwise offshore urban inference uses v1's spherical land projection, while
 rural nearest distance still uses the original centre. Equal identities **and
 methods** compact again. No exact per-cell distance
-column interferes with compaction. Country and method transition counts are
+column interferes with compaction. Catalogue export streams without preserving
+insertion order, uses one DuckDB thread, and caps working memory and spill at
+512 MB each. All 277 real country catalogues (6,875,329 places) passed the four
+normalization-reference checks under these limits. Catalogue and lookup receipts
+include publisher code and DuckDB version, so resource/code revisions are not
+silently treated as completed old exports. Country and method transition counts are
 recorded during block building, not estimated from a sample.
 
 Spatial postal/airport/trade/IP joins refresh from final v2 cells, whose city IDs

@@ -11,7 +11,7 @@ from h3.api import basic_int as h3
 
 from build_data.acquire import Ledger, Workspace, atomic_output
 from build_data.acquire.artifacts import file_record
-from build_data.acquire.io import fingerprint
+from build_data.acquire.io import fingerprint, sha256_file
 from build_data.acquire.ledger import read_units
 from build_data.acquire.manifests import load_manifest
 from build_data.reconcile.common import Row
@@ -126,6 +126,8 @@ def export(
                     "parts": parts,
                     "cells": cell_digest,
                     "join": 4,
+                    "code": sha256_file(Path(__file__)),
+                    "duckdb": duckdb.__version__,
                     "output": str(output.resolve()),
                 }
             )
