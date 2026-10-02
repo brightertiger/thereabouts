@@ -15,6 +15,10 @@ with Geocoder("tests/fixtures/serving", verify=True) as geo:
         print(result.status)
 ```
 
+`Geocoder(data_dir="/path/to/store")` opens an explicitly installed active pack;
+`Geocoder()` uses the environment/platform store. See
+[DATA_INSTALLATION.md](DATA_INSTALLATION.md) for installation and JSON CLI usage.
+
 The committed fixture is synthetic and is not geographic evidence. For another
 verified golden snapshot, use the exporter described in
 [SERVING_FORMAT.md](SERVING_FORMAT.md). The old `thereabouts.Geocoder` is still

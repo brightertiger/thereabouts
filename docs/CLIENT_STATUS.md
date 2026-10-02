@@ -1,15 +1,41 @@
 # Thereabouts client implementation status
 
-Phases 1 and 2 are implemented on `feat/client`, locally only:
+Phases 1–3 are implemented on `feat/client`, locally only:
 
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
-* Phase 2 commit — **Add offline Python golden reader and bounded public API**
-  (find the exact hash with `git log`).
+* `bf90c3a` — Add offline Python golden reader and bounded public API.
+* Phase 3 commit — **Add pinned pack installation and JSON command line client**
+  (find its hash with `git log`).
 
-Phases 3–7 remain. `thereabouts.client.Geocoder` reads the new packs;
+Phases 4–7 remain. `thereabouts.client.Geocoder` reads the new packs;
 the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Installation and CLI (phase 3)
+
+[DATA_INSTALLATION.md](DATA_INSTALLATION.md) documents local or pinned-URL
+installation, persistent store discovery, listing/full verification, and JSON
+`reverse`, `h3`, typed `resolve`, `batch`, `info` and `explain` commands. Run
+`python -m thereabouts --help` or the installed `thereabouts` entry point.
+`Geocoder(data_dir=...)` opens the active reverse pack; an explicit pack path
+bypasses discovery. Lookups never access the network.
+
+Installs require an operator-trusted manifest SHA256; URL manifests additionally
+require their trusted byte count. Verified files resume at shard boundaries.
+The completed pack is fully verified before immutable publication and atomic
+activation. Old versions remain available to existing readers. No data host is
+configured or contacted; external network access remains guarded in tests.
+
+A local install of the 208,592-byte synthetic pack took **0.427 seconds** including
+full verification; peak process RSS was **41,992,192 bytes**. See
+[CLIENT_INSTALL_MEASUREMENTS.json](CLIENT_INSTALL_MEASUREMENTS.json). CLI entry
+point rebuilding used this worktree's environment and cache, with `uv sync
+--frozen --offline`. The installed command's help and full fixture verification
+passed. No code or dataset was uploaded.
+
+Phase 3 final checks: **374 passed, 7 skipped in 33.83 seconds**; whole-worktree
+Ruff lint, formatting (325 files) and strict mypy (318 source files) passed.
 
 ### Python client (phase 2)
 
@@ -167,9 +193,9 @@ still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
 
 ## Deliberately deferred and how to continue
 
-* Phase 3: explicit data installation, store selection, URL/local import,
-  trusted manifest pins, atomic activation and query CLI. Only build-time export
-  and verify commands exist now; no lookup can trigger data installation.
+* Phase 3 follow-ups: signed release index/key rotation, byte-range resume,
+  explicit pruning and Windows/power-loss qualification. Local/URL installation
+  and file-level resume are complete; no remote release exists to qualify.
 * Phases 4–7: profiling-led Cython/wheels, postal and airport packs, independent
   Node reader with shared public-result vectors, optional MCP integration.
 * Ranked bitmaps and catalogue/layout optimization await representative real-data
@@ -191,7 +217,8 @@ still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
 
 All files that existed under `src/thereabouts/` and `build_data/` at task start
 remain byte-identical. New code lives in `src/thereabouts/packs/`, `src/thereabouts/reading/`, new
-client/result/column modules and `build_data/serve/`; these are not hashed by
+client/result/column/store/CLI modules, `src/thereabouts/installing/`,
+`src/thereabouts/commandline/` and `build_data/serve/`; these are not hashed by
 the existing normalization stage. No pipeline entry point was modified or invoked.
 
 After the running build is safe to change, replace the original runtime and

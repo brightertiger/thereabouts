@@ -6,6 +6,7 @@ from pathlib import Path
 from threading import RLock
 from typing import Any, Literal
 
+from .client_errors import InvalidInputError
 from .columns import Columns, columns
 from .errors import ClosedGeocoderError
 from .packs.address import address
@@ -14,6 +15,7 @@ from .reading.decode import data_identity, resolution
 from .reading.inputs import BATCH_SIZE, Errors, batch_options, coordinates, h3_cell
 from .reading.pack import Pack
 from .results import InputError, Query, Resolution
+from .store import installed_pack
 
 
 class Geocoder:
@@ -24,10 +26,19 @@ class Geocoder:
     It assumes an immutable, previously verified installation.
     """
 
-    def __init__(self, pack: str | Path, *, verify: bool = False) -> None:
+    def __init__(
+        self,
+        pack: str | Path | None = None,
+        *,
+        data_dir: str | Path | None = None,
+        verify: bool = False,
+    ) -> None:
+        if pack is not None and data_dir is not None:
+            raise InvalidInputError("Select a pack directory or a data store, not both")
+        selected = installed_pack(data_dir) if pack is None else Path(pack)
         self._lock = RLock()
         self._closed = False
-        self._pack = Pack(Path(pack), verify=verify)
+        self._pack = Pack(selected, verify=verify)
         self._data = data_identity(self._pack)
 
     def _ensure_open(self) -> None:
