@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from pyofflinegeocoder import DamagedPackError, Geocoder, UnsupportedSchemaError
+from thereabouts import DamagedPackError, Geocoder, UnsupportedSchemaError
 
 from .conftest import FIXTURE
 
@@ -49,7 +49,7 @@ def test_unsupported_schema(copy_pack: Path) -> None:
 def test_runtime_never_imports_build_dependencies() -> None:
     code = """
 import sys
-from pyofflinegeocoder import Geocoder
+from thereabouts import Geocoder
 with Geocoder(sys.argv[1]) as geocoder:
     assert geocoder.reverse(52.37, 4.9)
 for name in sys.modules:

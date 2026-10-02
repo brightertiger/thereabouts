@@ -91,7 +91,7 @@ a substitute for the certificate argument or exhaustive fixture check.
 
 ## Mmap format
 
-`src/pyofflinegeocoder/format.py` is the shared executable definition for schema
+`src/thereabouts/format.py` is the shared executable definition for schema
 `h3-table-v1`; the builder and reader import its constants and label codec.
 All multi-byte integers are **little endian**. Files contain no Python objects or
 pickles. Only the combined layout is supported.
@@ -191,7 +191,7 @@ uv run python -m benchmarks.accuracy
 uv run python -m benchmarks.runtime
 uv run python -m build_data.verify data/h3-world
 uv run pytest
-PYOFFLINEGEOCODER_WORLD_DATA=data/h3-world uv run pytest
+THEREABOUTS_WORLD_DATA=data/h3-world uv run pytest
 uv run ruff check
 uv run ruff format --check
 uv run mypy

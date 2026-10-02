@@ -1,4 +1,4 @@
-# Golden dataset card — completed v1
+# Thereabouts golden dataset card — completed v1
 
 This is the completed 2026-10-02 world publication, schema `golden-1`, for offline
 city/state/country lookup and source-preserving lookup-table joins. Counts and

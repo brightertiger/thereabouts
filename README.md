@@ -1,10 +1,10 @@
-# PyOfflineGeocoder
+# Thereabouts
 
 Give a latitude/longitude, get city, state and country, entirely offline.
 Python 3.11+; runtime dependencies are **H3 and NumPy only**.
 
 ```python
-from pyofflinegeocoder import Geocoder
+from thereabouts import Geocoder
 
 with Geocoder("data/h3-world") as geocoder:
     print(geocoder.reverse(52.37, 4.9))
@@ -15,7 +15,7 @@ with Geocoder("data/h3-world") as geocoder:
 
 `Location` is frozen and slotted. Each field is `str | None`; the whole result is
 `None` over ocean or absent data. `info()` returns provenance and build policy.
-Alternatively set `PYOFFLINEGEOCODER_DATA` and call `pyofflinegeocoder.reverse`.
+Alternatively set `THEREABOUTS_DATA` and call `thereabouts.reverse`.
 Explicit paths take precedence; missing data raises `DataNotInstalledError`.
 Imports, opening and lookups never download data.
 
@@ -88,7 +88,7 @@ uv run python -m benchmarks.build_size --reference data/reference --data data/h3
 uv run python -m benchmarks.accuracy
 uv run python -m benchmarks.runtime
 uv run pytest
-PYOFFLINEGEOCODER_WORLD_DATA=data/h3-world uv run pytest
+THEREABOUTS_WORLD_DATA=data/h3-world uv run pytest
 uv run ruff check
 uv run ruff format --check
 uv run mypy

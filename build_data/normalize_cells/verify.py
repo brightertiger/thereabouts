@@ -167,7 +167,7 @@ def verify(workspace: Workspace, output: Path, review: Path | None = None) -> No
         "WGS84 conversion and city allocation are modifications.\n"
     )
     (output / "DATASET_CARD.md").write_text(
-        "# Golden v2\n\nVerified country-checkpointed city normalization "
+        "# Thereabouts golden v2\n\nVerified country-checkpointed city normalization "
         "at H3 resolution 8.\n"
         f"{rows['places']:,} places; "
         f"{rows['canonical_cities']:,} absorbing cities/towns; "

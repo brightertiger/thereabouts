@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pyofflinegeocoder.errors import (
+from thereabouts.errors import (
     DamagedPackError,
     UnsupportedSchemaError,
 )

@@ -13,13 +13,13 @@ SCHEMA = "h3-table-v1"
 
 def locate(data_path: str | os.PathLike[str] | None) -> Path:
     selected = (
-        data_path if data_path is not None else os.environ.get("PYOFFLINEGEOCODER_DATA")
+        data_path if data_path is not None else os.environ.get("THEREABOUTS_DATA")
     )
     if not selected or not Path(selected).exists():
         raise DataNotInstalledError(
             "H3 data not installed. Run `uv run python -m build_data "
             "--output data/h3-world` "
-            "from the checkout, then pass that directory or set PYOFFLINEGEOCODER_DATA."
+            "from the checkout, then pass that directory or set THEREABOUTS_DATA."
         )
     return Path(selected)
 

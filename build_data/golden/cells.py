@@ -42,7 +42,7 @@ def builder() -> str:
             directory.parent / "hierarchy.py",
             directory.parent / "reconcile/classification.py",
             directory.parent / "reference/sphere.py",
-            directory.parents[1] / "src/pyofflinegeocoder/format.py",
+            directory.parents[1] / "src/thereabouts/format.py",
         )
     )
     return fingerprint(

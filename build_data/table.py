@@ -12,7 +12,7 @@ from typing import BinaryIO
 import numpy as np
 from numpy.typing import NDArray
 
-from pyofflinegeocoder.format import (
+from thereabouts.format import (
     BITMAP_BYTES_PER_WORD,
     BITMAP_FLAG,
     BITMAP_WORD_BITS,
@@ -28,8 +28,8 @@ from pyofflinegeocoder.format import (
     VALUE_DTYPES,
     bitmap_word_count,
 )
-from pyofflinegeocoder.hierarchy import addresses
-from pyofflinegeocoder.manifest import SCHEMA
+from thereabouts.hierarchy import addresses
+from thereabouts.manifest import SCHEMA
 
 from .hierarchy import blocks, compact, descendants, label_block
 from .reference.oracle import Labels, Reference

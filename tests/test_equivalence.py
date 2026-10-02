@@ -7,7 +7,7 @@ from h3.api import basic_int as h3
 
 from build_data.hierarchy import blocks, compact, descendants, label_block
 from build_data.reference.oracle import Reference
-from pyofflinegeocoder.table import Table
+from thereabouts.table import Table
 
 from .conftest import FIXTURE
 

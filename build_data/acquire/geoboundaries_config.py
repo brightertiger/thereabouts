@@ -18,7 +18,7 @@ DOWNLOAD_VERSION = "1"
 
 ADM2_COUNTRIES = ("PHL",)
 
-HEADERS = {"Accept-Encoding": "identity", "User-Agent": "PyOfflineGeocoder/acquire"}
+HEADERS = {"Accept-Encoding": "identity", "User-Agent": "Thereabouts/acquire"}
 
 RETRY_ERRORS = (OSError, HTTPException)
 

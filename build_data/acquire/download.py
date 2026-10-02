@@ -104,7 +104,7 @@ def _headers(response: HTTPResponse, pin: _Pin, offset: int) -> None:
 
 def _transfer(pin: _Pin, part: Path, receipt: Path, timeout: float) -> None:
     offset = part.stat().st_size if part.exists() else 0
-    headers = {"Accept-Encoding": "identity", "User-Agent": "PyOfflineGeocoder/acquire"}
+    headers = {"Accept-Encoding": "identity", "User-Agent": "Thereabouts/acquire"}
     if pin.size:
         headers["Range"] = f"bytes={offset}-"
     validator = pin.etag or pin.last_modified

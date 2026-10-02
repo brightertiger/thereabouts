@@ -32,7 +32,7 @@ Estimated effort: **1–3 working days [E]**, assuming accessible pilot data. Pr
 
 ## Public contract
 
-Use a working import name `pyofflinegeocoder`; verify naming availability before release. Support **Python 3.11+ [proposed minimum]** initially, with the exact supported versions determined by tested wheels. All input coordinates are WGS84 latitude, longitude in decimal degrees, in that order.
+The project is **Thereabouts**, with distribution and import name `thereabouts`. Support **Python 3.11+ [proposed minimum]** initially, with the exact supported versions determined by tested wheels. All input coordinates are WGS84 latitude, longitude in decimal degrees, in that order.
 
 Proposed public types and signatures:
 
@@ -230,7 +230,7 @@ The following is a **future layout**, not files created by this research task:
 
 ```text
 pyproject.toml
-src/pyofflinegeocoder/
+src/thereabouts/
     __init__.py           # public, lazy API
     api.py                # result construction, lifecycle, batch behavior
     models.py             # typed immutable result definitions
@@ -318,9 +318,9 @@ Do not let result collection dominate the claimed data footprint: measure idle, 
 
 Use separate distributions:
 
-- `pyofflinegeocoder`: API/native wheels, licenses, typed interfaces and no large embedded global dataset.
-- `pyofflinegeocoder-data-world`: a platform-independent wheel carrying one default cartographic `.pog` file, manifest, attribution and data licenses. This avoids duplicating the same dataset across platform wheels.
-- Proposed convenience installation: `pip install pyofflinegeocoder[world]`. The extra installs a tested compatible data version at installation time; queries remain entirely offline. Also support `Geocoder('/local/path/world.pog')` for explicit air-gapped distribution.
+- `thereabouts`: API/native wheels, licenses, typed interfaces and no large embedded global dataset.
+- `thereabouts-data-world`: a platform-independent wheel carrying one default cartographic `.pog` file, manifest, attribution and data licenses. This avoids duplicating the same dataset across platform wheels.
+- Proposed convenience installation: `pip install thereabouts[world]`. The extra installs a tested compatible data version at installation time; queries remain entirely offline. Also support `Geocoder('/local/path/world.pog')` for explicit air-gapped distribution.
 
 Names are provisional. Independently version engine schema and data snapshot; state the accepted schema range and record both in every result. The data wheel should contain its compressed wheel member as normal, leaving the installed `.pog` uncompressed for mmap. Do not ship a gzip that every process must decompress on startup. A zip-imported/unextracted data file should produce a clear unsupported-layout error or require explicit extraction during installation.
 

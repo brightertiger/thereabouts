@@ -3,7 +3,7 @@ requires = ["hatchling>=1.27,<2"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyofflinegeocoder"
+name = "thereabouts"
 version = "0.1.0"
 description = "Offline H3 city, state and country lookup"
 readme = "README.md"
@@ -30,7 +30,7 @@ acquire = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyofflinegeocoder"]
+packages = ["src/thereabouts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

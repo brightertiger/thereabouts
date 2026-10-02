@@ -45,7 +45,7 @@ def publish(
     write_json(root / "quality.json", quality)
     (root / "DATA_LICENSES.md").write_text(LICENSES, encoding="utf-8")
     (root / "DATASET_CARD.md").write_text(
-        "# Golden dataset card — draft\n\n"
+        "# Thereabouts golden dataset card — draft\n\n"
         "Canonical reconciled places and a compact H3 resolution-8 reference table.\n"
         "Use the original r8 key and walk to a stored ancestor; converting a point\n"
         "directly at a coarse resolution changes the reference centre.\n\n"
