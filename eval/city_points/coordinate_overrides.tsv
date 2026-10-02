@@ -1,0 +1,25 @@
+id	latitude	longitude	coordinate_source	note
+istanbul-06	40.949700	29.258150	https://mapcarta.com/W412141123	Castle footprint; corroborated by municipal castle page and Nominatim within 30 m.
+kolkata-05	22.480296	88.311371	https://shop.museumsofindia.org/node/464	Museum directory embedded data-lat/data-lng coordinates; Barisha museum address.
+tianjin-02	39.084111	117.205474	https://nominatim.openstreetmap.org/search?q=%E5%A4%A9%E6%B4%A5%E5%8D%9A%E7%89%A9%E9%A6%86&format=jsonv2	OSM museum footprint; official Hexi address; Wikipedia pin rejected as displaced.
+tianjin-04	39.124650	117.196993	https://nominatim.openstreetmap.org/search?q=%E7%93%B7%E6%88%BF%E5%AD%90%20%E5%A4%A9%E6%B4%A5&format=jsonv2	OSM Chifeng Avenue pin; official tourism address; avoid GCJ-02 coordinates from Chinese map providers.
+howrah-01	22.581615	88.337350	https://nominatim.openstreetmap.org/search?q=Howrah%20Municipal%20Corporation%20Howrah&format=jsonv2	Municipal headquarters footprint; official address corroborates.
+thane-03	19.256900	72.982000	https://en.wikipedia.org/wiki/Hiranandani_Foundation_School,_Thane	School within Hiranandani Estate; school address and Nominatim agree.
+thane-04	19.193000	72.977000	https://en.wikipedia.org/wiki/Kopineshwar_Mandir,_Thane	Temple in Thane; operator address corroborates.
+yokohama-03	35.494167	139.526978	https://www.leszoosdanslemonde.com/description.zoorasia-yokohama-zoological-gardens.php	Zoo's southern area; official zoo site and independent zoo directory.
+wilmette-02	42.070585	-87.733394	https://www.anyplaceamerica.com/directory/il/cook-county-17031/parks/?page=7	Park point from US geographic-name directory; park district address and Nominatim corroborate.
+st-andrews-01	56.341382	-2.794369	https://nominatim.openstreetmap.org/search?q=St%20Salvator%27s%20Chapel%20St%20Andrews&format=jsonv2	St Salvator's Chapel; compare university street map.
+bayeux-02	49.274413	-0.699938	https://nominatim.openstreetmap.org/search?q=Mus%C3%A9e%20de%20la%20Tapisserie%20Bayeux&format=jsonv2	Existing museum at 13 bis Rue de Nesmond; rejected displaced Wikidata coordinate and construction-site search hit.
+paraty-02	-23.218841	-44.712113	https://nominatim.openstreetmap.org/search?q=Casa%20da%20Cultura%20Paraty&format=jsonv2	Museum address confirmed by national museum registry.
+swakopmund-01	-22.679306	14.524389	https://de.wikipedia.org/wiki/Woermannhaus_(Swakopmund)	Independent architectural heritage directory agrees within 20 m.
+oamaru-01	-45.101447	170.969363	https://nominatim.openstreetmap.org/search?q=Forrester%20Gallery%20Oamaru&format=jsonv2	9 Thames Street; gallery and Tourism New Zealand address corroborate.
+reine-01	67.932400	13.088700	https://en.wikipedia.org/wiki/Reine	Original village article coordinate corroborated by Nominatim village pin; current fetched English page is disambiguation.
+vik-01	63.419440	-19.009720	https://en.wikipedia.org/wiki/V%C3%ADk_%C3%AD_M%C3%BDrdal	Use older village centre coordinate rather than imprecise eastern outskirts coordinate.
+ogimachi-01	36.260700	136.906800	https://www.vill.shirakawa.lg.jp/1484.htm	Wada House in Ogimachi; do not use serial UNESCO property's centroid in another village.
+mawlynnong-01	25.201951	91.915515	https://nominatim.openstreetmap.org/search?q=Mawlynnong%20Meghalaya&format=jsonv2	Village centre; Wikidata coordinate 1.6 km east rejected.
+nieu-bethesda-01	-31.867630	24.553032	https://nominatim.openstreetmap.org/search?q=Owl%20House%20Nieu%20Bethesda&format=jsonv2	Museum footprint on New Street; operator gives Martins Street address; unrelated TV-series Wikipedia page rejected.
+cachora-01	-13.512672	-72.813510	https://bioseguridad.minam.gob.pe/wp-content/uploads/2018/07/catalogo_quinua_lowres.pdf	Government field locality coordinates beside Cachora; within 55 m of Nominatim village pin.
+tianjin-05	39.073330	117.169440	https://en.wikipedia.org/wiki/Tianjin_Olympic_Center_Stadium	Outer southwestern core; replace remote Zhangjiawo station to avoid promoting a separate town to Tianjin.
+new-norcia-01	-30.971784	116.214119	https://www.newnorcia.com.au/visit/getting-there	Official monastery map's newNorciaCoords; rejected Wikipedia point nearly 3 km from the village.
+terlingua-01	29.321283	-103.616803	https://nominatim.openstreetmap.org/search?q=Starlight%20Theatre%20Terlingua&format=jsonv2	Historic ghost-town theatre; operator independently names Terlingua; rejected census centroid outside the village.
+purmamarca-01	-23.746590	-65.499220	https://mapcarta.com/W46594083	Plaza 9 de Julio beside the municipal office; replaced encyclopedia centroid at the separate railway locality.

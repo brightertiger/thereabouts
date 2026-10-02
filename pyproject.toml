@@ -39,7 +39,7 @@ markers = ["world: requires an explicitly built world pack"]
 [tool.ruff]
 target-version = "py311"
 line-length = 88
-extend-exclude = ["docs", "graft", "data"]
+extend-exclude = ["docs", "graft", "data", "eval"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

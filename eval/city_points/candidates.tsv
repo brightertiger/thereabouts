@@ -1,0 +1,121 @@
+id	group	role	expected_name	country_code	page	locality
+dhaka-01	large-city	centre	Dhaka	BD	Bangladesh National Museum	Shahbag
+dhaka-02	large-city	interior	Dhaka	BD	Lalbagh Fort	Lalbagh
+dhaka-03	large-city	interior	Dhaka	BD	Jatiya Sangsad Bhaban	Sher-e-Bangla Nagar
+dhaka-04	large-city	interior	Dhaka	BD	Gulshan Society Mosque	Gulshan
+dhaka-05	large-city	edge	Dhaka	BD	Bangladesh National Zoo	Mirpur
+dhaka-06	large-city	edge	Dhaka	BD	Uttara High School and College	Uttara Sector 7
+istanbul-01	large-city	centre	Istanbul	TR	Grand Bazaar, Istanbul	Fatih
+istanbul-02	large-city	interior	Istanbul	TR	Taksim Square	Beyoglu
+istanbul-03	large-city	interior	Istanbul	TR	Şükrü Saracoğlu Stadium	Kadikoy; Asian side
+istanbul-04	large-city	interior	Istanbul	TR	Yıldız Palace	Besiktas
+istanbul-05	large-city	edge	Istanbul	TR	Atatürk Arboretum	Sariyer; northern urban fringe
+istanbul-06	large-city	edge	Istanbul	TR	Aydos Castle	Sultanbeyli; eastern urban fringe
+mumbai-01	large-city	centre	Mumbai	IN	Chhatrapati Shivaji Terminus	Fort
+mumbai-02	large-city	interior	Mumbai	IN	Dr. Bhau Daji Lad Museum	Byculla
+mumbai-03	large-city	interior	Mumbai	IN	Shivaji Park	Dadar
+mumbai-04	large-city	interior	Mumbai	IN	Mahakali Caves	Andheri East
+mumbai-05	large-city	edge	Mumbai	IN	Kanheri Caves	Borivali; Sanjay Gandhi National Park
+mumbai-06	large-city	edge	Mumbai	IN	Dahisar railway station	Dahisar
+delhi-01	large-city	centre	Delhi	IN	Connaught Place, New Delhi	Connaught Place
+delhi-02	large-city	interior	Delhi	IN	India Gate	New Delhi
+delhi-03	large-city	interior	Delhi	IN	Red Fort	Old Delhi
+delhi-04	large-city	interior	Delhi	IN	Lotus Temple	Kalkaji
+delhi-05	large-city	edge	Delhi	IN	Dwarka Sector 13 metro station	Dwarka
+delhi-06	large-city	edge	Delhi	IN	Rithala metro station	Rohini
+kolkata-01	large-city	centre	Kolkata	IN	Indian Museum	Chowringhee
+kolkata-02	large-city	interior	Kolkata	IN	Jorasanko Thakur Bari	Jorasanko
+kolkata-03	large-city	interior	Kolkata	IN	Kalighat Kali Temple	Kalighat
+kolkata-04	large-city	interior	Kolkata	IN	Science City, Kolkata	Tangra
+kolkata-05	large-city	edge	Kolkata	IN	Sabarna Sangrahashala	Barisha
+kolkata-06	large-city	edge	Kolkata	IN	Netaji metro station	Kudghat
+tianjin-01	large-city	centre	Tianjin	CN	Tianjin railway station	Hedong
+tianjin-02	large-city	interior	Tianjin	CN	Tianjin Museum	Hexi
+tianjin-03	large-city	interior	Tianjin	CN	Nankai University	Nankai; Balitai campus
+tianjin-04	large-city	interior	Tianjin	CN	Porcelain House	Heping
+tianjin-05	large-city	edge	Tianjin	CN	Tianjin Olympic Center Stadium	Nankai; southwestern urban area
+tianjin-06	large-city	edge	Tianjin	CN	Tianjin Binhai International Airport	Dongli; terminal
+shanghai-01	large-city	centre	Shanghai	CN	Shanghai Museum	Huangpu; People's Square site
+shanghai-02	large-city	interior	Shanghai	CN	Jing'an Temple	Jing'an
+shanghai-03	large-city	interior	Shanghai	CN	Longhua Temple	Xuhui
+shanghai-04	large-city	interior	Shanghai	CN	Shanghai Science and Technology Museum	Pudong
+shanghai-05	large-city	edge	Shanghai	CN	Shanghai Hongqiao railway station	Minhang
+shanghai-06	large-city	edge	Shanghai	CN	Gucun Park	Baoshan
+tokyo-01	large-city	centre	Tokyo	JP	Tokyo Station	Chiyoda
+tokyo-02	large-city	interior	Tokyo	JP	Tokyo Metropolitan Government Building	Shinjuku
+tokyo-03	large-city	interior	Tokyo	JP	Sensō-ji	Taito
+tokyo-04	large-city	interior	Tokyo	JP	Meiji Shrine	Shibuya
+tokyo-05	large-city	edge	Tokyo	JP	Hikarigaoka Station	Nerima
+tokyo-06	large-city	edge	Tokyo	JP	Shinozaki Station	Edogawa
+london-01	large-city	interior	London	GB	Trafalgar Square	City of Westminster
+london-02	large-city	interior	London	GB	Natural History Museum, London	Kensington and Chelsea
+london-03	large-city	centre	London	GB	British Museum	Camden; central London
+london-04	large-city	interior	London	GB	Horniman Museum	Lewisham
+london-05	large-city	edge	London	GB	Royal Air Force Museum London	Barnet; Colindale
+london-06	large-city	edge	London	GB	Eltham Palace	Greenwich; Eltham
+new-york-01	large-city	centre	New York	US	Empire State Building	Manhattan
+new-york-02	large-city	interior	New York	US	Brooklyn Museum	Brooklyn
+new-york-03	large-city	interior	New York	US	Queens Museum	Queens
+new-york-04	large-city	interior	New York	US	Bronx Zoo	Bronx
+new-york-05	large-city	edge	New York	US	Tottenville High School	Staten Island; Huguenot
+new-york-06	large-city	edge	New York	US	Alley Pond Park	Queens; eastern city
+howrah-01	neighbour	centre	Howrah	IN	Howrah Municipal Corporation	municipal headquarters
+howrah-02	neighbour	interior	Howrah	IN	Santragachi Junction railway station	Santragachi
+howrah-03	neighbour	interior	Howrah	IN	Ramrajatala	Ramrajatala locality
+howrah-04	neighbour	facing-side	Howrah	IN	Howrah Maidan metro station	Howrah Maidan
+noida-01	neighbour	centre	Noida	IN	Botanical Garden metro station	Sector 38
+noida-02	neighbour	interior	Noida	IN	Noida City Centre metro station	Sector 32
+noida-03	neighbour	interior	Noida	IN	Noida Sector 50 metro station	Sector 50
+noida-04	neighbour	facing-side	Noida	IN	Noida Sector 16 metro station	Sector 16
+thane-01	neighbour	interior	Thane	IN	Upvan Lake	Pokhran
+thane-02	neighbour	centre	Thane	IN	Viviana Mall	Panch Pakhadi
+thane-03	neighbour	interior	Thane	IN	Hiranandani Estate	Patlipada
+thane-04	neighbour	facing-side	Thane	IN	Kopineshwar Mandir	Talao Pali
+navi-mumbai-01	neighbour	centre	Navi Mumbai	IN	Nerul railway station	Nerul
+navi-mumbai-02	neighbour	interior	Navi Mumbai	IN	DY Patil Stadium	Nerul
+navi-mumbai-03	neighbour	interior	Navi Mumbai	IN	CBD Belapur	CBD Belapur
+navi-mumbai-04	neighbour	facing-side	Navi Mumbai	IN	Vashi railway station	Vashi
+yokohama-01	neighbour	centre	Yokohama	JP	Yokohama Landmark Tower	Nishi
+yokohama-02	neighbour	interior	Yokohama	JP	Shin-Yokohama Ramen Museum	Kohoku
+yokohama-03	neighbour	interior	Yokohama	JP	Zoorasia	Asahi
+yokohama-04	neighbour	facing-side	Yokohama	JP	Kikuna Station	Kohoku; northeastern side
+petaling-jaya-01	neighbour	centre	Petaling Jaya	MY	Taman Jaya LRT station	Section 52
+petaling-jaya-02	neighbour	interior	Petaling Jaya	MY	1 Utama	Bandar Utama
+petaling-jaya-03	neighbour	interior	Petaling Jaya	MY	Kelana Jaya LRT station	Kelana Jaya
+petaling-jaya-04	neighbour	facing-side	Petaling Jaya	MY	Jaya One	Section 13
+oak-park-01	town	centre	Oak Park	US	Oak Park Public Library	Main Library
+oak-park-02	town	interior	Oak Park	US	Ernest Hemingway Birthplace Museum	Oak Park Avenue
+evanston-01	town	centre	Evanston	US	Evanston Public Library	Main Library
+evanston-02	town	interior	Evanston	US	Deering Library	Northwestern University
+wilmette-01	town	centre	Wilmette	US	Wilmette Public Library	downtown
+wilmette-02	town	interior	Wilmette	US	Centennial Park (Wilmette)	Centennial Park
+st-andrews-01	town	centre	St Andrews	GB	University of St Andrews	central town; St Salvator's
+st-andrews-02	town	interior	St Andrews	GB	St Andrews Botanic Garden	Canongate
+bayeux-01	town	centre	Bayeux	FR	Bayeux Cathedral	old town
+bayeux-02	town	interior	Bayeux	FR	Musée de la Tapisserie de Bayeux	Rue de Nesmond
+paraty-01	town	centre	Paraty	BR	Paraty	central historic town
+paraty-02	town	interior	Paraty	BR	Casa da Cultura de Paraty	Rua Dona Geralda
+swakopmund-01	town	centre	Swakopmund	NA	Woermannhaus	Bismarck Street
+swakopmund-02	town	interior	Swakopmund	NA	Swakopmund railway station	Bahnhof Street
+takayama-01	town	centre	Takayama	JP	Takayama Station	Hanasatomachi
+takayama-02	town	interior	Takayama	JP	Takayama Jinya	Hachikenmachi
+oamaru-01	town	centre	Oamaru	NZ	Forrester Gallery	Thames Street
+oamaru-02	town	interior	Oamaru	NZ	Waitaki Boys' High School	Waitaki Avenue
+castle-combe-01	rural	centre	Castle Combe	GB	Castle Combe	lower village
+clovelly-01	rural	centre	Clovelly	GB	Clovelly	village
+plockton-01	rural	centre	Plockton	GB	Plockton	village
+reine-01	rural	centre	Reine	NO	Reine	village
+vik-01	rural	centre	Vik	IS	Vík í Mýrdal	village
+monsanto-01	rural	centre	Monsanto	PT	Monsanto (Idanha-a-Nova)	hill village
+ogimachi-01	rural	centre	Ogimachi	JP	Historic Villages of Shirakawa-gō and Gokayama	Ogimachi village; Shirakawa
+khinalug-01	rural	centre	Khinalug	AZ	Khinalug	mountain village
+bario-01	rural	centre	Bario	MY	Bario	Kelabit Highlands village
+mawlynnong-01	rural	centre	Mawlynnong	IN	Mawlynnong	village
+hogsback-01	rural	centre	Hogsback	ZA	Hogsback, Eastern Cape	village
+nieu-bethesda-01	rural	centre	Nieu-Bethesda	ZA	The Owl House	village
+new-norcia-01	rural	centre	New Norcia	AU	New Norcia, Western Australia	monastic village
+nundle-01	rural	centre	Nundle	AU	Nundle, New South Wales	village
+terlingua-01	rural	centre	Terlingua	US	Terlingua, Texas	ghost-town village
+ocracoke-01	rural	centre	Ocracoke	US	Ocracoke Light	village
+purmamarca-01	rural	centre	Purmamarca	AR	Purmamarca	village
+cachora-01	rural	centre	Cachora	PE	Cachora	village
