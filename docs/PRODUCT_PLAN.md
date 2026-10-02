@@ -40,7 +40,7 @@ counts and pipeline completion do not establish that demand.
 
 ## 1. What exists, and what the product adds
 
-The current `src/pyofflinegeocoder/` reads `h3-table-v1`, using H3 and NumPy. It
+The current `src/thereabouts/` reads `h3-table-v1`, using H3 and NumPy. It
 does not read golden Parquet. Its measured warm median of 13.54 µs and batch rate
 of 436,159 points/s describe one M2 workload. The [design](DESIGN.md) already
 provides useful ancestor addressing, memory-mapped files, lazy string decoding,

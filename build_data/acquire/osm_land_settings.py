@@ -5,8 +5,8 @@ from __future__ import annotations
 import shapefile
 import shapely
 
-from . import SCHEMA_HASHES
 from .osm_land import BUILDER_VERSION, POLICY_VERSION, RELEASE, SOURCE_URL
+from .schemas import CORE_SCHEMA_HASHES
 
 GRID_DEGREES = 10
 
@@ -34,7 +34,7 @@ def configuration() -> dict[str, object]:
     return {
         "builder": BUILDER_VERSION,
         "policy": POLICY_VERSION,
-        "schemas": SCHEMA_HASHES,
+        "schemas": CORE_SCHEMA_HASHES,
         "grid_degrees": GRID_DEGREES,
         "max_records": MAX_UNIT_RECORDS,
         "max_unit_bytes": MAX_UNIT_BYTES,

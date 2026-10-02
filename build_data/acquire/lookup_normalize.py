@@ -18,7 +18,7 @@ from .lookup_phone import metadata, prefix, territories
 from .lookup_points import airport, ip_range, postal, trade
 from .lookup_reader import records
 from .lookup_rows import Reject, Row, decorate
-from .lookup_schemas import LOOKUP_SCHEMAS, LookupKind
+from .lookup_schemas import CORE_LOOKUP_KINDS, LookupKind
 from .runtime import resources, single_run
 from .schemas import SCHEMA_HASHES
 from .workspace import Workspace
@@ -32,7 +32,7 @@ def configuration() -> Row:
         builder="extra-lookups-1",
         h3_version=h3.__version__,
         resolution=8,
-        schemas={k: SCHEMA_HASHES[k] for k in LOOKUP_SCHEMAS},
+        schemas={k: SCHEMA_HASHES[k] for k in CORE_LOOKUP_KINDS},
         chunk_rows=CHUNK_ROWS,
     )
 

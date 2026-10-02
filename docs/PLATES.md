@@ -91,7 +91,7 @@ PYTHON=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/.venv/bin/python
 
 The first command downloads missing catalog entries and normalizes. The second
 is offline and reads pinned snapshots only. Successful files are reused across
-interruptions. Downloads identify `PyOfflineGeocoder`, cache every response, and
+interruptions. Downloads identify `Thereabouts`, cache every response, and
 serialize requests by host at least 1.1 seconds apart (65 seconds for Wikidata).
 Small documents resume at file boundaries; failed partial bytes are retained for
 inspection. Byte-range resume is available only for sources explicitly marked

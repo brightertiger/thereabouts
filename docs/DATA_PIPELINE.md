@@ -623,3 +623,26 @@ uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
 
 This receipt records a review; it changes no city assignment. If source editions
 produce additional losses, inspect them before adding any further exception.
+
+### Rebuilding for a content-neutral rename
+
+The controller accepts `--through base` to stop after a newly guarded base is
+built and snapshotted, before pilot or evaluation work. Record logical contents
+with `python -m build_data.digest_golden` before rebuilding, and compare the
+regenerated base with `--compare` before continuing to the normalized world.
+Use a separate `--output` directory and preserve the old datasets until both
+comparisons and ordinary verification succeed.
+
+For a controlled rebuild with unchanged city policy, inputs and normalization
+code, `--reuse-development` retains the existing `data/work/v2-dev.json` verbatim
+and skips development scoring. It requires that report to exist; it does not
+skip pilot measurements, stored probe blocks, review gates or world verification.
+Use this option on every controller invocation after `--through base` when the
+completed evaluation must not be scored again. The retained report is historical
+evidence, not a newly executed score. The holdout is never a controller stage.
+
+Acquisition configurations have separate schema dependencies: original geographic
+sources use the area/place/name contracts; existing lookups use their lookup
+contracts; plates uses its own three contracts. Adding a standalone source does
+not invalidate unrelated acquired data. Changes to a family's existing contracts
+still invalidate that family's checkpoints.

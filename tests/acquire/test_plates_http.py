@@ -33,7 +33,7 @@ def test_cached_responses_and_shared_per_host_rate_limit(
 
     def respond(request: Any, timeout: int) -> Response:
         assert timeout > 0
-        assert "PyOfflineGeocoder" in request.get_header("User-agent")
+        assert "Thereabouts" in request.get_header("User-agent")
         calls.append(request.full_url)
         return Response(b"source evidence")
 

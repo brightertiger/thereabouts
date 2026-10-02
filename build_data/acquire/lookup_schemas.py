@@ -28,7 +28,7 @@ LookupKind = (
     ]
     | PlateKind
 )
-KINDS = (
+CORE_LOOKUP_KINDS: tuple[LookupKind, ...] = (
     "postal_codes",
     "countries",
     "subdivisions",
@@ -40,8 +40,8 @@ KINDS = (
     "phone_metadata",
     "phone_prefixes",
     "ip_ranges",
-    *PLATE_KINDS,
 )
+KINDS = (*CORE_LOOKUP_KINDS, *PLATE_KINDS)
 
 
 def fields(names: str) -> list[pa.Field[pa.DataType]]:

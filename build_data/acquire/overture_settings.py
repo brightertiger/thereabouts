@@ -5,7 +5,7 @@ from __future__ import annotations
 import pyarrow as pa
 import shapely
 
-from . import SCHEMA_HASHES
+from .schemas import CORE_SCHEMA_HASHES
 
 BUILDER = "overture-normalize-1"
 
@@ -30,7 +30,7 @@ def configuration() -> dict[str, object]:
     return {
         "builder": BUILDER,
         "policy": POLICY,
-        "schemas": SCHEMA_HASHES,
+        "schemas": CORE_SCHEMA_HASHES,
         "geometry_bytes": GEOMETRY_BYTES,
         "batch_bytes": BATCH_BYTES,
         "part_bytes": PART_BYTES,

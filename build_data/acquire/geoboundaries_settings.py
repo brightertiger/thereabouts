@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from . import SCHEMA_HASHES
+from .schemas import CORE_SCHEMA_HASHES
 
 BUILDER_VERSION = "2"
 
@@ -25,7 +25,7 @@ def configuration() -> dict[str, object]:
     return {
         "builder": BUILDER_VERSION,
         "policy": POLICY_VERSION,
-        "schemas": SCHEMA_HASHES,
+        "schemas": CORE_SCHEMA_HASHES,
         "max_geometry_bytes": MAX_GEOMETRY_BYTES,
         "max_shape_bytes": MAX_SHAPE_BYTES,
     }

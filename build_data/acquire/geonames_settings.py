@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from . import SCHEMA_HASHES
 from .geonames_rows import BUILDER_VERSION, POLICY_VERSION
 from .geonames_tsv import CHUNK_BYTES, MAX_LINE_BYTES
+from .schemas import CORE_SCHEMA_HASHES
 
 BATCH_ROWS = 4096
 
@@ -30,7 +30,7 @@ def configuration() -> dict[str, object]:
     return {
         "builder": BUILDER_VERSION,
         "policy": POLICY_VERSION,
-        "schemas": SCHEMA_HASHES,
+        "schemas": CORE_SCHEMA_HASHES,
         "chunk_bytes": CHUNK_BYTES,
         "max_line_bytes": MAX_LINE_BYTES,
         "batch_rows": BATCH_ROWS,

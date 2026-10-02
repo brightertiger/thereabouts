@@ -89,7 +89,12 @@ def main() -> None:
     parser.add_argument("--gate", type=Path)
     parser.add_argument("--workers", type=int, choices=(1, 2), default=2)
     parser.add_argument(
-        "--through", choices=("pilot", "world", "publish"), default="world"
+        "--through", choices=("base", "pilot", "world", "publish"), default="world"
+    )
+    parser.add_argument(
+        "--reuse-development",
+        action="store_true",
+        help="Retain work/v2-dev.json without rescoring development points",
     )
     parser.add_argument("--output", type=Path)
     parser.add_argument(
@@ -99,42 +104,48 @@ def main() -> None:
     workspace = Workspace(args.data_dir.resolve())
     output = (args.output or workspace.root / "golden-v2").resolve()
     gate = (args.gate or workspace.work / "v2-pilot/gate.json").resolve()
+    if args.reuse_development and not (workspace.work / "v2-dev.json").is_file():
+        parser.error("--reuse-development requires an existing work/v2-dev.json")
     controller = Controller(workspace)
     with single_run(workspace, "rebuild-golden"):
         controller.upstream(args.sample_gate, args.workers)
-        countries = policy()["pilot"]
-        controller.run("city-pilot", "build_data.cities", "--countries", *countries)
-        controller.run(
-            "pilot-quality",
-            "build_data.cities.pilot",
-            "--output",
-            str(workspace.work / "v2-pilot"),
-        )
-        controller.run("pilot-dev", "build_data.cities.dev")
-        controller.run("pilot-blocks", "build_data.normalize_cells.pilot_blocks")
-        if args.through != "pilot":
+        if args.through != "base":
+            countries = policy()["pilot"]
+            controller.run("city-pilot", "build_data.cities", "--countries", *countries)
             controller.run(
-                "normalize-world",
-                "build_data.normalize_cells",
-                "run",
+                "pilot-quality",
+                "build_data.cities.pilot",
                 "--output",
-                str(output),
-                "--gate",
-                str(gate),
+                str(workspace.work / "v2-pilot"),
             )
-            review = ["--review", str(args.review.resolve())] if args.review else []
-            controller.run(
-                "verify-world",
-                "build_data.normalize_cells",
-                "verify",
-                "--output",
-                str(output),
-                *review,
-            )
-            if args.through == "publish":
-                from build_data.normalize_cells.publish import activate
+            if args.reuse_development:
+                print("Retaining existing development report; no rescoring", flush=True)
+            else:
+                controller.run("pilot-dev", "build_data.cities.dev")
+            controller.run("pilot-blocks", "build_data.normalize_cells.pilot_blocks")
+            if args.through != "pilot":
+                controller.run(
+                    "normalize-world",
+                    "build_data.normalize_cells",
+                    "run",
+                    "--output",
+                    str(output),
+                    "--gate",
+                    str(gate),
+                )
+                review = ["--review", str(args.review.resolve())] if args.review else []
+                controller.run(
+                    "verify-world",
+                    "build_data.normalize_cells",
+                    "verify",
+                    "--output",
+                    str(output),
+                    *review,
+                )
+                if args.through == "publish":
+                    from build_data.normalize_cells.publish import activate
 
-                activate(workspace, output)
+                    activate(workspace, output)
         write_json(
             controller.work / "run.json",
             {

@@ -108,6 +108,15 @@ SCHEMA_HASHES: dict[Kind, str] = {
 }
 
 
+# These source families publish only areas, places and names. Independent
+# lookup/plate contracts must not invalidate their existing checkpoints.
+CORE_SCHEMA_HASHES = {
+    kind: digest
+    for kind, digest in SCHEMA_HASHES.items()
+    if kind in ("areas", "places", "names")
+}
+
+
 def _provenance(row: dict[str, object]) -> None:
     value = json.loads(cast(str, row["provenance"]))
     if not isinstance(value, dict) or any(
