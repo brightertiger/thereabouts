@@ -1,12 +1,49 @@
 # Thereabouts client implementation status
 
-Phase 1 (serving format and exporter) is implemented on `feat/client`. This is a
-local implementation handoff, not a release. The latest phase commit is identified
-in `git log` by **Add verified golden serving packs and deterministic exporter**.
-Phases 2–7 have not been started. In particular, the top-level `thereabouts.Geocoder`
-still reads the original table; it does **not** read the new packs.
+Phases 1 and 2 are implemented on `feat/client`, locally only:
+
+* `ed74109` — Add verified golden serving packs and deterministic exporter.
+* Phase 2 commit — **Add offline Python golden reader and bounded public API**
+  (find the exact hash with `git log`).
+
+Phases 3–7 remain. `thereabouts.client.Geocoder` reads the new packs;
+the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Python client (phase 2)
+
+[PYTHON_CLIENT.md](PYTHON_CLIENT.md) documents `Geocoder(pack, verify=False)`,
+`reverse`, `from_h3`, bounded `reverse_many`/`from_h3_many`, numeric
+`reverse_columns(decode=False)`, `info` and `explain`. Coordinates become r8 once;
+logical ancestors preserve stored methods, canonical IDs, nulls and coverage.
+Frozen results preserve evidence, separate sovereigns, distance bands and warnings.
+NumPy batches group block reads and restore order. Numeric columns have validity
+masks and pack-local references; optional decoding supplies public IDs/names.
+
+```python
+from thereabouts.client import Geocoder
+
+with Geocoder("tests/fixtures/serving", verify=True) as geo:
+    print(geo.reverse(12.97, 77.59).to_dict())
+```
+
+Readers hold at most one spatial and one catalogue mapping. Close synchronizes
+with active chunks and invalidates buffered iterators. Normal opening validates
+inventory/headers and assumes an immutable verified installation; `verify=True`
+performs full checksums and structure verification. Lookup never installs data.
+
+Phase 2 adds 29 tests for methods, immutable evidence, distance/null/coverage,
+coordinate/H3 validation, logical versus geometric parent boundaries, exhaustive
+NumPy/scalar ancestor parity, bounded batches, numeric columns, concurrent reads,
+close, corruption and incompatible manifests. The network guard stays enabled.
+
+The integration report has **not** said `integrate finished` during this work;
+main-checkout golden data has not been read. The verified world counts supplied
+by the owner are not independently confirmed here. Continue with synthetic inputs
+until the marker exists **and** no `build_data` process is running there.
+
+### Serving exporter (phase 1)
 
 `python -m build_data.serve export` turns a completed, verified `golden-2` manifest
 into an immutable reverse pack. It verifies all manifest-listed hashes, relevant
@@ -105,7 +142,7 @@ TMPDIR="$PWD/.cache/tmp" OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 .venv/bin/mypy
 ```
 
-Final review checks: **319 passed, 7 skipped in 27.90 seconds**. The skipped tests
+Phase 1 review checks: **319 passed, 7 skipped in 27.90 seconds**. The skipped tests
 require explicitly selected world data; none were marked passed. Whole-worktree
 Ruff check and formatting (294 files), strict mypy (287 source files), and the
 build CLI's export/verify smoke test passed. No external CI was run. Original
@@ -113,12 +150,23 @@ runtime/pipeline files were compared against the starting commit `d3b4d94` and
 are unchanged. Added environment, cache, tests and measurement artifacts occupy
 less than 0.9 GiB even when counting the hard-linked environment/cache separately.
 
+Phase 2 public API measurements are in
+[CLIENT_READER_MEASUREMENTS.json](CLIENT_READER_MEASUREMENTS.json). The same
+208,592-byte, seven-block synthetic pack was queried at 10,000 centres clustered
+in four dense blocks. Warm scalar median/p99: **201.375 / 259.792 µs**;
+public-result batch: **4,724 points/s**; numeric columns: **102,433 points/s**.
+Peak process RSS was **111,919,104 bytes**, full verification **0.485 seconds**.
+The public-result performance targets are not met. Profile catalogue decoding
+and result construction before selecting a Cython kernel; numerical throughput
+must not be presented as public-result throughput. No cold-disk or world access
+measurement was made. The machine/dependencies are the same as above.
+
+Phase 2 final checks: **348 passed, 7 skipped in 44.35 seconds**; whole-worktree
+Ruff lint, formatting (309 files) and strict mypy (302 source files) passed. Every original runtime/build-stage file
+still matches `d3b4d94`; phase 1 format/export modules are also unchanged.
+
 ## Deliberately deferred and how to continue
 
-* Phase 2: public Python `Resolution`/candidate API, coordinate/H3 validation,
-  bounded ordered batches, lifecycle/thread semantics and NumPy lookup. The new
-  `thereabouts.packs` modules are internal format/verification primitives, not
-  an alternative public API. No top-level compatibility alias was added.
 * Phase 3: explicit data installation, store selection, URL/local import,
   trusted manifest pins, atomic activation and query CLI. Only build-time export
   and verify commands exist now; no lookup can trigger data installation.
@@ -142,9 +190,9 @@ less than 0.9 GiB even when counting the hard-linked environment/cache separatel
 ## Frozen-file follow-ups
 
 All files that existed under `src/thereabouts/` and `build_data/` at task start
-remain byte-identical. New code lives in `src/thereabouts/packs/` and
-`build_data/serve/`; neither directory is hashed by the existing normalization
-stage. No pipeline entry point was modified or invoked.
+remain byte-identical. New code lives in `src/thereabouts/packs/`, `src/thereabouts/reading/`, new
+client/result/column modules and `build_data/serve/`; these are not hashed by
+the existing normalization stage. No pipeline entry point was modified or invoked.
 
 After the running build is safe to change, replace the original runtime and
 top-level exports through a separately reviewed change. Before doing so, move
