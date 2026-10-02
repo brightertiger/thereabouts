@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import h3
+import shapely
 
 from build_data.golden.inputs import Inputs
 from build_data.golden.quality import display_names
@@ -43,8 +44,6 @@ def urban_checks(
 ) -> list[Row]:
     db = connect(engine.source, readonly=True)
     try:
-        import shapely
-
         borders = [
             shapely.from_wkb(b)
             for (b,) in db.execute("SELECT geometry FROM areas WHERE role='country'")
@@ -89,12 +88,22 @@ def neighbour_checks(
         before, after = comparison.query([cell])
         patch = sorted(h3.grid_disk(cell, 4))
         pb, pa = comparison.query(patch)
-        polygons = [f for f in engine.footprints if f["city_id"] == identity]
+        # Inspect original source polygons even if normalization rejected them.
+        # Otherwise rejecting a town's footprint could hide the very regression
+        # this independent neighbour check is meant to expose.
+        db = connect(engine.source, readonly=True)
+        try:
+            source_areas = db.execute(
+                "SELECT id,geometry FROM areas WHERE entity=? AND role='city'",
+                (identity,),
+            ).fetchall()
+        finally:
+            db.close()
         owned = sorted(
             {
                 c
-                for fp in polygons
-                for c in h3.geo_to_cells(fp["geometry"].__geo_interface__, 8)
+                for _, blob in source_areas
+                for c in h3.geo_to_cells(shapely.from_wkb(blob).__geo_interface__, 8)
             }
         )
         ob, oa = comparison.query(owned)
@@ -102,6 +111,10 @@ def neighbour_checks(
             {
                 "city_id": identity,
                 "name": name,
+                "source_area_ids": [r[0] for r in source_areas],
+                "accepted_city_footprint": any(
+                    f["city_id"] == identity for f in engine.footprints
+                ),
                 "point_before": before[0],
                 "point_after": after[0],
                 "patch_before": measure(pb, identity),
