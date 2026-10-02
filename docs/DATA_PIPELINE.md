@@ -485,6 +485,10 @@ receipts and licence notices available locally for status and provenance.
 
 ## Golden H3 dataset
 
+This is the lower-level base-cell stage. Use the full controller documented
+below for the current normalized dataset. The standalone commands here target
+a separate workspace with acquired/reconciled inputs, not an active v2 symlink.
+
 `build_data.golden` consumes canonical country checkpoints as they become ready,
 without waiting for a new reconciled world manifest. It exports canonical places,
 timezone memberships and code/phone links first. It then builds resolution-3 H3
@@ -494,7 +498,7 @@ IP rows join their existing r8 key through the resulting compact cell table.
 Pending, unlocated, ineligible and unresolved rows remain distinguishable.
 
 ```sh
-GOLDEN_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+GOLDEN_DATA=/path/to/base-stage-data
 uv run --no-sync python -m build_data.golden pilot --countries BE NL LU CA --workers 2 --data-dir "$GOLDEN_DATA"
 uv run --no-sync python -m build_data.golden run --workers 2 --watch --data-dir "$GOLDEN_DATA"
 uv run --no-sync python -m build_data.golden status --data-dir "$GOLDEN_DATA"
@@ -523,6 +527,10 @@ reconciliation and base-cell checkpoints; city normalization never retires or
 modifies reconciled inputs.
 
 ## Acquired sources to normalized golden data
+
+The 2026-10-02 world v2 run is verified and locally active. `data/golden` resolves
+to `data/golden-v2`; the retained v1 directory is `data/golden-v1`. Full measured
+results and limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
 
 `uv run --no-sync python -m build_data.acquire ghsl` acquires the pinned
 GHS-UCDB R2024A V1.2 general-characteristics ZIP (6,902,089 bytes, SHA256
@@ -580,3 +588,30 @@ integrity verification. Examined individual boundary losses can be supplied with
 and retains the prior directory as `golden-v1/`. No external publication is done.
 See [GOLDEN_V2.md](GOLDEN_V2.md) for measured results, gate receipts, all-boundaries
 checks, split-isolated scoring, and known limitations.
+
+Final boundary reviews are bound to the incomplete output manifest, including
+its absolute artifact paths. A clean machine must bind its own receipt after
+examining `golden-v2/quality.json`; it cannot reuse another machine's manifest
+fingerprint. For the same pinned sources, the committed pilot review supplies
+the two already-examined source-overlap exceptions. The final verifier checks
+their boundary IDs, counts and destinations against the new report:
+
+```sh
+uv run --no-sync python - <<'PY'
+from pathlib import Path
+from build_data.acquire.artifacts import read_json
+from build_data.acquire.io import fingerprint, write_json
+
+output = Path("data/golden-v2")
+notes = read_json(Path("docs/city-normalization-pilot-review.json"))
+write_json(Path("data/work/v2-world-review.json"), {
+    "manifest": fingerprint(read_json(output / "manifest.json")),
+    "boundary_exceptions": notes["boundary_exceptions"],
+})
+PY
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --through world --review data/work/v2-world-review.json
+```
+
+This receipt records a review; it changes no city assignment. If source editions
+produce additional losses, inspect them before adding any further exception.

@@ -1,8 +1,8 @@
 # Golden v2 city normalization
 
-**Status: final pilot gate passed; detached world build in progress.** Golden v1 and
-reconciliation remain intact. Do not interpret the city-plan prototypes, the
-source-point diagnostic or a successful country checkpoint as a completed world.
+**Status: world v2 verified complete and locally active.** Golden v1 and
+reconciliation remain intact. The final stored-output audits and the once-only
+holdout results are recorded below.
 The original failed pilot is archived under `data/work/v2-before-rework/`.
 The regenerated pilot report is `data/work/v2-pilot/summary.json`; the process handoff
 is `data/work/v2-progress.md`. Results and the gate decision are recorded below.
@@ -31,11 +31,17 @@ uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
   --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
   --through world > data/work/v2-world.log 2>&1 < /dev/null &
+# After that detached process finishes its first world audit, bind the review
+# to this workspace's incomplete manifest using the DATA_PIPELINE.md recipe.
+# Inspect any new losses, then resume:
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --through world --review data/work/v2-world-review.json
 # Only after final world verification; do not tune against this result:
 uv run --no-sync python -m build_data.normalize_cells score \
   --output data/golden-v2 --points eval/city_points/points.csv --split holdout
 # Reuses the verified output and retains the old golden directory:
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through publish
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --through publish --review data/work/v2-world-review.json
 ```
 
 A review-notes JSON contains `accepted`, a nonempty `review`,
@@ -189,8 +195,8 @@ Nothing under `eval/` is changed or committed by this work.
 ## Pilot gate and rework results
 
 The reviewed gate passed on **2026-10-02** for the final code and policy. The
-world controller is running; final world results below will be filled only after
-stored-output verification. V1 remains active during the build.
+completed world results below come from stored-output verification. V1 was kept
+active throughout the build and is retained after local activation.
 
 The nine-country pilot has **29,300 canonical cities/towns**, **2,697,403 place-map
 rows**, and **12,503 effective footprints**. The final candidate table still
@@ -203,8 +209,8 @@ withholds urban authority from weak point-only village seats.
 | Correct cells in nonempty accepted large-city footprints / 273,309 | 254,658 | 273,309 | 273,309 |
 | Summed distinct answers in those footprints | 1,401 | 794 | 794 |
 | Summed distinct answers in 5,374 country/urban-centre intersections | 103,277 | 29,416 | 29,416 |
-| Named fixtures, including the eight added points | — | 21/21 | 21/21 |
-| Required neighbour anchors | — | 6/6 | 6/6 |
+| Named fixtures, including the eight added points | 17/21 | 21/21 | 21/21 |
+| Required neighbour anchors | 6/6 | 6/6 | 6/6 |
 | Required neighbour source-polygon cells | 1,479 | 1,479 | 1,479 |
 | Hand-checked development points | 32/40 | 38/40 | 38/40 |
 
@@ -272,7 +278,8 @@ boundary is not expanded merely to preserve a diagnostic anchor.
 
 ### Independent neighbours
 
-Both variants give the following results. All eleven anchors pass. “Polygon”
+Both variants give the following results. All eleven anchors pass in both v1
+and v2. “Polygon”
 means the original source geometry, including geometry rejected by normalization;
 “patch” is the eligible radius-four resolution-8 disk around the source anchor.
 
@@ -321,7 +328,8 @@ rows elsewhere retain the base answer until the final world score. **Uttara→To
 municipal boundary in the acquired inputs. The **Tianjin edge→Baoyuan** cell is
 outside the acquired GHSL urban centre; enlarging the inferred city would need
 additional extent evidence. Neither point receives a special guard. The
-80-row holdout is reserved for the verified final world.
+80-row holdout was reserved for the verified final world and scored only after
+completion, as reported below.
 
 ### Actual stored pilot blocks
 
@@ -335,9 +343,185 @@ transition matrices are in `data/work/v2-pilot-blocks/report.json`.
 
 ## Final world verification
 
-World build in progress. Counts, stored-output quality, joins, holdout, activation
-and final disk state are not yet verified. See `data/work/v2-progress.md`.
+The world tables and all 277 stored-country censuses finished on **2026-10-02**;
+the controller recorded verified completion at **12:43:46 UTC**. Global integrity
+and mapping checks pass, with no unreviewed spatial gate failure. The two exact
+source-overlap exceptions are in
+[`city-normalization-world-review.json`](city-normalization-world-review.json),
+bound to the incomplete world manifest. See `data/work/v2-progress.md`.
+
+| Measure | V1 | World v2, radius off |
+| --- | ---: | ---: |
+| Resolution-3 blocks | 41,162 | 41,162 |
+| Represented eligible resolution-8 centres | 199,608,564 | 199,608,564 |
+| Compact cell rows | 62,355,684 | 66,226,680 |
+| Eligible centres with a city/settlement answer | 160,373,907 | 159,524,111 |
+| Places | 6,875,329 | 6,875,329 |
+| Canonical cities/towns / place-to-city rows | — | 68,923 / 6,875,329 |
+| Correct cells in accepted large-city footprints / 1,987,005 | 1,952,737 | 1,987,005 |
+| Summed distinct answers in those footprints | 3,492 | 2,384 |
+| Summed distinct answers in urban-centre/country intersections | 166,625 | 49,784 |
+| Named fixtures | 17/21 | 21/21 |
+| Required neighbour anchors / own-polygon cells | 6/6 / 1,479 | 6/6 / 1,479 |
+| GeoNames diagnostic, raw exact / 34,171 | 27,195 | 28,670 |
+| GeoNames diagnostic, supported roll-ups / 34,171 | 29,333 | 30,745 |
+
+All **2,384 nonempty** large-city footprints are **100%**; four more have no
+eligible same-country centres. The urban census covers all **11,422 GHSL centres**,
+11,543 country/centre intersections and 911,520 summed eligible centres. Distinct
+answers increase in 374 intersections; every before/after count is retained in
+`quality/<CC>.json`. All eleven neighbour anchors and every polygon/patch result
+in the pilot table above are reproduced by the stored world output.
+
+The all-boundaries census covers **33,924 original accepted boundaries** and
+**16,295,293 summed eligible cells**. Target-city ownership grows from 15,910,794
+to 16,282,385 summed cells, but the gate separately checks each loss: exactly the
+same **three London/Dearborn fringe cells**, with no new loss outside the pilot.
+The report separately credits 5,399 identity/part roll-up cells. There are 33,905
+effective footprints after overlap handling. These are source-consistency
+measurements, not independent proof of extent accuracy.
+
+Dhaka's GHSL centre 6090 has 8,148 eligible centres: **3,403 → 24 distinct answers**,
+with Dhaka itself growing from **5 → 5,696 cells (69.91%)**. This is an inferred
+division of a built-up area among cities and towns, not a recovered municipal
+boundary. The Uttara limitation remains.
+
+The original 130 simulation regressions retain exact identity at **57/130** and
+identity or explicit policy target at **104/130**. **61/62 town-loss cases** retain
+their name/target; the remaining Zekeriya case is the intended Istanbul roll-up.
+Of the other 25 diagnostic mismatches, seven retain their v1 answer and eighteen
+expose the Bangkok/Hamburg/Kyiv part-roll-up gaps described below. The frozen
+diagnostic's credit list is not extended to excuse these results.
+
+### Changes recorded during the world build
+
+**5,357,097** cells change city. The country counters cover 199,608,025 eligible
+centres with a country; **539 additional no-country centres remain unchanged**.
+Every country's exact city-change count and method transition matrix is in
+`transitions.json` and copied into `quality.json`.
+
+The transition file has 272 country codes with eligible base cells; the remaining
+five catalogued codes (AN, CS, EH, PS, YU) have no assigned base cells and therefore
+no transition record. Country assignment itself is inherited from v1. The global
+matrix is:
+
+| V1 method | V2 method | Cells |
+| --- | --- | ---: |
+| nearest | rural_nearest | 101,336,095 |
+| nearest | rural_nearest_distant | 17,498,514 |
+| nearest | city_polygon | 11,507 |
+| nearest | policy_polygon | 2,166 |
+| nearest | urban_allocation | 373,138 |
+| area | rural_polygon | 20,308,235 |
+| area | rural_nearest | 3,085,642 |
+| area | rural_nearest_distant | 442,860 |
+| area | city_polygon | 16,285,841 |
+| area | policy_polygon | 25,825 |
+| area | urban_allocation | 154,241 |
+| area | null | 849,843 |
+| null | city_polygon | 47 |
+| null | null | 39,234,071 |
+
+There are no world `town_radius` cells. The additional compact rows reflect
+method distinctions as well as changed identities; eligibility is unchanged.
+Removing unapproved broad area promotions produces 849,843 area-to-null answers
+where the retained rural rules supply no answer within the 50 km limit; 47
+previously null cells gain an accepted city polygon. The net city-answer coverage
+decrease is therefore explicit, rather than hidden in the method totals.
+All 41,162 cell hashes and all transitions exactly match the complete cell pass
+before the catalogue memory fix. The final run regenerated them with the frozen
+release code rather than accepting old implementation checkpoints.
+
+### Refreshed joins and integrity
+
+All spatial joins were regenerated from v2 cells. Row counts and eligibility
+coverage remain identical to v1:
+
+| Lookup | Rows | Matched | Ineligible | Unlocated |
+| --- | ---: | ---: | ---: | ---: |
+| Postal codes | 5,036,067 | 5,030,928 | 5,139 | 0 |
+| Airports | 86,154 | 85,822 | 332 | 0 |
+| Trade locations | 116,213 | 91,873 | 1,001 | 23,339 |
+| IP ranges | 7,786,864 | 7,786,137 | 727 | 0 |
+
+Country disagreements against source lookup metadata remain 12,038 postal,
+188 airport, 613 trade and 2,500 IP rows. These concern unchanged country
+assignment, not newly inferred city accuracy. Static lookup tables preserve their
+verified source rows. All duplicate-place, cell-target, parent, sovereign,
+mapping-target and cross-country mapping checks are zero.
+
+### Final independent scores
+
+The stored world development result is **38/40**, unchanged from the final
+pilot and improved from v1's **32/40**. The two misses remain Uttara→Tongi and
+the Tianjin airport edge→Baoyuan.
+
+The **holdout was scored once**, after verified world completion, with no
+subsequent code or policy tuning: **78/80 (97.5%)**, or **77/79** on unambiguous
+rows. All 80 are covered, with zero distant answers. The one ambiguous row is
+included in the overall count and excluded from the unambiguous denominator.
+
+| Holdout group | Correct / total |
+| --- | ---: |
+| Large city | 39/40 |
+| Independent neighbour | 16/16 |
+| Town | 9/9 |
+| Rural | 14/15 |
+
+The two unambiguous failures are `istanbul-05`, Atatürk Arboretum in Sarıyer
+(expected Istanbul, returned **Bahçeköy**, `rural_nearest`, cell
+`881ec98d1dfffff`), and `ogimachi-01`, Wada House in Ogimachi (expected Ogimachi,
+returned **Shirakawa**, `rural_polygon`, cell `882e627069fffff`). These results
+are reported as observed; neither receives a point guard or post-score policy
+change. The curated set is not an estimate of global random-point accuracy.
+
+Receipts are `data/golden-v2/dev-score.json` and `holdout-score.json`. Both bind
+the verified manifest and the untouched points CSV (SHA256
+`9d6e6025775e8fb2ec849f63d3938739c7eae6ef79e2b5c7e219f2e260bdf601`). The holdout
+receipt identity is `ff768b629cc956bcc686d1efc87882710cad0e3a4ececaf1d24f04bd90bb77ae`.
+V1's holdout was not scored: the reserved evaluation was used once on final v2.
+
+### Remaining extent and roll-up limitations
+
+The stored-world audit exposes an additional limitation of the conservative
+container screen. Bangkok, Hamburg and Kyiv are eligible cities, but their
+linked source polygons are administrative containers without a municipal policy
+approval. They therefore receive inferred GHSL allocation instead of those
+polygons. This can replace a correct v1 big-city answer with a part: for example,
+Sathorn returns Pom Prap Sattru Phai instead of Bangkok, the Bergedorf diagnostic
+cell returns Achterschlag instead of Hamburg, and Svyatoshyn returns Bilychi
+instead of Kyiv. These are remaining roll-up defects, not absent city records
+or losses from accepted municipal footprints. The rejected source area IDs are
+TH 52/306, DE 19322/19334 and UA 10153. They need evidence-backed municipal policy
+review; the all-accepted-boundaries gate does not measure rejected boundaries.
+The full 130-case diagnostic retains these failures visibly. This limitation
+must accompany the global aggregate improvements.
+
+Source locality polygons can also be much broader than a built-up city. For
+example, Altamira's accepted Brazilian municipality covers 192,668 eligible
+resolution-8 centres, all labelled Altamira in both v1 and v2 (source area 2542).
+Barcelos similarly retains 171,594 centres (area 4853). These unchanged broad
+municipal answers are not evidence that every rural village has been recovered.
+The locality/container distinction and a 100% footprint share alone cannot
+establish that a source boundary is the desired urban extent. Further source or
+country-policy review is needed for such municipal territories.
 
 Repository validation before the frozen world build: **267 passed, 7 skipped**;
 whole-repository Ruff check, Ruff format check and strict mypy pass. No external
 CI, push, PR or remote publication is part of this work.
+
+Local activation completed at **2026-10-02 12:50:26 UTC**. `data/golden` is a
+symlink to the stable `data/golden-v2` directory; v1 remains in `data/golden-v1`
+with its original manifest preserved as `manifest.original.json` and a relocated
+inventory. Reconciled inputs were not deleted or modified. The explicit base-cell
+snapshot remains available under `data/base_cells/` through hard links.
+
+The final observed free space is approximately **20 GiB**. To preserve headroom,
+374 obsolete completed country generations (4,413,020,499 source bytes) were
+archived to the existing bucket under
+`intermediates/city-normalization/obsolete-pilot-2026-10-02/` and
+`intermediates/city-normalization/prepared-rework-2026-10-02/`. Local removal
+followed remote byte-size and CRC32C verification; inventories, SHA256 values and
+generation-pinned restore locations are under `data/work/offloaded/`. No current
+country generation, reconciled input or v1 dataset was removed. No new cloud
+resource was created.

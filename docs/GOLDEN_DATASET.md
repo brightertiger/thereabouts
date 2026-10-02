@@ -1,11 +1,15 @@
-# Golden dataset (published `golden-1`; `golden-2` pipeline in pilot)
+# Golden dataset (`golden-2` locally active)
 
-The v1 world publication is complete. The city normalization stage and proposed
-`golden-2` tables/methods are documented in [GOLDEN_V2.md](GOLDEN_V2.md). V2 builds
-beside v1, has a separate pilot gate, and is not a completed world publication.
+Golden v2 was built beside v1, verified, and activated locally on 2026-10-02.
+`data/golden` points to `data/golden-v2`; the intact prior dataset is retained in
+`data/golden-v1`. Nothing was published remotely. The active dataset has
+66,226,680 compact rows representing 199,608,564 eligible resolution-8 centres,
+6,875,329 places and mappings, and 68,923 canonical cities/towns. The full
+before/after measurements, once-only holdout score (78/80), reproducible command
+chain, and known limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
 
-All v1 measurements below are from the final
-stored-cell [quality report](../data/golden/quality.json). The v0 failure audit
+All v1 measurements below are historical, from its final
+stored-cell [quality report](../data/golden-v1/quality.json). The v0 failure audit
 and rule-change evidence are in [GOLDEN_V1.md](GOLDEN_V1.md).
 
 The golden stage consumes committed reconciliation country checkpoints and acquired
@@ -28,6 +32,8 @@ snapshot under `base_cells/` and survives local activation of the new output.
 Schema `golden-2` adds `canonical_cities` and `place_to_city` tables. `places` adds
 `normalized_city_id`, `normalization_method`, `settlement_kind`; absorbing roles
 are `city` or `town`, and other settlements retain their source classification.
+Existing place IDs remain stable, including legacy `city:` prefixes on villages;
+use the role/classification columns rather than interpreting the ID prefix.
 Cell `city_method` becomes `city_polygon`, `policy_polygon`, `urban_allocation`,
 `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null.
 Country/state/land fields and the resolution-8 reference semantics remain the base
@@ -36,10 +42,14 @@ source attribution and limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
 
 The following sections document the base stage and its measured v1 snapshot.
 
-## Run and resume
+## Base-stage commands (historical v1 interface)
+
+Use `build_data.rebuild_golden` above for the current dataset. These lower-level
+commands require acquired/reconciled inputs in a separate base-stage workspace;
+their default output is `golden/`, which must not be the active v2 symlink.
 
 ```sh
-GOLDEN_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+GOLDEN_DATA=/path/to/base-stage-data
 uv run --no-sync python -m build_data.golden static --data-dir "$GOLDEN_DATA"
 uv run --no-sync python -m build_data.golden pilot --countries BE NL LU CA --workers 2 --data-dir "$GOLDEN_DATA"
 uv run --no-sync python -m build_data.golden run --workers 2 --watch --data-dir "$GOLDEN_DATA"
