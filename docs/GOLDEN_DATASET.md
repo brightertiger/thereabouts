@@ -1,6 +1,8 @@
 # Golden dataset (schema `golden-1`)
 
-V1 changes and measured rebuild status: [GOLDEN_V1.md](GOLDEN_V1.md). The historical pilot measurements below describe v0.
+The v1 world publication is complete. All measurements below are from the final
+stored-cell [quality report](../data/golden/quality.json). The v0 failure audit
+and rule-change evidence are in [GOLDEN_V1.md](GOLDEN_V1.md).
 
 The golden stage consumes committed reconciliation country checkpoints and acquired
 lookup manifests. It writes only beneath the supplied data directory. The H3
@@ -20,8 +22,7 @@ uv run --no-sync python -m build_data.golden status --data-dir "$GOLDEN_DATA"
 ```
 
 `pilot` defaults to blocks whose conservative dependencies include BE, NL, LU or
-AU. The command above selects Benelux and Canada, whose dependencies were ready
-when the pilot ran. It exhaustively compares all resolution-8 centres with
+AU. The example command selects Benelux and Canada. It exhaustively compares all resolution-8 centres with
 direct vector labelling,
 checks every ancestor lookup, and compares 16 evenly spaced centres in each block
 with the independent scalar reconciliation oracle. The synthetic test region
@@ -59,7 +60,7 @@ golden/
   manifest.json                  # sole published table inventory and input hashes
   quality.json                   # counts, coverage, disagreements and checks
   DATA_LICENSES.md                # source attribution and licence summary draft
-  DATASET_CARD.md                 # limitations and intended-use draft
+  DATASET_CARD.md                 # final v1 counts, limitations and intended use
   places/<CC>.parquet
   cells/<resolution-3-root>.parquet
   lookups/<spatial-kind>/joined.parquet
@@ -237,72 +238,258 @@ contradictory pattern evidence retains the original candidates. The original
 `country_codes` column is unchanged; descriptions are not fuzzy-matched to cities. An ambiguous multi-country prefix has all candidate
 IDs and a null singular ID. Missing reconciled countries remain pending.
 
-## Quality and limitations
+## Quality report semantics
 
 `quality.json` lists per-table rows and bytes, lookup status/disagreement counts,
 blocks built/waiting/remaining, stored cells per resolution and represented finest
-centres. Its checks repeat every named fixture from `RECONCILIATION.md` through
-`cells`, the sixteen additional metropolitan probes in `probes.json`, and every
-GeoNames P observation at population >=15,000. Pending blocks
-remain counted in the total and have an explicit pending count. State/city
-comparisons retain the original definitions, including PPLX/historical observations
-and the distinction between same identity and containing another city.
+centres. The final results below evaluate both named fixtures and large settlements
+through `cells`. Pending blocks would remain in the denominator; this publication
+has none. The integrity gate requires unique canonical IDs and no dangling cell,
+parent or sovereign references. A catalogue country can exist without a selected
+spatial border, as EH does under this boundary perspective.
 
-The integrity report counts duplicate canonical IDs and missing cell, parent and
-sovereign references. Partial snapshots can lack a sovereign country still being
-reconciled. Dataset completion requires unique canonical IDs and no dangling cell, parent
-or sovereign place IDs. Country catalogue records can exist without assigning a
-spatial country polygon, as for Western Sahara under the selected perspective. Source agreement is not independent accuracy. Country/state/city name
-conventions, broad municipalities and unlinked locality limitations remain those
-of reconciliation. Quantization from the source coordinate to the r8 centre can
-change even a named fixture. Such results are reported, never patched by name.
+The [dataset card](../data/golden/DATASET_CARD.md) records the final snapshot.
+The licence summary remains a draft; original source licences and evidence remain
+attached and must be consulted when preparing a release.
 
-The licence summary and dataset card are drafts. Original licences and evidence
-remain attached; consult the retained per-source notices when preparing release.
+## Final table rows and cell resolutions
 
-## Measured pilot (2026-10-02, Apple M2 / 8 GB)
+These are the completed publication's rows, counted in `quality.json`. Lookup
+rows preserve source observations, including duplicates; they are not unique
+place counts.
 
-The initial scalar Belgium probe labelled 989 centres in 8.182 seconds, about
-121 centres/second. Repeating the earlier builder's 40 million directly labelled
-centres at that rate would take about 92 hours, so the world scalar approach was
-rejected before launch. Vector polygon membership, reused local indexes and
-bounded spherical coast queries replaced that hot path.
+| Table | Rows |
+| --- | --- |
+| `places` | 6,875,329 |
+| `cells` | 62,355,684 |
+| `postal_codes` | 5,036,067 |
+| `ip_ranges` | 7,786,864 |
+| `airports` | 86,154 |
+| `trade_locations` | 116,213 |
+| `timezone_cells` | 4,567,490 |
+| `zone_tables` | 821 |
+| `phone_prefixes` | 427,963 |
+| `phone_metadata` | 254 |
+| `countries` | 252 |
+| `subdivisions` | 8,911 |
 
-The completed Benelux + Canada pilot covers 1,753 resolution-3 blocks. Every one
-of its 29,462,671 finest centres matched direct vector labelling and exactly one
-stored ancestor for eligible centres (none for ineligible ocean). All 28,048
-independent scalar spot checks agreed. The synthetic region additionally compares
-every centre to the independent scalar oracle, including holes, overlaps,
-nearest-city ties and offshore eligibility; separate seam/pole cases do the same.
+| Stored H3 resolution | Cells |
+| --- | --- |
+| 3 | 1,141 |
+| 4 | 5,145 |
+| 5 | 72,657 |
+| 6 | 790,253 |
+| 7 | 7,158,066 |
+| 8 | 54,328,422 |
 
-Production directly labelled 8,906,318 centres in 648.125 summed worker seconds:
-**13,742 centres/second**. Preparation, labelling and compaction totalled 792.817
-worker seconds, or 0.4523 seconds/block, excluding verification and final Parquet
-I/O. Charging all 41,162 world blocks this same average gives **2.59 hours with
-two workers** before joins and quality checks. The 22,043 country-dependent
-blocks alone extrapolate to 2.77 hours with one worker; most other blocks are
-cheap ocean. This is a planning estimate, not a bound: geometry density, cache
-warmup and shared CPU differ across countries. Raw timings and checks are in
-`work/golden/pilot.json` and `work/golden/pilot-performance.json`.
+The **62,355,684 stored cells** represent **199,608,564
+resolution-8 eligible centres** across all **41,162 resolution-3 blocks**.
+Eligibility includes OSM land and the 1 km offshore band; **1,811,604**
+represented centres use offshore projection. These are counts of centres, not a
+spherical land-area estimate. All **277 country checkpoints** are ready, with
+zero remaining or waiting blocks and no pending lookup rows.
 
-The pilot's stored-cell quality checks pass for Paris and Eindhoven; 11 other
-named fixtures await their world blocks. All 992 Benelux/Canadian settlement
-observations have a country answer and agree with their source country. State
-agreement is 990/992 and same-identity-or-containing-city agreement is 990/992.
-The two Luxembourg state-code mismatches are inherited from reconciliation's
-Esch Canton crosswalk. Canadian Brantford snaps from its source point to an r8
-centre assigned to Eagle Place; Cole Harbour (PPLX) already returns ColeRidge
-Estates at its original point. All four results match independent scalar lookup
-at the r8 centre. Evidence is in `work/golden/pilot-disagreements.json`.
+## Final world settlement check through stored cells
 
-The pilot catalogue has no duplicate canonical IDs or dangling cell place IDs.
-It retains 49 parent and sovereign references to `country:EH`, for which
-reconciliation has no canonical country entity under its source perspective.
-These are unresolved source catalogue references, explicitly counted in quality;
-no replacement identity is invented. The partial spatial joins retain 983 source
-country disagreements: postal 795, airports 10, trade 67 and IP 111. These counts
-will change as the world build fills currently pending rows.
+The before/after comparison uses the archived v0 cells and the final v1 cells,
+not the interim scalar oracle. All **34,171** GeoNames class P observations with
+population at least 15,000 were evaluated at their resolution-8 cell centres,
+including PPLX and historical observations. No observations remain pending.
 
+| Measure | v0 stored cells | v1 stored cells |
+| --- | --- | --- |
+| Answer | 34,169/34,171 (99.99%) | 34,169/34,171 (99.99%) |
+| Country agreement | 34,102/34,171 (99.80%) | 34,102/34,171 (99.80%) |
+| State agreement | 33,259/33,907 (98.09%) | 33,259/33,907 (98.09%) |
+| Exact city identity | 25,522/34,171 (74.69%) | 27,195/34,171 (79.59%) |
+| Different containing city | 6,935/34,171 (20.29%) | 5,187/34,171 (15.18%) |
+| Identity or containing city | 32,457/34,171 (94.98%) | 32,382/34,171 (94.76%) |
+
+A city is present for **34,169/34,171** observations. State comparison excludes
+intentionally absent states and empty source admin1 codes; **244** applicable
+states remain unmapped and count as disagreements. Containment is geometric
+membership at the cell centre, not an independently adjudicated municipal
+identity. Agreement with these source records is not holdout accuracy.
+
+The final stored-cell comparison recovers **1,854** v0 non-identities and
+introduces **181** new identity mismatches, a net gain of **1,673**. Exact city
+identity rises **4.90 percentage points**; identity-or-containing falls by **75**
+observations. The full change evidence is `data/work/v1/world-change-classes.json`.
+
+## Final named fixtures and city probes
+
+Every answer below comes from the completed `cells` table at the input's r8
+centre. All **13 named fixtures pass**. All **16 additional probes** have a
+matched cell; that does not make every city answer correct. Delhi, Dhaka and
+Istanbul are known wrong answers, discussed under “Known limitations of v1”.
+A dash means an intentionally absent state. Coordinates and cell keys are in
+`quality.json` under `checks.named` and `checks.probes`.
+
+### Named fixtures
+
+| Probe | City | State | Country | City method |
+| --- | --- | --- | --- | --- |
+| lower Manhattan | New York | New York | United States | area |
+| Tokyo | Tokyo | Tokyo | Japan | area |
+| Singapore | Singapore | — | Singapore | area |
+| Monaco | Monaco | — | Monaco | area |
+| Hong Kong Central | Hong Kong | — | Hong Kong | area |
+| Lagos | Lagos | Lagos State | Nigeria | nearest |
+| London | London | England | United Kingdom | area |
+| Cayenne | Cayenne | — | French Guiana | nearest |
+| Pristina | Pristina | District of Prishtina | Kosovo | area |
+| Bengaluru | Bengaluru | Karnataka | India | area |
+| Paris | Paris | Ile-de-France | France | area |
+| Cagayan de Oro | Cagayan de Oro | Cagayan de Oro | Philippines | area |
+| Eindhoven | Eindhoven | North Brabant | Netherlands | area |
+
+### Additional city probes
+
+| Probe | City | State | Country | City method |
+| --- | --- | --- | --- | --- |
+| Mumbai | Mumbai | Maharashtra | India | nearest |
+| Delhi | New Delhi | Delhi | India | area |
+| Kolkata | Kolkata | West Bengal | India | area |
+| Chennai | Chennai | Tamil Nadu | India | area |
+| Karachi | Karachi | Sindh | Pakistan | area |
+| Dhaka | Joār Sāhāra | Dhaka Division | Bangladesh | nearest |
+| Jakarta | Jakarta | Special Capital Region of Jakarta | Indonesia | area |
+| Manila | Manila | Manila | Philippines | area |
+| São Paulo | São Paulo | São Paulo | Brazil | area |
+| Mexico City | Mexico City | Mexico City | Mexico | area |
+| Cairo | Cairo | Cairo | Egypt | area |
+| Istanbul | Mercan Mahallesi | Istanbul | Turkey | nearest |
+| Moscow | Moscow | Moscow | Russia | area |
+| Seoul | Seoul | Seoul | South Korea | area |
+| Shanghai | Shanghai | Shanghai | China | area |
+| Sydney | Sydney | New South Wales | Australia | area |
+
+Monaco uses offshore projection within the eligibility band; its city method is `area`.
+
+## Final lookup joins
+
+Static links use source codes and administrative/numbering evidence; spatial
+links use the final stored cells. All source rows are accounted for, with zero
+pending or unassigned spatial rows.
+
+| Static table | Matched | Ambiguous | Unmatched |
+| --- | --- | --- | --- |
+| `countries` | 250 | 0 | 2 |
+| `subdivisions` | 8,247 | 96 | 568 |
+| `phone_metadata` | 243 | 0 | 11 |
+| `phone_prefixes` | 427,912 | 44 | 7 |
+
+| Spatial table | Matched | Ineligible | Unlocated | Country disagreements / compared |
+| --- | --- | --- | --- | --- |
+| `postal_codes` | 5,030,928 | 5,139 | 0 | 12,038 / 5,030,928 |
+| `ip_ranges` | 7,786,137 | 727 | 0 | 2,500 / 7,786,137 |
+| `airports` | 85,822 | 332 | 0 | 188 / 85,822 |
+| `trade_locations` | 91,873 | 1,001 | 23,339 | 613 / 91,873 |
+
+Country disagreements compare retained source country codes with cell assignments;
+they are reported without adjudication. Ineligible rows are outside the land/
+offshore coverage, while unlocated trade rows lack coordinates. Timezone cells
+and zone tables retain their source membership/reference semantics rather than
+receiving these place joins.
+
+The **8,911** subdivision rows combine **5,046 ISO-3166-2** and **3,865
+GeoNames-admin1** records. ISO has **4,617 matched / 44 ambiguous / 385 unmatched**;
+GeoNames has **3,630 / 52 / 183**. Compared with v0, unique subdivision matches
+increase from **7,087 to 8,247**, while unmatched rows fall from **1,775 to 568**.
+Additional administrative aliases also expose ambiguity (**49 to 96**), which
+remains explicit. Remaining gaps need validated identity, name/type or version
+crosswalks; a same-name settlement does not establish an administrative unit.
+
+Countries match **250/252**, up from **249/252** after adding the missing EH
+catalogue identity. AN and CS remain historical with no current single-country
+target. Phone metadata leaves AC, TA and nine non-geographic `001` services
+unmatched. Phone-prefix ambiguity falls from **95,723 to 44**: **43** have
+overlapping numbering languages (37 under +61, four under +212, two under +39),
+and one +134597 prefix lacks supporting fixed-line patterns. Stronger allocation
+evidence may resolve more. The **seven** unmatched prefixes are five AC rows
+and two translated TA `2908` rows; TA now narrows correctly instead of selecting
+SH merely because it has a represented country. Original candidates are retained.
+
+## Final integrity results
+
+| Check | Count |
+| --- | --- |
+| Duplicate place IDs | 0 |
+| Missing cell place IDs | 0 |
+| Missing parent references | 0 |
+| Missing sovereign references | 0 |
+
+All **6,875,329 places** and the final cell foreign keys pass these
+checks. `country:EH` occurs once and resolves the **49** former parent and **49**
+sovereign references without inventing a Western Sahara boundary or changing
+the selected territorial perspective.
+
+Of **199,608,564** represented r8 centres, **199,608,025** have a
+country and **180,083,434** have a state. A null assignment is distinct
+from a dangling reference: **539** eligible centres have no country, and
+**39,234,657** have no city. City coverage and its tradeoff are below.
+
+## Known limitations of v1
+
+**City identity improved at settlement anchors, but polygon-backed city coverage
+fell.** Compared with v0, the share of resolution-8 land centres whose city comes
+from a containing area fell from **72,311,908 to 41,152,487**, nearest-point
+assignments rose from **93,143,091 to 119,221,420**, and centres with any city
+fell from **165,454,999 to 160,373,907**. The common denominator below is all
+199,608,564 eligible centres, including the 1 km offshore band.
+
+| City assignment | v0 centres / eligible centres | v1 centres / eligible centres |
+| --- | --- | --- |
+| Containing area | 72,311,908/199,608,564 (36.23%) | 41,152,487/199,608,564 (20.62%) |
+| Nearest point | 93,143,091/199,608,564 (46.66%) | 119,221,420/199,608,564 (59.73%) |
+| Any city | 165,454,999/199,608,564 (82.89%) | 160,373,907/199,608,564 (80.34%) |
+
+V1 stopped treating untyped, unlinked locality polygons as cities, including many
+wards, boroughs, subdistricts and tehsils. It also excludes administrative
+containers of much larger linked city/town points unless the container has its
+own classified, linked settlement identity. County/localadmin polygons cannot
+stand in for cities without shared Wikidata settlement identity, and a region
+needs the exact shared identity of a uniquely linked, explicitly classified city;
+a similar name or a capital/seat relationship is insufficient. These rejected
+areas remain retained administrative entities, but no longer supply city labels.
+The rule does not reject every ward or county merely by its name.
+
+Removing a weak city polygon does not create the missing municipal boundary.
+Where no accepted city polygon covers a centre, same-country nearest-point
+fallback applies within 50 km; beyond that cutoff the city is absent. Area
+assignments decrease by **31,159,421**, nearest assignments increase by
+**26,078,329**, and any-city coverage loses **5,081,092** centres (**2.55 percentage
+points**). These are net aggregate changes, not a measured one-to-one transition
+of individual centres between methods.
+
+The accuracy cost near city edges is loss of boundary-based discrimination:
+nearest-point regions can cross municipal boundaries, assign an outside neighbour
+inside a city, or extend a city beyond its actual edge. Small or misclassified
+settlement anchors can win. Snapping inputs to r8 centres adds displacement near
+those boundaries. The settlement-anchor identity improvement does not establish
+better accuracy at arbitrary edge locations; the size of that edge error has not
+been independently measured.
+
+| Limitation | Next work |
+| --- | --- |
+| Reduced area coverage and greater nearest-point dependence | Audit rejected polygons by subtype and settlement evidence; recover validated municipal boundaries and administrative-to-city identity links. Test interior points and transects across city edges, measuring identity, boundary errors and missing-city coverage together. Preserve separate suburb municipalities; do not recreate broad city areas from population radii. |
+| **Delhi → New Delhi** (area), a known wrong answer for the requested Delhi city | Review the linked Delhi/New Delhi polygons and hierarchy, then document and validate the intended city versus municipality scope. Use source identity and explicit policy data where needed, preserving distinct municipalities rather than patching this probe. |
+| **Dhaka → Joār Sāhāra** (nearest) | The linked Dhaka polygon does not cover the probe, so a zero-population GeoNames PPL anchor wins. Obtain or validate the missing city footprint and review the subunit classification before changing fallback eligibility. |
+| **Istanbul → Mercan Mahallesi** (nearest) | The pinned reconciliation has no linked Istanbul city polygon; a zero-population GeoNames PPL anchor wins. Link a valid city footprint and audit neighbourhood classifications and hierarchy. |
+| **181 new identity mismatches** (CN 121, MY 21, DE 6, BE 5; every other country at most three) | Adjudicate the retained regression records, starting with China and Malaysia. Broad shared-identity administrative footprints can absorb point-only settlements lacking their own polygon; constrain those footprints with municipal evidence and recover independent settlement boundaries. Keep genuine suburbs distinct from independent municipalities, and rerun both identity and coverage checks. |
+
+All 21 Malaysian regressions return Kuala Lumpur and satisfy geometric
+containment; examples include Setapak, Wangsa Maju, Bukit Bintang and Bangsar.
+They remain in the mismatch count: source PPL classification and geometric
+containment alone cannot decide municipal identity. The three probe errors are
+not asserted to be disjoint from the settlement regression set. Detailed evidence
+is retained in `remaining-probe-evidence.json`, `malaysia-regression-evidence.json`
+and `world-change-classes.json` under `data/work/v1/`.
+
+Separately represented suburb municipalities are intended city answers. Broad
+metropolitan membership does not override a classified, linked municipality's
+own polygon. Rejected finer units remain in `places` with source classification
+and exclusion evidence; a per-cell ward/borough column is still deferred.
 
 ## Incremental v1 rebuild
 
@@ -319,5 +506,6 @@ rows and timezone hardlinks remain reusable.
 
 Before replacing golden files, the controller publishes `completed: false`.
 Completion requires both `work/golden/run.json` and `golden/manifest.json` to say
-`completed: true`, with the integrity checks above passing. See the gated world
-controller and exact launch/resume commands in [GOLDEN_V1.md](GOLDEN_V1.md).
+`completed: true`, with the integrity checks above passing. Both markers are true for the final v1 publication;
+[GOLDEN_V1.md](GOLDEN_V1.md#completed-rebuild-and-evidence) records completion and
+audit evidence.
