@@ -166,3 +166,25 @@ def footprint_order(footprint: Row) -> tuple[Any, ...]:
             "ownership_order", (0, footprint["geometry"].area, 0, footprint["city_id"])
         ),
     )
+
+
+def roll_up(footprints: list[Row], parts: dict[str, str]) -> list[Row]:
+    """Keep accepted part boundaries when their identity rolls into a larger city.
+
+    A built-up policy core can clip a part's edge. Dropping its independently
+    accepted locality polygon would let a neighbour take that edge. Preserve the
+    same geometry and source precedence, with the owner's requested city name.
+    """
+    result = []
+    for footprint in footprints:
+        source = footprint["city_id"]
+        if source in parts:
+            footprint = {
+                **footprint,
+                "city_id": parts[source],
+                "priority": -1,
+                "method": "policy_polygon",
+                "evidence": {**footprint["evidence"], "policy_part": source},
+            }
+        result.append(footprint)
+    return result

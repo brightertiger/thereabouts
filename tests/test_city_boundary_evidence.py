@@ -86,3 +86,35 @@ def test_linked_municipality_precedes_smaller_unlinked_overlap() -> None:
     result = {r["city_id"]: r for r in resolve_overlaps([small, municipal])}
     assert result["town"]["geometry"].equals(municipal["geometry"])
     assert not result["unlinked"]["geometry"].covers(shapely.Point(0.75, 0.25))
+
+
+def test_city_rollup_preserves_accepted_part_boundary() -> None:
+    from build_data.cities.footprints import resolve_overlaps, roll_up
+
+    core = {
+        "city_id": "city",
+        "method": "policy_polygon",
+        "priority": 0,
+        "geometry": shapely.box(0, 0, 1, 1),
+        "evidence": {},
+    }
+    part = {
+        "city_id": "part",
+        "method": "city_polygon",
+        "priority": 1,
+        "geometry": shapely.box(0.9, 0, 1.2, 0.2),
+        "ownership_order": (-20, 0.06, -10000, "part"),
+        "evidence": {},
+    }
+    neighbour = {
+        "city_id": "neighbour",
+        "method": "city_polygon",
+        "priority": 1,
+        "geometry": shapely.box(1.1, 0, 1.4, 0.2),
+        "ownership_order": (0, 0, 0.06, "neighbour"),
+        "evidence": {},
+    }
+    result = resolve_overlaps(roll_up([core, part, neighbour], {"part": "city"}))
+    edge = shapely.Point(1.15, 0.1)
+    assert {f["city_id"] for f in result if f["geometry"].covers(edge)} == {"city"}
+    assert part["city_id"] == "part"  # Keep original audit geometry/identity intact.

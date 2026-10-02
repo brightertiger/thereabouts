@@ -12,7 +12,7 @@ from build_data.reconcile.common import Row, check_database, connect, encode, pa
 
 from .candidates import candidates, divisions
 from .common import builder
-from .footprints import resolve_overlaps, screen
+from .footprints import resolve_overlaps, roll_up, screen
 from .policy_areas import policy_areas
 from .schemas import CITIES
 from .urban import Urban
@@ -97,6 +97,7 @@ def build_country(
             else:
                 parts[identity] = target
                 cities.pop(identity, None)
+        footprints = roll_up(footprints, parts)
         footprints = [f for f in footprints if f["city_id"] in cities]
         footprints = resolve_overlaps(footprints)
         missing_targets = set(parts.values()) - cities.keys()
