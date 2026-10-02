@@ -20,7 +20,15 @@ def _one(rows: list[Row], key: str) -> str | None:
     return values[0] if len(values) == 1 else None
 
 
-def rows(path: Path, country_item: str) -> Iterator[Row]:
+def _date(bindings: list[Row], key: str) -> str | None:
+    value = _one(bindings, key)
+    # Wikidata "some value" qualifiers are blank-node URIs, not timestamps.
+    return (
+        value if value and re.fullmatch(r"\d{4}-\d{2}-\d{2}T[0-9:]+Z", value) else None
+    )
+
+
+def rows(path: Path, country_item: str, retrieved_at: str) -> Iterator[Row]:
     data = json.loads(path.read_text(encoding="utf-8"))
     groups: dict[tuple[str, str, str], list[Row]] = defaultdict(list)
     for binding in data["results"]["bindings"]:
@@ -31,7 +39,7 @@ def rows(path: Path, country_item: str) -> Iterator[Row]:
             binding
         )
     for (item, statement, code), bindings in groups.items():
-        start, end = _one(bindings, "start"), _one(bindings, "end")
+        start, end = _date(bindings, "start"), _date(bindings, "end")
         coordinates = _values(bindings, "coord")
         lat = lon = None
         if len(coordinates) == 1:
@@ -58,7 +66,9 @@ def rows(path: Path, country_item: str) -> Iterator[Row]:
             local_language=next(iter(local_names)) if len(local_names) == 1 else None,
             unit_kind="wikidata_entity",
             series_id="P395-unspecified",
-            series_status="historic" if end else "unknown",
+            series_status="historic"
+            if end and end[:10] <= retrieved_at[:10]
+            else "unknown",
             valid_from=start,
             valid_to=end,
             latitude=lat,
@@ -75,6 +85,8 @@ def rows(path: Path, country_item: str) -> Iterator[Row]:
                     ranks=_values(bindings, "rank"),
                     local_names=local_names,
                     coordinates=coordinates,
+                    start_assertions=_values(bindings, "start"),
+                    end_assertions=_values(bindings, "end"),
                     warning=(
                         "P395 may repeat a district code on its municipalities; "
                         "no current-series assertion"

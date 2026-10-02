@@ -2,14 +2,16 @@
 
 import json
 from collections import Counter, defaultdict
+from pathlib import Path
 from typing import Any
 
 from .artifacts import publish_report, read_json
-from .io import fingerprint, write_json
+from .io import fingerprint, sha256_file, write_json
 from .ledger import Ledger
 from .lifecycle import finish_source, resume_source
 from .lookup_rows import decorate
-from .plates_config import DATA, configuration
+from .plates_config import DATA, configuration, policy
+from .plates_coverage import reviewed_scopes
 from .plates_reader import records
 from .plates_schemas import PlateKind
 from .runtime import single_run
@@ -28,6 +30,11 @@ def normalize(workspace: Workspace) -> None:
         inventory = read_json(workspace.raw("plates") / "inventory.json")
         if not inventory.get("completed_at"):
             raise ValueError("Complete the plates download stage first")
+        if inventory["specifications"] != policy("sources"):
+            raise ValueError("Source catalog changed; run plates download first")
+        for name, pin in inventory["files"].items():
+            if sha256_file(Path(pin["path"])) != pin["sha256"]:
+                raise ValueError(f"Corrupt raw snapshot: {name}")
         ledger = Ledger(workspace.ledger_path)
         digest = fingerprint(dict(inventory=inventory, configuration=config))
         unit = dict(stage="plates.normalize", unit_id="evidence", inputs_hash=digest)
@@ -40,17 +47,21 @@ def normalize(workspace: Workspace) -> None:
         source_codes: dict[str, dict[str, set[str]]] = defaultdict(
             lambda: defaultdict(set)
         )
+        current_sources: dict[str, dict[str, set[str]]] = defaultdict(
+            lambda: defaultdict(set)
+        )
         identifiers: Counter[str] = Counter()
         formats: Counter[str] = Counter()
         examples: Counter[str] = Counter()
-        for number, (kind, row, source) in enumerate(records(inventory)):
+        for kind, row, source in records(inventory):
             pin = inventory["files"][source]
             raw = dict(row)
+            raw["snapshot"] = dict(file=source, sha256=pin["sha256"])
             row.update(source_url=pin["url"], retrieved_at=pin["retrieved_at"])
             decorated = decorate(
                 row,
                 "plates",
-                f"{source}#{number}",
+                f"{source}#{kind}#{fingerprint(raw)}",
                 pin,
                 inventory["source_release"],
                 raw,
@@ -66,6 +77,7 @@ def normalize(workspace: Workspace) -> None:
                 source_codes[country][source].add(row["code"])
                 if row["series_status"] == "current":
                     current[country].add(row["code"])
+                    current_sources[country][source].add(row["code"])
                 identifiers["wikidata"] += bool(row.get("wikidata_id"))
                 identifiers["coordinates"] += row.get("latitude") is not None
             elif kind == "plate_survey":
@@ -92,6 +104,12 @@ def normalize(workspace: Workspace) -> None:
             distinct_country_codes=sum(map(len, distinct.values())),
             distinct_code_strings=len(set().union(*distinct.values())),
             cross_checks=_comparisons(source_codes),
+            current_series_cross_checks=_comparisons(current_sources),
+            reviewed_scopes=reviewed_scopes(source_codes, current_sources),
+            per_source_codes={
+                cc: {source: len(codes) for source, codes in data.items()}
+                for cc, data in source_codes.items()
+            },
         )
         summary = publish_report(workspace, "plates", report)
         licenses = workspace.normalized("plates") / f"licenses-{digest}.json"
@@ -123,10 +141,7 @@ def normalize(workspace: Workspace) -> None:
             [summary, licenses, *sorted(DATA.glob("*.json"))],
             config,
         )
-        print(
-            json.dumps({k: v for k, v in report.items() if k != "cross_checks"}),
-            flush=True,
-        )
+        print(json.dumps(dict(output_rows=dict(rows), report=str(summary))), flush=True)
 
 
 def _comparisons(sources: dict[str, dict[str, set[str]]]) -> list[Row]:

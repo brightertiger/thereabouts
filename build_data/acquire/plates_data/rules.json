@@ -373,7 +373,7 @@
       "skip_rows": 1,
       "code_suffix_column": 3,
       "suffix_pattern": "\\b[A-Z]\\b",
-      "exclude": "Reserved|reserved|Personal|personal|Not used|not used",
+      "exclude": "Reserved|reserved|Personal|personal|Not used|not used|Only issued with approval",
       "valid_from": "2001-09-01"
     },
     {
@@ -484,7 +484,9 @@
       "series_status": "current",
       "skip_rows": 2,
       "exclude": "Military|Government|Trailer",
-      "historic_pattern": "Exhausted"
+      "historic_pattern": "Exhausted in (?:2004|2016|2018|2023|2026)|replaced",
+      "unknown_pattern": "Exhausted in 2027",
+      "name_split": " and "
     },
     {
       "parser": "table",
@@ -2428,7 +2430,7 @@
         5
       ],
       "section_pattern": "Kewilayahan",
-      "item_pattern": "(?P<name>[^():]+)\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
+      "item_pattern": "(?P<name>[^():]+)\\s*:?\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
       "code_pattern": "[A-Z]{1,2}",
       "unit_kind": "regency_or_city",
       "series_status": "current",
@@ -2441,7 +2443,7 @@
         6
       ],
       "section_pattern": "Kewilayahan",
-      "item_pattern": "(?P<name>[^():]+)\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
+      "item_pattern": "(?P<name>[^():]+)\\s*:?\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
       "code_pattern": "[A-Z]{1,2}",
       "unit_kind": "regency_or_city",
       "series_status": "current",
@@ -2478,7 +2480,7 @@
           7
         ]
       ],
-      "code_pattern": "[一-鿿ぁ-ゖァ-ヺ]{1,6}",
+      "code_pattern": "^[一-鿿ぁ-ゖァ-ヺ]{1,6}",
       "unit_kind": "registration_office_seat",
       "series_status": "current",
       "series_id": "local-marking",
@@ -2499,7 +2501,8 @@
       "unit_kind": "registration_office_seat",
       "series_status": "historic",
       "series_id": "former-local-marking",
-      "name_language": "ja"
+      "name_language": "ja",
+      "code_exclude": "地名なし"
     }
   ],
   "wiki-IR-local.json": [
@@ -2545,6 +2548,131 @@
       "unit_kind": "island",
       "series_status": "current",
       "series_id": "island"
+    }
+  ],
+  "th-gazette.pdf": [
+    {
+      "parser": "text",
+      "start": "ตารางการใช้รหัสจังหวัด",
+      "stop": "หมายเหตุ",
+      "item_pattern": "(?P<name>[ก-๛]+)\\s+(?P<codes>[0-9]{2,3})(?![0-9])",
+      "code_pattern": "[0-9]{2,3}",
+      "unit_kind": "province_or_registration_district",
+      "series_status": "current",
+      "valid_from": "2023-06-27",
+      "series_id": "international-special-2023",
+      "name_language": "th"
+    }
+  ],
+  "jp-codes.pdf": [
+    {
+      "parser": "fixed",
+      "start": "ナンバープレート表示",
+      "code_slice": [
+        7,
+        20
+      ],
+      "name_slice": [
+        7,
+        20
+      ],
+      "code_line_pattern": "[一-鿿ぁ-ヺ]{1,6}",
+      "code_pattern": "[一-鿿ぁ-ヺ]{1,6}",
+      "unit_kind": "registration_area",
+      "series_status": "current",
+      "series_id": "MLIT-regional-marking",
+      "name_language": "ja",
+      "exclude_lines": "発出元|作成日|ナンバープレート"
+    }
+  ],
+  "wiki-ML-fr.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Sigles des régions",
+      "item_pattern": "(?P<codes>[A-Z]{3}) : (?P<name>.+)",
+      "code_pattern": "[A-Z]{3}",
+      "name_language": "fr",
+      "unit_kind": "region",
+      "series_status": "current",
+      "series_id": "source-described"
+    }
+  ],
+  "wiki-MA-fr.json": [
+    {
+      "parser": "ordered_list",
+      "section_pattern": "Liste des numéros",
+      "item_pattern": "(?P<codes>[0-9]{1,2}) (?P<name>.+)",
+      "code_pattern": "[0-9]{1,2}",
+      "name_language": "fr",
+      "unit_kind": "prefecture",
+      "series_status": "current",
+      "series_id": "source-described"
+    }
+  ],
+  "wiki-LS-pl.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Kody literowe",
+      "item_pattern": "(?P<codes>[A-K]) – (?P<name>.+)",
+      "code_pattern": "[A-K]",
+      "name_language": "pl",
+      "unit_kind": "district",
+      "series_status": "current",
+      "series_id": "source-described"
+    }
+  ],
+  "wiki-ET-fr.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Système",
+      "item_pattern": "(?P<codes>[A-Z]{2}) : (?P<name>.+)",
+      "code_pattern": "[A-Z]{2}",
+      "name_language": "fr",
+      "unit_kind": "region",
+      "series_status": "unknown",
+      "series_id": "source-described"
+    }
+  ],
+  "wiki-world.json": [
+    {
+      "parser": "text",
+      "country_code": "PK",
+      "item_pattern": "(?P<codes>[A-Z]{2})[A-Z]?\\s+(?:[0-9]{2} )?[0-9]{4}, is a vehicle registered in (?P<name>[^,]+), Punjab",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "registration_city",
+      "series_status": "historic",
+      "series_id": "Punjab-district",
+      "valid_to": "2020",
+      "subdivision_scope": "PK-PB"
+    }
+  ],
+  "wiki-SH-resolved.json": [
+    {
+      "parser": "text",
+      "item_pattern": "(?P<name>Ascension Island) plates are similar to those of Saint Helena but start with an '(?P<codes>A)'",
+      "code_pattern": "A",
+      "unit_kind": "island",
+      "series_status": "current",
+      "series_id": "island"
+    }
+  ],
+  "wiki-JO.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          3,
+          0
+        ]
+      ],
+      "code_pattern": "^AQ$",
+      "unit_kind": "free_trade_zone",
+      "series_status": "current",
+      "series_id": "aqaba-special",
+      "valid_from": "2025-08"
     }
   ]
 }

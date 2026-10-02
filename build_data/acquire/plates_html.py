@@ -49,12 +49,15 @@ class Document(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.tables: list[Table] = []
         self.items: list[tuple[str, str]] = []
+        self.ordered_items: list[tuple[str, str]] = []
         self.fragments: list[str] = []
         self.headings: dict[int, str] = {}
         self._heading: tuple[int, list[str]] | None = None
         self._tables: list[Table] = []
         self._cells: list[Cell | None] = []
         self._items: list[tuple[str, list[str]]] = []
+        self._list_numbers: list[int | None] = []
+        self._item_numbers: list[int | None] = []
         self._skip = 0
         self.feed(html)
 
@@ -89,8 +92,19 @@ class Document(HTMLParser):
                 self._tables[-1].rows.append([])
             self._tables[-1].rows[-1].append(cell)
             self._cells[-1] = cell
+        elif tag in ("ol", "ul"):
+            self._list_numbers.append(
+                int(attributes.get("start") or 1)
+                if tag == "ol" and attributes.get("type", "1") == "1"
+                else None
+            )
         elif tag == "li":
             self._items.append((self.section, []))
+            number = self._list_numbers[-1] if self._list_numbers else None
+            if number is not None:
+                number = int(attributes.get("value") or number)
+                self._list_numbers[-1] = number + 1
+            self._item_numbers.append(number)
         if tag in ("br", "p", "li", "tr", "td", "th", "div"):
             self.handle_data("\n")
         if tag == "a" and self._cells and self._cells[-1] is not None:
@@ -114,7 +128,13 @@ class Document(HTMLParser):
             self._cells[-1] = None
         if tag == "li" and self._items:
             section, fragments = self._items.pop()
-            self.items.append((section, clean_text("".join(fragments))))
+            text = clean_text("".join(fragments))
+            self.items.append((section, text))
+            number = self._item_numbers.pop()
+            if number is not None:
+                self.ordered_items.append((section, f"{number} {text}"))
+        if tag in ("ol", "ul") and self._list_numbers:
+            self._list_numbers.pop()
 
     def handle_data(self, data: str) -> None:
         if self._skip:

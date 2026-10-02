@@ -67,7 +67,7 @@
       "code_position": "first one or two letters",
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "nsurance\\ operator\\ Jasa\\ Raharja\\ \\.\\ Registration\\ area\\ codes\\ \\[\\ edit\\ \\]\\ The\\ lettering\\ convention\\ denoting\\ the\\ area\\ of\\ registration\\ is\\ a\\ legacy\\ of\\ the\\ Dutch\\ colonial\\ era\\ and\\ does\\ not\\ reflect\\ the\\ current\\ regional\\ divisions\\ of\\ the\\ country\\ into\\ provinces\\.\\ They\\ follow\\ ",
-      "examples_pattern": "(?<![A-Z0-9])(?P<code>[A-Z]{1,2})[ -]?[1-9][0-9]{0,3}[ -]?[A-Z]{0,3}(?![A-Z0-9])",
+      "examples_pattern": "B\\ 1945\\ PKL|B\\ 2814\\ SSP|B\\ 2309\\ LKV",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": null
     }
@@ -155,7 +155,7 @@
       "code_position": "leading one/two letters; Sarawak and Sabah vary",
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "t\\ and\\ the\\ first\\ alphabetical\\ sequence\\ progressed;\\ resuming\\ at\\ PBA\\ 1\\ \\.\\ Registration\\ plates\\ of\\ Peninsular\\ Malaysia\\ Prefix\\ \\(\\ x\\ \\)\\ State\\ Current\\ Plate\\ Current\\ Bidding\\ Plate\\ A\\ Perak\\ APL\\ APP\\ B\\ Selangor\\ BSU\\ BSY\\ C\\ Pahang\\ CFH\\ CFJ\\ D\\ Kelantan\\ DFS\\ DFS\\ F\\ Putrajaya\\ FH\\ FH\\ J\\ Joh",
-      "examples_pattern": "(?<![A-Z0-9])(?P<code>Q[A-Z]|S[A-Z])[A-Z]? ?[1-9][0-9]{0,3} ?[A-Z]?(?![A-Z0-9])",
+      "examples_pattern": "(?<![A-Z0-9])(?P<code>Q[A-Z]|S[A-Z])[A-Z]? ?[1-9][0-9]{0,3}(?: [A-Z])?(?![A-Z0-9])",
       "notes": "Sarawak/Sabah prefix scope; historic positional variants are incomplete.",
       "valid_to": null
     }
@@ -858,7 +858,7 @@
       "code_position": "historic province prefix/suffix",
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "\\ a\\ defined\\ format\\ \\(2\\ letters,\\ 3\\ numbers,\\ and\\ then\\ 2\\ letters\\)\\ which\\ is\\ issued\\ nationwide,\\ regardless\\ of\\ the\\ local\\ registration\\ office\\.\\ Starting\\ from\\ 7\\ February\\ 1999,\\ this\\ format\\ was\\ slightly\\ redesigned,\\ adding\\ a\\ blue\\ strip\\ on\\ the\\ left\\ containing\\ the\\ EU\\ flag\\ above\\ the\\ country\\ code\\ I\\ ",
-      "examples_pattern": "(?<![A-Z0-9])(?P<code>[A-Z]{2}|Roma)[ -]?[A-Z0-9]{5,6}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": "1994"
     }
@@ -1045,7 +1045,7 @@
       "code_position": "old leading letters",
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "the\\ present\\ system\\.\\ From\\ 1906,\\ a\\ new\\ system\\ used\\ the\\ format\\ xx\\-ddddd,\\ where\\ xx\\ was\\ a\\ province\\ code\\ and\\ ddddd\\ a\\ serial\\ number\\.\\ This\\ system\\ lasted\\ until\\ 1951\\ when\\ the\\ current\\ system\\ was\\ introduced\\.\\ Province\\ codes\\ \\[\\ edit\\ \\]\\ A:\\ Groningen\\ B:\\ Friesland\\ D:",
-      "examples_pattern": "(?<![A-Z0-9])(?P<code>[A-Z]{1,2})[- ]?[0-9]{1,5}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": "1951"
     }
@@ -1193,7 +1193,7 @@
       "code_position": null,
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "ation\\ plate\\ from\\ 2010\\ Country\\ Bahrain\\ Country\\ code\\ BRN\\ Current\\ series\\ Serial\\ format\\ 123456\\ Introduced\\ 2010\\ Vehicle\\ registration\\ plates\\ of\\ Bahrain\\ have\\ the\\ Flag\\ of\\ Bahrain\\ and\\ the\\ country's\\ name\\ in\\ Arabic\\ and\\ Latin\\ script\\.\\ Special\\ vehicles,\\ ",
-      "examples_pattern": "(?<![A-Z0-9])[0-9]{1,6}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": null
     }
@@ -1283,7 +1283,7 @@
       "code_position": null,
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "None\\ Current\\ series\\ Slogan\\ None\\ Size\\ 372\\ mm\\ ×\\ 134\\ mm\\ 14\\.6\\ in\\ ×\\ 5\\.3\\ in\\ Serial\\ format\\ 1234\\ Niue\\ requires\\ its\\ residents\\ to\\ register\\ their\\ motor\\ vehicles\\ and\\ display\\ vehicle\\ registration\\ plates\\ \\.\\ Current\\ plates\\ are\\ New\\ Zealand\\ standard\\ 360\\ mm",
-      "examples_pattern": "(?<![A-Z0-9])[0-9]{1,4}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": null
     }
@@ -1298,7 +1298,7 @@
       "code_position": null,
       "normalization": "Unicode NFC, trim outer whitespace; retain original script and separators",
       "evidence_pattern": "es\\ with\\ distinctive\\ licence\\ plates\\ which\\ are\\ white\\ with\\ blue\\ figures,\\ usually\\ a\\ letter\\ followed\\ by\\ up\\ to\\ four\\ numbers\\.\\ To\\ the\\ left\\ of\\ these\\ figures\\ is\\ displayed\\ the\\ national\\ coat\\ of\\ arms\\ of\\ San\\ Marino\\ \\.\\ Custom\\ licence\\ plates\\ were\\ offered\\ starting\\ in\\ 2004\\.\\ In\\ 2023,\\ th",
-      "examples_pattern": "(?<![A-Z0-9])[A-Z]?[0-9]{1,4}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Ordinary syntactic candidate only. Check known codes and series dates; exclusions, validity, and issuance are not fully encoded. Source examples may be illustrative specimens.",
       "valid_to": null
     }
@@ -1388,7 +1388,7 @@
       "code_position": "first two digits",
       "normalization": "Unicode NFC; trim outer whitespace",
       "evidence_pattern": "First\\ two\\ digits\\ indicating\\ the\\ province\\ code:\\ Code\\ Province\\ Code\\ Province\\ Code\\ Province\\ 01\\ Adana\\ 28\\ Giresun\\ 55\\ Samsun\\ 02\\ Adıyaman\\ 29\\ Gümüşhane\\ 56\\ Siirt\\ 03\\ Afyonkarahisar\\ 30\\ Hakkari\\ 57\\ Sinop\\ 04\\ Ağrı\\ 31\\ Hatay\\ 58\\ Sivas\\ 05\\ Amasya\\ 32\\ Isparta\\ 59\\ Tekirdağ\\ 06\\ Ankara\\ 33\\ Mersin\\ 60\\ Tokat\\ 07\\ Antalya\\ 34\\ İstanbul\\ 61\\ Trabzon\\ 08\\ Artvin\\ 35\\ İzmir\\ 62\\ Tunceli\\ 09\\ Aydın\\ 36\\ Kars\\ 63\\ Şanlıurfa\\ 10\\ Balıkesir\\ 37\\ Kastamonu\\ 64\\ Uşak\\ 11\\ Bilecik\\ 38\\ Kayseri\\ 65\\ Van\\ 12\\ Bingöl\\ 39\\ Kırklareli\\ 66\\ Yozgat\\ 13\\ Bitlis\\ 40\\ Kırşehir\\ 67\\ Zonguldak\\ 14\\ Bolu\\ 41\\ Kocaeli\\ 68\\ Aksaray\\ 15\\ Burdur\\ 42\\ Konya\\ 69\\ Bayburt\\ 16\\ Bursa\\ 43\\ Kütahya\\ 70\\ Karaman\\ 17\\ Çanakkale\\ 44\\ Malatya\\ 71\\ Kırıkkale\\ 18\\ Çankırı\\ 45\\ Manisa\\ 72\\ Batman\\ 19\\ Çorum\\ 46\\ Kahramanmaraş\\ 73\\ Şırnak\\ 20\\ Denizli\\ 47\\ Mardin\\ 74\\ Bartın\\ 21\\ Diyarbakır\\ 48\\ Muğla\\ 75\\ Ardahan\\ 22\\ Edirne\\ 49\\ Muş\\ 76\\ Iğdır\\ 23\\ Elazığ\\ 50\\ Nevşehir\\ 77\\ Yalova\\ 24\\ Erzincan\\ 51\\ Niğde\\ 78\\ Karabük\\ 25\\ Erzurum\\ 52\\ Ordu\\ 79\\ Kilis\\ 26\\ Eskişehir\\ 53\\ Rize\\ 80\\ Osmaniye\\ 27\\ Gaziantep\\ 54\\ Sakarya\\ 81\\ Düzce\\ Province\\ names\\ until\\ code\\ 67\\ go\\ alphabetically,\\ with\\ the\\ exception\\ of\\ Mersin,\\ Kahramanmaraş\\ and\\ Şanlıurfa\\ provinces\\ for\\ their\\ previous\\ names\\ taken\\ in\\ account\\ were\\ İçel,\\ Maraş\\ and\\ Urfa,\\ respectively",
-      "examples_pattern": "(?<![A-Z0-9])(?P<code>[0-9]{2})[ -]?[A-Z]{1,3}[ -]?[0-9]{2,5}(?![A-Z0-9])",
+      "examples_pattern": "(?!)",
       "notes": "Conservative syntax candidate; source-written examples may be specimens. Requires code-list membership and exceptions."
     }
   ],
@@ -1404,6 +1404,819 @@
       "evidence_pattern": "Vehicle\\ registration\\ plates\\ of\\ Poland\\ indicate\\ the\\ region\\ of\\ registration\\ of\\ the\\ vehicle\\ given\\ the\\ number\\ plate",
       "examples_pattern": "(?<![A-Z0-9])(?P<code>[A-Z]{2,3})[ -][A-Z0-9]{4,5}(?![A-Z0-9])",
       "notes": "Conservative syntax candidate; source-written examples may be specimens. Requires code-list membership and exceptions."
+    }
+  ],
+  "AR": [
+    {
+      "source": "wiki-AR.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2} [0-9]{3} [A-Z]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\ 123\\ CD",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "AS": [
+    {
+      "source": "wiki-AS.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "AW": [
+    {
+      "source": "wiki-AW.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "A ?[0-9]{1,5}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ A\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "BA": [
+    {
+      "source": "wiki-BA.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z][0-9]{2}-[A-Z]-[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ A12\\-B\\-345",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "BO": [
+    {
+      "source": "wiki-BO.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{3,4}[A-Z]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234ABC",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CI": [
+    {
+      "source": "wiki-CI.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}[- ]?[0-9]{3}[- ]?[A-Z]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Registration\\ plates\\ issued\\ from\\ 1\\ June\\ 2023\\ use\\ a\\ XX\\-NNN\\-ZZ\\ format\\ ,\\ composed\\ of\\ a\\ series\\ of\\ 7\\ alphanumeric\\ characters:\\ 2\\ letters,\\ 3\\ numbers,\\ and\\ then\\ 2\\ letters\\ \\(e",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CK": [
+    {
+      "source": "wiki-CK-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CL": [
+    {
+      "source": "wiki-CL.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2} [A-Z]{2} [0-9]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\ CD\\ 12",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CR": [
+    {
+      "source": "wiki-CR.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3}-[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ ABC\\-123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CU": [
+    {
+      "source": "wiki-CU.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z] [0-9]{3} [0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ P\\ 123\\ 456",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "CW": [
+    {
+      "source": "wiki-CW.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z] [0-9]{2}-[0-9]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ A\\ 12\\-34",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "EE": [
+    {
+      "source": "wiki-EE.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{3} [A-Z]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 123\\ ABC",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "FI": [
+    {
+      "source": "wiki-FI.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2,3}-[0-9]{1,3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Since\\ 1989\\ the\\ code\\ has\\ no\\ connection\\ with\\ the\\ geographic\\ location,\\ except\\ that\\ Åland\\ has\\ its\\ own\\ type\\ of\\ plate",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "FJ": [
+    {
+      "source": "wiki-FJ.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}[- ]?[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\ 123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "FM": [
+    {
+      "source": "wiki-FM.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GA": [
+    {
+      "source": "wiki-GA.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}-[0-9]{3}-[A-Z]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\-123\\-CD",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GD": [
+    {
+      "source": "wiki-GD.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3}[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ ABC123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GE": [
+    {
+      "source": "wiki-GE-country.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}-[0-9]{3}-[A-Z]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\-123\\-CD",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "HK": [
+    {
+      "source": "wiki-HK.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2} ?[1-9][0-9]{0,3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "standard\\ format\\ for\\ these\\ vehicles\\ is\\ \"XX\\ \\(\\#\\)\\#\\#\\#\",\\ where\\ 'XX'\\ are\\ two\\ letters\\ from\\ the\\ Latin\\ alphabet\\ ,\\ and\\ '\\(\\#\\)\\#\\#\\#'\\ is\\ a\\ sequence\\ of\\ between\\ three\\ and\\ four\\ digits",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "IL": [
+    {
+      "source": "wiki-IL.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{3}-[0-9]{2}-[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Current\\ civil\\ registration\\ numbers\\ \\(since\\ July\\ 2017\\)\\ consist\\ of\\ eight\\ digits,\\ separated\\ by\\ dashes\\ between\\ the\\ third\\ and\\ fourth\\ digits\\ and\\ between\\ the\\ fifth\\ and\\ sixth\\ digits\\ \\(XXX\\-XX\\-X\\ XX\\ \\)",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "KI": [
+    {
+      "source": "wiki-KI.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3} [0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ ABC\\ 123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "KW": [
+    {
+      "source": "wiki-KW.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{2}-[0-9]{5}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 12\\-45678",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "LI": [
+    {
+      "source": "wiki-LI.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "FL ?[1-9][0-9]{0,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "letters\\ FL\\ ,\\ standing\\ for\\ Fürstentum\\ Liechtenstein\\ ,\\ followed\\ by\\ the\\ small\\ version\\ of\\ the\\ coat\\ of\\ arms\\ of\\ Liechtenstein\\ and\\ up\\ to\\ five\\ digits",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "LU": [
+    {
+      "source": "wiki-LU.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2} [0-9]{4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "LV": [
+    {
+      "source": "wiki-LV.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}-[1-9][0-9]{0,3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "consist\\ of\\ two\\ letters\\ \\(trailers\\ plates\\ have\\ one\\ letter\\),\\ a\\ hyphen\\ and\\ one\\ to\\ four\\ numbers\\ \\(depending\\ on\\ the\\ age\\ of\\ registration\\)\\ ,\\ e",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "MH": [
+    {
+      "source": "wiki-MH-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "NR": [
+    {
+      "source": "wiki-NR.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3} [0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AAA\\ 123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "OM": [
+    {
+      "source": "wiki-OM.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4} [A-Z]{1,2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1\\(234\\)\\ A\\(B\\)",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "PA": [
+    {
+      "source": "wiki-PA.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}[0-9]{4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "AB1234\\ format\\ began",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "PR": [
+    {
+      "source": "wiki-PR.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3} [0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ ABC\\ 123",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "QA": [
+    {
+      "source": "wiki-QA.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,6}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 123\\(45\\)",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "SX": [
+    {
+      "source": "wiki-SX.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z] ?[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ A\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "TV": [
+    {
+      "source": "wiki-TV.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}[0-9]{4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "TZ": [
+    {
+      "source": "wiki-TZ.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "T ?[0-9]{3}[A-Z]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ T\\ 123ABC",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "WS": [
+    {
+      "source": "wiki-WS.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ 1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "MT": [
+    {
+      "source": "wiki-MT.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{3} ?[0-9]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "XXX999\\ format",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "SR": [
+    {
+      "source": "wiki-SR.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "P[A-Z] ?[0-9]{4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Configuration\\ is\\ two\\ letters\\ and\\ four\\ numbers\\ where\\ first\\ letter\\ is\\ always\\ letter\\ P",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "BW": [
+    {
+      "source": "wiki-BW.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "B ?[0-9]{3} ?[A-PR-Z]{3}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "begin\\ with\\ the\\ letter\\ B,\\ followed\\ by\\ three\\ digits,\\ followed\\ by\\ three\\ letters",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "MO": [
+    {
+      "source": "wiki-MO.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "M[A-Z]?-[0-9]{2}-[0-9]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ MA\\-12\\-34",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "VG": [
+    {
+      "source": "wiki-VG.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "PV ?[0-9]{5}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "sequenced\\ 'PV'\\ followed\\ by\\ five\\ digits",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "AX": [
+    {
+      "source": "wiki-AX-local.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "ÅL[A-Z]? ?[0-9]{1,5}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "mit\\ ÅL\\ beginnt",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "AO": [
+    {
+      "source": "wiki-AO.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z]{3})-[0-9]{2}-[0-9]{2}-[A-Z]{2}",
+      "code_group": "code",
+      "code_position": "first three letters",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "ABC\\ being\\ the\\ regional\\ code",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "BT": [
+    {
+      "source": "wiki-BT.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z]{2}-(?P<code>[0-9])-[A-Z][0-9]{4}",
+      "code_group": "code",
+      "code_position": "digit after vehicle type",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Serial\\ format\\ AB\\-1\\-C1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GQ": [
+    {
+      "source": "wiki-GQ.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z]{2})-[0-9]{3}-[A-Z]",
+      "code_group": "code",
+      "code_position": "first two letters",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "AB\\ being\\ the\\ regional\\ code",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GM": [
+    {
+      "source": "wiki-GM-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z]{2,3})-[0-9]{4}-[A-Z]",
+      "code_group": "code",
+      "code_position": "first two/three letters",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "XXX\\ or\\ XX\\ indicate\\ the\\ three\\ or\\ two\\ letter\\ regional\\ code",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GW": [
+    {
+      "source": "wiki-GW-local.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z]{2}) ?[0-9]{1,4}",
+      "code_group": "code",
+      "code_position": "first two letters",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "zwei\\ Buchstaben\\ für\\ die\\ Region",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "PS": [
+    {
+      "source": "wiki-PS.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]-[0-9]{4}-(?P<code>[A-N])",
+      "code_group": "code",
+      "code_position": "last letter (West Bank)",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "last\\ letter\\ in\\ the\\ number\\ will\\ be\\ determined",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "VI": [
+    {
+      "source": "wiki-VI.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z])[A-Z]{2} [0-9]{3}",
+      "code_group": "code",
+      "code_position": "first letter",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "coded\\ by\\ island\\ of\\ issuance",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "PG": [
+    {
+      "source": "wiki-PG.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "(?P<code>[A-Z])[A-Z]{2} [0-9]{3}",
+      "code_group": "code",
+      "code_position": "first letter",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "first\\ letter\\ identifying\\ the\\ province",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "GG": [
+    {
+      "source": "wiki-GG.json",
+      "series_id": "Alderney",
+      "series_status": "current",
+      "pattern": "(?P<code>AY) [0-9]{1,4}",
+      "code_group": "code",
+      "code_position": "initial AY",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "Alderney\\ are\\ issued\\ with\\ the\\ prefix\\ 'AY'",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate; this grammar is not an issuance validator. Unlisted historical/special layouts remain gaps."
+    }
+  ],
+  "US": [
+    {
+      "source": "wiki-US-ID.json",
+      "series_id": "Idaho-county-1945",
+      "series_status": "current",
+      "pattern": "(?P<code>[1-9]?[A-Z]) ?[A-Z0-9]{1,6}",
+      "code_group": "code",
+      "code_position": "initial county code",
+      "normalization": "Unicode NFC; trim outer whitespace; retain script and internal separators",
+      "evidence_pattern": "County\\ coding",
+      "examples_pattern": "(?!)",
+      "notes": "Idaho ordinary county series only. Requires US-ID jurisdiction and code membership; other US states are not described by this rule.",
+      "subdivision_scope": "US-ID"
+    }
+  ],
+  "BL": [
+    {
+      "source": "wiki-BL-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{2,3} [A-Z]{1,2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace",
+      "evidence_pattern": "Serial\\ format\\ 12\\(3\\)\\ A\\(B\\)",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate. Geographic applicability and completeness are not established."
+    }
+  ],
+  "KM": [
+    {
+      "source": "wiki-KM-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{4} [A-Z] [0-9]{2}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace",
+      "evidence_pattern": "Serial\\ format\\ 1234\\ A\\ 56",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate. Geographic applicability and completeness are not established."
+    }
+  ],
+  "VC": [
+    {
+      "source": "wiki-VC-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[A-Z][0-9]{1,4}",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace",
+      "evidence_pattern": "Serial\\ format\\ A1234",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate. Geographic applicability and completeness are not established."
+    }
+  ],
+  "WF": [
+    {
+      "source": "wiki-WF-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[0-9]{1,4} WF",
+      "code_group": null,
+      "code_position": null,
+      "normalization": "Unicode NFC; trim outer whitespace",
+      "evidence_pattern": "Serial\\ format\\ 1234\\ WF",
+      "examples_pattern": "(?!)",
+      "notes": "Source-described syntax candidate. Geographic applicability and completeness are not established."
+    }
+  ],
+  "TT": [
+    {
+      "source": "wiki-TT-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "[PDHRVXT][A-Z]{0,2} ?[1-9][0-9]{0,3}",
+      "code_group": null,
+      "code_position": "none",
+      "normalization": "Unicode NFC, trim outer whitespace; retain script and separators",
+      "evidence_pattern": "Each\\ registration\\ number\\ begins\\ with\\ a\\ letter\\ designating\\ the\\ class\\ of\\ vehicle",
+      "examples_pattern": "PAA 1|PAA 9999",
+      "notes": "Candidate ordinary syntax only; source specimens are illustrative, not authenticated live vehicles. No subnational geographic code."
+    }
+  ],
+  "SB": [
+    {
+      "source": "wiki-SB.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "M[A-Z]-[0-9]{4}",
+      "code_group": null,
+      "code_position": "none",
+      "normalization": "Unicode NFC, trim outer whitespace; retain script and separators",
+      "evidence_pattern": "MA\\-0000\\ to\\ MA\\-9999,\\ then\\ MB\\-0000\\ onwards",
+      "examples_pattern": "MA-0000|MA-9999|MB-0000",
+      "notes": "Candidate ordinary syntax only; source specimens are illustrative, not authenticated live vehicles. No subnational geographic code."
+    }
+  ],
+  "ST": [
+    {
+      "source": "wiki-ST-resolved.json",
+      "series_id": "ordinary",
+      "series_status": "current",
+      "pattern": "STP-[0-9]{2}-[0-9]{2}[A-Z]{1,2}",
+      "code_group": null,
+      "code_position": "none",
+      "normalization": "Unicode NFC, trim outer whitespace; retain script and separators",
+      "evidence_pattern": "The\\ current\\ standard\\ has\\ the\\ form\\ «STP\\-12\\-34AA»",
+      "examples_pattern": "STP-12-34AA",
+      "notes": "Candidate ordinary syntax only; source specimens are illustrative, not authenticated live vehicles. No subnational geographic code."
     }
   ]
 }

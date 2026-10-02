@@ -11,6 +11,7 @@ Row = dict[str, Any]
 
 def codes(value: str, rule: Row) -> list[str]:
     """Expand only source-written numeric intervals when explicitly enabled."""
+    value = value.strip()
     if rule.get("alpha_ranges"):
 
         def alphabetic(match: re.Match[str]) -> str:
@@ -51,7 +52,13 @@ def codes(value: str, rule: Row) -> list[str]:
             return ", ".join(str(n).zfill(len(left)) for n in range(start, end + 1))
 
         value = re.sub(r"(\d+)\s*(?:[-\u2013\u2014]|to|đến)\s*(\d+)", expand, value)
-    return list(dict.fromkeys(m[0] for m in re.finditer(rule["code_pattern"], value)))
+    return list(
+        dict.fromkeys(
+            m[0]
+            for m in re.finditer(rule["code_pattern"], value)
+            if not re.fullmatch(rule.get("code_exclude", r"(?!)"), m[0])
+        )
+    )
 
 
 def _row(code: str, name: str, raw: str, rule: Row, locator: str) -> Row:
@@ -133,7 +140,7 @@ def table_rows(doc: Document, rule: Row) -> Iterator[Row]:
 
 
 def list_rows(doc: Document, rule: Row) -> Iterator[Row]:
-    items = doc.items
+    items = doc.ordered_items if rule.get("parser") == "ordered_list" else doc.items
     if rule.get("parser") == "cell_lines":
         items = [
             (doc.tables[i].section, clean_text(line))
@@ -167,7 +174,15 @@ def list_rows(doc: Document, rule: Row) -> Iterator[Row]:
 
 def text_rows(doc: Document, rule: Row) -> Iterator[Row]:
     """Extract explicit prose pairs; policy must capture both code and place."""
-    for match in re.finditer(rule["item_pattern"], doc.text):
+    yield from regex_rows(doc.text, rule)
+
+
+def regex_rows(text: str, rule: Row) -> Iterator[Row]:
+    if rule.get("start"):
+        text = text[text.index(rule["start"]) :]
+    if rule.get("stop"):
+        text = text[: text.index(rule["stop"])]
+    for match in re.finditer(rule["item_pattern"], text):
         for code in codes(match["codes"], rule):
             yield _row(code, match["name"], match[0], rule, f"text:{match.start()}")
 

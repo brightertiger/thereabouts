@@ -4,13 +4,14 @@ import csv
 import json
 import re
 from collections.abc import Iterator
+from html import escape
 from pathlib import Path
 from typing import Any
 
 from .plates_config import policy
 from .plates_html import Document
 from .plates_http import wiki_document
-from .plates_rules import evidence, list_rows, table_rows, text_rows
+from .plates_rules import evidence, list_rows, regex_rows, table_rows, text_rows
 from .plates_schemas import PlateKind
 from .plates_text import fixed_rows, pdf_text
 from .plates_wikidata import rows as wikidata_rows
@@ -20,6 +21,10 @@ Row = dict[str, Any]
 
 def document(pin: Row) -> Document:
     path = Path(pin["path"])
+    if pin["kind"] == "pdf":
+        return Document(escape(pdf_text(path)))
+    if pin["kind"] != "wikipedia":
+        return Document(path.read_text(encoding=pin.get("encoding", "utf-8")))
     html, revision = wiki_document(path)
     if revision != pin["revision"]:
         raise ValueError("Wrong Wikipedia revision")
@@ -109,26 +114,38 @@ def records(inventory: Row) -> Iterator[tuple[PlateKind, Row, str]]:
     for source, pin in inventory["files"].items():
         country = pin.get("country_code")
         if pin["kind"] == "wikidata":
-            for row in wikidata_rows(Path(pin["path"]), countries[country]):
+            for row in wikidata_rows(
+                Path(pin["path"]), countries[country], pin["retrieved_at"]
+            ):
                 row["country_code"] = country
                 yield "plate_codes", row, source
         if source not in rules:
             continue
         if pin["kind"] == "pdf":
+            text = pdf_text(Path(pin["path"]))
             for rule in rules[source]:
-                for row in fixed_rows(pdf_text(Path(pin["path"])), rule):
-                    row["country_code"] = country
+                pdf_parser = regex_rows if rule["parser"] == "text" else fixed_rows
+                count = 0
+                for row in pdf_parser(text, rule):
+                    count += 1
+                    row["country_code"] = rule.get("country_code", country)
                     yield "plate_codes", row, source
+                if not count:
+                    raise ValueError(f"PDF rule extracted no records: {source}")
             continue
         doc = document(pin)
         seen: set[str] = set()
         for rule in rules[source]:
-            parser = {"table": table_rows, "text": text_rows}.get(
-                rule["parser"], list_rows
-            )
+            parser = {
+                "table": table_rows,
+                "text": text_rows,
+                "list": list_rows,
+                "cell_lines": list_rows,
+                "ordered_list": list_rows,
+            }[rule["parser"]]
             count = 0
             for row in parser(doc, rule):
-                row["country_code"] = country
+                row["country_code"] = rule.get("country_code", country)
                 key = json.dumps(
                     {
                         k: row.get(k)

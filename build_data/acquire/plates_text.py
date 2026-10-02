@@ -23,7 +23,7 @@ def pdf_text(path: Path) -> str:
 
 def fixed_rows(text: str, rule: dict[str, Any]) -> Iterator[dict[str, Any]]:
     start = text.index(rule["start"])
-    stop = text.index(rule["stop"], start)
+    stop = text.index(rule["stop"], start) if "stop" in rule else len(text)
     block = text[start:stop]
     exceptions: dict[str, str] = {}
     for pattern in rule.get("exceptions", []):
@@ -33,7 +33,13 @@ def fixed_rows(text: str, rule: dict[str, Any]) -> Iterator[dict[str, Any]]:
         exceptions[match["code"]] = " ".join(match["name"].split())
     name: str | None = None
     for i, line in enumerate(block.splitlines()):
-        code_text = line[rule["code_start"] :].strip()
+        if rule.get("exclude_lines") and re.search(rule["exclude_lines"], line):
+            continue
+        code_text = (
+            line[slice(*rule["code_slice"])]
+            if "code_slice" in rule
+            else line[rule["code_start"] :]
+        ).strip()
         if not re.fullmatch(rule["code_line_pattern"], code_text):
             continue
         candidate = line[slice(*rule["name_slice"])].strip()
@@ -45,7 +51,11 @@ def fixed_rows(text: str, rule: dict[str, Any]) -> Iterator[dict[str, Any]]:
                 continue
             yield dict(
                 code=code,
-                name_en=exceptions.get(code, name),
+                name_en=exceptions.get(code, name)
+                if rule.get("name_language", "en") == "en"
+                else None,
+                name_local=name if rule.get("name_language", "en") != "en" else None,
+                local_language=rule.get("name_language"),
                 unit_kind=rule["unit_kind"],
                 series_status=rule["series_status"],
                 series_id=rule["series_id"],

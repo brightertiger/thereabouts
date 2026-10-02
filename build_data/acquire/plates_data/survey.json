@@ -1520,14 +1520,14 @@
     "notes": "2023 national format replaced regional suffix; old codes need historical interpretation."
   },
   "LS": {
-    "source": "wiki-LS.json",
-    "classification": "historic_only",
+    "source": "wiki-LS-pl.json",
+    "classification": "usable_now",
     "unit_kind": "district",
-    "code_position": "historic first two letters",
-    "series": "ordinary; see exceptions",
+    "code_position": "first letter",
+    "series": "ordinary; see notes",
     "coverage_status": "partial",
-    "evidence_pattern": "\\[\\ edit\\ \\]\\ Period\\ following\\ independence:\\ LA\\ –\\ Maseru\\ LB\\ –\\ Butha\\ Buthe\\ LC\\ –\\ Leribe\\ LD\\ –\\ Teyateyaneng\\ LE\\ –\\ Mafeteng\\ LF\\ –\\ Mohales\\ Hoek\\ LG\\ –\\ Quthing\\ LH\\ –\\ Qacha's\\ Nek\\ LJ\\ –\\ Mokhotlong\\ Government:\\ LX",
-    "notes": "The cited district lists are historical; continuation of district meaning after removal of L is not established."
+    "evidence_pattern": "Obecny\\ format\\ tablic\\ to\\ L\\ 0000,\\ gdzie\\ L\\ to\\ litera\\ oznaczająca\\ dany\\ dystrykt\\ ,\\ a\\ 0\\ to\\ cyfra",
+    "notes": "Polish list explicitly describes current district letters; English page only gives older two-letter codes. Both generations retained."
   },
   "MA": {
     "source": "wiki-MA.json",
@@ -1948,5 +1948,207 @@
     "coverage_status": "partial",
     "evidence_pattern": "ial\\ on\\ white\\ plate\\ none\\ TC\\ 1234\\ TC12345\\ Red\\ serials\\ denote\\ private\\ vehicles\\ 2000\\ Embossed\\ red\\ serial\\ on\\ white\\ plate;\\ Coat\\ of\\ arms\\ symbols\\ in\\ each\\ corner;\\ slogan\\ embossed\\ at\\ top;\\ \"TURKS\\ \\&\\ CAICOS\\ ISLANDS\"\\ embossed\\ at\\ ",
     "notes": "No subnational component in the described ordinary serial. This is a series-level inference; earlier and special systems may differ."
+  },
+  "BF": {
+    "source": "wiki-world.json",
+    "classification": "usable_now",
+    "unit_kind": "province",
+    "code_position": "first digits",
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Burkina\\ Faso\\ passenger\\ plate\\ Vehicles\\ are\\ fitted\\ with\\ registration\\ plates\\ in\\ the\\ front\\ and\\ rear\\ of\\ the\\ vehicle\\.\\ Motorcycles\\ \\(50cc\\ or\\ more\\)\\ must\\ be\\ licensed\\ and\\ only\\ bear\\ rear\\ plates\\.\\ Registration\\ is\\ performed\\ at\\ the\\ local\\ police\\ or\\ Gendarmerie\\ station\\.\\ The\\ first\\ digits\\ of\\ the\\ plate\\ indicate\\ the\\ province\\ in\\ which\\ the\\ vehicle\\ is\\ registered",
+    "notes": "Applies to the source-described ordinary series; complete historical and special coverage remains unverified."
+  },
+  "ML": {
+    "source": "wiki-ML-fr.json",
+    "classification": "usable_now",
+    "unit_kind": "region_and_circle",
+    "code_position": "separate region abbreviation and circle/arrondissement number",
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "sigle\\ de\\ la\\ région\\ suivi\\ du\\ numéro\\ de\\ l’arrondissement\\ pour\\ le\\ district\\ de\\ Bamako\\ et\\ du\\ Cercle\\ pour\\ les\\ autres\\ régions\\ Le\\ drapeau\\ national\\ du\\ Mali\\ accompagné\\ de\\ la\\ mention\\ ML",
+    "notes": "2023/2024 series. Region abbreviations collected; circle-number mapping remains a gap."
+  },
+  "ET": {
+    "source": "wiki-ET-fr.json",
+    "classification": "unverified",
+    "unit_kind": "region",
+    "code_position": "letter group",
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Le\\ deux\\ dernières\\ lettres\\ signifie\\ la\\ région",
+    "notes": "French source describes regional plates; Ethiopian 2026 national redesign is not reconciled. Codes retained with unknown validity, not asserted current."
+  },
+  "SH": {
+    "source": "wiki-SH-resolved.json",
+    "classification": "usable_now",
+    "unit_kind": "island",
+    "code_position": "A for Ascension; TDC for Tristan",
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Ascension\\ Island\\ plates\\ are\\ similar\\ to\\ those\\ of\\ Saint\\ Helena\\ but\\ start\\ with\\ an\\ 'A'",
+    "notes": "Saint Helena itself uses a numeric ordinary serial; prefixes distinguish other islands in the territory."
+  },
+  "ZW": {
+    "source": "wiki-ZW.json",
+    "classification": "historic_only",
+    "unit_kind": "city",
+    "code_position": "historic letter prefix",
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "\"S\"\\ prefixed\\ serial\\ number\\ denotes\\ this\\ plate\\ issued\\ in\\ Salisbury,\\ Southern\\ Rhodesia,\\ between\\ 1931\\ and\\ 1958\\ ",
+    "notes": "Modern three-letter/four-digit series has no reviewed geographic allocation; historical Rhodesian schemes incomplete."
+  },
+  "FO": {
+    "source": "wiki-FO-resolved.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Cars\\ registered\\ after\\ 1996\\ have\\ white\\ background,\\ blue\\ text\\ in\\ their\\ own\\ style,\\ two\\ letters\\ and\\ three\\ digits",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "GD": {
+    "source": "wiki-GD.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Serial\\ format\\ ABC123",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "KW": {
+    "source": "wiki-KW.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Private\\ 33\\.5\\ x\\ 15\\.5\\ cm",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "MV": {
+    "source": "wiki-MV-resolved.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Background\\ colour,\\ in\\ combination\\ with\\ the\\ first\\ letter\\ on\\ the\\ left\\ denotes\\ the\\ type\\ of\\ vehicle",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "PF": {
+    "source": "wiki-PF.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "1993\\ Black\\ on\\ yellow\\ 123456\\ P",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "BL": {
+    "source": "wiki-BL-resolved.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Serial\\ format\\ 12\\(3\\)\\ A\\(B\\)",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "WF": {
+    "source": "wiki-WF-resolved.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Serial\\ format\\ 1234\\ WF",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "SA": {
+    "source": "wiki-SA.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "plates\\ consist\\ of\\ three\\ letters\\ and\\ up\\ to\\ four\\ numbers",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "VU": {
+    "source": "wiki-VU.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Republic\\ of\\ Vanuatu\\ 12345",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "VC": {
+    "source": "wiki-VC-resolved.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Serial\\ format\\ A1234",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "TV": {
+    "source": "wiki-TV.json",
+    "classification": "none",
+    "unit_kind": null,
+    "code_position": null,
+    "series": "ordinary; see notes",
+    "coverage_status": "partial",
+    "evidence_pattern": "Serial\\ format\\ AB1234",
+    "notes": "No subnational component in the described ordinary series. This is a series-level inference; historical and special exceptions have not been exhausted."
+  },
+  "TT": {
+    "source": "wiki-TT-resolved.json",
+    "classification": "none",
+    "unit_kind": "none",
+    "code_position": "none; leading letter denotes vehicle class",
+    "series": "ordinary serial",
+    "coverage_status": "reviewed",
+    "evidence_pattern": "Each\\ registration\\ number\\ begins\\ with\\ a\\ letter\\ designating\\ the\\ class\\ of\\ vehicle",
+    "notes": "Ordinary prefixes identify vehicle class; remaining letters advance as serials. Historic exceptions not exhaustively surveyed."
+  },
+  "SB": {
+    "source": "wiki-SB.json",
+    "classification": "none",
+    "unit_kind": "none",
+    "code_position": "none; sequential series",
+    "series": "ordinary 2014 series",
+    "valid_from": "2014",
+    "coverage_status": "reviewed",
+    "evidence_pattern": "MA\\-0000\\ to\\ MA\\-9999,\\ then\\ MB\\-0000\\ onwards",
+    "notes": "Inference from the described sequential ordinary series. No assertion about every former series."
+  },
+  "ST": {
+    "source": "wiki-ST-resolved.json",
+    "classification": "none",
+    "unit_kind": "none",
+    "code_position": "none; STP is the national prefix",
+    "series": "ordinary serial",
+    "coverage_status": "reviewed",
+    "evidence_pattern": "The\\ current\\ standard\\ has\\ the\\ form\\ «STP\\-12\\-34AA»",
+    "notes": "Source describes a common national prefix and serial; no subnational geography evidenced. Historic exceptions not exhaustively surveyed."
+  },
+  "JO": {
+    "source": "wiki-JO.json",
+    "classification": "usable_now",
+    "unit_kind": "free_trade_zone",
+    "code_position": "AQ prefix in special zone series; ordinary numeric prefixes denote class",
+    "series": "2025 special Aqaba series",
+    "valid_from": "2025-08",
+    "coverage_status": "partial",
+    "evidence_pattern": "Aqaba\\ Free\\ Trade\\ Zone\\ Red,\\ White\\ Text\\ سلطة\\ العقبة\\ AQ",
+    "notes": "Special Aqaba Free Trade Zone plates encode a place. Ordinary numeric series identify vehicle category, not district; nationwide series must not be geocoded."
   }
 }

@@ -51,6 +51,7 @@ def test_ranges_are_opt_in_and_preserve_leading_zeroes() -> None:
     rule = dict(code_pattern=r"\b\d{2}\b", numeric_ranges=True)
     assert codes("01-03, 08", rule) == ["01", "02", "03", "08"]
     assert codes("01-03", dict(code_pattern=r"\b\d{2}\b")) == ["01", "03"]
+    assert codes("NONE XY", dict(code_pattern="[A-Z]+", code_exclude="NONE")) == ["XY"]
     assert codes(
         "AH-AK",
         dict(code_pattern=r"\b[A-Z]{2}\b", alpha_ranges=True, excluded_letters="I"),
@@ -101,12 +102,12 @@ def test_wikidata_cross_products_merge_but_do_not_imply_current(tmp_path: Path) 
     ]
     path = tmp_path / "query.json"
     write_json(path, dict(results=dict(bindings=records)))
-    parsed = list(wikidata_rows(path, "Q99"))
+    parsed = list(wikidata_rows(path, "Q99", "2026-01-01"))
     assert len(parsed) == 1 and parsed[0]["series_status"] == "unknown"
     assert parsed[0]["latitude"] == 20 and parsed[0]["longitude"] == 10
     assert parsed[0]["code"] == "007"
     assert json.loads(parsed[0]["entity_types"]) == ["Q10", "Q11"]
-    assert list(wikidata_rows(path, "Q1")) == []
+    assert list(wikidata_rows(path, "Q1", "2026-01-01")) == []
 
 
 def test_format_rejects_missing_capture_and_bad_specimens() -> None:
@@ -198,6 +199,7 @@ def plate_workspace(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Workspac
         },
     )
     write_json(config / "formats.json", {})
+    write_json(config / "coverage.json", {})
     return workspace
 
 
@@ -229,6 +231,9 @@ def test_offline_publication_resume_and_corruption(
     Path(manifest["partitions"][0]["path"]).write_bytes(b"broken")
     plates.normalize(plate_workspace)
     assert load_manifest(plate_workspace, "plates")["rows"]["plate_codes"] == 1
+    (plate_workspace.raw("plates") / "snapshot/wiki-XY.json").write_bytes(b"corrupt")
+    with pytest.raises(ValueError, match="Corrupt raw snapshot"):
+        plates.normalize(plate_workspace)
 
 
 def test_changed_source_pin_fails_instead_of_accepting_new_bytes(
