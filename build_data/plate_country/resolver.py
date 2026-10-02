@@ -98,7 +98,7 @@ class Resolver:
         self, value: str, country: str | None, series: str | None
     ) -> list[Row]:
         result = []
-        observed = scripts(value)
+        observed = scripts(value, self.policy["script_patterns"])
         seen = set()
         for rule in self.formats:
             code = rule["country_code"]

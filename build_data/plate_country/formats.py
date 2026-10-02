@@ -21,10 +21,12 @@ def _decorate(row: Row, source: str, pin: Row) -> Row:
     decoded = re.sub(r"\\u([0-9a-fA-F]{4})", lambda m: chr(int(m[1], 16)), pattern)
     script_text = re.sub(r"\(\?P<[^>]+>|\{[^}]+\}", "", decoded)
     separators: set[str] = set()
-    for token in TOKEN.findall(pattern):
+    for token in TOKEN.findall(decoded):
+        if token in ("|", "."):
+            continue
         body = token[1:-1] if token.startswith("[") else token.removeprefix("\\")
         if token.startswith("["):
-            body = re.sub(r"[A-Za-z0-9]-[A-Za-z0-9]", "", body)
+            body = re.sub(r"[^\\]-[^\\]", "", body)
         separators.update(c for c in body if c in SEPARATORS)
     return dict(
         row,
@@ -46,6 +48,7 @@ def rows(pins: dict[str, Row]) -> Iterator[Row]:
         for rule in items
     ]
     rules.extend(policy("formats"))
+    rules.extend(policy("supplemental_formats"))
     documents = {
         name: document(pin)
         for name, pin in pins.items()

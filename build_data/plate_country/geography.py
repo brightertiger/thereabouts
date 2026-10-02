@@ -9,12 +9,15 @@ from .policy import Row, code_key
 class Geography:
     def __init__(self, codes: list[Row], policy: Row) -> None:
         self.policy = policy
+        self.separators = str(policy["code_separators"])
         self.index: dict[tuple[str, str], list[Row]] = defaultdict(list)
         for row in codes:
-            self.index[row["country_code"], code_key(row["code"])].append(row)
+            self.index[
+                row["country_code"], code_key(row["code"], self.separators)
+            ].append(row)
 
     def known(self, country: str, captured: str) -> list[Row]:
-        return self.index.get((country, code_key(captured)), [])
+        return self.index.get((country, code_key(captured, self.separators)), [])
 
     def locate(
         self, country: str, matches: list[Row], *, series: str | None = None
@@ -37,7 +40,11 @@ class Geography:
         eligible: list[Row] = []
         parents: list[Row] = []
         for match in matches:
-            if match["series_status"] == "historic" and series is None:
+            if (
+                match["series_status"] == "historic"
+                and config["historic_requires_explicit_series"]
+                and series is None
+            ):
                 continue
             found = self.known(country, match["code"] or "")
             eligible.extend(r for r in found if self._eligible(r, match))
@@ -45,7 +52,9 @@ class Geography:
             if length:
                 parents.extend(
                     r
-                    for r in self.known(country, code_key(match["code"] or "")[:length])
+                    for r in self.known(
+                        country, code_key(match["code"] or "", self.separators)[:length]
+                    )
                     if self._eligible(r, match)
                     and self.policy["levels"].get(r["unit_kind"]) == "state"
                 )
@@ -86,7 +95,11 @@ class Geography:
     def _eligible(self, row: Row, match: Row) -> bool:
         config = self.policy["geography"]
         return bool(
-            row.get("scope") not in config["excluded_scopes"]
+            row.get("scope") in config["allowed_scopes"]
+            and (
+                row.get("series_status") != "unknown"
+                or config["unknown_status_eligible"]
+            )
             and not row.get("subdivision_scope")
             and row.get("series_status") == match["series_status"]
             and row.get("unit_kind") in self.policy["levels"]

@@ -25,10 +25,11 @@ def normalize(value: str) -> str:
     return " ".join(value.split())
 
 
-def code_key(value: str) -> str:
+def code_key(value: str, separators: str | None = None) -> str:
     """Normalize code separators and decimal glyphs; never transliterate letters."""
     value = normalize(value)
-    separators = policy("inference")["code_separators"]
+    if separators is None:
+        separators = policy("inference")["code_separators"]
     return "".join(
         str(unicodedata.decimal(c)) if c.isdecimal() else c
         for c in value
@@ -36,9 +37,8 @@ def code_key(value: str) -> str:
     )
 
 
-def scripts(value: str) -> list[str]:
-    return [
-        name
-        for name, pattern in policy("inference")["script_patterns"].items()
-        if re.search(pattern, value)
-    ]
+def scripts(value: str, patterns: dict[str, str] | None = None) -> list[str]:
+    if patterns is None:
+        patterns = policy("inference")["script_patterns"]
+    assert patterns is not None
+    return [name for name, pattern in patterns.items() if re.search(pattern, value)]

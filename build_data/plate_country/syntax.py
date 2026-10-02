@@ -28,7 +28,7 @@ def relaxed_pattern(pattern: str) -> str:
     result = []
     for token in TOKEN.findall(pattern):
         body = token[1:-1] if token.startswith("[") else token.removeprefix("\\")
-        if body and all(c in SEPARATORS for c in body):
+        if token not in ("|", ".") and body and all(c in SEPARATORS for c in body):
             result.append("[ .·•/|\\-]*")
         else:
             result.append(token)

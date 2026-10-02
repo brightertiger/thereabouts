@@ -1,5 +1,6 @@
 """Rebuild inference artifacts from verified acquisition outputs and pinned bytes."""
 
+import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -77,7 +78,7 @@ def build(data: Path, *, offline: bool = True) -> Row:
                 dict(
                     country_code=r["country_code"],
                     name=r["name"],
-                    region="Europe",
+                    region=policy("extra_regions")[r["country_code"]],
                     aliases=[],
                 )
                 for r in pq.read_table(part["path"]).to_pylist()
@@ -96,10 +97,17 @@ def build(data: Path, *, offline: bool = True) -> Row:
     )
     output = data / "normalized" / "plates_country"
     output.mkdir(parents=True, exist_ok=True)
-    # Content addressing preserves previous releases; manifest is the commit point.
-    encoded = json.dumps(bundle, ensure_ascii=False, sort_keys=True).encode()
-    import hashlib
-
+    # All policy/report inputs enter the release key: a gap-note edit must not
+    # overwrite a previously published coverage artifact under the same name.
+    config = configuration()
+    base_hash = sha256_file(data / "normalized" / "plates" / "manifest.json")
+    release_inputs = dict(
+        bundle=bundle,
+        configuration=config,
+        base_manifest=base_hash,
+        prior_rejections=rejected,
+    )
+    encoded = json.dumps(release_inputs, ensure_ascii=False, sort_keys=True).encode()
     release = hashlib.sha256(encoded).hexdigest()
     bundle_name = f"bundle-{release}.json"
     write_json(output / bundle_name, bundle)
@@ -114,7 +122,8 @@ def build(data: Path, *, offline: bool = True) -> Row:
             else "gap",
             gap=policy("gaps").get(
                 r["country_code"],
-                "Special, vanity and some historical series are not exhaustively modeled.",
+                "Special, vanity and some historical series "
+                "are not exhaustively modeled.",
             ),
         )
         for r in universe
@@ -155,10 +164,8 @@ def build(data: Path, *, offline: bool = True) -> Row:
         release=release,
         bundle=bundle_name,
         coverage=report_name,
-        base_manifest_sha256=sha256_file(
-            data / "normalized" / "plates" / "manifest.json"
-        ),
-        policies={p.name: sha256_file(p) for p in DATA.glob("*.json")},
+        base_manifest_sha256=base_hash,
+        **config,
         sources={name: source_fields(pin) for name, pin in source_pins.items()},
         outputs=[dict(file=name, sha256=sha256_file(output / name)) for name in names],
         counts=dict(
@@ -169,3 +176,30 @@ def build(data: Path, *, offline: bool = True) -> Row:
     )
     write_json(output / "manifest.json", manifest)
     return manifest
+
+
+def verify(data: Path) -> None:
+    """Verify the policy/base snapshot as well as raw and normalized hashes."""
+    from build_data.acquire.artifacts import read_json
+
+    manifest = read_json(data / "normalized" / "plates_country" / "manifest.json")
+    pins(data)
+    for key, expected in configuration().items():
+        if expected != manifest.get(key):
+            raise ValueError(f"Resolver {key} changed; rebuild before reporting status")
+    if (
+        sha256_file(data / "normalized" / "plates" / "manifest.json")
+        != manifest["base_manifest_sha256"]
+    ):
+        raise ValueError("Base plates release changed; rebuild")
+    load_manifest(Workspace(data.resolve()), "plates")
+
+
+def configuration() -> Row:
+    """Inputs outside the bundle that still affect release behavior and reports."""
+    return dict(
+        policies={p.name: sha256_file(p) for p in DATA.glob("*.json")},
+        implementation={
+            p.name: sha256_file(p) for p in Path(__file__).parent.glob("*.py")
+        },
+    )
