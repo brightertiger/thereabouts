@@ -80,7 +80,7 @@ def load(workspace: Workspace, inputs: Inputs) -> tuple[Path, Row]:
         raise ValueError("Uncommitted base-cell snapshot")
     path = Path(record["path"])
     manifest = data_paths.read(path, workspace.root)
-    validate(manifest, inputs)
     for table in manifest["tables"]:
         verify_record(table)
+    validate(manifest, inputs)
     return path, manifest

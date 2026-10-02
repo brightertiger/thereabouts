@@ -109,6 +109,12 @@ def test_snapshot_moves_and_stale_builder_regenerates_without_restamping(
     assert base.load(workspace, inputs)[0] == moved / relative_snapshot
     # A new builder returns control to the normal pipeline, preserving old hashes.
     monkeypatch.setattr(base, "builder", lambda: "new-builder")
+    saved = paths.read(moved / relative_snapshot, moved)
+    retained_table = Path(saved["tables"][0]["path"])
+    retained_table.write_bytes(b"evil")
+    with pytest.raises(ValueError, match="verification failed"):
+        completed_base(workspace, inputs)
+    retained_table.write_bytes(b"rows")
     assert completed_base(workspace, inputs) is None
     assert (moved / relative_snapshot).read_bytes() == old_bytes
     value["inputs"]["golden_builder"] = "new-builder"
