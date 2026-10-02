@@ -159,4 +159,128 @@ remain reusable. H3 descendant envelopes have a separate reusable cache;
 dependency intersections are rechecked when country envelopes change. Static
 joins and place-only schema changes do not invalidate spatial cell code.
 
-Operational results and the final detached-process state follow after the sample.
+## Final sample at resolution-8 centres
+
+Before: stored v0 cells. After: independent scalar oracle at exactly the same r8 centres, using re-reconciled sample countries and v0 neighbours. Final world checks run through stored v1 cells.
+
+All 29 rebuilt countries passed the current full-pilot gate. The final sample
+improvement gate passed for builder `e4bb8ae48002bb0d54a0ba59247fb4bb13e86ce2506849f91074856b085a5e8a`.
+The 29 probe-root check passed all **487,403 centres**, plus **1,856 independent
+scalar checks**, for this final builder. All 13 named fixtures pass.
+
+| Measure | v0 | Final sample |
+| --- | ---: | ---: |
+| Answer | 16,408/16,409 (99.99%) | 16,408/16,409 (99.99%) |
+| Country agreement | 16,402/16,409 (99.96%) | 16,402/16,409 (99.96%) |
+| State agreement | 15,867/16,157 (98.21%) | 15,867/16,157 (98.21%) |
+| Exact city identity | 11,175/16,409 (68.10%) | 12,238/16,409 (74.58%) |
+| Identity or containing city | 15,646/16,409 (95.35%) | 15,499/16,409 (94.45%) |
+
+The final rule recovers **1,198** v0 non-identities and introduces **135**
+new identity mismatches, net **+1,063**. Of the new mismatches, **121 are in China**.
+Broad regional footprints can still absorb point-only settlements without their
+own city polygon. The independent-settlement preference protects linked locality
+**polygons**; it cannot recover missing municipal boundaries from point evidence.
+This is a remaining limitation, not a claim that every new containing answer is
+correct. Removing weak administrative containment also lowers the weaker geometric
+identity-or-containing score by 147. The exact source evidence and all regressions
+are retained in `sample-change-classes.json`.
+
+| Country | Observations | v0 exact | Final exact | v0 same/containing | Final same/containing |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| AU | 314 | 71 | 78 | 281 | 281 |
+| BE | 224 | 193 | 207 | 224 | 224 |
+| CA | 513 | 232 | 242 | 511 | 510 |
+| CM | 87 | 72 | 77 | 87 | 87 |
+| CN | 2122 | 1008 | 1237 | 2040 | 2003 |
+| FR | 692 | 580 | 580 | 692 | 692 |
+| GB | 868 | 629 | 688 | 843 | 840 |
+| GF | 5 | 4 | 4 | 4 | 4 |
+| GP | 9 | 9 | 9 | 9 | 9 |
+| HK | 141 | 0 | 0 | 141 | 141 |
+| ID | 450 | 227 | 233 | 295 | 285 |
+| IN | 3779 | 3210 | 3291 | 3469 | 3460 |
+| JP | 1301 | 962 | 963 | 1299 | 1292 |
+| KR | 148 | 65 | 93 | 134 | 129 |
+| MC | 2 | 0 | 0 | 1 | 1 |
+| MQ | 8 | 8 | 8 | 8 | 8 |
+| NG | 269 | 224 | 263 | 267 | 265 |
+| NL | 252 | 225 | 225 | 252 | 252 |
+| PH | 530 | 410 | 412 | 505 | 506 |
+| PK | 373 | 30 | 317 | 372 | 330 |
+| RE | 14 | 4 | 4 | 14 | 14 |
+| SG | 65 | 0 | 0 | 65 | 65 |
+| TH | 330 | 165 | 191 | 302 | 299 |
+| TN | 130 | 31 | 114 | 130 | 124 |
+| US | 3410 | 2764 | 2793 | 3334 | 3332 |
+| VN | 315 | 3 | 159 | 315 | 293 |
+| XK | 21 | 19 | 19 | 20 | 20 |
+| YT | 6 | 4 | 4 | 4 | 4 |
+| ZW | 31 | 26 | 27 | 28 | 29 |
+
+### Probe answers after the sample
+
+These are scalar answers at the exact r8 centres; the exhaustive probe-block
+check confirms the corresponding cell construction. Unsampled countries still
+use v0 neighbours here. Final world answers through published stored cells are
+reported separately when the world build completes.
+
+| Probe | City | State | Country | Method |
+| --- | --- | --- | --- | --- |
+| lower Manhattan | New York | New York | United States | area |
+| Tokyo | Tokyo | Tokyo | Japan | area |
+| Singapore | Singapore | — | Singapore | area |
+| Monaco | Monaco | — | Monaco | area |
+| Hong Kong Central | Hong Kong | — | Hong Kong | area |
+| Lagos | Lagos | Lagos State | Nigeria | nearest |
+| London | London | England | United Kingdom | area |
+| Cayenne | Cayenne | — | French Guiana | nearest |
+| Pristina | Pristina | District of Prishtina | Kosovo | area |
+| Bengaluru | Bengaluru | Karnataka | India | area |
+| Paris | Paris | Ile-de-France | France | area |
+| Cagayan de Oro | Cagayan de Oro | Cagayan de Oro | Philippines | area |
+| Eindhoven | Eindhoven | North Brabant | Netherlands | area |
+| Mumbai | Mumbai | Maharashtra | India | nearest |
+| Delhi | New Delhi | Delhi | India | area |
+| Kolkata | Kolkata | West Bengal | India | area |
+| Chennai | Chennai | Tamil Nadu | India | area |
+| Karachi | Karachi | Sindh | Pakistan | area |
+| Dhaka | Joār Sāhāra | Dhaka Division | Bangladesh | nearest |
+| Jakarta | Jakarta | Special Capital Region of Jakarta | Indonesia | area |
+| Manila | Manila | Manila | Philippines | area |
+| São Paulo | São Paulo | São Paulo | Brazil | area |
+| Mexico City | Mexico City | Mexico City | Mexico | area |
+| Cairo | Cairo | Cairo | Egypt | area |
+| Istanbul | Mercan Mahallesi | Istanbul | Turkey | nearest |
+| Moscow | Moscow | Moscow | Russia | area |
+| Seoul | Seoul | Seoul | South Korea | area |
+| Shanghai | Shanghai | Shanghai | China | area |
+| Sydney | Sydney | New South Wales | Australia | area |
+
+The Dhaka and Istanbul probes remain unresolved at this stage: Dhaka's
+linked polygon does not cover the probe, and Istanbul has no linked city polygon
+in the pinned v0 source partition. The nearest eligible GeoNames observations are
+Joār Sāhāra and Mercan Mahallesi, both PPL records with population zero. Evidence
+is saved in `remaining-probe-evidence.json`; no city boundary is invented from a
+population radius or a probe coordinate.
+
+## Detached rebuild state
+
+The gated world controller started at **2026-10-01 23:58:23 UTC**, PID **48816**.
+It runs reconciliation then the golden build sequentially. Launch metadata:
+`data/work/v1/world-launch.json`; stage status: `data/work/v1/rebuild.json`.
+Logs: `data/work/v1/reconcile-world.log`, `golden-world.log`, and `controller.log`.
+Completion requires `rebuild.json` to contain `completed:true`; the golden
+manifest and golden run marker must also be complete. Resume with:
+
+```sh
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --sample-gate data/work/v1/sample.json --workers 2
+```
+
+Operational recovery notes are in `data/work/v1-progress.md`. The detached
+continuation supervisor is also resumable with
+`uv run --no-sync python -m data.work.v1.continue_rebuild` when it is no longer
+running. Do not launch duplicate supervisors. At world launch, free disk was
+21 GiB; completed sample countries had no superseded SQLite or extract/link
+intermediates remaining. World metrics and final join counts are pending.
