@@ -19,6 +19,7 @@ def boundary_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Row
     reported separately. Overlap losses remain visible for review.
     """
     result = []
+    aliases = engine.policy["countries"].get(cc, {}).get("identity_aliases", {})
     db = connect(engine.index_path, readonly=True)
     try:
         for blob, metadata in db.execute(
@@ -34,15 +35,28 @@ def boundary_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Row
                 if r.get("country_id") == f"country:{cc}"
             ]
             owner, target = boundary["city_id"], boundary["target_id"]
+            owners = {
+                owner,
+                *(a for a, canonical in aliases.items() if canonical == owner),
+            }
+            owned_before = measure([before[i] for i in selected], owner)
+            owned_before["expected"] = sum(
+                owned_before["answers"].get(i, 0) for i in owners
+            )
+            owned_before["share"] = (
+                owned_before["expected"] / owned_before["eligible"]
+                if owned_before["eligible"]
+                else None
+            )
             lost = [
                 i
                 for i in selected
-                if before[i].get("city_id") == owner
+                if before[i].get("city_id") in owners
                 and after[i].get("city_id") != target
             ]
             rollups = (
                 sum(
-                    before[i].get("city_id") == owner
+                    before[i].get("city_id") in owners
                     and after[i].get("city_id") == target
                     for i in selected
                 )
@@ -56,7 +70,8 @@ def boundary_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Row
                     "target_id": target,
                     "references": boundary["references"],
                     "method": boundary["method"],
-                    "before": measure([before[i] for i in selected], owner),
+                    "before": owned_before,
+                    "before_owner_ids": sorted(owners),
                     "after": measure([after[i] for i in selected], target),
                     "policy_rollup_cells": rollups,
                     "lost_cells": len(lost),

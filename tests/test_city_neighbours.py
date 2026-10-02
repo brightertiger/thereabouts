@@ -99,3 +99,25 @@ def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> Non
     assert report["after"]["expected"] > report["before"]["expected"]
     assert report["lost_cells"] == 1
     assert report["lost_to"] == {"other": 1}
+    # A reviewed identity alias must not hide the old owner's lost cells.
+    db = connect(engine.index_path)
+    db.execute(
+        "UPDATE boundaries SET data=?",
+        (
+            pack(
+                {
+                    "city_id": "canonical",
+                    "target_id": "canonical",
+                    "method": "city_polygon",
+                    "references": ["1"],
+                }
+            ),
+        ),
+    )
+    db.commit()
+    db.close()
+    engine.policy["countries"]["ZZ"] = {"identity_aliases": {"town": "canonical"}}
+    aliased = boundary_checks(ChangedComparison(Cells([]), {}, False), "ZZ", engine)[0]
+    assert aliased["before"]["expected"] == 1
+    assert aliased["lost_cells"] == 1
+    assert aliased["before_owner_ids"] == ["canonical", "town"]
