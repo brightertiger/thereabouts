@@ -71,3 +71,20 @@ def test_compact_parent_splits_at_new_boundary_and_resumes(
     Path(table["path"]).write_bytes(b"interrupted/corrupt artifact")
     repaired = build(workspace, output, base, {"ZZ": engine}, "version-one", False)
     assert repaired["table"]["sha256"] == table["sha256"]
+
+
+def test_empty_ocean_block_does_not_enumerate_centres(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from build_data.golden.schemas import CELLS
+    from build_data.golden.storage import parquet
+    from build_data.normalize_cells.blocks import transform
+
+    def unexpected_enumeration(*args: object) -> None:
+        raise AssertionError("An empty base block has no eligible centres")
+
+    record = parquet(tmp_path / "ocean.parquet", [], CELLS)
+    monkeypatch.setattr(
+        "build_data.normalize_cells.blocks.descendants", unexpected_enumeration
+    )
+    assert transform(record, {}, False) == ([], {})

@@ -39,6 +39,9 @@ def expand(record: Row) -> tuple[NDArray[np.uint64], NDArray[np.float64], list[R
 def transform(
     record: Row, engines: dict[str, Engine], radius: bool
 ) -> tuple[list[Row], Row]:
+    """Change eligible base cells only; empty ocean blocks need no enumeration."""
+    if pq.read_metadata(record["path"]).num_rows == 0:
+        return [], {}
     fine, coordinates, before = expand(record)
     answers = [tuple(row.get(k) for k in FIELDS) for row in before]
     after = list(answers)
