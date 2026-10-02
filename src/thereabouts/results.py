@@ -41,14 +41,14 @@ def plain(value: object) -> Any:
     return value
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Evidence:
     golden_table: str
     source_ids: Json
     name_provenance: Json
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Place:
     id: str
     name: str
@@ -69,7 +69,7 @@ class Place:
     evidence: Evidence
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Methods:
     city: str | None
     state: str | None
@@ -77,13 +77,13 @@ class Methods:
     land: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Confidence:
     basis: str
     calibrated_probability: None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Distance:
     """A policy band at the reference centre, never a measured point distance."""
 
@@ -93,7 +93,7 @@ class Distance:
     exact_m: None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Candidate:
     id: str
     place: Place | None
@@ -108,7 +108,7 @@ class Candidate:
     accuracy_m: None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Query:
     kind: Literal["coordinates", "h3"]
     latitude: float | None = None
@@ -116,7 +116,7 @@ class Query:
     h3: str | None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Reference:
     h3: str
     resolution: int
@@ -125,7 +125,7 @@ class Reference:
     quantization: str = "r8-centre-logical-ancestors"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Source:
     source: str
     release: str
@@ -135,7 +135,7 @@ class Source:
     license_url: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Data:
     family: str
     version: str
@@ -147,18 +147,18 @@ class Data:
     sources: tuple[Source, ...]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Warning:
     code: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class InputError:
     code: str
     message: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Resolution:
     status: Status
     selected: Candidate | None

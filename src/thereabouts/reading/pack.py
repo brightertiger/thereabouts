@@ -1,4 +1,4 @@
-"""One mapping per payload kind; catalogue IDs never escape as public identities."""
+"""Lazy mappings and bounded decoded places for one immutable pack."""
 
 from bisect import bisect_right
 from copy import deepcopy
@@ -9,15 +9,18 @@ from ..errors import ClosedGeocoderError, DataNotInstalledError
 from ..packs.catalogue import Catalogue
 from ..packs.errors import CorruptPackError
 from ..packs.jsonio import relative_file
-from ..packs.layout import PLACES
+from ..packs.layout import PLACE, PLACES
 from ..packs.metadata import read_manifest
 from ..packs.spatial import Label, Spatial
 from ..packs.verify import verify as verify_pack
-from .search import search
+from .places import DEFAULT_CACHE_BYTES, Places
+from .spatial import SpatialIndex
 
 
 class Pack:
-    def __init__(self, root: Path, *, verify: bool) -> None:
+    def __init__(
+        self, root: Path, *, verify: bool, cache_bytes: int = DEFAULT_CACHE_BYTES
+    ) -> None:
         if not root.exists():
             raise DataNotInstalledError(f"No pack at {root}; install data explicitly")
         self.closed = False
@@ -29,25 +32,26 @@ class Pack:
         ]
         self.block_starts = [r["first_block"] for r in self.cells]
         self.place_starts = [r["first_id"] for r in self.catalogues]
-        self.spatial: Spatial | None = None
-        self.catalogue: Catalogue | None = None
-        self.spatial_index = self.catalogue_index = -1
+        self.spatials: dict[int, Spatial] = {}
+        self.indexes: dict[int, SpatialIndex] = {}
+        self.catalogue_maps: dict[int, Catalogue] = {}
+        self.places = Places(self, cache_bytes)
+
+    def ensure_open(self) -> None:
+        if self.closed:
+            raise ClosedGeocoderError("Geocoder is closed")
 
     def info(self) -> dict[str, Any]:
         return deepcopy(self.manifest)
 
     def spatial_for(self, block: int) -> Spatial | None:
-        if self.closed:
-            raise ClosedGeocoderError("Geocoder is closed")
+        self.ensure_open()
         index = bisect_right(self.block_starts, block) - 1
         if index < 0 or block > self.cells[index]["last_block"]:
             self._absent_block()
             return None
-        if self.spatial_index != index:
-            if self.spatial is not None:
-                self.spatial.close()
-                self.spatial = None
-            self.spatial_index = -1
+        shard = self.spatials.get(index)
+        if shard is None:
             record = self.cells[index]
             shard = Spatial(
                 relative_file(self.root, record["path"]), self.manifest["place_count"]
@@ -58,44 +62,37 @@ class Pack:
             ):
                 shard.close()
                 raise CorruptPackError("Spatial directory differs from manifest")
-            self.spatial, self.spatial_index = shard, index
-        assert self.spatial is not None
-        if block not in self.spatial.blocks:
+            self.spatials[index] = shard
+            try:
+                self.indexes[index] = SpatialIndex(shard)
+            except CorruptPackError:
+                self.spatials.pop(index).close()
+                raise
+        if block not in shard.blocks:
             self._absent_block()
             return None
-        return self.spatial
+        return shard
+
+    def index_for(self, block: int) -> SpatialIndex | None:
+        if self.spatial_for(block) is None:
+            return None
+        return self.indexes[bisect_right(self.block_starts, block) - 1]
+
+    def lookup(self, block: int, key: int) -> tuple[bool, tuple[int, Label] | None]:
+        index = self.index_for(block)
+        return index is not None, None if index is None else index.lookup(block, key)
 
     def _absent_block(self) -> None:
         if self.manifest["coverage"] == "world":
             raise CorruptPackError("World pack is missing a block")
 
-    def lookup_many(
-        self,
-        block: int,
-        keys: list[int],
-    ) -> list[tuple[int, Label] | None] | None:
-        shard = self.spatial_for(block)
-        if shard is None:
-            return None
-        positions = search(shard, block, keys)
-        row = shard.blocks[block]
-        stored = shard.keys(row)
-        return [
-            None if position is None else (stored[position], shard.label(row, position))
-            for position in positions
-        ]
-
-    def record(self, reference: int) -> dict[str, Any]:
-        if self.closed:
-            raise ClosedGeocoderError("Geocoder is closed")
+    def _catalogue_for(self, reference: int) -> tuple[Catalogue, int]:
+        self.ensure_open()
         if not 1 <= reference <= self.manifest["place_count"]:
             raise CorruptPackError("Invalid global catalogue reference")
         index = bisect_right(self.place_starts, reference) - 1
-        if self.catalogue_index != index:
-            if self.catalogue is not None:
-                self.catalogue.close()
-                self.catalogue = None
-            self.catalogue_index = -1
+        shard = self.catalogue_maps.get(index)
+        if shard is None:
             record = self.catalogues[index]
             shard = Catalogue(
                 relative_file(self.root, record["path"]), self.manifest["place_count"]
@@ -103,21 +100,34 @@ class Pack:
             if shard.sections[PLACES].count != record["count"]:
                 shard.close()
                 raise CorruptPackError("Catalogue count differs from manifest")
-            self.catalogue, self.catalogue_index = shard, index
-        assert self.catalogue is not None
-        return self.catalogue.record(reference - self.place_starts[index])
+            self.catalogue_maps[index] = shard
+        return shard, reference - self.place_starts[index]
+
+    def record(self, reference: int) -> dict[str, Any]:
+        shard, local = self._catalogue_for(reference)
+        return shard.record(local)
 
     def identity(self, reference: int) -> str | None:
         if not reference:
             return None
-        identity: str = self.record(reference)["place_id"]
+        shard, local = self._catalogue_for(reference)
+        fields = PLACE.unpack_from(
+            shard.data, shard.sections[PLACES].offset + local * PLACE.size
+        )
+        identity = shard.text(fields[0])
+        if not identity:
+            raise CorruptPackError("Missing place identity")
         return identity
 
     def close(self) -> None:
         self.closed = True
-        if self.spatial is not None:
-            self.spatial.close()
-            self.spatial = None
-        if self.catalogue is not None:
-            self.catalogue.close()
-            self.catalogue = None
+        self.places.clear()
+        for index in self.indexes.values():
+            index.close()
+        self.indexes.clear()
+        for shard in self.spatials.values():
+            shard.close()
+        for catalogue in self.catalogue_maps.values():
+            catalogue.close()
+        self.spatials.clear()
+        self.catalogue_maps.clear()

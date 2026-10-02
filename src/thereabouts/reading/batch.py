@@ -1,55 +1,82 @@
-"""Validate rows and group block reads, preserving the original row positions."""
+"""Normalize bounded chunks and search shards without constructing result objects."""
 
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Literal
 
+import numpy as np
+from h3.api import basic_int as h3
+from numpy.typing import NDArray
+
 from ..client_errors import InvalidInputError
-from ..packs.address import address
-from ..packs.spatial import Label
-from ..results import Query
-from .inputs import Errors, coordinates, h3_cell
+from .address import addresses
+from .inputs import Errors, coordinate_values, h3_value
 from .pack import Pack
 
-
-@dataclass(frozen=True)
-class Hit:
-    query: Query
-    cell: int = 0
-    block: int = 0
-    covered: bool = False
-    found: tuple[int, Label] | None = None
-    error: str | None = None
+Kind = Literal["coordinates", "h3"]
 
 
-def lookup_rows(
-    pack: Pack,
-    rows: list[object],
-    kind: Literal["coordinates", "h3"],
-    errors: Errors,
-) -> list[Hit]:
-    normalize = coordinates if kind == "coordinates" else h3_cell
-    groups: dict[int, list[tuple[int, int, Query, int]]] = defaultdict(list)
-    hits: dict[int, Hit] = {}
-    for index, row in enumerate(rows):
+@dataclass(frozen=True, slots=True)
+class Batch:
+    cells: NDArray[np.uint64]
+    coordinates: NDArray[np.float64]
+    kind: Kind
+    errors: tuple[str | None, ...]
+    blocks: NDArray[np.int64]
+    covered: NDArray[np.bool_]
+    keys: NDArray[np.int64]
+    labels: NDArray[np.uint32]
+
+
+def lookup_rows(pack: Pack, rows: list[object], kind: Kind, errors: Errors) -> Batch:
+    cells, points = [], []
+    failures: list[str | None] = []
+    for row in rows:
         try:
-            cell, query = normalize(row)
+            if kind == "coordinates":
+                lat, lon = coordinate_values(row)
+                cell = h3.latlng_to_cell(lat, lon, 8)
+            else:
+                lat, lon = 0.0, 0.0
+                cell = h3_value(row)
+            cells.append(cell)
+            points.append((lat, lon))
+            failures.append(None)
         except InvalidInputError as exc:
             if errors == "raise":
                 raise
-            hits[index] = Hit(Query(kind), error=str(exc))
+            cells.append(0)
+            points.append((0.0, 0.0))
+            failures.append(str(exc))
+    pack.ensure_open()
+    numeric = np.array(cells, dtype=np.uint64)
+    blocks, keys = addresses(numeric)
+    stored = np.full(len(rows), -1, dtype=np.int64)
+    covered = np.zeros(len(rows), dtype=np.bool_)
+    labels = np.zeros((len(rows), 4), dtype=np.uint32)
+    shards = np.searchsorted(pack.block_starts, blocks, side="right") - 1
+    for shard in np.unique(shards[numeric != 0]):
+        if shard < 0:
             continue
-        block, key = address(cell, 8)
-        groups[block].append((index, cell, query, key))
-    for block in sorted(groups):
-        group = groups[block]
-        found = pack.lookup_many(block, [row[3] for row in group])
-        for position, (index, cell, query, _) in enumerate(group):
-            hits[index] = Hit(
-                query,
-                cell,
-                block,
-                found is not None,
-                None if found is None else found[position],
-            )
-    return [hits[index] for index in range(len(rows))]
+        indices = np.flatnonzero((shards == shard) & (numeric != 0))
+        record = pack.cells[shard]
+        index = pack.index_for(record["first_block"])
+        assert index is not None
+        indices = indices[np.isin(blocks[indices], index.ids)]
+        if not len(indices):
+            continue
+        covered[indices] = True
+        stored[indices], labels[indices] = index.lookup_many(
+            blocks[indices], keys[indices]
+        )
+    if np.any((numeric != 0) & ~covered):
+        pack._absent_block()
+    return Batch(
+        numeric,
+        np.array(points, dtype=np.float64),
+        kind,
+        tuple(failures),
+        blocks,
+        covered,
+        stored,
+        labels,
+    )

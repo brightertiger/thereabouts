@@ -3,7 +3,7 @@
 import math
 from collections.abc import Iterable, Mapping
 from numbers import Real
-from typing import Literal
+from typing import Literal, cast
 
 from h3.api import basic_int as h3
 
@@ -14,11 +14,13 @@ BATCH_SIZE = 4096
 Errors = Literal["raise", "collect"]
 
 
-def coordinates(value: object) -> tuple[int, Query]:
-    if not isinstance(value, Iterable) or isinstance(value, (str, bytes, Mapping)):
+def coordinate_values(value: object) -> tuple[float, float]:
+    if type(value) not in (tuple, list) and (
+        not isinstance(value, Iterable) or isinstance(value, (str, bytes, Mapping))
+    ):
         raise InvalidInputError("Expected a latitude/longitude pair")
     try:
-        latitude, longitude = value
+        latitude, longitude = cast(Iterable[object], value)
     except (TypeError, ValueError) as exc:
         raise InvalidInputError("Expected a latitude/longitude pair") from exc
     numbers = []
@@ -26,10 +28,12 @@ def coordinates(value: object) -> tuple[int, Query]:
         ("latitude", latitude, 90),
         ("longitude", longitude, 180),
     ):
-        if isinstance(item, bool) or not isinstance(item, Real):
+        if type(item) not in (float, int) and (
+            isinstance(item, bool) or not isinstance(item, Real)
+        ):
             raise InvalidInputError(f"{name} must be a finite real number")
         try:
-            number = float(item)
+            number = float(cast(Real, item))
         except OverflowError as exc:
             raise InvalidInputError(f"{name} is outside the numeric range") from exc
         if not math.isfinite(number) or not -limit <= number <= limit:
@@ -38,10 +42,15 @@ def coordinates(value: object) -> tuple[int, Query]:
     lat, lon = numbers
     if lon == 180:
         lon = -180.0
+    return lat, lon
+
+
+def coordinates(value: object) -> tuple[int, Query]:
+    lat, lon = coordinate_values(value)
     return int(h3.latlng_to_cell(lat, lon, 8)), Query("coordinates", lat, lon)
 
 
-def h3_cell(value: object) -> tuple[int, Query]:
+def h3_value(value: object) -> int:
     if (
         not isinstance(value, str)
         or len(value) != 15
@@ -51,6 +60,11 @@ def h3_cell(value: object) -> tuple[int, Query]:
     cell = int(value, 16)
     if not h3.is_valid_cell(cell) or h3.get_resolution(cell) != 8:
         raise InvalidInputError("Only valid resolution-8 H3 cells are supported")
+    return cell
+
+
+def h3_cell(value: object) -> tuple[int, Query]:
+    cell = h3_value(value)
     return cell, Query("h3", h3=f"{cell:x}")
 
 

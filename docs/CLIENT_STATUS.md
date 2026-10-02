@@ -5,15 +5,52 @@ Phases 1–4 are implemented on `feat/client`, locally only:
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
 * `bf90c3a` — Add offline Python golden reader and bounded public API.
 * `4689230` — Add pinned pack installation and JSON command line client.
-* Phase 4 commit — **Accelerate stored-cell reconstruction with optional Cython**
-  (find its hash with `git log`).
+* `054d9bc` — Accelerate stored-cell reconstruction with optional Cython.
+* Read-path follow-up — **Cache decoded places and keep batch lookup columnar**
+  (this commit; find its hash with `git log`).
 
-Phases 5–7 remain; phase 4 is the stopping boundary for this session.
+Phases 5–7 remain; phase 5 is next after the read-path correction.
 `thereabouts.client.Geocoder` reads the new packs; the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
 
-### Optional Cython kernel and wheels (phase 4)
+### Read-path correction after phase 4
+
+The requested warm targets are met on a **4,176-place, 308,032-row, 64-block**
+synthetic sample, with 44,032 coordinate queries across 16 global centres.
+Installed pack: **3,006,380 bytes**. The new measured shuffled scalar median is
+**9.375 µs with Cython / 11.917 µs forced Python**, versus **367.417 µs** on the
+same larger sample before the fix (the accepted five-place baseline was 195 µs).
+Shuffled numeric-column throughput is **526,812 / 527,190 points/s**, versus
+90,575 before. Object throughput is **114,217 / 87,477 results/s**. Clustered
+results, p99s, full profiles, cache-pressure timings and reproduction commands are
+in [CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md) and its linked JSON report.
+
+Profiles showed repeated catalogue decoding and shard reopening. Decoded places
+now use a lazy byte-bounded LRU, default **32 MiB**, configurable with
+`Geocoder(..., cache_bytes=...)`; zero disables it. The sample's retained cache
+is 8,775,320 charged bytes. Shards map once on demand. Numeric batches operate on
+arrays; object iterators decode only their requested row. The original result
+semantics, pack format, binary fixture and exporter are unchanged. Native and
+Python peak RSS were **78,200,832 / 77,643,776 bytes** in separate processes.
+
+These are warm working-set timings: disabled/64 KiB cache stress runs measured
+77.917 / 97.563 µs medians. Their profiles attribute misses to evidence decoding
+and retained-byte accounting. No real-world/cold-disk latency claim is made.
+
+Tests cover lazy/reused detached places, eviction and disabled-cache parity,
+deferred object materialization, exhaustive ordinary/pentagon/polar ancestor
+parity, mixed shards, unaligned flat labels, both dictionary widths, validation
+failure cleanup, input types and close behavior. Current full native checks:
+**388 passed, 7 skipped**; Ruff check/format **340 files** and strict mypy
+**333 source files** pass. Full fallback suite: **386 passed, 9 skipped**
+(the two additional skips require the intentionally absent native module).
+
+The main integration marker remains absent; a `build_data.digest_golden` process
+was active on the latest check. No main golden data was read. Original hashed
+runtime/stage files and phase 1 format/exporter files remain byte-identical.
+
+### Optional Cython kernel and wheels (phase 4, historical measurements)
 
 [CLIENT_BUILD.md](CLIENT_BUILD.md) documents backend selection, profiling,
 local builds, wheel qualification and remaining performance limits. The native
@@ -25,9 +62,9 @@ small-block and public scalar/batch/column tests.
 Seven alternating numeric-column runs measured a **39% median throughput gain**
 (108,381 → 150,991 points/s) on the same synthetic sample. Public scalar median
 was **195 µs** with the extension, p99 **283 µs**, and public-result batches
-**5,079 points/s**: the public performance targets remain unmet. Catalogue
+**5,079 points/s**: the public targets were unmet at that baseline. Catalogue
 record decoding accounts for roughly **85%** of the public batch profile;
-profile a bounded decoded-place cache before adding further native code.
+that finding motivated the completed read-path correction above.
 [CLIENT_ACCELERATION_MEASUREMENTS.json](CLIENT_ACCELERATION_MEASUREMENTS.json)
 contains exact measurements and limitations. Combined process peak RSS was
 114,180,096 bytes; no world measurements were made.
@@ -96,7 +133,8 @@ with Geocoder("tests/fixtures/serving", verify=True) as geo:
     print(geo.reverse(12.97, 77.59).to_dict())
 ```
 
-Readers hold at most one spatial and one catalogue mapping. Close synchronizes
+The initial single-mapping reader has been replaced by lazy retained mappings
+and a bounded decoded-place cache (see the correction above). Close synchronizes
 with active chunks and invalidates buffered iterators. Normal opening validates
 inventory/headers and assumes an immutable verified installation; `verify=True`
 performs full checksums and structure verification. Lookup never installs data.
@@ -240,10 +278,10 @@ Every original runtime/build-stage file still matches `d3b4d94`; phase 1 format/
   and file-level resume are complete; no remote release exists to qualify.
 * Phases 5–7: postal and airport exporter/schema/API, independent Node reader
   with shared public-result vectors, optional MCP integration. None is partially
-  implemented. Continue from this committed phase 4 boundary.
-* Remaining performance work: bounded decoded-place caching and representative
-  real-pack access measurements. The numeric Cython improvement does not satisfy
-  the public-result targets. Cross-platform wheels require native-runner CI
+  implemented. Continue with phase 5 after the committed read-path correction.
+* Remaining performance work: representative real-pack access and cache-miss
+  measurements. Warm synthetic targets are met; cold/world behavior is unverified.
+  Cross-platform wheels require native-runner CI
   qualification before release; no remote CI or publication was attempted.
 * Ranked bitmaps and catalogue/layout optimization await representative real-data
   measurements. Format 1.0 intentionally specifies only sparse uint16 keys and

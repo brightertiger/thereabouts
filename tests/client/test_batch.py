@@ -11,7 +11,6 @@ from thereabouts.client import Geocoder
 from thereabouts.client_errors import InvalidInputError
 from thereabouts.errors import ClosedGeocoderError
 from thereabouts.reading.inputs import coordinates
-from thereabouts.reading.search import search
 
 from .test_api import BRANCHES, PACK, ROOT, finest
 
@@ -29,13 +28,16 @@ def test_scalar_batch_parity_all_ancestors_and_order() -> None:
             assert shard is not None
             children = h3.cell_to_children(root, 8)
             keys = [address(cell, 8)[1] for cell in children]
-            positions = search(shard, block, keys)
-            row = shard.blocks[block]
-            stored = shard.keys(row)
+            index = geo._pack.index_for(block)
+            assert index is not None
+            stored, labels = index.lookup_many(
+                np.full(len(keys), block, dtype=np.int64),
+                np.array(keys, dtype=np.int64),
+            )
             expected = [shard.lookup(block, key) for key in keys]
             actual = [
-                None if p is None else (stored[p], shard.label(row, p))
-                for p in positions
+                None if key < 0 else (int(key), tuple(map(int, label)))
+                for key, label in zip(stored, labels, strict=True)
             ]
             assert actual == expected
         # Public decoding, mixed blocks, duplicates, reversed order and partial chunks.
@@ -167,7 +169,7 @@ def test_source_iterator_can_close_without_reopening_mappings(columns: bool) -> 
     iterator = geo.reverse_columns(source()) if columns else geo.reverse_many(source())
     with pytest.raises(ClosedGeocoderError):
         next(iterator)
-    assert geo._pack.spatial is None and geo._pack.catalogue is None
+    assert not geo._pack.spatials and not geo._pack.catalogue_maps
 
 
 def test_numeric_input_callback_cannot_reopen_closed_reader() -> None:
@@ -180,4 +182,4 @@ def test_numeric_input_callback_cannot_reopen_closed_reader() -> None:
 
     with pytest.raises(ClosedGeocoderError):
         next(geo.reverse_many([(ClosingFloat(12.97), 77.59)]))
-    assert geo._pack.spatial is None
+    assert not geo._pack.spatials

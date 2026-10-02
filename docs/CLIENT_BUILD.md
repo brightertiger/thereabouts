@@ -11,7 +11,13 @@ The fallback requires no Thereabouts extension or Cython runtime. NumPy and H3
 remain runtime dependencies, including their own compiled components. Queries
 never compile code or install dependencies.
 
-## Why this kernel
+The read-path redesign and current populated-sample measurements are in
+[CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md). Both backends now meet the
+requested warm targets there. Numeric columns reconstruct parents in NumPy;
+the Cython kernel is used by scalar/object results. The measurements below
+describe the phase 4 baseline, before that redesign.
+
+## Why this kernel (phase 4 baseline)
 
 A preliminary profile of 10,040 synthetic numeric-column queries attributed
 0.056 of 0.196 seconds (29%, including child calls) to reconstructing stored H3
@@ -37,8 +43,8 @@ was measured. Seven alternating warm numeric-column runs gave:
 
 Numeric-column throughput improved **39%**. There is no demonstrated improvement
 in public-result throughput. Catalogue record decoding consumes roughly **85%**
-of the public batch profile; a bounded decoded-place cache is the next measured
-optimization to investigate. The scalar and public batch targets remain unmet.
+of the public batch profile; this motivated the now-implemented bounded decoded-place cache. At this
+baseline the scalar and public batch targets were unmet.
 The two public measurements ran sequentially in one process, so their reported
 peak RSS values are cumulative high-water marks, not isolated backend footprints
 (the combined peak was 114,180,096 bytes).

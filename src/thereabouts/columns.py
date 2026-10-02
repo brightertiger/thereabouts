@@ -7,14 +7,13 @@ from types import MappingProxyType
 import numpy as np
 from numpy.typing import NDArray
 
-from .reading.backend import StoredCell
-from .reading.batch import Hit
-from .reading.decode import place
+from .reading.address import parents
+from .reading.batch import Batch
 from .reading.pack import Pack
 from .results import Data, Place
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Columns:
     """Detached read-only arrays, with an optional catalogue for this chunk.
 
@@ -37,36 +36,21 @@ class Columns:
     errors: tuple[str | None, ...]
 
 
-def columns(
-    pack: Pack, data: Data, hits: list[Hit], stored_cell: StoredCell, *, decode: bool
-) -> Columns:
-    count = len(hits)
-    cell = np.zeros(count, dtype=np.uint64)
-    stored = np.zeros(count, dtype=np.uint64)
-    valid = np.zeros(count, dtype=np.bool_)
-    present = np.zeros(count, dtype=np.bool_)
-    status = np.empty(count, dtype="U16")
-    labels = np.zeros((count, 4), dtype=np.uint32)
-    for index, hit in enumerate(hits):
-        valid[index] = hit.error is None
-        cell[index] = hit.cell
-        if hit.error is not None:
-            status[index] = "invalid_input"
-        elif not hit.covered:
-            status[index] = "outside_coverage"
-        elif hit.found is None:
-            status[index] = "ineligible"
-        else:
-            key, label = hit.found
-            present[index] = True
-            stored[index] = stored_cell(hit.block, key)
-            labels[index] = label
-            status[index] = "matched" if any(label[:3]) else "unassigned"
+def columns(pack: Pack, data: Data, batch: Batch, *, decode: bool) -> Columns:
+    cell, labels = batch.cells, batch.labels
+    valid = cell != 0
+    present = batch.keys >= 0
+    stored = parents(cell, batch.keys)
+    status = np.full(len(cell), "invalid_input", dtype="U16")
+    status[valid] = "outside_coverage"
+    status[batch.covered] = "ineligible"
+    status[present] = "unassigned"
+    status[present & np.any(labels[:, :3] != 0, axis=1)] = "matched"
     places = None
     if decode:
         records = {}
         for reference in np.unique(labels[:, :3]):
-            value = place(pack, int(reference))
+            value = pack.places.place(int(reference))
             if value is not None:
                 records[int(reference)] = value
         places = MappingProxyType(records)
@@ -84,5 +68,5 @@ def columns(
         labels[:, 3],
         data,
         places,
-        tuple(hit.error for hit in hits),
+        batch.errors,
     )

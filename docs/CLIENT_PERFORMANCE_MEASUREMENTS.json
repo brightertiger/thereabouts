@@ -1,0 +1,757 @@
+{
+  "before": {
+    "machine": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.8",
+    "numpy": "2.3.5",
+    "info": {
+      "backend": "cython",
+      "pack": {
+        "block_resolution": 3,
+        "catalogue_epoch": "synthetic",
+        "coverage": "blocks",
+        "data_version": "synthetic",
+        "dependencies": [],
+        "export": {
+          "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+          "implementation": {
+            "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+            "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+            "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+            "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+            "build_data/serve/__main__.py": "cd465e4f392648411c7397b7af3ecb5241adf6feedc7f84bce90cbf54e305cab",
+            "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+            "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+            "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+            "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+            "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+            "build_data/serve/export.py": "f7b5e87424902c1f3eac3751fc69f9f44a94d9b8d2602143a8289608d19536c2",
+            "build_data/serve/metadata.py": "b41dd040dfa92f0cdffc68f7895022ec9fae352cb7c25ff4a5ad8ff09ee2d67a",
+            "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+            "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+            "src/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+            "src/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+            "src/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+            "src/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+            "src/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+            "src/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+            "src/thereabouts/packs/layout.py": "3e1e7c0059002f89f96d6ef5d9fc48fad940468560dbefbb7ee06a08988f0165",
+            "src/thereabouts/packs/metadata.py": "1820c8efe664eac9a99359f4b4879136ea6a47e88feb3b8241d5a14b9e25d7ea",
+            "src/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+            "src/thereabouts/packs/verify.py": "c42a050bce4146892bd3dc6752e3b0ed3b752b5bd766dc47a32c6540475fb1f9"
+          },
+          "release": {
+            "catalogue_epoch": "synthetic",
+            "data_version": "synthetic",
+            "notices": [
+              {
+                "path": "LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              }
+            ],
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ]
+          },
+          "shard_bytes": 4194304,
+          "tools": {
+            "h3": {
+              "c": "4.5.0",
+              "python": "4.5.0"
+            },
+            "pyarrow": "23.0.1",
+            "python": "3.12.8",
+            "sqlite": "3.47.1"
+          }
+        },
+        "export_fingerprint": "d48e1fed8520daa62454fa3bf798b7bb29b7cc5388df9a92d26c271ddc5ffbcf",
+        "family": "reverse",
+        "files": [
+          {
+            "count": 4176,
+            "first_id": 1,
+            "kind": "catalogue",
+            "path": "catalogue-00000.bin",
+            "sha256": "07ff4a469963842f5d6c50617ca9c76345a33a85e3c15f1c24bda6a21cdf7a71",
+            "size": 1306534
+          },
+          {
+            "first_block": 1277,
+            "kind": "cells",
+            "last_block": 7072,
+            "path": "cells-00000.bin",
+            "sha256": "f35498bb281db3ea65c0595339bfbe27b3294809ab9b9327ab05a67f86ae706e",
+            "size": 344152
+          },
+          {
+            "first_block": 7182,
+            "kind": "cells",
+            "last_block": 8531,
+            "path": "cells-00001.bin",
+            "sha256": "b1388bb78c6bd293dbf966fa9d81be9b1f20d0353c891901228c90eb45824e01",
+            "size": 344152
+          },
+          {
+            "first_block": 8537,
+            "kind": "cells",
+            "last_block": 12656,
+            "path": "cells-00002.bin",
+            "sha256": "576f8535abccd8a372e80ed9d5d52652dbc7375433b6b1a1226a4331f7dc8b72",
+            "size": 344152
+          },
+          {
+            "first_block": 12657,
+            "kind": "cells",
+            "last_block": 28829,
+            "path": "cells-00003.bin",
+            "sha256": "a0d3f3489d5eb388c44c7f3151c33c63f32cdc7ddb07360f194b424cde852944",
+            "size": 344152
+          },
+          {
+            "first_block": 30674,
+            "kind": "cells",
+            "last_block": 32594,
+            "path": "cells-00004.bin",
+            "sha256": "d2d051526dd8fc53d9129f95f2a5722e564893f9a124d2e818cce43cd42fae40",
+            "size": 317680
+          },
+          {
+            "kind": "notice",
+            "path": "notices/000-LICENSE.txt",
+            "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+            "size": 34
+          },
+          {
+            "kind": "notice",
+            "path": "notices/001-DATA_LICENSES.md",
+            "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+            "size": 36
+          },
+          {
+            "kind": "notice",
+            "path": "notices/002-DATASET_CARD.md",
+            "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+            "size": 48
+          }
+        ],
+        "format": {
+          "major": 1,
+          "minor": 0,
+          "required_features": 0
+        },
+        "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+        "h3_version": "4.5.0",
+        "minimum_reader": "0.1.0",
+        "nearest": {
+          "cutoff_m": 50000,
+          "distant_over_m": 25000,
+          "exact_distance": false
+        },
+        "notices": [
+          "notices/000-LICENSE.txt",
+          "notices/001-DATA_LICENSES.md",
+          "notices/002-DATASET_CARD.md"
+        ],
+        "place_count": 4176,
+        "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+        "reference_resolution": 8,
+        "schema": "thereabouts-pack-1",
+        "sources": [
+          {
+            "attribution": "Thereabouts test fixture",
+            "license": "public-domain",
+            "license_url": "https://example.invalid/license",
+            "release": "fixture",
+            "source": "synthetic",
+            "source_url": "https://example.invalid/synthetic"
+          }
+        ],
+        "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b"
+      }
+    },
+    "installed_bytes": 3006380,
+    "peak_process_rss_bytes": 127303680,
+    "workloads": {
+      "clustered": {
+        "points": 44032,
+        "scalar_median_ns": 195625.0,
+        "scalar_p99_ns": 230125,
+        "columns_per_second": 154275.96642473855,
+        "objects_per_second": 4902.225218494919,
+        "column_seconds": [
+          0.28711833400302567,
+          0.2836475829972187,
+          0.2818444590084255,
+          0.2856379580043722,
+          0.285410625001532
+        ],
+        "object_seconds": [
+          2.1024802920001093,
+          2.0450350839964813,
+          2.0398899590072688,
+          2.039007917002891,
+          2.0322672500042245
+        ],
+        "scalar_profile": "         8900995 function calls (8820983 primitive calls) in 2.497 seconds\n\n   Ordered by: cumulative time\n   List reduced from 122 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.006    0.000    2.524    0.001 client.py:51(reverse)\n     5000    0.005    0.000    2.479    0.000 client.py:61(_one)\n     5000    0.015    0.000    2.387    0.000 decode.py:129(resolution)\n     5000    0.022    0.000    2.361    0.000 decode.py:86(candidate)\n    20000    0.050    0.000    2.196    0.000 decode.py:56(place)\n    80000    0.039    0.000    2.118    0.000 pack.py:88(record)\n    80000    0.326    0.000    2.071    0.000 catalogue.py:48(record)\n    80000    0.024    0.000    1.470    0.000 pack.py:110(identity)\n   960000    0.579    0.000    0.828    0.000 catalogue.py:31(text)\n    80000    0.027    0.000    0.470    0.000 jsonio.py:39(parse)\n    80000    0.072    0.000    0.437    0.000 __init__.py:299(loads)\n    80003    0.080    0.000    0.316    0.000 jsonio.py:46(relative_name)\n    80000    0.061    0.000    0.298    0.000 decoder.py:333(decode)\n    80000    0.083    0.000    0.190    0.000 decoder.py:344(raw_decode)\n  2071913    0.178    0.000    0.178    0.000 {method 'unpack_from' of '_struct.Struct' objects}\n   165015    0.088    0.000    0.160    0.000 {built-in method builtins.any}\n   240000    0.077    0.000    0.106    0.000 jsonio.py:28(_object)\n    80024    0.029    0.000    0.101    0.000 pathlib.py:1157(__init__)\n120000/40000    0.063    0.000    0.092    0.000 results.py:22(freeze)\n   720000    0.090    0.000    0.090    0.000 {method 'decode' of 'bytes' objects}\n    80024    0.045    0.000    0.073    0.000 pathlib.py:358(__init__)\n   690174    0.053    0.000    0.065    0.000 {built-in method builtins.isinstance}\n     5000    0.019    0.000    0.063    0.000 spatial.py:116(lookup)\n    80000    0.051    0.000    0.051    0.000 decoder.py:285(__init__)\n    40000    0.006    0.000    0.048    0.000 results.py:26(<genexpr>)\n\n\n",
+        "column_profile": "         2053034 function calls (2052946 primitive calls) in 0.526 seconds\n\n   Ordered by: cumulative time\n   List reduced from 128 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.005    0.000    0.576    0.048 client.py:173(_column_iterator)\n       11    0.033    0.003    0.511    0.046 batch.py:25(lookup_rows)\n    44032    0.078    0.000    0.235    0.000 inputs.py:17(coordinates)\n       74    0.007    0.000    0.157    0.002 pack.py:72(lookup_many)\n   265912    0.034    0.000    0.102    0.000 {built-in method builtins.isinstance}\n    44032    0.042    0.000    0.074    0.000 spatial.py:91(label)\n   176128    0.019    0.000    0.068    0.000 <frozen abc>:117(__instancecheck__)\n       11    0.045    0.004    0.059    0.005 columns.py:40(columns)\n    44032    0.044    0.000    0.051    0.000 address.py:24(address)\n   176128    0.024    0.000    0.049    0.000 {built-in method _abc._abc_instancecheck}\n       74    0.016    0.000    0.037    0.001 spatial.py:85(keys)\n    88064    0.014    0.000    0.025    0.000 <frozen abc>:121(__subclasscheck__)\n    44032    0.021    0.000    0.023    0.000 __init__.py:176(latlng_to_cell)\n    44032    0.018    0.000    0.022    0.000 layout.py:97(check_label)\n   356236    0.021    0.000    0.021    0.000 spatial.py:87(<genexpr>)\n       74    0.000    0.000    0.021    0.000 pack.py:39(spatial_for)\n       74    0.009    0.000    0.019    0.000 search.py:13(search)\n       22    0.000    0.000    0.015    0.001 spatial.py:39(__init__)\n       22    0.012    0.001    0.013    0.001 container.py:19(__init__)\n   133093    0.011    0.000    0.011    0.000 {method 'append' of 'list' objects}\n    88064    0.011    0.000    0.011    0.000 {built-in method _abc._abc_subclasscheck}\n    44313    0.007    0.000    0.008    0.000 __init__.py:146(is_valid_cell)\n      888    0.000    0.000    0.008    0.000 fromnumeric.py:51(_wrapfunc)\n      444    0.000    0.000    0.007    0.000 fromnumeric.py:1446(searchsorted)\n    44594    0.007    0.000    0.007    0.000 address.py:20(level_offset)\n\n\n"
+      },
+      "shuffled": {
+        "points": 44032,
+        "scalar_median_ns": 367417.0,
+        "scalar_p99_ns": 448458,
+        "columns_per_second": 90575.23610043597,
+        "objects_per_second": 4640.7331013441435,
+        "column_seconds": [
+          0.4843683329963824,
+          0.4871639579941984,
+          0.48613729199860245,
+          0.49161329100024886,
+          0.48457712499657646
+        ],
+        "object_seconds": [
+          2.1646000829932746,
+          2.1457799159979913,
+          2.1548319590074243,
+          2.166517292003846,
+          2.144270791002782
+        ],
+        "scalar_profile": "         11633827 function calls (11537739 primitive calls) in 3.783 seconds\n\n   Ordered by: cumulative time\n   List reduced from 122 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.007    0.000    3.853    0.001 client.py:51(reverse)\n     5000    0.006    0.000    3.802    0.001 client.py:61(_one)\n     5000    0.017    0.000    2.416    0.000 decode.py:129(resolution)\n     5000    0.023    0.000    2.389    0.000 decode.py:86(candidate)\n    20000    0.054    0.000    2.224    0.000 decode.py:56(place)\n    80000    0.042    0.000    2.138    0.000 pack.py:88(record)\n    80000    0.332    0.000    2.089    0.000 catalogue.py:48(record)\n    80000    0.025    0.000    1.474    0.000 pack.py:110(identity)\n     5000    0.017    0.000    1.291    0.000 pack.py:39(spatial_for)\n   960000    0.570    0.000    0.819    0.000 catalogue.py:31(text)\n     4022    0.011    0.000    0.770    0.000 jsonio.py:54(relative_file)\n    12066    0.011    0.000    0.605    0.000 pathlib.py:1228(resolve)\n     4022    0.005    0.000    0.489    0.000 spatial.py:39(__init__)\n    80000    0.028    0.000    0.483    0.000 jsonio.py:39(parse)\n    80000    0.076    0.000    0.449    0.000 __init__.py:299(loads)\n    12066    0.009    0.000    0.446    0.000 <frozen posixpath>:423(realpath)\n    84022    0.087    0.000    0.337    0.000 jsonio.py:46(relative_name)\n    12066    0.067    0.000    0.308    0.000 <frozen posixpath>:432(_joinrealpath)\n    80000    0.063    0.000    0.306    0.000 decoder.py:333(decode)\n     4022    0.075    0.000    0.288    0.000 spatial.py:49(_blocks)\n  2143461    0.200    0.000    0.200    0.000 {method 'unpack_from' of '_struct.Struct' objects}\n     4022    0.068    0.000    0.196    0.000 container.py:19(__init__)\n    80000    0.086    0.000    0.194    0.000 decoder.py:344(raw_decode)\n   185110    0.093    0.000    0.168    0.000 {built-in method builtins.any}\n    60330    0.024    0.000    0.158    0.000 pathlib.py:437(__str__)\n\n\n",
+        "column_profile": "         5180114 function calls (5179894 primitive calls) in 0.993 seconds\n\n   Ordered by: cumulative time\n   List reduced from 128 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.012    0.001    1.042    0.087 client.py:173(_column_iterator)\n       11    0.054    0.005    0.969    0.088 batch.py:25(lookup_rows)\n      704    0.010    0.000    0.587    0.001 pack.py:72(lookup_many)\n      704    0.155    0.000    0.372    0.001 spatial.py:85(keys)\n    44032    0.076    0.000    0.243    0.000 inputs.py:17(coordinates)\n  3389056    0.217    0.000    0.217    0.000 spatial.py:87(<genexpr>)\n   271606    0.035    0.000    0.108    0.000 {built-in method builtins.isinstance}\n    44032    0.054    0.000    0.091    0.000 spatial.py:91(label)\n   176128    0.019    0.000    0.073    0.000 <frozen abc>:117(__instancecheck__)\n      704    0.029    0.000    0.061    0.000 search.py:13(search)\n       11    0.047    0.004    0.061    0.006 columns.py:40(columns)\n   176128    0.024    0.000    0.054    0.000 {built-in method _abc._abc_instancecheck}\n      704    0.001    0.000    0.053    0.000 pack.py:39(spatial_for)\n    44032    0.045    0.000    0.052    0.000 address.py:24(address)\n       55    0.000    0.000    0.037    0.001 spatial.py:39(__init__)\n       55    0.029    0.001    0.032    0.001 container.py:19(__init__)\n    88064    0.019    0.000    0.030    0.000 <frozen abc>:121(__subclasscheck__)\n    44032    0.026    0.000    0.028    0.000 __init__.py:176(latlng_to_cell)\n    44032    0.019    0.000    0.024    0.000 layout.py:97(check_label)\n     8448    0.003    0.000    0.019    0.000 fromnumeric.py:51(_wrapfunc)\n     4224    0.001    0.000    0.018    0.000 fromnumeric.py:1446(searchsorted)\n       55    0.000    0.000    0.015    0.000 jsonio.py:54(relative_file)\n     4224    0.014    0.000    0.014    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n      165    0.000    0.000    0.012    0.000 pathlib.py:1228(resolve)\n   134593    0.011    0.000    0.011    0.000 {method 'append' of 'list' objects}\n\n\n"
+      }
+    }
+  },
+  "cython": {
+    "open_ns": 1944416,
+    "first_lookup_ns": 7555667,
+    "machine": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.8",
+    "numpy": "2.3.5",
+    "info": {
+      "backend": "cython",
+      "pack": {
+        "block_resolution": 3,
+        "catalogue_epoch": "synthetic",
+        "coverage": "blocks",
+        "data_version": "synthetic",
+        "dependencies": [],
+        "export": {
+          "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+          "implementation": {
+            "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+            "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+            "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+            "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+            "build_data/serve/__main__.py": "cd465e4f392648411c7397b7af3ecb5241adf6feedc7f84bce90cbf54e305cab",
+            "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+            "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+            "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+            "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+            "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+            "build_data/serve/export.py": "f7b5e87424902c1f3eac3751fc69f9f44a94d9b8d2602143a8289608d19536c2",
+            "build_data/serve/metadata.py": "b41dd040dfa92f0cdffc68f7895022ec9fae352cb7c25ff4a5ad8ff09ee2d67a",
+            "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+            "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+            "src/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+            "src/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+            "src/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+            "src/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+            "src/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+            "src/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+            "src/thereabouts/packs/layout.py": "3e1e7c0059002f89f96d6ef5d9fc48fad940468560dbefbb7ee06a08988f0165",
+            "src/thereabouts/packs/metadata.py": "1820c8efe664eac9a99359f4b4879136ea6a47e88feb3b8241d5a14b9e25d7ea",
+            "src/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+            "src/thereabouts/packs/verify.py": "c42a050bce4146892bd3dc6752e3b0ed3b752b5bd766dc47a32c6540475fb1f9"
+          },
+          "release": {
+            "catalogue_epoch": "synthetic",
+            "data_version": "synthetic",
+            "notices": [
+              {
+                "path": "LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              }
+            ],
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ]
+          },
+          "shard_bytes": 4194304,
+          "tools": {
+            "h3": {
+              "c": "4.5.0",
+              "python": "4.5.0"
+            },
+            "pyarrow": "23.0.1",
+            "python": "3.12.8",
+            "sqlite": "3.47.1"
+          }
+        },
+        "export_fingerprint": "d48e1fed8520daa62454fa3bf798b7bb29b7cc5388df9a92d26c271ddc5ffbcf",
+        "family": "reverse",
+        "files": [
+          {
+            "count": 4176,
+            "first_id": 1,
+            "kind": "catalogue",
+            "path": "catalogue-00000.bin",
+            "sha256": "07ff4a469963842f5d6c50617ca9c76345a33a85e3c15f1c24bda6a21cdf7a71",
+            "size": 1306534
+          },
+          {
+            "first_block": 1277,
+            "kind": "cells",
+            "last_block": 7072,
+            "path": "cells-00000.bin",
+            "sha256": "f35498bb281db3ea65c0595339bfbe27b3294809ab9b9327ab05a67f86ae706e",
+            "size": 344152
+          },
+          {
+            "first_block": 7182,
+            "kind": "cells",
+            "last_block": 8531,
+            "path": "cells-00001.bin",
+            "sha256": "b1388bb78c6bd293dbf966fa9d81be9b1f20d0353c891901228c90eb45824e01",
+            "size": 344152
+          },
+          {
+            "first_block": 8537,
+            "kind": "cells",
+            "last_block": 12656,
+            "path": "cells-00002.bin",
+            "sha256": "576f8535abccd8a372e80ed9d5d52652dbc7375433b6b1a1226a4331f7dc8b72",
+            "size": 344152
+          },
+          {
+            "first_block": 12657,
+            "kind": "cells",
+            "last_block": 28829,
+            "path": "cells-00003.bin",
+            "sha256": "a0d3f3489d5eb388c44c7f3151c33c63f32cdc7ddb07360f194b424cde852944",
+            "size": 344152
+          },
+          {
+            "first_block": 30674,
+            "kind": "cells",
+            "last_block": 32594,
+            "path": "cells-00004.bin",
+            "sha256": "d2d051526dd8fc53d9129f95f2a5722e564893f9a124d2e818cce43cd42fae40",
+            "size": 317680
+          },
+          {
+            "kind": "notice",
+            "path": "notices/000-LICENSE.txt",
+            "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+            "size": 34
+          },
+          {
+            "kind": "notice",
+            "path": "notices/001-DATA_LICENSES.md",
+            "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+            "size": 36
+          },
+          {
+            "kind": "notice",
+            "path": "notices/002-DATASET_CARD.md",
+            "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+            "size": 48
+          }
+        ],
+        "format": {
+          "major": 1,
+          "minor": 0,
+          "required_features": 0
+        },
+        "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+        "h3_version": "4.5.0",
+        "minimum_reader": "0.1.0",
+        "nearest": {
+          "cutoff_m": 50000,
+          "distant_over_m": 25000,
+          "exact_distance": false
+        },
+        "notices": [
+          "notices/000-LICENSE.txt",
+          "notices/001-DATA_LICENSES.md",
+          "notices/002-DATASET_CARD.md"
+        ],
+        "place_count": 4176,
+        "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+        "reference_resolution": 8,
+        "schema": "thereabouts-pack-1",
+        "sources": [
+          {
+            "attribution": "Thereabouts test fixture",
+            "license": "public-domain",
+            "license_url": "https://example.invalid/license",
+            "release": "fixture",
+            "source": "synthetic",
+            "source_url": "https://example.invalid/synthetic"
+          }
+        ],
+        "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b"
+      },
+      "cache": {
+        "budget_bytes": 33554432,
+        "entries": 4176,
+        "retained_bytes": 8775320,
+        "hits": 868084,
+        "misses": 4176,
+        "evictions": 0
+      }
+    },
+    "installed_bytes": 3006380,
+    "peak_process_rss_bytes": 78200832,
+    "workloads": {
+      "clustered": {
+        "points": 44032,
+        "catalogue_warmup_ns": 610007958,
+        "scalar_median_ns": 9375.0,
+        "scalar_p99_ns": 11584,
+        "columns_per_second": 588008.6668579503,
+        "objects_per_second": 115993.41440417181,
+        "column_seconds": [
+          0.09231058298610151,
+          0.07413345800887328,
+          0.07476491600391455,
+          0.07488324999576434,
+          0.07820470799924806
+        ],
+        "object_seconds": [
+          0.08611116699466947,
+          0.08621179100009613,
+          0.08639900000707712,
+          0.08521370799280703,
+          0.08624524998595007
+        ],
+        "scalar_profile": "         267114 function calls in 0.092 seconds\n\n   Ordered by: cumulative time\n   List reduced from 33 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.106    0.000 client.py:56(reverse)\n     5000    0.003    0.000    0.082    0.000 client.py:66(_one)\n     5000    0.010    0.000    0.055    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.034    0.000 decode.py:53(candidate)\n     5000    0.003    0.000    0.019    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.018    0.000 pack.py:84(lookup)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.011    0.000 inputs.py:17(coordinate_values)\n    15000    0.003    0.000    0.010    0.000 places.py:79(place)\n    20000    0.006    0.000    0.010    0.000 places.py:54(get)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.002    0.000    0.006    0.000 pack.py:79(index_for)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.003    0.000    0.004    0.000 pack.py:49(spatial_for)\n     5024    0.004    0.000    0.004    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n    12089    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}\n    20000    0.001    0.000    0.001    0.000 typing.py:2183(cast)\n     5000    0.001    0.000    0.001    0.000 address.py:20(level_offset)\n    15000    0.001    0.000    0.001    0.000 _convert.py:4(_in_scalar)\n    10000    0.001    0.000    0.001    0.000 {built-in method _bisect.bisect_right}\n\n\n",
+        "column_profile": "         586656 function calls in 0.173 seconds\n\n   Ordered by: cumulative time\n   List reduced from 85 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.173    0.014 client.py:148(_column_iterator)\n       11    0.025    0.002    0.170    0.015 batch.py:30(lookup_rows)\n    44032    0.063    0.000    0.083    0.000 inputs.py:17(coordinate_values)\n    44032    0.022    0.000    0.024    0.000 __init__.py:176(latlng_to_cell)\n       25    0.013    0.001    0.019    0.001 spatial.py:125(lookup_many)\n   220160    0.016    0.000    0.016    0.000 {method 'append' of 'list' objects}\n   132121    0.007    0.000    0.007    0.000 typing.py:2183(cast)\n       41    0.007    0.000    0.007    0.000 {built-in method numpy.array}\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     1212    0.000    0.000    0.002    0.000 fromnumeric.py:2477(any)\n       25    0.002    0.000    0.002    0.000 spatial.py:161(_labels)\n     1212    0.001    0.000    0.002    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n      235    0.000    0.000    0.001    0.000 fromnumeric.py:51(_wrapfunc)\n     1262    0.001    0.000    0.001    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       47    0.000    0.000    0.001    0.000 fromnumeric.py:1446(searchsorted)\n       47    0.001    0.000    0.001    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n       25    0.001    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n      188    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n       22    0.000    0.000    0.000    0.000 fromnumeric.py:41(_wrapit)\n      188    0.000    0.000    0.000    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.000    0.000 address.py:36(parents)\n\n\n"
+      },
+      "shuffled": {
+        "points": 44032,
+        "catalogue_warmup_ns": 422185542,
+        "scalar_median_ns": 9375.0,
+        "scalar_p99_ns": 11125,
+        "columns_per_second": 526811.7283599642,
+        "objects_per_second": 114217.1839739744,
+        "column_seconds": [
+          0.08358204198884778,
+          0.08412466599838808,
+          0.08507662500778679,
+          0.08350383299693931,
+          0.08287783300329465
+        ],
+        "object_seconds": [
+          0.0875410830049077,
+          0.0876920830050949,
+          0.08792104199528694,
+          0.08752445799473207,
+          0.08755250000103842
+        ],
+        "scalar_profile": "         267073 function calls in 0.090 seconds\n\n   Ordered by: cumulative time\n   List reduced from 33 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.103    0.000 client.py:56(reverse)\n     5000    0.003    0.000    0.080    0.000 client.py:66(_one)\n     5000    0.010    0.000    0.053    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.033    0.000 decode.py:53(candidate)\n     5000    0.003    0.000    0.019    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.018    0.000 pack.py:84(lookup)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.010    0.000 inputs.py:17(coordinate_values)\n    15000    0.003    0.000    0.010    0.000 places.py:79(place)\n    20000    0.006    0.000    0.009    0.000 places.py:54(get)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.002    0.000    0.006    0.000 pack.py:79(index_for)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.003    0.000    0.004    0.000 pack.py:49(spatial_for)\n     5015    0.004    0.000    0.004    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n    12057    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}\n    20000    0.001    0.000    0.001    0.000 typing.py:2183(cast)\n     5000    0.001    0.000    0.001    0.000 address.py:20(level_offset)\n    10000    0.001    0.000    0.001    0.000 {built-in method _bisect.bisect_right}\n    10000    0.001    0.000    0.001    0.000 {built-in method math.isfinite}\n\n\n",
+        "column_profile": "         599810 function calls in 0.171 seconds\n\n   Ordered by: cumulative time\n   List reduced from 85 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.171    0.014 client.py:148(_column_iterator)\n       11    0.023    0.002    0.169    0.015 batch.py:30(lookup_rows)\n    44032    0.058    0.000    0.075    0.000 inputs.py:17(coordinate_values)\n       55    0.019    0.000    0.027    0.000 spatial.py:125(lookup_many)\n    44032    0.024    0.000    0.025    0.000 __init__.py:176(latlng_to_cell)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n       54    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n   132151    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     2312    0.001    0.000    0.004    0.000 fromnumeric.py:2477(any)\n     2312    0.001    0.000    0.003    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n       55    0.002    0.000    0.003    0.000 spatial.py:161(_labels)\n      466    0.000    0.000    0.002    0.000 fromnumeric.py:51(_wrapfunc)\n     2422    0.002    0.000    0.002    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       77    0.000    0.000    0.002    0.000 fromnumeric.py:1446(searchsorted)\n       77    0.002    0.000    0.002    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n      389    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       55    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n       55    0.001    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       22    0.000    0.000    0.001    0.000 fromnumeric.py:41(_wrapit)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n      389    0.000    0.000    0.001    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.001    0.000 address.py:36(parents)\n\n\n"
+      }
+    }
+  },
+  "python": {
+    "open_ns": 1285666,
+    "first_lookup_ns": 24948375,
+    "machine": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.8",
+    "numpy": "2.3.5",
+    "info": {
+      "backend": "python",
+      "pack": {
+        "block_resolution": 3,
+        "catalogue_epoch": "synthetic",
+        "coverage": "blocks",
+        "data_version": "synthetic",
+        "dependencies": [],
+        "export": {
+          "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+          "implementation": {
+            "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+            "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+            "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+            "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+            "build_data/serve/__main__.py": "cd465e4f392648411c7397b7af3ecb5241adf6feedc7f84bce90cbf54e305cab",
+            "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+            "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+            "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+            "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+            "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+            "build_data/serve/export.py": "f7b5e87424902c1f3eac3751fc69f9f44a94d9b8d2602143a8289608d19536c2",
+            "build_data/serve/metadata.py": "b41dd040dfa92f0cdffc68f7895022ec9fae352cb7c25ff4a5ad8ff09ee2d67a",
+            "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+            "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+            "src/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+            "src/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+            "src/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+            "src/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+            "src/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+            "src/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+            "src/thereabouts/packs/layout.py": "3e1e7c0059002f89f96d6ef5d9fc48fad940468560dbefbb7ee06a08988f0165",
+            "src/thereabouts/packs/metadata.py": "1820c8efe664eac9a99359f4b4879136ea6a47e88feb3b8241d5a14b9e25d7ea",
+            "src/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+            "src/thereabouts/packs/verify.py": "c42a050bce4146892bd3dc6752e3b0ed3b752b5bd766dc47a32c6540475fb1f9"
+          },
+          "release": {
+            "catalogue_epoch": "synthetic",
+            "data_version": "synthetic",
+            "notices": [
+              {
+                "path": "LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              }
+            ],
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ]
+          },
+          "shard_bytes": 4194304,
+          "tools": {
+            "h3": {
+              "c": "4.5.0",
+              "python": "4.5.0"
+            },
+            "pyarrow": "23.0.1",
+            "python": "3.12.8",
+            "sqlite": "3.47.1"
+          }
+        },
+        "export_fingerprint": "d48e1fed8520daa62454fa3bf798b7bb29b7cc5388df9a92d26c271ddc5ffbcf",
+        "family": "reverse",
+        "files": [
+          {
+            "count": 4176,
+            "first_id": 1,
+            "kind": "catalogue",
+            "path": "catalogue-00000.bin",
+            "sha256": "07ff4a469963842f5d6c50617ca9c76345a33a85e3c15f1c24bda6a21cdf7a71",
+            "size": 1306534
+          },
+          {
+            "first_block": 1277,
+            "kind": "cells",
+            "last_block": 7072,
+            "path": "cells-00000.bin",
+            "sha256": "f35498bb281db3ea65c0595339bfbe27b3294809ab9b9327ab05a67f86ae706e",
+            "size": 344152
+          },
+          {
+            "first_block": 7182,
+            "kind": "cells",
+            "last_block": 8531,
+            "path": "cells-00001.bin",
+            "sha256": "b1388bb78c6bd293dbf966fa9d81be9b1f20d0353c891901228c90eb45824e01",
+            "size": 344152
+          },
+          {
+            "first_block": 8537,
+            "kind": "cells",
+            "last_block": 12656,
+            "path": "cells-00002.bin",
+            "sha256": "576f8535abccd8a372e80ed9d5d52652dbc7375433b6b1a1226a4331f7dc8b72",
+            "size": 344152
+          },
+          {
+            "first_block": 12657,
+            "kind": "cells",
+            "last_block": 28829,
+            "path": "cells-00003.bin",
+            "sha256": "a0d3f3489d5eb388c44c7f3151c33c63f32cdc7ddb07360f194b424cde852944",
+            "size": 344152
+          },
+          {
+            "first_block": 30674,
+            "kind": "cells",
+            "last_block": 32594,
+            "path": "cells-00004.bin",
+            "sha256": "d2d051526dd8fc53d9129f95f2a5722e564893f9a124d2e818cce43cd42fae40",
+            "size": 317680
+          },
+          {
+            "kind": "notice",
+            "path": "notices/000-LICENSE.txt",
+            "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+            "size": 34
+          },
+          {
+            "kind": "notice",
+            "path": "notices/001-DATA_LICENSES.md",
+            "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+            "size": 36
+          },
+          {
+            "kind": "notice",
+            "path": "notices/002-DATASET_CARD.md",
+            "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+            "size": 48
+          }
+        ],
+        "format": {
+          "major": 1,
+          "minor": 0,
+          "required_features": 0
+        },
+        "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+        "h3_version": "4.5.0",
+        "minimum_reader": "0.1.0",
+        "nearest": {
+          "cutoff_m": 50000,
+          "distant_over_m": 25000,
+          "exact_distance": false
+        },
+        "notices": [
+          "notices/000-LICENSE.txt",
+          "notices/001-DATA_LICENSES.md",
+          "notices/002-DATASET_CARD.md"
+        ],
+        "place_count": 4176,
+        "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+        "reference_resolution": 8,
+        "schema": "thereabouts-pack-1",
+        "sources": [
+          {
+            "attribution": "Thereabouts test fixture",
+            "license": "public-domain",
+            "license_url": "https://example.invalid/license",
+            "release": "fixture",
+            "source": "synthetic",
+            "source_url": "https://example.invalid/synthetic"
+          }
+        ],
+        "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b"
+      },
+      "cache": {
+        "budget_bytes": 33554432,
+        "entries": 4176,
+        "retained_bytes": 8775320,
+        "hits": 868084,
+        "misses": 4176,
+        "evictions": 0
+      }
+    },
+    "installed_bytes": 3006380,
+    "peak_process_rss_bytes": 77643776,
+    "workloads": {
+      "clustered": {
+        "points": 44032,
+        "catalogue_warmup_ns": 748386750,
+        "scalar_median_ns": 11666.0,
+        "scalar_p99_ns": 15458,
+        "columns_per_second": 606299.2024965177,
+        "objects_per_second": 92155.95427413796,
+        "column_seconds": [
+          0.08704087499063462,
+          0.07275395799661055,
+          0.07258191698929295,
+          0.07262420900224242,
+          0.07230937499844003
+        ],
+        "object_seconds": [
+          0.11113874999864493,
+          0.10812841600272804,
+          0.10838375000457745,
+          0.10851170799287502,
+          0.10955925000598654
+        ],
+        "scalar_profile": "         352066 function calls in 0.121 seconds\n\n   Ordered by: cumulative time\n   List reduced from 35 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.135    0.000 client.py:56(reverse)\n     5000    0.003    0.000    0.111    0.000 client.py:66(_one)\n     5000    0.009    0.000    0.083    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.035    0.000 decode.py:53(candidate)\n     5000    0.001    0.000    0.031    0.000 _reader_py.py:6(stored_cell)\n     5000    0.020    0.000    0.030    0.000 address.py:36(cell_at)\n     5000    0.003    0.000    0.019    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.018    0.000 pack.py:84(lookup)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.011    0.000 inputs.py:17(coordinate_values)\n    20000    0.006    0.000    0.010    0.000 places.py:54(get)\n    15000    0.003    0.000    0.010    0.000 places.py:79(place)\n    39976    0.006    0.000    0.006    0.000 address.py:20(level_offset)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.002    0.000    0.006    0.000 pack.py:79(index_for)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n    52065    0.004    0.000    0.004    0.000 {method 'append' of 'list' objects}\n     5000    0.003    0.000    0.004    0.000 pack.py:49(spatial_for)\n     5024    0.004    0.000    0.004    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n    20000    0.001    0.000    0.001    0.000 typing.py:2183(cast)\n\n\n",
+        "column_profile": "         586656 function calls in 0.163 seconds\n\n   Ordered by: cumulative time\n   List reduced from 85 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.163    0.014 client.py:148(_column_iterator)\n       11    0.024    0.002    0.160    0.015 batch.py:30(lookup_rows)\n    44032    0.060    0.000    0.078    0.000 inputs.py:17(coordinate_values)\n    44032    0.021    0.000    0.023    0.000 __init__.py:176(latlng_to_cell)\n       25    0.013    0.001    0.018    0.001 spatial.py:125(lookup_many)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n       41    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n   132121    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     1212    0.000    0.000    0.002    0.000 fromnumeric.py:2477(any)\n       25    0.002    0.000    0.002    0.000 spatial.py:161(_labels)\n     1212    0.001    0.000    0.002    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n      235    0.000    0.000    0.001    0.000 fromnumeric.py:51(_wrapfunc)\n     1262    0.001    0.000    0.001    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       47    0.000    0.000    0.001    0.000 fromnumeric.py:1446(searchsorted)\n       47    0.001    0.000    0.001    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n      188    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n       22    0.000    0.000    0.000    0.000 fromnumeric.py:41(_wrapit)\n      188    0.000    0.000    0.000    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.000    0.000 address.py:36(parents)\n\n\n"
+      },
+      "shuffled": {
+        "points": 44032,
+        "catalogue_warmup_ns": 547238875,
+        "scalar_median_ns": 11917.0,
+        "scalar_p99_ns": 15917,
+        "columns_per_second": 527190.4408368078,
+        "objects_per_second": 87477.4882152583,
+        "column_seconds": [
+          0.0846611250017304,
+          0.08468320799875073,
+          0.08287233300507069,
+          0.08273275000101421,
+          0.08352200000081211
+        ],
+        "object_seconds": [
+          0.1139574580010958,
+          0.1169258329900913,
+          0.11531266699603293,
+          0.11392200000409503,
+          0.1143151249998482
+        ],
+        "scalar_profile": "         352043 function calls in 0.119 seconds\n\n   Ordered by: cumulative time\n   List reduced from 35 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.132    0.000 client.py:56(reverse)\n     5000    0.003    0.000    0.108    0.000 client.py:66(_one)\n     5000    0.009    0.000    0.081    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.034    0.000 decode.py:53(candidate)\n     5000    0.001    0.000    0.030    0.000 _reader_py.py:6(stored_cell)\n     5000    0.019    0.000    0.029    0.000 address.py:36(cell_at)\n     5000    0.003    0.000    0.019    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.018    0.000 pack.py:84(lookup)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.011    0.000 inputs.py:17(coordinate_values)\n    15000    0.003    0.000    0.010    0.000 places.py:79(place)\n    20000    0.006    0.000    0.010    0.000 places.py:54(get)\n    39985    0.006    0.000    0.006    0.000 address.py:20(level_offset)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.002    0.000    0.006    0.000 pack.py:79(index_for)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n    52042    0.004    0.000    0.004    0.000 {method 'append' of 'list' objects}\n     5000    0.003    0.000    0.004    0.000 pack.py:49(spatial_for)\n     5015    0.003    0.000    0.003    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n    10000    0.001    0.000    0.001    0.000 {built-in method math.isfinite}\n\n\n",
+        "column_profile": "         599810 function calls in 0.172 seconds\n\n   Ordered by: cumulative time\n   List reduced from 85 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.172    0.014 client.py:148(_column_iterator)\n       11    0.023    0.002    0.169    0.015 batch.py:30(lookup_rows)\n    44032    0.058    0.000    0.075    0.000 inputs.py:17(coordinate_values)\n       55    0.018    0.000    0.027    0.000 spatial.py:125(lookup_many)\n    44032    0.024    0.000    0.026    0.000 __init__.py:176(latlng_to_cell)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n       54    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n   132151    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     2312    0.001    0.000    0.004    0.000 fromnumeric.py:2477(any)\n     2312    0.001    0.000    0.003    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n       55    0.002    0.000    0.002    0.000 spatial.py:161(_labels)\n      466    0.000    0.000    0.002    0.000 fromnumeric.py:51(_wrapfunc)\n     2422    0.002    0.000    0.002    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n       77    0.000    0.000    0.002    0.000 fromnumeric.py:1446(searchsorted)\n       77    0.002    0.000    0.002    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       55    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n      389    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       55    0.001    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       22    0.000    0.000    0.001    0.000 fromnumeric.py:41(_wrapit)\n      389    0.000    0.000    0.001    0.000 fromnumeric.py:2018(nonzero)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n       11    0.000    0.000    0.001    0.000 address.py:36(parents)\n\n\n"
+      }
+    }
+  },
+  "cache_pressure": [
+    {
+      "budget_bytes": 0,
+      "scalar_median_ns": 77917.0,
+      "scalar_p99_ns": 102042,
+      "cache": {
+        "budget_bytes": 0,
+        "entries": 0,
+        "retained_bytes": 0,
+        "hits": 0,
+        "misses": 20000,
+        "evictions": 0
+      },
+      "profile": "         3357073 function calls (3277073 primitive calls) in 0.979 seconds\n\n   Ordered by: cumulative time\n   List reduced from 64 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.005    0.000    1.010    0.000 client.py:56(reverse)\n     5000    0.003    0.000    0.981    0.000 client.py:66(_one)\n     5000    0.013    0.000    0.939    0.000 decode.py:97(resolution)\n     5000    0.015    0.000    0.916    0.000 decode.py:53(candidate)\n    20000    0.010    0.000    0.886    0.000 places.py:54(get)\n    20000    0.053    0.000    0.874    0.000 places.py:83(_decode)\n    15000    0.004    0.000    0.674    0.000 places.py:79(place)\n    20000    0.009    0.000    0.559    0.000 pack.py:110(record)\n    20000    0.084    0.000    0.536    0.000 catalogue.py:48(record)\n   295000    0.183    0.000    0.263    0.000 catalogue.py:31(text)\n    80000    0.030    0.000    0.128    0.000 pack.py:114(identity)\n    20000    0.007    0.000    0.122    0.000 jsonio.py:39(parse)\n    20000    0.018    0.000    0.114    0.000 __init__.py:299(loads)\n120000/40000    0.059    0.000    0.086    0.000 results.py:22(freeze)\n    20000    0.019    0.000    0.080    0.000 jsonio.py:46(relative_name)\n    20000    0.016    0.000    0.078    0.000 decoder.py:333(decode)\n   670000    0.066    0.000    0.066    0.000 {method 'unpack_from' of '_struct.Struct' objects}\n    75000    0.035    0.000    0.053    0.000 pack.py:92(_catalogue_for)\n    20000    0.022    0.000    0.050    0.000 decoder.py:344(raw_decode)\n    40000    0.005    0.000    0.045    0.000 results.py:26(<genexpr>)\n    45000    0.023    0.000    0.043    0.000 {built-in method builtins.any}\n    20000    0.035    0.000    0.035    0.000 <string>:2(__init__)\n     5000    0.002    0.000    0.030    0.000 pack.py:84(lookup)\n   235000    0.030    0.000    0.030    0.000 {method 'decode' of 'bytes' objects}\n    60000    0.020    0.000    0.028    0.000 jsonio.py:28(_object)\n\n\n"
+    },
+    {
+      "budget_bytes": 65536,
+      "scalar_median_ns": 97562.5,
+      "scalar_p99_ns": 145667,
+      "cache": {
+        "budget_bytes": 65536,
+        "entries": 31,
+        "retained_bytes": 64765,
+        "hits": 8474,
+        "misses": 11526,
+        "evictions": 11495
+      },
+      "profile": "         7386431 function calls (6626045 primitive calls) in 1.704 seconds\n\n   Ordered by: cumulative time\n   List reduced from 86 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.006    0.000    1.732    0.000 client.py:56(reverse)\n     5000    0.004    0.000    1.700    0.000 client.py:66(_one)\n     5000    0.014    0.000    1.653    0.000 decode.py:97(resolution)\n     5000    0.017    0.000    1.628    0.000 decode.py:53(candidate)\n    20000    0.026    0.000    1.590    0.000 places.py:54(get)\n    15000    0.008    0.000    1.287    0.000 places.py:79(place)\n380193/11521    0.307    0.000    0.975    0.000 places.py:18(retained_bytes)\n80647/11521    0.047    0.000    0.943    0.000 {built-in method builtins.sum}\n69126/46084    0.013    0.000    0.937    0.000 places.py:36(<genexpr>)\n288025/34563    0.075    0.000    0.836    0.000 places.py:27(<genexpr>)\n    11521    0.036    0.000    0.580    0.000 places.py:83(_decode)\n    11521    0.006    0.000    0.370    0.000 pack.py:110(record)\n    11521    0.055    0.000    0.354    0.000 catalogue.py:48(record)\n  1160068    0.120    0.000    0.209    0.000 {built-in method builtins.isinstance}\n   175471    0.123    0.000    0.175    0.000 catalogue.py:31(text)\n    57605    0.015    0.000    0.150    0.000 places.py:31(<genexpr>)\n   336765    0.086    0.000    0.134    0.000 dataclasses.py:1301(is_dataclass)\n    46084    0.021    0.000    0.092    0.000 pack.py:114(identity)\n   302202    0.041    0.000    0.090    0.000 <frozen abc>:117(__instancecheck__)\n    11521    0.005    0.000    0.081    0.000 jsonio.py:39(parse)\n    11521    0.012    0.000    0.076    0.000 __init__.py:299(loads)\n    34563    0.039    0.000    0.067    0.000 dataclasses.py:1278(fields)\n69126/23042    0.037    0.000    0.054    0.000 results.py:22(freeze)\n    11521    0.013    0.000    0.053    0.000 jsonio.py:46(relative_name)\n    11521    0.010    0.000    0.051    0.000 decoder.py:333(decode)\n\n\n"
+    }
+  ],
+  "sample": {
+    "kind": "synthetic",
+    "places": 4176,
+    "stored_cell_rows": 308032,
+    "blocks": 64,
+    "coordinate_queries": 44032,
+    "shard_target_bytes": 4194304,
+    "description": "16 global centres, four r3 blocks each; sparse r8 rows and r5 controls, 64 cities/block; 4,096 distinct city names and evidence records. No geographic accuracy claims."
+  },
+  "limitations": [
+    "Warm retained-place working set, not world or cold-disk latency.",
+    "Normal open and first lookup include lazy validation; page cache not evicted.",
+    "Profiles run separately from timers; five batch repetitions, median throughput.",
+    "Python and Cython sequential processes; NumPy column path is identical in both.",
+    "Object batches and JSON serialization are not covered by the numeric-column throughput target.",
+    "64 KiB and disabled caches intentionally stress catalogue misses; results retained by callers are outside the cache budget."
+  ]
+}

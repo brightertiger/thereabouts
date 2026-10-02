@@ -15,15 +15,12 @@ from ..results import (
     Confidence,
     Data,
     Distance,
-    Evidence,
     Methods,
-    Place,
     Query,
     Reference,
     Resolution,
     Source,
     Warning,
-    freeze,
 )
 from .backend import StoredCell
 from .pack import Pack
@@ -53,45 +50,16 @@ def data_identity(pack: Pack) -> Data:
     )
 
 
-def place(pack: Pack, reference: int) -> Place | None:
-    if not reference:
-        return None
-    row = pack.record(reference)
-    evidence = row["evidence"]
-    return Place(
-        id=row["place_id"],
-        name=row["name"],
-        name_en=row["name_en"],
-        local_name=row["local_name"],
-        role=row["role"],
-        settlement_kind=row["settlement_kind"],
-        country_code=row["country_code"],
-        code=row["code"],
-        code_status=row["code_status"],
-        code_system=None,
-        country_id=pack.identity(row["country_id"]),
-        parent_id=pack.identity(row["parent_id"]),
-        sovereign_id=pack.identity(row["sovereign_id"]),
-        normalized_city_id=pack.identity(row["normalized_city_id"]),
-        parent_method=row["parent_method"],
-        normalization_method=row["normalization_method"],
-        evidence=Evidence(
-            evidence["golden_table"],
-            freeze(evidence["source_ids"]),
-            freeze(evidence["name_provenance"]),
-        ),
-    )
-
-
 def candidate(pack: Pack, label: Label) -> Candidate | None:
     country_ref, state_ref, city_ref, flags = label
     if not any(label[:3]):
         return None
-    country = place(pack, country_ref)
-    state, city = place(pack, state_ref), place(pack, city_ref)
+    country_entry = pack.places.get(country_ref)
+    country = None if country_entry is None else country_entry.place
+    state, city = pack.places.place(state_ref), pack.places.place(city_ref)
     sovereign = None
-    if country_ref:
-        sovereign = place(pack, pack.record(country_ref)["sovereign_id"])
+    if country_entry is not None:
+        sovereign = pack.places.place(country_entry.sovereign)
     method = CITY_METHODS[flags & CITY_METHOD_MASK]
     basis = BASIS.get(
         method or "", "source_boundary" if country or state else "unknown"

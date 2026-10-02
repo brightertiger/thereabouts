@@ -76,7 +76,7 @@ remain usable after the reader closes.
 ## Batches and analytics
 
 `reverse_many` and `from_h3_many` return bounded iterators in input order, grouping
-lookups by block within each chunk. The default is 4,096 rows. `chunk_size` accepts
+lookups by shard within each chunk. Results stay numeric until each object is requested. The default is 4,096 rows. `chunk_size` accepts
 any positive integer so the caller controls the memory/latency tradeoff; there is
 no guessed global input limit. The default `errors="raise"` rejects invalid
 inputs. `errors="collect"` emits `invalid_input` for individual malformed rows,
@@ -97,8 +97,10 @@ Open once per process and use a context manager or `close()`. Close is idempoten
 all later operations, including buffered iterators, fail with
 `ClosedGeocoderError`. Concurrent reads share a lock; close waits for an active
 chunk. This is thread safety, not a parallel throughput promise. Each process
-must open its own handle. The reader retains at most one spatial and one catalogue
-mapping, replacing each on shard changes; there is no full-world object cache.
+must open its own handle. Shards map lazily and remain mapped until close.
+Decoded places use a byte-bounded LRU: `cache_bytes=32 * 1024 * 1024` by default;
+zero disables it. `info()["cache"]` reports its usage and hit/miss/eviction counts.
+Mapped pages and objects retained by callers are outside that budget.
 
 ## Integrity and performance
 
@@ -119,17 +121,9 @@ remain in `thereabouts.errors`; serving corruption and unsupported formats are
 in `thereabouts.packs.errors`. Their modules stay separate while original runtime
 files are frozen.
 
-[CLIENT_READER_MEASUREMENTS.json](CLIENT_READER_MEASUREMENTS.json) records an
-Apple M2 / 8 GiB / macOS 27 / Python 3.12 sample with 67,230 synthetic rows and five
-retained places. Reproduce against the pack produced by `benchmarks.serving_export`:
-
-```sh
-TMPDIR="$PWD/.cache/tmp" OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-  .venv/bin/python -m benchmarks.client .cache/serving-measurement-reviewed/pack \
-  --output .cache/reader-measurement.json
-```
-
-Public results are considerably more expensive than numeric columns. These
-measurements include H3 conversion; they do not establish world latency or the
-product plan's performance targets. No disk cache eviction or real-world catalogue
-pressure was tested. Optimize only after profiling these separate costs.
+[CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md) reports profiles and before/after
+measurements on 4,176 synthetic places, 308,032 stored rows and 64 blocks. Warm
+shuffled scalar medians are 9.375 µs with Cython and 11.917 µs in Python; numeric
+columns exceed 526,000 points/s in both modes. Cache-pressure runs and limitations
+are included. These are warm working-set measurements, not real-world latency
+or geographic quality claims.

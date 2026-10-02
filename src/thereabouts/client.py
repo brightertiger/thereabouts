@@ -14,8 +14,10 @@ from .reading.backend import Backend, select
 from .reading.batch import lookup_rows
 from .reading.decode import data_identity, resolution
 from .reading.inputs import BATCH_SIZE, Errors, batch_options, coordinates, h3_cell
+from .reading.objects import result
 from .reading.pack import Pack
-from .results import InputError, Query, Resolution
+from .reading.places import DEFAULT_CACHE_BYTES
+from .results import Query, Resolution
 from .store import installed_pack
 
 
@@ -34,14 +36,17 @@ class Geocoder:
         data_dir: str | Path | None = None,
         verify: bool = False,
         backend: Backend = "auto",
+        cache_bytes: int = DEFAULT_CACHE_BYTES,
     ) -> None:
         if pack is not None and data_dir is not None:
             raise InvalidInputError("Select a pack directory or a data store, not both")
+        if type(cache_bytes) is not int or cache_bytes < 0:
+            raise InvalidInputError("cache_bytes must be a nonnegative integer")
         selected = installed_pack(data_dir) if pack is None else Path(pack)
         self._backend, self._stored_cell = select(backend)
         self._lock = RLock()
         self._closed = False
-        self._pack = Pack(selected, verify=verify)
+        self._pack = Pack(selected, verify=verify, cache_bytes=cache_bytes)
         self._data = data_identity(self._pack)
 
     def _ensure_open(self) -> None:
@@ -60,15 +65,14 @@ class Geocoder:
 
     def _one(self, cell: int, query: Query) -> Resolution:
         block, key = address(cell, 8)
-        shard = self._pack.spatial_for(block)
-        found = None if shard is None else shard.lookup(block, key)
+        covered, found = self._pack.lookup(block, key)
         return resolution(
             self._pack,
             self._data,
             query,
             cell,
             block,
-            shard is not None,
+            covered,
             found,
             self._stored_cell,
         )
@@ -118,43 +122,14 @@ class Geocoder:
                 self._ensure_open()
                 if not chunk:
                     return
-                answers = self._chunk(chunk, kind, errors)
-            for answer in answers:
+                batch = lookup_rows(self._pack, chunk, kind, errors)
+            for index in range(len(chunk)):
                 with self._lock:
                     self._ensure_open()
+                    answer = result(
+                        self._pack, self._data, batch, index, self._stored_cell
+                    )
                 yield answer
-
-    def _chunk(
-        self,
-        rows: list[object],
-        kind: Literal["coordinates", "h3"],
-        errors: Errors,
-    ) -> list[Resolution]:
-        answers = []
-        for hit in lookup_rows(self._pack, rows, kind, errors):
-            if hit.error is not None:
-                answer = Resolution(
-                    status="invalid_input",
-                    selected=None,
-                    candidates=(),
-                    query=hit.query,
-                    reference=None,
-                    data=self._data,
-                    error=InputError("invalid_input", hit.error),
-                )
-            else:
-                answer = resolution(
-                    self._pack,
-                    self._data,
-                    hit.query,
-                    hit.cell,
-                    hit.block,
-                    hit.covered,
-                    hit.found,
-                    self._stored_cell,
-                )
-            answers.append(answer)
-        return answers
 
     def reverse_columns(
         self,
@@ -185,15 +160,17 @@ class Geocoder:
                 if not chunk:
                     return
                 hits = lookup_rows(self._pack, chunk, "coordinates", errors)
-                result = columns(
-                    self._pack, self._data, hits, self._stored_cell, decode=decode
-                )
+                result = columns(self._pack, self._data, hits, decode=decode)
             yield result
 
     def info(self) -> dict[str, Any]:
         with self._lock:
             self._ensure_open()
-            return {"backend": self._backend, "pack": self._pack.info()}
+            return {
+                "backend": self._backend,
+                "pack": self._pack.info(),
+                "cache": self._pack.places.info(),
+            }
 
     def explain(self, answer: Resolution) -> dict[str, Any]:
         """Return installed evidence and golden references, without fetching more."""
