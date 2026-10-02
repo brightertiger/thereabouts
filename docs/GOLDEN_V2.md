@@ -1,8 +1,17 @@
 # Golden v2 city normalization
 
-**Status: world v2 verified complete and locally active.** Golden v1 and
-reconciliation remain intact. The final stored-output audits and the once-only
-holdout results are recorded below.
+**Status: world v2 verified complete and locally active.** The Thereabouts
+regeneration is content-identical to the original across all 14 logical tables;
+its regenerated base is identical across all 12 tables. `data/golden` now points
+to `data/golden-thereabouts`, and `data/base_cells/current.json` selects the new
+verified immutable base. Golden v1 and reconciliation remain intact.
+
+The [integration proof](RENAME_INTEGRATION.md) records every table, full digests,
+unchanged upstream receipts, fresh world review and selective duplicate cleanup.
+The original development and once-only holdout receipts remain under
+`data/golden-v2/`, with their original identities and bytes. Neither was rescored
+or rebound to the new manifest. The measurements below describe that original
+build; complete content equality carries them to the regenerated data.
 The original failed pilot is archived under `data/work/v2-before-rework/`.
 The regenerated pilot report is `data/work/v2-pilot/summary.json`; the process handoff
 is `data/work/v2-progress.md`. Results and the gate decision are recorded below.
@@ -24,25 +33,22 @@ those cells at resolution 8 and normalizes city assignments. The base dependency
 is verified and checkpointed under `data/base_cells/`, independently of the active
 `data/golden` publication. No raw prototype output is an input.
 
+For this existing verified checkout, resume or verify without rescoring:
+
 ```sh
-uv sync --frozen
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
-uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
-  --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
+uv sync --locked
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --through world > data/work/v2-world.log 2>&1 < /dev/null &
-# After that detached process finishes its first world audit, bind the review
-# to this workspace's incomplete manifest using the DATA_PIPELINE.md recipe.
-# Inspect any new losses, then resume:
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --through world --review data/work/v2-world-review.json
-# Only after final world verification; do not tune against this result:
-uv run --no-sync python -m build_data.normalize_cells score \
-  --output data/golden-v2 --points eval/city_points/points.csv --split holdout
-# Reuses the verified output and retains the old golden directory:
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --through publish --review data/work/v2-world-review.json
+  --through world --reuse-development --output data/golden-thereabouts \
+  --gate data/work/v2-pilot/thereabouts-gate.json \
+  --review docs/city-normalization-thereabouts-review.json \
+  > data/work/thereabouts-resume.log 2>&1 < /dev/null &
+uv run --no-sync python -m build_data.normalize_cells verify \
+  --data-dir data --output data/golden
 ```
+
+For a new workspace, follow the clean-source chain in DATA_PIPELINE.md and create
+reviews bound to that build's actual evidence. The holdout in this checkout is
+closed; do not rerun its scoring or tune against it.
 
 A review-notes JSON contains `accepted`, a nonempty `review`,
 `unresolved_losses: []`, `minimum_dev_correct`, and `boundary_exceptions` (empty
@@ -510,13 +516,17 @@ Repository validation before the frozen world build: **267 passed, 7 skipped**;
 whole-repository Ruff check, Ruff format check and strict mypy pass. No external
 CI, push, PR or remote publication is part of this work.
 
-Local activation completed at **2026-10-02 12:50:26 UTC**. `data/golden` is a
-symlink to the stable `data/golden-v2` directory; v1 remains in `data/golden-v1`
+Initial local activation completed at **2026-10-02 12:50:26 UTC**. At that time,
+`data/golden` pointed to `data/golden-v2`; v1 remains in `data/golden-v1`
 with its original manifest preserved as `manifest.original.json` and a relocated
 inventory. Reconciled inputs were not deleted or modified. The explicit base-cell
-snapshot remains available under `data/base_cells/` through hard links.
+snapshot was retained under `data/base_cells/` through hard links. After the
+identical rename regeneration, the active target is `data/golden-thereabouts` and
+the current base pointer selects the regenerated snapshot. Superseded duplicate
+payloads were removed; their historical metadata and evaluation receipts remain.
+The integration proof records that cleanup and the final 316-test validation.
 
-The final observed free space is approximately **20 GiB**. To preserve headroom,
+The initial build finished with approximately **20 GiB** free. Before integration,
 374 obsolete completed country generations (4,413,020,499 source bytes) were
 archived to the existing bucket under
 `intermediates/city-normalization/obsolete-pilot-2026-10-02/` and
