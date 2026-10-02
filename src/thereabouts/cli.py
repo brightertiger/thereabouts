@@ -87,6 +87,17 @@ def _data(args: argparse.Namespace) -> int:
 def _run(args: argparse.Namespace) -> int:
     if args.command == "data":
         return _data(args)
+    if args.command == "mcp":
+        try:
+            from .mcp_service.server import run
+        except ModuleNotFoundError as exc:
+            if exc.name != "mcp":
+                raise
+            raise InvalidInputError(
+                "MCP is optional; install thereabouts[mcp] explicitly"
+            ) from exc
+        run(args.pack, args.data_dir, args.families)
+        return 0
     kind = args.kind if args.command in ("resolve", "explain") else args.command
     family = {"postal": "postal", "airport": "airports"}.get(kind, "reverse")
     selection = None if args.pack else [family]

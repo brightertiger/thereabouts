@@ -23,8 +23,21 @@ def check(pack: Path, expected_backend: str) -> None:
         assert answer.selected is not None and answer.selected.city is not None
         assert answer.selected.city.id == "city:synthetic:A"
         assert list(geo.from_h3_many([cell])) == [answer]
-    assert "pyarrow" not in sys.modules and "Cython" not in sys.modules
+    assert not {"pyarrow", "Cython", "mcp", "pydantic"}.intersection(sys.modules)
+
+
+def check_codes(fixtures: Path) -> None:
+    with Geocoder(fixtures / "postal", verify=True) as geo:
+        answer = geo.postal("00100", country="AA")
+        assert answer.selected is not None
+        assert len(answer.selected.observations) == 2
+    with Geocoder(fixtures / "airports", verify=True) as geo:
+        answer = geo.airport("ZZZ", scheme="iata")
+        assert answer.status == "ambiguous" and answer.selected is None
+        assert len(answer.candidates) == 2
 
 
 if __name__ == "__main__":
     check(Path(sys.argv[1]), sys.argv[2])
+    if len(sys.argv) > 3:
+        check_codes(Path(sys.argv[3]))

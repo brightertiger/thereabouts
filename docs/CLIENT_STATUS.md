@@ -1,6 +1,6 @@
 # Thereabouts client implementation status
 
-Phases 1–6 are implemented on `feat/client`, locally only:
+Phases 1–7 are implemented on `feat/client`, locally only:
 
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
 * `bf90c3a` — Add offline Python golden reader and bounded public API.
@@ -8,13 +8,79 @@ Phases 1–6 are implemented on `feat/client`, locally only:
 * `054d9bc` — Accelerate stored-cell reconstruction with optional Cython.
 * `fe5cad9` — Cache decoded places and keep batch lookup columnar.
 * `0faac7d` — Add standalone postal and airport serving packs.
-* Phase 6 — **Add independent Node reader and shared conformance bundle**
+* `f05c5c7` — Add independent Node reader and shared conformance bundle.
+* Phase 7 — **Add optional bounded stdio MCP integration**
   (this commit; find its hash with `git log`).
 
-Phase 7 remains; the optional MCP server is next.
+The requested implementation sequence is complete; real-data and release
+qualification remain as listed below. Current warm lookup targets are met on
+4,176 synthetic places / 308,032 rows: **10.291 µs Cython / 12.750 µs Python**,
+**531,994 / 530,437 column results/s**. The pack is 3,006,380 bytes; these are
+Apple M2 measurements, not world-pack results. See the phase 5 report below.
 `thereabouts.client.Geocoder` reads the new packs; the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Optional MCP server (phase 7)
+
+[MCP_SERVER.md](MCP_SERVER.md) documents `thereabouts mcp`, the optional pinned
+SDK 2.2.0 extra, startup pack selection and a tested headless stdio host. The
+server exposes read-only `reverse`, bounded `reverse_many`, typed `resolve`,
+`info` and `explain`. It calls the Python API and preserves IDs, methods,
+source evidence, attribution, nulls and ambiguity. Pack installation and arbitrary
+paths are not tools. The base wheel still requires only NumPy/H3 and imports
+neither MCP nor Pydantic during lookup.
+
+Requests accept at most 1,000 numeric coordinate pairs; responses page at most
+20 full results or code candidates. Pages report total count, offset, limit,
+next offset and truncation. Ambiguity and selected-candidate semantics are never
+inferred from a page's length. Batch pages consume all inputs, preserving
+whole-request raise/collect behavior and input order. Schemas reject unwanted
+request fields and numeric coercion. The core owns nested result semantics;
+the transport schema validates the envelope and pagination fields.
+
+On the same populated sample and M2, CPython 3.12.8 / SDK 2.2.0 / Pydantic 2.13.5,
+[CLIENT_MCP_MEASUREMENTS.json](CLIENT_MCP_MEASUREMENTS.json) records **0.419 s**
+startup, **1.293 ms** warmed scalar median round trip, and **21.8–36.4 ms** for
+1,000-input requests returning 20 rows. Reply payload **349,381 bytes**;
+host/server peak RSS **94,044,160 / 97,550,336 bytes**. These include SDK schemas,
+JSON text plus structured content and stdio transfer, not just lookup.
+
+**Resource incident:** the initial unpaged 1,000-row probe produced 17,467,570
+bytes and peaked at **1,990,803,456 bytes in the SDK host**, exceeding the owner's
+1.5 GB process budget; server peak was 515,293,184 bytes. The probe finished,
+then smaller profiles/rechecks preceded the corrected limit test. Explicit
+paging and replacing recursive JSON-union validation corrected the measured
+problem. The original report and follow-up CPU profile remain in
+[CLIENT_MCP_INITIAL_MEASUREMENTS.json](CLIENT_MCP_INITIAL_MEASUREMENTS.json).
+No world job or main golden read was involved. The incident is not hidden by
+the final lower measurements.
+
+All 41 successful shared vectors serialize identically through MCP. Eleven
+adapter tests include invalid inputs, limits, continuation, batch ordering,
+unknown tools, missing optional SDK, immutable selection and actual stdio
+startup/EOF. A subprocess host exercises all three installed families with
+external networking blocked in both processes. An installed-wheel stdio test
+uses `-I` in host and server, excluding source imports. No external host UI or
+HTTP deployment is qualified.
+
+Full native checks: **579 passed, 7 skipped**; full fallback: **577 passed,
+9 skipped** (two native-only cases skipped). Ruff check and formatting (**383
+files**) and strict mypy (**367 files**) pass. Final local artifacts are
+**93,496 bytes native wheel**, **70,188 bytes fallback wheel**, and **139,866
+bytes sdist**. Only macOS arm64 / CPython 3.12 was built and run.
+The native and pure wheels both pass reverse and optional-code smoke tests in
+separate local environments; the native wheel with MCP extra passes stdio, and
+the base fallback wheel reports the missing optional extra cleanly. Runtime
+wheels contain neither build stages, fixtures, world data nor C/Cython sources.
+SDK dependencies were prepared explicitly before runtime checks.
+
+The main integration marker remains absent. No `build_data` process was active
+at the last check, but both conditions are required; the real dataset has not
+been read. World export, geographic evaluation and release qualification remain
+deferred. Environment/cache/build output is under 2 GiB even when hard-linked
+installations are counted separately.
+Original hashed runtime and pipeline files remain byte-identical.
 
 ### Independent Node client (phase 6)
 
@@ -385,8 +451,9 @@ Every original runtime/build-stage file still matches `d3b4d94`; phase 1 format/
 * Phase 3 follow-ups: signed release index/key rotation, byte-range resume,
   explicit pruning and Windows/power-loss qualification. Local/URL installation
   and file-level resume are complete; no remote release exists to qualify.
-* Phase 7: optional stdio MCP integration over the existing Python API. No MCP
-  implementation is included at the phase 6 boundary.
+* MCP follow-ups: an adopting host UI, real-data resource measurements and any
+  hosted transport. Stdio and the reference headless host are complete; no HTTP
+  service or agent marketplace package is included.
 * Remaining performance work: representative real-pack access and cache-miss
   measurements. Warm synthetic targets are met; cold/world behavior is unverified.
   Cross-platform wheels require native-runner CI
@@ -413,7 +480,8 @@ All files that existed under `src/thereabouts/` and `build_data/` at task start
 remain byte-identical. New code lives in `src/thereabouts/packs/`,
 `src/thereabouts/reading/`, new
 client/result/column/store/CLI modules, `src/thereabouts/installing/`,
-`src/thereabouts/commandline/` and `build_data/serve/`; these are not hashed by
+`src/thereabouts/commandline/`, `src/thereabouts/mcp_service/`,
+`build_data/serve/` and `build_data/serve_codes/`; these are not hashed by
 the existing normalization stage. No pipeline entry point was modified or invoked.
 
 After the running build is safe to change, replace the original runtime and

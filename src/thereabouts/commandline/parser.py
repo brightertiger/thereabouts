@@ -35,6 +35,13 @@ def parser() -> argparse.ArgumentParser:
         resolve.add_argument("--scheme")
         resolve.add_argument("values", nargs="+")
     commands.add_parser("info")
+    mcp = commands.add_parser("mcp", help="Serve read-only MCP tools over stdio")
+    mcp.add_argument(
+        "--families",
+        nargs="+",
+        choices=("reverse", "postal", "airports"),
+        help="Installed families selected at startup (default: reverse)",
+    )
     batch = commands.add_parser(
         "batch", help="Read stdin; emit one JSON result per row"
     )

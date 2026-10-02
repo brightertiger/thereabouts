@@ -109,3 +109,18 @@ the sdist contained both sources and no compiled binary. With both wheels offere
 via local `--find-links`, pip selected the fallback for simulated Linux s390x
 wheel tags. This tests wheel selection, not runtime or NumPy/H3 availability on
 s390x. No package was uploaded or published.
+
+## Final client qualification after phase 7
+
+The rebuilt macOS arm64/CPython 3.12 native wheel is **93,496 bytes**, fallback
+wheel **70,188 bytes**, and sdist **139,866 bytes**. Both installed wheels pass
+reverse lookup, fallback parity, postal multiplicity and airport ambiguity
+smoke tests with source imports excluded. The native wheel with the explicit
+`mcp` extra also passes an actual stdio round trip in an isolated host/server;
+the base fallback wheel reports a clear optional-extra error for `mcp` while
+normal lookup imports neither MCP nor Pydantic. No package is published.
+
+Wheels exclude build stages, fixtures, world data and C/Cython sources. The sdist
+contains the generated C and Cython input and no shared library. Other platform
+wheels and remote CI remain unverified. See [MCP_SERVER.md](MCP_SERVER.md) for the
+transport bounds, measured resource correction and tested host configuration.
