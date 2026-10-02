@@ -54,5 +54,14 @@ def test_offshore_uses_city_on_projected_land(
     )
     assert actual.tolist() == ["coastal-city"]
     assert methods.tolist() == ["city_polygon"]
+    if not original_boundary:
+        mixed, _ = engine.apply(
+            np.array([[0.0, 0.02], [0.0, 0.01]]),
+            np.array(["coastal-city", "far-neighbour"], dtype=object),
+            np.array(["area", "area"], dtype=object),
+            False,
+            np.array([True, False]),
+        )
+        assert mixed.tolist() == ["coastal-city", "far-neighbour"]
     with pytest.raises(ValueError, match="land input"):
         project(None, coordinates, np.array([True]))

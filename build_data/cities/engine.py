@@ -193,13 +193,16 @@ class Engine:
         # Project only otherwise unclaimed offshore cells before urban inference.
         inside = self.polygons(coordinates) >= 0
         projected[inside] = coordinates[inside]
-        ids, methods = self.overlay(
-            projected,
-            radius,
-            self.policy["projected_edge_tolerance_degrees"]
-            if offshore is not None and offshore.any()
-            else 0.0,
-        )
+        ids, methods = self.overlay(projected, radius)
+        if offshore is not None:
+            water = np.flatnonzero(offshore & ~inside)
+            winners = self.polygons(
+                projected[water], self.policy["projected_edge_tolerance_degrees"]
+            )
+            for i in np.unique(winners[winners >= 0]):
+                hit = water[winners == i]
+                ids[hit] = self.footprints[i]["city_id"]
+                methods[hit] = self.footprints[i]["method"]
         missing = ids == None  # noqa: E711
         repair = (
             missing
