@@ -23,6 +23,7 @@ from build_data.reconcile.common import Row
 from .blocks import build
 from .run import implementation
 from .tables import places
+from .verify import reference_checks
 
 
 def main() -> None:
@@ -130,6 +131,9 @@ def main() -> None:
     reports["catalogue"] = places(
         workspace, output / "catalogue", {"tables": [chosen]}, normalized, inputs, urban
     )
+    reports["catalogue_integrity"] = reference_checks(reports["catalogue"])
+    if any(reports["catalogue_integrity"].values()):
+        raise ValueError("Pilot catalogue has invalid normalization references")
     reports["scope"] = "Probe blocks only; transitions are not complete-country counts"
     write_json(output / "report.json", reports)
 
