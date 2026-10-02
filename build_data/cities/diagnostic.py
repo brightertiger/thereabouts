@@ -1,9 +1,11 @@
 """All population-15k source points; exact and explicitly supported roll-up credit."""
 
 from collections import Counter
+from pathlib import Path
 
 import h3
 
+from build_data.acquire.artifacts import read_json
 from build_data.reconcile.common import Row, connect, unpack
 
 from .engine import Engine
@@ -24,22 +26,14 @@ def checks(comparison: Comparison, engine: Engine) -> Row:
         db.close()
     cells = [h3.latlng_to_cell(p["latitude"], p["longitude"], 8) for p in places]
     before, after = comparison.query(cells)
+    overrides = read_json(Path(__file__).with_name("diagnostic_expectations.json"))[
+        "overrides"
+    ]
     counts: Counter[str] = Counter()
     changes = []
     for p, b, a in zip(places, before, after, strict=True):
         identity = "city:geonames:" + p["source_id"]
-        expected = engine.parts.get(identity, identity)
-        # Freeze pre-change support: a section inside a baseline containing city.
-        # No expected answer is inferred from the new allocation winner.
-        if (
-            expected == identity
-            and p["feature_code"] == "PPLX"
-            and b.get("city_method") == "area"
-            and identity not in set(engine.ids)
-        ):
-            expected = b.get("city_id") or identity
-        if any(i.startswith("city:country:") for i in engine.ids):
-            expected = next(i for i in engine.ids if i.startswith("city:country:"))
+        expected = overrides.get(identity, identity)
         counts["total"] += 1
         for prefix, row in [("before", b), ("after", a)]:
             counts[prefix + "_exact"] += row.get("city_id") == identity
