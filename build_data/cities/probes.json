@@ -1,0 +1,19 @@
+{
+  "neighbours": {
+    "IN": {"city:geonames:1270396": "Howrah", "city:geonames:7279746": "Noida", "city:geonames:1254661": "Thane", "city:geonames:6619347": "Navi Mumbai"},
+    "JP": {"city:geonames:1848354": "Yokohama"},
+    "MY": {"city:geonames:1735158": "Petaling Jaya"},
+    "US": {"city:geonames:4896075": "Hoffman Estates", "city:geonames:4885955": "Buffalo Grove", "city:geonames:4900579": "Loves Park", "city:geonames:4902763": "Morton Grove"},
+    "TR": {"city:geonames:740430": "Safranbolu"}
+  },
+  "named": [
+    ["central Delhi", 28.6139, 77.2090, "IN", "city:geonames:1273294"],
+    ["central Dhaka", 23.8103, 90.4125, "BD", "city:geonames:1185241"],
+    ["central Istanbul", 41.0082, 28.9784, "TR", "city:geonames:745044"],
+    ["central Mumbai", 19.0760, 72.8777, "IN", "city:geonames:1275339"],
+    ["New Delhi", 28.6358, 77.2245, "IN", "city:geonames:1273294"],
+    ["Westminster", 51.4995, -0.1330, "GB", "city:geonames:2643743"],
+    ["Shinjuku", 35.6938, 139.7034, "JP", "city:geonames:1850147"],
+    ["Brooklyn", 40.6782, -73.9442, "US", "city:geonames:5128581"]
+  ]
+}

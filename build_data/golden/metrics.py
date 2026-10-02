@@ -41,8 +41,16 @@ def measure(workspace: Workspace, places: list[Row], cells: list[Row]) -> Row:
             "country": "country_id IS NOT NULL",
             "state": "state_id IS NOT NULL",
             "city": "city_id IS NOT NULL",
-            "city_area": "city_method='area'",
-            "city_nearest": "city_method='nearest'",
+            "city_area": (
+                "city_method IN ('area','city_polygon',"
+                "'policy_polygon','rural_polygon')"
+            ),
+            "city_nearest": (
+                "city_method IN ('nearest','rural_nearest','rural_nearest_distant')"
+            ),
+            "city_urban_allocation": "city_method='urban_allocation'",
+            "city_town_radius": "city_method='town_radius'",
+            "city_distant": "city_method='rural_nearest_distant'",
             "offshore": "land_method='offshore'",
         }
         expression = ",".join(

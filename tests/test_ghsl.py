@@ -36,5 +36,7 @@ def test_geopackage_header_and_source_evidence(tmp_path: Path) -> None:
     (row,) = records(path)
     assert row["source_id"] == "1"
     assert row["license"] == "CC-BY-4.0"
-    assert shapely.from_wkb(row["geometry"]).covers(shapely.Point(0, 0))
+    geometry = shapely.from_wkb(row["geometry"])
+    assert geometry is not None
+    assert geometry.covers(shapely.Point(0, 0))
     assert row["xmax"] < 0.02

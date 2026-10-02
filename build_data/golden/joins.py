@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -91,7 +93,14 @@ def assignments(db: duckdb.DuckDBPyConnection, groups: dict[int, list[str]]) -> 
         )
 
 
-def export(workspace: Workspace, cells: list[Row]) -> list[Row]:
+def export(
+    workspace: Workspace,
+    cells: list[Row],
+    *,
+    output: Path | None = None,
+    stage: str = "golden.lookup",
+) -> list[Row]:
+    output = output or workspace.root / "golden"
     db = duckdb.connect()
     db.execute("SET memory_limit='512MB'")
     db.execute("SET threads=1")
@@ -100,10 +109,8 @@ def export(workspace: Workspace, cells: list[Row]) -> list[Row]:
     db.execute("SET max_temp_directory_size='512MB'")
     cell_digest = fingerprint({r["block"]: r["sha256"] for r in cells})
     ledger = Ledger(workspace.ledger_path)
-    previous = {
-        r["unit_id"]: r for r in read_units(workspace.ledger_path, "golden.lookup")
-    }
-    output = []
+    previous = {r["unit_id"]: r for r in read_units(workspace.ledger_path, stage)}
+    results = []
     try:
         groups = prepare(db, cells)
         for source in ("postal", "airports", "unlocode", "dbip"):
@@ -114,9 +121,16 @@ def export(workspace: Workspace, cells: list[Row]) -> list[Row]:
             kind = parts[0]["kind"]
             if any(p["kind"] != kind for p in parts):
                 raise ValueError("A spatial lookup source must contain one kind")
-            digest = fingerprint({"parts": parts, "cells": cell_digest, "join": 4})
-            if ledger.is_complete("golden.lookup", kind, digest):
-                output.append(previous[kind]["metadata"]["table"])
+            digest = fingerprint(
+                {
+                    "parts": parts,
+                    "cells": cell_digest,
+                    "join": 4,
+                    "output": str(output.resolve()),
+                }
+            )
+            if ledger.is_complete(stage, kind, digest):
+                results.append(previous[kind]["metadata"]["table"])
                 continue
             budget(workspace, required=512_000_000)
             print(f"lookups {source}: join unique reference cells", flush=True)
@@ -127,7 +141,7 @@ def export(workspace: Workspace, cells: list[Row]) -> list[Row]:
               CASE WHEN s.country_code IS NOT NULL AND a.country_id IS NOT NULL
                    THEN s.country_code<>a.cell_country_code END AS country_disagrees
               FROM source s LEFT JOIN assignments a USING(h3_uint64)"""
-            destination = workspace.root / "golden/lookups" / kind / "joined.parquet"
+            destination = output / "lookups" / kind / "joined.parquet"
             with atomic_output(destination, check_parquet) as temporary:
                 db.sql(query).write_parquet(
                     str(temporary), compression="zstd", row_group_size=16384
@@ -154,10 +168,10 @@ def export(workspace: Workspace, cells: list[Row]) -> list[Row]:
                 "counts": counts,
             }
             ledger.complete(
-                "golden.lookup", kind, digest, [destination], metadata={"table": record}
+                stage, kind, digest, [destination], metadata={"table": record}
             )
-            output.append(record)
+            results.append(record)
             print(f"lookups {source}: {counts}", flush=True)
     finally:
         db.close()
-    return output
+    return results

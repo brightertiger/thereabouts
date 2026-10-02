@@ -1,0 +1,1175 @@
+{
+  "provenance": "Frozen regression IDs in committed CITY_NORMALIZATION_PLAN.md (9785291); GeoNames IDs are resolved afresh from acquired/reconciled inputs. This is a diagnostic list, not independently labelled truth.",
+  "points": [
+    {
+      "country": "BD",
+      "id": "1209106",
+      "name": "Bhatara",
+      "population": 324300,
+      "category": "exact",
+      "after": "Dhaka",
+      "town_loss": false
+    },
+    {
+      "country": "BE",
+      "id": "2794507",
+      "name": "Kessel-Lo",
+      "population": 30215,
+      "category": "exact",
+      "after": "Leuven",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2794860",
+      "name": "Jumet",
+      "population": 24510,
+      "category": "exact",
+      "after": "Charleroi",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2783456",
+      "name": "Wondelgem",
+      "population": 23546,
+      "category": "exact",
+      "after": "Gent",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2803030",
+      "name": "Assebroek",
+      "population": 19772,
+      "category": "exact",
+      "after": "Brugge",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2786739",
+      "name": "Sint-Andries",
+      "population": 19336,
+      "category": "exact",
+      "after": "Brugge",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2790796",
+      "name": "Montignies-sur-Sambre",
+      "population": 18765,
+      "category": "exact",
+      "after": "Charleroi",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2794179",
+      "name": "Koersel",
+      "population": 18076,
+      "category": "exact",
+      "after": "Beringen",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2800445",
+      "name": "Châtelineau",
+      "population": 17166,
+      "category": "exact",
+      "after": "Châtelet",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2791700",
+      "name": "Mariakerke",
+      "population": 17062,
+      "category": "exact",
+      "after": "Gent",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2786634",
+      "name": "Sint-Kruis",
+      "population": 16000,
+      "category": "exact",
+      "after": "Brugge",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2795795",
+      "name": "Heusy",
+      "population": 15420,
+      "category": "exact",
+      "after": "Verviers",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2791534",
+      "name": "Mechelen-aan-de-Maas",
+      "population": 15374,
+      "category": "exact",
+      "after": "Maasmechelen",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2802039",
+      "name": "Bevere",
+      "population": 15311,
+      "category": "exact",
+      "after": "Oudenaarde",
+      "town_loss": true
+    },
+    {
+      "country": "BE",
+      "id": "2791735",
+      "name": "Marchienne-au-Pont",
+      "population": 15154,
+      "category": "exact",
+      "after": "Charleroi",
+      "town_loss": true
+    },
+    {
+      "country": "BF",
+      "id": "2353332",
+      "name": "Zinguédéssé",
+      "population": 19648,
+      "category": "exact",
+      "after": "Ouagadougou",
+      "town_loss": true
+    },
+    {
+      "country": "BR",
+      "id": "3452900",
+      "name": "Porto Belo",
+      "population": 27688,
+      "category": "exact",
+      "after": "Itapema",
+      "town_loss": true
+    },
+    {
+      "country": "CA",
+      "id": "5963453",
+      "name": "Gordon Head",
+      "population": 21270,
+      "category": "check_subcity_city_answer",
+      "after": "Victoria",
+      "town_loss": false
+    },
+    {
+      "country": "CA",
+      "id": "13512367",
+      "name": "Carey",
+      "population": 18405,
+      "category": "check_subcity_city_answer",
+      "after": "Victoria",
+      "town_loss": false
+    },
+    {
+      "country": "CI",
+      "id": "12687494",
+      "name": "Touagui",
+      "population": 16684,
+      "category": "exact",
+      "after": "Méagui",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1806508",
+      "name": "Jiading",
+      "population": 1886100,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1814544",
+      "name": "Dachang",
+      "population": 371856,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1799823",
+      "name": "Nanqiao",
+      "population": 361185,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "11694038",
+      "name": "Huocheng",
+      "population": 360000,
+      "category": "exact",
+      "after": "Shuiding",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1798097",
+      "name": "Qibao",
+      "population": 283352,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1809571",
+      "name": "Gucun",
+      "population": 240185,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "7843638",
+      "name": "Changzheng",
+      "population": 229925,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1787592",
+      "name": "Yanghang",
+      "population": 204564,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "13512708",
+      "name": "Nyingchi",
+      "population": 200000,
+      "category": "exact",
+      "after": "Bayi",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "8416933",
+      "name": "Huixing",
+      "population": 186972,
+      "category": "exact",
+      "after": "Chongqing",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1788669",
+      "name": "Xinqiao",
+      "population": 155856,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1798919",
+      "name": "Pengpu",
+      "population": 152725,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1786676",
+      "name": "Yima",
+      "population": 147800,
+      "category": "exact",
+      "after": "Qianqiu",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1785916",
+      "name": "Yuepu",
+      "population": 139328,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "7845495",
+      "name": "Xiayang",
+      "population": 137321,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "7843633",
+      "name": "Gaojing",
+      "population": 127512,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1793999",
+      "name": "Songnan",
+      "population": 127347,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "2037685",
+      "name": "Didao",
+      "population": 109561,
+      "category": "exact",
+      "after": "Didaohe",
+      "town_loss": false
+    },
+    {
+      "country": "CN",
+      "id": "1784450",
+      "name": "Gusong",
+      "population": 87882,
+      "category": "exact",
+      "after": "Zhongcheng",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1785964",
+      "name": "Yudong",
+      "population": 81408,
+      "category": "exact",
+      "after": "Chongqing",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1787437",
+      "name": "Yangliuqing",
+      "population": 76387,
+      "category": "exact",
+      "after": "Tianjin",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "8307082",
+      "name": "Huajing",
+      "population": 67415,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1784647",
+      "name": "Zhaobaoshan",
+      "population": 61979,
+      "category": "exact",
+      "after": "Ningbo",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1803998",
+      "name": "Jiangbei",
+      "population": 60466,
+      "category": "exact",
+      "after": "Chongqing",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1801243",
+      "name": "Maocun",
+      "population": 57649,
+      "category": "exact",
+      "after": "Xuzhou",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1799383",
+      "name": "Ninghai",
+      "population": 56937,
+      "category": "exact",
+      "after": "Yantai",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1801895",
+      "name": "Luojing",
+      "population": 54329,
+      "category": "exact",
+      "after": "Shanghai",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "2047837",
+      "name": "Songlingcun",
+      "population": 52277,
+      "category": "exact",
+      "after": "Tangshan",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1529626",
+      "name": "Baijiantan",
+      "population": 50825,
+      "category": "exact",
+      "after": "Zhongxinglu",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1786016",
+      "name": "Yuanyang",
+      "population": 37009,
+      "category": "exact",
+      "after": "Chongqing",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1538375",
+      "name": "Dadamtu",
+      "population": 36572,
+      "category": "exact",
+      "after": "Ghulja",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "1794050",
+      "name": "Songgang",
+      "population": 24201,
+      "category": "exact",
+      "after": "Shenzhen",
+      "town_loss": true
+    },
+    {
+      "country": "CN",
+      "id": "8416934",
+      "name": "Cuiyun",
+      "population": 18636,
+      "category": "exact",
+      "after": "Chongqing",
+      "town_loss": true
+    },
+    {
+      "country": "DE",
+      "id": "7290243",
+      "name": "Bergedorf",
+      "population": 119665,
+      "category": "check_subcity_city_answer",
+      "after": "Wentorf bei Hamburg",
+      "town_loss": false
+    },
+    {
+      "country": "ES",
+      "id": "3124041",
+      "name": "Culleredo",
+      "population": 30221,
+      "category": "exact",
+      "after": "A Coruña",
+      "town_loss": true
+    },
+    {
+      "country": "FR",
+      "id": "2974494",
+      "name": "Sin-le-Noble",
+      "population": 17682,
+      "category": "exact",
+      "after": "Douai",
+      "town_loss": true
+    },
+    {
+      "country": "GB",
+      "id": "2636433",
+      "name": "Swanscombe",
+      "population": 15801,
+      "category": "exact",
+      "after": "Dartford",
+      "town_loss": true
+    },
+    {
+      "country": "ID",
+      "id": "1625420",
+      "name": "Taliwang",
+      "population": 55340,
+      "category": "exact",
+      "after": "Motong",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "1262111",
+      "name": "Najafgarh",
+      "population": 1365000,
+      "category": "exact",
+      "after": "Delhi",
+      "town_loss": false
+    },
+    {
+      "country": "IN",
+      "id": "1275248",
+      "name": "Borivli",
+      "population": 609617,
+      "category": "exact",
+      "after": "Mumbai",
+      "town_loss": false
+    },
+    {
+      "country": "IN",
+      "id": "1261481",
+      "name": "New Delhi",
+      "population": 317797,
+      "category": "exact",
+      "after": "Delhi",
+      "town_loss": false
+    },
+    {
+      "country": "IN",
+      "id": "7302861",
+      "name": "Ashoknagar Kalyangarh",
+      "population": 111475,
+      "category": "exact",
+      "after": "Hābra",
+      "town_loss": false
+    },
+    {
+      "country": "IN",
+      "id": "1268205",
+      "name": "Kāmthi",
+      "population": 86793,
+      "category": "exact",
+      "after": "Yerkhera",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "13353566",
+      "name": "Manakunnam",
+      "population": 39538,
+      "category": "exact",
+      "after": "Kanayannur",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "1270937",
+      "name": "Gorai",
+      "population": 29107,
+      "category": "exact",
+      "after": "Mumbai",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "6324621",
+      "name": "Powai",
+      "population": 20000,
+      "category": "exact",
+      "after": "Mumbai",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "10210427",
+      "name": "Chāndāmeta",
+      "population": 16497,
+      "category": "exact",
+      "after": "Parāsia",
+      "town_loss": true
+    },
+    {
+      "country": "IN",
+      "id": "11663358",
+      "name": "Ellakkudi",
+      "population": 16244,
+      "category": "exact",
+      "after": "Pāppākurichchi",
+      "town_loss": true
+    },
+    {
+      "country": "IT",
+      "id": "12188754",
+      "name": "Monte Rosello",
+      "population": 45000,
+      "category": "check_subcity_city_answer",
+      "after": "Sassari",
+      "town_loss": false
+    },
+    {
+      "country": "KH",
+      "id": "1821940",
+      "name": "Takeo",
+      "population": 843931,
+      "category": "exact",
+      "after": "Phumĭ Véal Srê",
+      "town_loss": false
+    },
+    {
+      "country": "MX",
+      "id": "3530587",
+      "name": "Fray Bernardino de Sahagún",
+      "population": 28609,
+      "category": "exact",
+      "after": "Tepeapulco",
+      "town_loss": true
+    },
+    {
+      "country": "MY",
+      "id": "1771298",
+      "name": "Kampong Baharu Cheras Batu Sebelas",
+      "population": 232100,
+      "category": "check_subcity_city_answer",
+      "after": "Bandar Tun Hussein Onn",
+      "town_loss": false
+    },
+    {
+      "country": "MY",
+      "id": "1732700",
+      "name": "Simpang Renggam",
+      "population": 59033,
+      "category": "exact",
+      "after": "Kampung Simpang Renggam",
+      "town_loss": true
+    },
+    {
+      "country": "MY",
+      "id": "1767194",
+      "name": "Kampung Machap Baru",
+      "population": 16000,
+      "category": "exact",
+      "after": "Alor Gajah",
+      "town_loss": true
+    },
+    {
+      "country": "PA",
+      "id": "3708066",
+      "name": "La Cabima",
+      "population": 17975,
+      "category": "check_subcity_city_answer",
+      "after": "San Miguelito",
+      "town_loss": false
+    },
+    {
+      "country": "PK",
+      "id": "1172993",
+      "name": "Kot Malik Barkhurdar",
+      "population": 69359,
+      "category": "check_subcity_city_answer",
+      "after": "Quetta",
+      "town_loss": false
+    },
+    {
+      "country": "PT",
+      "id": "6946669",
+      "name": "São Jorge de Arroios",
+      "population": 22990,
+      "category": "check_subcity_city_answer",
+      "after": "Lisbon",
+      "town_loss": false
+    },
+    {
+      "country": "RS",
+      "id": "787615",
+      "name": "Nova Pazova",
+      "population": 15488,
+      "category": "exact",
+      "after": "Stara Pazova",
+      "town_loss": true
+    },
+    {
+      "country": "SB",
+      "id": "13527002",
+      "name": "Tandai",
+      "population": 24592,
+      "category": "exact",
+      "after": "Honiara",
+      "town_loss": true
+    },
+    {
+      "country": "SN",
+      "id": "2244799",
+      "name": "Thiès Nones",
+      "population": 252320,
+      "category": "exact",
+      "after": "Thiès",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "11071484",
+      "name": "Latkrabang",
+      "population": 173987,
+      "category": "check_subcity_city_answer",
+      "after": "Lat Krabang",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "10172776",
+      "name": "Sathorn",
+      "population": 79624,
+      "category": "check_subcity_city_answer",
+      "after": "Pom Prap Sattru Phai",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494081",
+      "name": "Bang Sue subdistrict",
+      "population": 79405,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Sue",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494072",
+      "name": "Khlong Chan",
+      "population": 76934,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Kapi",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494090",
+      "name": "Khlong Kum",
+      "population": 69071,
+      "category": "check_subcity_city_answer",
+      "after": "Bueng Kum",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "10227099",
+      "name": "Huamak",
+      "population": 67798,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Kapi",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494073",
+      "name": "Bang Khae Nuea",
+      "population": 59821,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Khae",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "1611088",
+      "name": "Chong Nonsi",
+      "population": 48277,
+      "category": "check_subcity_city_answer",
+      "after": "Yan Nawa",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "10176275",
+      "name": "Bangkok Riverside",
+      "population": 48227,
+      "category": "check_subcity_city_answer",
+      "after": "Pom Prap Sattru Phai",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494065",
+      "name": "Khetsamsenok",
+      "population": 38204,
+      "category": "check_subcity_city_answer",
+      "after": "Din Daeng",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "7503743",
+      "name": "Ban Khlong Bang Phran",
+      "population": 32286,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Bon",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494063",
+      "name": "Inner Huai Khwang",
+      "population": 25879,
+      "category": "check_subcity_city_answer",
+      "after": "Huai Khwang",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494079",
+      "name": "Bang Yi Khan",
+      "population": 24745,
+      "category": "check_subcity_city_answer",
+      "after": "Phra Nakhon",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494077",
+      "name": "Bang Kho Laem subdistrict",
+      "population": 22697,
+      "category": "check_subcity_city_answer",
+      "after": "Bang Kho Laem",
+      "town_loss": false
+    },
+    {
+      "country": "TH",
+      "id": "13494087",
+      "name": "Arun Amarin",
+      "population": 19882,
+      "category": "check_subcity_city_answer",
+      "after": "Bangkok Noi",
+      "town_loss": false
+    },
+    {
+      "country": "TN",
+      "id": "2473551",
+      "name": "El Mgarsa",
+      "population": 63528,
+      "category": "exact",
+      "after": "Midoun",
+      "town_loss": true
+    },
+    {
+      "country": "TR",
+      "id": "747323",
+      "name": "Esenyurt",
+      "population": 983571,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "742394",
+      "name": "Küçükçekmece",
+      "population": 792030,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "751324",
+      "name": "Bağcılar",
+      "population": 740069,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "7627067",
+      "name": "Bahçelievler",
+      "population": 576799,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "738377",
+      "name": "Umraniye",
+      "population": 573265,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "738329",
+      "name": "Üsküdar",
+      "population": 524452,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "747340",
+      "name": "Esenler",
+      "population": 520235,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "7628420",
+      "name": "Sancaktepe",
+      "population": 489848,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "7628416",
+      "name": "Sultangazi",
+      "population": 436935,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "741763",
+      "name": "Maltepe",
+      "population": 427040,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "6947640",
+      "name": "Beylikdüzü",
+      "population": 415290,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "6947637",
+      "name": "Ataşehir",
+      "population": 361615,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "7628419",
+      "name": "Sultanbeyli",
+      "population": 358201,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "747158",
+      "name": "Fatih",
+      "population": 356025,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "739549",
+      "name": "Şişli",
+      "population": 314684,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "737071",
+      "name": "Zeytinburnu",
+      "population": 280896,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "6947639",
+      "name": "Başakşehir",
+      "population": 193750,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "6947641",
+      "name": "Büyükçekmece",
+      "population": 163140,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": false
+    },
+    {
+      "country": "TR",
+      "id": "740430",
+      "name": "Safranbolu",
+      "population": 35242,
+      "category": "exact",
+      "after": "Karabük",
+      "town_loss": true
+    },
+    {
+      "country": "TR",
+      "id": "746234",
+      "name": "Gürpınar",
+      "population": 29411,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": true
+    },
+    {
+      "country": "TR",
+      "id": "738064",
+      "name": "Yakuplu",
+      "population": 28811,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": true
+    },
+    {
+      "country": "TR",
+      "id": "737081",
+      "name": "Zekeriya",
+      "population": 22558,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": true
+    },
+    {
+      "country": "TR",
+      "id": "8623183",
+      "name": "Çubuklu",
+      "population": 20698,
+      "category": "exact",
+      "after": "Istanbul",
+      "town_loss": true
+    },
+    {
+      "country": "UA",
+      "id": "13535747",
+      "name": "Svyatoshyn",
+      "population": 53000,
+      "category": "check_subcity_city_answer",
+      "after": "Bilychi",
+      "town_loss": false
+    },
+    {
+      "country": "UA",
+      "id": "13645622",
+      "name": "Novobilychi",
+      "population": 28500,
+      "category": "check_subcity_city_answer",
+      "after": "Bilychi",
+      "town_loss": false
+    },
+    {
+      "country": "UA",
+      "id": "8354605",
+      "name": "Svyatopetrivske",
+      "population": 16200,
+      "category": "exact",
+      "after": "Kyiv",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4896075",
+      "name": "Hoffman Estates",
+      "population": 52138,
+      "category": "exact",
+      "after": "Schaumburg",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4885955",
+      "name": "Buffalo Grove",
+      "population": 41496,
+      "category": "exact",
+      "after": "Wheeling",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "7262622",
+      "name": "Summerlin South",
+      "population": 24085,
+      "category": "exact",
+      "after": "Spring Valley",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4900579",
+      "name": "Loves Park",
+      "population": 23455,
+      "category": "exact",
+      "after": "Rockford",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4902763",
+      "name": "Morton Grove",
+      "population": 23448,
+      "category": "exact",
+      "after": "Niles",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4905337",
+      "name": "Park Forest",
+      "population": 21954,
+      "category": "exact",
+      "after": "Chicago Heights",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "5386053",
+      "name": "Rancho San Diego",
+      "population": 21208,
+      "category": "exact",
+      "after": "El Cajon",
+      "town_loss": true
+    },
+    {
+      "country": "US",
+      "id": "4906882",
+      "name": "Prospect Heights",
+      "population": 16386,
+      "category": "exact",
+      "after": "Wheeling",
+      "town_loss": true
+    }
+  ]
+}
