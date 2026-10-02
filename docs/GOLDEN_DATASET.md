@@ -225,8 +225,11 @@ The four code/phone tables add `country_id` (string?, direct country-code match)
 candidates), and `link_status` (`matched`, `ambiguous`, `unmatched`, `pending`).
 Subdivisions first use explicit ISO codes or the reconciled GeoNames state
 crosswalk, then administrative GeoNames identity or exact country-scoped aliases
-of retained states/districts. Multiple matches remain ambiguous. `link_method`
-records the evidence. Names never manufacture ISO codes on canonical places.
+of retained states/districts. If no exact alias exists, the ISO row's stated type
+may qualify its name (for example, `Bagerhat District`), and explicitly coded
+same-country alternate names may match. Multiple matches remain ambiguous.
+`link_method` records the evidence. Names never manufacture ISO codes on canonical
+places.
 Phone prefixes narrow their supplied country codes with the pinned libphonenumber
 fixed-line patterns and leading digits. A candidate survives if some full number
 can extend the prefix; short shared prefixes remain ambiguous. Missing or

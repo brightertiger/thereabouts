@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -10,6 +11,28 @@ from build_data.reconcile.common import Row, connect, key, rows, unpack
 
 from .inputs import Inputs
 from .phone import PhoneCountries
+
+ISO_ALTERNATE_NAME = re.compile(
+    r"(?P<primary>.+) \[(?P<alternate>.+) (?P<code>[A-Z]{2}-[A-Z0-9]{1,3})\]"
+)
+
+
+def qualified_aliases(row: Row) -> set[str]:
+    """Expand only the row's stated administrative type and coded alternate name."""
+    if not row["code_system"].startswith("ISO"):
+        return set()
+    names = {row[field] for field in ("name", "name_ascii") if row.get(field)}
+    for name in list(names):
+        alternate = ISO_ALTERNATE_NAME.fullmatch(name)
+        if alternate and alternate["code"].startswith(row["country_code"] + "-"):
+            names.update((alternate["primary"], alternate["alternate"]))
+    if kind := row.get("type"):
+        names.update(
+            candidate
+            for name in list(names)
+            for candidate in (f"{name} {kind}", f"{kind} {name}")
+        )
+    return names
 
 
 class CodeIndex:
@@ -88,13 +111,19 @@ class CodeIndex:
             return sorted(identity), "GeoNames administrative identity"
         # Exact normalized aliases within one country. Never fuzzily match a
         # subdivision to an arbitrary city or claim a unique ambiguous alias.
-        matches = set().union(
-            *(
-                self.names.get((row["country_code"], key(row.get(field))), set())
-                for field in ("name", "name_ascii")
-            )
+        matches = self.alias_matches(
+            row["country_code"],
+            {row[field] for field in ("name", "name_ascii") if row.get(field)},
         )
-        return sorted(matches), "exact country-scoped administrative alias"
+        if matches:
+            return sorted(matches), "exact country-scoped administrative alias"
+        matches = self.alias_matches(row["country_code"], qualified_aliases(row))
+        return sorted(matches), "source-qualified administrative alias"
+
+    def alias_matches(self, country: str, names: set[str]) -> set[str]:
+        return set().union(
+            *(self.names.get((country, key(name)), set()) for name in names)
+        )
 
 
 def code_map(inputs: Inputs) -> tuple[set[str], dict[str, set[str]]]:

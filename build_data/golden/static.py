@@ -22,7 +22,7 @@ from .phone import PhoneCountries
 from .schemas import strings
 from .storage import budget, parquet
 
-STATIC_VERSION = 6
+STATIC_VERSION = 7
 
 
 def export(workspace: Workspace, inputs: Inputs) -> list[Row]:

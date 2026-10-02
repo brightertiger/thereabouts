@@ -78,6 +78,16 @@ An exact sovereign/territory code pair can identify a separately represented
 country, such as `CN-HK` → `country:HK`. An unrelated country-code suffix is not
 sufficient evidence.
 
+When an exact alias is absent, an ISO row's stated subdivision type can qualify
+its name: `Bagerhat` + `District` matches the retained administrative alias
+`Bagerhat District`. Explicit bracketed alternate names with a same-country ISO
+code are also accepted. Neither rule strips arbitrary words or selects a fuzzy
+nearest name; existing ambiguous aliases stay ambiguous. A read-only preview
+found 130 additional unique matches (MA 51, BD 42, LT 15, GB 14, LK 8).
+This final static-join refinement was tested before the golden stage started;
+the frozen reconciliation and cell builder hashes did not change. Final published
+counts, rather than this mixed-generation preview, determine the world result.
+
 Unmatched countries are EH, AN and CS. EH has a GeoNames TERR record but no
 accepted default-perspective country polygon; 49 retained cities consequently
 reference a missing country. AN and CS are historical countries.
@@ -138,13 +148,14 @@ rejects dangling parent and sovereign references as well as dangling cell IDs.
 Historical AN/CS and non-geographic phone services are not invented as current
 countries.
 
-Final code validation passed **236 tests with 7 existing skips**, including the
+Final code validation passed **237 tests with 7 existing skips**, including the
 envelope-cache regression test. Ruff lint, Ruff format (209 files) and strict
 mypy (206 source files) pass. Logs are `data/work/v1/{pytest-final,ruff-final,
 format-final,mypy-final}.log`.
 Tests cover independent municipalities, administrative containers, exact region
 identity, country-only catalogue entries, interrupted replacement and resumed
-cleanup, administrative alias ambiguity, numbering-prefix overlap, and exhaustive
+cleanup, administrative alias ambiguity, source-qualified subdivision names,
+numbering-prefix overlap, and exhaustive
 scalar/vector/compacted-cell equivalence including seams and pentagons.
 The first sample additionally passed certificate/direct-vector and compacted
 ancestor equivalence for all **487,403 r8 centres** in the 29 requested probe

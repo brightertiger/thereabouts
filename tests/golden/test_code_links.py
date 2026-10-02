@@ -91,3 +91,62 @@ def test_subdivision_can_identify_a_separately_represented_territory(
     )
     assert matched == ["country:YY"]
     assert unrelated == []
+
+
+def test_source_qualified_aliases_preserve_type_scope_and_ambiguity(
+    tmp_path: Path,
+) -> None:
+    root = write_inputs(
+        tmp_path / "inputs",
+        geonames=[],
+        divisions=[],
+        areas=[
+            area("nation", "Nation", "country", (0, 0, 1, 1)),
+            area("river", "River District", "county", (0, 0, 1, 1)),
+            area("north", "District North", "county", (0, 0, 1, 1)),
+            area("island", "Island", "county", (0, 0, 1, 1)),
+            area("one", "Central District", "county", (0, 0, 1, 1)),
+            area("two", "Central District", "county", (0, 0, 1, 1)),
+            area("weak", "Weak District", "locality", (0, 0, 1, 1)),
+        ],
+    )
+    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {}, "test", {"ZZ"})
+    index = CodeIndex(inputs)
+    path = tmp_path / "codes.parquet"
+    cases = [
+        ("River", "District", "matched", "district:overture:river"),
+        ("North", "District", "matched", "district:overture:north"),
+        ("Island [Alternative ZZ-I1]", None, "matched", "district:overture:island"),
+        ("Alternative [Island ZZ-I1]", None, "matched", "district:overture:island"),
+        ("Alternative [Island YY-I1]", None, "unmatched", None),
+        ("River", "Province", "unmatched", None),
+        ("Rivers", "District", "unmatched", None),
+        ("Central", "District", "ambiguous", None),
+        ("Weak", "District", "unmatched", None),
+    ]
+    pq.write_table(
+        pa.Table.from_pylist(
+            [
+                {
+                    "country_code": "ZZ",
+                    "code_system": "ISO-3166-2",
+                    "code": f"ZZ-{number}",
+                    "name": name,
+                    "type": kind,
+                }
+                for number, (name, kind, _, _) in enumerate(cases)
+            ]
+        ),
+        path,
+    )
+    linked = list(
+        linked_rows(
+            path, "subdivisions", inputs, index.countries, index.codes, index=index
+        )
+    )
+    assert [(r["link_status"], r["place_id"]) for r in linked] == [
+        (status, identity) for _, _, status, identity in cases
+    ]
+    assert len(linked[7]["place_ids"]) == 2
+    assert linked[0]["link_method"] == "source-qualified administrative alias"
