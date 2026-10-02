@@ -1,0 +1,2550 @@
+{
+  "wiki-IN-rto.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        33,
+        34,
+        37,
+        38,
+        39,
+        40,
+        41
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}[- ]\\d{1,2}(?:[A-Z]{1,2})?\\b",
+      "unit_kind": "registration_office",
+      "series_status": "current",
+      "historic_pattern": "Not in use|Discontinued|Defunct|not issued|abolished",
+      "exclude": "Government vehicles|Police vehicles|Governor|Reserved|Defunct|Rented cars"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        0
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}-\\d{2}\\b",
+      "unit_kind": "district",
+      "series_status": "current",
+      "notes": "Statewide code: retain every listed district; does not uniquely identify the office"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2,
+        36
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}[- ]\\d{2}\\b",
+      "unit_kind": "district",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        32
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}-\\d{2}\\b",
+      "unit_kind": "registration_office",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        32
+      ],
+      "pairs": [
+        [
+          3,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{3}\\b",
+      "unit_kind": "registration_office",
+      "series_status": "historic",
+      "valid_to": "1989"
+    }
+  ],
+  "wiki-CN.json": [
+    {
+      "parser": "list",
+      "section_pattern": "List of prefixes",
+      "item_pattern": "(?P<codes>[\\u3400-\\u9fff][A-Z][^—–-]*?)\\s*[—–-]\\s*(?P<name>.+)",
+      "code_pattern": "[\\u3400-\\u9fff][A-Z]{1,2}",
+      "unit_kind": "registration_area",
+      "series_status": "unknown",
+      "exclude": "Police|Military|Central Guard|Ministry|foreigner|foreign company|Taxi|Taxis|buses|Buses"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "[\\u3400-\\u9fff]{2,3}",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1986",
+      "valid_to": "1992"
+    }
+  ],
+  "wiki-DE.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        27
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜ]{1,3}\\b",
+      "unit_kind": "district_or_city",
+      "series_status": "current",
+      "skip_rows": 2,
+      "header_contains": "City / rural district",
+      "name_exclude": "Police|Government|government|Bundes|Landtag"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        35
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜ]{1,3}\\b",
+      "unit_kind": "district",
+      "series_status": "historic",
+      "series_id": "DDR"
+    }
+  ],
+  "wiki-ID.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          1,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current",
+      "exclude": "Army|Military|Police Head|Diplomatic|Trishaw|Rickshaw|Horse carriage"
+    }
+  ],
+  "wiki-TR-fixed.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b\\d{2}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-RU.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[0-9]{2,3}\\b",
+      "unit_kind": "federal_subject",
+      "series_status": "current",
+      "numeric_ranges": false,
+      "exclude": "Not used|unused|not assigned|Military|diplomatic",
+      "historic_pattern": "until|formerly"
+    }
+  ],
+  "wiki-IT.json": [
+    {
+      "parser": "table",
+      "tables": [
+        101
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          8,
+          9
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b|Roma",
+      "unit_kind": "province",
+      "series_status": "unknown",
+      "series_id": "province-symbols-including-current-optional-band"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        102
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1905",
+      "valid_to": "1927"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        103
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-PL.json": [
+    {
+      "parser": "cell_lines",
+      "section_pattern": "District indicators",
+      "item_pattern": "(?P<codes>[A-Z][A-Z, ]+)\\s*[–—-]\\s*(?P<name>.+)",
+      "code_pattern": "\\b[A-Z]{2,3}\\b",
+      "unit_kind": "district_or_city",
+      "series_status": "current",
+      "tables": [
+        4
+      ]
+    }
+  ],
+  "wiki-GB.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]\\b",
+      "unit_kind": "registration_office",
+      "series_status": "current",
+      "skip_rows": 1,
+      "code_suffix_column": 3,
+      "suffix_pattern": "\\b[A-Z]\\b",
+      "exclude": "Reserved|reserved|Personal|personal|Not used|not used",
+      "valid_from": "2001-09-01"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        9
+      ],
+      "pairs": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "registration_office",
+      "series_status": "historic",
+      "valid_to": "2001",
+      "exclude": "Not issued|not issued|Unallocated|unallocated"
+    }
+  ],
+  "wiki-JP.json": [
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "[\\u3040-\\u30ff\\u3400-\\u9fff]+",
+      "unit_kind": "registration_office",
+      "series_status": "current",
+      "skip_rows": 2,
+      "name_language": "en",
+      "local_column": 2,
+      "local_language": "ja"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          5,
+          3
+        ]
+      ],
+      "code_pattern": "[\\u3040-\\u30ff\\u3400-\\u9fff]+",
+      "unit_kind": "registration_office",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "name_language": "en",
+      "local_column": 5,
+      "local_language": "ja"
+    }
+  ],
+  "wiki-VN.json": [
+    {
+      "parser": "table",
+      "tables": [
+        15,
+        16,
+        17
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b\\d{2}\\b",
+      "unit_kind": "province",
+      "series_status": "current",
+      "numeric_ranges": true,
+      "exclude": "National Authorities|Government",
+      "valid_from": "2025-07-01",
+      "name_language": "vi"
+    }
+  ],
+  "wiki-MY.json": [
+    {
+      "parser": "table",
+      "tables": [
+        4,
+        15,
+        26
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "state_or_division",
+      "series_status": "current",
+      "skip_rows": 2,
+      "exclude": "Military|Government|Trailer",
+      "historic_pattern": "Exhausted"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        12,
+        13
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "state",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "valid_to": "1948"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        16,
+        18
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b(?:[1-9]D|[A-Z])\\b",
+      "unit_kind": "division",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "valid_to": "1991"
+    }
+  ],
+  "wiki-IR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "[۰-۹]{2}",
+      "unit_kind": "province",
+      "series_status": "current",
+      "exclude": "not allocated|No code|Not used",
+      "skip_rows": 1
+    }
+  ],
+  "wiki-UA.json": [
+    {
+      "parser": "table",
+      "tables": [
+        4
+      ],
+      "pairs": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-ZА-ЯІ]{2}\\b",
+      "unit_kind": "oblast",
+      "series_status": "current",
+      "exclude": "Online|online|nationwide|Nationwide|Statewide|issued online|All regions"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZА-ЯІЇ]{2}\\b",
+      "unit_kind": "oblast",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        6
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "code_pattern": "\\b(?:\\d{2}|[A-ZА-ЯІЇ]{2})\\b",
+      "unit_kind": "oblast",
+      "series_status": "historic",
+      "valid_to": "2004"
+    }
+  ],
+  "wiki-CH.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "unit_kind": "canton",
+      "series_status": "current"
+    }
+  ],
+  "wiki-AT.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "district",
+      "series_status": "current",
+      "exclude": "official|diplomat|consul|police|Federal|Government|government|Army|military",
+      "historic_pattern": "until|former|dissolved"
+    }
+  ],
+  "wiki-CZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        6
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]\\b",
+      "unit_kind": "region",
+      "series_status": "current",
+      "local_column": 2,
+      "local_language": "cs",
+      "exclude": "electric"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        7
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "district",
+      "series_status": "historic",
+      "valid_from": "1954",
+      "valid_to": "2001",
+      "exclude": "government|military|electric"
+    }
+  ],
+  "wiki-ES.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜ]{1,3}\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_to": "2000"
+    }
+  ],
+  "wiki-FR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "valid_from": "1901",
+      "valid_to": "1919"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        6
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "valid_from": "1919",
+      "valid_to": "1928"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        11
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          8,
+          9
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "unit_kind": "department",
+      "series_status": "historic",
+      "skip_rows": 2,
+      "valid_from": "1928",
+      "valid_to": "1950",
+      "alpha_ranges": true
+    }
+  ],
+  "wiki-IE.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "county",
+      "series_status": "current",
+      "local_column": 2,
+      "local_language": "ga"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "county",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "county",
+      "series_status": "historic",
+      "valid_to": "1987"
+    }
+  ],
+  "wiki-NO.json": [
+    {
+      "parser": "table",
+      "tables": [
+        19
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "unit_kind": "registration_office",
+      "series_status": "current",
+      "exclude": "Electric|electric|diplomat|Armed|Hydrogen|hydrogen|Gas powered"
+    }
+  ],
+  "wiki-AR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1972",
+      "valid_to": "1994",
+      "name_language": "es"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1972",
+      "valid_to": "1994",
+      "series_id": "province-1972"
+    }
+  ],
+  "wiki-BR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{3}\\b",
+      "unit_kind": "state",
+      "series_status": "current",
+      "alpha_ranges": true,
+      "exclude": "not allocated|Not allocated|[0-9][A-Z][0-9]",
+      "name_language": "pt"
+    }
+  ],
+  "wiki-MX.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          6,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{3}\\b",
+      "unit_kind": "state",
+      "series_status": "unknown",
+      "alpha_ranges": true,
+      "series_id": "1992-allocation"
+    }
+  ],
+  "wiki-ZA.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2,4}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-DZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        6
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b\\d{2}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-AF.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ],
+        [
+          5,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-AL.json": [
+    {
+      "parser": "table",
+      "tables": [
+        31
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "district",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-AM.json": [
+    {
+      "parser": "table",
+      "tables": [
+        6
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "unknown",
+      "numeric_ranges": true,
+      "exclude": "Individual plates"
+    }
+  ],
+  "wiki-AZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b\\d{2}\\b",
+      "unit_kind": "registration_office",
+      "series_status": "current"
+    }
+  ],
+  "wiki-BB.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "parish",
+      "series_status": "current"
+    }
+  ],
+  "wiki-BZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "district",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          2,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "city",
+      "series_status": "current"
+    }
+  ],
+  "wiki-BA.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "city",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2,
+        4
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "city",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[А-ЯЂЈЉЊЋЏ]{2,3}\\b",
+      "unit_kind": "city",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-BG.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZА-Я]{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          2,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZА-Я]{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-CF.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "prefecture",
+      "series_status": "current"
+    }
+  ],
+  "wiki-HR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-CU.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "province",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-EC.json": [
+    {
+      "parser": "table",
+      "tables": [
+        0
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          5,
+          4
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-GR.json": [
+    {
+      "parser": "table",
+      "tables": [
+        4
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZΑ-Ω]{1,3}\\b",
+      "unit_kind": "prefecture",
+      "series_status": "unknown"
+    }
+  ],
+  "wiki-GU.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3,
+        5
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "municipality",
+      "series_status": "current"
+    }
+  ],
+  "wiki-GN.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b\\d{2}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-IQ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "governorate",
+      "series_status": "current"
+    }
+  ],
+  "wiki-KZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          1,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        4
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[А-Я]{2}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-KG.json": [
+    {
+      "parser": "table",
+      "tables": [
+        44
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        45
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        46
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[А-Я]{2}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-LY.json": [
+    {
+      "parser": "table",
+      "tables": [
+        12
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          8,
+          9
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "municipality",
+      "series_status": "current"
+    }
+  ],
+  "wiki-LT.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "county",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-MD.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "district",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-ME.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "municipality",
+      "series_status": "current"
+    }
+  ],
+  "wiki-MM.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-MK.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-PE.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_zone",
+      "series_status": "current"
+    }
+  ],
+  "wiki-PH.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        13
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-RO.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "county",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "county_or_region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-RS.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current"
+    }
+  ],
+  "wiki-SK.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "district",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-SI.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "registration_region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-TJ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "region",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[А-Я]{2}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-TM.json": [
+    {
+      "parser": "table",
+      "tables": [
+        10
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        5
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[А-Я]{2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-UZ.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "region",
+      "series_status": "current",
+      "numeric_ranges": true
+    },
+    {
+      "parser": "table",
+      "tables": [
+        3
+      ],
+      "pairs": [
+        [
+          1,
+          2
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "region",
+      "series_status": "historic"
+    }
+  ],
+  "wiki-UY.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "department",
+      "series_status": "current"
+    }
+  ],
+  "wiki-VE.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "state",
+      "series_status": "current"
+    }
+  ],
+  "wiki-YE.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "governorate",
+      "series_status": "unknown",
+      "skip_rows": 2
+    }
+  ],
+  "wiki-XK.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b\\d{1,2}\\b",
+      "unit_kind": "district",
+      "series_status": "current"
+    }
+  ],
+  "wiki-DE-local.json": [
+    {
+      "parser": "table",
+      "tables": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "pairs": [
+        [
+          0,
+          3
+        ]
+      ],
+      "code_pattern": "\\b[A-ZÄÖÜČĆŠĐŽ]{1,3}\\b",
+      "unit_kind": "district_or_city",
+      "series_status": "unknown",
+      "name_language": "de"
+    }
+  ],
+  "wiki-NE.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Regional Codes",
+      "item_pattern": "(?P<codes>\\d+)\\s*-\\s*(?P<name>.+)",
+      "code_pattern": "\\d+",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-MG.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Province codes",
+      "item_pattern": "(?P<codes>[A-Z]) for (?P<name>.+)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-MZ.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Province Codes",
+      "item_pattern": "(?P<codes>[A-Z]{2}) = (?P<name>.+)",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-SE.json": [
+    {
+      "parser": "list",
+      "section_pattern": "History / 1906–1973 series / Codes",
+      "item_pattern": "(?P<codes>[A-Z, ]+) [–—-] (?P<name>.+)",
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "county",
+      "series_status": "historic",
+      "valid_from": "1906",
+      "valid_to": "1973"
+    }
+  ],
+  "wiki-NL.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Earlier schemes / Province codes",
+      "item_pattern": "(?P<codes>[A-Z, ]+): (?P<name>.+)",
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_from": "1906",
+      "valid_to": "1951",
+      "exclude": "overseas"
+    }
+  ],
+  "wiki-BT.json": [
+    {
+      "parser": "list",
+      "section_pattern": "^$",
+      "item_pattern": "(?P<codes>\\d)\\. (?P<name>.+)",
+      "code_pattern": "\\d",
+      "unit_kind": "district",
+      "series_status": "current",
+      "name_split": ",\\s*"
+    }
+  ],
+  "wiki-TD.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Regional coding",
+      "item_pattern": "(?P<codes>\\d{2}) [–—-] (?P<name>.+)",
+      "code_pattern": "\\d{2}",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-MR.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Regional coding",
+      "item_pattern": "(?P<codes>\\d{2}) [–—-] (?P<name>.+)",
+      "code_pattern": "\\d{2}",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-LK.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Regional Identifier Codes",
+      "item_pattern": "(?P<name>.+): (?P<codes>[A-Z]{2})",
+      "code_pattern": "[A-Z]{2}",
+      "unit_kind": "province",
+      "series_status": "unknown"
+    }
+  ],
+  "wiki-MN.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZА-ЯӨҮ]{2}\\b",
+      "unit_kind": "province",
+      "series_status": "current"
+    }
+  ],
+  "wiki-LB.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          0,
+          2
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]\\b",
+      "unit_kind": "registration_area",
+      "series_status": "current",
+      "skip_rows": 2,
+      "exclude": "Code A added"
+    }
+  ],
+  "gb-inf104.pdf": [
+    {
+      "parser": "fixed_text",
+      "start": "Letter                  Postal area",
+      "stop": "We will not use",
+      "name_slice": [
+        24,
+        43
+      ],
+      "code_start": 43,
+      "code_line_pattern": "(?:[A-Z]{2}[ ]*)+(?:– [A-Z]{2})?",
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "alpha_ranges": true,
+      "excluded_letters": "IQZ",
+      "exceptions": [
+        "\\((?P<code>HW) will be used exclusively for (?P<name>Isle of\\s+Wight) residents\\)"
+      ],
+      "exclude_codes": [
+        "MN"
+      ],
+      "unit_kind": "registration_office",
+      "series_status": "current",
+      "series_id": "GB-2001-DVLA-2022",
+      "valid_from": "2001-09-01"
+    }
+  ],
+  "wiki-CD.json": [
+    {
+      "parser": "table",
+      "tables": [
+        0
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[0-9]{2}\\b",
+      "unit_kind": "province",
+      "series_status": "current",
+      "series_id": "numeric-province"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          3,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,2}\\b",
+      "unit_kind": "province",
+      "series_status": "historic",
+      "valid_to": "2009",
+      "series_id": "province-letters"
+    }
+  ],
+  "wiki-GM-resolved.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2,3}\\b",
+      "unit_kind": "region",
+      "series_status": "current",
+      "valid_from": "2019",
+      "series_id": "2019"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2,3}\\b",
+      "unit_kind": "region",
+      "series_status": "historic",
+      "valid_from": "1994",
+      "valid_to": "2019",
+      "series_id": "1994"
+    }
+  ],
+  "wiki-SN.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{2}\\b",
+      "unit_kind": "region",
+      "series_status": "current",
+      "series_id": "regional-group",
+      "name_language": "fr"
+    }
+  ],
+  "wiki-AU-WA.json": [
+    {
+      "parser": "table",
+      "tables": [
+        0
+      ],
+      "pairs": [
+        [
+          0,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{1,3}\\b",
+      "unit_kind": "local_government_area",
+      "series_status": "current",
+      "series_id": "WA-optional-LGA",
+      "subdivision_scope": "AU-WA"
+    }
+  ],
+  "wiki-US-ID.json": [
+    {
+      "parser": "table",
+      "tables": [
+        4
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[0-9]?[A-Z]\\b",
+      "unit_kind": "county",
+      "series_status": "current",
+      "series_id": "Idaho-county-1945",
+      "valid_from": "1945",
+      "subdivision_scope": "US-ID"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        4
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[0-9]?[A-Z]\\b",
+      "unit_kind": "county",
+      "series_status": "historic",
+      "series_id": "Idaho-county-1934",
+      "valid_from": "1934",
+      "valid_to": "1944",
+      "subdivision_scope": "US-ID"
+    }
+  ],
+  "wiki-SY.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          3,
+          1
+        ]
+      ],
+      "code_pattern": "\\b[A-ZŞ]{3}\\b",
+      "unit_kind": "region_or_district",
+      "series_status": "current",
+      "series_id": "AANES",
+      "local_column": 2,
+      "local_language": "ar"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        19
+      ],
+      "pairs": [
+        [
+          2,
+          0
+        ]
+      ],
+      "code_pattern": "\\b[A-Z]{3}\\b",
+      "unit_kind": "district",
+      "series_status": "historic",
+      "series_id": "SIG",
+      "local_column": 1,
+      "local_language": "ar"
+    }
+  ],
+  "wiki-CG.json": [
+    {
+      "parser": "list",
+      "section_pattern": "^Regular",
+      "item_pattern": "(?P<codes>\\d{1,2})\\s*-\\s*(?P<name>.+)",
+      "code_pattern": "\\d{1,2}",
+      "unit_kind": "region",
+      "series_status": "current"
+    }
+  ],
+  "wiki-GE-country.json": [
+    {
+      "parser": "list",
+      "section_pattern": "1993 to 2014",
+      "item_pattern": "(?P<codes>[A-Z]) - (?P<name>.+)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "region",
+      "series_status": "historic",
+      "valid_from": "1993",
+      "valid_to": "2004",
+      "series_id": "geographic-1993"
+    }
+  ],
+  "wiki-LS.json": [
+    {
+      "parser": "list",
+      "section_pattern": "^Kingdom of Lesotho$",
+      "item_pattern": "(?P<codes>L[A-J]) – (?P<name>.+)",
+      "code_pattern": "L[A-J]",
+      "unit_kind": "district",
+      "series_status": "historic",
+      "valid_to": "1979",
+      "series_id": "kingdom-old"
+    },
+    {
+      "parser": "list",
+      "section_pattern": "^Colony of Basutoland$",
+      "item_pattern": "(?P<codes>B[A-J]) – (?P<name>.+)",
+      "code_pattern": "B[A-J]",
+      "unit_kind": "district",
+      "series_status": "historic",
+      "series_id": "Basutoland"
+    }
+  ],
+  "wiki-PS.json": [
+    {
+      "parser": "list",
+      "section_pattern": "Private vehicles since July 2018",
+      "item_pattern": "The letter (?P<codes>[A-N]) – (?P<name>.+)",
+      "code_pattern": "[A-N]",
+      "unit_kind": "governorate",
+      "series_status": "current",
+      "valid_from": "2018-07",
+      "series_id": "West-Bank-2018"
+    },
+    {
+      "parser": "list",
+      "section_pattern": "Private vehicles between 1994",
+      "item_pattern": "(?P<codes>[1-9])\\s*:\\s*(?P<name>.+)",
+      "code_pattern": "[1-9]",
+      "unit_kind": "region",
+      "series_status": "historic",
+      "valid_from": "1994",
+      "valid_to": "2018-07",
+      "series_id": "numeric-1994"
+    }
+  ],
+  "wiki-ID-local.json": [
+    {
+      "parser": "cell_lines",
+      "tables": [
+        5
+      ],
+      "section_pattern": "Kewilayahan",
+      "item_pattern": "(?P<name>[^():]+)\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
+      "code_pattern": "[A-Z]{1,2}",
+      "unit_kind": "regency_or_city",
+      "series_status": "current",
+      "series_id": "area-motorcycle",
+      "name_language": "id"
+    },
+    {
+      "parser": "cell_lines",
+      "tables": [
+        6
+      ],
+      "section_pattern": "Kewilayahan",
+      "item_pattern": "(?P<name>[^():]+)\\s*\\((?P<codes>[A-Z]{1,2})\\s+(?:xxxx|[0-9])",
+      "code_pattern": "[A-Z]{1,2}",
+      "unit_kind": "regency_or_city",
+      "series_status": "current",
+      "series_id": "area-car",
+      "name_language": "id"
+    }
+  ],
+  "wiki-CN-civil.json": [
+    {
+      "parser": "list",
+      "section_pattern": "^各地车辆号牌发牌机关代号 / .+（.）$",
+      "item_pattern": "(?P<codes>[A-Z](?:(?:/|、)[A-Z])*)\\s+(?P<name>.+)",
+      "code_pattern": "[A-Z]",
+      "unit_kind": "registration_area",
+      "series_status": "current",
+      "series_id": "civil-1992",
+      "name_language": "zh",
+      "code_prefix_section": "（(?P<prefix>.)）$",
+      "unknown_pattern": "\\[註|地区|摩托|普通汽|市街|郊区",
+      "historic_pattern": "已撤|已取消|停发|不再|已停|撤销",
+      "exclude": "从未启用|警用|公安|中央|国家机关|专用|出租|临时|外资|部队",
+      "name_remove": "\\[註\\s*\\d+\\]|（[^）]*）"
+    }
+  ],
+  "wiki-JP-regions.json": [
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          3,
+          7
+        ]
+      ],
+      "code_pattern": "[一-鿿ぁ-ゖァ-ヺ]{1,6}",
+      "unit_kind": "registration_office_seat",
+      "series_status": "current",
+      "series_id": "local-marking",
+      "name_language": "ja"
+    },
+    {
+      "parser": "table",
+      "tables": [
+        2
+      ],
+      "pairs": [
+        [
+          8,
+          7
+        ]
+      ],
+      "code_pattern": "[一-鿿ぁ-ゖァ-ヺ]{1,6}",
+      "unit_kind": "registration_office_seat",
+      "series_status": "historic",
+      "series_id": "former-local-marking",
+      "name_language": "ja"
+    }
+  ],
+  "wiki-IR-local.json": [
+    {
+      "parser": "table",
+      "tables": [
+        1
+      ],
+      "pairs": [
+        [
+          1,
+          0
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "code_pattern": "[۰-۹]{2}",
+      "unit_kind": "province",
+      "series_status": "current",
+      "series_id": "province-private",
+      "name_language": "fa",
+      "name_remove": "\\s*\\([۰-۹]+\\)",
+      "name_exclude": "^[۰-۹،\\s]+$"
+    }
+  ],
+  "wiki-GG.json": [
+    {
+      "parser": "text",
+      "item_pattern": "Registration plates of (?P<name>Alderney) are issued with the prefix .(?P<codes>AY).",
+      "code_pattern": "AY",
+      "unit_kind": "island",
+      "series_status": "current",
+      "series_id": "Alderney"
+    }
+  ],
+  "wiki-BQ-fixed.json": [
+    {
+      "parser": "text",
+      "item_pattern": "large letter \"(?P<codes>[BE])\" indicates? a plate from (?P<name>[^,.]+)",
+      "code_pattern": "[BE]",
+      "unit_kind": "island",
+      "series_status": "current",
+      "series_id": "island"
+    }
+  ]
+}

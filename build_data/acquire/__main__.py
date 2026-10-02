@@ -5,7 +5,7 @@ from collections.abc import Callable, Sequence
 from functools import partial
 from pathlib import Path
 
-from . import geoboundaries, geonames, ghsl, osm_land, overture
+from . import geoboundaries, geonames, ghsl, osm_land, overture, plates
 from .lookup_catalog import LOOKUP_SOURCES
 from .lookup_download import download as lookup_download
 from .lookup_normalize import normalize as lookup_normalize
@@ -16,6 +16,7 @@ from .status import print_status
 from .workspace import Workspace
 
 ADAPTERS: dict[str, tuple[Callable[[Workspace], None], Callable[[Workspace], None]]] = {
+    "plates": (plates.download, plates.normalize),
     "ghsl": (ghsl.download, ghsl.normalize),
     "osm_land": (osm_land.download, osm_land.normalize),
     "overture": (overture.download, overture.normalize),

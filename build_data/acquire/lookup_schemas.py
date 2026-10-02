@@ -9,19 +9,25 @@ from typing import Any, Literal
 import h3
 import pyarrow as pa
 
-LookupKind = Literal[
-    "postal_codes",
-    "countries",
-    "subdivisions",
-    "airports",
-    "trade_locations",
-    "timezones",
-    "timezone_cells",
-    "zone_tables",
-    "phone_metadata",
-    "phone_prefixes",
-    "ip_ranges",
-]
+from .plates_schemas import PLATE_KINDS, PLATE_SCHEMAS, PlateKind
+from .plates_validation import validate_plate
+
+LookupKind = (
+    Literal[
+        "postal_codes",
+        "countries",
+        "subdivisions",
+        "airports",
+        "trade_locations",
+        "timezones",
+        "timezone_cells",
+        "zone_tables",
+        "phone_metadata",
+        "phone_prefixes",
+        "ip_ranges",
+    ]
+    | PlateKind
+)
 KINDS = (
     "postal_codes",
     "countries",
@@ -34,6 +40,7 @@ KINDS = (
     "phone_metadata",
     "phone_prefixes",
     "ip_ranges",
+    *PLATE_KINDS,
 )
 
 
@@ -149,10 +156,14 @@ LOOKUP_SCHEMAS: dict[LookupKind, pa.Schema] = {
         ]
     ),
 }
+for plate_kind, plate_schema in PLATE_SCHEMAS.items():
+    LOOKUP_SCHEMAS[plate_kind] = plate_schema
 
 
 def validate_lookup(row: dict[str, Any], kind: str) -> None:
     """Check stored cells, point agreement, IP ordering and bounded area geometry."""
+    if kind in PLATE_KINDS:
+        validate_plate(row, kind)
     if "h3" in row:
         cell, number, resolution = row["h3"], row["h3_uint64"], row["h3_resolution"]
         if cell is None:
