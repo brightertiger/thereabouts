@@ -1,6 +1,10 @@
-# Golden dataset (schema `golden-1`)
+# Golden dataset (published `golden-1`; `golden-2` pipeline in pilot)
 
-The v1 world publication is complete. All measurements below are from the final
+The v1 world publication is complete. The city normalization stage and proposed
+`golden-2` tables/methods are documented in [GOLDEN_V2.md](GOLDEN_V2.md). V2 builds
+beside v1, has a separate pilot gate, and is not a completed world publication.
+
+All v1 measurements below are from the final
 stored-cell [quality report](../data/golden/quality.json). The v0 failure audit
 and rule-change evidence are in [GOLDEN_V1.md](GOLDEN_V1.md).
 
@@ -8,7 +12,7 @@ The golden stage consumes committed reconciliation country checkpoints and acqui
 lookup manifests. It writes only beneath the supplied data directory. The H3
 reference key is **resolution 8**. A row's original coordinates are retained, but
 its place assignment is the answer at its H3 cell's centre. These can differ near
-boundaries. Countries and cities inherit the reconciliation policy, without new
+boundaries. In v1, countries and cities inherit the reconciliation policy, without new
 name, boundary, or nearest-city overrides.
 
 ## Run and resume

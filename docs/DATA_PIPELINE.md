@@ -529,3 +529,31 @@ reconciliation builder. The existing full-pilot gate is also required. Logs and
 controller status live under `work/v1/`; `rebuild.json` is complete only after both
 stage completion markers pass. Run the same command to resume. See
 [GOLDEN_V1.md](GOLDEN_V1.md) for measured results and current process state.
+
+
+## GHSL and city normalization (v2 pilot; world gate failed)
+
+`uv run --no-sync python -m build_data.acquire ghsl` acquires the pinned
+GHS-UCDB R2024A V1.2 general-characteristics ZIP (6,902,089 bytes, SHA256
+`bc879d82320504f89df2041b7936221c8239cd808abe93980493aed062b4f3d6`). It validates
+the ZIP and GeoPackage, converts the declared Mollweide geometry to WGS84, and
+publishes 11,422 `areas` rows through the common bounded writer, ledger and
+manifest-v2 contract. Licence: CC BY 4.0, European Commission/JRC; the manifest
+retains attribution and the GHSL reference publication. This is a built-up urban
+extent source, not municipal boundaries. See the [producer overview](https://human-settlement.emergency.copernicus.eu/ucdb2024Overview.php)
+and [attribution requirements](https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php).
+
+`build_data.cities` runs after reconciliation; `build_data.cities.pilot` measures
+nine countries with radius off/on. It publishes canonical cities and a total
+place-to-city map, with policy/source/code keyed country checkpoints. The separate
+`build_data.golden_v2` controller expands the verified base cells to r8, changes
+city labels/methods, recompacts and refreshes lookup joins beside v1. Its reviewed
+pilot gate is mandatory. [GOLDEN_V2.md](GOLDEN_V2.md) gives clean-workspace and
+resume commands, columns, evaluation isolation, measured status and limitations.
+The current golden v1 remains the published dataset until v2 is verified.
+
+The completed nine-country pilot failed its independent source-polygon gate:
+Hoffman Estates, Buffalo Grove and Loves Park lose municipal-interior cells even
+though their anchor points pass. Radius remains disabled. See the measured
+results and continuation blockers in [GOLDEN_V2.md](GOLDEN_V2.md); no world v2
+has been built or swapped into `data/golden`.
