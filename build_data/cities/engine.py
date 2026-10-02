@@ -185,6 +185,10 @@ class Engine:
             if offshore is not None
             else coordinates
         )
+        # Explicit city footprints own their original r8 centres, including water.
+        # Project only otherwise unclaimed offshore cells before urban inference.
+        inside = self.polygons(coordinates) >= 0
+        projected[inside] = coordinates[inside]
         ids, methods = self.overlay(projected, radius)
         missing = ids == None  # noqa: E711
         repair = (

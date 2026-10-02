@@ -12,11 +12,18 @@ from build_data.reconcile.spatial import create_areas, insert_area
 from tests.test_city_normalization import city, make_engine
 
 
-def test_offshore_uses_city_on_projected_land(tmp_path: Path) -> None:
+@pytest.mark.parametrize("original_boundary", [False, True])
+def test_offshore_uses_city_on_projected_land(
+    tmp_path: Path, original_boundary: bool
+) -> None:
     land_path = tmp_path / "land.sqlite"
     db = connect(land_path)
     create_areas(db)
-    shape = shapely.box(-0.03, -0.03, 0.01, 0.03)
+    shape = (
+        shapely.box(0.03, -0.03, 0.06, 0.03)
+        if original_boundary
+        else shapely.box(-0.03, -0.03, 0.01, 0.03)
+    )
     insert_area(db, "land", "land", 0, shape.wkb, shape.bounds, "test")
     db.commit()
     db.close()
@@ -28,14 +35,16 @@ def test_offshore_uses_city_on_projected_land(tmp_path: Path) -> None:
                 "city_id": "coastal-city",
                 "priority": 0,
                 "method": "city_polygon",
-                "geometry": shapely.box(-0.03, -0.03, 0.011, 0.03),
+                "geometry": shapely.box(
+                    -0.03, -0.03, 0.025 if original_boundary else 0.011, 0.03
+                ),
             }
         ],
     )
     engine.land = land_path, 15000
     coordinates = np.array([[0.0, 0.02]])
     wrong, _ = engine.overlay(coordinates, False)
-    assert wrong.tolist() == ["far-neighbour"]
+    assert wrong.tolist() == ["coastal-city" if original_boundary else "far-neighbour"]
     actual, methods = engine.apply(
         coordinates,
         np.array(["coastal-city"], dtype=object),
