@@ -11,8 +11,10 @@ import numpy as np
 from h3.api import basic_int as h3
 from numpy.typing import NDArray
 
-from build_data.acquire import Ledger, Workspace
+from build_data.acquire import Workspace
 from build_data.acquire.io import fingerprint, sha256_file
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger
 from build_data.hierarchy import descendants, groups, label_block
 from build_data.reconcile.common import Row
 from build_data.reconcile.lookup import Locator
@@ -29,6 +31,8 @@ def builder() -> str:
         directory / name
         for name in (
             "cells.py",
+            "paths.py",
+            "ledger.py",
             "geometry.py",
             "nearest.py",
             "oracle.py",
@@ -82,14 +86,17 @@ def compact(
     return np.array(stored, dtype=np.uint64), np.array(values, dtype=np.uint64)
 
 
-def digest(inputs: Inputs, countries: list[str], implementation: str) -> str:
-    return fingerprint(
+def digest(
+    inputs: Inputs, countries: list[str], implementation: str, root: Path
+) -> str:
+    return data_paths.digest(
         {
             "land": inputs.land,
             "countries": {cc: inputs.countries[cc] for cc in countries},
             "policy": inputs.policy,
             "builder": implementation,
-        }
+        },
+        root,
     )
 
 
@@ -193,10 +200,10 @@ def build(
         "resolutions": dict(resolutions),
         "checks": checks,
     }
-    Ledger(workspace.ledger_path).complete(
+    Ledger(workspace).complete(
         "golden.cells",
         h3.int_to_str(root),
-        digest(inputs, countries, implementation),
+        digest(inputs, countries, implementation, workspace.root),
         [path],
         metadata=stats,
     )

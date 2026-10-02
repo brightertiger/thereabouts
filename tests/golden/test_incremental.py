@@ -141,7 +141,7 @@ def test_block_waits_for_every_dependency_and_stale_or_corrupt_output_is_not_reu
     inputs.countries["YY"] = {"sha256": "two"}
     output = tmp_path / "block.bin"
     output.write_bytes(b"verified")
-    expected = digest(inputs, ["YY", "ZZ"], "builder")
+    expected = digest(inputs, ["YY", "ZZ"], "builder", workspace.root)
     Ledger(workspace.ledger_path).complete(
         "golden.cells", root, expected, [output], metadata={"countries": ["YY", "ZZ"]}
     )

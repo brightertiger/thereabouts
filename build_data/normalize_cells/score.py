@@ -9,8 +9,9 @@ import duckdb
 import h3
 
 from build_data.acquire.artifacts import read_json
-from build_data.acquire.io import fingerprint, sha256_file, write_json
+from build_data.acquire.io import sha256_file, write_json
 from build_data.cities.evaluate import lookup
+from build_data.golden import paths as data_paths
 from build_data.golden.reader import Cells
 from build_data.reconcile.common import Row
 
@@ -24,14 +25,15 @@ def score(output: Path, points: Path, split: str) -> Row:
         result: Row = {"status": "unavailable", "points": str(points), "split": split}
         print(result, flush=True)
         return result
-    manifest = read_json(output / "manifest.json")
+    manifest = data_paths.manifest(output / "manifest.json")
+    data_root = (output / manifest.get("data_root", ".")).resolve()
     if split == "holdout" and not manifest.get("completed"):
         raise ValueError(
             "Holdout may only be scored on the final verified world output"
         )
     receipt = output / f"{split}-score.json"
-    identity = fingerprint(
-        {"golden": manifest, "points": sha256_file(points), "split": split}
+    identity = data_paths.digest(
+        {"golden": manifest, "points": sha256_file(points), "split": split}, data_root
     )
     if split == "holdout" and receipt.exists():
         previous = read_json(receipt)

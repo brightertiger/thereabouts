@@ -6,9 +6,11 @@ import duckdb
 import shapely
 from shapely import STRtree
 
-from build_data.acquire import Ledger, Workspace
+from build_data.acquire import Workspace
 from build_data.acquire.artifacts import read_json
 from build_data.acquire.io import fingerprint, write_json
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger
 from build_data.reconcile.common import Row
 from build_data.reconcile.matching import default_perspective
 
@@ -18,15 +20,16 @@ from .windows import expanded
 
 def inventory(workspace: Workspace, inputs: Inputs) -> Row:
     path = workspace.work / "golden" / "countries.json"
-    digest = fingerprint(
+    digest = data_paths.digest(
         {
             "sources": inputs.sources,
             "licenses": inputs.policy["compatible_gb_licenses"],
             "perspective": inputs.policy.get("perspective"),
             "plan": 3,
-        }
+        },
+        workspace.root,
     )
-    ledger = Ledger(workspace.ledger_path)
+    ledger = Ledger(workspace)
     if ledger.is_complete("golden.plan", "countries", digest):
         return read_json(path)
     db = duckdb.connect()

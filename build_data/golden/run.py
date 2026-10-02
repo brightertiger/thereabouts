@@ -6,7 +6,7 @@ import time
 
 from build_data.acquire import Workspace
 from build_data.acquire.io import write_json
-from build_data.acquire.ledger import read_units
+from build_data.golden.ledger import units
 from build_data.reconcile.common import Row
 
 from . import cells
@@ -20,7 +20,7 @@ def committed(
     expected = {r["root"]: r["countries"] for r in plan}
     result = {}
     fingerprints = {}
-    for unit in read_units(workspace.ledger_path, "golden.cells"):
+    for unit in units(workspace, "golden.cells"):
         root, required = unit["unit_id"], unit["metadata"]["countries"]
         if (
             root not in expected
@@ -30,7 +30,9 @@ def committed(
             continue
         key = tuple(required)
         if key not in fingerprints:
-            fingerprints[key] = cells.digest(inputs, required, implementation)
+            fingerprints[key] = cells.digest(
+                inputs, required, implementation, workspace.root
+            )
         if unit["inputs_hash"] != fingerprints[key]:
             continue
         try:

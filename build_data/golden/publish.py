@@ -7,8 +7,10 @@ from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 
-from build_data.acquire import Ledger, Workspace
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire import Workspace
+from build_data.acquire.io import write_json
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger
 from build_data.reconcile.common import Row
 
 from .cells import builder
@@ -69,6 +71,7 @@ def publish(
     )
     manifest = {
         "schema_version": "golden-1",
+        "data_root": data_paths.relative(workspace.root, root),
         "reference_resolution": 8,
         "block_resolution": 3,
         "created_at": datetime.now(UTC).isoformat(),
@@ -86,11 +89,11 @@ def publish(
         "license_summary": "DATA_LICENSES.md",
         "dataset_card": "DATASET_CARD.md",
     }
-    write_json(root / "manifest.json", manifest)
-    Ledger(workspace.ledger_path).complete(
+    data_paths.write(root / "manifest.json", manifest, workspace.root)
+    Ledger(workspace).complete(
         "golden.manifest",
         "current",
-        fingerprint(manifest),
+        data_paths.digest(manifest, workspace.root),
         [
             root / "manifest.json",
             root / "quality.json",

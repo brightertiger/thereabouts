@@ -6,14 +6,15 @@ from pathlib import Path
 import duckdb
 import pyarrow.parquet as pq
 
-from build_data.acquire import Ledger, Workspace, atomic_output
-from build_data.acquire.artifacts import file_record, read_json
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire import Workspace, atomic_output
+from build_data.acquire.artifacts import file_record
 from build_data.cities.engine import Engine
 from build_data.cities.mapping import export as map_export
 from build_data.cities.urban import Urban
+from build_data.golden import paths as data_paths
 from build_data.golden.inputs import Inputs
 from build_data.golden.joins import export as joins_export
+from build_data.golden.ledger import Ledger
 from build_data.golden.storage import check_parquet
 from build_data.reconcile.common import Row
 
@@ -29,7 +30,7 @@ def places(
     urban: Urban,
 ) -> list[Row]:
     results = []
-    ledger = Ledger(workspace.ledger_path)
+    ledger = Ledger(workspace)
     for record in base["tables"]:
         if record["kind"] != "places":
             continue
@@ -44,14 +45,15 @@ def places(
             target = output / table["kind"] / f"{cc}.parquet"
             link(Path(table["path"]), target)
             results.append({**table, **file_record(target)})
-        digest = fingerprint(
-            {"base": record, "normalization": report["digest"], "mapping": mapping}
+        digest = data_paths.digest(
+            {"base": record, "normalization": report["digest"], "mapping": mapping},
+            workspace.root,
         )
         path = output / "places" / f"{cc}.parquet"
         receipt = output / "checkpoints" / f"places-{cc}.json"
-        unit = str(output.resolve()) + ":" + cc
+        unit = data_paths.relative(output, workspace.root) + ":" + cc
         if ledger.is_complete("normalize-cells.places", unit, digest):
-            results.append(read_json(receipt))
+            results.append(data_paths.read(receipt, workspace.root))
             continue
         db = duckdb.connect()
         try:
@@ -81,7 +83,7 @@ def places(
         if count != record["rows"]:
             raise ValueError("Normalization changed catalogue cardinality")
         result = {**file_record(path), "kind": "places", "country": cc, "rows": count}
-        write_json(receipt, result)
+        data_paths.write(receipt, result, workspace.root)
         ledger.complete("normalize-cells.places", unit, digest, [path, receipt])
         results.append(result)
         print(f"v2 places {cc}: {count}", flush=True)

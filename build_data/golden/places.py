@@ -6,9 +6,9 @@ import json
 from collections.abc import Iterator
 from pathlib import Path
 
-from build_data.acquire import Ledger, Workspace
-from build_data.acquire.io import fingerprint
-from build_data.acquire.ledger import read_units
+from build_data.acquire import Workspace
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger, units
 from build_data.reconcile.common import Row, connect, encode, unpack
 
 from .inputs import Inputs
@@ -89,13 +89,13 @@ def entities(path: Path, policy: Row) -> Iterator[Row]:
 
 
 def export(workspace: Workspace, inputs: Inputs) -> list[Row]:
-    ledger = Ledger(workspace.ledger_path)
-    saved = {
-        r["unit_id"]: r for r in read_units(workspace.ledger_path, "golden.places")
-    }
+    ledger = Ledger(workspace)
+    saved = {r["unit_id"]: r for r in units(workspace, "golden.places")}
     output = []
     for cc, record in sorted(inputs.countries.items()):
-        digest = fingerprint({"country": record, "places": 3, "policy": inputs.policy})
+        digest = data_paths.digest(
+            {"country": record, "places": 3, "policy": inputs.policy}, workspace.root
+        )
         if ledger.is_complete("golden.places", cc, digest):
             output.append(saved[cc]["metadata"]["table"])
             continue

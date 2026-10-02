@@ -9,11 +9,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 
-from build_data.acquire import Ledger, Workspace, atomic_output
+from build_data.acquire import Workspace, atomic_output
 from build_data.acquire.artifacts import file_record
-from build_data.acquire.io import fingerprint
-from build_data.acquire.ledger import read_units
 from build_data.acquire.manifests import load_manifest
+from build_data.golden import paths as data_paths
+from build_data.golden.ledger import Ledger, units
 from build_data.reconcile.common import Row
 
 from .storage import budget, check_parquet
@@ -107,9 +107,11 @@ def export(
     db.execute("SET preserve_insertion_order=false")
     db.execute("SET temp_directory=?", [str(workspace.work / "golden" / "spill")])
     db.execute("SET max_temp_directory_size='512MB'")
-    cell_digest = fingerprint({r["block"]: r["sha256"] for r in cells})
-    ledger = Ledger(workspace.ledger_path)
-    previous = {r["unit_id"]: r for r in read_units(workspace.ledger_path, stage)}
+    cell_digest = data_paths.digest(
+        {r["block"]: r["sha256"] for r in cells}, workspace.root
+    )
+    ledger = Ledger(workspace)
+    previous = {r["unit_id"]: r for r in units(workspace, stage)}
     results = []
     try:
         groups = prepare(db, cells)
@@ -121,13 +123,14 @@ def export(
             kind = parts[0]["kind"]
             if any(p["kind"] != kind for p in parts):
                 raise ValueError("A spatial lookup source must contain one kind")
-            digest = fingerprint(
+            digest = data_paths.digest(
                 {
                     "parts": parts,
                     "cells": cell_digest,
                     "join": 4,
-                    "output": str(output.resolve()),
-                }
+                    "output": data_paths.relative(output, workspace.root),
+                },
+                workspace.root,
             )
             if ledger.is_complete(stage, kind, digest):
                 results.append(previous[kind]["metadata"]["table"])

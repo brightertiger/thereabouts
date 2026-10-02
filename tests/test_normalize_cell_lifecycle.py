@@ -5,10 +5,11 @@ from pathlib import Path
 import pytest
 
 from build_data.acquire import Workspace
-from build_data.acquire.artifacts import file_record, read_json
+from build_data.acquire.artifacts import file_record
 from build_data.acquire.io import write_json
 from build_data.golden.cells import builder
 from build_data.golden.inputs import Inputs
+from build_data.golden.paths import manifest
 from build_data.normalize_cells.base import load, snapshot
 from build_data.normalize_cells.publish import activate
 
@@ -64,6 +65,6 @@ def test_activation_retains_v1_and_stable_v2_paths(tmp_path: Path) -> None:
     activate(workspace, new)
     activate(workspace, new)
     assert old.is_symlink() and old.resolve() == new
-    previous = read_json(tmp_path / "golden-v1/manifest.json")
+    previous = manifest(tmp_path / "golden-v1/manifest.json")
     assert Path(previous["tables"][0]["path"]).read_bytes() == b"old data"
     assert (tmp_path / "golden-v1/manifest.original.json").exists()

@@ -10,12 +10,12 @@ import pyarrow.parquet as pq
 
 from build_data.acquire import Workspace
 from build_data.acquire.artifacts import read_json
-from build_data.acquire.io import fingerprint, write_json
 from build_data.cities.common import builder
 from build_data.cities.engine import Engine
 from build_data.cities.evaluate import Comparison
 from build_data.cities.quality import named_checks
 from build_data.cities.urban import Urban
+from build_data.golden import paths as data_paths
 from build_data.golden.inputs import discover, verify_record
 from build_data.golden.reader import Cells
 from build_data.normalize_cells.base import load
@@ -63,8 +63,9 @@ def main() -> None:
     records = [
         r for r in base["tables"] if r["kind"] == "cells" and r["block"] in roots
     ]
-    identity = fingerprint(
-        {"normalization": normalized, "implementation": implementation()}
+    identity = data_paths.digest(
+        {"normalization": normalized, "implementation": implementation()},
+        workspace.root,
     )
     output = workspace.work / "v2-pilot-blocks"
     reports: Row = {}
@@ -119,7 +120,7 @@ def main() -> None:
             "named": named,
             "stored_cells": sum(r["rows"] for r in tables),
         }
-        write_json(output / "report.json", reports)
+        data_paths.write(output / "report.json", reports, workspace.root)
     # Exercise actual publication joins on the smallest pilot place catalogue.
     chosen = min(
         (
@@ -136,7 +137,7 @@ def main() -> None:
     if any(reports["catalogue_integrity"].values()):
         raise ValueError("Pilot catalogue has invalid normalization references")
     reports["scope"] = "Probe blocks only; transitions are not complete-country counts"
-    write_json(output / "report.json", reports)
+    data_paths.write(output / "report.json", reports, workspace.root)
 
 
 if __name__ == "__main__":

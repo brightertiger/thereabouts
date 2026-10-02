@@ -8,11 +8,11 @@ import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 from numpy.typing import NDArray
 
-from build_data.acquire import Ledger, Workspace
-from build_data.acquire.artifacts import read_json
-from build_data.acquire.io import fingerprint, write_json
+from build_data.acquire import Workspace
 from build_data.cities.engine import Engine
+from build_data.golden import paths as data_paths
 from build_data.golden.cells import compact
+from build_data.golden.ledger import Ledger
 from build_data.golden.reader import interval
 from build_data.golden.schemas import CELLS
 from build_data.golden.storage import budget, parquet
@@ -116,18 +116,20 @@ def build(
     radius: bool,
 ) -> Row:
     root = record["block"]
-    digest = fingerprint({"base": record, "normalization": identity, "radius": radius})
+    digest = data_paths.digest(
+        {"base": record, "normalization": identity, "radius": radius}, workspace.root
+    )
     receipt = output / "checkpoints" / f"{root}.json"
-    ledger = Ledger(workspace.ledger_path)
-    unit = str(output.resolve()) + ":" + root
+    ledger = Ledger(workspace)
+    unit = data_paths.relative(output, workspace.root) + ":" + root
     if ledger.is_complete("normalize-cells.cells", unit, digest):
-        return read_json(receipt)
+        return data_paths.read(receipt, workspace.root)
     budget(workspace)
     rows, counts = transform(record, engines, radius)
     table = parquet(output / "cells" / f"{root}.parquet", rows, CELLS)
     table.update(kind="cells", block=root)
     result = {"table": table, "countries": counts}
-    write_json(receipt, result)
+    data_paths.write(receipt, result, workspace.root)
     ledger.complete(
         "normalize-cells.cells", unit, digest, [Path(table["path"]), receipt]
     )
