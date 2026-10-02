@@ -1,19 +1,79 @@
 # Thereabouts client implementation status
 
-Phases 1–5 are implemented on `feat/client`, locally only:
+Phases 1–6 are implemented on `feat/client`, locally only:
 
 * `ed74109` — Add verified golden serving packs and deterministic exporter.
 * `bf90c3a` — Add offline Python golden reader and bounded public API.
 * `4689230` — Add pinned pack installation and JSON command line client.
 * `054d9bc` — Accelerate stored-cell reconstruction with optional Cython.
 * `fe5cad9` — Cache decoded places and keep batch lookup columnar.
-* Phase 5 — **Add standalone postal and airport serving packs**
+* `0faac7d` — Add standalone postal and airport serving packs.
+* Phase 6 — **Add independent Node reader and shared conformance bundle**
   (this commit; find its hash with `git log`).
 
-Phases 6–7 remain; the Node reader is next.
+Phase 7 remains; the optional MCP server is next.
 `thereabouts.client.Geocoder` reads the new packs; the frozen top-level `thereabouts.Geocoder` still reads the original table.
 
 ## What is usable
+
+### Independent Node client (phase 6)
+
+[clients/node/README.md](../clients/node/README.md) documents the asynchronous
+ESM API, public TypeScript declarations, local pinned import and full verification.
+`await Geocoder.open({pack: path})` supports `reverse`, `fromH3`, ordered async
+`reverseMany`/`fromH3Many`, postal, all five airport schemes, `info`, `explain` and
+`close`. Results are immutable, detached JSON objects with Python-equivalent
+IDs, methods, ambiguity, evidence and nulls. The only runtime dependency is
+H3-JS 4.5.0. No Python worker, native addon, compiler or build step is involved.
+
+File I/O is asynchronous and page reads close their handles. A 32 MiB accounted
+cache budget covers raw buffers and lazily decoded objects. Measured residency
+motivated an 8/24 MiB split; the populated sample retains 4,757,630 / 18,086,650
+charged bytes without eviction. This bounds retained cache accounting, not total
+V8/process memory or caller-retained results. Batch iteration and first-read
+validation yield every 256 rows to avoid long uninterrupted loops.
+
+`importPack(source, {manifestSha256, dataDir})` explicitly imports local packs,
+verifying hashes/structure before and after copying and atomically publishing the
+same immutable store paths and active pointers as Python. Cross-client discovery
+is tested locally. Node has no URL downloader, installer resume or pack-list API;
+Python's explicit CLI supplies those functions against the same store. Lookup
+never uses the network. No Node NumPy-equivalent column API is promised.
+
+[CLIENT_NODE_MEASUREMENTS.json](CLIENT_NODE_MEASUREMENTS.json) records Node
+24.21.0 on the same M2/8 GiB/macOS 27 arm64 machine, H3-JS 4.5.0, synthetic
+4,176 places / 308,032 rows / 64 blocks, 44,032 shuffled queries and the
+3,006,380-byte pack. Warm scalar median/p99: **8.583 / 16.583 µs**. Five object
+batches: **105,022–110,640 results/s**, median **108,583/s**. Open **9.125 ms**,
+first query **10.870 ms**, first pass **54,589/s**; the OS disk cache was not
+flushed. Peak RSS **176,553,984 bytes**. At 5 ms sampling, first-pass event-loop
+p99/max **10.002 / 10.568 ms** and warm-batch p99/max **7.279 / 8.937 ms**.
+These are synthetic shared-machine measurements, not world or service guarantees.
+
+Reproduce after generating `benchmarks.populated_sample` as described in
+[CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md): convert `shuffled.npy` with
+`json.dumps(numpy.load(path).tolist())`, then run
+`node clients/node/benchmark.mjs PACK QUERIES.json OUTPUT.json`.
+
+The committed shared bundle contains **54** public-result/error vectors generated
+from the Python reference and **17** declarative malformed-pack mutations.
+Python fallback/native and CLI serialization are checked against it; Node also
+exhausts three fixture blocks including a pentagon and polar block. Tests cover
+uint16 dictionaries, unsafe integers, duplicate JSON keys, UTF-8, trailing zlib
+streams, cache disable/eviction, close during reads/iteration, source callbacks,
+concurrent imports, symlinks and incompatible packs. Network is blocked in Node
+tests. Both local macOS arm64 Node **22.23.3 and 24.21.0** pass **33 tests**.
+The full Python suite passes **568 tests, 7 skipped**; Ruff lint/format (**373
+files**), strict mypy (**357 files**), TypeScript declaration checks and Prettier
+pass. Node LTS CI is configured but was not run remotely. Other OSes remain
+unqualified. The **32,740-byte npm tarball** (102,535 bytes unpacked) passed all
+successful shared vectors and local import in a separate offline installation.
+Node-imported postal data opens in Python; Python-installed airports open in Node. The package stays private.
+
+Only the format document's stale reverse-only introduction changed; bytes and
+exporter are unchanged in this phase. Original runtime/pipeline files remain
+byte-identical. The integration marker is absent and main normalization is still
+running; no main golden data has been read.
 
 ### Postal and airport packs (phase 5)
 
@@ -325,9 +385,8 @@ Every original runtime/build-stage file still matches `d3b4d94`; phase 1 format/
 * Phase 3 follow-ups: signed release index/key rotation, byte-range resume,
   explicit pruning and Windows/power-loss qualification. Local/URL installation
   and file-level resume are complete; no remote release exists to qualify.
-* Phases 6–7: independent Node reader with shared public-result vectors, then
-  optional MCP integration. Neither is partially implemented. Continue with Node
-  after the committed optional-pack boundary.
+* Phase 7: optional stdio MCP integration over the existing Python API. No MCP
+  implementation is included at the phase 6 boundary.
 * Remaining performance work: representative real-pack access and cache-miss
   measurements. Warm synthetic targets are met; cold/world behavior is unverified.
   Cross-platform wheels require native-runner CI

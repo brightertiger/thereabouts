@@ -3,7 +3,7 @@
 A serving pack is an immutable directory containing a JSON manifest, binary
 shards and source notices. It preserves answers from verified golden v2 tables;
 it performs no geographic reconciliation. This document specifies format 1.0,
-`thereabouts-pack-1`, currently for the `reverse` family only. The original
+`thereabouts-pack-1`, for reverse, postal and airport packs. The original
 `h3-table-v1` format is unrelated and is not accepted by this exporter.
 
 Export and verify locally, using this checkout's build dependencies:
@@ -18,8 +18,8 @@ python -m build_data.serve verify packs/reverse-sample
 The golden manifest must be completed `golden-2`, with verified quality,
 normalization, canonical-city and place-mapping tables. All listed files are
 hashed; relevant Arrow schemas and row counts are checked. Pending spatial or
-static joins and failed quality gates are rejected. Other lookup families are
-hash-checked but are not exported or interpreted. The exporter never opens the
+static joins and failed quality gates are rejected. Select a family with `--family reverse|postal|airports`. Each export admits
+that family and its required canonical catalogue; other tables are hash-checked. The exporter never opens the
 golden ledger or writes to the source dataset. It is a separate stage, not yet
 wired into the world controller.
 
@@ -66,7 +66,7 @@ Required fields:
 | Field | Value or meaning |
 | --- | --- |
 | `schema`, `format` | `thereabouts-pack-1`; `{major:1, minor:0, required_features:0}` |
-| `family`, `minimum_reader`, `dependencies` | `reverse`, `0.1.0`, `[]` |
+| `family`, `minimum_reader`, `dependencies` | `reverse`, `postal` or `airports`; `0.1.0`; `[]` |
 | `data_version`, `catalogue_epoch` | Nonempty immutable release and identity-epoch strings |
 | `reference_resolution`, `block_resolution` | 8, 3 |
 | `h3_version` | Exporter's H3 Python version; H3 major 4 is supported |
@@ -123,8 +123,8 @@ Every shard begins with this 32-byte header:
 | 0 | 8 bytes | `54 48 45 52 45 50 4b 00` (`THEREPK` plus NUL) |
 | 8, 10 | uint16 each | Major 1, minor 0 |
 | 12 | uint32 | Required-feature flags, zero |
-| 16 | uint32 | Kind: 1 spatial, 2 catalogue |
-| 20 | uint32 | Number of section entries: 4 spatial, 3 catalogue |
+| 16 | uint32 | Kind: 1 spatial, 2 catalogue, 3 exact |
+| 20 | uint32 | Number of section entries: 4 spatial, 3 catalogue or exact |
 | 24 | uint64 | Exact total file length |
 
 Immediately following are 32-byte section entries: `type:uint32`,

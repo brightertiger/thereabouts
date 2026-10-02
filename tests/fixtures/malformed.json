@@ -1,0 +1,22 @@
+{
+  "schema": "thereabouts-malformed-1",
+  "cases": [
+    {"id":"major", "pack":"serving", "manifest":["format","major"], "value":2, "error":"UnsupportedPackError"},
+    {"id":"minor", "pack":"serving", "manifest":["format","minor"], "value":1, "error":"UnsupportedPackError"},
+    {"id":"required", "pack":"serving", "manifest":["format","required_features"], "value":1, "error":"UnsupportedPackError"},
+    {"id":"bool-count", "pack":"serving", "manifest":["place_count"], "value":true, "error":"CorruptPackError"},
+    {"id":"dependency", "pack":"serving", "manifest":["dependencies"], "value":["unknown"], "error":"UnsupportedPackError"},
+    {"id":"epoch", "pack":"serving", "manifest":["catalogue_epoch"], "value":"other", "error":"CorruptPackError"},
+    {"id":"self-hash", "pack":"serving", "manifest":["manifest_sha256"], "value":"bad", "error":"CorruptPackError"},
+    {"id":"coverage", "pack":"serving", "manifest":["coverage"], "value":"world", "error":"CorruptPackError"},
+    {"id":"traversal", "pack":"serving", "manifest":["files",0,"path"], "value":"../outside", "error":"CorruptPackError"},
+    {"id":"duplicate-json", "pack":"serving", "duplicate":true, "error":"CorruptPackError"},
+    {"id":"checksum", "pack":"serving", "kind":"catalogue", "offset":0, "hex":"00", "rehash":false, "error":"CorruptPackError"},
+    {"id":"magic", "pack":"serving", "kind":"cells", "offset":0, "hex":"00", "rehash":true, "error":"CorruptPackError"},
+    {"id":"binary-required", "pack":"serving", "kind":"cells", "offset":12, "hex":"01000000", "rehash":true, "error":"UnsupportedPackError"},
+    {"id":"unsigned-span", "pack":"serving", "kind":"catalogue", "offset":40, "hex":"ffffffffffffffff", "rehash":true, "error":"CorruptPackError"},
+    {"id":"binary-count", "pack":"serving", "kind":"catalogue", "offset":20, "hex":"ffffffff", "rehash":true, "error":"CorruptPackError"},
+    {"id":"code-count", "pack":"codes/postal", "kind":"exact", "offset":140, "hex":"ffffffff", "rehash":true, "error":"CorruptPackError"},
+    {"id":"inflate-bound", "pack":"codes/airports", "kind":"exact", "offset":160, "hex":"0100000000000000", "rehash":true, "error":"CorruptPackError"}
+  ]
+}

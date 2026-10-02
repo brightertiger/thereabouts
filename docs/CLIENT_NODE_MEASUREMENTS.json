@@ -1,0 +1,69 @@
+{
+  "machine": {
+    "cpu": "Apple M2",
+    "memory_bytes": 8589934592,
+    "os": "27.0.0",
+    "arch": "arm64",
+    "node": "v24.21.0",
+    "h3_js": "4.5.0"
+  },
+  "sample": {
+    "query_count": 44032,
+    "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b",
+    "places": 4176,
+    "pack_bytes": 3006380
+  },
+  "open_ms": 9.125250000000001,
+  "first_query_us": 10869.916999999994,
+  "first_pass_results_per_s": 54588.58928216996,
+  "scalar_warm_median_us": 8.583000000044194,
+  "scalar_warm_p99_us": 16.582999999968706,
+  "batch_object_results_per_s": [
+    108582.96878107471,
+    106179.20815924706,
+    105021.85222298185,
+    110313.30104882174,
+    110640.0691578829
+  ],
+  "first_pass_event_loop": {
+    "p99_ms": 10.002431,
+    "max_ms": 10.567679
+  },
+  "warm_event_loop": {
+    "p99_ms": 7.278591,
+    "max_ms": 8.937471
+  },
+  "memory": {
+    "rss": 170590208,
+    "heapTotal": 104480768,
+    "heapUsed": 41831000,
+    "external": 41164723,
+    "arrayBuffers": 38803269
+  },
+  "peak_rss_bytes": 176553984,
+  "cache": {
+    "reverse": {
+      "raw": {
+        "budget_bytes": 8388608,
+        "retained_bytes": 4757630,
+        "entries": 113,
+        "hits": 366206,
+        "misses": 113,
+        "evictions": 0
+      },
+      "decoded": {
+        "budget_bytes": 25165824,
+        "retained_bytes": 18086650,
+        "entries": 8352,
+        "hits": 1105028,
+        "misses": 8352,
+        "evictions": 0
+      }
+    }
+  },
+  "notes": [
+    "Synthetic assignments; not geographic accuracy evidence.",
+    "First pass is an empty reader cache, not a flushed OS disk cache.",
+    "Warm event-loop measurement covers object batches, excluding scalar timing."
+  ]
+}

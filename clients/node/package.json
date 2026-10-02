@@ -1,0 +1,34 @@
+{
+  "name": "thereabouts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline readers for Thereabouts serving packs",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md",
+    "FORMAT.md"
+  ],
+  "engines": {
+    "node": "^22.0.0 || ^24.0.0"
+  },
+  "scripts": {
+    "test": "node --import ./test/offline.js --test test/*.test.js",
+    "check": "tsc --strict --noEmit --target es2022 --module nodenext test/types.ts",
+    "format": "prettier --check src test index.d.ts package.json"
+  },
+  "dependencies": {
+    "h3-js": "4.5.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2",
+    "typescript": "~5.9.3"
+  }
+}
