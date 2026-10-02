@@ -33,6 +33,8 @@ def builder() -> str:
         "footprints.py",
         "policy_areas.py",
         "engine.py",
+        "allocation.py",
+        "boundaries.py",
         "urban.py",
         "radius.py",
         "rural.py",

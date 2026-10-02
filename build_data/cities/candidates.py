@@ -22,6 +22,8 @@ def divisions(db: sqlite3.Connection) -> dict[str, Row]:
             "name": row.get("name"),
             "local_type": upstream.get("local_type"),
             "parent": row.get("parent_source_id"),
+            "longitude": row.get("longitude"),
+            "latitude": row.get("latitude"),
         }
     return result
 

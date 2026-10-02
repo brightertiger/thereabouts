@@ -3,10 +3,13 @@
 import json
 import sqlite3
 from collections import defaultdict
+from typing import Any
 
 import shapely
 
+from build_data.reconcile.classification import city_order
 from build_data.reconcile.common import Row, unpack
+from build_data.reconcile.spatial import distance
 
 
 def screen(
@@ -15,6 +18,7 @@ def screen(
     divisions: dict[str, Row],
     rules: Row,
     fixed: list[Row],
+    anchor_edge_m: float = 0.0,
 ) -> tuple[list[Row], list[Row]]:
     fixed_ids = {r["city_id"] for r in fixed}
     grouped: dict[str, list[Row]] = defaultdict(list)
@@ -35,14 +39,15 @@ def screen(
         elif evidence.get("subtype") != "locality":
             reason = "administrative container; no municipal policy approval"
         elif identity in cities:
-            if division.get("class") in ("village", "hamlet") and not set(
-                cities[identity]["classes"]
-            ) & {"city", "town"}:
-                # A large village can be an urban anchor without making its
-                # existing rural village boundary invalid. Keep that fallback.
-                continue
-            if division.get("class") not in ("city", "town"):
-                reason = "polygon division is not typed city/town"
+            # A territorial locality is a settlement's own source boundary.
+            # Its title (including village/hamlet) does not override ownership.
+            # Point-only weak seats are absent from cities and get no footprint.
+            settlement = division.get("class") in ("city", "town")
+            territorial = evidence.get("is_territorial") is True
+            if not settlement and not (
+                territorial and division.get("class") in ("village", "hamlet")
+            ):
+                reason = "no territorial settlement boundary evidence"
             elif any(
                 term.casefold() in json.dumps(upstream, ensure_ascii=False).casefold()
                 for term in rules.get("container_terms", [])
@@ -57,13 +62,28 @@ def screen(
                     "geometry": shapely.from_wkb(blob),
                     "evidence": evidence,
                     "priority": priority,
+                    "division": division,
                 }
             )
     output = list(fixed)
     for identity, parts in grouped.items():
         c = cities[identity]
         geometry = shapely.union_all([p["geometry"] for p in parts])
-        if not geometry.covers(shapely.Point(c["longitude"], c["latitude"])):
+        anchors = [shapely.Point(c["longitude"], c["latitude"])]
+        anchors.extend(
+            shapely.Point(d["longitude"], d["latitude"])
+            for p in parts
+            if (d := p["division"]).get("longitude") is not None
+            and d.get("latitude") is not None
+        )
+        primary_inside = geometry.covers(anchors[0])
+        edge = shapely.shortest_line(anchors[0], geometry)
+        near_edge = primary_inside or (
+            edge is not None
+            and distance(*edge.coords[0], *edge.coords[-1]) <= anchor_edge_m
+        )
+        linked_inside = any(geometry.covers(anchor) for anchor in anchors[1:])
+        if not (primary_inside or (near_edge and linked_inside)):
             rejected.extend(
                 {
                     "area_id": p["area_id"],
@@ -79,8 +99,24 @@ def screen(
                 "geometry": geometry,
                 "method": "city_polygon",
                 "references": [str(p["area_id"]) for p in parts],
-                "evidence": {"screen": "typed locality and contained anchor"},
+                "evidence": {
+                    "screen": (
+                        "territorial settlement or typed locality; "
+                        "contained linked source anchor"
+                    )
+                },
                 "priority": 1,
+                "ownership_order": city_order(
+                    {
+                        "id": identity,
+                        "population": c["population"],
+                        "geonames_id": identity
+                        if identity.startswith("city:geonames:")
+                        else None,
+                    },
+                    max(p["priority"] for p in parts),
+                    geometry.area,
+                ),
             }
         )
     return output, rejected
@@ -89,16 +125,14 @@ def screen(
 def resolve_overlaps(footprints: list[Row]) -> list[Row]:
     """Respect separately retained municipal limits before broader policy unions.
 
-    Smaller municipal boundaries win shared source territory. Store the effective
-    footprint plus explicit exclusion IDs; never pretend overlapping input
+    Retained source precedence resolves shared municipal territory. Store the
+    effective footprint plus exclusion IDs; never pretend overlapping input
     geometries were independently validated single-city extents.
     """
     for fp in footprints:
         if fp["method"] == "city_polygon":
             fp["priority"] = -1
-    ordered = sorted(
-        footprints, key=lambda fp: (fp["priority"], fp["geometry"].area, fp["city_id"])
-    )
+    ordered = sorted(footprints, key=footprint_order)
     tree = shapely.STRtree([fp["geometry"] for fp in ordered])
     result = []
     for i, fp in enumerate(ordered):
@@ -122,3 +156,13 @@ def resolve_overlaps(footprints: list[Row]) -> list[Row]:
         if not fp["geometry"].is_empty:
             result.append(fp)
     return result
+
+
+def footprint_order(footprint: Row) -> tuple[Any, ...]:
+    """Preserve source municipal ownership before smaller unlinked localities."""
+    return (
+        footprint["priority"],
+        *footprint.get(
+            "ownership_order", (0, footprint["geometry"].area, 0, footprint["city_id"])
+        ),
+    )

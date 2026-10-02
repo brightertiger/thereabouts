@@ -56,7 +56,10 @@ def build_country(
                             "evidence": {"city_state": cc},
                         }
                     )
-        footprints, rejected = screen(db, cities, evidence, rules, fixed)
+        footprints, rejected = screen(
+            db, cities, evidence, rules, fixed, policy["boundary_anchor_edge_m"]
+        )
+        original_boundaries = [dict(f) for f in footprints]
         parts = {**rules.get("parts", {}), **rules.get("identity_aliases", {})}
         independent = set(rules.get("independent", []))
         for fp in footprints:
@@ -110,6 +113,8 @@ def build_country(
                 CREATE TABLE footprints(id INTEGER PRIMARY KEY,city_id TEXT,
                   geometry BLOB,data BLOB);
                 CREATE TABLE parts(place_id TEXT PRIMARY KEY,city_id TEXT);
+                CREATE TABLE boundaries(id INTEGER PRIMARY KEY,city_id TEXT,
+                  geometry BLOB,data BLOB);
                 CREATE TABLE rejected(area_id INTEGER PRIMARY KEY,
                   city_id TEXT,reason TEXT);
             """)
@@ -130,6 +135,14 @@ def build_country(
                         fp["geometry"].wkb,
                         pack({k: v for k, v in fp.items() if k != "geometry"}),
                     ),
+                )
+            for i, boundary in enumerate(original_boundaries):
+                identity = boundary["city_id"]
+                metadata = {k: v for k, v in boundary.items() if k != "geometry"}
+                metadata["target_id"] = parts.get(identity, identity)
+                out.execute(
+                    "INSERT INTO boundaries VALUES(?,?,?,?)",
+                    (i, identity, boundary["geometry"].wkb, pack(metadata)),
                 )
             out.commit()
         finally:

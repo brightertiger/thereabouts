@@ -11,9 +11,9 @@ from numpy.typing import NDArray
 
 from build_data.golden.nearest import nearest
 from build_data.reconcile.common import Row, connect, unpack
-from build_data.reconcile.spatial import EARTH_M
-from build_data.reference.sphere import unit_vectors
 
+from .allocation import Allocation
+from .boundaries import BoundaryIndex
 from .projection import project
 from .rural import rural
 from .urban import Urban
@@ -23,6 +23,12 @@ Floats = NDArray[np.float64]
 
 
 class Engine:
+    """Apply city footprints, urban inference, then the retained rural answer.
+
+    Country/state and land eligibility are inherited from the base cell stage.
+    Rejected broad promotions are repaired before falling back to a village.
+    """
+
     def __init__(
         self,
         path: Path,
@@ -31,6 +37,8 @@ class Engine:
         policy: Row,
         land: tuple[Path, float] | None = None,
     ) -> None:
+        """Load a committed country index and build its two spatial selectors."""
+        self.index_path = path
         self.land = land
         self.source, self.urban, self.policy = source, urban, policy
         db = connect(path, readonly=True)
@@ -55,44 +63,19 @@ class Engine:
         self.city_state = next(
             (i for i in self.ids if i.startswith("city:country:")), None
         )
-        self.coordinates = np.array(
-            [(r["latitude"], r["longitude"]) for r in self.cities], dtype=np.float64
-        ).reshape((-1, 2))
-        self.xyz = unit_vectors(self.coordinates)
-        self.pop = np.array([r["population"] for r in self.cities], dtype=np.float64)
-        self.clusters = urban.anchors(self.coordinates, policy["anchor_urban_edge_m"])
-        bounded = {r["city_id"] for r in self.footprints}
-        self.unbounded = np.array([i not in bounded for i in self.ids], dtype=bool)
-        self.tree = shapely.STRtree([r["geometry"] for r in self.footprints])
-        self.order = np.array(
-            sorted(
-                range(len(self.footprints)),
-                key=lambda i: (
-                    self.footprints[i]["priority"],
-                    self.footprints[i]["geometry"].area,
-                    self.footprints[i]["city_id"],
-                ),
-            ),
-            dtype=np.int64,
-        )
-        self.rank = np.argsort(self.order)
+        self.boundaries = BoundaryIndex(self.footprints)
+        self.allocation = Allocation(self.cities, self.footprints, urban, policy)
 
     def polygons(
         self, coordinates: Floats, tolerance: float = 0.0
     ) -> NDArray[np.int64]:
-        points = shapely.points(coordinates[:, 1], coordinates[:, 0])
-        pairs = self.tree.query(points, predicate="dwithin", distance=tolerance)
-        ranks = np.full(len(coordinates), len(self.footprints), dtype=np.int64)
-        if pairs.size:
-            np.minimum.at(ranks, pairs[0], self.rank[pairs[1]])
-        result = np.full(len(coordinates), -1, dtype=np.int64)
-        hit = ranks < len(self.footprints)
-        result[hit] = self.order[ranks[hit]]
-        return result
+        """Choose an accepted boundary without expanding over nearby settlements."""
+        return self.boundaries.query(coordinates, tolerance)
 
     def overlay(
         self, coordinates: Floats, radius: bool, tolerance: float = 0.0
     ) -> tuple[Objects, Objects]:
+        """Known municipal limits win; inference fills the remaining urban cells."""
         ids = np.full(len(coordinates), None, dtype=object)
         methods = ids.copy()
         if self.city_state is not None:
@@ -104,77 +87,10 @@ class Engine:
             mask = winners == i
             ids[mask] = self.footprints[i]["city_id"]
             methods[mask] = self.footprints[i]["method"]
-        clusters = self.urban.locate(coordinates)
-        xyz = unit_vectors(coordinates)
-        for cluster in np.unique(clusters[(winners < 0) & (clusters >= 0)]):
-            selected = np.flatnonzero((clusters == cluster) & (winners < 0))
-            candidates = np.flatnonzero((self.clusters == cluster) & self.unbounded)
-            if not len(candidates):
-                continue
-            for start in range(0, len(selected), 1024):
-                rows = selected[start : start + 1024]
-                # At most 1024 query rows by this one urban centre's anchors.
-                distances = (
-                    2
-                    * EARTH_M
-                    * np.arcsin(
-                        np.minimum(
-                            1,
-                            np.sqrt(
-                                np.maximum(
-                                    0, 2 - 2 * xyz[rows] @ self.xyz[candidates].T
-                                )
-                            )
-                            / 2,
-                        )
-                    )
-                )
-                close = np.argmin(distances, axis=1)
-                weighted = np.argmin(
-                    distances
-                    / np.sqrt(
-                        np.maximum(
-                            self.policy["population_floor"], self.pop[candidates]
-                        )
-                    ),
-                    axis=1,
-                )
-                chosen = np.where(
-                    distances[np.arange(len(rows)), close] <= self.policy["core_m"],
-                    close,
-                    weighted,
-                )
-                ids[rows] = self.ids[candidates[chosen]]
-                methods[rows] = "urban_allocation"
+        clusters = self.allocation.divide(coordinates, ids, methods)
         if radius:
-            self.radii(coordinates, clusters, ids, methods)
+            self.allocation.radii(coordinates, clusters, ids, methods)
         return cast(Objects, ids), cast(Objects, methods)
-
-    def radii(
-        self,
-        coordinates: Floats,
-        clusters: NDArray[np.int64],
-        ids: Objects,
-        methods: Objects,
-    ) -> None:
-        from .radius import assign
-
-        settings = self.policy["town_radius"]
-        candidates = np.flatnonzero(
-            self.unbounded
-            & (self.clusters < 0)
-            & (self.pop <= settings["maximum_population"])
-        )
-        rows = np.flatnonzero((clusters < 0) & (ids == None))  # noqa: E711
-        chosen = assign(
-            coordinates[rows],
-            self.xyz[candidates],
-            self.pop[candidates],
-            self.ids[candidates],
-            settings,
-        )
-        hit = chosen != None  # noqa: E711
-        ids[rows[hit]], methods[rows[hit]] = chosen[hit], "town_radius"
 
     def apply(
         self,
@@ -184,6 +100,7 @@ class Engine:
         radius: bool,
         offshore: NDArray[np.bool_] | None = None,
     ) -> tuple[Objects, Objects]:
+        """Retain rural answers unless a city extent or repair supersedes them."""
         projected = (
             project(self.land, coordinates, offshore)
             if offshore is not None
