@@ -11,7 +11,8 @@ from build_data.acquire.artifacts import read_json
 from build_data.acquire.io import write_json
 from build_data.golden.inputs import discover
 from build_data.golden.reader import Cells
-from build_data.golden_v2.score import grade
+from build_data.normalize_cells.base import load
+from build_data.normalize_cells.score import grade
 from build_data.reconcile.common import Row, connect, unpack
 
 from .engine import Engine
@@ -34,7 +35,7 @@ def main() -> None:
     workspace = Workspace(args.data_dir.resolve())
     inputs = discover(workspace)
     normalized = read_json(workspace.root / "city_normalized/manifest.json")
-    base = read_json(workspace.root / "golden/manifest.json")
+    base = load(workspace, inputs)[1]
     urban = Urban(normalized["ghsl"]["partitions"])
     cells = [
         h3.latlng_to_cell(float(r["latitude"]), float(r["longitude"]), 8)

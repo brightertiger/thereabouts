@@ -9,7 +9,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from build_data.acquire.io import write_json
-from build_data.golden_v2.score import normalized_name, score
+from build_data.normalize_cells.score import normalized_name, score
 
 
 def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -> None:

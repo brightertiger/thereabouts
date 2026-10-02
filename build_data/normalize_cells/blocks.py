@@ -117,7 +117,7 @@ def build(
     receipt = output / "checkpoints" / f"{root}.json"
     ledger = Ledger(workspace.ledger_path)
     unit = str(output.resolve()) + ":" + root
-    if ledger.is_complete("golden-v2.cells", unit, digest):
+    if ledger.is_complete("normalize-cells.cells", unit, digest):
         return read_json(receipt)
     budget(workspace)
     rows, counts = transform(record, engines, radius)
@@ -125,5 +125,7 @@ def build(
     table.update(kind="cells", block=root)
     result = {"table": table, "countries": counts}
     write_json(receipt, result)
-    ledger.complete("golden-v2.cells", unit, digest, [Path(table["path"]), receipt])
+    ledger.complete(
+        "normalize-cells.cells", unit, digest, [Path(table["path"]), receipt]
+    )
     return result

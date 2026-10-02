@@ -18,6 +18,7 @@ from build_data.cities.quality import named_checks
 from build_data.cities.urban import Urban
 from build_data.golden.inputs import discover, verify_record
 from build_data.golden.reader import Cells
+from build_data.normalize_cells.base import load
 from build_data.reconcile.common import Row
 
 from .blocks import build
@@ -35,7 +36,7 @@ def main() -> None:
     normalized = read_json(workspace.root / "city_normalized/manifest.json")
     if normalized["builder"] != builder():
         raise ValueError("Stale country normalization; regenerate pilot first")
-    base = read_json(workspace.root / "golden/manifest.json")
+    base = load(workspace, inputs)[1]
     urban = Urban(normalized["ghsl"]["partitions"])
     engines = {
         cc: Engine(

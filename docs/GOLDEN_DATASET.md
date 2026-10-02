@@ -15,6 +15,27 @@ its place assignment is the answer at its H3 cell's centre. These can differ nea
 boundaries. In v1, countries and cities inherit the reconciliation policy, without new
 name, boundary, or nearest-city overrides.
 
+## Normalized schema and controller
+
+`build_data.rebuild_golden` runs or resumes the full source-to-dataset chain; see
+[DATA_PIPELINE.md](DATA_PIPELINE.md#acquired-sources-to-normalized-golden-data).
+The base `build_data.golden` stage below remains the country/state/land and rural
+cell input. `build_data.cities` publishes canonical cities and place mappings;
+`build_data.normalize_cells` applies them, recompacts, refreshes spatial lookups,
+and verifies the final stored output. The base input is an explicit committed
+snapshot under `base_cells/` and survives local activation of the new output.
+
+Schema `golden-2` adds `canonical_cities` and `place_to_city` tables. `places` adds
+`normalized_city_id`, `normalization_method`, `settlement_kind`; absorbing roles
+are `city` or `town`, and other settlements retain their source classification.
+Cell `city_method` becomes `city_polygon`, `policy_polygon`, `urban_allocation`,
+`town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null.
+Country/state/land fields and the resolution-8 reference semantics remain the base
+stage's output. Radius is disabled. Full column definitions, quality measures,
+source attribution and limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
+
+The following sections document the base stage and its measured v1 snapshot.
+
 ## Run and resume
 
 ```sh

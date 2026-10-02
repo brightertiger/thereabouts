@@ -517,21 +517,12 @@ reconciled manifest is archived under `work/reconcile/history/`; the active
 manifest is explicitly incomplete while the new generation builds. A verified
 country resumes without reconstructing its retired intermediates.
 
-Run world reconciliation followed by the golden stage with:
+The original v1 results and retirement mechanism are historical records in
+[GOLDEN_V1.md](GOLDEN_V1.md). The current rebuild controller below reuses verified
+reconciliation and base-cell checkpoints; city normalization never retires or
+modifies reconciled inputs.
 
-```sh
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --sample-gate data/work/v1/sample.json
-```
-The sample gate must demonstrate improved exact identity, no aggregate country or
-state regression, and passing named fixtures for the exact source, policy and
-reconciliation builder. The existing full-pilot gate is also required. Logs and
-controller status live under `work/v1/`; `rebuild.json` is complete only after both
-stage completion markers pass. Run the same command to resume. See
-[GOLDEN_V1.md](GOLDEN_V1.md) for measured results and current process state.
-
-
-## GHSL and city normalization (v2 pilot; world gate failed)
+## Acquired sources to normalized golden data
 
 `uv run --no-sync python -m build_data.acquire ghsl` acquires the pinned
 GHS-UCDB R2024A V1.2 general-characteristics ZIP (6,902,089 bytes, SHA256
@@ -543,17 +534,43 @@ retains attribution and the GHSL reference publication. This is a built-up urban
 extent source, not municipal boundaries. See the [producer overview](https://human-settlement.emergency.copernicus.eu/ucdb2024Overview.php)
 and [attribution requirements](https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php).
 
-`build_data.cities` runs after reconciliation; `build_data.cities.pilot` measures
-nine countries with radius off/on. It publishes canonical cities and a total
-place-to-city map, with policy/source/code keyed country checkpoints. The separate
-`build_data.golden_v2` controller expands the verified base cells to r8, changes
-city labels/methods, recompacts and refreshes lookup joins beside v1. Its reviewed
-pilot gate is mandatory. [GOLDEN_V2.md](GOLDEN_V2.md) gives clean-workspace and
-resume commands, columns, evaluation isolation, measured status and limitations.
-The current golden v1 remains the published dataset until v2 is verified.
+The single controller is `build_data.rebuild_golden`. Its chain is acquisition →
+reconciliation → base cells (`build_data.golden`) → canonical cities/maps
+(`build_data.cities`) → normalized cells, joins and verification
+(`build_data.normalize_cells`) → optional local activation. Packages name jobs;
+`golden-1` and `golden-2` are dataset schemas.
 
-The completed nine-country pilot failed its independent source-polygon gate:
-Hoffman Estates, Buffalo Grove and Loves Park lose municipal-interior cells even
-though their anchor points pass. Radius remains disabled. See the measured
-results and continuation blockers in [GOLDEN_V2.md](GOLDEN_V2.md); no world v2
-has been built or swapped into `data/golden`.
+```sh
+uv sync --frozen
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
+# After examining the generated pilot, bind the reasoned decision to its hashes:
+uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
+  --review data/work/v2-pilot/review-notes.json --gate data/work/v2-pilot/gate.json
+nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --through world > data/work/v2-world.log 2>&1 < /dev/null &
+```
+
+Use the same controller command to resume any interrupted stage. From an empty
+workspace it acquires all sources, runs the reconciliation pilot and world,
+builds base cells, then evaluates the city pilot. Exact source-date reproduction
+requires the preserved acquired snapshots; fresh discovery may retrieve newer
+GeoNames bytes. Existing verified acquisition/reconciliation checkpoints are reused
+without restoring offloaded raw files. `--sample-gate` can additionally require
+the historical reconciliation improvement gate.
+
+The base stage's complete tables are verified against reconciled inputs and cell
+code, then hard-linked into `base_cells/<digest>/`. `base_cells/current.json`
+points to that committed manifest. It is an explicit immutable dependency, not
+an assumption that the active `golden/` directory happens to contain v1.
+Normalization builds `golden-v2/` beside the active dataset. Country indexes/maps,
+cell blocks, refreshed joins and country quality each have input/code/policy
+checkpoints. The base snapshot's hard links add no duplicate payload bytes.
+
+Logs and controller state are under `work/rebuild/`; world progress also lives in
+`work/v2-run.json`. `--through world` stops only after final stored-cell quality and
+integrity verification. Examined individual boundary losses can be supplied with
+`--review`; each exception must match the exact city, count and destinations.
+`--through publish` activates the verified result locally through a stable symlink
+and retains the prior directory as `golden-v1/`. No external publication is done.
+See [GOLDEN_V2.md](GOLDEN_V2.md) for measured results, gate receipts, all-boundaries
+checks, split-isolated scoring, and known limitations.

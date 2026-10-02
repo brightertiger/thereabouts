@@ -1,9 +1,10 @@
 # Golden v2 city normalization
 
-**Status: pilot complete; release gate failed; world v2 not built.** Golden v1 and
+**Status: boundary fixes and controller rework complete; pilot rerun in progress.** Golden v1 and
 reconciliation remain intact. Do not interpret the city-plan prototypes, the
 source-point diagnostic or a successful country checkpoint as a completed world.
-The generated pilot report is `data/work/v2-pilot/summary.json`; the process handoff
+The original failed pilot is archived under `data/work/v2-before-rework/`.
+The regenerated pilot report is `data/work/v2-pilot/summary.json`; the process handoff
 is `data/work/v2-progress.md`. Results and the gate decision are recorded below.
 
 ## Pipeline and reproduction
@@ -16,59 +17,41 @@ independent neighbours, exclusions, aliases and all numeric thresholds live in
 London 33, and New York five pinned borough identities. Delhi includes both the
 Delhi and New Delhi municipal polygons.
 
-From a new workspace (one process at a time on the 8 GB machine):
+The complete controller chain and clean-workspace commands are in
+[DATA_PIPELINE.md](DATA_PIPELINE.md#acquired-sources-to-normalized-golden-data).
+`build_data.golden` produces the base cells; `build_data.normalize_cells` expands
+those cells at resolution 8 and normalizes city assignments. The base dependency
+is verified and checkpointed under `data/base_cells/`, independently of the active
+`data/golden` publication. No raw prototype output is an input.
 
 ```sh
 uv sync --frozen
-V2_DATA=/absolute/path/to/data
-uv run --no-sync python -m build_data.acquire all --data-dir "$V2_DATA"
-uv run --no-sync python -m build_data.reconcile --data-dir "$V2_DATA"
-uv run --no-sync python -m build_data.reconcile --world --data-dir "$V2_DATA"
-uv run --no-sync python -m build_data.golden run --workers 1 --data-dir "$V2_DATA"
-uv run --no-sync python -m build_data.cities --data-dir "$V2_DATA" \
-  --countries IN BD TR CN US JP GB MY ID
-uv run --no-sync python -m build_data.cities.pilot --data-dir "$V2_DATA" \
-  --output "$V2_DATA/work/v2-pilot"
-uv run --no-sync python -m build_data.cities.dev --data-dir "$V2_DATA"
-```
-
-The existing reconcile world gate also applies. Exact snapshot reproduction needs
-its preserved inventories/raw bytes, not a fresh discovery of mutable GeoNames
-exports. See [raw custody and restore](DATA_PIPELINE.md#raw-offload-and-restore).
-On this machine, reuse `data/reconciled` and `data/golden`; do not rebuild or delete
-those inputs. Only the 6.9 MB GHSL package requires an additional acquisition:
-
-```sh
-uv run --no-sync python -m build_data.acquire ghsl --data-dir data
-```
-
-After reviewing the pilot, a gate JSON must record `accepted: true`, the exact
-normalization `builder()` hash, `policy: fingerprint(policy())`, verified source
-`inputs`, `base` and `ghsl` hashes, `pilot_summary` and `normalization_manifest`
-file records, a nonempty `review`, and an empty `unresolved_losses` list. The
-selected off/on variant and all country report artifacts must still verify. An absent, rejected or stale gate refuses a world build.
-**No accepted gate has been issued for this implementation yet.** The commands
-below describe the implemented continuation; they are not evidence it ran.
-
-```sh
-nohup uv run --no-sync python -m build_data.golden_v2 run \
-  --data-dir data --output data/golden-v2 --gate data/work/v2-pilot/gate.json \
-  > data/work/v2-world.log 2>&1 < /dev/null &
-# After cells, places and joins finish:
-nohup uv run --no-sync python -m build_data.golden_v2 verify \
-  --data-dir data --output data/golden-v2 \
-  > data/work/v2-world-verify.log 2>&1 < /dev/null &
-uv run --no-sync python -m build_data.golden_v2 score \
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
+uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
+  --review data/work/v2-pilot/review-notes.json --gate data/work/v2-pilot/gate.json
+nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
+  --through world > data/work/v2-world.log 2>&1 < /dev/null &
+# Only after final world verification; do not tune against this result:
+uv run --no-sync python -m build_data.normalize_cells score \
   --output data/golden-v2 --points eval/city_points/points.csv --split holdout
+# Reuses the verified output and retains the old golden directory:
+uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through publish
 ```
 
-The world controller writes progress to `data/work/v2-run.json`. Publication is
-complete only when **both** that marker and `golden-v2/manifest.json` say
-`completed: true`. The verifier checks stored cells, catalogue references and
-complete same-country mappings, footprint shares and original neighbour polygons
-before setting them. Country quality checkpoints resume independently. V2 builds beside v1; these
-commands do not swap or delete v1. No cloud resource or external publication is
-part of this stage.
+A review-notes JSON contains `accepted`, a nonempty `review`,
+`unresolved_losses: []`, `minimum_dev_correct`, and `boundary_exceptions` (empty
+when none). The `review` command attaches source/base/GHSL/policy/code identities
+and verified pilot, normalization and development file records, and refuses
+failed spatial checks or unexamined accepted-boundary losses. Every exception
+requires country, city ID, exact lost-cell count/destination counts, reason and
+source reference. These review receipts cannot influence the assignment rule.
+
+World completion requires `data/work/v2-run.json` and the output manifest to say
+`completed: true`, with verified table and quality artifact hashes. The controller
+marker `data/work/rebuild/run.json` identifies the current stage and its log.
+An interruption resumes country/block checkpoints. `data/work/v2-progress.md`
+records the live process state. Local activation keeps v2 artifact paths stable
+and retains v1 as `data/golden-v1`; it does not delete or publish anything remotely.
 
 ## Rules and evidence
 
@@ -79,17 +62,21 @@ or radius authority simply from their seat code. Retain them as settlements.
 The six existing linked city/PPLX conflicts retain reconciliation's explicit
 shared-Wikidata city evidence. Existing city-state conventions remain policy.
 
-Approved policy unions precede inference. Generic absorbing footprints require a
-compatible typed locality and a contained source anchor. Reject unapproved
-county/localadmin/region promotions, incompatible linked village polygons and
-US source areas explicitly identified as townships. Existing standalone village
-boundaries remain rural evidence even when that village is large enough to be an
-urban candidate. The rejected area IDs are recorded; when they supplied the base
-answer, recompute other containing rural polygons and then same-country nearest
-settlements, rather than keeping the invalid promotion. Chongqing's region-wide
-promotion is replaced by its connected GHSL core and repaired rural alternatives.
+Accepted municipal boundaries and approved policy unions precede inference.
+A territorial locality may own a boundary even when its local title is village or
+hamlet. A point-only weak village seat still cannot obtain a footprint. The source
+anchor must be inside, or within 250 metres with a linked alternate anchor inside;
+this accepts small source-coordinate discrepancies without enlarging a boundary.
+Distant namesake polygons (Dhaka's tiny linked village) remain rejected.
+Unapproved county/localadmin/region promotions and source-identified US townships
+remain excluded. Salem's independent-city county representation is an explicit
+policy approval. Yichang and Fuxin retain only GHSL-clipped prefecture cores.
+Rejected broad area answers are repaired from remaining rural polygons and then
+same-country nearest settlements. Chongqing's region-wide promotion is replaced
+by its connected GHSL core and repaired rural alternatives.
 
 Retained independent municipal boundaries win overlapping source territory.
+Preserve the source precedence of linked municipalities over unlinked localities.
 Store disjoint effective footprints, with the excluded boundary IDs and original
 source-area evidence. This makes the 99% footprint measurement a **consistency
 check**, not independent proof of a municipal boundary. Source boundary overlaps
@@ -121,7 +108,8 @@ Synthetic mixed-batch tests ensure land rows do not inherit that tolerance.
 
 Each country has content-addressed `city_normalized/<digest>/<CC>/index.sqlite`,
 `canonical_cities.parquet`, `place_to_city.parquet` and a report. SQLite stores
-canonical candidates, effective footprints, explicit parts and rejected area IDs.
+canonical candidates, original accepted boundaries, effective footprints, explicit
+parts and rejected area IDs.
 Country keys include reconciled input hash, GHSL manifest, policy, implementation,
 shared spatial helpers and runtime versions. Atomic temporary publication and
 ledger hash verification make interruption and corruption resumable. A changed
@@ -179,7 +167,7 @@ winner or newly inferred part maps to redefine expected answers. The original
 130 regressions are also audited by `regressions.json`; points outside the pilot
 remain untested until a world run. Neither score is independent accuracy.
 
-`python -m build_data.golden_v2 score --output <golden> --points <csv> --split dev`
+`python -m build_data.normalize_cells score --output <golden> --points <csv> --split dev`
 scores either golden schema through stored ancestors. It supports the hand-check
 CSV's expected name, accepted names, GeoNames/Wikidata IDs, country and split.
 Ambiguous rows are visible and separately counted. Holdout requires a completed
@@ -319,7 +307,7 @@ municipal status, true parts and genuine independent neighbours.
 
 ### Stored pilot and verification
 
-`uv run --no-sync python -m build_data.golden_v2.pilot_blocks` materializes
+`uv run --no-sync python -m build_data.normalize_cells.pilot_blocks` materializes
 14 probe blocks: **202,576** eligible r8 centres, **147,382** compact cells with
 radius off and **147,514** with it on. Changed city counts are **18,735 / 19,073**;
 all 12 named fixtures falling in these blocks pass through actual stored ancestor

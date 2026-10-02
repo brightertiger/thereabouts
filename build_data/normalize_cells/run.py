@@ -17,6 +17,7 @@ from build_data.cities.urban import Urban
 from build_data.golden.inputs import discover, verify_record
 from build_data.reconcile.common import Row
 
+from .base import load
 from .blocks import build
 from .gates import reviewed
 from .tables import lookups, places
@@ -49,13 +50,28 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
         code = implementation()
         normalization_code = builder()
         inputs = discover(workspace)
-        base = read_json(workspace.root / "golden/manifest.json")
-        if not base["completed"] or base["schema_version"] != "golden-1":
-            raise ValueError("World normalization requires complete golden-1 base")
-        for table in base["tables"]:
-            verify_record(table)
+        base_path, base = load(workspace, inputs)
         ghsl = load_manifest(workspace, "ghsl")
         reviewed(gate, settings, inputs, base, ghsl)
+        existing = output / "manifest.json"
+        if existing.exists():
+            previous = read_json(existing)
+            if (
+                previous.get("completed")
+                and previous.get("implementation") == code
+                and previous.get("base") == fingerprint(base)
+            ):
+                for artifact in [
+                    *previous["tables"],
+                    *previous["verification_artifacts"],
+                ]:
+                    verify_record(artifact)
+                write_json(
+                    run_path,
+                    {"completed": True, "stage": "verified", "output": str(output)},
+                )
+                print("Verified normalized dataset already complete", flush=True)
+                return
         urban = Urban(ghsl["partitions"])
         reports = {}
         for cc in sorted(inputs.countries):
@@ -171,12 +187,11 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
                 "tables": tables,
                 "normalization": normalized,
                 "base": fingerprint(base),
-                "base_manifest": str(
-                    (workspace.root / "golden/manifest.json").resolve()
-                ),
+                "base_manifest": str(base_path),
                 "reference_resolution": 8,
                 "block_resolution": 3,
                 "builder": identity,
+                "implementation": code,
             },
         )
         write_json(
@@ -188,6 +203,7 @@ def run(workspace: Workspace, output: Path, gate: Path) -> None:
             },
         )
         print(
-            "World cells, places and joins finished; run golden_v2 verify before use.",
+            "World cells, places and joins finished; "
+            "run normalize_cells verify before use.",
             flush=True,
         )

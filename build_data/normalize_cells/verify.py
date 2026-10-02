@@ -6,7 +6,7 @@ from pathlib import Path
 import duckdb
 
 from build_data.acquire import Ledger, Workspace
-from build_data.acquire.artifacts import read_json
+from build_data.acquire.artifacts import file_record, read_json
 from build_data.acquire.io import fingerprint, write_json
 from build_data.cities.engine import Engine
 from build_data.cities.evaluate import Comparison
@@ -17,7 +17,7 @@ from build_data.golden.metrics import measure
 from build_data.golden.reader import Cells
 from build_data.reconcile.common import Row
 
-from .gates import failures
+from .gates import failures, unreviewed
 from .run import implementation
 
 
@@ -60,9 +60,13 @@ def reference_checks(tables: list[Row]) -> Row:
         db.close()
 
 
-def verify(workspace: Workspace, output: Path) -> None:
+def verify(workspace: Workspace, output: Path, review: Path | None = None) -> None:
     manifest = read_json(output / "manifest.json")
+    if manifest.get("implementation") != implementation():
+        raise ValueError("Build implementation changed; rebuild before verification")
     if manifest.get("completed"):
+        for record in [*manifest["tables"], *manifest["verification_artifacts"]]:
+            verify_record(record)
         print("V2 already verified complete", flush=True)
         return
     inputs = discover(workspace)
@@ -82,19 +86,24 @@ def verify(workspace: Workspace, output: Path) -> None:
     digest = fingerprint({"manifest": manifest, "implementation": implementation()})
     totals: Counter[str] = Counter()
     reports = {}
-    failed: dict[str, list[Row]] = {"footprints": [], "neighbours": [], "named": []}
+    failed: dict[str, list[Row]] = {
+        "footprints": [],
+        "neighbours": [],
+        "named": [],
+        "all_boundaries": [],
+    }
     for cc, r in normalized["countries"].items():
         engine = Engine(
             Path(r["index"]["path"]), inputs.paths[cc], urban, normalized["policy"]
         )
         path = output / "quality" / f"{cc}.json"
         unit = str(output.resolve()) + ":" + cc
-        if ledger.is_complete("golden-v2.quality", unit, digest):
+        if ledger.is_complete("normalize-cells.quality", unit, digest):
             report = read_json(path)
         else:
             report = country_report(comparison, cc, engine, urban, probes)
             write_json(path, report)
-            ledger.complete("golden-v2.quality", unit, digest, [path])
+            ledger.complete("normalize-cells.quality", unit, digest, [path])
         totals.update(report["diagnostic"]["counts"])
         for kind, rows_failed in failures([report], []).items():
             failed[kind].extend(rows_failed)
@@ -118,6 +127,14 @@ def verify(workspace: Workspace, output: Path) -> None:
     rows: Counter[str] = Counter()
     for table in manifest["tables"]:
         rows[table["kind"]] += table["rows"]
+    exceptions = []
+    if review:
+        examined = read_json(review)
+        if examined.get("manifest") != fingerprint(manifest):
+            raise ValueError("Final boundary review is stale")
+        exceptions = examined.get("boundary_exceptions", [])
+    boundary_losses = list(failed["all_boundaries"])
+    failed["all_boundaries"] = unreviewed(boundary_losses, exceptions)
     quality = {
         "rows": dict(rows),
         "integrity": integrity,
@@ -126,6 +143,8 @@ def verify(workspace: Workspace, output: Path) -> None:
         "countries": reports,
         "named": named,
         "failed_spatial_gates": failed,
+        "boundary_losses": boundary_losses,
+        "boundary_exceptions": exceptions,
         "transitions": read_json(output / "transitions.json"),
         "limitations": [
             "GHSL is built-up extent, not municipal authority.",
@@ -161,6 +180,19 @@ def verify(workspace: Workspace, output: Path) -> None:
         "failures; these consistency/source checks are not independent accuracy. "
         "Dhaka has an inferred urban allocation, not a verified municipal boundary. "
         "See docs/GOLDEN_V2.md for reproduction and limitations.\n"
+    )
+    manifest["verification_artifacts"] = [
+        file_record(output / name)
+        for name in (
+            "quality.json",
+            "DATASET_CARD.md",
+            "DATA_LICENSES.md",
+            "transitions.json",
+            "normalization.json",
+        )
+    ]
+    manifest["verification_artifacts"].extend(
+        file_record(Path(p)) for p in reports.values()
     )
     manifest["completed"] = True
     write_json(output / "manifest.json", manifest)

@@ -50,7 +50,7 @@ def places(
         path = output / "places" / f"{cc}.parquet"
         receipt = output / "checkpoints" / f"places-{cc}.json"
         unit = str(output.resolve()) + ":" + cc
-        if ledger.is_complete("golden-v2.places", unit, digest):
+        if ledger.is_complete("normalize-cells.places", unit, digest):
             results.append(read_json(receipt))
             continue
         db = duckdb.connect()
@@ -82,7 +82,7 @@ def places(
             raise ValueError("Normalization changed catalogue cardinality")
         result = {**file_record(path), "kind": "places", "country": cc, "rows": count}
         write_json(receipt, result)
-        ledger.complete("golden-v2.places", unit, digest, [path, receipt])
+        ledger.complete("normalize-cells.places", unit, digest, [path, receipt])
         results.append(result)
         print(f"v2 places {cc}: {count}", flush=True)
     return results
@@ -100,7 +100,9 @@ def link(source: Path, target: Path) -> None:
 def lookups(
     workspace: Workspace, output: Path, base: Row, cells: list[Row]
 ) -> list[Row]:
-    result = joins_export(workspace, cells, output=output, stage="golden-v2.lookup")
+    result = joins_export(
+        workspace, cells, output=output, stage="normalize-cells.lookup"
+    )
     for record in base["tables"]:
         if record["kind"] in {"places", "cells", *SPATIAL}:
             continue

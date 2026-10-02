@@ -10,6 +10,7 @@ from build_data.golden.inputs import Inputs
 from build_data.golden.quality import display_names
 from build_data.reconcile.common import Row, connect
 
+from .boundary_checks import boundary_checks
 from .engine import Engine
 from .evaluate import Comparison, measure
 from .regressions import audit
@@ -174,6 +175,7 @@ def country_report(
         "diagnostic": checks(comparison, engine),
         "plan_regressions": audit(comparison, cc, engine),
         "footprints": footprint_checks(comparison, cc, engine),
+        "all_boundaries": boundary_checks(comparison, cc, engine),
         "neighbours": neighbour_checks(comparison, cc, engine, probes["neighbours"]),
         "urban_centres": urban_checks(comparison, cc, engine, urban),
     }

@@ -11,14 +11,14 @@ from tests.test_city_normalization import city, make_engine
 def test_compact_parent_splits_at_new_boundary_and_resumes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setattr("build_data.golden_v2.blocks.budget", lambda _: None)
+    monkeypatch.setattr("build_data.normalize_cells.blocks.budget", lambda _: None)
     import h3
 
     from build_data.acquire import Workspace
     from build_data.golden.reader import Cells
     from build_data.golden.schemas import CELLS
     from build_data.golden.storage import parquet
-    from build_data.golden_v2.blocks import build
+    from build_data.normalize_cells.blocks import build
 
     shape = shapely.box(-0.1, -2, 0.1, 2)
     engine = make_engine(

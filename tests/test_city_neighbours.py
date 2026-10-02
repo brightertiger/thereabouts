@@ -10,8 +10,8 @@ from build_data.cities.quality import neighbour_checks
 from build_data.golden.reader import Cells
 from build_data.golden.schemas import CELLS
 from build_data.golden.storage import parquet
-from build_data.golden_v2.gates import failures
-from build_data.reconcile.common import connect
+from build_data.normalize_cells.gates import failures
+from build_data.reconcile.common import Row, connect
 from build_data.reconcile.spatial import create_areas, insert_area
 from tests.test_city_normalization import city, make_engine
 
@@ -52,3 +52,50 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
     assert report["point_after"]["city_id"] == "town"
     assert report["polygon_before"]["expected"] > report["polygon_after"]["expected"]
     assert failures([{"footprints": [], "neighbours": [report]}], [])["neighbours"]
+
+
+def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> None:
+    from build_data.cities.boundary_checks import boundary_checks
+    from build_data.reconcile.common import pack
+
+    engine = make_engine(tmp_path, [city("town", 0, 20000)], [])
+    shape = shapely.box(-0.01, -0.01, 0.01, 0.01)
+    db = connect(engine.index_path)
+    db.execute("CREATE TABLE boundaries(id INT,geometry BLOB,data BLOB)")
+    db.execute(
+        "INSERT INTO boundaries VALUES(1,?,?)",
+        (
+            shape.wkb,
+            pack(
+                {
+                    "city_id": "town",
+                    "target_id": "town",
+                    "method": "city_polygon",
+                    "references": ["1"],
+                }
+            ),
+        ),
+    )
+    db.commit()
+    db.close()
+
+    class ChangedComparison(Comparison):
+        def query(self, cells: list[str]) -> tuple[list[Row], list[Row]]:
+            before = [
+                {
+                    "country_id": "country:ZZ",
+                    "cell_status": "matched",
+                    "city_id": "town" if i == 0 else "other",
+                }
+                for i in range(len(cells))
+            ]
+            after = [
+                {**r, "city_id": "other" if i == 0 else "town"}
+                for i, r in enumerate(before)
+            ]
+            return before, after
+
+    report = boundary_checks(ChangedComparison(Cells([]), {}, False), "ZZ", engine)[0]
+    assert report["after"]["expected"] > report["before"]["expected"]
+    assert report["lost_cells"] == 1
+    assert report["lost_to"] == {"other": 1}

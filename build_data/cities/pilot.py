@@ -9,6 +9,7 @@ from build_data.acquire.artifacts import file_record, read_json
 from build_data.acquire.io import fingerprint, sha256_file, write_json
 from build_data.golden.inputs import discover
 from build_data.golden.reader import Cells
+from build_data.normalize_cells.base import load
 from build_data.reconcile.common import Row
 
 from .engine import Engine
@@ -25,7 +26,7 @@ def main() -> None:
     workspace = Workspace(args.data_dir.resolve())
     inputs = discover(workspace)
     normalized = read_json(workspace.root / "city_normalized/manifest.json")
-    base = read_json(workspace.root / "golden/manifest.json")
+    base = load(workspace, inputs)[1]
     if not base["completed"]:
         raise ValueError("Pilot requires a verified complete base golden")
     reader = Cells(base["tables"])
@@ -99,6 +100,9 @@ def main() -> None:
             or n["point_after"].get("city_id") != n["city_id"]
             or n["polygon_after"]["expected"] < n["polygon_before"]["expected"]
         ]
+        boundary_losses = [
+            b for r in all_reports for b in r["all_boundaries"] if b["lost_cells"]
+        ]
         losses = [
             c for r in all_reports for c in r["diagnostic"]["changes"] if c["loss"]
         ]
@@ -110,6 +114,7 @@ def main() -> None:
             "bad_footprints": bad_footprints,
             "bad_neighbours": bad_neighbours,
             "diagnostic_losses": losses,
+            "boundary_losses": boundary_losses,
             "automated_gate": not bad_footprints
             and not bad_neighbours
             and all(r["passed"] for r in named),

@@ -10,7 +10,7 @@ from .run import run
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["run", "verify", "score"])
+    parser.add_argument("command", choices=["run", "verify", "score", "review"])
     parser.add_argument("--data-dir", type=Path, default=Path("data"))
     parser.add_argument("--output", type=Path, default=Path("data/golden-v2"))
     parser.add_argument(
@@ -20,6 +20,7 @@ def main() -> None:
         "--points", type=Path, default=Path("eval/city_points/points.csv")
     )
     parser.add_argument("--split", choices=["dev", "holdout"], default="dev")
+    parser.add_argument("--review", type=Path)
     args = parser.parse_args()
     workspace = Workspace(args.data_dir.resolve())
     if args.command == "run":
@@ -27,7 +28,13 @@ def main() -> None:
     elif args.command == "verify":
         from .verify import verify
 
-        verify(workspace, args.output.resolve())
+        verify(workspace, args.output.resolve(), args.review)
+    elif args.command == "review":
+        from .gates import record
+
+        if args.review is None:
+            parser.error("review requires --review with a reasoned pilot decision")
+        record(workspace, args.review, args.gate)
     else:
         from .score import score
 
