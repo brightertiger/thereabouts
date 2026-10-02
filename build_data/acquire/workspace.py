@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .lookup_catalog import LOOKUP_SOURCES
 
-SOURCES = ("osm_land", "overture", "geonames", "geoboundaries", *LOOKUP_SOURCES)
+SOURCES = ("ghsl", "osm_land", "overture", "geonames", "geoboundaries", *LOOKUP_SOURCES)
 MIN_FREE_BYTES = 12_000_000_000
 MAX_WORKSPACE_BYTES = 60_000_000_000
 

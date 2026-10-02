@@ -12,6 +12,7 @@ from .lookup_catalog import LOOKUP_SOURCES
 from .workspace import Workspace
 
 SOURCE_LIMITS = {
+    "ghsl": 100_000_000,
     **dict.fromkeys(LOOKUP_SOURCES, 6_000_000_000),
     "osm_land": 8_000_000_000,
     "overture": 25_000_000_000,
