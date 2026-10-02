@@ -1,6 +1,6 @@
 # Golden v2 city normalization
 
-**Status: boundary fixes and controller rework complete; pilot rerun in progress.** Golden v1 and
+**Status: final pilot gate passed; detached world build in progress.** Golden v1 and
 reconciliation remain intact. Do not interpret the city-plan prototypes, the
 source-point diagnostic or a successful country checkpoint as a completed world.
 The original failed pilot is archived under `data/work/v2-before-rework/`.
@@ -14,7 +14,7 @@ reconciliation country databases and the acquired GHSL manifest. It never import
 or reads `data/work/city-analysis/`. Source membership, city-specific exceptions,
 independent neighbours, exclusions, aliases and all numeric thresholds live in
 `build_data/cities/policy.json`. Mumbai has 24 pinned source ward IDs, Tokyo 23,
-London 33, and New York five pinned borough identities. Delhi includes both the
+London 33, Jakarta five mainland administrative cities, and New York five pinned borough identities. Delhi includes both the
 Delhi and New Delhi municipal polygons.
 
 The complete controller chain and clean-workspace commands are in
@@ -28,7 +28,7 @@ is verified and checkpointed under `data/base_cells/`, independently of the acti
 uv sync --frozen
 uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
 uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
-  --review data/work/v2-pilot/review-notes.json --gate data/work/v2-pilot/gate.json
+  --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
   --through world > data/work/v2-world.log 2>&1 < /dev/null &
 # Only after final world verification; do not tune against this result:
@@ -175,63 +175,95 @@ world manifest; the result is saved once and a changed snapshot is refused after
 scoring. `build_data.cities.dev` selects only development rows for pilot tuning.
 Nothing under `eval/` is changed or committed by this work.
 
-## Results and release decision
+## Pilot gate and rework results
 
-**World gate rejected.** `data/work/v2-pilot/gate.json` records `accepted: false`
-for these exact sources, code, policy and reports. Golden v1 remains the active
-world dataset. No world v2, refreshed world lookups, final world dataset card,
-full-country transition census or holdout result exists. Nothing is still running.
-The controller and final verifier are implemented but have not completed a world.
+The reviewed gate passed on **2026-10-02** for the final code and policy. The
+world controller is running; final world results below will be filled only after
+stored-output verification. V1 remains active during the build.
 
-The pilot built nine country indexes, **29,319 canonical cities/towns**,
-**2,697,403 place-map rows**, and **12,233 effective footprints**. Eligibility
-withheld absorption from **13,971 weak administrative seats** in these countries.
-This is not a world count of the plan's 37,819 village/hamlet-evidence candidates.
+The nine-country pilot has **29,300 canonical cities/towns**, **2,697,403 place-map
+rows**, and **12,503 effective footprints**. The final candidate table still
+withholds urban authority from weak point-only village seats.
 
-| Measure | Before | Radius off | Radius on |
+| Measure | V1 | Final radius off | Final radius on |
 | --- | ---: | ---: | ---: |
-| Frozen diagnostic, raw exact / 12,857 | 9,944 | 10,966 | 11,254 |
-| Frozen diagnostic, supported roll-ups / 12,857 | 10,366 | 11,384 | 11,672 |
-| Correct cells in 696 accepted large-city footprints / 265,478 | 252,514 | 265,478 | 265,478 |
-| Summed distinct answers in those footprints | 1,248 | 696 | 696 |
-| Summed distinct answers in 5,374 country/urban-centre intersections | 103,277 | 29,282 | 29,282 |
+| Frozen diagnostic, raw exact / 12,857 | 9,944 | 10,961 | 11,243 |
+| Frozen diagnostic, supported roll-ups / 12,857 | 10,366 | 11,379 | 11,661 |
+| Correct cells in nonempty accepted large-city footprints / 273,309 | 254,658 | 273,309 | 273,309 |
+| Summed distinct answers in those footprints | 1,401 | 794 | 794 |
+| Summed distinct answers in 5,374 country/urban-centre intersections | 103,277 | 29,416 | 29,416 |
 | Named fixtures, including the eight added points | — | 21/21 | 21/21 |
 | Required neighbour anchors | — | 6/6 | 6/6 |
 | Required neighbour source-polygon cells | 1,479 | 1,479 | 1,479 |
 | Hand-checked development points | 32/40 | 38/40 | 38/40 |
 
-The urban-centre census covers 5,360 distinct GHSL IDs and 491,414 eligible
-same-country centres. **307 country/centre intersections gain distinct answers**;
-some removals of broad administrative promotions also fragment genuine cities.
-The accepted-footprint result is 100% for every measured footprint. It checks
-consistency within the accepted/effective geometry, not whether rejecting or
-subtracting another source boundary was correct. The independent source-polygon
-failures below demonstrate that distinction.
+All **794 nonempty** accepted large-city footprints are at **100%**; three more
+have no eligible same-country resolution-8 centres. Footprint denominators are
+summed per geometry, not a unique world-cell count. The urban census covers 5,360
+unique GHSL IDs and 491,414 eligible cells; 308 country/centre intersections gain
+distinct answers. Reports retain every centre's before/after count, not just the
+aggregate reduction.
 
-### Country diagnostic results
+Compared with the reviewed first implementation, the large-city footprint count
+increases from 696 to 794 nonempty footprints, all still 100%; development remains
+38/40 and all 21 named checks remain correct. Urban distinct answers increase
+slightly from 29,282 to 29,416 as accepted independent municipal boundaries and
+conservative extents are retained. The raw diagnostic changes 10,966→10,961 with
+radius off; this candidate-anchor check is not the optimization target.
 
-Each pair is raw exact / frozen roll-up agreement. This is the pilot subset of
-the 34,171-point world check; there is no new world score. The reference expectations
-are unchanged by tuning. Intended New Delhi→Delhi and Istanbul-part roll-ups can
-therefore appear as visible grading conflicts.
+### All accepted boundaries, including small municipalities
 
-| Country | Points | Before | Radius off | Radius on |
-| --- | ---: | ---: | ---: | ---: |
-| IN | 3,779 | 3,291 / 3,312 | 3,422 / 3,443 | 3,523 / 3,544 |
-| BD | 137 | 118 / 118 | 128 / 128 | 130 / 130 |
-| TR | 432 | 407 / 407 | 388 / 388 | 389 / 389 |
-| CN | 2,122 | 1,237 / 1,249 | 1,877 / 1,885 | 1,942 / 1,950 |
-| US | 3,410 | 2,793 / 3,048 | 2,842 / 3,097 | 2,892 / 3,147 |
-| JP | 1,301 | 963 / 1,033 | 967 / 1,037 | 969 / 1,039 |
-| GB | 868 | 688 / 729 | 697 / 738 | 704 / 745 |
-| MY | 358 | 214 / 237 | 231 / 254 | 268 / 291 |
-| ID | 450 | 233 / 233 | 414 / 414 | 437 / 437 |
+The new independent-boundary audit enumerates **12,505 original accepted
+boundaries**, before overlap subtraction or part roll-up, covering **2,795,090
+summed eligible cells**. It compares each individual cell owned in v1, including
+old identity aliases, with its v2 answer. Net gains cannot conceal losses.
+Supported identity aliases and owner-approved part roll-ups are reported separately (5,399 cells).
+There are **three lost cells across two identities**, all examined:
 
-### Neighbours and the failed gate
+- **Dearborn: one cell** (`882ab2cda1fffff`) is outside the main municipal relation
+  OSM `r134579` but inside both a secondary Dearborn way (`w1276063111`) and
+  Dearborn Heights' municipal relation. V1 ranked the small duplicate way first;
+  v2 retains Dearborn Heights. No cell is lost from Dearborn's main municipal
+  boundary in this case.
+- **London: two fringe cells** overlap the London policy union and separately
+  retained Sunbury-on-Thames (`88195d368dfffff`) and Buckhurst Hill
+  (`88194e684dfffff`) boundaries. Their anchors are outside the London policy
+  extent. Independent municipal boundaries precede the broader union; neither
+  neighbour loses its own polygon cells. This resolves overlapping source claims,
+  rather than asserting an independently surveyed border.
 
-Both variants give the same following counts. All eleven probe anchors pass.
-“Polygon” is the original source polygon, not just the accepted city footprint.
-“Patch” is the eligible r8 disk of radius four around the anchor.
+Exact destinations, counts, source area IDs and evidence are bound into the gate
+receipt. The audit is part of both pilot and final world quality generation.
+
+### Municipal-village and container fixes
+
+The general distinction is **territorial locality ownership**, not the English
+word “city.” Hoffman Estates (`village`) and Loves Park (`hamlet`) have their own
+territorial locality polygons; they now own those polygons. Buffalo Grove's
+primary anchor is just outside its boundary, but its linked Overture anchor is
+inside and the primary anchor is within the global 250 m discrepancy allowance.
+The same evidence fixes Hanahan. This does not admit point-only village seats,
+nonlocality containers, source-identified townships, or distant namesake polygons.
+
+Salem is an independent city encoded as a county and is approved by data policy.
+Yichang and Fuxin are broad prefecture containers: policy accepts only the
+connected GHSL urban core, as for Chongqing. Accepted component geometry survives
+roll-up to its containing city, preventing neighbour capture of fringe cells
+outside a clipped core. Jakarta's five mainland administrative cities form an
+explicit policy union; its island regency is excluded. The source grouping is
+confirmed by the [Jakarta provincial description](https://jakarta.go.id/index.php/tentang-jakarta).
+These named choices and their reasons/source IDs live in `policy.json`.
+
+Mehsi and Krishnagiri have source anchors inside their accepted boundaries, but
+the resolution-8 cell centres lie respectively **266.5 m** and **86.3 m** outside.
+They return Motipur and Kādiganpalli. Their own polygon interiors survive; the
+boundary is not expanded merely to preserve a diagnostic anchor.
+
+### Independent neighbours
+
+Both variants give the following results. All eleven anchors pass. “Polygon”
+means the original source geometry, including geometry rejected by normalization;
+“patch” is the eligible radius-four resolution-8 disk around the source anchor.
 
 | Neighbour | Polygon before → after / eligible | Patch before → after / eligible |
 | --- | --- | --- |
@@ -242,99 +274,59 @@ Both variants give the same following counts. All eleven probe anchors pass.
 | Yokohama | 724 → 724 / 724 | 61 → 61 / 61 |
 | Petaling Jaya | 114 → 114 / 114 | 50 → 50 / 61 |
 | Safranbolu | No source polygon | 14 → 21 / 61 |
-| Hoffman Estates | 74 → 60 / 74 | 20 → 29 / 61 |
-| Buffalo Grove | 35 → 27 / 35 | 26 → 34 / 61 |
-| Loves Park | 60 → 57 / 60 | 16 → 20 / 61 |
-| Morton Grove | 17 → 17 / 17 | 16 → 20 / 61 |
+| Hoffman Estates | 74 → 74 / 74 | 20 → 23 / 61 |
+| Buffalo Grove | 35 → 35 / 35 | 26 → 26 / 61 |
+| Loves Park | 60 → 60 / 60 | 16 → 16 / 61 |
+| Morton Grove | 17 → 17 / 17 | 16 → 16 / 61 |
 
-Hoffman Estates loses **14/74**, Buffalo Grove **8/35**, and Loves Park **3/60**
-source-polygon cells despite passing their own points. Their source `village`
-classification is insufficiently distinguished from a weak rural village seat:
-the current screening leaves these municipal boundaries as rural fallback,
-then urban allocation can override them. This must be repaired with municipal
-status evidence/policy before release; protecting more anchor points is not a fix.
+The rework restores all **25** municipal interior cells previously lost by
+Hoffman Estates (14), Buffalo Grove (8), and Loves Park (3). Howrah has no source
+polygon: keeping bounded Kolkata inside its accepted geometry leaves Howrah an
+inferred urban patch. Thane's single lost patch cell is outside its own boundary
+and goes to Mumbai. Safranbolu's anchor can associate with the adjacent GHSL
+centre within the global 1 km edge allowance; no footprint is enlarged.
 
-Howrah has no source polygon. Keeping Kolkata inside its accepted boundary lets
-Howrah retain an inferred urban patch: 13→49 of 61 cells. Thane's single lost patch
-cell is outside its own boundary and goes to Mumbai; its entire source polygon
-survives. Navi Mumbai's coastal patch improves to 56/56 after projection handling.
-Safranbolu's raster-edge anchor is associated with its adjacent GHSL centre and
-its patch improves 14→21/61; it also has no source polygon.
-
-Of the plan's original **130** failed anchors, **80** are in the pilot. Radius off
-retains the exact identity at 31 and the identity or explicit policy target at 78;
+Of the original 130 failed simulation anchors, 80 are in the pilot. Radius off
+retains exact identity at 31 and identity or explicit policy target at 78;
 radius on gives 26 and 73. Of 38 original mid-sized-town cases in the pilot,
-37 have the identity/policy target with radius off, 34 with it on. Zekeriya's
-snapped cell lands in the Istanbul policy footprint; the other remaining off
-identity mismatch is Kampong Baharu Cheras Batu Sebelas. The **50 nonpilot cases
-remain unverified**. These are anchor diagnostics, not municipal-interior proof.
+37 retain identity/policy target with radius off, 34 with it on. The two remaining
+off mismatches are Zekeriya (inside the Istanbul policy footprint) and Kampong
+Baharu Cheras Batu Sebelas (an unresolved identity/extent case). These diagnostics
+are separate from the all-boundaries census.
 
-### Radius decision and remaining errors
+### Radius decision and remaining development failures
 
-**Leave radius off.** It adds a net 288 agreements on the frozen diagnostic,
-introduces nine mismatches relative to off, and changes none of the measured
-accepted footprints, neighbour patches, GHSL counts or development scores.
-The nine new mismatches are Cheriyamundam, Kāmthi (→Yerkhera), Iringal, Zhangfeng,
-Gengqing, Nyingchi, Gusong, Didao and Simpang Renggam. Source identity ambiguity and
-nearby-town capture still need adjudication; candidate-point gains do not justify
-turning on an inferred footprint with no demonstrated independent gain.
-Both variants have 73 losses against the frozen baseline; some are intended
-big-city roll-ups and others are real unresolved boundary/identity failures.
+**Radius stays off**, as accepted by the owner. On adds a net 282 exact and
+credited agreements on the circular source-point diagnostic, but no independent
+development, footprint, neighbour or urban-centre benefit. It introduces eleven
+new credited source-point mismatches: Cheriyamundam, Kāmthi, Iringal, Zhangfeng,
+Gengqing, Nyingchi, Gusong, Didao, Ānwén, Taibai and Simpang Renggam. Nearby-town
+capture and conflicting identities remain insufficiently resolved to justify
+turning it on for the world.
 
-The development split improves to **38/40**, with large cities 18/20, neighbours
-8/8, towns 9/9 and rural controls 3/3. Its two failures are Uttara in Dhaka→Tongi
-and the Tianjin urban edge→Baoyuan. The 80 holdout rows have **not been scored**;
-there is no verified final world on which to run the one-time evaluation.
-Evaluation CSV SHA256: `9d6e6025775e8fb2ec849f63d3938739c7eae6ef79e2b5c7e219f2e260bdf601`. Nothing under `eval/` was edited by this work.
+Development remains **38/40**: large cities 18/20, neighbours 8/8, towns 9/9 and
+rural controls 3/3. The pilot transforms only its nine countries; development
+rows elsewhere retain the base answer until the final world score. **Uttara→Tongi** is a GHSL allocation edge without a real Dhaka
+municipal boundary in the acquired inputs. The **Tianjin edge→Baoyuan** cell is
+outside the acquired GHSL urban centre; enlarging the inferred city would need
+additional extent evidence. Neither point receives a special guard. The
+80-row holdout is reserved for the verified final world.
 
-Dhaka has no verified municipal boundary in these inputs. Within GHSL centre
-6090 and the same-country denominator of **8,148 cells**, distinct answers fall
-**3,403→24**, and Dhaka's own answer rises **5→5,663 (69.50%)**. The plan's earlier
-3,404 count used its prototype footprint/denominator; this census consistently
-filters eligible same-country cells. This is a built-up allocation proxy and
-still gives the wrong city at the independently labelled Uttara point.
+### Actual stored pilot blocks
 
-Broad Chongqing promotion is clipped to the connected urban core; removed
-administrative areas fall through to village polygons/50 km nearest instead of
-remaining region-wide city answers. However, rejecting containers solely from
-subtype is overaggressive elsewhere: **Yichang→Xiling, Fuxin→Haizhou,
-Salem→Whitefield**. **Hanahan→Highland Park** follows an anchor-outside-boundary
-rejection. **Mehsi→Motipur** and **Krishnagiri→Kādiganpalli** occur where the snapped
-centre falls just outside an accepted boundary and the bounded city is excluded
-from expansion. These are unresolved release blockers, not reasons to tune the
-check's expected answers. The next pass must distinguish source/link defects,
-municipal status, true parts and genuine independent neighbours.
+Fourteen stored probe blocks contain **202,576 eligible resolution-8 centres**.
+Radius off produces **147,394 compact rows**, with **18,560** changed city answers;
+on produces **147,490 rows**, with **18,887** changed answers. All 12 named checks
+in these blocks pass through stored ancestor lookup. Malaysia's 27,839-row
+catalogue exports the new columns; all four mapping-reference checks are zero.
+These are selected-block totals, not full-country totals. Per-country method
+transition matrices are in `data/work/v2-pilot-blocks/report.json`.
 
-### Stored pilot and verification
+## Final world verification
 
-`uv run --no-sync python -m build_data.normalize_cells.pilot_blocks` materializes
-14 probe blocks: **202,576** eligible r8 centres, **147,382** compact cells with
-radius off and **147,514** with it on. Changed city counts are **18,735 / 19,073**;
-all 12 named fixtures falling in these blocks pass through actual stored ancestor
-lookup. Malaysia's actual 27,839-row catalogue is exported with the new columns;
-all four normalization-reference checks are zero. The synthetic compaction test
-also checks every child, verifies a no-op resume and rebuilds a corrupt artifact.
+World build in progress. Counts, stored-output quality, joins, holdout, activation
+and final disk state are not yet verified. See `data/work/v2-progress.md`.
 
-These transitions are **selected-block counts, not whole-country totals**.
-Full method-transition matrices are recorded alongside them in
-`data/work/v2-pilot-blocks/report.json` and each block checkpoint.
-
-| Country in stored probe blocks | Eligible r8 | City changed, off | City changed, on |
-| --- | ---: | ---: | ---: |
-| BD | 20,739 | 4,397 | 4,412 |
-| GB | 16,807 | 633 | 699 |
-| IN | 53,669 | 5,284 | 5,397 |
-| JP | 30,061 | 337 | 340 |
-| MY | 11,499 | 1,151 | 1,233 |
-| TR | 23,115 | 3,936 | 3,948 |
-| US | 46,686 | 2,997 | 3,044 |
-
-Local validation: **254 passed, 7 skipped** with `uv run --no-sync pytest`;
-whole-repository `ruff check`, `ruff format --check` and strict `mypy` pass.
-No external CI, push, PR, cloud publication, world build or v1/v2 swap occurred.
-The world controller's resource behaviour, full joins and final stored-world
-quality are unverified until the release blockers are fixed and the gate passes.
-
-Disk at handoff: approximately **18 GiB free**; reconciled inputs **33 GiB**,
-active golden v1 **2.6 GiB**, retained normalization generations **1.6 GiB**,
-stored pilot **6.1 MiB**. No source restoration or cloud offload was needed.
+Repository validation before the frozen world build: **265 passed, 7 skipped**;
+whole-repository Ruff check, Ruff format check and strict mypy pass. No external
+CI, push, PR or remote publication is part of this work.

@@ -545,10 +545,16 @@ uv sync --frozen
 uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
 # After examining the generated pilot, bind the reasoned decision to its hashes:
 uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
-  --review data/work/v2-pilot/review-notes.json --gate data/work/v2-pilot/gate.json
+  --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
   --through world > data/work/v2-world.log 2>&1 < /dev/null &
 ```
+
+The committed `docs/city-normalization-pilot-review.json` records the examined
+exceptions for this pinned snapshot. It is evaluation evidence, never an input
+to city assignment. The review command binds it to freshly verified artifacts
+and rejects changed loss counts or destinations; inspect new source editions
+before issuing a new receipt.
 
 Use the same controller command to resume any interrupted stage. From an empty
 workspace it acquires all sources, runs the reconciliation pilot and world,
