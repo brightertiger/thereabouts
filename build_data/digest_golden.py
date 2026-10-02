@@ -5,10 +5,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import sqlite3
 import tempfile
 from collections import defaultdict
-from contextlib import closing
 from datetime import date, datetime, time
 from decimal import Decimal
 from pathlib import Path
@@ -19,6 +17,7 @@ import pyarrow.parquet as pq
 
 from build_data.acquire.artifacts import read_json
 from build_data.acquire.io import fingerprint, write_json
+from build_data.digest_sort import RowHashes
 from build_data.golden.paths import manifest
 from build_data.reconcile.common import Row
 
@@ -67,16 +66,11 @@ def columns(schema: pa.Schema) -> list[Row]:
 
 
 def table_digest(records: list[Row], scratch: Path) -> Row:
-    """Sort a multiset of SHA256 row digests in a bounded-memory scratch B-tree."""
+    """Sort a multiset of SHA256 row digests using bounded sequential scratch."""
     schema: list[Row] | None = None
     count = 0
-    with closing(sqlite3.connect(scratch)) as db, db:
-        db.execute("PRAGMA journal_mode=OFF")  # Disposable scratch, never a ledger.
-        db.execute("PRAGMA cache_size=-32768")
-        db.execute(
-            "CREATE TABLE hashes(digest BLOB PRIMARY KEY, n INTEGER NOT NULL) "
-            "WITHOUT ROWID"
-        )
+    with tempfile.TemporaryDirectory(prefix=scratch.stem, dir=scratch.parent) as work:
+        sorter = RowHashes(Path(work) / "runs")
         for record in records:
             with pq.ParquetFile(record["path"]) as file:
                 actual = columns(file.schema_arrow)
@@ -96,18 +90,12 @@ def table_digest(records: list[Row], scratch: Path) -> Row:
                             separators=(",", ":"),
                             allow_nan=False,
                         ).encode("utf-8")
-                        hashes.append((hashlib.sha256(encoded).digest(),))
-                    db.executemany(
-                        "INSERT INTO hashes VALUES (?,1) ON CONFLICT(digest) "
-                        "DO UPDATE SET n=n+1",
-                        hashes,
-                    )
+                        hashes.append(hashlib.sha256(encoded).digest())
+                    sorter.add(hashes)
                     count += batch.num_rows
         digest = hashlib.sha256(b"thereabouts-golden-rows-v1\0")
         digest.update(fingerprint({"columns": schema}).encode("ascii"))
-        for row_hash, occurrences in db.execute(
-            "SELECT digest,n FROM hashes ORDER BY digest"
-        ):
+        for row_hash, occurrences in sorter.counts():
             digest.update(row_hash)
             digest.update(occurrences.to_bytes(8, "big"))
     return {"columns": schema, "rows": count, "sha256": digest.hexdigest()}
@@ -129,9 +117,9 @@ def digest_dataset(directory: Path, *, temp_dir: Path | None = None) -> Row:
     tables = {}
     with tempfile.TemporaryDirectory(prefix="golden-digest-", dir=temp_dir) as work:
         for number, kind in enumerate(sorted(grouped)):
-            scratch = Path(work) / f"{number}.sqlite"
+            scratch = Path(work) / f"{number}"
             tables[kind] = table_digest(grouped[kind], scratch)
-            scratch.unlink()
+            print(f"digested {kind}: {tables[kind]['rows']:,} rows", flush=True)
     result: Row = {"format": "thereabouts-golden-content-1", "tables": tables}
     return {**result, "sha256": fingerprint(result)}
 

@@ -646,3 +646,10 @@ sources use the area/place/name contracts; existing lookups use their lookup
 contracts; plates uses its own three contracts. Adding a standalone source does
 not invalidate unrelated acquired data. Changes to a family's existing contracts
 still invalidate that family's checkpoints.
+
+The digest command sorts the same SHA256 row values in 250,000-row disk runs,
+with at most 64 input runs per merge. This keeps scratch access sequential on
+small machines; schema descriptors, row encoding, duplicate counts and the final
+hash format are unchanged from its original SQLite sorter. Scratch is disposable
+and separate from the pipeline ledger. Each logical table's scratch is removed
+after its digest completes.
