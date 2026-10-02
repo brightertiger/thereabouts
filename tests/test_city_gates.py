@@ -96,3 +96,34 @@ def test_boundary_exception_is_exact_and_explained() -> None:
     }
     assert unreviewed([loss], [approved]) == []
     assert unreviewed([{**loss, "lost_cells": 2}], [approved])
+
+
+def test_distinct_boundaries_of_one_city_keep_separate_reviews() -> None:
+    from build_data.normalize_cells.gates import unreviewed
+
+    first = {
+        "country": "ZZ",
+        "city_id": "town",
+        "lost_cells": 1,
+        "lost_to": {"neighbour": 1},
+        "references": ["municipal-relation"],
+    }
+    second = {
+        **first,
+        "lost_cells": 2,
+        "lost_to": {"neighbour": 2},
+        "references": ["way"],
+    }
+    reviews = [
+        {
+            **loss,
+            "boundary_references": loss["references"],
+            "reason": "Individually examined overlap",
+            "reference": "Source polygons and cell coordinates",
+        }
+        for loss in [first, second]
+    ]
+    assert unreviewed([first, second], reviews) == []
+    assert unreviewed([first, second], reviews[:1]) == [second]
+    unrelated = {**first, "references": ["another-polygon"]}
+    assert unreviewed([unrelated], reviews) == [unrelated]

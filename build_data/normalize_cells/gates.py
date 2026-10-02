@@ -74,18 +74,22 @@ def reviewed(gate: Path, settings: Row, inputs: Inputs, base: Row, ghsl: Row) ->
 
 def unreviewed(losses: list[Row], exceptions: list[Row]) -> list[Row]:
     """Credit only individually explained losses with exactly matching evidence."""
-    approved = {
-        (r["country"], r["city_id"]): r
-        for r in exceptions
-        if r.get("reason") and r.get("reference")
-    }
+    approved: dict[tuple[str, str], list[Row]] = {}
+    for review in exceptions:
+        if review.get("reason") and review.get("reference"):
+            key = (review["country"], review["city_id"])
+            approved.setdefault(key, []).append(review)
     return [
         loss
         for loss in losses
-        if not (
-            (review := approved.get((loss["country"], loss["city_id"])))
-            and review.get("lost_cells") == loss["lost_cells"]
+        if not any(
+            review.get("lost_cells") == loss["lost_cells"]
             and review.get("lost_to") == loss["lost_to"]
+            and (
+                "boundary_references" not in review
+                or review["boundary_references"] == loss.get("references")
+            )
+            for review in approved.get((loss["country"], loss["city_id"]), [])
         )
     ]
 

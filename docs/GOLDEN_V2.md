@@ -44,7 +44,8 @@ when none). The `review` command attaches source/base/GHSL/policy/code identitie
 and verified pilot, normalization and development file records, and refuses
 failed spatial checks or unexamined accepted-boundary losses. Every exception
 requires country, city ID, exact lost-cell count/destination counts, reason and
-source reference. These review receipts cannot influence the assignment rule.
+source reference. `boundary_references` can additionally bind a review to the
+original boundary IDs; distinct source polygons of one city retain separate reviews. These review receipts cannot influence the assignment rule.
 
 World completion requires `data/work/v2-run.json` and the output manifest to say
 `completed: true`, with verified table and quality artifact hashes. The controller
@@ -332,6 +333,6 @@ transition matrices are in `data/work/v2-pilot-blocks/report.json`.
 World build in progress. Counts, stored-output quality, joins, holdout, activation
 and final disk state are not yet verified. See `data/work/v2-progress.md`.
 
-Repository validation before the frozen world build: **266 passed, 7 skipped**;
+Repository validation before the frozen world build: **267 passed, 7 skipped**;
 whole-repository Ruff check, Ruff format check and strict mypy pass. No external
 CI, push, PR or remote publication is part of this work.
