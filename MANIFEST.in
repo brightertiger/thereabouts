@@ -1,0 +1,5 @@
+include src/thereabouts/reading/_reader_cy.pyx
+include src/thereabouts/reading/_reader_cy.c
+include src/thereabouts/reading/_reader_cy.pyi
+recursive-include tests/fixtures/serving *
+include tests/wheel_smoke.py

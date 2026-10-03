@@ -1,5 +1,23 @@
 # Thereabouts
 
+The golden-pack clients use `thereabouts.client.Geocoder` in Python and
+`clients/node/` in Node. They read explicitly installed reverse, postal and
+airport packs, preserving canonical identities, methods, evidence and ambiguity.
+The optional `thereabouts mcp` command exposes the Python API over stdio.
+
+Start with the [Python API](docs/PYTHON_CLIENT.md),
+[data installation](docs/DATA_INSTALLATION.md), [code packs](docs/CODE_PACKS.md),
+[Node reader](clients/node/README.md) or [MCP server](docs/MCP_SERVER.md).
+[Client status](docs/CLIENT_STATUS.md) records completed phases, measurements,
+validation and release follow-ups. Nothing has been published.
+
+## Original runtime retained during pipeline integration
+
+The API and measurements below describe the first table format. Its code remains
+in place because the pipeline imports and hashes it; the new reader's eventual
+top-level switch is documented in the client status. The first release will use
+golden packs.
+
 Give a latitude/longitude, get city, state and country, entirely offline.
 Python 3.11+; runtime dependencies are **H3 and NumPy only**.
 

@@ -220,6 +220,10 @@ __marimo__/
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 
+# Node client dependencies and local package artifacts.
+node_modules/
+*.tgz
+
 # Build intermediates and the source archive cache; the exported world table
 # in data/h3-world is committed.
 /data/*

@@ -1,0 +1,29 @@
+name: Node client
+on:
+  push:
+    paths: ['clients/node/**', 'tests/fixtures/**', 'docs/SERVING_FORMAT.md', '.github/workflows/node-client.yml']
+  pull_request:
+    paths: ['clients/node/**', 'tests/fixtures/**', 'docs/SERVING_FORMAT.md', '.github/workflows/node-client.yml']
+permissions:
+  contents: read
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['22', '24']
+    defaults:
+      run:
+        working-directory: clients/node
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: clients/node/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run check
+      - run: npm run format
+      - run: npm pack --dry-run
