@@ -1,0 +1,1285 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/airports-sample",
+  "cases": [
+    {
+      "id": "airports-000",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "00A"
+        ],
+        "country": "US",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-PA",
+          "name": "Pennsylvania"
+        },
+        "city": {
+          "id": "city:geonames:5095691",
+          "name": "Beverly",
+          "name_en": "Beverly",
+          "kind": "village",
+          "population": 2559,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 40.070985,
+          "lon": -74.933689
+        },
+        "cell": "882a134215fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-001",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "00AA"
+        ],
+        "country": "US",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-KS",
+          "name": "Kansas"
+        },
+        "city": {
+          "id": "city:geonames:5446709",
+          "name": "Wallace",
+          "name_en": "Wallace",
+          "kind": "hamlet",
+          "population": 58,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 38.704022,
+          "lon": -101.473911
+        },
+        "cell": "8826f0c967fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-002",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "00AK"
+        ],
+        "country": "US",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-AK",
+          "name": "Alaska"
+        },
+        "city": {
+          "id": "city:geonames:5863686",
+          "name": "Happy Valley",
+          "name_en": "Happy Valley",
+          "kind": "hamlet",
+          "population": 593,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 59.947733,
+          "lon": -151.692524
+        },
+        "cell": "880c50a5a7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-003",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "BE-0001"
+        ],
+        "country": "BE",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2797937",
+          "name": "Froidchapelle",
+          "name_en": null,
+          "kind": "village",
+          "population": 3579,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.176388,
+          "lon": 4.352222
+        },
+        "cell": "881fa63b61fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-004",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "BE-0002"
+        ],
+        "country": "BE",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2800325",
+          "name": "Chimay",
+          "name_en": null,
+          "kind": "town",
+          "population": 9720,
+          "point": {
+            "lat": 50.04856,
+            "lon": 4.31712
+          }
+        },
+        "timezone": "Europe/Brussels",
+        "point": {
+          "lat": 50.117779,
+          "lon": 4.330556
+        },
+        "cell": "881fa60ca3fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-005",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "BE-0003"
+        ],
+        "country": "BE",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2800298",
+          "name": "Ciney",
+          "name_en": "Ciney",
+          "kind": "town",
+          "population": 14830,
+          "point": {
+            "lat": 50.29449,
+            "lon": 5.10015
+          }
+        },
+        "timezone": "Europe/Brussels",
+        "point": {
+          "lat": 50.286944,
+          "lon": 5.038462
+        },
+        "cell": "881fa05345fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-006",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "EH58"
+        ],
+        "country": "NL",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-LI",
+          "name": "Limburg"
+        },
+        "city": {
+          "id": "city:geonames:2758174",
+          "name": "Brunssum",
+          "name_en": "Brunssum",
+          "kind": "town",
+          "population": 29254,
+          "point": {
+            "lat": 50.94667,
+            "lon": 5.97083
+          }
+        },
+        "timezone": "Europe/Amsterdam",
+        "point": {
+          "lat": 50.9437,
+          "lon": 6.0052
+        },
+        "cell": "881fa54d23fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-007",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "EHAD"
+        ],
+        "country": "NL",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-FR",
+          "name": "Fryslân"
+        },
+        "city": {
+          "id": "city:geonames:2759456",
+          "name": "Ballum",
+          "name_en": "Ballum",
+          "kind": "village",
+          "population": 360,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 53.450925,
+          "lon": 5.682351
+        },
+        "cell": "88196dd98bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-008",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "EHAK"
+        ],
+        "country": "NL",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 55.399167,
+          "lon": 3.810278
+        },
+        "cell": "881960b0adfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-009",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ELLX"
+        ],
+        "country": "LU",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-LU",
+          "name": "Luxembourg"
+        },
+        "city": {
+          "id": "city:geonames:2960518",
+          "name": "Grevelscheuer",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.626845,
+          "lon": 6.212134
+        },
+        "cell": "881fa3cdc3fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-010",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ELNT"
+        ],
+        "country": "LU",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-WI",
+          "name": "Wiltz"
+        },
+        "city": {
+          "id": "city:geonames:2960218",
+          "name": "Noertrange",
+          "name_en": null,
+          "kind": "village",
+          "population": 353,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.981098,
+          "lon": 5.91778
+        },
+        "cell": "881fa06893fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-011",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ELUS"
+        ],
+        "country": "LU",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-RD",
+          "name": "Redange"
+        },
+        "city": {
+          "id": "city:geonames:2960588",
+          "name": "Everlange",
+          "name_en": null,
+          "kind": "village",
+          "population": 370,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.768155,
+          "lon": 5.965962
+        },
+        "cell": "881fa3c305fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-012",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "FR-0001"
+        ],
+        "country": "FR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-GES",
+          "name": "Grand-Est"
+        },
+        "city": {
+          "id": "city:geonames:2991214",
+          "name": "Mulhouse",
+          "name_en": "Mulhouse",
+          "kind": "city",
+          "population": 111430,
+          "point": {
+            "lat": 47.75205,
+            "lon": 7.32866
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 47.725328,
+          "lon": 7.344995
+        },
+        "cell": "881f80293dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-013",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "FR-0002"
+        ],
+        "country": "FR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-GES",
+          "name": "Grand-Est"
+        },
+        "city": {
+          "id": "city:geonames:2973783",
+          "name": "Strasbourg",
+          "name_en": "Strasbourg",
+          "kind": "city",
+          "population": 274845,
+          "point": {
+            "lat": 48.58392,
+            "lon": 7.74553
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 48.593357,
+          "lon": 7.704855
+        },
+        "cell": "881f856069fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-014",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "FR-0003"
+        ],
+        "country": "FR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-GES",
+          "name": "Grand-Est"
+        },
+        "city": {
+          "id": "city:geonames:3014078",
+          "name": "Haguenau",
+          "name_en": "Haguenau",
+          "kind": "town",
+          "population": 38721,
+          "point": {
+            "lat": 48.81557,
+            "lon": 7.79051
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 48.797797,
+          "lon": 7.776888
+        },
+        "cell": "881f850d9bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-015",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "HU-0072"
+        ],
+        "country": "IN",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-UK",
+          "name": "Uttarākhand"
+        },
+        "city": {
+          "id": "city:geonames:10819831",
+          "name": "hichauri",
+          "name_en": null,
+          "kind": "hamlet",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 29.946754,
+          "lon": 79.903173
+        },
+        "cell": "883d1e79b9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-016",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "IN-0001"
+        ],
+        "country": "IN",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-LA",
+          "name": "Ladākh"
+        },
+        "city": {
+          "id": "city:overture:89cd3f8f-0766-4609-9105-4c4bf071c3c5",
+          "name": "Tsamskangchan",
+          "name_en": null,
+          "kind": "hamlet",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 35.194275,
+          "lon": 77.213051
+        },
+        "cell": "883d22b6a9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-017",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "IN-0002"
+        ],
+        "country": "IN",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": null,
+          "name": "South Tibet"
+        },
+        "city": {
+          "id": "city:overture:7bd2fe81-f7c9-43d5-96e3-8520141a412d",
+          "name": "Beghar",
+          "name_en": null,
+          "kind": "hamlet",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 27.588732,
+          "lon": 91.877439
+        },
+        "cell": "883c52d631fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-018",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "LTAB"
+        ],
+        "country": "TR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-06",
+          "name": "Ankara"
+        },
+        "city": {
+          "id": "city:geonames:323786",
+          "name": "Ankara",
+          "name_en": "Ankara",
+          "kind": "city",
+          "population": 3517182,
+          "point": {
+            "lat": 39.91987,
+            "lon": 32.85427
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 39.935001,
+          "lon": 32.740799
+        },
+        "cell": "882d33ad67fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-019",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "LTAC"
+        ],
+        "country": "TR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-06",
+          "name": "Ankara"
+        },
+        "city": {
+          "id": "city:geonames:747366",
+          "name": "Esenboğa",
+          "name_en": "Esenboğa",
+          "kind": "village",
+          "population": 1712,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 40.128101,
+          "lon": 32.995098
+        },
+        "cell": "882d06ca61fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-020",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "LTAD"
+        ],
+        "country": "TR",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-06",
+          "name": "Ankara"
+        },
+        "city": {
+          "id": "city:geonames:315155",
+          "name": "Etimesgut",
+          "name_en": null,
+          "kind": "town",
+          "population": null,
+          "point": {
+            "lat": 39.95328,
+            "lon": 32.63285
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 39.949799,
+          "lon": 32.688599
+        },
+        "cell": "882d33a8d3fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-021",
+      "request": {
+        "kind": "airport",
+        "values": [
+          " 00a "
+        ],
+        "country": "us",
+        "scheme": "ident"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-PA",
+          "name": "Pennsylvania"
+        },
+        "city": {
+          "id": "city:geonames:5095691",
+          "name": "Beverly",
+          "name_en": "Beverly",
+          "kind": "village",
+          "population": 2559,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 40.070985,
+          "lon": -74.933689
+        },
+        "cell": "882a134215fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-022",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2971874",
+          "name": "Tremblay-en-France",
+          "name_en": null,
+          "kind": "town",
+          "population": 35591,
+          "point": {
+            "lat": 48.94956,
+            "lon": 2.5684
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 49.00896,
+          "lon": 2.554117
+        },
+        "cell": "881fb42a99fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-023",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "LFPG"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2971874",
+          "name": "Tremblay-en-France",
+          "name_en": null,
+          "kind": "town",
+          "population": 35591,
+          "point": {
+            "lat": 48.94956,
+            "lon": 2.5684
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 49.00896,
+          "lon": 2.554117
+        },
+        "cell": "881fb42a99fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-024",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ],
+        "scheme": "iata"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2971874",
+          "name": "Tremblay-en-France",
+          "name_en": null,
+          "kind": "town",
+          "population": 35591,
+          "point": {
+            "lat": 48.94956,
+            "lon": 2.5684
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 49.00896,
+          "lon": 2.554117
+        },
+        "cell": "881fb42a99fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-025",
+      "request": {
+        "kind": "airport",
+        "values": [
+          ""
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    },
+    {
+      "id": "airports-026",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "x\u0000y"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    },
+    {
+      "id": "airports-027",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ],
+        "scheme": "wrong"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    },
+    {
+      "id": "airports-028",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "L1"
+        ],
+        "scheme": "local"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    },
+    {
+      "id": "airports-029",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ],
+        "country": "ZZ"
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-030",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "NOT-AN-AIRPORT"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "airports-031",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ],
+        "country": "FRA"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    },
+    {
+      "id": "airports-032",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "CDG"
+        ],
+        "country": "fr",
+        "scheme": "IATA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2971874",
+          "name": "Tremblay-en-France",
+          "name_en": null,
+          "kind": "town",
+          "population": 35591,
+          "point": {
+            "lat": 48.94956,
+            "lon": 2.5684
+          }
+        },
+        "timezone": "Europe/Paris",
+        "point": {
+          "lat": 49.00896,
+          "lon": 2.554117
+        },
+        "cell": "881fb42a99fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    }
+  ]
+}

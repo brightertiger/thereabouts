@@ -1,0 +1,25 @@
+[package]
+name = "thereabouts-writer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+fst = "0.4"
+thereabouts-core = { path = "../thereabouts-core" }
+h3o = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+sha2 = "0.10"
+parquet = { version = "56", default-features = false, features = ["arrow", "snap", "zstd"] }
+arrow-array = "56"
+arrow-schema = "56"
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+fs2 = "0.4"
+
+tempfile = "3"

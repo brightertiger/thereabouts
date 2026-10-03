@@ -1,0 +1,426 @@
+//! Lazy core-pack ownership. No lookup reads outside its inventoried shards.
+use super::{
+    cache::Cache,
+    catalogue::{self, Place},
+    container::{Container, FileShard},
+    manifest::{self, Manifest},
+    metadata::Metadata,
+    metadata_index::MetadataIndex,
+    spatial::{self, Block, Entry},
+};
+use crate::{Error, Result, error::ensure};
+use std::{
+    collections::BTreeMap,
+    path::Path,
+    sync::{Arc, Mutex},
+};
+
+/// Retained decoded blocks: 8 MiB accommodates the sample's 133k sparse labels.
+/// Eviction is by allocated vector bytes; active readers may retain an evicted Arc.
+pub const BLOCK_CACHE_BYTES: usize = 8 * 1024 * 1024;
+/// Four MiB for repeatedly projected places; charged by owned string capacities.
+/// The sample's hot workload touches tens of places; random queries exercise eviction.
+pub const PLACE_CACHE_BYTES: usize = 4 * 1024 * 1024;
+
+#[derive(Debug)]
+struct BlockSource {
+    shard: Arc<FileShard>,
+    entry: Entry,
+}
+#[derive(Debug)]
+struct CatalogueSource {
+    first: usize,
+    end: usize,
+    shard: FileShard,
+}
+/// Concurrent pack handle. Open checks inventories; lookups validate accessed payloads.
+#[derive(Debug)]
+pub struct Pack {
+    pub(crate) core: Option<Arc<Pack>>,
+    compact: Option<super::compact::Compact>,
+    /// Validated release identity and policy used when projecting results.
+    pub manifest: Manifest,
+    /// Published side-table rows; runtime indexes refer to these rows.
+    pub metadata: Metadata,
+    pub(crate) metadata_index: MetadataIndex,
+    blocks: BTreeMap<u32, BlockSource>,
+    catalogues: Vec<CatalogueSource>,
+    pub(crate) place_count: usize,
+    pub(crate) exacts: Vec<super::exact::Exact>,
+    pub(crate) tries: Vec<super::trie::Trie>,
+    pub(crate) names: Vec<super::names::Names>,
+    pub(crate) plates: Option<crate::plates_index::PlateIndex>,
+    intervals: Vec<super::intervals::Intervals>,
+    // One MiB bounds repeated exact-address queries without retaining full interval tables.
+    address_cache: Mutex<Cache<super::intervals::Address, Vec<(usize, usize)>>>,
+    block_cache: Mutex<Cache<u32, Block>>,
+    place_cache: Mutex<Cache<(u32, bool), Place>>,
+    observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
+}
+impl Pack {
+    /// Attach an optional installed core; a mismatched namespace is never silently used.
+    pub fn with_core(mut self, core: Arc<Self>) -> Result<Self> {
+        let pin = self
+            .manifest
+            .core_catalogue
+            .as_ref()
+            .ok_or_else(|| Error::Incompatible("Pack has no core dependency".into()))?;
+        if core.manifest.family != "core"
+            || core.manifest.data_version != pin.data_version
+            || manifest::catalogue_digest(&core.manifest)? != pin.sha256
+            || core.place_count != pin.place_count as usize
+        {
+            return Err(Error::Incompatible(
+                "Core catalogue identity does not match forward pack".into(),
+            ));
+        }
+        self.core = Some(core);
+        Ok(self)
+    }
+
+    /// Read headers/directories only; opt in to full hashes and structural verification.
+    #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
+    pub fn open(root: &Path, verify: bool) -> Result<Self> {
+        if !root.exists() {
+            return Err(Error::PackNotFound(root.to_owned()));
+        }
+        Self::open_with(&super::reader::Reader::native(root), verify)
+    }
+    /// Open through host reads; all shards retain their original handles after admission.
+    pub fn open_with(root: &super::reader::Reader<'_>, verify: bool) -> Result<Self> {
+        let manifest = if verify {
+            super::verify::verify_with(root)?
+        } else {
+            manifest::read_with(root)?
+        };
+        let mut metadata = None;
+        let mut exacts = Vec::new();
+        let mut tries = Vec::new();
+        let mut intervals = Vec::new();
+        let mut names = Vec::new();
+        let mut catalogues = Vec::new();
+        let mut place_count = 0_usize;
+        let mut blocks = BTreeMap::new();
+        for file in &manifest.files {
+            let path = manifest::artifact_path(root, &file.path)?;
+            match file.kind.as_str() {
+                "catalogue" => {
+                    let source = catalogue_source(&path, place_count, root)?;
+                    place_count = source.end;
+                    catalogues.push(source);
+                }
+                "metadata" => {
+                    ensure(metadata.is_none(), "Repeated metadata table")?;
+                    let c = Container::decode(root.read(&path)?, 3, &[1])?;
+                    metadata = Some(serde_json::from_slice::<Metadata>(c.section(0))?);
+                }
+                "cells" => load_blocks(root, &path, &mut blocks)?,
+                "exact" => exacts.push(super::exact::Exact::open(&path, root)?),
+                "trie" => tries.push(super::trie::Trie::open(&path, root)?),
+                "intervals" => intervals.push(super::intervals::Intervals::open(&path, root)?),
+                "names" => names.push(super::names::Names::open(&path, root)?),
+                "notice" | "keys" => {}
+                role if super::compact::ROLES.contains(&role)
+                    || super::plate_columns::ROLES.contains(&role) => {}
+                _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
+            }
+        }
+        let compact = if manifest.forward_columns.is_some() {
+            Some(super::compact::Compact::open(root, &manifest)?)
+        } else {
+            None
+        };
+        ensure(
+            match manifest.family.as_str() {
+                "core" => true,
+                "phone" => compact.is_some() || !tries.is_empty(),
+                "ip" => compact.is_some() || !intervals.is_empty(),
+                "plates" => manifest.plate_columns.is_some(),
+                _ => compact.is_some() || !exacts.is_empty(),
+            },
+            "Missing required exact index",
+        )?;
+        let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
+        metadata.validate()?;
+        let metadata_index = MetadataIndex::build(&metadata)?;
+        let plates = if manifest.plate_columns.is_some() {
+            let evidence = super::plate_columns::PlateColumns::open(root, &manifest)?;
+            let tables = evidence.decode(&manifest)?;
+            Some(crate::plates_index::PlateIndex::new(
+                tables,
+                evidence,
+                metadata.countries.len(),
+            )?)
+        } else {
+            None
+        };
+        if let Some(pin) = &manifest.core_catalogue {
+            place_count = pin.place_count as usize;
+        }
+        Ok(Self {
+            core: None,
+            compact,
+            manifest,
+            metadata,
+            metadata_index,
+            blocks,
+            catalogues,
+            place_count,
+            exacts,
+            tries,
+            intervals,
+            plates,
+            names,
+            address_cache: Mutex::new(Cache::new(1024 * 1024)),
+            block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
+            place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
+            observation_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
+        })
+    }
+    pub(crate) fn interval_observations(
+        &self,
+        address: super::intervals::Address,
+        evidence: bool,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.interval(address, evidence, self.place_count);
+        }
+        let cached = self
+            .address_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+            .get(address);
+        let selected = if let Some(rows) = cached {
+            rows
+        } else {
+            let mut rows = Vec::new();
+            for (i, shard) in self.intervals.iter().enumerate() {
+                if let Some(row) = shard.lookup(address)? {
+                    rows.push((i, row));
+                }
+            }
+            ensure(rows.len() <= 1, "Overlapping IP interval shards")?;
+            let bytes = 64 + rows.len() * size_of::<(usize, usize)>();
+            self.address_cache
+                .lock()
+                .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+                .insert(address, rows, bytes)
+        };
+        selected
+            .iter()
+            .map(|&(i, row)| {
+                let shard = self
+                    .intervals
+                    .get(i)
+                    .ok_or_else(|| Error::Corrupt("Missing IP shard".into()))?;
+                self.cached_observation((self.exacts.len() + self.tries.len() + i, row), || {
+                    shard.record(row, self.place_count)
+                })
+            })
+            .collect()
+    }
+    pub(crate) fn prefix_observations(
+        &self,
+        key: &str,
+        evidence: bool,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.prefix(key, evidence, self.place_count);
+        }
+        let mut longest = 0;
+        let mut selected = Vec::new();
+        for (i, shard) in self.tries.iter().enumerate() {
+            let (length, rows) = shard.lookup(key)?;
+            if length > longest {
+                longest = length;
+                selected.clear();
+            }
+            if length == longest {
+                selected.extend(rows.map(|row| (i, row)));
+            }
+        }
+        selected
+            .into_iter()
+            .map(|(i, row)| {
+                let shard = self
+                    .tries
+                    .get(i)
+                    .ok_or_else(|| Error::Corrupt("Missing trie".into()))?;
+                self.cached_observation((self.exacts.len() + i, row), || {
+                    shard.record(row, self.place_count)
+                })
+            })
+            .collect()
+    }
+    fn cached_observation(
+        &self,
+        key: (usize, usize),
+        read: impl FnOnce() -> Result<super::observation::Observation>,
+    ) -> Result<Arc<super::observation::Observation>> {
+        let cached = self
+            .observation_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .get(key);
+        if let Some(value) = cached {
+            return Ok(value);
+        }
+        let value = read()?;
+        let bytes = size_of::<super::observation::Observation>()
+            + value
+                .text
+                .iter()
+                .flatten()
+                .map(String::capacity)
+                .sum::<usize>();
+        Ok(self
+            .observation_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .insert(key, value, bytes))
+    }
+    pub(crate) fn observations(
+        &self,
+        key: &str,
+        evidence: bool,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.lookup(key, evidence, self.place_count);
+        }
+        let mut records = Vec::new();
+        for (i, shard) in self.exacts.iter().enumerate() {
+            for row in shard.lookup(key)? {
+                records.push(
+                    self.cached_observation((i, row), || shard.record(row, self.place_count))?,
+                );
+            }
+        }
+        Ok(records)
+    }
+    pub(crate) fn block(&self, block: u32) -> Result<Option<Arc<Block>>> {
+        let Some(source) = self.blocks.get(&block) else {
+            return Ok(None);
+        };
+        let mut cache = self
+            .block_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+        if let Some(value) = cache.get(block) {
+            return Ok(Some(value));
+        }
+        drop(cache);
+        let mut spans: [Vec<u8>; 3] = std::array::from_fn(|_| Vec::new());
+        for (section, &(offset, length)) in source.entry.spans.iter().enumerate() {
+            if let Some(span) = spans.get_mut(section) {
+                *span = source.shard.range(section + 1, offset, length)?;
+            }
+        }
+        let value = spatial::decode_block(
+            &source.entry,
+            &spans[0],
+            &spans[1],
+            &spans[2],
+            self.place_count,
+            self.metadata.timezone_sets.len(),
+        )?;
+        let bytes = value.keys.capacity() * size_of::<u16>()
+            + value.labels.capacity() * size_of::<spatial::Label>();
+        let mut cache = self
+            .block_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+        Ok(Some(cache.insert(block, value, bytes)))
+    }
+    /// Reference zero is null; other references project one record, with opt-in source evidence.
+    pub fn place(&self, reference: u32, evidence: bool) -> Result<Option<Arc<Place>>> {
+        if self.manifest.core_catalogue.is_some() {
+            return self
+                .core
+                .as_ref()
+                .map_or(Ok(None), |core| core.place(reference, evidence));
+        }
+        let Some(index) = reference.checked_sub(1).map(|v| v as usize) else {
+            return Ok(None);
+        };
+        let mut places = self
+            .place_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+        if let Some(place) = places.get((reference, evidence)) {
+            return Ok(Some(place));
+        }
+        drop(places);
+        let shard_index = self.catalogues.partition_point(|s| s.end <= index);
+        let source = self
+            .catalogues
+            .get(shard_index)
+            .ok_or_else(|| Error::Corrupt("Dangling place reference".into()))?;
+        let place = catalogue::read_place(&source.shard, index - source.first, evidence)?;
+        place.validate(self.place_count)?;
+        ensure(
+            self.manifest.family != "core" || !evidence || !place.field(11).is_empty(),
+            "Missing core catalogue evidence",
+        )?;
+        let bytes = size_of::<Place>()
+            + place
+                .text
+                .iter()
+                .chain(std::iter::once(&place.timezone))
+                .filter_map(Option::as_ref)
+                .map(String::capacity)
+                .sum::<usize>();
+        let mut places = self
+            .place_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+        Ok(Some(places.insert((reference, evidence), place, bytes)))
+    }
+}
+
+fn catalogue_source(
+    path: &Path,
+    first: usize,
+    reader: &super::reader::Reader<'_>,
+) -> Result<CatalogueSource> {
+    let shard = FileShard::from_file(reader.open(path)?, 2, &[80, 8, 1])?;
+    catalogue::validate_header(&shard)?;
+    let end = first
+        .checked_add(shard.len(0)? / 80)
+        .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
+    ensure(
+        u32::try_from(end).is_ok(),
+        "Catalogue exceeds u32 references",
+    )?;
+    Ok(CatalogueSource { first, end, shard })
+}
+
+fn load_blocks(
+    reader: &super::reader::Reader<'_>,
+    path: &Path,
+    blocks: &mut BTreeMap<u32, BlockSource>,
+) -> Result<()> {
+    let shard = Arc::new(FileShard::from_file(
+        reader.open(path)?,
+        1,
+        &[40, 2, 1, 20],
+    )?);
+    let entries = spatial::directory(
+        &shard.section(0)?,
+        [shard.len(1)?, shard.len(2)?, shard.len(3)?],
+    )?;
+    for entry in entries {
+        ensure(
+            blocks
+                .insert(
+                    entry.block,
+                    BlockSource {
+                        shard: Arc::clone(&shard),
+                        entry,
+                    },
+                )
+                .is_none(),
+            "Repeated spatial block",
+        )?;
+    }
+    Ok(())
+}

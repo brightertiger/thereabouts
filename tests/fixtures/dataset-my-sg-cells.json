@@ -1,0 +1,29 @@
+{
+  "manifest_sha256": "c43983107777db804a92f3065ddb3c31f079fb2b3493ee387f2c9d3544a099cc",
+  "tables": [
+    {
+      "blocks": [
+        {
+          "block": "836500fffffffff",
+          "row_group": 0,
+          "rows": 11107
+        },
+        {
+          "block": "836505fffffffff",
+          "row_group": 1,
+          "rows": 8019
+        },
+        {
+          "block": "836526fffffffff",
+          "row_group": 2,
+          "rows": 3278
+        }
+      ],
+      "kind": "cells",
+      "path": "cells/group=81653ffffffffff/part.parquet",
+      "rows": 22404,
+      "sha256": "dadb3586c398660fc4633bb634d343d330949411fafbac7d339ba95c43cb364e",
+      "size": 173850
+    }
+  ]
+}

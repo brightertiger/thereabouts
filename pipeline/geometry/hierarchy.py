@@ -5,14 +5,13 @@ from typing import overload
 import numpy as np
 from numpy.typing import NDArray
 
-from thereabouts.format import (
-    BLOCK_RESOLUTION,
+from thereabouts.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
+
+from .format import (
     CHILD_RADIX,
     H3_BASE_MASK,
     H3_BASE_SHIFT,
-    H3_DIGIT_BITS,
     H3_DIGIT_MASK,
-    H3_MAX_RESOLUTION,
     Integer,
     level_offset,
 )

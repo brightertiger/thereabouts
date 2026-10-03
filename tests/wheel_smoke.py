@@ -1,43 +1,38 @@
-"""Run against an installed wheel, outside the source import path."""
+"""Run inside a fresh installed wheel environment, without any data dependency."""
 
-import sys
+import importlib.util
+import os
+import subprocess
+import sysconfig
+import tempfile
 from pathlib import Path
 
-from h3.api import basic_int as h3
-
 import thereabouts
-from thereabouts.client import Geocoder
 
 
-def check(pack: Path, expected_backend: str) -> None:
-    assert Path(thereabouts.__file__).is_relative_to(Path(sys.prefix))
-    root = h3.latlng_to_cell(12.97, 77.59, 3)
-    cell = h3.int_to_str(h3.cell_to_center_child(h3.cell_to_children(root, 4)[0], 8))
-    with (
-        Geocoder(pack, verify=True) as geo,
-        Geocoder(pack, backend="python") as reference,
-    ):
-        assert geo.info()["backend"] == expected_backend
-        answer = geo.from_h3(cell)
-        assert answer == reference.from_h3(cell)
-        assert answer.selected is not None and answer.selected.city is not None
-        assert answer.selected.city.id == "city:synthetic:A"
-        assert list(geo.from_h3_many([cell])) == [answer]
-    assert not {"pyarrow", "Cython", "mcp", "pydantic"}.intersection(sys.modules)
-
-
-def check_codes(fixtures: Path) -> None:
-    with Geocoder(fixtures / "postal", verify=True) as geo:
-        answer = geo.postal("00100", country="AA")
-        assert answer.selected is not None
-        assert len(answer.selected.observations) == 2
-    with Geocoder(fixtures / "airports", verify=True) as geo:
-        answer = geo.airport("ZZZ", scheme="iata")
-        assert answer.status == "ambiguous" and answer.selected is None
-        assert len(answer.candidates) == 2
+def main() -> None:
+    assert thereabouts.Geocoder.__module__ == "thereabouts.geocoder"
+    for name in ("api", "client", "packs", "reading", "commandline", "installing"):
+        assert importlib.util.find_spec(f"thereabouts.{name}") is None, name
+    with tempfile.TemporaryDirectory() as directory:
+        env = os.environ | {"THEREABOUTS_DATA": directory}
+        result = subprocess.run(
+            [
+                str(
+                    Path(sysconfig.get_path("scripts"))
+                    / ("thereabouts.exe" if os.name == "nt" else "thereabouts")
+                ),
+                "--version",
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert result.stdout.strip() == "thereabouts 0.1.0", result.stdout
+        assert not list(Path(directory).iterdir())
+    print("Installed package imports and reports its version without data.")
 
 
 if __name__ == "__main__":
-    check(Path(sys.argv[1]), sys.argv[2])
-    if len(sys.argv) > 3:
-        check_codes(Path(sys.argv[3]))
+    main()

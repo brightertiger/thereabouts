@@ -1,0 +1,3761 @@
+{
+  "machine": {
+    "chip": "Apple M2",
+    "memory_bytes": 8589934592,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.8"
+  },
+  "workload": {
+    "pack": "core-sample",
+    "filesystem_cache": "preloaded",
+    "iterations": 20000,
+    "coordinate_vectors": 65,
+    "seed": 20261003,
+    "pack_bytes": 14740365
+  },
+  "open_seconds": 0.01157370800501667,
+  "open_rss_delta_bytes": 4800512,
+  "cache_hot": {
+    "points": 20000,
+    "scalar_median_us": 7.75,
+    "scalar_p99_us": 9.584409999999934,
+    "reverse_columns_points_per_second": 636291.6922252798,
+    "reverse_columns_repeats": [
+      616199.8953621484,
+      637442.580484575,
+      638364.9273351297,
+      638139.1862273286,
+      629827.8666875106,
+      636291.6922252798,
+      635089.4879509133
+    ]
+  },
+  "random": {
+    "points": 100000,
+    "scalar_median_us": 4.584,
+    "scalar_p99_us": 14.291009999999995,
+    "reverse_columns_points_per_second": 772447.8182020739,
+    "reverse_columns_repeats": [
+      769288.2173939028,
+      779336.6675752503,
+      758225.0796044527,
+      771960.0933655907,
+      772549.2664590434,
+      772447.8182020739,
+      777652.8513168518
+    ]
+  },
+  "peak_rss_bytes": 125616128,
+  "historical_reader": {
+    "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
+    "workload": "synthetic 308032 cells / 4176 places; not the real sample",
+    "cython_scalar_median_us": 10.291,
+    "python_scalar_median_us": 12.75,
+    "cython_columns_points_per_second": 531994,
+    "python_columns_points_per_second": 530437
+  },
+  "multishard": {
+    "before": {
+      "points": 100000,
+      "scalar_median_us": 18.4585,
+      "scalar_p99_us": 53.16600999999999,
+      "reverse_columns_points_per_second": 39706.65714406321,
+      "reverse_columns_repeats": [
+        40734.45166291532,
+        38877.61995333118,
+        37370.93771491131,
+        38826.11255236362,
+        40557.497948381075,
+        41118.219587185624,
+        39706.65714406321
+      ],
+      "open_seconds": 0.013366458006203175,
+      "open_rss_delta_bytes": 819200,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "after": {
+      "points": 100000,
+      "scalar_median_us": 13.209,
+      "scalar_p99_us": 107.75040999999979,
+      "reverse_columns_points_per_second": 140438.74592035104,
+      "reverse_columns_repeats": [
+        136172.28342340904,
+        139055.5463852437,
+        141935.54179639663,
+        141500.8571366643,
+        139262.47188178747,
+        140438.74592035104,
+        141104.5985455971
+      ],
+      "open_seconds": 0.04758241699892096,
+      "open_rss_delta_bytes": 524288,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    }
+  },
+  "before_names": {
+    "open_seconds": 0.0029504999984055758,
+    "open_rss_delta_bytes": 1048576,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 7.584,
+      "scalar_p99_us": 8.25,
+      "reverse_columns_points_per_second": 763474.1448462022,
+      "reverse_columns_repeats": [
+        757984.8976888969,
+        762459.0768415825,
+        768087.2648201325,
+        766226.0430779664,
+        765633.264417793,
+        763474.1448462022,
+        762287.1255367569
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 4.417,
+      "scalar_p99_us": 36.333,
+      "reverse_columns_points_per_second": 426340.7540523758,
+      "reverse_columns_repeats": [
+        415574.6283381637,
+        408821.3424861365,
+        398229.4051761884,
+        428623.16889998957,
+        427218.29093327693,
+        426340.7540523758,
+        427607.78328170447
+      ]
+    }
+  },
+  "before_lazy_open": {
+    "machine": {
+      "chip": "Apple M2",
+      "memory_bytes": 8589934592,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "python": "3.12.8"
+    },
+    "workload": {
+      "pack": "core-sample",
+      "iterations": 20000,
+      "coordinate_vectors": 65,
+      "seed": 20261003,
+      "pack_bytes": 4498416
+    },
+    "open_seconds": 0.05904149997513741,
+    "open_rss_delta_bytes": 21872640,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 8.833,
+      "scalar_p99_us": 22.917,
+      "reverse_columns_points_per_second": 553973.1311199064,
+      "reverse_columns_repeats": [
+        524335.154640723,
+        552209.0609545675,
+        547858.2686436173,
+        553973.1311199064,
+        568358.0900586214,
+        580982.9689514606,
+        578191.3451912963
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 5.5,
+      "scalar_p99_us": 9.833,
+      "reverse_columns_points_per_second": 665566.4498548141,
+      "reverse_columns_repeats": [
+        699513.2828711045,
+        659877.987054989,
+        658233.4153214697,
+        664287.2253504216,
+        665566.4498548141,
+        670492.9463039051,
+        679189.4115716703
+      ]
+    },
+    "peak_rss_bytes": 300318720,
+    "historical_reader": {
+      "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
+      "workload": "synthetic 308032 cells / 4176 places; not the real sample",
+      "cython_scalar_median_us": 10.291,
+      "python_scalar_median_us": 12.75,
+      "cython_columns_points_per_second": 531994,
+      "python_columns_points_per_second": 530437
+    }
+  },
+  "after_lazy_open": {
+    "open_seconds": 0.01010208300431259,
+    "open_rss_delta_bytes": 1015808,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 12.917,
+      "scalar_p99_us": 27.667,
+      "reverse_columns_points_per_second": 184956.13070533614,
+      "reverse_columns_repeats": [
+        190597.1288962652,
+        184956.13070533614,
+        180495.2337758869,
+        183496.05975045476,
+        184222.21134472452,
+        185999.8680208291,
+        185980.33725665938
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 5.542,
+      "scalar_p99_us": 14,
+      "reverse_columns_points_per_second": 320130.01480034285,
+      "reverse_columns_repeats": [
+        327693.6352236071,
+        304140.33878259815,
+        316036.6066421557,
+        320130.01480034285,
+        322095.38144402293,
+        322517.48583610053,
+        319447.2713579062
+      ]
+    }
+  },
+  "forward_format": {
+    "postal": {
+      "source_rows": 28833,
+      "compressed_query_bytes": 211928,
+      "compressed_evidence_bytes": 188595,
+      "query_bytes_per_row": 7.350189019526237,
+      "all_compressed_bytes_per_row": 13.891131689383693,
+      "budget_ceiling_bytes_per_row": 14,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 11497,
+        "evidence": 25985,
+        "strings": 1135,
+        "evidence_strings": 153898,
+        "geographies": 34046,
+        "locations": 165250,
+        "details": 8712
+      },
+      "artifact_bytes_by_role": {
+        "records": 11977,
+        "evidence": 26465,
+        "keys": 25708,
+        "strings": 1279,
+        "evidence_strings": 154282,
+        "geographies": 34382,
+        "locations": 165682,
+        "details": 8856,
+        "metadata": 5134,
+        "notice": 2692
+      },
+      "pack_bytes": 445935,
+      "estimated_world_bytes": 74990618,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 14.86598689002185,
+      "measured_catalogue_metadata_bytes": 124512,
+      "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+      "before": {
+        "source_rows": 897,
+        "data_shard_bytes": 116604,
+        "data_bytes_per_row": 129.9933110367893,
+        "pack_bytes": 363327,
+        "manifest_sha256": "7b25e8d35f955398f259bee23c8d4824d4b1040b2870180c73cff09732352d2c"
+      }
+    },
+    "airports": {
+      "source_rows": 2475,
+      "compressed_query_bytes": 37676,
+      "compressed_evidence_bytes": 57554,
+      "query_bytes_per_row": 15.222626262626262,
+      "all_compressed_bytes_per_row": 38.47676767676768,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 36,
+        "evidence": 2696,
+        "postings": 4100,
+        "airport_assertions": 167,
+        "airport_evidence": 464,
+        "strings": 2878,
+        "evidence_strings": 48479,
+        "geographies": 11085,
+        "locations": 19577,
+        "details": 5748
+      },
+      "artifact_bytes_by_role": {
+        "records": 180,
+        "evidence": 2840,
+        "postings": 4340,
+        "airport_assertions": 311,
+        "airport_evidence": 704,
+        "keys": 12164,
+        "strings": 3022,
+        "evidence_strings": 48671,
+        "geographies": 11229,
+        "locations": 19721,
+        "details": 5892,
+        "metadata": 11701,
+        "notice": 2692
+      },
+      "pack_bytes": 134628,
+      "estimated_world_bytes": 3808534,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 44.07030303030303,
+      "measured_catalogue_metadata_bytes": 11701,
+      "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+      "before": {
+        "source_rows": 213,
+        "data_shard_bytes": 85908,
+        "data_bytes_per_row": 403.32394366197184,
+        "pack_bytes": 375778,
+        "manifest_sha256": "444a6cfba65b294ba0ac5d79c0522e86a676c9988747416a74eb7aec8446c4df"
+      }
+    },
+    "locode": {
+      "source_rows": 3265,
+      "compressed_query_bytes": 40480,
+      "compressed_evidence_bytes": 67165,
+      "query_bytes_per_row": 12.398162327718223,
+      "all_compressed_bytes_per_row": 32.96937212863706,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 91,
+        "evidence": 337,
+        "strings": 2901,
+        "evidence_strings": 51680,
+        "geographies": 12350,
+        "locations": 25138,
+        "details": 15148
+      },
+      "artifact_bytes_by_role": {
+        "records": 235,
+        "evidence": 481,
+        "keys": 14384,
+        "strings": 3045,
+        "evidence_strings": 51872,
+        "geographies": 12494,
+        "locations": 25282,
+        "details": 15292,
+        "metadata": 11801,
+        "notice": 2692
+      },
+      "pack_bytes": 148371,
+      "estimated_world_bytes": 4392835,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 37.69831546707504,
+      "measured_catalogue_metadata_bytes": 11801,
+      "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+      "before": {
+        "source_rows": 225,
+        "data_shard_bytes": 57844,
+        "data_bytes_per_row": 257.08444444444444,
+        "pack_bytes": 349522,
+        "manifest_sha256": "0f49404df6a916bf267f0770fbd516793705322bcf1a8b58a849e1a044336726"
+      }
+    },
+    "phone": {
+      "source_rows": 395,
+      "compressed_query_bytes": 538,
+      "compressed_evidence_bytes": 3336,
+      "query_bytes_per_row": 1.3620253164556961,
+      "all_compressed_bytes_per_row": 9.807594936708862,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 207,
+        "evidence": 394,
+        "strings": 104,
+        "evidence_strings": 2468,
+        "geographies": 70,
+        "locations": 157,
+        "details": 474
+      },
+      "artifact_bytes_by_role": {
+        "records": 351,
+        "evidence": 538,
+        "keys": 755,
+        "strings": 248,
+        "evidence_strings": 2612,
+        "geographies": 214,
+        "locations": 301,
+        "details": 618,
+        "metadata": 513,
+        "notice": 2692
+      },
+      "pack_bytes": 66126,
+      "estimated_world_bytes": 6111549,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 14.270886075949367,
+      "measured_catalogue_metadata_bytes": 513,
+      "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+      "before": {
+        "source_rows": 389,
+        "data_shard_bytes": 103797,
+        "data_bytes_per_row": 266.8303341902314,
+        "pack_bytes": 187284,
+        "manifest_sha256": "8aac6fe067a1b85e337ec5e9d7d07c3566c5c217a25b7409afe310b7575e238d"
+      }
+    },
+    "ip": {
+      "source_rows": 7170,
+      "compressed_query_bytes": 51858,
+      "compressed_evidence_bytes": 38646,
+      "query_bytes_per_row": 7.232635983263599,
+      "all_compressed_bytes_per_row": 12.622594142259414,
+      "budget_ceiling_bytes_per_row": 16,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "starts4": 11710,
+        "starts6": 13116,
+        "evidence4": 8637,
+        "evidence6": 9718,
+        "strings": 2629,
+        "evidence_strings": 16849,
+        "geographies": 6751,
+        "locations": 17652,
+        "details": 3442
+      },
+      "artifact_bytes_by_role": {
+        "starts4": 11902,
+        "starts6": 13308,
+        "evidence4": 8829,
+        "evidence6": 9910,
+        "strings": 2773,
+        "evidence_strings": 16993,
+        "geographies": 6895,
+        "locations": 17796,
+        "details": 3586,
+        "metadata": 10992,
+        "notice": 2692
+      },
+      "pack_bytes": 115492,
+      "estimated_world_bytes": 100098143,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 12.830125523012553,
+      "measured_catalogue_metadata_bytes": 191700,
+      "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+      "before": {
+        "source_rows": 449,
+        "data_shard_bytes": 87412,
+        "data_bytes_per_row": 194.6815144766147,
+        "pack_bytes": 234875,
+        "manifest_sha256": "5e127c0a24398a42d181f256d0a3c1f19fc2e901ac81c3686290b359e95360ef"
+      }
+    },
+    "plates": {
+      "source_rows": 521,
+      "compressed_query_bytes": 8278,
+      "compressed_evidence_bytes": 1857,
+      "query_bytes_per_row": 15.888675623800383,
+      "all_compressed_bytes_per_row": 19.452975047984644,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "plate_formats": 1290,
+        "plate_format_evidence": 40,
+        "plate_codes": 1007,
+        "plate_code_evidence": 80,
+        "plate_priors": 0,
+        "strings": 5981,
+        "evidence_strings": 1737
+      },
+      "artifact_bytes_by_role": {
+        "plate_formats": 1434,
+        "plate_format_evidence": 184,
+        "plate_codes": 1151,
+        "plate_code_evidence": 224,
+        "plate_priors": 96,
+        "strings": 6125,
+        "evidence_strings": 1881,
+        "metadata": 14355,
+        "notice": 2692
+      },
+      "pack_bytes": 43463,
+      "estimated_world_bytes": 3095294,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+      "data_artifact_bytes_per_row": 21.295585412667947,
+      "measured_catalogue_metadata_bytes": 14355,
+      "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+      "before": {
+        "source_rows": 521,
+        "data_shard_bytes": 340787,
+        "data_bytes_per_row": 654.101727447217,
+        "pack_bytes": 1139827,
+        "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
+      }
+    }
+  },
+  "world_exports": {
+    "ip": {
+      "family": "ip",
+      "export_seconds": 233.53255816700403,
+      "peak_rss_bytes": 1086291968,
+      "pack_bytes": 94643648,
+      "input_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+      "storage": {
+        "catalogue_bytes": 20176096,
+        "data_artifact_bytes": 74265916,
+        "evidence_compressed_bytes": 27654798,
+        "metadata_bytes": 191700,
+        "query_compressed_bytes": 46411534,
+        "source_rows": 7786864
+      },
+      "ipv6_rows": 4166430,
+      "ipv6_nonzero_low64": 7836,
+      "monitored_peak_worktree_bytes": 2828644352,
+      "monitored_peak_output_bytes": 94643648,
+      "monitored_peak_rss_bytes": 1071726592,
+      "minimum_free_bytes": 49613615104,
+      "measurement_seconds": 239.29098037499352,
+      "output_deleted": true
+    },
+    "postal": {
+      "family": "postal",
+      "export_seconds": 190.20960654199007,
+      "peak_rss_bytes": 902545408,
+      "pack_bytes": 134347594,
+      "input_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+      "storage": {
+        "catalogue_bytes": 61177911,
+        "data_artifact_bytes": 73033272,
+        "evidence_compressed_bytes": 25353557,
+        "metadata_bytes": 124512,
+        "query_compressed_bytes": 41039789,
+        "source_rows": 5036067
+      },
+      "monitored_peak_worktree_bytes": 3300290560,
+      "monitored_peak_output_bytes": 134347594,
+      "monitored_peak_rss_bytes": 797671424,
+      "minimum_free_bytes": 49219751936,
+      "measurement_seconds": 190.7823931669991,
+      "output_deleted": true
+    }
+  },
+  "catalogue_read_rework": {
+    "before": {
+      "points": 100000,
+      "scalar_median_us": 13.291,
+      "scalar_p99_us": 120.875,
+      "reverse_columns_points_per_second": 144578.55712150357,
+      "reverse_columns_repeats": [
+        143230.01827282293,
+        141612.88832389994,
+        144207.50876562396,
+        144578.55712150357,
+        144614.15317459992,
+        145112.22139456918,
+        145015.7364838989
+      ],
+      "open_seconds": 0.05511774998740293,
+      "open_rss_delta_bytes": 1245184,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "after": {
+      "points": 100000,
+      "scalar_median_us": 7.5,
+      "scalar_p99_us": 13.625,
+      "reverse_columns_points_per_second": 467161.92243314924,
+      "reverse_columns_repeats": [
+        438457.1503611757,
+        440782.1967369879,
+        467161.92243314924,
+        470980.7185293979,
+        486831.71095673536,
+        475931.9249936878,
+        460940.1250654486
+      ],
+      "filesystem_cache": "preloaded",
+      "open_seconds": 0.006012750003719702,
+      "open_rss_delta_bytes": 1228800,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 37226859,
+      "seed": 20261003
+    },
+    "after_history": [
+      {
+        "points": 100000,
+        "scalar_median_us": 7.833,
+        "scalar_p99_us": 155.33482999999956,
+        "reverse_columns_points_per_second": 256552.4838294929,
+        "reverse_columns_repeats": [
+          273954.18325389654,
+          260447.24479838414,
+          255337.75601377274,
+          251431.21941880434,
+          260875.83189158695,
+          256552.4838294929,
+          244737.3066197133
+        ],
+        "open_seconds": 0.05683249997673556,
+        "open_rss_delta_bytes": 1245184,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 36678465,
+        "seed": 20261003
+      },
+      {
+        "points": 100000,
+        "scalar_median_us": 7.5,
+        "scalar_p99_us": 51.083,
+        "reverse_columns_points_per_second": 242767.4272936086,
+        "reverse_columns_repeats": [
+          245645.14634736843,
+          271152.4008534382,
+          225659.05120585594,
+          243881.59546650405,
+          177719.28839050845,
+          227841.0571117887,
+          242767.4272936086
+        ],
+        "open_seconds": 0.06216862500878051,
+        "open_rss_delta_bytes": 1015808,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 36678465,
+        "seed": 20261003
+      },
+      {
+        "points": 100000,
+        "scalar_median_us": 7.416,
+        "scalar_p99_us": 11.25,
+        "reverse_columns_points_per_second": 435478.98122715764,
+        "reverse_columns_repeats": [
+          356024.6637822925,
+          409575.39600925957,
+          437207.765974292,
+          434817.346845266,
+          435478.98122715764,
+          464506.9302422855,
+          478665.0995499626
+        ],
+        "open_seconds": 0.006290708988672122,
+        "open_rss_delta_bytes": 1327104,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 37226859,
+        "seed": 20261003
+      },
+      {
+        "points": 100000,
+        "scalar_median_us": 7.25,
+        "scalar_p99_us": 12.583,
+        "reverse_columns_points_per_second": 497542.96862847265,
+        "reverse_columns_repeats": [
+          454218.1263963801,
+          494448.6812650558,
+          498105.7462214188,
+          474452.324609831,
+          497542.96862847265,
+          506934.76365808316,
+          505350.60927765985
+        ],
+        "open_seconds": 0.010226125014014542,
+        "open_rss_delta_bytes": 1392640,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 37226859,
+        "seed": 20261003
+      }
+    ]
+  },
+  "forward_workloads": {
+    "geocode": {
+      "before": {
+        "pack_bytes": 210397,
+        "sample_rows": 101,
+        "world_source_rows": 68923,
+        "estimated_world_bytes": 11846553,
+        "data_artifact_bytes_per_row": 169.22772277227722,
+        "measured_catalogue_metadata_bytes": 182871,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
+        "vectors": 51,
+        "workload_scope": "all published source keys; plates are code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.375,
+            "scalar_p99_us": 11.333,
+            "batch_points_per_second": 419432.6679162629
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 88,
+            "seed": 271828,
+            "status_counts": {
+              "ambiguous": 422,
+              "matched": 19578
+            },
+            "scalar_median_us": 8.959,
+            "scalar_p99_us": 46.45841999999993,
+            "batch_points_per_second": 333669.0879949147
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 5.542,
+            "scalar_p99_us": 7.875409999999935,
+            "batch_points_per_second": 386128.6525793384
+          },
+          "fuzzy": {
+            "queries": 1000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 1000
+            },
+            "scalar_median_us": 11.125,
+            "scalar_p99_us": 15.50041,
+            "batch_points_per_second": 178365.73470552792
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.375,
+        "scalar_p99_us": 11.333,
+        "batch_points_per_second": 419432.6679162629
+      },
+      "after": {
+        "pack_bytes": 225876,
+        "sample_rows": 102,
+        "world_source_rows": 68923,
+        "estimated_world_bytes": 11952713,
+        "estimate_writer_revision": "0.2.2",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 170.54901960784315,
+        "measured_catalogue_metadata_bytes": 197963,
+        "supporting_tables_scope": "sample core catalogue and metadata, not world core",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample core catalogue and metadata, not world core",
+        "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
+        "vectors": 52,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.916,
+            "scalar_p99_us": 10.5,
+            "batch_points_per_second": 431451.7542601839
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 90,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 19574,
+              "ambiguous": 426
+            },
+            "scalar_median_us": 8.417,
+            "scalar_p99_us": 44.167,
+            "batch_points_per_second": 351232.78830721363
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 7.1455,
+            "scalar_p99_us": 8.417409999999935,
+            "batch_points_per_second": 260496.7999441647
+          },
+          "fuzzy": {
+            "filesystem_cache": "preloaded",
+            "queries": 1000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 1000
+            },
+            "scalar_median_us": 10.667,
+            "scalar_p99_us": 10.95801,
+            "batch_points_per_second": 191716.24815051837
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.916,
+        "scalar_p99_us": 10.5,
+        "batch_points_per_second": 431451.7542601839
+      }
+    },
+    "postal": {
+      "after": {
+        "pack_bytes": 445935,
+        "sample_rows": 28833,
+        "world_source_rows": 5036067,
+        "estimated_world_bytes": 74990618,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 14.86598689002185,
+        "measured_catalogue_metadata_bytes": 124512,
+        "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 28,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 9,
+            "scalar_p99_us": 9.583,
+            "batch_points_per_second": 317918.4833850853
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 7173,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 16081,
+              "ambiguous": 3919
+            },
+            "scalar_median_us": 11.25,
+            "scalar_p99_us": 465.21966999999813,
+            "batch_points_per_second": 76381.42975891162
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 3,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.208,
+            "scalar_p99_us": 4.208009999999998,
+            "batch_points_per_second": 2710593.4540476184
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 9,
+        "scalar_p99_us": 9.583,
+        "batch_points_per_second": 317918.4833850853
+      }
+    },
+    "airports": {
+      "after": {
+        "pack_bytes": 134628,
+        "sample_rows": 2475,
+        "world_source_rows": 86154,
+        "estimated_world_bytes": 3808534,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 44.07030303030303,
+        "measured_catalogue_metadata_bytes": 11701,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 33,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.334,
+            "scalar_p99_us": 22.167,
+            "batch_points_per_second": 306304.5126133983
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 4614,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 9.084,
+            "scalar_p99_us": 16.792409999999933,
+            "batch_points_per_second": 282559.0417791391
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.209,
+            "scalar_p99_us": 3.334,
+            "batch_points_per_second": 1946116.8899718756
+          },
+          "default_scheme": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 416,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.875,
+            "scalar_p99_us": 12.375,
+            "batch_points_per_second": 280712.754424004
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.334,
+        "scalar_p99_us": 22.167,
+        "batch_points_per_second": 306304.5126133983
+      }
+    },
+    "locode": {
+      "after": {
+        "pack_bytes": 148371,
+        "sample_rows": 3265,
+        "world_source_rows": 116213,
+        "estimated_world_bytes": 4392835,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 37.69831546707504,
+        "measured_catalogue_metadata_bytes": 11801,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 33,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.292,
+            "scalar_p99_us": 8.833009999999998,
+            "batch_points_per_second": 367617.21692068485
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 3262,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 19981,
+              "ambiguous": 19
+            },
+            "scalar_median_us": 8.417,
+            "scalar_p99_us": 14.416009999999998,
+            "batch_points_per_second": 352796.1689391591
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3,
+            "scalar_p99_us": 3.125,
+            "batch_points_per_second": 3587604.83407538
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.292,
+        "scalar_p99_us": 8.833009999999998,
+        "batch_points_per_second": 367617.21692068485
+      }
+    },
+    "phone": {
+      "after": {
+        "pack_bytes": 66126,
+        "sample_rows": 395,
+        "world_source_rows": 428217,
+        "estimated_world_bytes": 6111549,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 14.270886075949367,
+        "measured_catalogue_metadata_bytes": 513,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 30,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 5.292,
+            "scalar_p99_us": 5.5,
+            "batch_points_per_second": 547276.1041089986
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 173,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.375,
+            "scalar_p99_us": 12.4592499999998,
+            "batch_points_per_second": 248964.5904676071
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.084,
+            "scalar_p99_us": 4.1674099999999346,
+            "batch_points_per_second": 2573795.5533305756
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 5.292,
+        "scalar_p99_us": 5.5,
+        "batch_points_per_second": 547276.1041089986
+      }
+    },
+    "ip": {
+      "after": {
+        "pack_bytes": 115492,
+        "sample_rows": 7170,
+        "world_source_rows": 7786864,
+        "estimated_world_bytes": 100098143,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 12.830125523012553,
+        "measured_catalogue_metadata_bytes": 191700,
+        "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 60,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.875,
+            "scalar_p99_us": 13.25,
+            "batch_points_per_second": 411688.87637930416
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 14338,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.291,
+            "scalar_p99_us": 13.792,
+            "batch_points_per_second": 363322.0306330345
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 2.958,
+            "scalar_p99_us": 3.125,
+            "batch_points_per_second": 3295616.6385230278
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.875,
+        "scalar_p99_us": 13.25,
+        "batch_points_per_second": 411688.87637930416
+      }
+    },
+    "plates": {
+      "after": {
+        "pack_bytes": 43463,
+        "sample_rows": 521,
+        "world_source_rows": 144675,
+        "estimated_world_bytes": 3095294,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 21.295585412667947,
+        "measured_catalogue_metadata_bytes": 14355,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "estimate_scope": "family pack plus metadata; shared core catalogue excluded",
+        "vectors": 36,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "FR",
+          "IN",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 4.042,
+            "scalar_p99_us": 5.5,
+            "batch_points_per_second": 1375854.8614230615
+          },
+          "random": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 155,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 4.083,
+            "scalar_p99_us": 5.542,
+            "batch_points_per_second": 1267768.5701551111
+          },
+          "miss": {
+            "filesystem_cache": "preloaded",
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 4,
+            "scalar_p99_us": 4.750419999999933,
+            "batch_points_per_second": 822984.6101149165
+          }
+        },
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 4.042,
+        "scalar_p99_us": 5.5,
+        "batch_points_per_second": 1375854.8614230615
+      }
+    }
+  },
+  "forward_scale": {
+    "after": {
+      "scope": "synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 90k distinct cities/names sharing common trigrams, 3 FST shards. Random IP exercises decoded-block cache misses.",
+      "intervals": 7800000,
+      "name_keys": 90000,
+      "ip": {
+        "queries": 20000,
+        "distinct_queries": 20000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 138.042,
+        "scalar_p99_us": 356.0004199999999,
+        "batch_points_per_second": 6832.284371238708
+      },
+      "ip_gap": {
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 20000
+        },
+        "scalar_median_us": 3.292,
+        "scalar_p99_us": 4.708,
+        "batch_points_per_second": 1877632.971621564
+      },
+      "names_exact": {
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.334,
+        "scalar_p99_us": 28.793239999999802,
+        "batch_points_per_second": 329777.00708248926
+      },
+      "names_random": {
+        "queries": 90000,
+        "distinct_queries": 90000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 90000
+        },
+        "scalar_median_us": 16.833,
+        "scalar_p99_us": 156.25208999999893,
+        "batch_points_per_second": 60835.228797757874
+      },
+      "names_fuzzy_common_grams": {
+        "queries": 20,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "ambiguous": 20
+        },
+        "scalar_median_us": 11887.0625,
+        "scalar_p99_us": 24846.202439999983,
+        "batch_points_per_second": 81.73394477716535
+      },
+      "names_miss": {
+        "queries": 1000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 1000
+        },
+        "scalar_median_us": 10.5,
+        "scalar_p99_us": 13.833,
+        "batch_points_per_second": 136517.98892086896
+      },
+      "pack_bytes": {
+        "ip": 1112537,
+        "names": 23248528
+      }
+    },
+    "initial": {
+      "scope": "synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 90k distinct cities/names sharing common trigrams, 3 FST shards. Random IP exercises decoded-block cache misses.",
+      "intervals": 7800000,
+      "name_keys": 90000,
+      "ip": {
+        "queries": 20000,
+        "distinct_queries": 20000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 144.042,
+        "scalar_p99_us": 425.66782999999987,
+        "batch_points_per_second": 6728.712970093764
+      },
+      "ip_gap": {
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 20000
+        },
+        "scalar_median_us": 3.25,
+        "scalar_p99_us": 3.416,
+        "batch_points_per_second": 2647107.3706935504
+      },
+      "names_exact": {
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.333,
+        "scalar_p99_us": 11.041009999999998,
+        "batch_points_per_second": 369686.3342395082
+      },
+      "names_random": {
+        "queries": 90000,
+        "distinct_queries": 90000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 90000
+        },
+        "scalar_median_us": 15.833,
+        "scalar_p99_us": 59.04241999999978,
+        "batch_points_per_second": 81008.1554961484
+      },
+      "names_fuzzy_common_grams": {
+        "queries": 20,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "ambiguous": 20
+        },
+        "scalar_median_us": 46687.4165,
+        "scalar_p99_us": 60221.20054,
+        "batch_points_per_second": 21.588706615656356
+      },
+      "names_miss": {
+        "queries": 1000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 1000
+        },
+        "scalar_median_us": 104.292,
+        "scalar_p99_us": 111.00832999999999,
+        "batch_points_per_second": 9882.468590963947
+      },
+      "pack_bytes": {
+        "ip": 24426693,
+        "names": 23248528
+      }
+    }
+  },
+  "geocode_profile": {
+    "normalization_ns_per_call": 440,
+    "normalization_calls": 100000,
+    "normalization_input": "Utrecht",
+    "cpu_workload": [
+      "Utrecht (NL)",
+      "Springfield",
+      "Utrechx (NL)"
+    ],
+    "cpu_sample": ".tmp/geocode-profile.txt"
+  },
+  "plates_world_rules": {
+    "before": {
+      "queries": 20000,
+      "distinct_queries": 91,
+      "seed": 271828,
+      "status_counts": {
+        "ambiguous": 18901,
+        "not_found": 1099
+      },
+      "scalar_median_us": 83.1665,
+      "scalar_p99_us": 205.75,
+      "batch_points_per_second": 15167.106442742237,
+      "rules": 704,
+      "countries": 239,
+      "scope": "all committed rules; sample code assertions; no vehicle priors",
+      "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
+    },
+    "after": {
+      "queries": 20000,
+      "distinct_queries": 91,
+      "seed": 271828,
+      "status_counts": {
+        "ambiguous": 18901,
+        "not_found": 1099
+      },
+      "scalar_median_us": 27.5,
+      "scalar_p99_us": 155.333,
+      "batch_points_per_second": 67086.22571382453,
+      "rules": 704,
+      "countries": 239,
+      "scope": "all committed rules; sample code assertions; no vehicle priors",
+      "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
+    },
+    "final": {
+      "filesystem_cache": "preloaded",
+      "queries": 20000,
+      "distinct_queries": 91,
+      "seed": 271828,
+      "status_counts": {
+        "ambiguous": 13395,
+        "matched": 5295,
+        "not_found": 1310
+      },
+      "scalar_median_us": 26.167,
+      "scalar_p99_us": 145.79240999999993,
+      "batch_points_per_second": 70512.4137048104,
+      "rules": 704,
+      "countries": 239,
+      "scope": "all committed rules; sample code assertions; no vehicle priors",
+      "semantic_sha256": "3c82fb27851b1940cc6cfb9a320ffa4d386bbbbe862d6e43b0e01228d65e5ba8"
+    }
+  },
+  "result_contract_rework": {
+    "baseline_commit": "3d242a7",
+    "vectors": {
+      "airports-synthetic-vectors.json": {
+        "cases": 11,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "match": 2
+        }
+      },
+      "geocode-vectors.json": {
+        "cases": 51,
+        "changed_cases": 6,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 6,
+          "match": 6
+        }
+      },
+      "phone-synthetic-vectors.json": {
+        "cases": 6,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "match": 2
+        }
+      },
+      "plates-vectors.json": {
+        "cases": 36,
+        "changed_cases": 14,
+        "status_changes": [
+          {
+            "id": "plate-001",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-003",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-005",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-007",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-011",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-013",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-015",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-017",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-019",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-021",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-023",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-025",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-027",
+            "before": "ambiguous",
+            "after": "not_found"
+          }
+        ],
+        "changed_fields": {
+          "country": 12,
+          "match": 13,
+          "status": 13,
+          "candidates": 13,
+          "rank_basis": 1
+        }
+      },
+      "postal-synthetic-vectors.json": {
+        "cases": 8,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 2,
+          "match": 1,
+          "state": 1
+        }
+      },
+      "postal-vectors.json": {
+        "cases": 28,
+        "changed_cases": 5,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 5,
+          "match": 5,
+          "candidates": 1,
+          "state": 4
+        }
+      }
+    }
+  },
+  "enlarged_sample_audit": {
+    "postal": {
+      "source_rows": 14846,
+      "compressed_query_bytes": 169075,
+      "compressed_evidence_bytes": 179699,
+      "query_bytes_per_row": 11.388589519062373,
+      "all_compressed_bytes_per_row": 23.492792671426646,
+      "compressed_bytes_by_role": {
+        "records": 23789,
+        "evidence": 41958,
+        "strings": 9,
+        "evidence_strings": 132636,
+        "geographies": 16445,
+        "locations": 128832,
+        "details": 5105
+      },
+      "artifact_bytes_by_role": {
+        "records": 24077,
+        "evidence": 42246,
+        "keys": 13863,
+        "strings": 153,
+        "evidence_strings": 132876,
+        "geographies": 16685,
+        "locations": 129120,
+        "details": 5249,
+        "catalogue": 1118408,
+        "metadata": 3824,
+        "notice": 2692
+      },
+      "pack_bytes": 1498482,
+      "estimated_world_bytes": 124689731,
+      "data_artifact_bytes_per_row": 24.536508150343526,
+      "measured_catalogue_metadata_bytes": 1122232,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 116604,
+        "data_bytes_per_row": 129.9933110367893,
+        "pack_bytes": 363327,
+        "manifest_sha256": "7b25e8d35f955398f259bee23c8d4824d4b1040b2870180c73cff09732352d2c"
+      }
+    },
+    "airports": {
+      "source_rows": 2475,
+      "compressed_query_bytes": 46296,
+      "compressed_evidence_bytes": 119192,
+      "query_bytes_per_row": 18.705454545454547,
+      "all_compressed_bytes_per_row": 66.86383838383838,
+      "compressed_bytes_by_role": {
+        "records": 3747,
+        "evidence": 9000,
+        "postings": 10518,
+        "airport_assertions": 24021,
+        "airport_evidence": 12789,
+        "strings": 9,
+        "evidence_strings": 65875,
+        "geographies": 5968,
+        "locations": 26054,
+        "details": 7507
+      },
+      "artifact_bytes_by_role": {
+        "records": 3891,
+        "evidence": 9144,
+        "postings": 10758,
+        "airport_assertions": 24261,
+        "airport_evidence": 13029,
+        "keys": 12164,
+        "strings": 153,
+        "evidence_strings": 66067,
+        "geographies": 6112,
+        "locations": 26198,
+        "details": 7651,
+        "catalogue": 305064,
+        "metadata": 11701,
+        "notice": 2692
+      },
+      "pack_bytes": 509862,
+      "estimated_world_bytes": 6562599,
+      "data_artifact_bytes_per_row": 72.49616161616161,
+      "measured_catalogue_metadata_bytes": 316765,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 85908,
+        "data_bytes_per_row": 403.32394366197184,
+        "pack_bytes": 375778,
+        "manifest_sha256": "444a6cfba65b294ba0ac5d79c0522e86a676c9988747416a74eb7aec8446c4df"
+      }
+    },
+    "locode": {
+      "source_rows": 3265,
+      "compressed_query_bytes": 43597,
+      "compressed_evidence_bytes": 138654,
+      "query_bytes_per_row": 13.352833078101073,
+      "all_compressed_bytes_per_row": 55.81960183767228,
+      "compressed_bytes_by_role": {
+        "records": 4937,
+        "evidence": 11948,
+        "strings": 9,
+        "evidence_strings": 104188,
+        "geographies": 7061,
+        "locations": 31590,
+        "details": 22518
+      },
+      "artifact_bytes_by_role": {
+        "records": 5081,
+        "evidence": 12092,
+        "keys": 14384,
+        "strings": 153,
+        "evidence_strings": 104428,
+        "geographies": 7205,
+        "locations": 31734,
+        "details": 22662,
+        "catalogue": 340656,
+        "metadata": 11801,
+        "notice": 2692
+      },
+      "pack_bytes": 563495,
+      "estimated_world_bytes": 7390694,
+      "data_artifact_bytes_per_row": 60.56324655436447,
+      "measured_catalogue_metadata_bytes": 352457,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 57844,
+        "data_bytes_per_row": 257.08444444444444,
+        "pack_bytes": 349522,
+        "manifest_sha256": "0f49404df6a916bf267f0770fbd516793705322bcf1a8b58a849e1a044336726"
+      }
+    },
+    "phone": {
+      "source_rows": 395,
+      "compressed_query_bytes": 813,
+      "compressed_evidence_bytes": 6775,
+      "query_bytes_per_row": 2.0582278481012657,
+      "all_compressed_bytes_per_row": 19.21012658227848,
+      "compressed_bytes_by_role": {
+        "records": 416,
+        "evidence": 1081,
+        "strings": 9,
+        "evidence_strings": 4933,
+        "geographies": 28,
+        "locations": 360,
+        "details": 761
+      },
+      "artifact_bytes_by_role": {
+        "records": 560,
+        "evidence": 1225,
+        "keys": 755,
+        "strings": 153,
+        "evidence_strings": 5077,
+        "geographies": 172,
+        "locations": 504,
+        "details": 905,
+        "catalogue": 1029,
+        "metadata": 513,
+        "notice": 2692
+      },
+      "pack_bytes": 70696,
+      "estimated_world_bytes": 10138902,
+      "data_artifact_bytes_per_row": 23.673417721518987,
+      "measured_catalogue_metadata_bytes": 1542,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 103797,
+        "data_bytes_per_row": 266.8303341902314,
+        "pack_bytes": 187284,
+        "manifest_sha256": "8aac6fe067a1b85e337ec5e9d7d07c3566c5c217a25b7409afe310b7575e238d"
+      }
+    },
+    "ip": {
+      "source_rows": 7170,
+      "compressed_query_bytes": 76680,
+      "compressed_evidence_bytes": 79383,
+      "query_bytes_per_row": 10.694560669456067,
+      "all_compressed_bytes_per_row": 21.76610878661088,
+      "compressed_bytes_by_role": {
+        "starts4": 22168,
+        "starts6": 29420,
+        "evidence4": 16921,
+        "evidence6": 18866,
+        "strings": 9,
+        "evidence_strings": 38198,
+        "geographies": 3644,
+        "locations": 21439,
+        "details": 5398
+      },
+      "artifact_bytes_by_role": {
+        "starts4": 22360,
+        "starts6": 29612,
+        "evidence4": 17113,
+        "evidence6": 19058,
+        "strings": 153,
+        "evidence_strings": 38342,
+        "geographies": 3788,
+        "locations": 21583,
+        "details": 5542,
+        "catalogue": 195789,
+        "metadata": 10992,
+        "notice": 2692
+      },
+      "pack_bytes": 376672,
+      "estimated_world_bytes": 171312529,
+      "data_artifact_bytes_per_row": 21.973640167364017,
+      "measured_catalogue_metadata_bytes": 206781,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 87412,
+        "data_bytes_per_row": 194.6815144766147,
+        "pack_bytes": 234875,
+        "manifest_sha256": "5e127c0a24398a42d181f256d0a3c1f19fc2e901ac81c3686290b359e95360ef"
+      }
+    },
+    "plates": {
+      "source_rows": 521,
+      "compressed_query_bytes": 13481,
+      "compressed_evidence_bytes": 1968,
+      "query_bytes_per_row": 25.87523992322457,
+      "all_compressed_bytes_per_row": 29.652591170825335,
+      "compressed_bytes_by_role": {
+        "plate_formats": 1626,
+        "plate_format_evidence": 52,
+        "plate_codes": 1154,
+        "plate_code_evidence": 112,
+        "plate_priors": 0,
+        "strings": 10701,
+        "evidence_strings": 1804
+      },
+      "artifact_bytes_by_role": {
+        "plate_formats": 1770,
+        "plate_format_evidence": 196,
+        "plate_codes": 1298,
+        "plate_code_evidence": 256,
+        "plate_priors": 96,
+        "strings": 10845,
+        "evidence_strings": 1948,
+        "metadata": 14355,
+        "notice": 2692
+      },
+      "pack_bytes": 48499,
+      "estimated_world_bytes": 4570923,
+      "data_artifact_bytes_per_row": 31.495201535508638,
+      "measured_catalogue_metadata_bytes": 14355,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "data_shard_bytes": 340787,
+        "data_bytes_per_row": 654.101727447217,
+        "pack_bytes": 1139827,
+        "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
+      }
+    }
+  },
+  "final_compression_audit": {
+    "postal": {
+      "source_rows": 14846,
+      "compressed_query_bytes": 107564,
+      "compressed_evidence_bytes": 105365,
+      "query_bytes_per_row": 7.245318604337869,
+      "all_compressed_bytes_per_row": 14.342516502761686,
+      "compressed_bytes_by_role": {
+        "records": 6236,
+        "evidence": 14096,
+        "strings": 9,
+        "evidence_strings": 86470,
+        "geographies": 16416,
+        "locations": 84903,
+        "details": 4799
+      },
+      "artifact_bytes_by_role": {
+        "records": 6524,
+        "evidence": 14384,
+        "keys": 13863,
+        "strings": 153,
+        "evidence_strings": 86710,
+        "geographies": 16656,
+        "locations": 85191,
+        "details": 4943,
+        "catalogue": 1118408,
+        "metadata": 3824,
+        "notice": 2692
+      },
+      "pack_bytes": 1362688,
+      "estimated_world_bytes": 78608327,
+      "data_artifact_bytes_per_row": 15.386231981678566,
+      "measured_catalogue_metadata_bytes": 1122232,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 897,
+        "data_shard_bytes": 116604,
+        "data_bytes_per_row": 129.9933110367893,
+        "pack_bytes": 363327,
+        "manifest_sha256": "7b25e8d35f955398f259bee23c8d4824d4b1040b2870180c73cff09732352d2c"
+      }
+    },
+    "airports": {
+      "source_rows": 2475,
+      "compressed_query_bytes": 30369,
+      "compressed_evidence_bytes": 59198,
+      "query_bytes_per_row": 12.27030303030303,
+      "all_compressed_bytes_per_row": 36.188686868686865,
+      "compressed_bytes_by_role": {
+        "records": 36,
+        "evidence": 2699,
+        "postings": 5036,
+        "airport_assertions": 0,
+        "airport_evidence": 51,
+        "strings": 9,
+        "evidence_strings": 50858,
+        "geographies": 5608,
+        "locations": 19680,
+        "details": 5590
+      },
+      "artifact_bytes_by_role": {
+        "records": 180,
+        "evidence": 2843,
+        "postings": 5276,
+        "airport_assertions": 96,
+        "airport_evidence": 291,
+        "keys": 12164,
+        "strings": 153,
+        "evidence_strings": 51050,
+        "geographies": 5752,
+        "locations": 19824,
+        "details": 5734,
+        "catalogue": 305064,
+        "metadata": 11701,
+        "notice": 2692
+      },
+      "pack_bytes": 433843,
+      "estimated_world_bytes": 3914800,
+      "data_artifact_bytes_per_row": 41.76282828282828,
+      "measured_catalogue_metadata_bytes": 316765,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 213,
+        "data_shard_bytes": 85908,
+        "data_bytes_per_row": 403.32394366197184,
+        "pack_bytes": 375778,
+        "manifest_sha256": "444a6cfba65b294ba0ac5d79c0522e86a676c9988747416a74eb7aec8446c4df"
+      }
+    },
+    "locode": {
+      "source_rows": 3265,
+      "compressed_query_bytes": 31294,
+      "compressed_evidence_bytes": 67363,
+      "query_bytes_per_row": 9.58468606431853,
+      "all_compressed_bytes_per_row": 30.21653905053599,
+      "compressed_bytes_by_role": {
+        "records": 91,
+        "evidence": 337,
+        "strings": 9,
+        "evidence_strings": 52100,
+        "geographies": 6363,
+        "locations": 24831,
+        "details": 14926
+      },
+      "artifact_bytes_by_role": {
+        "records": 235,
+        "evidence": 481,
+        "keys": 14384,
+        "strings": 153,
+        "evidence_strings": 52292,
+        "geographies": 6507,
+        "locations": 24975,
+        "details": 15070,
+        "catalogue": 340656,
+        "metadata": 11801,
+        "notice": 2692
+      },
+      "pack_bytes": 479902,
+      "estimated_world_bytes": 4413576,
+      "data_artifact_bytes_per_row": 34.945482388973964,
+      "measured_catalogue_metadata_bytes": 352457,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 225,
+        "data_shard_bytes": 57844,
+        "data_bytes_per_row": 257.08444444444444,
+        "pack_bytes": 349522,
+        "manifest_sha256": "0f49404df6a916bf267f0770fbd516793705322bcf1a8b58a849e1a044336726"
+      }
+    },
+    "phone": {
+      "source_rows": 395,
+      "compressed_query_bytes": 400,
+      "compressed_evidence_bytes": 3407,
+      "query_bytes_per_row": 1.0126582278481013,
+      "all_compressed_bytes_per_row": 9.637974683544304,
+      "compressed_bytes_by_role": {
+        "records": 207,
+        "evidence": 421,
+        "strings": 9,
+        "evidence_strings": 2527,
+        "geographies": 28,
+        "locations": 156,
+        "details": 459
+      },
+      "artifact_bytes_by_role": {
+        "records": 351,
+        "evidence": 565,
+        "keys": 755,
+        "strings": 153,
+        "evidence_strings": 2671,
+        "geographies": 172,
+        "locations": 300,
+        "details": 603,
+        "catalogue": 1029,
+        "metadata": 513,
+        "notice": 2692
+      },
+      "pack_bytes": 66949,
+      "estimated_world_bytes": 6039944,
+      "data_artifact_bytes_per_row": 14.10126582278481,
+      "measured_catalogue_metadata_bytes": 1542,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 389,
+        "data_shard_bytes": 103797,
+        "data_bytes_per_row": 266.8303341902314,
+        "pack_bytes": 187284,
+        "manifest_sha256": "8aac6fe067a1b85e337ec5e9d7d07c3566c5c217a25b7409afe310b7575e238d"
+      }
+    },
+    "ip": {
+      "source_rows": 7170,
+      "compressed_query_bytes": 45958,
+      "compressed_evidence_bytes": 41421,
+      "query_bytes_per_row": 6.40976290097629,
+      "all_compressed_bytes_per_row": 12.186750348675035,
+      "compressed_bytes_by_role": {
+        "starts4": 11710,
+        "starts6": 13116,
+        "evidence4": 8902,
+        "evidence6": 10142,
+        "strings": 9,
+        "evidence_strings": 18821,
+        "geographies": 3356,
+        "locations": 17767,
+        "details": 3556
+      },
+      "artifact_bytes_by_role": {
+        "starts4": 11902,
+        "starts6": 13308,
+        "evidence4": 9094,
+        "evidence6": 10334,
+        "strings": 153,
+        "evidence_strings": 18965,
+        "geographies": 3500,
+        "locations": 17911,
+        "details": 3700,
+        "catalogue": 195789,
+        "metadata": 10992,
+        "notice": 2692
+      },
+      "pack_bytes": 308021,
+      "estimated_world_bytes": 96719367,
+      "data_artifact_bytes_per_row": 12.394281729428172,
+      "measured_catalogue_metadata_bytes": 206781,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 449,
+        "data_shard_bytes": 87412,
+        "data_bytes_per_row": 194.6815144766147,
+        "pack_bytes": 234875,
+        "manifest_sha256": "5e127c0a24398a42d181f256d0a3c1f19fc2e901ac81c3686290b359e95360ef"
+      }
+    },
+    "plates": {
+      "source_rows": 521,
+      "compressed_query_bytes": 8286,
+      "compressed_evidence_bytes": 1857,
+      "query_bytes_per_row": 15.904030710172744,
+      "all_compressed_bytes_per_row": 19.468330134357007,
+      "compressed_bytes_by_role": {
+        "plate_formats": 1290,
+        "plate_format_evidence": 40,
+        "plate_codes": 1015,
+        "plate_code_evidence": 80,
+        "plate_priors": 0,
+        "strings": 5981,
+        "evidence_strings": 1737
+      },
+      "artifact_bytes_by_role": {
+        "plate_formats": 1434,
+        "plate_format_evidence": 184,
+        "plate_codes": 1159,
+        "plate_code_evidence": 224,
+        "plate_priors": 96,
+        "strings": 6125,
+        "evidence_strings": 1881,
+        "metadata": 14355,
+        "notice": 2692
+      },
+      "pack_bytes": 43191,
+      "estimated_world_bytes": 3097515,
+      "data_artifact_bytes_per_row": 21.310940499040306,
+      "measured_catalogue_metadata_bytes": 14355,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 521,
+        "data_shard_bytes": 340787,
+        "data_bytes_per_row": 654.101727447217,
+        "pack_bytes": 1139827,
+        "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
+      }
+    }
+  },
+  "strict_compression_audit": {
+    "postal": {
+      "source_rows": 28833,
+      "compressed_query_bytes": 208221,
+      "compressed_evidence_bytes": 188792,
+      "query_bytes_per_row": 7.221621059202996,
+      "all_compressed_bytes_per_row": 13.769396177990497,
+      "budget_ceiling_bytes_per_row": 14,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 11497,
+        "evidence": 25972,
+        "strings": 9,
+        "evidence_strings": 154064,
+        "geographies": 32694,
+        "locations": 164021,
+        "details": 8756
+      },
+      "artifact_bytes_by_role": {
+        "records": 11977,
+        "evidence": 26452,
+        "keys": 25708,
+        "strings": 153,
+        "evidence_strings": 154448,
+        "geographies": 33030,
+        "locations": 164453,
+        "details": 8900,
+        "catalogue": 2098465,
+        "metadata": 5134,
+        "notice": 2692
+      },
+      "pack_bytes": 2540756,
+      "estimated_world_bytes": 76356637,
+      "data_artifact_bytes_per_row": 14.744251378628654,
+      "measured_catalogue_metadata_bytes": 2103599,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 897,
+        "data_shard_bytes": 116604,
+        "data_bytes_per_row": 129.9933110367893,
+        "pack_bytes": 363327,
+        "manifest_sha256": "7b25e8d35f955398f259bee23c8d4824d4b1040b2870180c73cff09732352d2c"
+      }
+    },
+    "airports": {
+      "source_rows": 2475,
+      "compressed_query_bytes": 29388,
+      "compressed_evidence_bytes": 58020,
+      "query_bytes_per_row": 11.873939393939393,
+      "all_compressed_bytes_per_row": 35.31636363636363,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 36,
+        "evidence": 2699,
+        "postings": 4100,
+        "airport_assertions": 0,
+        "airport_evidence": 51,
+        "strings": 9,
+        "evidence_strings": 49680,
+        "geographies": 5563,
+        "locations": 19680,
+        "details": 5590
+      },
+      "artifact_bytes_by_role": {
+        "records": 180,
+        "evidence": 2843,
+        "postings": 4340,
+        "airport_assertions": 96,
+        "airport_evidence": 291,
+        "keys": 12164,
+        "strings": 153,
+        "evidence_strings": 49872,
+        "geographies": 5707,
+        "locations": 19824,
+        "details": 5734,
+        "catalogue": 305064,
+        "metadata": 11701,
+        "notice": 2692
+      },
+      "pack_bytes": 431684,
+      "estimated_world_bytes": 3839646,
+      "data_artifact_bytes_per_row": 40.89050505050505,
+      "measured_catalogue_metadata_bytes": 316765,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 213,
+        "data_shard_bytes": 85908,
+        "data_bytes_per_row": 403.32394366197184,
+        "pack_bytes": 375778,
+        "manifest_sha256": "444a6cfba65b294ba0ac5d79c0522e86a676c9988747416a74eb7aec8446c4df"
+      }
+    },
+    "locode": {
+      "source_rows": 3265,
+      "compressed_query_bytes": 31221,
+      "compressed_evidence_bytes": 67182,
+      "query_bytes_per_row": 9.562327718223584,
+      "all_compressed_bytes_per_row": 30.13874425727412,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 91,
+        "evidence": 337,
+        "strings": 9,
+        "evidence_strings": 52100,
+        "geographies": 6363,
+        "locations": 24758,
+        "details": 14745
+      },
+      "artifact_bytes_by_role": {
+        "records": 235,
+        "evidence": 481,
+        "keys": 14384,
+        "strings": 153,
+        "evidence_strings": 52292,
+        "geographies": 6507,
+        "locations": 24902,
+        "details": 14889,
+        "catalogue": 340656,
+        "metadata": 11801,
+        "notice": 2692
+      },
+      "pack_bytes": 479648,
+      "estimated_world_bytes": 4404536,
+      "data_artifact_bytes_per_row": 34.8676875957121,
+      "measured_catalogue_metadata_bytes": 352457,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 225,
+        "data_shard_bytes": 57844,
+        "data_bytes_per_row": 257.08444444444444,
+        "pack_bytes": 349522,
+        "manifest_sha256": "0f49404df6a916bf267f0770fbd516793705322bcf1a8b58a849e1a044336726"
+      }
+    },
+    "phone": {
+      "source_rows": 395,
+      "compressed_query_bytes": 405,
+      "compressed_evidence_bytes": 3318,
+      "query_bytes_per_row": 1.0253164556962024,
+      "all_compressed_bytes_per_row": 9.425316455696203,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "records": 207,
+        "evidence": 394,
+        "strings": 9,
+        "evidence_strings": 2467,
+        "geographies": 28,
+        "locations": 161,
+        "details": 457
+      },
+      "artifact_bytes_by_role": {
+        "records": 351,
+        "evidence": 538,
+        "keys": 755,
+        "strings": 153,
+        "evidence_strings": 2611,
+        "geographies": 172,
+        "locations": 305,
+        "details": 601,
+        "catalogue": 1029,
+        "metadata": 513,
+        "notice": 2692
+      },
+      "pack_bytes": 66865,
+      "estimated_world_bytes": 5948880,
+      "data_artifact_bytes_per_row": 13.888607594936708,
+      "measured_catalogue_metadata_bytes": 1542,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 389,
+        "data_shard_bytes": 103797,
+        "data_bytes_per_row": 266.8303341902314,
+        "pack_bytes": 187284,
+        "manifest_sha256": "8aac6fe067a1b85e337ec5e9d7d07c3566c5c217a25b7409afe310b7575e238d"
+      }
+    },
+    "ip": {
+      "source_rows": 7170,
+      "compressed_query_bytes": 45958,
+      "compressed_evidence_bytes": 40791,
+      "query_bytes_per_row": 6.40976290097629,
+      "all_compressed_bytes_per_row": 12.098884239888424,
+      "budget_ceiling_bytes_per_row": 16,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "starts4": 11710,
+        "starts6": 13116,
+        "evidence4": 8902,
+        "evidence6": 10142,
+        "strings": 9,
+        "evidence_strings": 18216,
+        "geographies": 3356,
+        "locations": 17767,
+        "details": 3531
+      },
+      "artifact_bytes_by_role": {
+        "starts4": 11902,
+        "starts6": 13308,
+        "evidence4": 9094,
+        "evidence6": 10334,
+        "strings": 153,
+        "evidence_strings": 18360,
+        "geographies": 3500,
+        "locations": 17911,
+        "details": 3675,
+        "catalogue": 195789,
+        "metadata": 10992,
+        "notice": 2692
+      },
+      "pack_bytes": 307391,
+      "estimated_world_bytes": 96035166,
+      "data_artifact_bytes_per_row": 12.306415620641562,
+      "measured_catalogue_metadata_bytes": 206781,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 449,
+        "data_shard_bytes": 87412,
+        "data_bytes_per_row": 194.6815144766147,
+        "pack_bytes": 234875,
+        "manifest_sha256": "5e127c0a24398a42d181f256d0a3c1f19fc2e901ac81c3686290b359e95360ef"
+      }
+    },
+    "plates": {
+      "source_rows": 521,
+      "compressed_query_bytes": 8278,
+      "compressed_evidence_bytes": 1857,
+      "query_bytes_per_row": 15.888675623800383,
+      "all_compressed_bytes_per_row": 19.452975047984644,
+      "budget_ceiling_bytes_per_row": 40,
+      "budget_passed": true,
+      "compressed_bytes_by_role": {
+        "plate_formats": 1290,
+        "plate_format_evidence": 40,
+        "plate_codes": 1007,
+        "plate_code_evidence": 80,
+        "plate_priors": 0,
+        "strings": 5981,
+        "evidence_strings": 1737
+      },
+      "artifact_bytes_by_role": {
+        "plate_formats": 1434,
+        "plate_format_evidence": 184,
+        "plate_codes": 1151,
+        "plate_code_evidence": 224,
+        "plate_priors": 96,
+        "strings": 6125,
+        "evidence_strings": 1881,
+        "metadata": 14355,
+        "notice": 2692
+      },
+      "pack_bytes": 43183,
+      "estimated_world_bytes": 3095294,
+      "data_artifact_bytes_per_row": 21.295585412667947,
+      "measured_catalogue_metadata_bytes": 14355,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "before": {
+        "source_rows": 521,
+        "data_shard_bytes": 340787,
+        "data_bytes_per_row": 654.101727447217,
+        "pack_bytes": 1139827,
+        "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
+      }
+    }
+  },
+  "qualification": {
+    "legacy_mappings": {
+      "reverse": {
+        "matched": 19,
+        "unassigned": 1,
+        "ineligible": 4,
+        "outside_coverage": 2,
+        "invalid_input": 8,
+        "coarse_cell_intended_change": 1
+      },
+      "postal": {
+        "matched": 4,
+        "ambiguous": 1,
+        "not_found": 1,
+        "invalid_input": 2
+      },
+      "airports": {
+        "ambiguous": 2,
+        "matched": 7,
+        "not_found": 1,
+        "invalid_input": 1
+      }
+    },
+    "independent_reverse": {
+      "checked_r8_requests": 131,
+      "checked_r8_matches": 123,
+      "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832"
+    },
+    "validation": {
+      "rust_tests": 104,
+      "pytest_passed": 510,
+      "pytest_skipped": 2,
+      "mypy_files": 465,
+      "node_tests": 63,
+      "gates": [
+        "cargo fmt --check",
+        "cargo clippy --all-targets --all-features -- -D warnings",
+        "cargo test",
+        "cargo check -p thereabouts-core --target wasm32-unknown-unknown",
+        "cargo check -p thereabouts-cli-core --target wasm32-unknown-unknown",
+        "cargo check -p thereabouts-wasm --target wasm32-unknown-unknown",
+        "npm run build",
+        "uv run pytest",
+        "uv run ruff check",
+        "uv run ruff format --check",
+        "uv run mypy",
+        "node --test (with offline guard)",
+        "npm run check"
+      ],
+      "node24_tests": 63
+    },
+    "cli_conformance": {
+      "current_total": 411,
+      "console": 405,
+      "nul_binding": 5,
+      "typed_api": 1,
+      "grammar_usage": 6,
+      "legacy_console": 18,
+      "legacy_typed_api": 1
+    }
+  },
+  "cli_startup": {
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.12.8",
+    "iterations": 30,
+    "warmup_launches": 3,
+    "file_cache": "warm; each sample launches a new console process",
+    "command": [
+      "thereabouts",
+      "reverse",
+      "--lat",
+      "48.8566",
+      "--lon",
+      "2.3522"
+    ],
+    "pack_manifest_sha256": "e36060803d9eac961834fe478e81f5cc7559c12da140e052126442a887760481",
+    "first_launch_ms": 119.287292,
+    "first_result_median_ms": 63.2400625,
+    "first_result_p99_ms": 68.047958,
+    "total_median_ms": 72.176125,
+    "first_result_samples_ms": [
+      63.014542,
+      64.205667,
+      63.05975,
+      63.263083,
+      62.796958,
+      62.584166,
+      62.85275,
+      63.217042,
+      65.0525,
+      68.047958,
+      64.085083,
+      63.094125,
+      64.254083,
+      63.101417,
+      63.550166,
+      62.499125,
+      64.7765,
+      63.119166,
+      62.903542,
+      63.938208,
+      62.754708,
+      63.640042,
+      62.434375,
+      62.760083,
+      67.243792,
+      63.425,
+      63.469084,
+      66.777208,
+      64.032917,
+      63.126583
+    ],
+    "total_samples_ms": [
+      71.930208,
+      73.130958,
+      71.991042,
+      72.186083,
+      71.712333,
+      71.498958,
+      71.768833,
+      72.166167,
+      73.983291,
+      106.369333,
+      72.988708,
+      72.010125,
+      73.182542,
+      72.028042,
+      72.470708,
+      71.384667,
+      73.728292,
+      72.031041,
+      71.823292,
+      72.8605,
+      71.636625,
+      72.547375,
+      71.350625,
+      71.665166,
+      76.18025,
+      72.350166,
+      72.390709,
+      75.704375,
+      72.951792,
+      72.047625
+    ]
+  },
+  "shared_catalogue": {
+    "baseline_commit": "07fbae7",
+    "families": {
+      "postal": {
+        "source_rows": 28833,
+        "compressed_query_bytes": 211928,
+        "compressed_evidence_bytes": 188595,
+        "query_bytes_per_row": 7.350189019526237,
+        "all_compressed_bytes_per_row": 13.891131689383693,
+        "budget_ceiling_bytes_per_row": 14,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "records": 11497,
+          "evidence": 25985,
+          "strings": 1135,
+          "evidence_strings": 153898,
+          "geographies": 34046,
+          "locations": 165250,
+          "details": 8712
+        },
+        "artifact_bytes_by_role": {
+          "records": 11977,
+          "evidence": 26465,
+          "keys": 25708,
+          "strings": 1279,
+          "evidence_strings": 154282,
+          "geographies": 34382,
+          "locations": 165682,
+          "details": 8856,
+          "metadata": 5134,
+          "notice": 2692
+        },
+        "pack_bytes": 445935,
+        "estimated_world_bytes": 74990618,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 14.86598689002185,
+        "measured_catalogue_metadata_bytes": 124512,
+        "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [
+          "postal-000",
+          "postal-001",
+          "postal-002",
+          "postal-003",
+          "postal-004",
+          "postal-005",
+          "postal-006",
+          "postal-007",
+          "postal-008",
+          "postal-021"
+        ],
+        "vectors": 28,
+        "results_with_timezone": 10
+      },
+      "airports": {
+        "source_rows": 2475,
+        "compressed_query_bytes": 37676,
+        "compressed_evidence_bytes": 57554,
+        "query_bytes_per_row": 15.222626262626262,
+        "all_compressed_bytes_per_row": 38.47676767676768,
+        "budget_ceiling_bytes_per_row": 40,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "records": 36,
+          "evidence": 2696,
+          "postings": 4100,
+          "airport_assertions": 167,
+          "airport_evidence": 464,
+          "strings": 2878,
+          "evidence_strings": 48479,
+          "geographies": 11085,
+          "locations": 19577,
+          "details": 5748
+        },
+        "artifact_bytes_by_role": {
+          "records": 180,
+          "evidence": 2840,
+          "postings": 4340,
+          "airport_assertions": 311,
+          "airport_evidence": 704,
+          "keys": 12164,
+          "strings": 3022,
+          "evidence_strings": 48671,
+          "geographies": 11229,
+          "locations": 19721,
+          "details": 5892,
+          "metadata": 11701,
+          "notice": 2692
+        },
+        "pack_bytes": 134628,
+        "estimated_world_bytes": 3808534,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 44.07030303030303,
+        "measured_catalogue_metadata_bytes": 11701,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [
+          "airports-004",
+          "airports-005",
+          "airports-006",
+          "airports-013",
+          "airports-014",
+          "airports-022",
+          "airports-023",
+          "airports-024",
+          "airports-032"
+        ],
+        "vectors": 33,
+        "results_with_timezone": 9
+      },
+      "locode": {
+        "source_rows": 3265,
+        "compressed_query_bytes": 40480,
+        "compressed_evidence_bytes": 67165,
+        "query_bytes_per_row": 12.398162327718223,
+        "all_compressed_bytes_per_row": 32.96937212863706,
+        "budget_ceiling_bytes_per_row": 40,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "records": 91,
+          "evidence": 337,
+          "strings": 2901,
+          "evidence_strings": 51680,
+          "geographies": 12350,
+          "locations": 25138,
+          "details": 15148
+        },
+        "artifact_bytes_by_role": {
+          "records": 235,
+          "evidence": 481,
+          "keys": 14384,
+          "strings": 3045,
+          "evidence_strings": 51872,
+          "geographies": 12494,
+          "locations": 25282,
+          "details": 15292,
+          "metadata": 11801,
+          "notice": 2692
+        },
+        "pack_bytes": 148371,
+        "estimated_world_bytes": 4392835,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 37.69831546707504,
+        "measured_catalogue_metadata_bytes": 11801,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [
+          "locode-000",
+          "locode-011",
+          "locode-014",
+          "locode-015",
+          "locode-016",
+          "locode-017",
+          "locode-021",
+          "locode-022",
+          "locode-024",
+          "locode-025"
+        ],
+        "vectors": 33,
+        "results_with_timezone": 10
+      },
+      "phone": {
+        "source_rows": 395,
+        "compressed_query_bytes": 538,
+        "compressed_evidence_bytes": 3336,
+        "query_bytes_per_row": 1.3620253164556961,
+        "all_compressed_bytes_per_row": 9.807594936708862,
+        "budget_ceiling_bytes_per_row": 40,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "records": 207,
+          "evidence": 394,
+          "strings": 104,
+          "evidence_strings": 2468,
+          "geographies": 70,
+          "locations": 157,
+          "details": 474
+        },
+        "artifact_bytes_by_role": {
+          "records": 351,
+          "evidence": 538,
+          "keys": 755,
+          "strings": 248,
+          "evidence_strings": 2612,
+          "geographies": 214,
+          "locations": 301,
+          "details": 618,
+          "metadata": 513,
+          "notice": 2692
+        },
+        "pack_bytes": 66126,
+        "estimated_world_bytes": 6111549,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 14.270886075949367,
+        "measured_catalogue_metadata_bytes": 513,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [],
+        "vectors": 30,
+        "results_with_timezone": 0
+      },
+      "ip": {
+        "source_rows": 7170,
+        "compressed_query_bytes": 51858,
+        "compressed_evidence_bytes": 38646,
+        "query_bytes_per_row": 7.232635983263599,
+        "all_compressed_bytes_per_row": 12.622594142259414,
+        "budget_ceiling_bytes_per_row": 16,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "starts4": 11710,
+          "starts6": 13116,
+          "evidence4": 8637,
+          "evidence6": 9718,
+          "strings": 2629,
+          "evidence_strings": 16849,
+          "geographies": 6751,
+          "locations": 17652,
+          "details": 3442
+        },
+        "artifact_bytes_by_role": {
+          "starts4": 11902,
+          "starts6": 13308,
+          "evidence4": 8829,
+          "evidence6": 9910,
+          "strings": 2773,
+          "evidence_strings": 16993,
+          "geographies": 6895,
+          "locations": 17796,
+          "details": 3586,
+          "metadata": 10992,
+          "notice": 2692
+        },
+        "pack_bytes": 115492,
+        "estimated_world_bytes": 100098143,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 12.830125523012553,
+        "measured_catalogue_metadata_bytes": 191700,
+        "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; historical world metadata, writer 0.3.1; shared core excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [
+          "ip-000",
+          "ip-001",
+          "ip-002",
+          "ip-006",
+          "ip-007",
+          "ip-008",
+          "ip-009",
+          "ip-010",
+          "ip-011",
+          "ip-012",
+          "ip-013",
+          "ip-014",
+          "ip-015",
+          "ip-016",
+          "ip-017",
+          "ip-018",
+          "ip-019",
+          "ip-020",
+          "ip-024",
+          "ip-025",
+          "ip-026",
+          "ip-027",
+          "ip-028",
+          "ip-029",
+          "ip-030",
+          "ip-031",
+          "ip-032",
+          "ip-036",
+          "ip-037",
+          "ip-038",
+          "ip-039",
+          "ip-040",
+          "ip-041"
+        ],
+        "vectors": 60,
+        "results_with_timezone": 33
+      },
+      "plates": {
+        "source_rows": 521,
+        "compressed_query_bytes": 8278,
+        "compressed_evidence_bytes": 1857,
+        "query_bytes_per_row": 15.888675623800383,
+        "all_compressed_bytes_per_row": 19.452975047984644,
+        "budget_ceiling_bytes_per_row": 40,
+        "budget_passed": true,
+        "compressed_bytes_by_role": {
+          "plate_formats": 1290,
+          "plate_format_evidence": 40,
+          "plate_codes": 1007,
+          "plate_code_evidence": 80,
+          "plate_priors": 0,
+          "strings": 5981,
+          "evidence_strings": 1737
+        },
+        "artifact_bytes_by_role": {
+          "plate_formats": 1434,
+          "plate_format_evidence": 184,
+          "plate_codes": 1151,
+          "plate_code_evidence": 224,
+          "plate_priors": 96,
+          "strings": 6125,
+          "evidence_strings": 1881,
+          "metadata": 14355,
+          "notice": 2692
+        },
+        "pack_bytes": 43463,
+        "estimated_world_bytes": 3095294,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
+        "data_artifact_bytes_per_row": 21.295585412667947,
+        "measured_catalogue_metadata_bytes": 14355,
+        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "catalogue_bytes": 0,
+        "changed_vector_ids": [],
+        "vectors": 36,
+        "results_with_timezone": 0
+      }
+    },
+    "core_sample_bytes": 14740365
+  },
+  "single_shard": {
+    "before": {
+      "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+      "scalar_median_us": 3784.6455,
+      "scalar_p99_us": 7816.33425,
+      "reverse_columns_points_per_second": 249.5040470203096,
+      "open_seconds": 0.002262708992930129,
+      "open_rss_delta_bytes": 704512,
+      "pack_bytes": 55854205,
+      "single_shard_spans": {
+        "catalogue_shards": 1,
+        "places": 25000,
+        "hot_text_median_bytes": 26339239.5,
+        "hot_text_p99_bytes": 52173456.089999996,
+        "hot_text_max_bytes": 52700685,
+        "hot_offsets_max_bytes": 600008,
+        "full_text_max_bytes": 52702773
+      },
+      "real_sample_spans": {
+        "catalogue_shards": 4,
+        "places": 29772,
+        "hot_text_median_bytes": 927565,
+        "hot_text_p99_bytes": 2082939.4600000002,
+        "hot_text_max_bytes": 2135215,
+        "hot_offsets_max_bytes": 216376,
+        "full_text_max_bytes": 2135427
+      }
+    },
+    "after": {
+      "scope": "preloaded file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+      "scalar_median_us": 9.292,
+      "scalar_p99_us": 12.29142,
+      "reverse_columns_points_per_second": 166426.26397713964,
+      "open_seconds": 0.0003786669985856861,
+      "open_rss_delta_bytes": 884736,
+      "pack_bytes": 56704188,
+      "single_shard_spans": {
+        "catalogue_shards": 1,
+        "places": 25000,
+        "hot_text_median_bytes": 31,
+        "hot_text_p99_bytes": 31,
+        "hot_text_max_bytes": 31,
+        "hot_offsets_max_bytes": 48,
+        "full_text_max_bytes": 2119
+      },
+      "real_sample_spans": {
+        "catalogue_shards": 4,
+        "places": 29772,
+        "hot_text_median_bytes": 90,
+        "hot_text_p99_bytes": 107,
+        "hot_text_max_bytes": 162,
+        "hot_offsets_max_bytes": 88,
+        "full_text_max_bytes": 457
+      }
+    },
+    "after_history": [
+      {
+        "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+        "scalar_median_us": 88.708,
+        "scalar_p99_us": 281.08183999999994,
+        "reverse_columns_points_per_second": 165459.0497555668,
+        "open_seconds": 0.0031696250080130994,
+        "open_rss_delta_bytes": 737280,
+        "pack_bytes": 56704188,
+        "single_shard_spans": {
+          "catalogue_shards": 1,
+          "places": 25000,
+          "hot_text_median_bytes": 31,
+          "hot_text_p99_bytes": 31,
+          "hot_text_max_bytes": 31,
+          "hot_offsets_max_bytes": 48,
+          "full_text_max_bytes": 2119
+        },
+        "real_sample_spans": {
+          "catalogue_shards": 4,
+          "places": 29772,
+          "hot_text_median_bytes": 90,
+          "hot_text_p99_bytes": 107,
+          "hot_text_max_bytes": 162,
+          "hot_offsets_max_bytes": 88,
+          "full_text_max_bytes": 457
+        }
+      }
+    ]
+  },
+  "world_scale": {
+    "before": {
+      "scope": "preloaded filesystem cache, initially empty decoded caches; synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 1M distinct cities/names sharing common trigrams, 34 FST shards. Random IP exercises decoded-block cache misses.",
+      "intervals": 7800000,
+      "name_keys": 1000000,
+      "ip": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 20000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 129.5,
+        "scalar_p99_us": 143.125,
+        "batch_points_per_second": 8086.328020666773
+      },
+      "ip_gap": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 20000
+        },
+        "scalar_median_us": 3.25,
+        "scalar_p99_us": 7.958,
+        "batch_points_per_second": 2560300.185113125
+      },
+      "names_exact": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 10.125,
+        "scalar_p99_us": 10.458,
+        "batch_points_per_second": 216006.72704134817
+      },
+      "names_random": {
+        "filesystem_cache": "preloaded",
+        "queries": 2000,
+        "distinct_queries": 2000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 2000
+        },
+        "scalar_median_us": 13.583,
+        "scalar_p99_us": 18.586489999999998,
+        "batch_points_per_second": 196805.20216242337
+      },
+      "names_fuzzy_common_grams": {
+        "filesystem_cache": "preloaded",
+        "queries": 10,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "ambiguous": 10
+        },
+        "scalar_median_us": 111596.833,
+        "scalar_p99_us": 125372.53925,
+        "batch_points_per_second": 8.92785201919427
+      },
+      "names_miss": {
+        "filesystem_cache": "preloaded",
+        "queries": 1000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 1000
+        },
+        "scalar_median_us": 85.459,
+        "scalar_p99_us": 93.713,
+        "batch_points_per_second": 12047.43683097012
+      },
+      "pack_bytes": {
+        "ip": 905955,
+        "names": 310925591
+      },
+      "process_peak_rss_bytes": 333905920
+    },
+    "after": {
+      "scope": "preloaded filesystem cache, initially empty decoded caches; synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 1M distinct cities/names sharing common trigrams, 34 FST shards. Random IP exercises decoded-block cache misses.",
+      "intervals": 7800000,
+      "name_keys": 1000000,
+      "ip": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 20000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.667,
+        "scalar_p99_us": 140.459,
+        "batch_points_per_second": 341161.81430596893
+      },
+      "ip_gap": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 20000
+        },
+        "scalar_median_us": 3.125,
+        "scalar_p99_us": 3.25,
+        "batch_points_per_second": 2808578.135498211
+      },
+      "names_exact": {
+        "filesystem_cache": "preloaded",
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 10.208,
+        "scalar_p99_us": 10.667,
+        "batch_points_per_second": 212373.1236568808
+      },
+      "names_random": {
+        "filesystem_cache": "preloaded",
+        "queries": 2000,
+        "distinct_queries": 2000,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 2000
+        },
+        "scalar_median_us": 14.166,
+        "scalar_p99_us": 24.00042,
+        "batch_points_per_second": 187189.2364279892
+      },
+      "names_fuzzy_common_grams": {
+        "filesystem_cache": "preloaded",
+        "queries": 10,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "ambiguous": 10
+        },
+        "scalar_median_us": 1129.5415,
+        "scalar_p99_us": 3733.8593100000007,
+        "batch_points_per_second": 935.3115165016313
+      },
+      "names_miss": {
+        "filesystem_cache": "preloaded",
+        "queries": 1000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "not_found": 1000
+        },
+        "scalar_median_us": 72.5,
+        "scalar_p99_us": 77.66866999999999,
+        "batch_points_per_second": 14726.92582853468
+      },
+      "pack_bytes": {
+        "ip": 905955,
+        "names": 310925591
+      },
+      "process_peak_rss_bytes": 630849536
+    },
+    "before_history": [
+      {
+        "scope": "synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 1M distinct cities/names sharing common trigrams, 34 FST shards. Random IP exercises decoded-block cache misses.",
+        "intervals": 7800000,
+        "name_keys": 1000000,
+        "ip": {
+          "queries": 20000,
+          "distinct_queries": 20000,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 130.334,
+          "scalar_p99_us": 169.67532999999867,
+          "batch_points_per_second": 8104.646383585069
+        },
+        "ip_gap": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.167,
+          "scalar_p99_us": 3.333,
+          "batch_points_per_second": 2679707.904622948
+        },
+        "names_exact": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 10.25,
+          "scalar_p99_us": 10.916,
+          "batch_points_per_second": 213364.24666172234
+        },
+        "names_random": {
+          "queries": 2000,
+          "distinct_queries": 2000,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 2000
+          },
+          "scalar_median_us": 13.958,
+          "scalar_p99_us": 27.507909999999992,
+          "batch_points_per_second": 193172.93954838454
+        },
+        "names_fuzzy_common_grams": {
+          "queries": 10,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "ambiguous": 10
+          },
+          "scalar_median_us": 112304.625,
+          "scalar_p99_us": 126634.852,
+          "batch_points_per_second": 8.634493060950199
+        },
+        "names_miss": {
+          "queries": 1000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 1000
+          },
+          "scalar_median_us": 87.125,
+          "scalar_p99_us": 97.79642,
+          "batch_points_per_second": 11596.824786796524
+        },
+        "pack_bytes": {
+          "ip": 905955,
+          "names": 310925591
+        },
+        "process_peak_rss_bytes": 352583680
+      }
+    ],
+    "after_history": [
+      {
+        "scope": "synthetic search scale, not a world compression estimate; 7.8M single-address intervals, half v4/v6, each followed by a gap; one hot location dictionary; 1M distinct cities/names sharing common trigrams, 34 FST shards. Random IP exercises decoded-block cache misses.",
+        "intervals": 7800000,
+        "name_keys": 1000000,
+        "ip": {
+          "queries": 20000,
+          "distinct_queries": 20000,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 9.167,
+          "scalar_p99_us": 147.95883999999984,
+          "batch_points_per_second": 302195.2597657361
+        },
+        "ip_gap": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.166,
+          "scalar_p99_us": 4.292,
+          "batch_points_per_second": 2815546.765235809
+        },
+        "names_exact": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 10.208,
+          "scalar_p99_us": 13.833,
+          "batch_points_per_second": 214065.72359001226
+        },
+        "names_random": {
+          "queries": 2000,
+          "distinct_queries": 2000,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 2000
+          },
+          "scalar_median_us": 290.396,
+          "scalar_p99_us": 861.02375,
+          "batch_points_per_second": 197612.1726735545
+        },
+        "names_fuzzy_common_grams": {
+          "queries": 10,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "ambiguous": 10
+          },
+          "scalar_median_us": 1134.2705,
+          "scalar_p99_us": 7642.690130000001,
+          "batch_points_per_second": 919.4309985690456
+        },
+        "names_miss": {
+          "queries": 1000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 1000
+          },
+          "scalar_median_us": 71.958,
+          "scalar_p99_us": 74.83733000000001,
+          "batch_points_per_second": 14818.528451043006
+        },
+        "pack_bytes": {
+          "ip": 905955,
+          "names": 310925591
+        },
+        "process_peak_rss_bytes": 582041600
+      }
+    ]
+  },
+  "format_followups_baseline": {
+    "commit": "07fbae7",
+    "multishard": {
+      "points": 100000,
+      "scalar_median_us": 7.5,
+      "scalar_p99_us": 51.083,
+      "reverse_columns_points_per_second": 242767.4272936086,
+      "reverse_columns_repeats": [
+        245645.14634736843,
+        271152.4008534382,
+        225659.05120585594,
+        243881.59546650405,
+        177719.28839050845,
+        227841.0571117887,
+        242767.4272936086
+      ],
+      "open_seconds": 0.06216862500878051,
+      "open_rss_delta_bytes": 1015808,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "core_open_seconds": 0.022276624978985637,
+    "core_open_rss_delta_bytes": 2506752
+  },
+  "node_wasm": {
+    "node": "v22.23.3",
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M2",
+    "memory_bytes": 8589934592,
+    "iterations": 10000,
+    "file_cache": "warm; no filesystem cache flush",
+    "verbs": {
+      "reverse": {
+        "pack": "packs/core-sample",
+        "request_count": 61,
+        "open_ms": 32.263666,
+        "open_rss_delta_bytes": 19972096,
+        "scalar_median_us": 6.292000000030384,
+        "scalar_p99_us": 8.791999999999689,
+        "varied_median_us": 6.541999999996051,
+        "varied_p99_us": 9.125000000011596,
+        "batch_points_per_second": 148988.1854752729,
+        "batch_repeats": [
+          144021.22942051847,
+          145014.40406323402,
+          150770.5324060303,
+          148988.1854752729,
+          151845.30000835154
+        ],
+        "batch_api": "reverseMany async iterable"
+      },
+      "postal": {
+        "pack": "packs/postal-sample",
+        "request_count": 17,
+        "open_ms": 16.372375000000034,
+        "open_rss_delta_bytes": 507904,
+        "scalar_median_us": 8.750000000077307,
+        "scalar_p99_us": 10.959000000070773,
+        "varied_median_us": 9.20799999994415,
+        "varied_p99_us": 24.541999999996733,
+        "batch_points_per_second": 92101.38520483347,
+        "batch_repeats": [
+          91769.00822938573,
+          91263.4977686484,
+          92101.38520483347,
+          92347.68567511102,
+          92234.93285186212
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "airport": {
+        "pack": "packs/airports-sample",
+        "request_count": 26,
+        "open_ms": 17.501125000000002,
+        "open_rss_delta_bytes": 425984,
+        "scalar_median_us": 8.624999999938154,
+        "scalar_p99_us": 9.999999999990905,
+        "varied_median_us": 9.457999999995081,
+        "varied_p99_us": 10.958999999957086,
+        "batch_points_per_second": 109618.82257786913,
+        "batch_repeats": [
+          109264.93913407506,
+          109915.97879689984,
+          109964.82917892987,
+          109425.90116770777,
+          109618.82257786913
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "locode": {
+        "pack": "packs/locode-sample",
+        "request_count": 25,
+        "open_ms": 15.15729199999987,
+        "open_rss_delta_bytes": 229376,
+        "scalar_median_us": 8.542000000034022,
+        "scalar_p99_us": 9.12499999958527,
+        "varied_median_us": 8.499999999912689,
+        "varied_p99_us": 9.37500000009095,
+        "batch_points_per_second": 117446.82304405782,
+        "batch_repeats": [
+          117539.77543062046,
+          117446.82304405782,
+          117405.80095252937,
+          117385.41501948005,
+          117515.25647692962
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "phone": {
+        "pack": "packs/phone-sample",
+        "request_count": 21,
+        "open_ms": 13.343792000000121,
+        "open_rss_delta_bytes": 245760,
+        "scalar_median_us": 10.458000000198808,
+        "scalar_p99_us": 11.083000000326138,
+        "varied_median_us": 7.541999999830296,
+        "varied_p99_us": 10.832999999820458,
+        "batch_points_per_second": 138727.6834671533,
+        "batch_repeats": [
+          137912.56751440864,
+          138815.2223495732,
+          138775.73269839914,
+          138727.6834671533,
+          138136.81069731494
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "ip": {
+        "pack": "packs/ip-sample",
+        "request_count": 46,
+        "open_ms": 14.79275000000007,
+        "open_rss_delta_bytes": 245760,
+        "scalar_median_us": 8.041999999932159,
+        "scalar_p99_us": 8.707999999842286,
+        "varied_median_us": 8.207999999740423,
+        "varied_p99_us": 9.041999999681138,
+        "batch_points_per_second": 124270.23701353968,
+        "batch_repeats": [
+          124072.81471202859,
+          124349.11012668094,
+          124375.85398015998,
+          124270.23701353968,
+          123578.7165467935
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "plate": {
+        "pack": "packs/plates-sample",
+        "request_count": 31,
+        "open_ms": 42.13029199999983,
+        "open_rss_delta_bytes": 6946816,
+        "scalar_median_us": 4.7920000001795415,
+        "scalar_p99_us": 5.916999999953987,
+        "varied_median_us": 5.458000000089669,
+        "varied_p99_us": 16.87499999979991,
+        "batch_points_per_second": 157747.26307709925,
+        "batch_repeats": [
+          157747.26307709925,
+          158667.93067886983,
+          159310.7147910144,
+          156172.01404067635,
+          156706.44670263425
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      },
+      "geocode": {
+        "pack": "packs/core-names-sample",
+        "request_count": 28,
+        "open_ms": 2.571125000000393,
+        "open_rss_delta_bytes": 16384,
+        "scalar_median_us": 8.20800000019517,
+        "scalar_p99_us": 10.166999999455584,
+        "varied_median_us": 9.29199999973207,
+        "varied_p99_us": 22.54099999936443,
+        "batch_points_per_second": 104352.45425441502,
+        "batch_repeats": [
+          104007.40532725936,
+          104352.45425441502,
+          104414.15213547053,
+          103966.49434358886,
+          104550.4266310841
+        ],
+        "batch_api": "ordered scalar loop; no vectorized forward API"
+      }
+    },
+    "conformance": {
+      "current": {
+        "total": 478,
+        "os_argv": 467,
+        "nul_runner": 5,
+        "typed_library": 6,
+        "grammar_usage": 7
+      },
+      "legacy": {
+        "total": 54,
+        "os_argv_results": 48,
+        "grammar_usage": 1,
+        "typed_library": 5,
+        "mappings": {
+          "matched": 30,
+          "unassigned": 1,
+          "ineligible": 4,
+          "outside_coverage": 2,
+          "ambiguous": 3,
+          "not_found": 2,
+          "invalid_input": 11,
+          "coarse_cell_intended_change": 1
+        }
+      },
+      "numeric_absolute_tolerance": 1e-10
+    },
+    "wasm": {
+      "bytes": 2539196,
+      "sha256": "9a3d106421a4aa2be855519a4ac17b75539c0be94ae4c0bfecf1f7a4b3ddea03",
+      "committed": false,
+      "build": "npm run build (cargo --locked release wasm32 + wasm-bindgen 0.2.129)"
+    },
+    "startup": {
+      "bin": {
+        "launches": 30,
+        "warmups": 3,
+        "first_launch_ms": 71.9032500000003,
+        "first_result_median_ms": 69.74299999999948,
+        "first_result_p99_ms": 72.83637499999986,
+        "samples": [
+          {
+            "first_ms": 69.78850000000057,
+            "total_ms": 73.21837500000038
+          },
+          {
+            "first_ms": 70.91374999999971,
+            "total_ms": 74.20324999999957
+          },
+          {
+            "first_ms": 72.83637499999986,
+            "total_ms": 75.88204200000018
+          },
+          {
+            "first_ms": 69.74299999999948,
+            "total_ms": 72.74799999999959
+          },
+          {
+            "first_ms": 70.22929099999965,
+            "total_ms": 73.21037499999966
+          },
+          {
+            "first_ms": 69.24691699999948,
+            "total_ms": 72.35816699999941
+          },
+          {
+            "first_ms": 71.81675000000087,
+            "total_ms": 74.77258300000085
+          },
+          {
+            "first_ms": 70.32574999999997,
+            "total_ms": 73.59458300000006
+          },
+          {
+            "first_ms": 70.17216600000029,
+            "total_ms": 73.23158300000068
+          },
+          {
+            "first_ms": 68.609375,
+            "total_ms": 71.71254200000021
+          },
+          {
+            "first_ms": 69.1683750000002,
+            "total_ms": 72.10129200000029
+          },
+          {
+            "first_ms": 69.2255839999998,
+            "total_ms": 72.2278750000005
+          },
+          {
+            "first_ms": 69.09150000000045,
+            "total_ms": 72.14391700000033
+          },
+          {
+            "first_ms": 69.18062500000087,
+            "total_ms": 72.19175000000087
+          },
+          {
+            "first_ms": 69.35608299999967,
+            "total_ms": 72.38000000000011
+          },
+          {
+            "first_ms": 70.38841599999978,
+            "total_ms": 73.42274999999972
+          },
+          {
+            "first_ms": 69.09495900000002,
+            "total_ms": 72.13649999999961
+          },
+          {
+            "first_ms": 70.81116700000075,
+            "total_ms": 73.80958400000054
+          },
+          {
+            "first_ms": 69.82004200000029,
+            "total_ms": 72.77012500000001
+          },
+          {
+            "first_ms": 69.66862500000025,
+            "total_ms": 72.66345799999999
+          },
+          {
+            "first_ms": 68.57704199999989,
+            "total_ms": 71.55362500000047
+          },
+          {
+            "first_ms": 70.39741700000013,
+            "total_ms": 73.37016700000004
+          },
+          {
+            "first_ms": 70.17745800000012,
+            "total_ms": 73.4467910000003
+          },
+          {
+            "first_ms": 70.55283400000008,
+            "total_ms": 73.50749999999971
+          },
+          {
+            "first_ms": 68.742209,
+            "total_ms": 71.69129200000043
+          },
+          {
+            "first_ms": 68.64862500000072,
+            "total_ms": 71.69408300000032
+          },
+          {
+            "first_ms": 70.26329200000055,
+            "total_ms": 73.19866700000057
+          },
+          {
+            "first_ms": 72.04691600000024,
+            "total_ms": 75.01758299999983
+          },
+          {
+            "first_ms": 69.28262499999983,
+            "total_ms": 72.29449999999997
+          },
+          {
+            "first_ms": 69.46150000000034,
+            "total_ms": 72.48050000000057
+          }
+        ]
+      },
+      "npx": {
+        "launches": 30,
+        "warmups": 3,
+        "first_launch_ms": 464.2344579999999,
+        "first_result_median_ms": 253.7072079999998,
+        "first_result_p99_ms": 296.9028339999986,
+        "samples": [
+          {
+            "first_ms": 296.9028339999986,
+            "total_ms": 304.4668750000001
+          },
+          {
+            "first_ms": 255.2726249999996,
+            "total_ms": 262.2624159999996
+          },
+          {
+            "first_ms": 253.7072079999998,
+            "total_ms": 260.6390420000007
+          },
+          {
+            "first_ms": 253.6359999999986,
+            "total_ms": 261.2529999999988
+          },
+          {
+            "first_ms": 258.1643750000003,
+            "total_ms": 266.01645800000006
+          },
+          {
+            "first_ms": 269.20341599999847,
+            "total_ms": 276.55341599999883
+          },
+          {
+            "first_ms": 261.22758299999987,
+            "total_ms": 268.52437499999905
+          },
+          {
+            "first_ms": 258.4080410000006,
+            "total_ms": 266.576833000001
+          },
+          {
+            "first_ms": 260.63929200000166,
+            "total_ms": 267.73575000000164
+          },
+          {
+            "first_ms": 260.74395800000093,
+            "total_ms": 267.7750410000008
+          },
+          {
+            "first_ms": 263.03962499999943,
+            "total_ms": 270.16599999999926
+          },
+          {
+            "first_ms": 253.4429999999993,
+            "total_ms": 260.54033399999935
+          },
+          {
+            "first_ms": 259.089833,
+            "total_ms": 265.9982909999999
+          },
+          {
+            "first_ms": 275.7374999999993,
+            "total_ms": 282.669167
+          },
+          {
+            "first_ms": 263.2769590000007,
+            "total_ms": 271.4646670000002
+          },
+          {
+            "first_ms": 263.7634590000016,
+            "total_ms": 271.019542
+          },
+          {
+            "first_ms": 259.60541700000067,
+            "total_ms": 266.8044580000005
+          },
+          {
+            "first_ms": 264.9007500000007,
+            "total_ms": 272.06574999999975
+          },
+          {
+            "first_ms": 252.21479199999885,
+            "total_ms": 259.0338329999995
+          },
+          {
+            "first_ms": 242.74862500000017,
+            "total_ms": 250.06295800000044
+          },
+          {
+            "first_ms": 241.81012499999997,
+            "total_ms": 248.56362500000068
+          },
+          {
+            "first_ms": 242.06195900000057,
+            "total_ms": 248.81458399999974
+          },
+          {
+            "first_ms": 239.82741700000042,
+            "total_ms": 246.5981670000001
+          },
+          {
+            "first_ms": 242.2704589999994,
+            "total_ms": 249.03770900000018
+          },
+          {
+            "first_ms": 244.3864169999997,
+            "total_ms": 251.1767920000002
+          },
+          {
+            "first_ms": 240.21145799999977,
+            "total_ms": 246.84291699999994
+          },
+          {
+            "first_ms": 243.51791699999922,
+            "total_ms": 250.20370899999944
+          },
+          {
+            "first_ms": 242.79600000000028,
+            "total_ms": 249.75566700000127
+          },
+          {
+            "first_ms": 242.69516699999986,
+            "total_ms": 249.2860840000012
+          },
+          {
+            "first_ms": 241.07933299999968,
+            "total_ms": 247.7983750000003
+          }
+        ]
+      }
+    }
+  }
+}

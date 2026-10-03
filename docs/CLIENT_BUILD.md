@@ -1,5 +1,9 @@
 # Building and measuring the Python client
 
+> Historical: this document describes the retired Python/Cython client. Its
+> commands and API are no longer supported. See [CLIENT_RELEASE.md](CLIENT_RELEASE.md)
+> for current builds and [CLIENT_STATUS.md](CLIENT_STATUS.md) for current measurements.
+
 The Python client can use an optional Cython kernel to reconstruct the H3 identity
 of a stored cell. `Geocoder(..., backend="python")` selects the reference path;
 the default `backend="auto"` selects the extension when present. `info()` reports

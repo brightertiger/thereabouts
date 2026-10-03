@@ -1,14 +1,16 @@
 [build-system]
-requires = ["setuptools>=77,<81", "wheel>=0.45,<1"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
 
 [project]
 name = "thereabouts"
 version = "0.1.0"
-description = "Offline H3 city, state and country lookup"
-readme = "README.md"
+description = "Offline geographic context from a shared Rust core"
+readme = "src/thereabouts/README.md"
+# A decision note is not a granted code licence.
+license-files = []
 requires-python = ">=3.11"
-dependencies = ["numpy>=2.0,<2.4", "h3>=4.3,<5"]
+dependencies = ["numpy>=2.0,<2.4"]
 
 [project.optional-dependencies]
 mcp = ["mcp==2.2.0"]
@@ -29,9 +31,8 @@ dev = [
     "types-PyYAML",
     "types-psutil>=7,<8",
     "mcp==2.2.0",
-    "Cython==3.3.0",
-    "setuptools>=77,<81",
-    "types-setuptools",
+    "maturin>=1.9,<2",
+    "platformdirs>=4,<5",
     "pytest>=8,<10",
     "ruff>=0.11,<1",
     "mypy>=1.15,<2",
@@ -40,6 +41,7 @@ dev = [
     "types-regex>=2026.9.10.20260911",
 ]
 acquire = [
+    "h3>=4.3,<5",
     "pyarrow>=19,<24",
     "duckdb>=1.2,<2",
     "shapely>=2.1,<3",
@@ -48,28 +50,12 @@ acquire = [
     "gcsfs>=2026.10.0",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-thereabouts = ["py.typed", "reading/*.pyi"]
-
-[tool.setuptools.exclude-package-data]
-"*" = ["*.pyx", "*.c"]
-
-[tool.cibuildwheel]
-build = ["cp311-*", "cp312-*", "cp313-*", "cp314-*"]
-skip = ["*-musllinux_*"]
-test-command = "python {project}/tests/wheel_smoke.py {project}/tests/fixtures/serving cython"
-
-[tool.cibuildwheel.linux]
-archs = ["auto64"]
-
-[tool.cibuildwheel.macos]
-archs = ["auto"]
-
-[tool.cibuildwheel.windows]
-archs = ["AMD64"]
+[tool.maturin]
+python-source = "src"
+module-name = "thereabouts._core"
+manifest-path = "core/thereabouts-py/Cargo.toml"
+features = ["pyo3/extension-module", "writer"]
+include = ["src/thereabouts/py.typed", "src/thereabouts/_core.pyi"]
 
 [tool.pytest.ini_options]
 addopts = "--basetemp=.cache/pytest"
@@ -87,13 +73,30 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "pipeline", "benchmarks", "tests", "examples", "setup.py"]
+files = ["src", "pipeline", "benchmarks", "tests", "examples", "tools"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]
 module = ["scipy.spatial", "shapefile", "h3.*"]
 ignore_missing_imports = true
 
+[tool.uv]
+# Rust edits must invalidate uv's editable-wheel cache as well as Python metadata.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "core/Cargo.toml" },
+    { file = "core/Cargo.lock" },
+    { file = "core/thereabouts-core/Cargo.toml" },
+    { file = "core/thereabouts-py/Cargo.toml" },
+    { file = "core/thereabouts-cli/Cargo.toml" },
+    { file = "core/thereabouts-cli/src/**/*.rs" },
+    { file = "core/thereabouts-cli-core/Cargo.toml" },
+    { file = "core/thereabouts-cli-core/src/**/*" },
+    { file = "core/thereabouts-writer/Cargo.toml" },
+    { file = "core/thereabouts-writer/src/**/*.rs" },
+    { file = "core/thereabouts-core/src/**/*.rs" },
+    { file = "core/thereabouts-py/src/**/*.rs" },
+]
 # fsspec backends are narrowed to the storage Protocol at their boundary.
 [[tool.mypy.overrides]]
 module = ["fsspec.*"]

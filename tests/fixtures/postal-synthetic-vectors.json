@@ -1,0 +1,333 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/postal-synthetic",
+  "cases": [
+    {
+      "id": "legacy-26",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "00100"
+        ],
+        "country": "AA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": "Fixture/One",
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-27",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "AMB"
+        ],
+        "country": "AA"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": {
+              "code": "AA.A",
+              "name": "München 東京 state:synthetic:A"
+            },
+            "city": {
+              "id": "city:synthetic:A",
+              "name": "München 東京",
+              "name_en": null,
+              "kind": "city",
+              "population": null,
+              "point": {
+                "lat": 12.97,
+                "lon": 77.59
+              }
+            },
+            "timezone": "Fixture/One",
+            "point": {
+              "lat": 12.576453,
+              "lon": 77.155595
+            },
+            "cell": "8860140001fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": {
+              "code": "AA.A",
+              "name": "München 東京 state:synthetic:A"
+            },
+            "city": {
+              "id": "city:synthetic:unused",
+              "name": "München 東京 city:synthetic:unused",
+              "name_en": null,
+              "kind": "city",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 12.94179,
+              "lon": 77.366825
+            },
+            "cell": "8860144001fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "legacy-28",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "560001"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:unused",
+          "name": "München 東京 city:synthetic:unused",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.94179,
+          "lon": 77.366825
+        },
+        "cell": "8860144001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-29",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "VOID"
+        ],
+        "country": "AA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-30",
+      "request": {
+        "kind": "postal",
+        "values": [
+          " a1a 1a1 "
+        ],
+        "country": "ca"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": "Fixture/One",
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-31",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "missing"
+        ],
+        "country": "AA"
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-50",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "00100"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    },
+    {
+      "id": "legacy-51",
+      "request": {
+        "kind": "postal",
+        "values": [
+          100
+        ],
+        "country": "AA"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    }
+  ]
+}

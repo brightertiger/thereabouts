@@ -1,0 +1,26 @@
+[package]
+name = "thereabouts-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+thereabouts-cli-core = { path = "../thereabouts-cli-core" }
+clap = { version = "4", features = ["derive"] }
+ureq = { version = "3", default-features = false, features = ["rustls"] }
+thereabouts-core = { path = "../thereabouts-core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+fs2 = "0.4"
+terminal_size = "0.4"
+sysinfo = { version = "0.37.2", default-features = false, features = ["system"] }
+sha2 = "0.10"
+
+tempfile = "3"
+
+[dev-dependencies]
+csv = "1"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }

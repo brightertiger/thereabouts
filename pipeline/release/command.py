@@ -14,8 +14,8 @@ from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.runner import exclusive
 from pipeline.stages.dataset import DatasetStage
 
-from . import client, registry
 from . import pins as release_pins
+from . import prepared, registry
 from .assemble import assemble
 from .publish import inventory, publish
 from .source import external
@@ -97,22 +97,7 @@ def main(argv: Sequence[str]) -> int:
             "bytes": sum(path.stat().st_size for path in paths),
         }
     elif args.command == "packs":
-        writer = client.binding()
-        paths = [
-            path
-            for family in config.release.packs.families
-            for path in client.write(
-                dataset,
-                family,
-                located(root, config.paths.packs) / args.version / family,
-                args.version,
-                writer,
-            )
-        ]
-        result = {
-            "files": len(paths),
-            "bytes": sum(path.stat().st_size for path in paths),
-        }
+        result = prepared.packs(config, root)
     else:
         destination = config.storage.get("s3_release")
         if not destination:

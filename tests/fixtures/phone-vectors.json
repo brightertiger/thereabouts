@@ -1,0 +1,805 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/phone-sample",
+  "cases": [
+    {
+      "id": "phone-sample-000",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+32105551234"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-001",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+32115551234"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-002",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+32125551234"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-003",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+352225551234"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-004",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+352235551234"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-005",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+3522405551234"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-006",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+31105551234"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-007",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+311115551234"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-008",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+311135551234"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-009",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+902125551234"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-010",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+902165551234"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-011",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+902225551234"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-012",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+91115551234"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-013",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+911205551234"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-014",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+911215551234"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-015",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+335551234"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-016",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+15551234"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-017",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+91 (22) 1234-5678"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-018",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+91 (22) 2345-6789"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-019",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+352"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-020",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+1"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-021",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+999123"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-022",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "12025551234"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-023",
+      "request": {
+        "kind": "phone",
+        "values": [
+          ""
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-024",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+0123"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-025",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "++33123456789"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-026",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+１２３"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-027",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+1234567890123456"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-028",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+1 x123"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    },
+    {
+      "id": "phone-sample-029",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+33\u0000"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    }
+  ]
+}

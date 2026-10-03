@@ -1,0 +1,459 @@
+{
+  "machine": "Apple M2, 8 GB",
+  "source_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+  "countries": [
+    "MY",
+    "SG"
+  ],
+  "blocks": [
+    "836505fffffffff",
+    "836500fffffffff",
+    "836526fffffffff"
+  ],
+  "rss_method": "100 ms samples of child process tree; not an allocator bound",
+  "prepare": {
+    "seconds": 14.60735808397294,
+    "sampled_peak_rss_bytes": 439451648
+  },
+  "packs": {
+    "seconds": 3.597605666000163,
+    "sampled_peak_rss_bytes": 319012864
+  },
+  "install": {
+    "seconds": 1.3231697080191225,
+    "sampled_peak_rss_bytes": 72286208
+  },
+  "lookups": [
+    {
+      "argv": [
+        "reverse",
+        "--lat",
+        "3.139",
+        "--lon",
+        "101.6869"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "8865050931fffff",
+        "city": {
+          "id": "city:geonames:1735161",
+          "kind": "city",
+          "name": "Kuala Lumpur",
+          "name_en": "Kuala Lumpur",
+          "point": {
+            "lat": 3.1412,
+            "lon": 101.68653
+          },
+          "population": 1453975
+        },
+        "country": {
+          "code": "MY",
+          "code3": "MYS",
+          "name": "Malaysia"
+        },
+        "distance_band": null,
+        "kind": "cell",
+        "match": "contained",
+        "point": {
+          "lat": 3.138761136952729,
+          "lon": 101.68708759962307
+        },
+        "rank_basis": null,
+        "state": {
+          "code": "MY-14",
+          "name": "Wilayah Persekutuan Kuala Lumpur"
+        },
+        "status": "matched",
+        "timezone": "Asia/Kuala_Lumpur"
+      },
+      "seconds": 0.1145835839852225,
+      "sampled_peak_rss_bytes": 327680
+    },
+    {
+      "argv": [
+        "reverse",
+        "--lat",
+        "1.3521",
+        "--lon",
+        "103.8198"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "88652636d9fffff",
+        "city": {
+          "id": "city:country:SG",
+          "kind": "city",
+          "name": "Singapore",
+          "name_en": "Singapore",
+          "point": {
+            "lat": 1.303352,
+            "lon": 103.86084
+          },
+          "population": 4839400
+        },
+        "country": {
+          "code": "SG",
+          "code3": "SGP",
+          "name": "Singapore"
+        },
+        "distance_band": null,
+        "kind": "cell",
+        "match": "contained",
+        "point": {
+          "lat": 1.3527786420358883,
+          "lon": 103.82139659276208
+        },
+        "rank_basis": null,
+        "state": null,
+        "status": "matched",
+        "timezone": "Asia/Singapore"
+      },
+      "seconds": 0.11305245800758712,
+      "sampled_peak_rss_bytes": 327680
+    },
+    {
+      "argv": [
+        "geocode",
+        "Kuala Lumpur",
+        "--country",
+        "MY"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "8865050931fffff",
+        "city": {
+          "id": "city:geonames:1735161",
+          "kind": "city",
+          "name": "Kuala Lumpur",
+          "name_en": "Kuala Lumpur",
+          "point": {
+            "lat": 3.1412,
+            "lon": 101.68653
+          },
+          "population": 1453975
+        },
+        "country": {
+          "code": "MY",
+          "code3": "MYS",
+          "name": "Malaysia"
+        },
+        "distance_band": null,
+        "kind": "city",
+        "match": "exact",
+        "point": {
+          "lat": 3.1412,
+          "lon": 101.68653
+        },
+        "rank_basis": "population",
+        "state": {
+          "code": "MY-14",
+          "name": "Wilayah Persekutuan Kuala Lumpur"
+        },
+        "status": "matched",
+        "timezone": "Asia/Kuala_Lumpur"
+      },
+      "seconds": 0.11279275000561029,
+      "sampled_peak_rss_bytes": 311296
+    },
+    {
+      "argv": [
+        "postal",
+        "50000",
+        "--country",
+        "MY"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "8865050935fffff",
+        "city": {
+          "id": "city:geonames:1735161",
+          "kind": "city",
+          "name": "Kuala Lumpur",
+          "name_en": "Kuala Lumpur",
+          "point": {
+            "lat": 3.1412,
+            "lon": 101.68653
+          },
+          "population": 1453975
+        },
+        "country": {
+          "code": "MY",
+          "code3": "MYS",
+          "name": "Malaysia"
+        },
+        "distance_band": null,
+        "kind": "postal",
+        "match": "exact",
+        "point": {
+          "lat": 3.1433,
+          "lon": 101.6955
+        },
+        "rank_basis": null,
+        "state": {
+          "code": "MY-14",
+          "name": "Wilayah Persekutuan Kuala Lumpur"
+        },
+        "status": "matched",
+        "timezone": "Asia/Kuala_Lumpur"
+      },
+      "seconds": 0.11343129197484814,
+      "sampled_peak_rss_bytes": 327680
+    },
+    {
+      "argv": [
+        "airport",
+        "SIN"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "886526ad53fffff",
+        "city": {
+          "id": "city:country:SG",
+          "kind": "city",
+          "name": "Singapore",
+          "name_en": "Singapore",
+          "point": {
+            "lat": 1.303352,
+            "lon": 103.86084
+          },
+          "population": 4839400
+        },
+        "country": {
+          "code": "SG",
+          "code3": "SGP",
+          "name": "Singapore"
+        },
+        "distance_band": null,
+        "kind": "airport",
+        "match": "exact",
+        "point": {
+          "lat": 1.35019,
+          "lon": 103.994003
+        },
+        "rank_basis": null,
+        "state": null,
+        "status": "matched",
+        "timezone": null
+      },
+      "seconds": 0.11280174998682924,
+      "sampled_peak_rss_bytes": 311296
+    },
+    {
+      "argv": [
+        "locode",
+        "SGCHG"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "886526ac25fffff",
+        "city": {
+          "id": "city:country:SG",
+          "kind": "city",
+          "name": "Singapore",
+          "name_en": "Singapore",
+          "point": {
+            "lat": 1.303352,
+            "lon": 103.86084
+          },
+          "population": 4839400
+        },
+        "country": {
+          "code": "SG",
+          "code3": "SGP",
+          "name": "Singapore"
+        },
+        "distance_band": null,
+        "kind": "trade_location",
+        "match": "exact",
+        "point": {
+          "lat": 1.35,
+          "lon": 103.983333
+        },
+        "rank_basis": null,
+        "state": null,
+        "status": "matched",
+        "timezone": null
+      },
+      "seconds": 0.11265337499207817,
+      "sampled_peak_rss_bytes": 327680
+    },
+    {
+      "argv": [
+        "phone",
+        "+60321234567"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": null,
+        "city": null,
+        "country": {
+          "code": "MY",
+          "code3": "MYS",
+          "name": "Malaysia"
+        },
+        "distance_band": null,
+        "kind": "phone_prefix",
+        "match": "exact",
+        "point": null,
+        "rank_basis": null,
+        "state": null,
+        "status": "matched",
+        "timezone": null
+      },
+      "seconds": 0.11275200001546182,
+      "sampled_peak_rss_bytes": 311296
+    },
+    {
+      "argv": [
+        "ip",
+        "1.9.0.1"
+      ],
+      "result": {
+        "candidates": [],
+        "cell": "8865054613fffff",
+        "city": {
+          "id": "city:geonames:1735161",
+          "kind": "city",
+          "name": "Kuala Lumpur",
+          "name_en": "Kuala Lumpur",
+          "point": {
+            "lat": 3.1412,
+            "lon": 101.68653
+          },
+          "population": 1453975
+        },
+        "country": {
+          "code": "MY",
+          "code3": "MYS",
+          "name": "Malaysia"
+        },
+        "distance_band": null,
+        "kind": "ip_range",
+        "match": "exact",
+        "point": {
+          "lat": 3.16544,
+          "lon": 101.704
+        },
+        "rank_basis": null,
+        "state": {
+          "code": "MY-14",
+          "name": "Wilayah Persekutuan Kuala Lumpur"
+        },
+        "status": "matched",
+        "timezone": "Asia/Kuala_Lumpur"
+      },
+      "seconds": 0.11267916701035574,
+      "sampled_peak_rss_bytes": 311296
+    }
+  ],
+  "dataset": {
+    "bytes": 8802046,
+    "tables": {
+      "airports": {
+        "bytes": 14291,
+        "files": 1,
+        "rows": 25
+      },
+      "canonical_cities": {
+        "bytes": 34789,
+        "files": 2,
+        "rows": 408
+      },
+      "cells": {
+        "bytes": 173850,
+        "files": 1,
+        "rows": 22404
+      },
+      "countries": {
+        "bytes": 18584,
+        "files": 1,
+        "rows": 2
+      },
+      "ip_ranges": {
+        "bytes": 1493691,
+        "files": 1,
+        "rows": 36547
+      },
+      "phone_metadata": {
+        "bytes": 26146,
+        "files": 1,
+        "rows": 2
+      },
+      "phone_prefixes": {
+        "bytes": 2063,
+        "files": 1,
+        "rows": 0
+      },
+      "place_to_city": {
+        "bytes": 417842,
+        "files": 2,
+        "rows": 28063
+      },
+      "places": {
+        "bytes": 3919626,
+        "files": 2,
+        "rows": 28063
+      },
+      "postal_codes": {
+        "bytes": 1161474,
+        "files": 1,
+        "rows": 64317
+      },
+      "subdivisions": {
+        "bytes": 10370,
+        "files": 1,
+        "rows": 37
+      },
+      "timezone_cells": {
+        "bytes": 21689,
+        "files": 1,
+        "rows": 1473
+      },
+      "trade_locations": {
+        "bytes": 24994,
+        "files": 1,
+        "rows": 202
+      },
+      "zone_tables": {
+        "bytes": 7964,
+        "files": 1,
+        "rows": 5
+      }
+    },
+    "manifest_sha256": "c43983107777db804a92f3065ddb3c31f079fb2b3493ee387f2c9d3544a099cc"
+  },
+  "families": {
+    "core": {
+      "bytes": 13136114,
+      "archive_bytes": 13148160,
+      "manifest_sha256": "e58d84349ea47aa7f9785a30b61cab19a93e13a2d0f0ee22bc54323c92fce59b"
+    },
+    "postal": {
+      "bytes": 3045540,
+      "archive_bytes": 3061760,
+      "manifest_sha256": "6f8f418ca1bc3a7a509c2e120f487fbf042801648f761f93094e948ba7c4a6d1"
+    },
+    "airports": {
+      "bytes": 2812952,
+      "archive_bytes": 2826240,
+      "manifest_sha256": "82c36f1b9e6a284838ff40aeb9d28bafde42c38b93bae5911b1f86db5308c97b"
+    },
+    "locode": {
+      "bytes": 2817278,
+      "archive_bytes": 2836480,
+      "manifest_sha256": "1b9cf768e6f1633385d64e86f9a73d366f84f8377e5854e141f56922a5a78f23"
+    },
+    "phone": {
+      "bytes": 2810546,
+      "archive_bytes": 2826240,
+      "manifest_sha256": "b5ab7e9121eb2d147c5ef616e146c70592831ca965fb140aaca338d1e78908c5"
+    },
+    "ip": {
+      "bytes": 3037725,
+      "archive_bytes": 3051520,
+      "manifest_sha256": "80836ae06efbdebe58c0c9bb97153a23f644ef20a5b8be3807245ae4b452ea3f"
+    }
+  },
+  "plates": "Unavailable: golden has no plate tables; normalized/plates_country is absent.",
+  "output_bytes": 91926416
+}

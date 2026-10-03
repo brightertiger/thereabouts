@@ -1,0 +1,119 @@
+//! Golden side tables retain nullable source fields without type coercion.
+use crate::{Result, error::ensure};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+/// Metadata tables preserve source rows and timezone overlaps without precedence.
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct Metadata {
+    /// Golden country rows, preserving original nullable source fields.
+    pub countries: Vec<Value>,
+    /// Golden subdivision rows, indexed by their published code.
+    pub subdivisions: Vec<Value>,
+    /// IANA rows used to narrow overlap by comma-separated country codes.
+    pub zone_tables: Vec<Value>,
+    /// Sorted unique zone-name sets; entry zero is the empty set.
+    pub timezone_sets: Vec<Vec<String>>,
+}
+impl Metadata {
+    /// Country membership narrows overlap without creating a geographic ambiguity.
+    pub(crate) fn narrow_timezones(
+        &self,
+        index: &super::metadata_index::MetadataIndex,
+        reference: u32,
+        country: Option<&str>,
+    ) -> Result<Vec<String>> {
+        let zones = self
+            .timezone_sets
+            .get(reference as usize)
+            .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
+        let narrowed: Vec<_> = zones
+            .iter()
+            .filter(|zone| {
+                country.is_none_or(|country| {
+                    index
+                        .zone_countries
+                        .get(zone.as_str())
+                        .is_some_and(|countries| countries.contains(country))
+                })
+            })
+            .cloned()
+            .collect();
+        Ok(if narrowed.is_empty() {
+            zones.clone()
+        } else {
+            narrowed
+        })
+    }
+    /// Validate fields used by lookup and preserve unknown source metadata.
+    pub fn validate(&self) -> Result<()> {
+        ensure(
+            self.timezone_sets.first() == Some(&vec![]),
+            "Missing null timezone set",
+        )?;
+        for (index, names) in self.timezone_sets.iter().enumerate() {
+            ensure(
+                (index == 0 || !names.is_empty())
+                    && names.iter().zip(names.iter().skip(1)).all(|(a, b)| a < b)
+                    && names.iter().all(|n| !n.is_empty()),
+                "Invalid timezone set",
+            )?;
+        }
+        for (rows, key, fields) in [
+            (
+                &self.countries,
+                "country_code",
+                "country_code alpha3 numeric name calling_code currency languages tld continent m49 region_code region_name subregion_code subregion_name intermediate_region_code intermediate_region_name",
+            ),
+            (
+                &self.subdivisions,
+                "code",
+                "code code_system country_code name type parent_code geoname_id name_ascii",
+            ),
+            (
+                &self.zone_tables,
+                "tzid",
+                "table tzid country_codes comments coordinates_raw h3",
+            ),
+        ] {
+            for row in rows {
+                ensure(
+                    row.is_object() && row[key].as_str().is_some_and(|s| !s.is_empty()),
+                    "Missing metadata row identity",
+                )?;
+                for field in fields.split_whitespace().chain("source source_id source_release license provenance country_id place_id link_status link_method".split_whitespace()) {
+                    ensure(row[field].is_null() || row[field].is_string(), "Invalid metadata string")?;
+                }
+            }
+        }
+        Ok(())
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn missing_country_membership_retains_a_single_published_zone() {
+        let metadata = Metadata {
+            timezone_sets: vec![vec![], vec!["Area/One".into()]],
+            ..Metadata::default()
+        };
+        let index = super::super::metadata_index::MetadataIndex::build(&metadata).unwrap();
+        assert_eq!(
+            metadata.narrow_timezones(&index, 1, Some("XK")).unwrap(),
+            vec!["Area/One"]
+        );
+    }
+    #[test]
+    fn invalid_metadata_never_silently_loses_a_country_code() {
+        let mut metadata = Metadata {
+            timezone_sets: vec![vec![]],
+            ..Metadata::default()
+        };
+        assert!(metadata.validate().is_ok());
+        metadata
+            .countries
+            .push(serde_json::json!({"country_code":7}));
+        assert!(metadata.validate().is_err());
+    }
+}

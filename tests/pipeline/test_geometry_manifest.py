@@ -6,9 +6,9 @@ import pytest
 
 from pipeline.config.schema import H3
 from pipeline.geometry.errors import DamagedPackError
+from pipeline.geometry.format import CITY_CUTOFF_KM
 from pipeline.geometry.manifest import SCHEMA, read_manifest
 from pipeline.runtime.jsonio import write_json
-from thereabouts.format import CITY_CUTOFF_KM
 
 
 def test_manifest_requires_configured_finest_resolution(tmp_path: Path) -> None:

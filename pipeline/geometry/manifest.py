@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Any
 
 from pipeline.config.schema import H3
-from thereabouts.format import CITY_CUTOFF_KM
 
 from .errors import DamagedPackError, UnsupportedSchemaError
+from .format import CITY_CUTOFF_KM
 
 SCHEMA = "h3-table-v1"
 

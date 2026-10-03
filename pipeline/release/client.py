@@ -40,6 +40,8 @@ def write(
             "dataset_manifest_sha256": sha256_file(dataset / "manifest.json")
         },
     }
+    if family != "core":
+        options["core_pack"] = str(output.parent / "core")
     value: Row = writer(str(dataset), family, str(output), options)
     paths = []
     for record in value["files"]:

@@ -1,6 +1,0 @@
-Natural Earth 5.1.1: public domain. https://www.naturalearthdata.com/about/terms-of-use/
-Made with Natural Earth.
-GeoNames, 2026-10-01: CC BY 4.0. https://www.geonames.org/
-https://creativecommons.org/licenses/by/4.0/
-Derived data: selected fields, geometry repair/clipping, optional regional settlement selection.
-Source data is provided without warranty. No endorsement by source authors.

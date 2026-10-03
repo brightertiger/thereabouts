@@ -1,0 +1,37 @@
+//! Version 2 wire definitions. Both reader and writer use these codecs.
+pub mod address;
+pub mod catalogue;
+pub mod container;
+pub mod manifest;
+pub mod pack;
+pub mod spatial;
+pub use pack::Pack;
+pub mod metadata;
+pub mod verify;
+
+mod cache;
+mod metadata_index;
+
+#[cfg(not(target_arch = "wasm32"))]
+mod positioned;
+pub mod reader;
+
+pub mod exact;
+pub mod observation;
+
+pub mod trie;
+
+pub mod intervals;
+
+pub mod plates;
+
+pub mod columns;
+pub mod compact;
+mod fst;
+pub(crate) mod name_search;
+pub mod names;
+pub mod table;
+
+pub(crate) mod plate_columns;
+
+mod string_block;

@@ -1,0 +1,24 @@
+[package]
+name = "thereabouts-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+h3o = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+sha2 = "0.10"
+regex = "1"
+unicode-normalization = "0.1"
+unicode-casefold = "0.2"
+fst = "0.4"
+lz4_flex = { version = "0.13", default-features = false, features = ["std", "safe-encode", "safe-decode"] }
+
+[dev-dependencies]
+proptest = "1"
+tempfile = "3"

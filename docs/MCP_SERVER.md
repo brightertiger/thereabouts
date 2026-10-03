@@ -1,5 +1,10 @@
 # Local MCP lookup server
 
+> Historical format-1 MCP documentation. Current commands, data store and
+> MCP are documented in [CLI.md](CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> `python -m thereabouts.commandline.application` in place of `thereabouts`.
+
 `thereabouts mcp` serves read-only place lookups over standard input/output. It
 uses the same Python reader, selected installed packs, methods and result
 semantics as the CLI. It does not install data or expose arbitrary filesystem

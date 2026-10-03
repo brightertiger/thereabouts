@@ -30,7 +30,11 @@ def workspace_bytes(root: Path) -> int:
             path = Path(directory) / name
             if path.is_symlink():
                 continue
-            stat = path.stat()
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                # Installers and workers can retire staging files during the walk.
+                continue
             key = stat.st_dev, stat.st_ino
             if key not in inodes:
                 inodes.add(key)

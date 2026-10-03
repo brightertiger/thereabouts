@@ -9,10 +9,12 @@ import numpy as np
 from numpy.typing import NDArray
 
 from pipeline.config.schema import H3
-from thereabouts.format import (
+from thereabouts.format import BLOCK_RESOLUTION
+
+from .errors import DamagedPackError
+from .format import (
     BITMAP_FLAG,
     BLOCK_COUNT,
-    BLOCK_RESOLUTION,
     BYTE_BITS,
     CHILD_RADIX,
     DIRECTORY_DTYPE,
@@ -22,8 +24,6 @@ from thereabouts.format import (
     level_offset,
     unpack_label,
 )
-
-from .errors import DamagedPackError
 from .hierarchy import addresses
 from .index import position, positions
 from .manifest import read_manifest
