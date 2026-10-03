@@ -129,9 +129,8 @@ Malformed NDJSON records retain their raw text in an input field.
 
 Input encoding is independent of --format, which selects output. Files ending
 in .ndjson or .jsonl (case-insensitive) use NDJSON; otherwise the first nonblank
-line beginning with { or [ selects NDJSON. A line without a comma and without
-explicit column flags also selects NDJSON, allowing a malformed first row to
-be reported. Other input uses CSV. Empty input emits no rows (or
+line beginning with { or [ selects NDJSON. Other input uses comma-separated CSV. Single-column and semicolon-separated
+input produces a usage error explaining CSV headers and NDJSON objects. Empty input emits no rows (or
 {"results": []} with --json).
 
 NDJSON-to-CSV/table needs the union of input keys before writing a header.
@@ -309,7 +308,9 @@ with Content-Range: bytes N-(total-1)/total. If supplied, Content-Length must
 equal the remaining advertised length. Ignored/mismatched ranges fail and
 retain the partial file for retry. No bytes are appended before these checks.
 Requests use Accept-Encoding: identity; encoded responses are rejected.
-Redirects and environment proxies are currently disabled. Connections and headers
+HTTPS requests follow at most five HTTPS-only redirects; downgrade to HTTP is
+rejected. HTTP sources (including loopback tests) do not follow redirects.
+HTTPS_PROXY/HTTP_PROXY/ALL_PROXY and NO_PROXY use ureq environment semantics. Connections and headers
 have 30-second deadlines; each transport read has a fresh 60-second stall limit.
 There is no total download timeout. Failures retain verified-offset partial bytes
 for the next explicit install to resume. Tests use only loopback HTTP and local directories.

@@ -208,7 +208,7 @@ fn tabular_ndjson_keeps_union_columns_and_initial_failures() {
     install(temp.path(), &["core"]);
     let mut host = Host::new(temp.path());
     host.input = Cursor::new(
-        b"bad\n{\"lat\":0,\"lon\":0,\"id\":7}\n{\"lat\":91,\"lon\":0,\"tag\":\"x\"}\n".to_vec(),
+        b"{bad}\n{\"lat\":0,\"lon\":0,\"id\":7}\n{\"lat\":91,\"lon\":0,\"tag\":\"x\"}\n".to_vec(),
     );
     assert_eq!(host.run(&["reverse", "-", "--csv"]), 5, "{}", host.err);
     let mut csv = csv::Reader::from_reader(host.out.as_bytes());
@@ -261,4 +261,30 @@ fn help_explains_globals_and_reverse_alternatives() {
     ] {
         assert!(host.out.contains(explanation), "{explanation}");
     }
+}
+
+#[test]
+fn one_column_input_is_usage_but_bad_ndjson_rows_continue() {
+    let temp = tempfile::tempdir().unwrap();
+    install(temp.path(), &["core"]);
+    let mut host = Host::new(temp.path());
+    for input in ["lat\n48\n", "lat;lon\n48;2\n"] {
+        host.input = Cursor::new(input.as_bytes().to_vec());
+        assert_eq!(host.run(&["reverse", "-"]), 2);
+        assert!(host.err.contains("comma-separated CSV"));
+    }
+    host.input = Cursor::new(b"{bad}\n{\"lat\":95,\"lon\":0}\n".to_vec());
+    assert_eq!(host.run(&["reverse", "-"]), 5);
+    let rows: Vec<serde_json::Value> = host
+        .out
+        .lines()
+        .map(|s| serde_json::from_str(s).unwrap())
+        .collect();
+    assert_eq!(rows.len(), 2);
+    assert!(
+        rows.last().unwrap()["thereabouts_hint"]
+            .as_str()
+            .unwrap()
+            .contains("[-90, 90]")
+    );
 }

@@ -1,5 +1,6 @@
 """Freeze shared reverse vectors; legacy postal/airport vectors remain unchanged."""
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -154,6 +155,22 @@ def real() -> None:
     print(f"Frozen {len(cases)} real reverse vectors")
 
 
+def refresh() -> None:
+    """Reproject frozen requests without rebuilding datasets or pack artifacts."""
+    for name in ("core-synthetic-vectors.json", "core-sample-vectors.json"):
+        path = FIXTURES / name
+        bundle = json.loads(path.read_text())
+        with Geocoder(FIXTURES / bundle["pack"]) as geo:
+            for case in bundle["cases"]:
+                case["result"] = resolve(geo, case["request"])
+        write_json(path, bundle)
+
+
 if __name__ == "__main__":
-    synthetic()
-    real()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--refresh-only", action="store_true")
+    if parser.parse_args().refresh_only:
+        refresh()
+    else:
+        synthetic()
+        real()

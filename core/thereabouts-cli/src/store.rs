@@ -224,7 +224,7 @@ pub fn lock(root: &Path) -> Result<File> {
         .read(true)
         .write(true)
         .open(path)?;
-    fs2::FileExt::try_lock_exclusive(&file)
+    file.try_lock()
         .map_err(|_| Error::Integrity("Another data operation holds the install lock".into()))?;
     Ok(file)
 }

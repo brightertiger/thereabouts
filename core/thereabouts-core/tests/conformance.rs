@@ -5,7 +5,7 @@
 )]
 use serde_json::Value;
 use std::{fs, path::PathBuf};
-use thereabouts_core::{format::Pack, result::LookupResult};
+use thereabouts_core::format::Pack;
 fn fixtures() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures")
 }
@@ -43,7 +43,7 @@ fn run(bundle: &str) {
         } else if let (Some(lat), Some(lon)) = (values[0].as_f64(), values[1].as_f64()) {
             pack.reverse(lat, lon, false).unwrap()
         } else {
-            LookupResult::empty(thereabouts_core::result::Status::InvalidInput)
+            pack.reverse(f64::NAN, 0.0, false).unwrap()
         };
         close(&serde_json::to_value(result).unwrap(), &case["result"]);
     }

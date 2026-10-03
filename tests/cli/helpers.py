@@ -17,9 +17,26 @@ CONSOLE = Path(sysconfig.get_path("scripts")) / (
 
 
 def console(
-    root: Path, *args: str, stdin: str = "", source: str | None = None
+    root: Path,
+    *args: str,
+    stdin: str = "",
+    source: str | None = None,
+    environ: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
+    for key in (
+        "ALL_PROXY",
+        "all_proxy",
+        "HTTP_PROXY",
+        "http_proxy",
+        "HTTPS_PROXY",
+        "https_proxy",
+        "no_proxy",
+    ):
+        env.pop(key, None)
+    env["NO_PROXY"] = "*"
+    if environ:
+        env.update(environ)
     if source is not None:
         env["THEREABOUTS_RELEASE_URL"] = source
     return subprocess.run(

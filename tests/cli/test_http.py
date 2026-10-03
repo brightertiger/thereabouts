@@ -33,6 +33,14 @@ def server(tmp_path: Path) -> Iterator[tuple[str, State]]:
         def log_message(self, format: str, *args: object) -> None:
             pass
 
+        def do_CONNECT(self) -> None:
+            # Terminate a synthetic tunnel locally; never forward or resolve its target.
+            state.requests.append("CONNECT " + self.path)
+            self.send_response(200)
+            self.end_headers()
+            self.close_connection = False
+            self.handle_one_request()
+
         def do_GET(self) -> None:
             state.requests.append(self.path)
             value = state.files.get(self.path)
@@ -174,3 +182,30 @@ def test_lookup_never_fetches_a_configured_release(
         "thereabouts data install core",
     ]
     assert not state.requests
+
+
+def test_https_proxy_environment_and_no_proxy_bypass(
+    tmp_path: Path, server: tuple[str, State]
+) -> None:
+    url, state = server
+    # The endpoint serves the tunneled request locally, without target DNS.
+    proxied = console(
+        tmp_path,
+        "data",
+        "list",
+        "--remote",
+        source="http://release.invalid",
+        environ={"HTTPS_PROXY": url, "NO_PROXY": ""},
+    )
+    assert proxied.returncode == 0, proxied.stderr
+    assert "CONNECT release.invalid:80" in state.requests
+    direct = console(
+        tmp_path,
+        "data",
+        "list",
+        "--remote",
+        source=url,
+        environ={"HTTPS_PROXY": "http://127.0.0.1:1", "NO_PROXY": "127.0.0.1"},
+    )
+    assert direct.returncode == 0, direct.stderr
+    assert state.requests[-1] == "/index.json"

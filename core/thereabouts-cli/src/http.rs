@@ -15,9 +15,9 @@ pub(crate) struct Http {
 }
 impl Http {
     pub fn new(base: &str) -> Result<Self> {
-        Self::with_stall(base, READ_STALL_TIMEOUT)
+        Self::with_stall(base, READ_STALL_TIMEOUT, ureq::Proxy::try_from_env())
     }
-    fn with_stall(base: &str, stall: Duration) -> Result<Self> {
+    fn with_stall(base: &str, stall: Duration, proxy: Option<ureq::Proxy>) -> Result<Self> {
         use ureq::unversioned::{
             resolver::DefaultResolver,
             transport::{Connector, DefaultConnector},
@@ -25,7 +25,7 @@ impl Http {
         let base = base.trim_end_matches('/');
         validate_url(base)?;
         let config = ureq::Agent::config_builder()
-            .proxy(None)
+            .proxy(proxy)
             .max_redirects(0)
             .timeout_connect(Some(CONNECT_TIMEOUT))
             .timeout_recv_response(Some(HEADER_TIMEOUT))
@@ -50,7 +50,14 @@ impl Http {
         }
     }
     fn get(&self, url: &str, offset: Option<u64>) -> Result<ureq::http::Response<ureq::Body>> {
-        let mut request = self.agent.get(url).header("Accept-Encoding", "identity");
+        let mut request = self
+            .agent
+            .get(url)
+            .config()
+            .https_only(url.starts_with("https://"))
+            .max_redirects(if url.starts_with("https://") { 5 } else { 0 })
+            .build()
+            .header("Accept-Encoding", "identity");
         if let Some(offset) = offset {
             request = request.header("Range", format!("bytes={offset}-"));
         }
@@ -137,50 +144,4 @@ impl Source for Http {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use std::{
-        io::{BufRead, BufReader, Write},
-        net::TcpListener,
-        thread,
-    };
-    #[test]
-    fn steady_transfer_outlives_a_stall_budget_and_a_stalled_body_fails() {
-        for stalled in [false, true] {
-            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-            let base = format!("http://{}", listener.local_addr().unwrap());
-            let server = thread::spawn(move || {
-                let (mut stream, _) = listener.accept().unwrap();
-                let mut reader = BufReader::new(stream.try_clone().unwrap());
-                loop {
-                    let mut line = String::new();
-                    reader.read_line(&mut line).unwrap();
-                    if line == "\r\n" {
-                        break;
-                    }
-                }
-                stream
-                    .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\n")
-                    .unwrap();
-                for _ in 0..8 {
-                    thread::sleep(Duration::from_millis(if stalled { 250 } else { 25 }));
-                    if stream.write_all(b"x").is_err() {
-                        break;
-                    }
-                }
-            });
-            let client = Http::with_stall(&base, Duration::from_millis(100)).unwrap();
-            let mut bytes = Vec::new();
-            let result = client
-                .open("pack.tar", 0, 8)
-                .unwrap()
-                .read_to_end(&mut bytes);
-            if stalled {
-                assert!(result.is_err());
-            } else {
-                assert_eq!(bytes, b"xxxxxxxx");
-            }
-            server.join().unwrap();
-        }
-    }
-}
+mod tests;

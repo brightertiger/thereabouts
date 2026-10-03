@@ -36,7 +36,11 @@ def test_every_verb_returns_the_public_json() -> None:
                 geo.postal("75001", country="FR").to_dict(),
             ),
             ("airport", {"code": "CDG"}, geo.airport("CDG").to_dict()),
-            ("locode", {"code": "BEANR"}, geo.locode("BEANR").to_dict()),
+            (
+                "locode",
+                {"code": "ANR", "country": "BE"},
+                geo.locode("ANR", country="BE").to_dict(),
+            ),
             ("phone", {"number": "+3225551234"}, geo.phone("+3225551234").to_dict()),
             ("ip", {"address": "8.8.8.8"}, geo.ip("8.8.8.8").to_dict()),
             ("plate", {"text": "AB-123-CD"}, geo.plate("AB-123-CD").to_dict()),

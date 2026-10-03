@@ -23,10 +23,10 @@ impl Pack {
             || !(-90.0..=90.0).contains(&lat)
             || !(-180.0..=180.0).contains(&lon)
         {
-            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
+            return Ok(invalid_coordinates());
         }
         let Ok(point) = LatLng::new(lat, lon) else {
-            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
+            return Ok(invalid_coordinates());
         };
         self.lookup(point.to_cell(Resolution::Eight), evidence)
     }
@@ -209,6 +209,11 @@ impl Pack {
         }
         Ok(answer)
     }
+}
+fn invalid_coordinates() -> LookupResult {
+    let mut result = LookupResult::empty(crate::result::Status::InvalidInput);
+    result.hint = Some("Use finite latitude in [-90, 90] and longitude in [-180, 180]".into());
+    result
 }
 #[cfg(test)]
 mod tests {

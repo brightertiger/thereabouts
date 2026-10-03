@@ -168,7 +168,6 @@ pub(crate) fn run(
         .extension()
         .is_some_and(|e| e.eq_ignore_ascii_case("ndjson") || e.eq_ignore_ascii_case("jsonl"))
         || first.trim_start().starts_with(['{', '['])
-        || (!first.is_empty() && !first.contains(',') && lat_col.is_none() && lon_col.is_none())
     {
         if lat_col.is_some() || lon_col.is_some() {
             return Err(Error::Usage("Column flags apply only to CSV input".into()));
@@ -192,6 +191,9 @@ pub(crate) fn run(
             .map_err(|e| Error::Usage(e.to_string()))?
             .clone();
         let unique: std::collections::BTreeSet<_> = headers.iter().collect();
+        if headers.len() < 2 {
+            return Err(Error::Usage("Expected comma-separated CSV with lat/lon columns, or NDJSON objects with lat/lon keys".into()));
+        }
         if unique.len() != headers.len()
             || headers
                 .iter()

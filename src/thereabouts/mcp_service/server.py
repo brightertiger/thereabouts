@@ -98,10 +98,12 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
             ).to_dict()
 
     @server.tool(annotations=READ_ONLY)
-    def locode(code: str, evidence: bool = False) -> dict[str, Any]:
+    def locode(
+        code: str, country: str | None = None, evidence: bool = False
+    ) -> dict[str, Any]:
         """Find a trade location by its five-character LOCODE."""
         with tool_errors():
-            return geo.locode(code, evidence=evidence).to_dict()
+            return geo.locode(code, country=country, evidence=evidence).to_dict()
 
     @server.tool(annotations=READ_ONLY)
     def ip(address: str, evidence: bool = False) -> dict[str, Any]:
