@@ -1,12 +1,16 @@
 # Golden v2 city normalization
 
+> Historical build record. These commands describe the old builders; use
+> [the current pipeline guide](../DATA_PIPELINE.md) for inspection and migration.
+> The protected workspace is not a target for rebuilding.
+
 **Status: world v2 verified complete and locally active.** The Thereabouts
 regeneration is content-identical to the original across all 14 logical tables;
 its regenerated base is identical across all 12 tables. `data/golden` now points
 to `data/golden-thereabouts`, and `data/base_cells/current.json` selects the new
 verified immutable base. Golden v1 and reconciliation remain intact.
 
-The [integration proof](RENAME_INTEGRATION.md) records every table, full digests,
+The [integration proof](rename-integration.md) records every table, full digests,
 unchanged upstream receipts, fresh world review and selective duplicate cleanup.
 The original development and once-only holdout receipts remain under
 `data/golden-v2/`, with their original identities and bytes. Neither was rescored
@@ -27,7 +31,7 @@ London 33, Jakarta five mainland administrative cities, and New York five pinned
 Delhi and New Delhi municipal polygons.
 
 The complete controller chain and clean-workspace commands are in
-[DATA_PIPELINE.md](DATA_PIPELINE.md#acquired-sources-to-normalized-golden-data).
+[DATA_PIPELINE.md](source-and-golden-pipeline.md#acquired-sources-to-normalized-golden-data).
 `build_data.golden` produces the base cells; `build_data.normalize_cells` expands
 those cells at resolution 8 and normalizes city assignments. The base dependency
 is verified and checkpointed under `data/base_cells/`, independently of the active
@@ -353,7 +357,7 @@ The world tables and all 277 stored-country censuses finished on **2026-10-02**;
 the controller recorded verified completion at **12:43:46 UTC**. Global integrity
 and mapping checks pass, with no unreviewed spatial gate failure. The two exact
 source-overlap exceptions are in
-[`city-normalization-world-review.json`](city-normalization-world-review.json),
+[`city-normalization-world-review.json`](../city-normalization-world-review.json),
 bound to the incomplete world manifest. See `data/work/v2-progress.md`.
 
 | Measure | V1 | World v2, radius off |

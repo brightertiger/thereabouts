@@ -1,0 +1,8 @@
+# Conservative starting profile; raise measured limits for the selected VM.
+paths:
+  root: /mnt/data
+resources:
+  duckdb_memory: 1GB
+  duckdb_threads: 1
+  workers: 1
+  rss_limit: 2000000000

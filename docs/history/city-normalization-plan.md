@@ -1,5 +1,9 @@
 # City normalization plan
 
+> Historical build record. These commands describe the old builders; use
+> [the current pipeline guide](../DATA_PIPELINE.md) for inspection and migration.
+> The protected workspace is not a target for rebuilding.
+
 V1 does not distinguish a settlement that names the countryside from a city that absorbs its neighbourhoods. All **6.69 million settlement entities have role `city`**. Small anchors therefore win inside large cities, while the benchmark sometimes asks for a suburb instead of its parent city. Parent roll-ups alone barely change this.
 
 Build **one city/town table, one place-to-city map, a small country-policy file, and a spatial cell rule**. Cities and towns own their footprints; smaller places cannot win inside them. Outside those footprints, keep standalone villages and other settlements. Start with the existing polygons and recover missing city footprints from retained wards; use GHSL to constrain inferred urban footprints.

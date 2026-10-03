@@ -4,8 +4,8 @@ The v1 world rebuild is complete. All outcome tables below use the final
 published stored cells at resolution-8 centres, as recorded in
 [quality.json](../data/golden/quality.json). They replace the earlier pilot and
 interim scalar measurements. The v0 failure classification is retained in
-[GOLDEN_V1.md](GOLDEN_V1.md#baseline-analysis-before-implementation-changes), and
-[GOLDEN_DATASET.md](GOLDEN_DATASET.md) defines the schema and reader contract.
+[GOLDEN_V1.md](history/base-cell-results.md#baseline-analysis-before-implementation-changes), and
+[GOLDEN_DATASET.md](history/golden-dataset.md) defines the schema and reader contract.
 Source acquisition is unchanged.
 
 ## Final city rule and limits
@@ -322,7 +322,7 @@ The sample gate passed before the world rebuild, and all 277 country replacement
 completed with predecessor partitions and extract/link intermediates retired.
 The world controller, golden manifest and golden run marker all report
 `completed: true`. Full completion/audit evidence is in
-[GOLDEN_V1.md](GOLDEN_V1.md#completed-rebuild-and-evidence).
+[GOLDEN_V1.md](history/base-cell-results.md#completed-rebuild-and-evidence).
 
 The final code validation recorded **237 passed, 7 existing skips** for
 `uv run --no-sync pytest`, with `ruff check`, `ruff format --check` (209 files)

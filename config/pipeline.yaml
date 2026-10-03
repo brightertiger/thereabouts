@@ -1,0 +1,55 @@
+# Byte budgets are decimal. Stage-specific source and engine settings follow later.
+paths:
+  root: data
+storage:
+  local: file://
+resources:
+  duckdb_memory: 1GB
+  duckdb_threads: 1
+  workers: 1
+  rss_limit: 2000000000
+  disk_floor: 5000000000
+  max_workspace: 60000000000
+  poll_seconds: 10
+  ledger_timeout_seconds: 30
+h3:
+  block_resolution: 3
+  cell_resolution: 8
+# Runtime-core inventory stages. Source and engine implementations replace these
+# declarations in the following work packages; rebuilding is explicitly refused.
+stages:
+  - name: download
+    packages: [pipeline/stages/retained.py]
+  - name: normalize
+    needs: [download]
+    packages: [pipeline/stages/retained.py]
+    native: [duckdb, shapely, h3]
+  - name: reconcile
+    needs: [normalize]
+    packages: [pipeline/stages/retained.py]
+    native: [duckdb, shapely, h3]
+  - name: cells
+    needs: [reconcile]
+    packages: [pipeline/stages/retained.py]
+    config: [h3]
+    native: [duckdb, shapely, h3]
+    cell_format: true
+  - name: cities
+    needs: [reconcile, normalize]
+    packages: [pipeline/stages/retained.py]
+    native: [duckdb, shapely, h3]
+  - name: evaluate
+    needs: [cells, cities]
+    packages: [pipeline/stages/retained.py]
+    config: [h3]
+    native: [duckdb, shapely, h3]
+  - name: normalize_cells
+    needs: [cells, cities, evaluate]
+    packages: [pipeline/stages/retained.py]
+    config: [h3]
+    native: [duckdb, shapely, h3]
+    cell_format: true
+  - name: lookups
+    needs: [normalize, normalize_cells]
+    packages: [pipeline/stages/retained.py]
+    native: [duckdb, h3]

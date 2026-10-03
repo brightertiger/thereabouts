@@ -1,16 +1,20 @@
 # Golden dataset (`golden-2` locally active)
 
+> Historical build record. These commands describe the old builders; use
+> [the current pipeline guide](../DATA_PIPELINE.md) for inspection and migration.
+> The protected workspace is not a target for rebuilding.
+
 Golden v2 was built beside v1, verified, and activated locally on 2026-10-02.
 `data/golden` points to `data/golden-v2`; the intact prior dataset is retained in
 `data/golden-v1`. Nothing was published remotely. The active dataset has
 66,226,680 compact rows representing 199,608,564 eligible resolution-8 centres,
 6,875,329 places and mappings, and 68,923 canonical cities/towns. The full
 before/after measurements, once-only holdout score (78/80), reproducible command
-chain, and known limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
+chain, and known limitations are in [GOLDEN_V2.md](city-normalization-results.md).
 
 All v1 measurements below are historical, from its final
-stored-cell [quality report](../data/golden-v1/quality.json). The v0 failure audit
-and rule-change evidence are in [GOLDEN_V1.md](GOLDEN_V1.md).
+stored-cell [quality report](../../data/golden-v1/quality.json). The v0 failure audit
+and rule-change evidence are in [GOLDEN_V1.md](base-cell-results.md).
 
 The golden stage consumes committed reconciliation country checkpoints and acquired
 lookup manifests. It writes only beneath the supplied data directory. The H3
@@ -22,7 +26,7 @@ name, boundary, or nearest-city overrides.
 ## Normalized schema and controller
 
 `build_data.rebuild_golden` runs or resumes the full source-to-dataset chain; see
-[DATA_PIPELINE.md](DATA_PIPELINE.md#acquired-sources-to-normalized-golden-data).
+[DATA_PIPELINE.md](source-and-golden-pipeline.md#acquired-sources-to-normalized-golden-data).
 The base `build_data.golden` stage below remains the country/state/land and rural
 cell input. `build_data.cities` publishes canonical cities and place mappings;
 `build_data.normalize_cells` applies them, recompacts, refreshes spatial lookups,
@@ -38,7 +42,7 @@ Cell `city_method` becomes `city_polygon`, `policy_polygon`, `urban_allocation`,
 `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null.
 Country/state/land fields and the resolution-8 reference semantics remain the base
 stage's output. Radius is disabled. Full column definitions, quality measures,
-source attribution and limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
+source attribution and limitations are in [GOLDEN_V2.md](city-normalization-results.md).
 
 The following sections document the base stage and its measured v1 snapshot.
 
@@ -86,7 +90,7 @@ configured with a 12 GB reserve; golden does not modify that setting. Temporary 
 A resource guard stops new units; `--watch` reports `waiting for disk` and retries
 after the polling interval. Other I/O failures remain visible failures. The stage
 never deletes another stage's data. Source
-raw custody is described in [DATA_PIPELINE.md](DATA_PIPELINE.md#raw-offload-and-restore).
+raw custody is described in [DATA_PIPELINE.md](source-and-golden-pipeline.md#raw-offload-and-restore).
 
 ## Layout and manifest
 
@@ -286,7 +290,7 @@ has none. The integrity gate requires unique canonical IDs and no dangling cell,
 parent or sovereign references. A catalogue country can exist without a selected
 spatial border, as EH does under this boundary perspective.
 
-The [dataset card](../data/golden/DATASET_CARD.md) records the final snapshot.
+The [dataset card](../../data/golden/DATASET_CARD.md) records the final snapshot.
 The licence summary remains a draft; original source licences and evidence remain
 attached and must be consulted when preparing a release.
 
@@ -545,7 +549,7 @@ rows and timezone hardlinks remain reusable.
 Before replacing golden files, the controller publishes `completed: false`.
 Completion requires both `work/golden/run.json` and `golden/manifest.json` to say
 `completed: true`, with the integrity checks above passing. Both markers are true for the final v1 publication;
-[GOLDEN_V1.md](GOLDEN_V1.md#completed-rebuild-and-evidence) records completion and
+[GOLDEN_V1.md](base-cell-results.md#completed-rebuild-and-evidence) records completion and
 audit evidence.
 
 

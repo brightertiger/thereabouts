@@ -18,6 +18,11 @@ thereabouts = "thereabouts.cli:main"
 
 [dependency-groups]
 dev = [
+    "omegaconf==2.3.0",
+    "fsspec>=2026.9,<2027",
+    "types-PyYAML",
+    "psutil>=7,<8",
+    "types-psutil>=7,<8",
     "mcp==2.2.0",
     "Cython==3.3.0",
     "setuptools>=77,<81",
@@ -77,7 +82,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "build_data", "benchmarks", "tests", "setup.py"]
+files = ["src", "build_data", "pipeline", "benchmarks", "tests", "setup.py"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]

@@ -1,10 +1,14 @@
 # Golden v1 final publication, 2026-10-02
 
+> Historical build record. These commands describe the old builders; use
+> [the current pipeline guide](../DATA_PIPELINE.md) for inspection and migration.
+> The protected workspace is not a target for rebuilding.
+
 The world rebuild is complete. This report uses the final published stored cells
-and [quality.json](../data/golden/quality.json), with v0 figures explicitly marked
+and [quality.json](../../data/golden/quality.json), with v0 figures explicitly marked
 for comparison. Schema and lookup semantics are in
-[GOLDEN_DATASET.md](GOLDEN_DATASET.md); source and city policy are in
-[RECONCILIATION.md](RECONCILIATION.md).
+[GOLDEN_DATASET.md](golden-dataset.md); source and city policy are in
+[RECONCILIATION.md](../RECONCILIATION.md).
 
 ## Final table rows and cell resolutions
 
@@ -452,7 +456,7 @@ removed their extract/link intermediates after verification. The filesystem
 audit is `data/work/v1/disk-retirement-audit.json`. Logs are
 `data/work/v1/reconcile-world.log`, `golden-world.log` and `controller.log`.
 The final stored-cell metrics come from
-[quality.json](../data/golden/quality.json); the manifest is the published table
+[quality.json](../../data/golden/quality.json); the manifest is the published table
 inventory. `join-audit-v1.json`, `place-integrity-v1.json` and
 `world-change-classes.json` under `data/work/v1/` provide the final audit evidence.
 The scalar reports and sample reports are historical build evidence only.

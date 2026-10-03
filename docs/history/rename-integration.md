@@ -1,5 +1,9 @@
 # Thereabouts integration and data neutrality
 
+> Historical build record. These commands describe the old builders; use
+> [the current pipeline guide](../DATA_PIPELINE.md) for inspection and migration.
+> The protected workspace is not a target for rebuilding.
+
 **Status: both full content comparisons passed; regenerated v2 is verified and
 locally active. Superseded duplicate payloads have been removed.**
 The live, resumable record is `data/work/integration-progress.md`; all comparison
@@ -86,7 +90,7 @@ previously examined boundary cells: London `88194e684dfffff` and
 `88195d368dfffff`, and secondary Dearborn geometry `882ab2cda1fffff`. Their source
 references and destinations are identical. A new review was bound to the actual
 regenerated manifest in
-[`city-normalization-thereabouts-review.json`](city-normalization-thereabouts-review.json).
+[`city-normalization-thereabouts-review.json`](../city-normalization-thereabouts-review.json).
 The original review and original manifest hashes remain unchanged.
 The resumed controller accepted this review and finished world verification at
 2026-10-02 19:28 UTC. All 14 output table row counts match the original v2.
@@ -96,7 +100,7 @@ The resumed controller accepted this review and finished world verification at
 Every digest below is identical before and after regeneration. Counts are also
 identical within each stage. A dash means the table is absent from that stage.
 Full per-table SHA-256 values and stage guards are in
-[`rename-content-comparison.json`](rename-content-comparison.json).
+[`rename-content-comparison.json`](../rename-content-comparison.json).
 
 | Logical table | Base rows | Normalized v2 rows | Base / v2 digest comparison |
 | --- | ---: | ---: | --- |
@@ -130,7 +134,7 @@ original immutable base and original normalized v2 remained intact beside it.
 
 These commands record the integration sequence while `data/golden` contained the
 base construction output. Current verification/resume commands for the active
-normalized publication are in [GOLDEN_V2.md](GOLDEN_V2.md#pipeline-and-reproduction).
+normalized publication are in [GOLDEN_V2.md](city-normalization-results.md#pipeline-and-reproduction).
 
 ```sh
 python -m build_data.rebuild_golden --data-dir data --workers 2 --through base
