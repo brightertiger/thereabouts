@@ -184,6 +184,24 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, codes, |code| pack.locode(code, country, false))
     }
+    #[pyo3(signature=(number, *, evidence=false))]
+    fn phone(&self, py: Python<'_>, number: &str, evidence: bool) -> PyResult<Py<PyAny>> {
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .phone(number, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    fn phone_columns<'py>(
+        &self,
+        py: Python<'py>,
+        numbers: Vec<String>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        columns::forward(py, numbers, |number| pack.phone(number, false))
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

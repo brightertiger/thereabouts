@@ -27,6 +27,8 @@ impl Pack {
                 self.place(city)?
                     .map(|p| format!("{}:{country}:{state}", p.field(0)))
                     .ok_or_else(|| Error::Corrupt("Missing canonical city".into()))?
+            } else if kind == Kind::PhonePrefix {
+                format!("{country}:{state}:{city}")
             } else {
                 format!(
                     "{}:{}",

@@ -14,7 +14,15 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     let manifest = manifest::read(root)?;
     manifest::verify(root, &manifest)?;
     ensure(
-        manifest.family == "core" || manifest.files.iter().any(|f| f.kind == "exact"),
+        manifest.family == "core"
+            || manifest.files.iter().any(|f| {
+                f.kind
+                    == if manifest.family == "phone" {
+                        "trie"
+                    } else {
+                        "exact"
+                    }
+            }),
         "Missing required exact index",
     )?;
     let mut metadata = None;
@@ -37,7 +45,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     "Catalogue exceeds u32 references",
                 )?;
             }
-            "cells" | "exact" | "notice" => {}
+            "cells" | "exact" | "trie" | "notice" => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
     }
@@ -69,6 +77,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                 }
             }
             "exact" => super::exact::Exact::open(&path)?.verify(total)?,
+            "trie" => super::trie::Trie::open(&path)?.verify(total)?,
             _ => {}
         }
     }

@@ -74,6 +74,29 @@
         468185.7921712485,
         472077.5900544596
       ]
+    },
+    "phone": {
+      "pack_bytes": 187284,
+      "sample_rows": 389,
+      "world_source_rows": 428217,
+      "estimated_world_bytes": 206165020,
+      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "vectors": 29,
+      "iterations": 20000,
+      "distinct_queries": 1,
+      "country": "US",
+      "scalar_median_us": 4.333,
+      "scalar_p99_us": 4.583,
+      "batch_points_per_second": 967617.097436548,
+      "batch_repeats": [
+        962361.6503356395,
+        961093.7253793905,
+        960784.0146737332,
+        972307.4683801031,
+        970485.1215547096,
+        967617.097436548,
+        969101.7880079647
+      ]
     }
   }
 }

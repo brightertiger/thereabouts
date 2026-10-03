@@ -95,3 +95,20 @@ class ForwardQueries:
         return self._handles.get("locode").locode_columns(
             [code if isinstance(code, str) else "" for code in codes], country=country
         )
+
+    def phone(self, number: str, *, evidence: bool = False) -> Result:
+        """Find the longest published prefix of an international E.164 number."""
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("phone").phone(
+                number if isinstance(number, str) else "",
+                evidence=evidence,
+            )
+        )
+
+    def phone_columns(self, numbers: Iterable[str]) -> dict[str, NDArray[Any]]:
+        """Return phone prefix columns and ambiguous country candidates."""
+        self._ensure_open()
+        return self._handles.get("phone").phone_columns(
+            [number if isinstance(number, str) else "" for number in numbers]
+        )

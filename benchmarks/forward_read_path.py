@@ -31,6 +31,8 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
     durations, rates = [], []
     verb = "airport" if family == "airports" else family
     kwargs: dict[str, Any] = {"country": country}
+    if family == "phone":
+        kwargs = {}
     if family == "airports":
         kwargs["scheme"] = "ident"
     with Geocoder(pack) as geo:
@@ -112,7 +114,7 @@ def update_status(data: dict[str, Any]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("family", choices=["postal", "airports", "locode"])
+    parser.add_argument("family", choices=["postal", "airports", "locode", "phone"])
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument(
         "--output", type=Path, default=ROOT / "docs/CLIENT_FORWARD_MEASUREMENTS.json"

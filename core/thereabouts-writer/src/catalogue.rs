@@ -39,11 +39,30 @@ pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
     }
     mappings.flush()?;
     let mut needed = Inserts::new(db, "INSERT OR IGNORE INTO needed", 1);
-    for table in data.tables(kind) {
+    let kinds = if kind == "phone_prefixes" {
+        vec![kind, "phone_metadata"]
+    } else {
+        vec![kind]
+    };
+    for table in kinds.iter().flat_map(|kind| data.tables(kind)) {
         data.scan(table, |row| {
-            for field in ["country_id", "state_id", "city_id"] {
+            for field in ["country_id", "state_id", "city_id", "place_id"] {
                 if let Some(id) = row.text(field)? {
                     needed.push([SqlValue::Text(id.into())])?;
+                }
+            }
+            if kind == "phone_prefixes" {
+                for id in row.texts("place_ids")? {
+                    needed.push([SqlValue::Text(id)])?;
+                }
+                let mut countries = row.texts("country_codes")?;
+                if let Some(code) = row.text("territory")? {
+                    countries.push(code.into());
+                }
+                for code in countries {
+                    if code != "001" {
+                        needed.push([SqlValue::Text(format!("country:{code}"))])?;
+                    }
                 }
             }
             Ok(())

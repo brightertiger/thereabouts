@@ -11,6 +11,7 @@ mod error;
 mod forward;
 mod inserts;
 mod locode;
+mod phone;
 mod postal;
 mod source;
 mod staging;
@@ -68,7 +69,7 @@ pub fn write_pack(
     output: &Path,
     options: &Options,
 ) -> Result<Manifest> {
-    if !matches!(family, "core" | "postal" | "airports" | "locode") {
+    if !matches!(family, "core" | "postal" | "airports" | "locode" | "phone") {
         return Err(Error::Input("Unsupported export family".into()));
     }
     ensure(
@@ -90,6 +91,9 @@ pub fn write_pack(
             ],
             &options.allow_missing_tables,
         )?;
+    }
+    if family == "phone" {
+        data.require_tables(&["phone_metadata"], &options.allow_missing_tables)?;
     }
     let mut identity =
         json!({"manifest_sha256":data.digest,"options":options,"writer":WRITER_REVISION});
@@ -162,6 +166,7 @@ fn build(
         "postal" => postal::load(data, &db)?,
         "airports" => airports::load(data, &db)?,
         "locode" => locode::load(data, &db)?,
+        "phone" => phone::load(data, &db)?,
         _ => return Err(Error::Input("Unsupported export family".into())),
     }
     db.execute_batch("COMMIT")?;
@@ -299,12 +304,14 @@ fn primary_table(family: &str) -> &str {
         "core" => "cells",
         "postal" => "postal_codes",
         "locode" => "trade_locations",
+        "phone" => "phone_prefixes",
         other => other,
     }
 }
 fn normalization(family: &str) -> &[&str] {
     match family {
         "postal" => &postal::NORMALIZATION,
+        "phone" => &["e164_plus", "strip_phone_presentation"],
         "airports" | "locode" => &airports::NORMALIZATION,
         _ => &[],
     }

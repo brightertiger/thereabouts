@@ -1,0 +1,240 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/phone-synthetic",
+  "cases": [
+    {
+      "id": "phone-synthetic-000",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+1"
+        ]
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "phone_prefix",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "phone_prefix",
+            "match": "exact",
+            "country": {
+              "code": "BB",
+              "code3": null,
+              "name": "München 東京 country:BB"
+            },
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "phone-synthetic-001",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+12025551234"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-synthetic-002",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+120999"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "BB",
+          "code3": null,
+          "name": "München 東京 country:BB"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-synthetic-003",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+129999"
+        ]
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "phone_prefix",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "phone_prefix",
+            "match": "exact",
+            "country": {
+              "code": "BB",
+              "code3": null,
+              "name": "München 東京 country:BB"
+            },
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "phone-synthetic-004",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "+44"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-synthetic-005",
+      "request": {
+        "kind": "phone",
+        "values": [
+          "123"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "phone_prefix",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(\"+91 22 1234 5678\") with an international calling code."
+      }
+    }
+  ]
+}

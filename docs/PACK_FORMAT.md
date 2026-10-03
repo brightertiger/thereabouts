@@ -456,3 +456,43 @@ references are published associations with canonical-city rollup, not a new
 reverse lookup. Identity is source plus source_id. Kind is trade_location and
 match is exact. Duplicate identities merge evidence; multiple identities are
 ambiguous. Column output has the shared dictionary and candidate-offset layout.
+
+## Phone family and decimal trie (kind 5)
+
+The phone family requires phone_prefixes, phone_metadata and the five geographic
+tables required by postal. The manifest normalization is exactly
+["e164_plus", "strip_phone_presentation"]. Input must have a leading plus;
+ASCII spaces, hyphens and parentheses after it are ignored. The remaining 1–15
+ASCII digits must begin with 1–9. National numbers, extensions and Unicode
+digits are invalid_input. This is prefix lookup, not subscriber validation.
+
+A trie shard has four sections: nodes (48-byte records), observations (44-byte
+shared records), string offsets (u64), UTF-8 string bytes. Each node contains
+ten little-endian u32 child references for digits 0–9, followed by u32 first
+observation and u32 observation count. Node zero is the root; child 0xFFFFFFFF
+means absent. Every child has a greater node index than its parent, has exactly
+one parent, and is reachable from the root. Depth is at most 15. The root has
+no observations. Nonempty observation ranges are contiguous, disjoint, cover
+the observation section exactly, and reference records for that node's prefix.
+The null and terminal string-offset rules are the same as the exact index.
+Empty input still emits an explicit root node.
+
+Queries follow digits from the root and retain the deepest terminal reached.
+Across shards only terminals at the maximum matched depth contribute records.
+No shorter calling-code result competes with a more specific prefix. The writer
+sorts prefixes and emits bounded shards; reader observations are range-read and
+share the pack's bounded LRU.
+
+Each phone_prefixes row is indexed at prefix. Each phone_metadata territory is
+a fallback at calling_code. Territory 001 is explicitly non-geographic and is
+excluded. Other country references must exist; an unlinked territory cannot
+silently acquire a guessed country. The source place_ids/place_id links determine
+state and canonical city; description is never parsed into geography. Each
+distinct linked country/state/city is a candidate; translations and metadata
+observations for the same geography merge into evidence. Kind is phone_prefix,
+match exact, source point null, and country is present on each matched candidate.
+Multiple countries at a shared calling code are ambiguous. Observation name is
+description, code is the digit prefix, scheme is prefix or calling_code; details
+retains language, description, calling_code, leading_digits, national_prefix,
+international_prefix, link_status and link_method when present. The metadata
+regex fields are provenance, not a second number parser.

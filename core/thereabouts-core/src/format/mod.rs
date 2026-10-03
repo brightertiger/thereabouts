@@ -16,3 +16,5 @@ mod positioned;
 
 pub mod exact;
 pub mod observation;
+
+pub mod trie;

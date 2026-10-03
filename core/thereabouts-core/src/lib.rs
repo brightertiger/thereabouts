@@ -13,3 +13,5 @@ pub mod airports;
 pub mod forward;
 pub mod locode;
 pub mod postal;
+
+pub mod phone;

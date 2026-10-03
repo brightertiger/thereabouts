@@ -46,6 +46,7 @@ pub struct Pack {
     catalogues: Vec<CatalogueSource>,
     pub(crate) place_count: usize,
     pub(crate) exacts: Vec<super::exact::Exact>,
+    pub(crate) tries: Vec<super::trie::Trie>,
     block_cache: Mutex<Cache<u32, Block>>,
     place_cache: Mutex<Cache<u32, Place>>,
     observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
@@ -60,6 +61,7 @@ impl Pack {
         };
         let mut metadata = None;
         let mut exacts = Vec::new();
+        let mut tries = Vec::new();
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
@@ -110,12 +112,17 @@ impl Pack {
                     }
                 }
                 "exact" => exacts.push(super::exact::Exact::open(&path)?),
+                "trie" => tries.push(super::trie::Trie::open(&path)?),
                 "notice" => {}
                 _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
             }
         }
         ensure(
-            manifest.family == "core" || !exacts.is_empty(),
+            match manifest.family.as_str() {
+                "core" => true,
+                "phone" => !tries.is_empty(),
+                _ => !exacts.is_empty(),
+            },
             "Missing required exact index",
         )?;
         let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
@@ -129,10 +136,67 @@ impl Pack {
             catalogues,
             place_count,
             exacts,
+            tries,
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
             observation_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
         })
+    }
+    pub(crate) fn prefix_observations(
+        &self,
+        key: &str,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        let mut longest = 0;
+        let mut selected = Vec::new();
+        for (i, shard) in self.tries.iter().enumerate() {
+            let (length, rows) = shard.lookup(key)?;
+            if length > longest {
+                longest = length;
+                selected.clear();
+            }
+            if length == longest {
+                selected.extend(rows.map(|row| (i, row)));
+            }
+        }
+        selected
+            .into_iter()
+            .map(|(i, row)| {
+                let shard = self
+                    .tries
+                    .get(i)
+                    .ok_or_else(|| Error::Corrupt("Missing trie".into()))?;
+                self.cached_observation((self.exacts.len() + i, row), || {
+                    shard.record(row, self.place_count)
+                })
+            })
+            .collect()
+    }
+    fn cached_observation(
+        &self,
+        key: (usize, usize),
+        read: impl FnOnce() -> Result<super::observation::Observation>,
+    ) -> Result<Arc<super::observation::Observation>> {
+        let cached = self
+            .observation_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .get(key);
+        if let Some(value) = cached {
+            return Ok(value);
+        }
+        let value = read()?;
+        let bytes = size_of::<super::observation::Observation>()
+            + value
+                .text
+                .iter()
+                .flatten()
+                .map(String::capacity)
+                .sum::<usize>();
+        Ok(self
+            .observation_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .insert(key, value, bytes))
     }
     pub(crate) fn observations(
         &self,
@@ -141,29 +205,8 @@ impl Pack {
         let mut records = Vec::new();
         for (i, shard) in self.exacts.iter().enumerate() {
             for row in shard.lookup(key)? {
-                let key = (i, row);
-                let cached = self
-                    .observation_cache
-                    .lock()
-                    .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
-                    .get(key);
-                if let Some(value) = cached {
-                    records.push(value);
-                    continue;
-                }
-                let value = shard.record(row, self.place_count)?;
-                let bytes = size_of::<super::observation::Observation>()
-                    + value
-                        .text
-                        .iter()
-                        .flatten()
-                        .map(String::capacity)
-                        .sum::<usize>();
                 records.push(
-                    self.observation_cache
-                        .lock()
-                        .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
-                        .insert(key, value, bytes),
+                    self.cached_observation((i, row), || shard.record(row, self.place_count))?,
                 );
             }
         }

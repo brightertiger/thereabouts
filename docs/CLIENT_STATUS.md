@@ -267,6 +267,7 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | postal | 363,327 / 897 | 28 | 7.459 / 10.375 | 474,755 | 2,039,842,937 |
 | airports | 375,778 / 213 | 33 | 7.417 / 9.334 | 469,223 | 151,994,262 |
 | locode | 349,522 / 225 | 31 | 7.750 / 15.710 | 469,668 | 180,528,890 |
+| phone | 187,284 / 389 | 29 | 4.333 / 4.583 | 967,617 | 206,165,020 |
 <!-- forward-measurements:end -->
 
 ## Airports
@@ -296,3 +297,23 @@ identity, names, coordinates and published canonical associations have an
 independent committed extract check. Shared real vectors run in Rust and Python.
 The sample includes the first 32 locations per requested country plus named
 airport-associated codes where available. Legacy conformance has no LOCODE cases.
+
+## Phone
+
+The phone pack uses a serialized decimal trie with longest-prefix lookup and
+phone/phone_columns methods. E.164 input requires a plus and an international
+calling code; presentation spaces, hyphens and parentheses are accepted.
+Calling-code metadata supplies country fallbacks. Shared codes remain ambiguous
+until a longer published prefix resolves them. Descriptions are retained as
+evidence, never guessed into a city. Twenty-nine real vectors and six synthetic
+vectors cover normalization, misses, invalid inputs, nested prefixes, a linked
+city and shared-country ambiguity in both Rust and Python. Source rows are also
+asserted independently under pytest.
+
+The sample keeps first 32 prefixes per country plus named examples and all
+observations of those prefixes; metadata covers the same seven countries.
+Cross-country prefix rows containing countries outside the subset are excluded.
+Thus this is a partial sample, not an authoritative complete calling-code map.
+The current real sample has country-only place links. Synthetic linked-city
+cases exercise regional projection. Non-geographic territory 001 is excluded;
+unlinked geographic territories fail strict export. World export is unverified.

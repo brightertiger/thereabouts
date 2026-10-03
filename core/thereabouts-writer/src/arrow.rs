@@ -97,6 +97,24 @@ impl<'a> Row<'a> {
             _ => return Err(Error::Input(format!("{name} must be text"))),
         }))
     }
+    pub(crate) fn texts(self, name: &str) -> Result<Vec<String>> {
+        let Some(array) = self.column(name) else {
+            return Ok(Vec::new());
+        };
+        let values = match array.data_type() {
+            DataType::List(_) => typed::<ListArray>(array)?.value(self.index),
+            DataType::LargeList(_) => typed::<LargeListArray>(array)?.value(self.index),
+            _ => return Err(Error::Input(format!("{name} must be a string list"))),
+        };
+        let strings = typed::<StringArray>(values.as_ref())?;
+        strings
+            .iter()
+            .map(|v| {
+                v.map(str::to_owned)
+                    .ok_or_else(|| Error::Input(format!("Null {name} element")))
+            })
+            .collect()
+    }
     pub(crate) fn required(self, name: &str) -> Result<&'a str> {
         self.text(name)?
             .filter(|v| !v.is_empty())

@@ -105,7 +105,7 @@ pub fn read(root: &Path) -> Result<Manifest> {
         != Some(2)
         || !matches!(
             value.get("family").and_then(serde_json::Value::as_str),
-            Some("core" | "postal" | "airports" | "locode")
+            Some("core" | "postal" | "airports" | "locode" | "phone")
         )
         || value.get("schema").and_then(serde_json::Value::as_str) != Some("thereabouts-pack-2")
     {
@@ -135,6 +135,11 @@ pub fn read(root: &Path) -> Result<Manifest> {
     {
         return Err(Error::Incompatible(
             "Unsupported airport normalization".into(),
+        ));
+    }
+    if m.family == "phone" && m.normalization != ["e164_plus", "strip_phone_presentation"] {
+        return Err(Error::Incompatible(
+            "Unsupported phone normalization".into(),
         ));
     }
     let mut names = BTreeSet::new();

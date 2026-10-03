@@ -9,6 +9,7 @@ use crate::{
 };
 use rusqlite::{Connection, OptionalExtension, types::Value};
 use std::path::Path;
+type Encoder = fn(&[(String, Observation)]) -> thereabouts_core::Result<Vec<u8>>;
 pub(crate) fn initialize(db: &Connection) -> Result<()> {
     db.execute_batch("CREATE TABLE observations(key TEXT,country INTEGER,state INTEGER,city INTEGER,latitude INTEGER,longitude INTEGER,source TEXT,source_id TEXT,name TEXT,code TEXT,scheme TEXT,details TEXT)")?;
     Ok(())
@@ -99,6 +100,11 @@ pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Re
             },
         ))
     })?;
+    let (kind, encoder): (&str, Encoder) = if manifest.family == "phone" {
+        ("trie", thereabouts_core::format::trie::encode_entries)
+    } else {
+        ("exact", encode_entries)
+    };
     let mut entries = Vec::new();
     let mut size = 0;
     let mut shard = 0;
@@ -118,9 +124,9 @@ pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Re
             add(
                 stage,
                 manifest,
-                &format!("exact-{shard:05}.bin"),
-                "exact",
-                &encode_entries(&entries)?,
+                &format!("{kind}-{shard:05}.bin"),
+                kind,
+                &encoder(&entries)?,
             )?;
             entries.clear();
             size = 0;
@@ -133,8 +139,8 @@ pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Re
     add(
         stage,
         manifest,
-        &format!("exact-{shard:05}.bin"),
-        "exact",
-        &encode_entries(&entries)?,
+        &format!("{kind}-{shard:05}.bin"),
+        kind,
+        &encoder(&entries)?,
     )
 }
