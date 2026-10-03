@@ -93,7 +93,7 @@ fn overlap_narrows_by_country_and_never_changes_geographic_status() {
         let pack = Pack::open(dir.path(), true).unwrap();
         let result = pack.from_h3(&cell.to_string(), true).unwrap();
         assert_eq!(
-            result.status,
+            result.status.as_str(),
             if assigned { "matched" } else { "not_found" }
         );
         assert_eq!(result.timezone.as_deref(), expected_timezone);

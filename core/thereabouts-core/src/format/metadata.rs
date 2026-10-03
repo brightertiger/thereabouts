@@ -15,6 +15,7 @@ impl Metadata {
     /// Country membership narrows overlap without creating a geographic ambiguity.
     pub(crate) fn narrow_timezones(
         &self,
+        index: &super::metadata_index::MetadataIndex,
         reference: u32,
         country: Option<&str>,
     ) -> Result<Vec<String>> {
@@ -26,15 +27,10 @@ impl Metadata {
             .iter()
             .filter(|zone| {
                 country.is_none_or(|country| {
-                    self.zone_tables.iter().any(|row| {
-                        row.get("tzid").and_then(Value::as_str) == Some(zone.as_str())
-                            && row
-                                .get("country_codes")
-                                .and_then(Value::as_str)
-                                .is_some_and(|codes| {
-                                    codes.split(',').any(|code| code.trim() == country)
-                                })
-                    })
+                    index
+                        .zone_countries
+                        .get(zone.as_str())
+                        .is_some_and(|countries| countries.contains(country))
                 })
             })
             .cloned()

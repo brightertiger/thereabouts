@@ -239,6 +239,13 @@ Golden rows additionally retain `source`, `source_id`, `source_release`,
 subdivision rows also retain nullable `country_id`, `place_id`, `link_status`,
 `link_method`, and string-array `place_ids`. Unknown source metadata fields
 are retained; consumers must not discard them when re-exporting a table.
+Country and subdivision rows are indexed by country_code and code respectively;
+duplicate codes or missing names are corrupt. State.code and State.name come
+from the subdivision row matching the place code. Only when that row is absent
+does the reader fall back to the place code and name. Country alpha3 is looked
+up by country code. The provenance payload is retained once; the runtime indexes
+refer to its rows. JSON side tables remain the wire representation.
+
 A subset can omit metadata rows unrelated to its catalogue or timezone sets.
 The current golden `zone_tables` holds zone.tab/zone1970.tab, not UTC transition
 history; including it does not yet provide historical offset computation.

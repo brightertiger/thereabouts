@@ -7,9 +7,11 @@ use thereabouts_core::{format::Pack, result::LookupResult};
 type TextColumn = (&'static str, fn(&LookupResult) -> Option<&str>);
 type FloatColumn = (&'static str, fn(&LookupResult) -> Option<f64>);
 const TEXT_COLUMNS: [TextColumn; 15] = [
-    ("status", |r| Some(&r.status)),
-    ("kind", |r| Some(&r.kind)),
-    ("match", |r| r.r#match.as_deref()),
+    ("status", |r| Some(r.status.as_str())),
+    ("kind", |r| Some(r.kind.as_str())),
+    ("match", |r| {
+        r.r#match.map(thereabouts_core::result::Match::as_str)
+    }),
     ("country_code", |r| {
         r.country.as_ref().map(|v| v.code.as_str())
     }),

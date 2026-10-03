@@ -10,3 +10,4 @@ pub mod metadata;
 pub mod verify;
 
 mod cache;
+mod metadata_index;

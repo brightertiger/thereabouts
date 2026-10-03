@@ -68,6 +68,14 @@ def check() -> dict[str, Any]:
             if row["state_id"]:
                 assert result.state is not None
                 state = extract["places"][row["state_id"]]
+                state = next(
+                    (
+                        row
+                        for row in extract["subdivisions"]
+                        if row["code"] == state["code"]
+                    ),
+                    state,
+                )
                 assert result.state.code == state["code"]
                 assert result.state.name == state["name"]
             zones = source["timezones"]

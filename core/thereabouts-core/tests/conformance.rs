@@ -43,7 +43,7 @@ fn run(bundle: &str) {
         } else if let (Some(lat), Some(lon)) = (values[0].as_f64(), values[1].as_f64()) {
             pack.reverse(lat, lon, false).unwrap()
         } else {
-            LookupResult::empty("invalid_input")
+            LookupResult::empty(thereabouts_core::result::Status::InvalidInput)
         };
         close(&serde_json::to_value(result).unwrap(), &case["result"]);
     }

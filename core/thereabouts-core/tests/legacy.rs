@@ -23,13 +23,13 @@ fn thirty_five_original_reverse_requests_have_explicit_mappings() {
                 .unwrap(),
             "coordinates" => match (values[0].as_f64(), values[1].as_f64()) {
                 (Some(lat), Some(lon)) => pack.reverse(lat, lon, true).unwrap(),
-                _ => LookupResult::empty("invalid_input"),
+                _ => LookupResult::empty(thereabouts_core::result::Status::InvalidInput),
             },
             _ => continue,
         };
         if case["id"] == 47 {
             assert_eq!(values[0], "836014fffffffff");
-            assert_eq!(actual.status, "not_found");
+            assert_eq!(actual.status.as_str(), "not_found");
             assert_eq!(
                 actual.evidence.unwrap().reason.as_deref(),
                 Some("no_stored_ancestor")
@@ -39,7 +39,7 @@ fn thirty_five_original_reverse_requests_have_explicit_mappings() {
         }
         if !case["error"].is_null() {
             assert_eq!(case["error"]["name"], "InvalidInputError");
-            assert_eq!(actual.status, "invalid_input");
+            assert_eq!(actual.status.as_str(), "invalid_input");
             counts[4] += 1;
             continue;
         }
@@ -51,7 +51,7 @@ fn thirty_five_original_reverse_requests_have_explicit_mappings() {
                 "outside_coverage" => (3, "outside_coverage"),
                 status => panic!("unexpected legacy status: {status}"),
             };
-            assert_eq!(actual.status, "not_found");
+            assert_eq!(actual.status.as_str(), "not_found");
             assert_eq!(actual.evidence.unwrap().reason.as_deref(), Some(reason));
             assert!(actual.country.is_none() && actual.state.is_none() && actual.city.is_none());
             counts[bucket] += 1;

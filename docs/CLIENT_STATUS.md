@@ -28,6 +28,9 @@ makes the independent golden comparison part of offline pytest.
 Review fix 8 distinguishes absent explicit paths (pack_not_found), missing
 store data and writer inputs. Stale-stage messages name the cleanup path;
 cleanup failures no longer hide the original export error.
+Review fix 9 makes result status/kind/match Rust enums and indexes country,
+subdivision and zone membership metadata. State fields use the subdivision
+row for the place code, falling back only when that row is absent.
 Remaining review fixes are in progress.
 
 ## Built and usable

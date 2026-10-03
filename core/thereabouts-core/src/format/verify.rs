@@ -39,6 +39,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     }
     let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata".into()))?;
     metadata.validate()?;
+    super::metadata_index::MetadataIndex::build(&metadata)?;
     let mut blocks = BTreeSet::new();
     let mut previous_id = None;
     for file in &manifest.files {

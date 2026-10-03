@@ -5,6 +5,7 @@ use super::{
     container::{Container, FileShard},
     manifest::{self, Manifest},
     metadata::Metadata,
+    metadata_index::MetadataIndex,
     spatial::{self, Block, Entry},
 };
 use crate::{Error, Result, error::ensure};
@@ -37,6 +38,7 @@ struct CatalogueSource {
 pub struct Pack {
     pub manifest: Manifest,
     pub metadata: Metadata,
+    pub(crate) metadata_index: MetadataIndex,
     blocks: BTreeMap<u32, BlockSource>,
     catalogues: Vec<CatalogueSource>,
     place_count: usize,
@@ -100,9 +102,11 @@ impl Pack {
         }
         let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
         metadata.validate()?;
+        let metadata_index = MetadataIndex::build(&metadata)?;
         Ok(Self {
             manifest,
             metadata,
+            metadata_index,
             blocks,
             catalogues,
             place_count,

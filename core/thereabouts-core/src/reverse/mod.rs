@@ -23,28 +23,28 @@ impl Pack {
             || !(-90.0..=90.0).contains(&lat)
             || !(-180.0..=180.0).contains(&lon)
         {
-            return Ok(LookupResult::empty("invalid_input"));
+            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
         }
         let Ok(point) = LatLng::new(lat, lon) else {
-            return Ok(LookupResult::empty("invalid_input"));
+            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
         };
         self.lookup(point.to_cell(Resolution::Eight), evidence)
     }
     /// Accept canonical H3 cells at any resolution through eight.
     pub fn from_h3(&self, text: &str, evidence: bool) -> crate::Result<LookupResult> {
         if text.len() != 15 || !text.bytes().all(|b| b.is_ascii_hexdigit()) {
-            return Ok(LookupResult::empty("invalid_input"));
+            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
         }
         let Ok(cell) = text.parse::<CellIndex>() else {
-            return Ok(LookupResult::empty("invalid_input"));
+            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
         };
         if cell.resolution() > Resolution::Eight {
-            return Ok(LookupResult::empty("invalid_input"));
+            return Ok(LookupResult::empty(crate::result::Status::InvalidInput));
         }
         self.lookup(cell, evidence)
     }
     fn lookup(&self, cell: CellIndex, evidence: bool) -> crate::Result<LookupResult> {
-        let mut answer = LookupResult::empty("not_found");
+        let mut answer = LookupResult::empty(crate::result::Status::NotFound);
         let centre = LatLng::from(cell);
         answer.point = Some(Point {
             lat: centre.lat(),
@@ -69,7 +69,7 @@ impl Pack {
         if let Some((key, label)) = found {
             let stored = address::cell_at(address::address(cell).0, key).ok();
             answer = self.project(answer, label)?;
-            reason = if answer.status == "matched" {
+            reason = if answer.status == crate::result::Status::Matched {
                 "matched"
             } else {
                 "unassigned"
@@ -101,9 +101,11 @@ impl Pack {
                         .and_then(|v| v.get("source_ids").cloned()),
                 });
             }
-            let zones = self
-                .metadata
-                .narrow_timezones(label.0[4], answer.country.as_ref().map(|c| c.code.as_str()))?;
+            let zones = self.metadata.narrow_timezones(
+                &self.metadata_index,
+                label.0[4],
+                answer.country.as_ref().map(|c| c.code.as_str()),
+            )?;
             answer.timezone = (zones.len() == 1).then(|| zones.first().cloned()).flatten();
             if zones.len() != 1
                 && let Some(audit) = &mut answer.evidence
@@ -130,10 +132,10 @@ impl Pack {
         if let Some(place) = self.place(country)? {
             let code = place.field(6);
             let meta = self
-                .metadata
+                .metadata_index
                 .countries
-                .iter()
-                .find(|r| r["country_code"].as_str() == Some(code));
+                .get(code)
+                .and_then(|index| self.metadata.countries.get(*index));
             answer.country = Some(Country {
                 code: code.into(),
                 code3: meta
@@ -143,10 +145,36 @@ impl Pack {
                 name: place.field(1).into(),
             });
         }
-        answer.state = self.place(state)?.map(|p| State {
-            code: p.text[7].clone().filter(|s| !s.is_empty()),
-            name: p.field(1).into(),
-        });
+        answer.state = self
+            .place(state)?
+            .map(|place| -> crate::Result<State> {
+                let meta = self
+                    .metadata_index
+                    .subdivisions
+                    .get(place.field(7))
+                    .and_then(|index| self.metadata.subdivisions.get(*index));
+                if let Some(row) = meta {
+                    Ok(State {
+                        code: row
+                            .get("code")
+                            .and_then(serde_json::Value::as_str)
+                            .map(str::to_owned),
+                        name: row
+                            .get("name")
+                            .and_then(serde_json::Value::as_str)
+                            .ok_or_else(|| {
+                                crate::Error::Corrupt("Missing subdivision name".into())
+                            })?
+                            .into(),
+                    })
+                } else {
+                    Ok(State {
+                        code: place.text[7].clone().filter(|s| !s.is_empty()),
+                        name: place.field(1).into(),
+                    })
+                }
+            })
+            .transpose()?;
         answer.city = self.place(city)?.map(|p| City {
             id: p.field(0).into(),
             name: p.field(1).into(),
@@ -156,7 +184,7 @@ impl Pack {
             point: p.point(),
         });
         if country != 0 || state != 0 || city != 0 {
-            answer.status = "matched".into();
+            answer.status = crate::result::Status::Matched;
             answer.distance_band = match flags & 7 {
                 6 => Some(DistanceBand {
                     greater_than_km: 0.0,
@@ -168,14 +196,11 @@ impl Pack {
                 }),
                 _ => None,
             };
-            answer.r#match = Some(
-                match flags & 7 {
-                    6 => "nearest",
-                    7 => "nearest_distant",
-                    _ => "contained",
-                }
-                .into(),
-            );
+            answer.r#match = Some(match flags & 7 {
+                6 => crate::result::Match::Nearest,
+                7 => crate::result::Match::NearestDistant,
+                _ => crate::result::Match::Contained,
+            });
         }
         Ok(answer)
     }
@@ -185,7 +210,8 @@ mod tests {
     use crate::result::LookupResult;
     #[test]
     fn omitted_evidence_and_null_distance() {
-        let json = serde_json::to_value(LookupResult::empty("not_found")).unwrap();
+        let json =
+            serde_json::to_value(LookupResult::empty(crate::result::Status::NotFound)).unwrap();
         assert!(json.get("evidence").is_none());
         assert!(json["distance_band"].is_null());
     }
