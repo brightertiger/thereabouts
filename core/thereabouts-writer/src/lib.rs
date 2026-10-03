@@ -10,6 +10,7 @@ mod emission;
 mod error;
 mod forward;
 mod inserts;
+mod locode;
 mod postal;
 mod source;
 mod staging;
@@ -67,7 +68,7 @@ pub fn write_pack(
     output: &Path,
     options: &Options,
 ) -> Result<Manifest> {
-    if !matches!(family, "core" | "postal" | "airports") {
+    if !matches!(family, "core" | "postal" | "airports" | "locode") {
         return Err(Error::Input("Unsupported export family".into()));
     }
     ensure(
@@ -160,6 +161,7 @@ fn build(
         "core" => timezones::load(&db, data)?,
         "postal" => postal::load(data, &db)?,
         "airports" => airports::load(data, &db)?,
+        "locode" => locode::load(data, &db)?,
         _ => return Err(Error::Input("Unsupported export family".into())),
     }
     db.execute_batch("COMMIT")?;
@@ -296,13 +298,14 @@ fn primary_table(family: &str) -> &str {
     match family {
         "core" => "cells",
         "postal" => "postal_codes",
+        "locode" => "trade_locations",
         other => other,
     }
 }
 fn normalization(family: &str) -> &[&str] {
     match family {
         "postal" => &postal::NORMALIZATION,
-        "airports" => &airports::NORMALIZATION,
+        "airports" | "locode" => &airports::NORMALIZATION,
         _ => &[],
     }
 }

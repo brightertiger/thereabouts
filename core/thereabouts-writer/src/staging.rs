@@ -28,6 +28,7 @@ pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
     for kind in [
         "postal_codes",
         "airports",
+        "trade_locations",
         "cells",
         "places",
         "canonical_cities",

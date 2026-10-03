@@ -42,42 +42,48 @@ def postal(source: Subset) -> list[dict[str, Any]]:
     return rows
 
 
-def airports(source: Subset) -> list[dict[str, Any]]:
+def points(source: Subset, family: str) -> list[dict[str, Any]]:
     chosen: dict[str, set[str]] = {c: set() for c in COUNTRIES}
     rows: list[dict[str, Any]] = []
     preferred = {"CDG", "AMS", "BRU", "LUX", "IST", "BOM", "DEL", "SPI"}
-    for table in source.inventory("airports"):
+    primary = "airports" if family == "airports" else "trade_locations"
+    field = "ident" if family == "airports" else "locode"
+    for table in source.inventory(primary):
         for batch in source.batches(table):
             for row in batch.to_pylist():
                 country = row["country_code"]
                 if country not in COUNTRIES:
                     continue
-                code = row["ident"]
+                code = row[field]
                 if len(chosen[country]) < 32 or row["iata_code"] in preferred:
                     chosen[country].add(code)
                 if code in chosen[country]:
                     rows.append(row)
             schema = batch.schema
-        source.write("airports", rows, schema)
+        source.write(primary, rows, schema)
     return rows
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--golden", type=Path, required=True)
-    parser.add_argument("--family", choices=["postal", "airports"], required=True)
+    parser.add_argument(
+        "--family", choices=["postal", "airports", "locode"], required=True
+    )
     args = parser.parse_args()
     output = ROOT / f"tests/fixtures/packs/{args.family}-sample"
     with tempfile.TemporaryDirectory(dir=ROOT / ".tmp", prefix="forward-") as directory:
         source = Subset(args.golden, Path(directory))
-        rows = postal(source) if args.family == "postal" else airports(source)
-        source.context(rows)
-        total = sum(
-            t["rows"]
-            for t in source.inventory(
-                "postal_codes" if args.family == "postal" else "airports"
-            )
+        rows = (
+            postal(source) if args.family == "postal" else points(source, args.family)
         )
+        source.context(rows)
+        primary = {
+            "postal": "postal_codes",
+            "airports": "airports",
+            "locode": "trade_locations",
+        }[args.family]
+        total = sum(t["rows"] for t in source.inventory(primary))
         provenance = source.finish(args.family, total)
         _core.write_pack(
             str(source.output),
@@ -104,6 +110,9 @@ def main() -> None:
                     for k in (
                         "country_code",
                         "postal_code",
+                        "locode",
+                        "location",
+                        "name_ascii",
                         "ident",
                         "iata_code",
                         "icao_code",

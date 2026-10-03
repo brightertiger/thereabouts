@@ -73,3 +73,25 @@ class ForwardQueries:
             scheme=scheme,
             country=country,
         )
+
+    def locode(
+        self, code: str, *, country: str | None = None, evidence: bool = False
+    ) -> Result:
+        """Find a locode code within an explicitly named country."""
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("locode").locode(
+                code if isinstance(code, str) else "",
+                country=country,
+                evidence=evidence,
+            )
+        )
+
+    def locode_columns(
+        self, codes: Iterable[str], *, country: str | None = None
+    ) -> dict[str, NDArray[Any]]:
+        """Return columns, plus offsets and columns for ambiguous candidates."""
+        self._ensure_open()
+        return self._handles.get("locode").locode_columns(
+            [code if isinstance(code, str) else "" for code in codes], country=country
+        )

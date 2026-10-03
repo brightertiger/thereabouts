@@ -11,4 +11,5 @@ pub use error::{Error, Result};
 
 pub mod airports;
 pub mod forward;
+pub mod locode;
 pub mod postal;

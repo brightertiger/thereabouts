@@ -29,7 +29,7 @@ def write(path: Path, pack: str, cases: list[dict[str, Any]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("family", choices=["postal", "airports"])
+    parser.add_argument("family", choices=["postal", "airports", "locode"])
     family = parser.parse_args().family
     source = json.loads((FIXTURES / f"{family}-source.json").read_text())
     verb = "airport" if family == "airports" else family
@@ -38,7 +38,11 @@ def main() -> None:
     for row in source["rows"]:
         country, code = (
             row["country_code"],
-            row["postal_code"] if family == "postal" else row["ident"],
+            row[
+                {"postal": "postal_code", "airports": "ident", "locode": "locode"}[
+                    family
+                ]
+            ],
         )
         chosen = codes.setdefault(country, set())
         if code not in chosen and len(chosen) < 3:
@@ -78,6 +82,21 @@ def main() -> None:
                 ("CDG", {"country": "fr", "scheme": "IATA"}),
             ]
         ]
+    if family == "locode":
+        requests = requests[:22] + [
+            {"kind": family, "values": [code], **kwargs}
+            for code, kwargs in [
+                (first["values"][0][2:], {"country": first["country"]}),
+                ("BOM", {}),
+                ("", {}),
+                ("INBOM", {"country": "FR"}),
+                ("INBOM", {"country": "IND"}),
+                ("x\0y", {}),
+                ("1NBOM", {}),
+                ("IN-BOM", {}),
+                ("ZZZZZ", {}),
+            ]
+        ]
     with Geocoder(FIXTURES / f"packs/{family}-sample") as geo:
         cases = [
             {
@@ -89,6 +108,9 @@ def main() -> None:
         ]
     assert len(cases) >= 20
     write(FIXTURES / f"{family}-vectors.json", f"packs/{family}-sample", cases)
+    if family not in {"postal", "airports"}:
+        print(f"Frozen {len(cases)} {family} vectors")
+        return
     with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
         cases = []
         for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:

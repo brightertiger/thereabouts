@@ -158,6 +158,32 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, codes, |code| pack.airport(code, scheme, country, false))
     }
+    #[pyo3(signature=(code, *, country=None, evidence=false))]
+    fn locode(
+        &self,
+        py: Python<'_>,
+        code: &str,
+        country: Option<&str>,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .locode(code, country, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    #[pyo3(signature=(codes, *, country=None))]
+    fn locode_columns<'py>(
+        &self,
+        py: Python<'py>,
+        codes: Vec<String>,
+        country: Option<&str>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        columns::forward(py, codes, |code| pack.locode(code, country, false))
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

@@ -266,6 +266,7 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | --- | ---: | ---: | ---: | ---: | ---: |
 | postal | 363,327 / 897 | 28 | 7.459 / 10.375 | 474,755 | 2,039,842,937 |
 | airports | 375,778 / 213 | 33 | 7.417 / 9.334 | 469,223 | 151,994,262 |
+| locode | 349,522 / 225 | 31 | 7.750 / 15.710 | 469,668 | 180,528,890 |
 <!-- forward-measurements:end -->
 
 ## Airports
@@ -285,3 +286,13 @@ postal, all 19 legacy forward cases have direct assertions, not just snapshots.
 The sample selects the first 32 airport identifiers per country where available,
 plus CDG, AMS, BRU, LUX, IST, BOM, DEL and SPI. It includes BE, NL, LU, FR, TR, IN
 and US. The writer retains all five published schemes and explicit nulls.
+
+## LOCODE
+
+The locode family implements locode(code, country=None) and locode_columns.
+Both a full LOCODE and country plus three-character location are accepted.
+Invalid formats and conflicting country hints return invalid_input. Source
+identity, names, coordinates and published canonical associations have an
+independent committed extract check. Shared real vectors run in Rust and Python.
+The sample includes the first 32 locations per requested country plus named
+airport-associated codes where available. Legacy conformance has no LOCODE cases.

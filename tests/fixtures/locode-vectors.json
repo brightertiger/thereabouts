@@ -1,0 +1,1169 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/locode-sample",
+  "cases": [
+    {
+      "id": "locode-000",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "BE2HW"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:overture:2f16c31c-2d18-4df4-878b-4d6e57061528",
+          "name": "Écaussinnes",
+          "name_en": null,
+          "kind": "town",
+          "population": 10000,
+          "point": {
+            "lat": 50.569683,
+            "lon": 4.175286
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.55,
+          "lon": 4.183333
+        },
+        "cell": "881fa6bb49fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-001",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "BE7PD"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2803007",
+          "name": "Athis",
+          "name_en": null,
+          "kind": "village",
+          "population": 471,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.366667,
+          "lon": 3.766667
+        },
+        "cell": "881fa6c6e9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-002",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "BE9IR"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2799030",
+          "name": "Eben-Emael",
+          "name_en": null,
+          "kind": "village",
+          "population": 1657,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.8,
+          "lon": 5.666667
+        },
+        "cell": "881fa0856bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-003",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "FRAE3"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-HDF",
+          "name": "Hauts-de-France"
+        },
+        "city": {
+          "id": "city:geonames:3038356",
+          "name": "Aix-en-Issart",
+          "name_en": null,
+          "kind": "village",
+          "population": 219,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.483333,
+          "lon": 1.866667
+        },
+        "cell": "8819482ed9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-004",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "FR222"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-BFC",
+          "name": "Bourgogne-Franche-Comté"
+        },
+        "city": {
+          "id": "city:geonames:3023258",
+          "name": "Coulmier-le-Sec",
+          "name_en": null,
+          "kind": "village",
+          "population": 268,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 47.75,
+          "lon": 4.483333
+        },
+        "cell": "881f86d965fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-005",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "FR22A"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-OCC",
+          "name": "Occitanie"
+        },
+        "city": {
+          "id": "city:geonames:3028325",
+          "name": "Castelreng",
+          "name_en": null,
+          "kind": "village",
+          "population": 181,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 43.033333,
+          "lon": 2.133333
+        },
+        "cell": "8839638b69fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-006",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "IN5PA"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-GJ",
+          "name": "Gujarāt"
+        },
+        "city": {
+          "id": "city:geonames:1260514",
+          "name": "Paneli",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 21.866667,
+          "lon": 70.15
+        },
+        "cell": "8842c28ce7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-007",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "IN9BH"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-GJ",
+          "name": "Gujarāt"
+        },
+        "city": {
+          "id": "city:geonames:1275950",
+          "name": "Bhimāsar",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 23.533333,
+          "lon": 70.866667
+        },
+        "cell": "8842c1920bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-008",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "INABD"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-TS",
+          "name": "Telangāna"
+        },
+        "city": {
+          "id": "city:geonames:7302832",
+          "name": "Kyathampalle",
+          "name_en": null,
+          "kind": "town",
+          "population": 42275,
+          "point": {
+            "lat": 19.66781,
+            "lon": 78.5289
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 19.666667,
+          "lon": 78.533333
+        },
+        "cell": "886094b607fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-009",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "LU4ST"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ME",
+          "name": "Mersch"
+        },
+        "city": {
+          "id": "city:geonames:2960301",
+          "name": "Maisons Prevent",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.716667,
+          "lon": 6.183333
+        },
+        "cell": "881fa3ce1dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-010",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "LU7NL"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960217",
+          "name": "Noertzange",
+          "name_en": null,
+          "kind": "village",
+          "population": 1072,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5,
+          "lon": 6.05
+        },
+        "cell": "881fa35151fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-011",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "LU8LX"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-CA",
+          "name": "Capellen"
+        },
+        "city": {
+          "id": "city:geonames:2960187",
+          "name": "Pétange",
+          "name_en": "Pétange",
+          "kind": "town",
+          "population": 7187,
+          "point": {
+            "lat": 49.55833,
+            "lon": 5.88056
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.55,
+          "lon": 5.883333
+        },
+        "cell": "881fa22613fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-012",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "NL2LL"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2746075",
+          "name": "2e Exloërmond",
+          "name_en": null,
+          "kind": "village",
+          "population": 2365,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.916667,
+          "lon": 6.966667
+        },
+        "cell": "881f14594dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-013",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "NL5RD"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2759863",
+          "name": "Alteveer",
+          "name_en": null,
+          "kind": "village",
+          "population": 565,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.683333,
+          "lon": 6.483333
+        },
+        "cell": "88196d34b7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-014",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "NL6LN"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2754659",
+          "name": "Heerhugowaard",
+          "name_en": "Heerhugowaard",
+          "kind": "town",
+          "population": 47580,
+          "point": {
+            "lat": 52.67144,
+            "lon": 4.84862
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.716667,
+          "lon": 4.866667
+        },
+        "cell": "881968af2bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-015",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "TR9AK"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.016667,
+          "lon": 29.266667
+        },
+        "cell": "881ec9a901fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-016",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "TRABH"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.083333,
+          "lon": 28.816667
+        },
+        "cell": "881ec91327fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-017",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "TRABK"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.083333,
+          "lon": 28.933333
+        },
+        "cell": "881ec91011fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-018",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "US237"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-MD",
+          "name": "Maryland"
+        },
+        "city": {
+          "id": "city:geonames:4356724",
+          "name": "Great Mills",
+          "name_en": "Great Mills",
+          "kind": "village",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 38.233333,
+          "lon": -76.483333
+        },
+        "cell": "882aa94b13fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-019",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "US267"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-AR",
+          "name": "Arkansas"
+        },
+        "city": {
+          "id": "city:geonames:4114413",
+          "name": "Hermitage",
+          "name_en": "Hermitage",
+          "kind": "village",
+          "population": 804,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 33.433333,
+          "lon": -92.166667
+        },
+        "cell": "88444a8f49fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-020",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "US289"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-MD",
+          "name": "Maryland"
+        },
+        "city": {
+          "id": "city:geonames:4355722",
+          "name": "Friendship Manor",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 39.3,
+          "lon": -76.95
+        },
+        "cell": "882aa8c9ebfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-021",
+      "request": {
+        "kind": "locode",
+        "values": [
+          " be2hw "
+        ],
+        "country": "be"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:overture:2f16c31c-2d18-4df4-878b-4d6e57061528",
+          "name": "Écaussinnes",
+          "name_en": null,
+          "kind": "town",
+          "population": 10000,
+          "point": {
+            "lat": 50.569683,
+            "lon": 4.175286
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.55,
+          "lon": 4.183333
+        },
+        "cell": "881fa6bb49fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-022",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "2HW"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:overture:2f16c31c-2d18-4df4-878b-4d6e57061528",
+          "name": "Écaussinnes",
+          "name_en": null,
+          "kind": "town",
+          "population": 10000,
+          "point": {
+            "lat": 50.569683,
+            "lon": 4.175286
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.55,
+          "lon": 4.183333
+        },
+        "cell": "881fa6bb49fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-023",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "BOM"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-024",
+      "request": {
+        "kind": "locode",
+        "values": [
+          ""
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-025",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "INBOM"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-026",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "INBOM"
+        ],
+        "country": "IND"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-027",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "x\u0000y"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-028",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "1NBOM"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-029",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "IN-BOM"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(\"INBOM\") or locode(\"BOM\", country=\"IN\")."
+      }
+    },
+    {
+      "id": "locode-030",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "ZZZZZ"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "trade_location",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    }
+  ]
+}

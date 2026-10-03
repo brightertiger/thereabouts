@@ -438,3 +438,21 @@ geography remains null, even when a source country code can scope its index.
 Point is the published airport point. Canonical geography follows place_to_city.
 Match is exact and kind is airport. Evidence retains the contributing names,
 schemes and source identities. Airport columns use the postal column contract.
+
+## LOCODE family
+
+The locode family consumes trade_locations and the same required geographic
+tables as postal. Its normalization is ["strip_ascii", "upper_ascii"]. It uses
+the kind-4 exact index with a full normalized LOCODE as the key, without a
+separator. LOCODE has two ASCII uppercase country letters and three uppercase
+ASCII letters or digits. Export rejects disagreement between locode,
+country_code and location. Lookup accepts the full code or three characters
+plus country. Conflicting or malformed country hints are invalid_input.
+
+The shared observation layout stores name, full code, scheme "unlocode", and
+details containing non-null name_ascii, subdivision_code, function, status,
+iata_code, date, change, remarks and coordinates_raw. Point and geographic
+references are published associations with canonical-city rollup, not a new
+reverse lookup. Identity is source plus source_id. Kind is trade_location and
+match is exact. Duplicate identities merge evidence; multiple identities are
+ambiguous. Column output has the shared dictionary and candidate-offset layout.

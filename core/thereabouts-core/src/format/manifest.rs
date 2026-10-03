@@ -105,7 +105,7 @@ pub fn read(root: &Path) -> Result<Manifest> {
         != Some(2)
         || !matches!(
             value.get("family").and_then(serde_json::Value::as_str),
-            Some("core" | "postal" | "airports")
+            Some("core" | "postal" | "airports" | "locode")
         )
         || value.get("schema").and_then(serde_json::Value::as_str) != Some("thereabouts-pack-2")
     {
@@ -130,7 +130,9 @@ pub fn read(root: &Path) -> Result<Manifest> {
             "Unsupported postal normalization".into(),
         ));
     }
-    if m.family == "airports" && m.normalization != ["strip_ascii", "upper_ascii"] {
+    if matches!(m.family.as_str(), "airports" | "locode")
+        && m.normalization != ["strip_ascii", "upper_ascii"]
+    {
         return Err(Error::Incompatible(
             "Unsupported airport normalization".into(),
         ));
