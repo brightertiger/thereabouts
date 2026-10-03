@@ -1,11 +1,12 @@
 //! A disk index keeps global place closure and sorting out of process memory.
+use super::inserts::Inserts;
 use super::source::{Dataset, population, required};
 use crate::{
     Error, Result,
     error::ensure,
     format::catalogue::{Place, REF_FIELDS, TEXT_FIELDS},
 };
-use rusqlite::{Connection, OptionalExtension, params};
+use rusqlite::{Connection, OptionalExtension, types::Value as SqlValue};
 use serde_json::{Value, json};
 
 pub fn initialize(db: &Connection) -> Result<()> {
@@ -22,6 +23,12 @@ pub fn initialize(db: &Connection) -> Result<()> {
 #[allow(clippy::indexing_slicing)] // Arrow rows are objects; serde_json reads return Null.
 pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     for kind in ["places", "canonical_cities", "place_to_city"] {
+        let prefix = match kind {
+            "places" => "INSERT INTO places",
+            "canonical_cities" => "INSERT INTO cities",
+            _ => "INSERT INTO mappings",
+        };
+        let mut inserts = Inserts::new(db, prefix, 2);
         for table in data.tables(kind) {
             data.scan(table,|mut row| {
                 ensure(row.is_object(), "Dataset row must be an object")?;
@@ -32,28 +39,31 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
                         row["evidence"]=Value::String(serde_json::to_string(&evidence)?);
                         row["country_id"]=Value::String(format!("country:{}",required(&row,"country_code")?));
                         if let Some(object)=row.as_object_mut() {object.retain(|k,_| TEXT_FIELDS.contains(&k.as_str()) || REF_FIELDS.contains(&k.as_str()) || k=="population");}
-                        db.execute("INSERT INTO places VALUES (?,?)",params![required(&row,"place_id")?,row.to_string()])?;
+                        inserts.push([SqlValue::Text(required(&row,"place_id")?.into()),SqlValue::Text(row.to_string())])?;
                     },
-                    "canonical_cities" => {db.execute("INSERT INTO cities VALUES (?,?)",params![required(&row,"city_id")?,row.to_string()])?;},
-                    _ => {db.execute("INSERT INTO mappings VALUES (?,?)",params![required(&row,"place_id")?,row["city_id"].as_str()])?;},
+                    "canonical_cities" => {inserts.push([SqlValue::Text(required(&row,"city_id")?.into()),SqlValue::Text(row.to_string())])?;},
+                    _ => {inserts.push([SqlValue::Text(required(&row,"place_id")?.into()),row["city_id"].as_str().map_or(SqlValue::Null,|v|SqlValue::Text(v.into()))])?;},
                 } Ok(())
             })?;
         }
+        inserts.flush()?;
     }
+    let mut needed = Inserts::new(db, "INSERT OR IGNORE INTO needed", 1);
     for table in data.tables("cells") {
         data.scan(table, |row| {
             for field in ["country_id", "state_id", "city_id"] {
                 if let Some(id) = row[field].as_str() {
-                    db.execute("INSERT OR IGNORE INTO needed VALUES (?)", [id])?;
+                    needed.push([SqlValue::Text(id.into())])?;
                 }
             }
             Ok(())
         })?;
     }
+    needed.flush()?;
     loop {
         let changed = db.total_changes();
         for field in REF_FIELDS {
-            db.execute(&format!("INSERT OR IGNORE INTO needed SELECT json_extract(p.payload,'$.{field}') FROM places p JOIN needed n USING(id) WHERE json_extract(p.payload,'$.{field}') IS NOT NULL"),[])?;
+            db.prepare_cached(&format!("INSERT OR IGNORE INTO needed SELECT json_extract(p.payload,'$.{field}') FROM places p JOIN needed n USING(id) WHERE json_extract(p.payload,'$.{field}') IS NOT NULL"))?.execute([])?;
         }
         if changed == db.total_changes() {
             break;
@@ -67,28 +77,28 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
         )
         .optional()?;
     ensure(missing.is_none(), "Dangling dataset place reference")?;
-    db.execute(
-        "INSERT INTO ids(id) SELECT id FROM needed ORDER BY id COLLATE BINARY",
-        [],
-    )?;
+    db.prepare_cached("INSERT INTO ids(id) SELECT id FROM needed ORDER BY id COLLATE BINARY")?
+        .execute([])?;
     Ok(())
 }
 pub fn reference(db: &Connection, id: Option<&str>) -> Result<u32> {
     match id {
         None => Ok(0),
-        Some(id) => Ok(db.query_row("SELECT reference FROM ids WHERE id=?", [id], |r| r.get(0))?),
+        Some(id) => Ok(db
+            .prepare_cached("SELECT reference FROM ids WHERE id=?")?
+            .query_row([id], |r| r.get(0))?),
     }
 }
 #[allow(clippy::indexing_slicing)] // Stored rows are objects and field arrays have fixed schema lengths.
 pub fn record(db: &Connection, id: &str) -> Result<Place> {
-    let payload: String =
-        db.query_row("SELECT payload FROM places WHERE id=?", [id], |r| r.get(0))?;
+    let payload: String = db
+        .prepare_cached("SELECT payload FROM places WHERE id=?")?
+        .query_row([id], |r| r.get(0))?;
     let mut row: Value = serde_json::from_str(&payload)?;
     ensure(row.is_object(), "Catalogue payload must be an object")?;
     if let Some(canonical) = db
-        .query_row("SELECT payload FROM cities WHERE id=?", [id], |r| {
-            r.get::<_, String>(0)
-        })
+        .prepare_cached("SELECT payload FROM cities WHERE id=?")?
+        .query_row([id], |r| r.get::<_, String>(0))
         .optional()?
     {
         let canonical: Value = serde_json::from_str(&canonical)?;
@@ -99,9 +109,8 @@ pub fn record(db: &Connection, id: &str) -> Result<Place> {
     }
     // A supplied mapping must agree with the published normalized identity.
     if let Some(mapped) = db
-        .query_row("SELECT city FROM mappings WHERE id=?", [id], |r| {
-            r.get::<_, Option<String>>(0)
-        })
+        .prepare_cached("SELECT city FROM mappings WHERE id=?")?
+        .query_row([id], |r| r.get::<_, Option<String>>(0))
         .optional()?
     {
         ensure(

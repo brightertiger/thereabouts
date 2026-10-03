@@ -36,6 +36,12 @@ results into fixed-width/dictionary buffers. A 4 MiB decoded-place LRU avoids
 repeated validation for hot places while retaining bounded memory. The random
 workload exposes catalogue-cache misses and has lower throughput than eager
 reading; that tradeoff is measured below.
+Review fix 11 reads typed Arrow arrays, caches repeated SQL statements and
+inserts bounded batches within one transaction. staging_directory controls
+SQLite and output staging without entering pack identity. Preflight preserves
+a 5 GiB floor plus an input-size estimate; no world build was run. Typed reads
+preserve Parquet floating-point values without the old JSON intermediate;
+the encoder revision records that byte-level correction.
 Remaining review fixes are in progress.
 
 ## Built and usable

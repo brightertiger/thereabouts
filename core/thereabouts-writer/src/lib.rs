@@ -3,10 +3,13 @@
     test,
     allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
 )]
+mod arrow;
 mod catalogue;
 mod emission;
 mod error;
+mod inserts;
 mod source;
+mod staging;
 mod timezones;
 use error::ensure;
 pub use error::{Error, Result};
@@ -17,6 +20,8 @@ use sha2::{Digest, Sha256};
 use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
+// Encoding revision is independent of the library release and changes when bytes change.
+const WRITER_REVISION: &str = "0.1.1";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -28,6 +33,9 @@ use thereabouts_core::format::{
 #[serde(deny_unknown_fields)]
 pub struct Options {
     pub data_version: String,
+    /// Parent for both the exclusive stage and SQLite file; omitted from pack identity.
+    #[serde(default, skip_serializing)]
+    pub staging_directory: Option<std::path::PathBuf>,
     /// Explicit omissions for deliberately incomplete fixtures, never inferred.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub allow_missing_tables: Vec<String>,
@@ -57,7 +65,8 @@ pub fn write_pack(
     )?;
     let data = Dataset::open(dataset_dir)?;
     data.validate_core(&options.allow_missing_tables)?;
-    let identity = json!({"manifest_sha256":data.digest,"options":options,"writer":"0.1.0"});
+    let identity =
+        json!({"manifest_sha256":data.digest,"options":options,"writer":WRITER_REVISION});
     let input_digest = format!("{:x}", Sha256::digest(serde_json::to_vec(&identity)?));
     if output.exists() {
         let manifest = format::verify::verify(output)?;
@@ -75,7 +84,9 @@ pub fn write_pack(
         .file_name()
         .and_then(|s| s.to_str())
         .ok_or_else(|| Error::Input("Invalid output name".into()))?;
-    let stage = parent.join(format!(".{name}.building"));
+    let stage_parent = options.staging_directory.as_deref().unwrap_or(parent);
+    staging::preflight(&data, stage_parent, parent)?;
+    let stage = stage_parent.join(format!(".{name}.building"));
     // create_dir is the exclusive writer lock; interrupted work is kept for review.
     fs::create_dir(&stage).map_err(|error| {
         if error.kind() == std::io::ErrorKind::AlreadyExists {

@@ -95,21 +95,13 @@ impl Dataset {
         let mut count = 0_u64;
         for batch in builder.with_batch_size(BATCH_ROWS).build()? {
             let batch = batch?;
-            let mut bytes = Vec::new();
-            {
-                let mut writer = arrow_json::ArrayWriter::new(&mut bytes);
-                writer.write(&batch)?;
-                writer.finish()?;
-            }
             ensure(
-                bytes.len() <= MEMORY_BUDGET_BYTES / 4,
-                "Arrow JSON batch exceeds admission budget",
+                batch.get_array_memory_size() <= MEMORY_BUDGET_BYTES / 4,
+                "Arrow batch exceeds admission budget",
             )?;
-            let rows: Vec<Value> = serde_json::from_slice(&bytes)?;
-            for row in rows {
-                visit(row)?;
-                count += 1;
-            }
+            let rows = batch.num_rows() as u64;
+            super::arrow::scan(&batch, &mut visit)?;
+            count += rows;
         }
         ensure(
             table["rows"].as_u64() == Some(count),

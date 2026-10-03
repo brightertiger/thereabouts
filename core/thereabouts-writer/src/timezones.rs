@@ -1,4 +1,5 @@
 //! Join all matching timezones; overlapping source zones retain their complete set.
+use super::inserts::Inserts;
 use super::source::{Dataset, required};
 use crate::{
     Error, Result,
@@ -6,10 +7,12 @@ use crate::{
     format::{address, spatial::Label},
 };
 use h3o::{CellIndex, Resolution};
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, params, types::Value};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
+    let mut coarse = Inserts::new(db, "INSERT OR IGNORE INTO coarse_zones", 2);
+    let mut fine = Inserts::new(db, "INSERT OR IGNORE INTO zones", 3);
     for table in data.tables("timezone_cells") {
         data.scan(table, |row| {
             let cell = required(&row, "h3")?
@@ -21,20 +24,26 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
             )?;
             let zone = required(&row, "tzid")?;
             if cell.resolution() < Resolution::Three {
-                db.execute(
-                    "INSERT OR IGNORE INTO coarse_zones VALUES (?,?)",
-                    params![u64::from(cell), zone],
-                )?;
+                coarse.push([
+                    Value::Integer(
+                        i64::try_from(u64::from(cell))
+                            .map_err(|_| Error::Input("Invalid H3 integer".into()))?,
+                    ),
+                    Value::Text(zone.into()),
+                ])?;
             } else {
                 let (block, key) = address::address(cell);
-                db.execute(
-                    "INSERT OR IGNORE INTO zones VALUES (?,?,?)",
-                    params![block, key, zone],
-                )?;
+                fine.push([
+                    Value::Integer(i64::from(block)),
+                    Value::Integer(i64::from(key)),
+                    Value::Text(zone.into()),
+                ])?;
             }
             Ok(())
         })?;
     }
+    coarse.flush()?;
+    fine.flush()?;
     Ok(())
 }
 pub fn block_zones(db: &Connection, block: u32) -> Result<BTreeMap<u64, BTreeSet<String>>> {
@@ -58,13 +67,14 @@ pub fn block_zones(db: &Connection, block: u32) -> Result<BTreeMap<u64, BTreeSet
     for resolution in [Resolution::Zero, Resolution::One, Resolution::Two] {
         if let Some(parent) = root.parent(resolution) {
             let mut query =
-                db.prepare("SELECT zone FROM coarse_zones WHERE cell=? ORDER BY zone")?;
+                db.prepare_cached("SELECT zone FROM coarse_zones WHERE cell=? ORDER BY zone")?;
             for z in query.query_map([u64::from(parent)], |r| r.get::<_, String>(0))? {
                 add(root, z?)?;
             }
         }
     }
-    let mut query = db.prepare("SELECT key,zone FROM zones WHERE block=? ORDER BY key,zone")?;
+    let mut query =
+        db.prepare_cached("SELECT key,zone FROM zones WHERE block=? ORDER BY key,zone")?;
     for row in query.query_map([block], |r| {
         Ok((r.get::<_, u16>(0)?, r.get::<_, String>(1)?))
     })? {
@@ -149,12 +159,13 @@ pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
             Resolution::try_from(r).map_err(|_| Error::Input("Invalid resolution".into()))?;
         if let Some(parent) = cell.parent(resolution) {
             if r < 3 {
-                let mut query = db.prepare("SELECT zone FROM coarse_zones WHERE cell=?")?;
+                let mut query = db.prepare_cached("SELECT zone FROM coarse_zones WHERE cell=?")?;
                 for zone in query.query_map([u64::from(parent)], |row| row.get::<_, String>(0))? {
                     names.insert(zone?);
                 }
             } else {
-                let mut query = db.prepare("SELECT zone FROM zones WHERE block=? AND key=?")?;
+                let mut query =
+                    db.prepare_cached("SELECT zone FROM zones WHERE block=? AND key=?")?;
                 for zone in query.query_map(params![block, address::address(parent).1], |row| {
                     row.get::<_, String>(0)
                 })? {

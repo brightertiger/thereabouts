@@ -70,7 +70,7 @@ pub fn cells(
     Ok(())
 }
 pub fn catalogue(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
-    let mut query = db.prepare("SELECT id FROM ids ORDER BY reference")?;
+    let mut query = db.prepare_cached("SELECT id FROM ids ORDER BY reference")?;
     let mut places = vec![];
     let mut size = 0;
     let mut shard = 0;

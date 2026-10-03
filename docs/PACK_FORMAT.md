@@ -265,14 +265,22 @@ after a bounded Arrow scan, with row counts checked. The writer does no
 geographic reconciliation. Existing output is verified and returned only when
 its input identity agrees; changed inputs are rejected without overwriting.
 
-An exclusive sibling `.<name>.building` directory owns SQLite and output
-artifacts. On success all shards are verified and the directory is renamed
+An exclusive `.<name>.building` directory owns SQLite and output artifacts.
+Its parent defaults to the output parent; `options.staging_directory` selects
+another parent on the same filesystem. This operational option is excluded
+from pack identity. Preflight requires at least 5 GiB free plus an estimate of
+eight times the consumed compressed input size and one maximum-size shard
+(64 MiB). The estimate is admission policy, not a measured world-build bound.
+No world export has been qualified. On success all shards are verified and the directory is renamed
 atomically. Ordinary failures remove only the writer's own staging directory.
 An interrupted process leaves staging for inspection; automatic resume is not
 implemented. The caller must explicitly remove abandoned staging before retry.
 
 The writer's admission budget constant is 512 MiB: 1,024-row Arrow batches,
-Parquet row groups at most 128 MiB uncompressed, a 16 MiB SQLite cache,
+Parquet row groups and Arrow batches at most 128 MiB uncompressed, a 16 MiB
+SQLite cache, typed Arrow array reads (no batch JSON round trip), cached SQL
+statements and multi-row inserts (at most 256 rows / 1 MiB, with a single
+larger row bounded at 128 MiB) within the existing transaction,
 block-local timezone joins, and bounded output shards. It rejects oversized
 units. Full verification visits one decoded shard at a time. This budget is
 not an allocator/RSS proof; world export remains unmeasured.

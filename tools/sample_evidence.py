@@ -13,13 +13,14 @@ def extract(
 ) -> None:
     """Freeze only the source rows needed to independently test the sample queries."""
     manifest = json.loads((dataset / "manifest.json").read_text())
+    data_root = dataset / manifest.get("data_root", ".")
 
     def rows(kind: str) -> list[dict[str, Any]]:
         return [
             row
             for table in manifest["tables"]
             if table["kind"] == kind
-            for row in pq.read_table(dataset / table["path"]).to_pylist()
+            for row in pq.read_table(data_root / table["path"]).to_pylist()
         ]
 
     cells = {row["h3"]: row for row in rows("cells")}
@@ -63,7 +64,9 @@ def extract(
                 )
             }
             identities.update(
-                row[key] for key in ("country_id", "state_id", "city_id") if row[key]
+                found[key]
+                for key in ("country_id", "state_id", "city_id")
+                if found[key]
             )
         zone_set = set().union(
             *(zones.get(h3.cell_to_parent(cell, r), set()) for r in range(9))
