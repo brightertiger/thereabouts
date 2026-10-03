@@ -55,7 +55,11 @@ def points(source: Subset, family: str) -> list[dict[str, Any]]:
                 if country not in COUNTRIES:
                     continue
                 code = row[field]
-                if len(chosen[country]) < 32 or row["iata_code"] in preferred:
+                if (
+                    len(chosen[country]) < 32
+                    or row["iata_code"] in preferred
+                    or (family == "locode" and code == "INBOM")
+                ):
                     chosen[country].add(code)
                 if code in chosen[country]:
                     rows.append(row)

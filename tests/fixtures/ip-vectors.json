@@ -1902,15 +1902,35 @@
         ]
       },
       "result": {
-        "status": "not_found",
+        "status": "matched",
         "kind": "ip_range",
-        "match": null,
-        "country": null,
-        "state": null,
-        "city": null,
+        "match": "exact",
+        "country": {
+          "code": "CA",
+          "code3": "CAN",
+          "name": "Canada"
+        },
+        "state": {
+          "code": "CA-QC",
+          "name": "Quebec"
+        },
+        "city": {
+          "id": "city:geonames:6077243",
+          "name": "Montreal",
+          "name_en": "Montreal",
+          "kind": "city",
+          "population": 1762949,
+          "point": {
+            "lat": 45.50884,
+            "lon": -73.58781
+          }
+        },
         "timezone": null,
-        "point": null,
-        "cell": null,
+        "point": {
+          "lat": 45.5019,
+          "lon": -73.5674
+        },
+        "cell": "882baa46a7fffff",
         "distance_band": null,
         "candidates": [],
         "rank_basis": null
@@ -2245,6 +2265,94 @@
         "candidates": [],
         "rank_basis": null,
         "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-058",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:4860:4802::"
+        ],
+        "country": "CA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "CA",
+          "code3": "CAN",
+          "name": "Canada"
+        },
+        "state": {
+          "code": "CA-QC",
+          "name": "Quebec"
+        },
+        "city": {
+          "id": "city:geonames:6077243",
+          "name": "Montreal",
+          "name_en": "Montreal",
+          "kind": "city",
+          "population": 1762949,
+          "point": {
+            "lat": 45.50884,
+            "lon": -73.58781
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 45.5019,
+          "lon": -73.5674
+        },
+        "cell": "882baa46a7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-059",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:4860:6dff:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "CA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "CA",
+          "code3": "CAN",
+          "name": "Canada"
+        },
+        "state": {
+          "code": "CA-QC",
+          "name": "Quebec"
+        },
+        "city": {
+          "id": "city:geonames:6077243",
+          "name": "Montreal",
+          "name_en": "Montreal",
+          "kind": "city",
+          "population": 1762949,
+          "point": {
+            "lat": 45.50884,
+            "lon": -73.58781
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 45.5019,
+          "lon": -73.5674
+        },
+        "cell": "882baa46a7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
       }
     }
   ]

@@ -4,6 +4,7 @@
     "files": {
       "golden-thereabouts/lookups/ip_ranges/joined.parquet": "437dac0204acdf6d74a45a37e12f9739dfe62a08bdd260e4d37327640746a79c",
       "golden-thereabouts/places/BE.parquet": "7896dc40377708c09347eb55180753f4af815e2d2b8f5eb1573c095f5aeaa506",
+      "golden-thereabouts/places/CA.parquet": "003fd30a455ae9110e5dc769d0952c1c59f8fb14383c28cc2df6ca79041d307f",
       "golden-thereabouts/places/FR.parquet": "cc4b57441a1b7b9cb19ad64fd2d2681a7a019ebc82fbd58d1901e9f96d18efcd",
       "golden-thereabouts/places/IN.parquet": "bb6c81ea508c7d8364df864d81ea7c6d4993e51f13d55940ead3ae29a175b743",
       "golden-thereabouts/places/LU.parquet": "af911bdd5452fdfeaf2366254c61cdc848bacd25b7c8e6b3c74e7139ee7bbaa9",
@@ -11,6 +12,7 @@
       "golden-thereabouts/places/TR.parquet": "118d487d9a412a82603c32ec2344054d9531bca3147cca7775c4521110441ac2",
       "golden-thereabouts/places/US.parquet": "14cb39127a22321af2bbd0d282bc6e719124fb45638b4b4d27bc91343b7a5e44",
       "golden-thereabouts/canonical_cities/BE.parquet": "1d9a8a13bacf6844ffa27d4fb730ecd3b34e18336f219e30fbca302f8aedea03",
+      "golden-thereabouts/canonical_cities/CA.parquet": "f7c11d487aa53e9e9709e3dba5a12882f376f08c907f36e63597078fd353886a",
       "golden-thereabouts/canonical_cities/FR.parquet": "063b0d510cc68e85d47c55d16e06ca0766d01a3038fd426df5cf3689f40f4ad5",
       "golden-thereabouts/canonical_cities/IN.parquet": "1b19ad617b50ded918d5a887216481c7568f901709fe2be9883d2bf5cd10224a",
       "golden-thereabouts/canonical_cities/LU.parquet": "49690fdaaa12d6051e3da4943a27329782f7be94957750a5e86fbfc12224928e",
@@ -18,6 +20,7 @@
       "golden-thereabouts/canonical_cities/TR.parquet": "0f7c5679ba53edd33899dc0b32f9ba02ec5d71a0d82d7df2f8b6f4cf3d2f1684",
       "golden-thereabouts/canonical_cities/US.parquet": "374353730af929105e8e981d884d31f686bb9a99a046cace491fbed833b16523",
       "golden-thereabouts/place_to_city/BE.parquet": "e67719e12e4e4eddc732cee73352cdb048d01be58498861cdc4ac1df7d2a3b29",
+      "golden-thereabouts/place_to_city/CA.parquet": "442c5d3ab040d4288045a204976adf3df9cd1cc46cbe99ec3917d4b9bcb9d637",
       "golden-thereabouts/place_to_city/FR.parquet": "a2b2b98c5e4baa9834773dca913ee5093957bbd0fe058c3ee980ca2ea52520a0",
       "golden-thereabouts/place_to_city/IN.parquet": "9b44f266b87e2e4ca5436b76347c41f85930f5f816c5da9ce2a1956723f86c8e",
       "golden-thereabouts/place_to_city/LU.parquet": "fa54895bc8eb9e0ec6cefc1cfe6315f3fdabdce5014d8382555c394b6dc7771b",
@@ -30,6 +33,7 @@
     },
     "countries": [
       "BE",
+      "CA",
       "FR",
       "IN",
       "LU",
@@ -40,7 +44,7 @@
     "family": "ip",
     "world_source_rows": 7786864,
     "pyarrow": "23.0.1",
-    "subset_policy": "first 32 intervals per country and IP version, plus intervals containing 8.8.8.8 and 2001:4860:4860::8888",
+    "subset_policy": "first 32 intervals per country and IP version, plus intervals containing 8.8.8.8 and 2001:4860:4860::8888 regardless of country",
     "parquet": {
       "version": "2.6",
       "compression": "zstd",
@@ -64,6 +68,9 @@
     "country:BE": null,
     "state:overture:5cbce05b-ffe3-41cf-afdd-b41d3b9352c7": null,
     "state:overture:5f5c9898-672a-4afc-aa46-a27d3ebce45c": null,
+    "city:geonames:6077243": "city:geonames:6077243",
+    "country:CA": null,
+    "state:overture:a792deed-ea07-45bc-9950-f601840db392": null,
     "city:geonames:2967210": "city:geonames:2967210",
     "city:geonames:2969392": "city:geonames:2969392",
     "city:geonames:2969646": "city:geonames:2969646",
@@ -6919,6 +6926,21 @@
       "country_id": "country:LU",
       "state_id": "state:overture:2c7a3650-b60d-4a44-a50e-ca96fb3a3f7b",
       "city_id": "city:geonames:2960578"
+    },
+    {
+      "source": "dbip",
+      "source_id": "dbip-city-lite-2026-10.csv.gz:4014909",
+      "ip_start": "2001:4860:4802::",
+      "ip_end": "2001:4860:6dff:ffff:ffff:ffff:ffff:ffff",
+      "ip_version": 6,
+      "country_code": "CA",
+      "region": "Quebec",
+      "city": "Montreal",
+      "latitude": 45.5019,
+      "longitude": -73.5674,
+      "country_id": "country:CA",
+      "state_id": "state:overture:a792deed-ea07-45bc-9950-f601840db392",
+      "city_id": "city:geonames:6077243"
     }
   ]
 }

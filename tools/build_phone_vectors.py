@@ -27,6 +27,7 @@ def main() -> None:
         {"kind": "phone", "values": [number]}
         for number in [
             "+91 (22) 1234-5678",
+            "+91 (22) 2345-6789",
             "+352",
             "+1",
             "+999123",

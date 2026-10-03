@@ -29,16 +29,21 @@ def extract(source: Subset) -> list[dict[str, Any]]:
                     prefix = row.get("prefix") or row["calling_code"]
                     if kind == "phone_prefixes":
                         for country in codes:
-                            if len(chosen[country]) < 32 or prefix in {
-                                "9122",
-                                "9111",
-                                "1202",
-                                "33",
-                                "32",
-                                "31",
-                                "352",
-                                "90",
-                            }:
+                            if (
+                                len(chosen[country]) < 32
+                                or prefix.startswith("9122")
+                                or prefix
+                                in {
+                                    "9122",
+                                    "9111",
+                                    "1202",
+                                    "33",
+                                    "32",
+                                    "31",
+                                    "352",
+                                    "90",
+                                }
+                            ):
                                 chosen[country].add(prefix)
                         if not any(prefix in chosen[c] for c in codes):
                             continue
@@ -78,7 +83,8 @@ def main() -> None:
         provenance = source.finish("phone", total)
         provenance["subset_policy"] = (
             "first 32 distinct prefixes per country, named prefixes, "
-            "all observations of selected prefixes; metadata for the seven countries"
+            "all observations of selected prefixes, including published 91222-91227 "
+            "Mumbai prefixes (no literal 9122 row); metadata for the seven countries"
         )
         output = ROOT / "tests/fixtures/packs/phone-sample"
         _core.write_pack(

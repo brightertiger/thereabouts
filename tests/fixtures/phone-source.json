@@ -301,7 +301,7 @@
     "family": "phone",
     "world_source_rows": 428217,
     "pyarrow": "23.0.1",
-    "subset_policy": "first 32 distinct prefixes per country, named prefixes, all observations of selected prefixes; metadata for the seven countries",
+    "subset_policy": "first 32 distinct prefixes per country, named prefixes, all observations of selected prefixes, including published 91222-91227 Mumbai prefixes (no literal 9122 row); metadata for the seven countries",
     "parquet": {
       "version": "2.6",
       "compression": "zstd",
@@ -4767,6 +4767,126 @@
       "description": "Muzaffarnagar, Uttar Pradesh",
       "source": "phone",
       "source_id": "resources/geocoding/en/91.txt:32",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91222",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:412",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91223",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:413",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91224",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:414",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91225",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:415",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91226",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:416",
+      "link_status": "matched",
+      "link_method": "territory fixed-line prefix language"
+    },
+    {
+      "table": "phone_prefixes",
+      "prefix": "91227",
+      "calling_code": "91",
+      "territory": null,
+      "country_codes": [
+        "IN"
+      ],
+      "country_id": "country:IN",
+      "place_id": "country:IN",
+      "place_ids": [
+        "country:IN"
+      ],
+      "language": "en",
+      "description": "Mumbai",
+      "source": "phone",
+      "source_id": "resources/geocoding/en/91.txt:417",
       "link_status": "matched",
       "link_method": "territory fixed-line prefix language"
     },

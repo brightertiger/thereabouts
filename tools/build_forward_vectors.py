@@ -88,6 +88,8 @@ def main() -> None:
             for code, kwargs in [
                 (first["values"][0][2:], {"country": first["country"]}),
                 ("BOM", {}),
+                ("INBOM", {}),
+                ("BOM", {"country": "IN"}),
                 ("", {}),
                 ("INBOM", {"country": "FR"}),
                 ("INBOM", {"country": "IND"}),

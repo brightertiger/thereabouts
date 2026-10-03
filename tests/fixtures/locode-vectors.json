@@ -1001,6 +1001,93 @@
       "request": {
         "kind": "locode",
         "values": [
+          "INBOM"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:1275339",
+          "name": "Mumbai",
+          "name_en": "Mumbai",
+          "kind": "city",
+          "population": 12691836,
+          "point": {
+            "lat": 19.07283,
+            "lon": 72.88261
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 18.966667,
+          "lon": 72.816667
+        },
+        "cell": "88608b016bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-025",
+      "request": {
+        "kind": "locode",
+        "values": [
+          "BOM"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "trade_location",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:1275339",
+          "name": "Mumbai",
+          "name_en": "Mumbai",
+          "kind": "city",
+          "population": 12691836,
+          "point": {
+            "lat": 19.07283,
+            "lon": 72.88261
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 18.966667,
+          "lon": 72.816667
+        },
+        "cell": "88608b016bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "locode-026",
+      "request": {
+        "kind": "locode",
+        "values": [
           ""
         ]
       },
@@ -1021,7 +1108,7 @@
       }
     },
     {
-      "id": "locode-025",
+      "id": "locode-027",
       "request": {
         "kind": "locode",
         "values": [
@@ -1046,7 +1133,7 @@
       }
     },
     {
-      "id": "locode-026",
+      "id": "locode-028",
       "request": {
         "kind": "locode",
         "values": [
@@ -1071,7 +1158,7 @@
       }
     },
     {
-      "id": "locode-027",
+      "id": "locode-029",
       "request": {
         "kind": "locode",
         "values": [
@@ -1095,7 +1182,7 @@
       }
     },
     {
-      "id": "locode-028",
+      "id": "locode-030",
       "request": {
         "kind": "locode",
         "values": [
@@ -1119,7 +1206,7 @@
       }
     },
     {
-      "id": "locode-029",
+      "id": "locode-031",
       "request": {
         "kind": "locode",
         "values": [
@@ -1143,7 +1230,7 @@
       }
     },
     {
-      "id": "locode-030",
+      "id": "locode-032",
       "request": {
         "kind": "locode",
         "values": [

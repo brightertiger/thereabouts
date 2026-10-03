@@ -23,12 +23,13 @@ def extract(source: Subset) -> list[dict[str, Any]]:
         for batch in source.batches(table):
             for row in batch.to_pylist():
                 country, version = row["country_code"], row["ip_version"]
-                if country not in COUNTRIES:
-                    continue
                 key = (country, version)
                 first = int.from_bytes(row["ip_start_packed"], "big")
                 last = int.from_bytes(row["ip_end_packed"], "big")
-                if selected.get(key, 0) < 32 or first <= preferred[version] <= last:
+                preferred_interval = first <= preferred[version] <= last
+                if preferred_interval or (
+                    country in COUNTRIES and selected.get(key, 0) < 32
+                ):
                     rows.append(row)
                     selected[key] = selected.get(key, 0) + 1
             schema = batch.schema
@@ -46,9 +47,10 @@ def main() -> None:
         source.context(rows)
         total = sum(t["rows"] for t in source.inventory("ip_ranges"))
         provenance = source.finish("ip", total)
+        provenance["countries"] = sorted({r["country_code"] for r in rows})
         provenance["subset_policy"] = (
             "first 32 intervals per country and IP version, plus intervals "
-            "containing 8.8.8.8 and 2001:4860:4860::8888"
+            "containing 8.8.8.8 and 2001:4860:4860::8888 regardless of country"
         )
         output = ROOT / "tests/fixtures/packs/ip-sample"
         _core.write_pack(

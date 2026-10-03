@@ -13,7 +13,7 @@ def main() -> None:
     requests = []
     for row in source["rows"]:
         key = (row["country_code"], row["ip_version"])
-        if key in selected:
+        if key in selected or row["country_code"] == "CA":
             continue
         selected.add(key)
         first, last = (
@@ -50,6 +50,12 @@ def main() -> None:
             "1.2.3.4\0",
         ]
     ]
+    for row in source["rows"]:
+        if row["country_code"] == "CA":
+            requests.extend(
+                {"kind": "ip", "values": [row[k]], "country": "CA"}
+                for k in ("ip_start", "ip_end")
+            )
     with Geocoder(FIXTURES / "packs/ip-sample") as geo:
         cases = [
             {

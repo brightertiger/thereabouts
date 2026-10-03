@@ -202,9 +202,9 @@ query numbers remain historical records in the measurements JSON.
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | postal | 105,111 / 897 | 28 | 8.042 / 8.875 | 8.500 / 363.136 | 146,026 | 143,127,131 |
 | airports | 75,947 / 213 | 33 | 7.666 / 13.000 | 8.167 / 12.958 | 394,943 | 7,219,281 |
-| locode | 76,930 / 225 | 31 | 7.750 / 8.292 | 7.834 / 10.208 | 459,627 | 8,823,901 |
-| phone | 70,425 / 389 | 29 | 4.542 / 4.833 | 5.750 / 6.917 | 411,426 | 10,075,099 |
-| ip | 45,523 / 449 | 58 | 7.292 / 9.667 | 7.417 / 8.000 | 563,711 | 215,105,432 |
+| locode | 76,998 / 226 | 33 | 7.500 / 10.793 | 7.417 / 11.541 | 481,329 | 8,820,037 |
+| phone | 70,696 / 395 | 30 | 4.458 / 7.208 | 5.459 / 12.875 | 418,418 | 10,138,902 |
+| ip | 46,544 / 450 | 60 | 6.959 / 14.833 | 7.291 / 9.917 | 577,381 | 217,050,567 |
 | plates | 48,499 / 521 | 36 | 4.834 / 5.083 | 5.167 / 17.833 | 246,194 | 4,570,923 |
 | geocode | 210,397 / 101 | 51 | 7.875 / 13.584 | 8.334 / 42.583 | 367,764 | 11,846,553 |
 <!-- forward-measurements:end -->
@@ -259,9 +259,9 @@ artifact and manifest. Historical speed/size estimates above predate this rework
 | --- | ---: | ---: | ---: | ---: | ---: |
 | postal | 129.99 | 10.25 | 25.93 | 105,111 | 143,127,131 |
 | airports | 403.32 | 15.42 | 65.99 | 75,947 | 7,219,281 |
-| locode | 257.08 | 13.23 | 65.48 | 76,930 | 8,823,901 |
-| phone | 266.83 | 2.07 | 19.06 | 70,425 | 10,075,099 |
-| ip | 194.68 | 11.81 | 24.73 | 45,523 | 215,105,432 |
+| locode | 257.08 | 13.23 | 65.46 | 76,998 | 8,820,037 |
+| phone | 266.83 | 2.06 | 19.21 | 70,696 | 10,138,902 |
+| ip | 194.68 | 11.93 | 24.99 | 46,544 | 217,050,567 |
 | plates | 654.10 | 25.88 | 29.65 | 48,499 | 4,570,923 |
 <!-- forward-format:end -->
 
@@ -344,3 +344,11 @@ template rule, sample code assertions, the complete fixture country universe
 and no vehicle priors. Its before/after results have identical evidence-inclusive
 result digests over the same requests. This measures rule-count scaling, not
 world code-table coverage or plate-country accuracy.
+
+The preferred-IP selection now runs before country filtering. The Canada/Montreal
+interval containing `2001:4860:4860::8888` is the documented exception to the
+seven-country IP subset. Named sample checks also require `locode("INBOM")` and
+`locode("BOM", country="IN")`. Golden has no literal `9122` phone row: the builder
+includes all six published Mumbai children `91222`–`91227`, and the example
+`phone("+91 22 2345 6789")` matches `91222`. These rows still link only to India;
+Mumbai is source description evidence, not a fabricated canonical-city link.

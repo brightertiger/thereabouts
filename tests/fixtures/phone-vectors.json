@@ -510,6 +510,33 @@
       "request": {
         "kind": "phone",
         "values": [
+          "+91 (22) 2345-6789"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "phone_prefix",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "phone-sample-019",
+      "request": {
+        "kind": "phone",
+        "values": [
           "+352"
         ]
       },
@@ -533,7 +560,7 @@
       }
     },
     {
-      "id": "phone-sample-019",
+      "id": "phone-sample-020",
       "request": {
         "kind": "phone",
         "values": [
@@ -560,7 +587,7 @@
       }
     },
     {
-      "id": "phone-sample-020",
+      "id": "phone-sample-021",
       "request": {
         "kind": "phone",
         "values": [
@@ -583,7 +610,7 @@
       }
     },
     {
-      "id": "phone-sample-021",
+      "id": "phone-sample-022",
       "request": {
         "kind": "phone",
         "values": [
@@ -607,7 +634,7 @@
       }
     },
     {
-      "id": "phone-sample-022",
+      "id": "phone-sample-023",
       "request": {
         "kind": "phone",
         "values": [
@@ -631,7 +658,7 @@
       }
     },
     {
-      "id": "phone-sample-023",
+      "id": "phone-sample-024",
       "request": {
         "kind": "phone",
         "values": [
@@ -655,7 +682,7 @@
       }
     },
     {
-      "id": "phone-sample-024",
+      "id": "phone-sample-025",
       "request": {
         "kind": "phone",
         "values": [
@@ -679,7 +706,7 @@
       }
     },
     {
-      "id": "phone-sample-025",
+      "id": "phone-sample-026",
       "request": {
         "kind": "phone",
         "values": [
@@ -703,7 +730,7 @@
       }
     },
     {
-      "id": "phone-sample-026",
+      "id": "phone-sample-027",
       "request": {
         "kind": "phone",
         "values": [
@@ -727,7 +754,7 @@
       }
     },
     {
-      "id": "phone-sample-027",
+      "id": "phone-sample-028",
       "request": {
         "kind": "phone",
         "values": [
@@ -751,7 +778,7 @@
       }
     },
     {
-      "id": "phone-sample-028",
+      "id": "phone-sample-029",
       "request": {
         "kind": "phone",
         "values": [
