@@ -1,0 +1,20 @@
+{
+  "AQ": "No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.",
+  "BI": "English article gives no standard serial grammar; German/Ukrainian/French article attempts unavailable. Commercial plate guide found but no reuse licence established. Native photo/OCR transcription not generalized into a national grammar.",
+  "BV": "No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.",
+  "CC": "English article says current Australian-standard plates since 2000, but its serial table is blank. Italian Australian article does not establish a complete Cocos grammar. Do not inherit every Australian format.",
+  "DO": "Only temporary and 1996–2003 truck/SUV rules collected. Current ordinary private series remains a gap; government brochure identified but reuse licence not established.",
+  "EH": "English/German ordinary digit-count conflict retained. Only SADR issuing series and pre-1976 Spanish example pattern included; Moroccan-administered territorial allocation is not comprehensively mapped. Not a sovereignty inference.",
+  "GS": "No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.",
+  "HM": "No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.",
+  "LR": "English article documents A/B/C vehicle-class prefixes but not ordinary serial length or complete syntax. German/Ukrainian articles unavailable. Diplomatic series also lacks a bounded serial length.",
+  "MW": "English plate article contains no textual serial grammar; German/Ukrainian/French attempts unavailable. Reuse terms of specialist plate galleries unconfirmed.",
+  "PN": "No reusable sourced issuing grammar found. Sparse claims about vehicles or absence of plates are insufficient to certify non-issuance.",
+  "PW": "Ngiwal ordinary, government and diplomatic templates only; most state serial fields are empty. Coverage is not all 16 states.",
+  "SJ": "Svalbard ZN five-digit car series only, overlapping Norway. Jan Mayen, motorcycles and historic Russian mining-company series not fully sourced.",
+  "SL": "Ordinary serial and diplomatic serial only. Printed office/type field, vanity choices and earlier series are not fully modeled.",
+  "SV": "Numeric private 2011 series only. The official 2021 announcement confirms retained numeric plates and hexadecimal expansion, but the latter is not normalized from a reusable pinned grammar.",
+  "TK": "No reusable sourced issuing grammar found. Sparse claims about vehicles or absence of plates are insufficient to certify non-issuance.",
+  "UG": "Digital government, police and prisons rules only; ordinary private and older private formats remain gaps. English article has no ordinary serial grammar, German/Ukrainian attempts unavailable.",
+  "UM": "No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format."
+}

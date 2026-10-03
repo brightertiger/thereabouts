@@ -4,7 +4,12 @@
 registration plates. It publishes three Parquet tables: a country survey,
 code–place evidence, and plate-format rules. **This is a partial global collection,
 not a complete world plate decoder.** Its explicit gaps are part of the data.
-No golden-place join or runtime lookup function is included.
+No golden-place join is included. The additive reference resolver described below
+ranks country candidates and implements geographic fallback over this evidence.
+
+The acquisition tables and survey below retain the accepted `plates` baseline.
+Their format counts describe that original source; the additive inventory and
+measurements later in this document describe `plates_country`.
 
 A code describes a registration jurisdiction, office or allocation area. It does
 not locate the vehicle or its owner today. Vehicles can retain plates after sale
@@ -79,14 +84,15 @@ cannot guarantee retrieval of an identical historical Wikidata response.
 ## Reproduce and inspect
 
 Run from this worktree. Use its own `data/`, never the main checkout's data.
-The existing main-checkout interpreter is borrowed without changing dependencies:
+Use this worktree’s own environment; the main checkout is independent:
 
 ```sh
-PYTHON=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/.venv/bin/python
+uv sync
+PYTHON=.venv/bin/python
 "$PYTHON" -m build_data.acquire plates --data-dir data
 "$PYTHON" -m build_data.acquire plates --data-dir data --stage normalize
 "$PYTHON" -m build_data.acquire status --data-dir data
-"$PYTHON" -m build_data.acquire.plates_report --data-dir data --output docs/PLATES.md
+"$PYTHON" -m build_data.acquire.plates_report --data-dir data --output data/work/plates-base-report.md
 ```
 
 The first command downloads missing catalog entries and normalizes. The second
@@ -541,3 +547,568 @@ The table compares current code sets when both sources classify current series. 
 Countries with no format rule: AE, AF, AG, AQ, AU, BD, BF, BI, BJ, BN, BQ, BS, BV, BZ, CA, CC, CD, CG, CO, DJ, DM, DO, DZ, EG, EH, ER, ET, FK, FO, GI, GN, GS, GY, HM, HN, HT, IM, IO, JO, KE, KH, KN, KP, KR, KY, LA, LC, LK, LR, LS, LY, MA, MC, MF, ML, MM, MP, MR, MS, MU, MV, MW, MX, NF, NP, NZ, PF, PN, PT, PW, PY, RW, SA, SC, SD, SG, SH, SJ, SL, SN, SO, SS, SV, SY, SZ, TC, TF, TK, TL, TN, TW, UG, UM, UY, VU, YE, ZA, ZM, ZW.
 
 Rules without literal source specimens: AL/historic-geographic, AO/ordinary, AR/ordinary, AS/ordinary, AW/ordinary, AX/ordinary, BA/ordinary, BH/ordinary, BL/ordinary, BO/ordinary, BT/ordinary, BW/ordinary, CH/ordinary, CI/ordinary, CK/ordinary, CL/ordinary, CR/ordinary, CU/ordinary, CW/ordinary, CX/ordinary, EE/ordinary, ES/historic-geographic, ES/ordinary, FI/ordinary, FJ/ordinary, FM/ordinary, GA/ordinary, GD/ordinary, GE/ordinary, GF/SIV, GG/Alderney, GM/ordinary, GP/SIV, GQ/ordinary, GR/ordinary, GW/ordinary, HK/ordinary, IL/ordinary, IQ/ordinary, IR/ordinary, IT/historic-geographic, KI/ordinary, KM/ordinary, KW/ordinary, LI/ordinary, LU/ordinary, LV/ordinary, MD/historic-geographic, MD/ordinary, MH/ordinary, MN/ordinary, MO/ordinary, MQ/SIV, MT/ordinary, NL/historic-geographic, NR/ordinary, NU/ordinary, OM/ordinary, PA/ordinary, PG/ordinary, PR/ordinary, PS/ordinary, QA/ordinary, RE/SIV, RU/ordinary, SI/ordinary, SM/ordinary, SR/ordinary, SX/ordinary, TR/ordinary, TV/ordinary, TZ/ordinary, US/Idaho-county-1945, VC/ordinary, VG/ordinary, VI/ordinary, WF/ordinary, WS/ordinary, YT/SIV.
+
+## Country candidates and graceful geographic fallback
+
+**Pass the country whenever you know it.** A serial alone generally cannot establish
+its country. `ABC 123`-shaped serials are shared by many jurisdictions; flags,
+colours, plate shape and printed state names would add information, but are absent
+from this string-only interface. The reference lives in
+[`build_data/plate_country`](../build_data/plate_country/). It is separate from
+acquisition and from the eventual Python/JavaScript client APIs.
+
+With an ISO alpha-2 country or territory hint (including the survey's `XK`),
+`Resolver.resolve(plate, country)` returns that country even for an unknown code,
+vanity string, unsupported format or empty input. It reports `level="place"`
+when eligible evidence identifies an office/district/city; otherwise `"state"`
+for an evidenced broader unit; otherwise `"country"`. The explicit unit-kind map
+is in [`inference.json`](../build_data/plate_country/data/inference.json).
+`place` does not mean a city point is known. Names, identifiers and coordinates
+remain source assertions, without a golden-place join or current-location claim.
+An invalid country identifier raises `ValueError`, rather than inventing one.
+
+Without a hint, the result has `status="ranked_candidates"` or `"no_match"`,
+`country_code=null`, `certain=false`, and all matching candidates with their
+scores and evidence. **This release never certifies an unhinted country.** A sole
+candidate sets `unique_in_catalog=true`, but the catalogue is incomplete and
+special/vanity series are open-ended. A score lead is not proof of uniqueness.
+Consumers must not silently convert the first candidate into a certain country.
+This abstention is deliberate; there is no calibrated confidence threshold.
+
+### Deterministic reference contract
+
+Use the release's JSON bundle and its included policy. Country-specific formats,
+place-code associations, geographic exclusions, script ranges, national marks,
+weights and priors are data, not country branches in the resolver.
+
+1. Normalize the input to Unicode NFC, uppercase **ASCII a–z only**, collapse runs
+   of Python `str.isspace()` characters to one ASCII space, and trim them. The
+   whitespace set is U+0009–000D, U+001C–001F, U+0020, U+0085, U+00A0, U+1680,
+   U+2000–200A, U+2028–2029, U+202F, U+205F and U+3000. Do not transliterate scripts,
+   fold similar-looking letters, strip flags, run OCR or remove printed labels.
+   Empty input or more than 64 Unicode code points produces no unhinted candidates;
+   a supplied country still returns `level="country"`, reason
+   `empty_or_too_long_input`.
+2. Full-match each eligible rule against the normalized serial. With a hint, filter
+   to that country; an optional `series` filters by exact `series_id`. Try the
+   published `pattern` first, then `relaxed_pattern`. The latter tolerates missing,
+   repeated or changed separators **only at separator positions declared by the
+   original rule**. It is not arbitrary punctuation stripping. Exact matching
+   takes precedence for a rule. Both regexes are exported in the bundle.
+3. Extract the named `code_group`, if any. For code-index equality only, remove the
+   policy's characters ` -·•./` and map Unicode decimal digits to their decimal
+   values (Unicode 15.0 in the reference environment). Preserve leading zeroes
+   and native letters. A known code means at least one country/code assertion
+   exists, including historical or Wikidata associations; it is useful country
+   evidence but not proof of a current, uniquely identifying geographic code.
+4. Each matched rule receives the score below. A country uses its **maximum** rule
+   score, never the sum of duplicate source assertions. Sort descending score,
+   then ascending ISO code for ties. Scores round to six decimal places with
+   round-to-nearest, ties-to-even. For matching-rule evidence within a country,
+   sort by descending score then `series_id`, preserving input order for remaining
+   ties. Deduplicate identical `(country, series_status, matched_pattern,
+   extracted_code)` matches in source order; this does not merge code-place
+   disagreements. The first identical format assertion supplies its provenance.
+
+```
+score = 12 * known_code
+      +  4 * fixed_national_mark_present
+      +  2 * script_rarity
+      +      specificity_bits
+      + 0.5 * log2(max(1, road_motor_vehicles))
+      -  2 * separator_relaxed_match
+```
+
+Booleans are zero or one. `script_rarity` is the largest
+`log2(250 / max(1, countries_with_that_script_in_format_metadata))` among observed
+scripts other than Latin and ASCII digits; use zero if there are none. Script
+ranges are explicit policy regexes, not a general Unicode script classifier.
+`fixed_national_mark_present` requires a nonempty configured literal inside the
+serial; printed identity bands are not automatically added. `specificity_bits`
+is exported by the normalizer: a heuristic based on required character slots
+against a 36-character baseline, minimum repeat counts and the least-specific
+regex alternative. Optional slots add zero. It is **not** an exact count of valid
+plates, and clients should use the exported value rather than recalculate it.
+
+The prior is the **road motor vehicles count**, not vehicles per capita, from
+[Wikipedia revision 1377579042](https://en.wikipedia.org/w/index.php?oldid=1377579042),
+under CC BY-SA 4.0. There are 178 observed country counts, dated 2007–2025. For the
+other 72, the exported median count is 1,531,458.5 and evidence explicitly says
+`imputed=true`. Observed rows retain their year, label, table position and source.
+Definitions and dates differ across countries; no adjustment or interpolation
+is made. A global vehicle-stock prior is a weak default, not a probability for
+traffic at a particular camera or a probability that a candidate is correct.
+Weights were chosen before the benchmark and were not fitted to its results.
+
+Regexes use explicit letter/digit ranges. For JavaScript, compile their JSON
+strings with Unicode mode, change `(?P<name>...)` to `(?<name>...)`, and require
+a whole-string match. Count code points, not UTF-16 code units, for the input
+limit. Do not use JavaScript's default `\s` or broad case-insensitive matching as
+substitutes for the normalization above. The bundle plus these transformations
+is the cross-language contract; no client implementation is added in this task.
+
+### Geographic eligibility and reasons
+
+With a country hint, an absence of matches yields `no_matching_format`. A matching
+non-geographic series prevents a coincidentally matching geographic series from
+claiming a location (`non_geographic_or_ambiguous_series`). US subnational
+patterns require state context not supported by this reference interface, so they
+return `subdivision_series_context_required`.
+
+Only rows with `scope="registration_unit"`, a mapped unit kind, no narrower
+`subdivision_scope` prerequisite and the same verified current/historic status as
+the matched format are eligible. Wikidata `entity_association` rows and unknown
+temporal status never produce a precise place. Historic matches need an explicit
+`series` argument before supplying geography. This guards against an older
+allocation silently winning over a reused serial. Validity dates are not yet an
+input to the reference; historical status alone is not proof of validity today.
+
+Eligible place rows win over eligible state rows. All distinct assertions at that
+level remain in `locations`, including disagreements; differing name pairs set
+`ambiguous=true`. That flag is conservative and can include name aliases. Parent
+fallback is limited to evidenced state prefixes configured in data (India: two
+characters; China: one). India state-prefix rows are parsed from the pinned state
+abbreviation table; the resolver does not infer parents from coordinates or from
+municipalities repeating a district code. State fallback explains itself as
+`known_state_code_no_finer_verified_unit`; otherwise the reason is
+`unknown_code_or_unverified_temporal_scope`. Geographic ambiguity does not alter
+the caller's supplied country.
+
+### Format sources, scope and remaining limitations
+
+The additive source catalog is
+[`plate_country/data/sources.json`](../build_data/plate_country/data/sources.json).
+It reuses accepted pins and adds English, German, French, Italian, Ukrainian,
+Spanish and Norwegian Wikipedia revisions. US, Canadian and Australian table
+cells are parsed as declared serial templates, including listed retained older
+series. Scripts, exact and relaxed separators, fixed marks and original evidence
+are recorded per rule. Templates describe syntax and may over-accept forbidden
+letters, reserved blocks or unissued numbers. A match is not a legal-validity
+check. Duplicate source/template evidence is retained in the inventory.
+
+Coverage below is **at least one supported series**, not a claim that every
+ordinary, commercial, motorcycle, historic or special plate is recognized.
+Some previously covered countries still lack common retained formats; the
+benchmark exposes this for older Brazilian and Argentine serials and a Delhi
+commercial variant. Greedy regex captures can miss another possible prefix split
+in an unseparated serial; all parse alternatives are not enumerated. Letter/digit
+confusables and visually indistinguishable scripts are not automatically repaired.
+
+The English Sahrawi article specifies seven numeric characters after `SH`, while
+German specifies six; both alternatives are preserved. The `EH` rules describe
+SADR-issued series, not a sovereignty judgment or a complete mapping of
+Moroccan-administered territory. Svalbard's `ZN` format also matches Norway.
+Territory/parent overlap is expected, including overseas departments and other
+shared issuing systems; the ISO survey universe is not 250 independent systems.
+
+The WHO legacy GHO vehicle-stock API was rejected because its
+[terms restrict use to public health](https://www.who.int/about/policies/publishing/data-policy/terms-and-conditions).
+WorldLicensePlates, MatriculasDelMundo and the commercial VideoEdge plate guide
+were not imported because reusable terms were not established. The UD smart-city
+benchmark's CC BY-NC-ND terms and unclear image rights in other plate benchmarks
+were not used. No paid, private or scraped owner-information source is involved.
+
+### Evaluation design and limits
+
+The committed
+[scored evaluation rows](plate-country-evaluation.json) retain each serial,
+country, source/revision/hash, split, candidate ranking and geographic reason.
+The extraction/transcription policy is
+[`evaluation.json`](../build_data/plate_country/data/evaluation.json).
+Metadata was fetched from Wikimedia Commons country categories; image filenames
+present in the format articles were excluded. This reduces direct example reuse
+but is **not proof of independent publishers**: both collections use Wikimedia,
+the string filter is imperfect, and repeated photographers remain possible.
+Metadata/category country labels were reviewed during selection, not taken as
+universally correct. There is no independent human audit of the transcriptions.
+
+Caption examples are regex extractions from pinned metadata. Photo examples were
+visually transcribed from fetched images, with annotations linked to the exact
+SHA-256; the normalizer checks that digest and Commons' SHA-1 before accepting an
+annotation. Rebuilding consumes those reviewed annotations; it does **not** rerun
+vision or claim deterministic OCR. Fifty-five image files are pinned: CC BY-SA
+4.0 (16), 3.0 (10), 2.0 (7), CC BY 4.0 (9), 2.0 (6), public domain (6), CC0 (1).
+Every row retains its own licence and author. Commons description metadata is
+attributed under CC BY-SA 4.0; photo rights remain separate.
+
+The initial formats and weights were committed as `9aa2f29` before evaluation
+labels were inspected. Later supplemental rules concern seven countries absent
+from this benchmark; benchmark-country patterns and ranking weights were not
+changed after label inspection. Their addition did not change the aggregate
+scores. A subsequent synthetic regression test exposed a separator compiler bug:
+regex alternation was being treated as a literal separator. Fixing that bug
+improved one held-out example, changing all-sample top-1/top-3 from 40.2%/54.3%
+to 40.9%/55.1%, and holdout from 42.9%/57.1% to 46.4%/60.7%. The table below
+measures the corrected implementation. The first run was blind to results;
+this implementation correction occurred after that run and is disclosed here.
+No benchmark-country source patterns or weights were tuned to the examples.
+Country plus normalized serial is deduplicated before splitting; the first eight
+hex digits of its SHA-256, interpreted as an unsigned integer, modulo five select
+holdout when zero. All other groups are development. The split is fixed, with no
+seed search, resampling or weight fitting. It is **not photographer- or
+country-disjoint**, and its regional counts are small and uneven.
+
+The sample was selected for legibility and permissive reuse from the first page
+(up to 50 files) of 40 country categories. It includes special, older and vanity
+plates; captions sometimes use documentary Latin transcriptions rather than
+native glyphs. It is neither a representative road sample nor an OCR benchmark.
+Thirty-three countries are measured; none of these results validates performance
+in the other 217 survey entries. The Americas subset lacks US and Canadian
+examples and has no held-out examples. Oceania's zero top-3 score reflects both
+missing series and ambiguity; it must not be hidden by reporting only matched
+plates. All denominators include no-match inputs. More independent, stratified
+examples and a new untouched holdout are needed before tuning this release.
+
+### Rebuild, resolve and inspect
+
+Use the worktree's own environment and retained raw sources:
+
+```sh
+uv sync
+.venv/bin/python -m build_data.acquire plates --data-dir data --stage normalize
+.venv/bin/python -m build_data.plate_country fetch --data-dir data
+.venv/bin/python -m build_data.plate_country build --data-dir data
+.venv/bin/python -m build_data.plate_country evaluate --data-dir data
+.venv/bin/python -m build_data.plate_country status --data-dir data
+.venv/bin/python -m build_data.plate_country.report --data-dir data
+.venv/bin/python -m build_data.plate_country resolve --data-dir data --plate 'MH-09 S-2112' --country IN
+.venv/bin/python -m build_data.plate_country resolve --data-dir data --plate 'MH-09 S-2112'
+```
+
+The example is transcribed from a pinned Indian plate photograph in the benchmark.
+`fetch` reuses cached files and the shared identified, host-locked client (at least
+1.1 seconds between requests to a host). Base pins are supplied by the existing
+`plates` acquisition; the new command fetches only additive sources. The default
+build is offline. Raw snapshots live under `data/raw/plates_country/`, with
+HTTP receipts, and must be retained alongside the accepted `plates` snapshots.
+Commons API category responses are pinned by bytes/hash and contain individual
+page revision IDs; a later category query is not a historical snapshot. If remote
+bytes change, a fresh fetch fails the expected hash rather than accepting new data.
+
+The new manifest commits content-addressed JSON/Parquet artifacts under
+`data/normalized/plates_country/`, with base-manifest fingerprint, source licences,
+source hashes, policy and implementation hashes, and output hashes. `status` verifies all of these
+and the accepted base release. Read active filenames from the manifest, never a
+wildcard over superseded releases. Parquet `formats`, `vehicle_priors` and
+`coverage` have schema version `plates-country-1`: non-null UTF-8 `country_code`
+and non-null UTF-8 `evidence_json`, whose complete nested fields match the bundle.
+The bundle's top-level keys are `version`, `policy`, `countries`, `priors`,
+`formats` and `codes`. Evaluation is a separately generated report tied to the
+manifest hash; the documentation report rejects a stale evaluation.
+
+Validation on `data/plates-country`: 300 tests passed, 7 skipped; whole-worktree
+`ruff check`, `ruff format --check` and strict `mypy` passed. Nineteen new synthetic
+tests require no network. An offline rebuild reproduced the identical manifest;
+all 323 pinned sources verified from cache. Main-checkout code, data and interpreter
+were not used by this extension.
+
+<!-- plate-country-measurements:start -->
+## Country-inference measurements and format inventory
+
+Generated by `python -m build_data.plate_country.report --data-dir data`.
+Before: **151/250** countries with 159 format rows. After: **239/250** with **704** format evidence rows. These counts mean at least one modeled series, not complete coverage.
+
+The benchmark contains **127** distinct documented plates from **33** countries: 99 development examples and **28 held-out examples**. It contains 72 caption/filename transcriptions, 51 visually transcribed photographed plates and 4 published specimens. The latter are not claimed to be issued serials or government-certified specimens.
+
+| Region | All n | All top-1 | All top-3 | Holdout n | Holdout top-1 | Holdout top-3 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Overall | 127 | 40.9% | 55.1% | 28 | 46.4% | 60.7% |
+| Africa | 18 | 50.0% | 55.6% | 5 | 40.0% | 60.0% |
+| Americas | 11 | 9.1% | 9.1% | 0 | — | — |
+| Asia | 43 | 48.8% | 72.1% | 9 | 66.7% | 88.9% |
+| Europe | 33 | 63.6% | 84.8% | 6 | 83.3% | 100.0% |
+| Oceania | 22 | 0.0% | 0.0% | 8 | 0.0% | 0.0% |
+
+Truth appears anywhere in the candidate list for 67.7% overall and 71.4% on holdout. No unhinted result is certified as certain. The absence of an Americas holdout example is a sampling gap, not a zero-accuracy measurement.
+
+| Supplied-country level | All examples | Holdout examples |
+| --- | ---: | ---: |
+| place | 11 | 4 |
+| state | 18 | 5 |
+| country | 98 | 19 |
+
+Every supplied-country example retains that country. Geographic levels measure what evidence was available, **not independently checked place accuracy**. Country-only reasons in this sample:
+
+- `no_matching_format`: 41.
+- `non_geographic_or_ambiguous_series`: 49.
+- `unknown_code_or_unverified_temporal_scope`: 8.
+
+The full scored rows, candidate rankings, image/caption provenance, split assignments and denominators are in `data/normalized/plates_country/evaluation.json`.
+
+### Per-country format coverage
+
+C/H are counts of current/historic **evidence rows**, including duplicate source assertions and non-ordinary series. All coverage remains partial. The bundle records exact regexes, separators, marks, code groups and evidence. No-format territories are not asserted to be non-issuers.
+
+| ISO | Country/territory | C/H | Scripts (digits included) | Sources |
+| --- | --- | ---: | --- | --- |
+| AD | Andorra | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1363303908) |
+| AE | United Arab Emirates | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1365209773) |
+| AF | Afghanistan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1356853566) |
+| AG | Antigua & Barbuda | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001799) |
+| AI | Anguilla | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001793) |
+| AL | Albania | 0/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371058793) |
+| AM | Armenia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371471817) |
+| AO | Angola | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001791) |
+| AQ | Antarctica | 0/0 | Gap | Unsourced grammar |
+| AR | Argentina | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367699844) |
+| AS | American Samoa | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1343912298) |
+| AT | Austria | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367179317) |
+| AU | Australia | 59/8 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377988841) |
+| AW | Aruba | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001805) |
+| AX | Åland Islands | 1/0 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=248707514) |
+| AZ | Azerbaijan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371307150) |
+| BA | Bosnia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001871) |
+| BB | Barbados | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367992026) |
+| BD | Bangladesh | 1/0 | Bengali, Bengali digits | [1](https://en.wikipedia.org/w/index.php?oldid=1365474120) |
+| BE | Belgium | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1369135514) |
+| BF | Burkina Faso | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1234450751) |
+| BG | Bulgaria | 1/0 | ASCII digits, Cyrillic, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372353235) |
+| BH | Bahrain | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338129219) |
+| BI | Burundi | 0/0 | Gap | Unsourced grammar |
+| BJ | Benin | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001852) |
+| BL | St. Barthélemy | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002779) |
+| BM | Bermuda | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1356256004) |
+| BN | Brunei | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001881) |
+| BO | Bolivia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1341292282) |
+| BQ | Caribbean Netherlands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345337205) |
+| BR | Brazil | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1361898556) |
+| BS | Bahamas | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1358279279) |
+| BT | Bhutan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376978101) |
+| BV | Bouvet Island | 0/0 | Gap | Unsourced grammar |
+| BW | Botswana | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001869) |
+| BY | Belarus | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368347962) |
+| BZ | Belize | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001838) |
+| CA | Canada | 30/36 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1373784295) |
+| CC | Cocos Islands | 0/0 | Gap | Unsourced grammar |
+| CD | Congo - Kinshasa | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002018) |
+| CF | Central African Republic | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1303069313) |
+| CG | Congo - Brazzaville | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001978) |
+| CH | Switzerland | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368288237) |
+| CI | Côte d’Ivoire | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1318022341) |
+| CK | Cook Islands | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338002003) |
+| CL | Chile | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1366530061) |
+| CM | Cameroon | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001926) |
+| CN | China | 2/0 | ASCII digits, Han, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374494974) |
+| CO | Colombia | 2/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1373706002) |
+| CR | Costa Rica | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002006) |
+| CU | Cuba | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1349341809) |
+| CV | Cape Verde | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376832347) |
+| CW | Curaçao | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002012) |
+| CX | Christmas Island | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1310411286) |
+| CY | Cyprus | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376218876) |
+| CZ | Czechia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372467542) |
+| DE | Germany | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377669488) |
+| DJ | Djibouti | 2/0 | ASCII digits, Arabic, Arabic-Indic digits, Latin | [1](https://uk.wikipedia.org/w/index.php?oldid=36058050) |
+| DK | Denmark | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338668056) |
+| DM | Dominica | 1/1 | ASCII digits, Latin | [1](https://uk.wikipedia.org/w/index.php?oldid=38199368) |
+| DO | Dominican Republic | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002026) |
+| DZ | Algeria | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376724844) |
+| EC | Ecuador | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002030) |
+| EE | Estonia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002750) |
+| EG | Egypt | 2/0 | Arabic, Arabic-Indic digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338002725) |
+| EH | Western Sahara | 3/1 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=260305379), [2](https://en.wikipedia.org/w/index.php?oldid=1338003287) |
+| ER | Eritrea | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=222874638) |
+| ES | Spain | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1363970679) |
+| ET | Ethiopia | 0/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376535567) |
+| FI | Finland | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367179902) |
+| FJ | Fiji | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1341979193) |
+| FK | Falkland Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345582883) |
+| FM | Micronesia | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338003034) |
+| FO | Faroe Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338668056) |
+| FR | France | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1360313366) |
+| GA | Gabon | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002796) |
+| GB | UK | 2/2 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1370151084), [2](https://en.wikipedia.org/w/index.php?oldid=1375613060) |
+| GD | Grenada | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002829) |
+| GE | Georgia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372335903) |
+| GF | French Guiana | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| GG | Guernsey | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1350805077) |
+| GH | Ghana | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002819) |
+| GI | Gibraltar | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1349341906) |
+| GL | Greenland | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338668056) |
+| GM | Gambia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002798) |
+| GN | Guinea | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377835056) |
+| GP | Guadeloupe | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| GQ | Equatorial Guinea | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002738) |
+| GR | Greece | 1/0 | ASCII digits, Greek, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367180219) |
+| GS | South Georgia & South Sandwich Islands | 0/0 | Gap | Unsourced grammar |
+| GT | Guatemala | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1347696568) |
+| GU | Guam | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1366265234) |
+| GW | Guinea-Bissau | 1/0 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=264340455) |
+| GY | Guyana | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376645220) |
+| HK | Hong Kong | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374661832) |
+| HM | Heard & McDonald Islands | 0/0 | Gap | Unsourced grammar |
+| HN | Honduras | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002850) |
+| HR | Croatia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375714451) |
+| HT | Haiti | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002849) |
+| HU | Hungary | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372826697) |
+| ID | Indonesia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375240023) |
+| IE | Ireland | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375357170) |
+| IL | Israel | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1374923846) |
+| IM | Isle of Man | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1352659370) |
+| IN | India | 2/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372866191) |
+| IO | British Indian Ocean Territory | 1/0 | ASCII digits, Latin | [1](https://it.wikipedia.org/w/index.php?oldid=151111064) |
+| IQ | Iraq | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002866) |
+| IR | Iran | 1/0 | Arabic, Persian digits | [1](https://en.wikipedia.org/w/index.php?oldid=1353798607) |
+| IS | Iceland | 0/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371704297) |
+| IT | Italy | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376348433) |
+| JE | Jersey | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1242049100) |
+| JM | Jamaica | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002878) |
+| JO | Jordan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002897) |
+| JP | Japan | 1/0 | ASCII digits, Han, Hiragana, Katakana, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375974707) |
+| KE | Kenya | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376439213) |
+| KG | Kyrgyzstan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1356365785) |
+| KH | Cambodia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1357532292) |
+| KI | Kiribati | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002909) |
+| KM | Comoros | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1353226271) |
+| KN | St. Kitts & Nevis | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338753711) |
+| KP | North Korea | 1/0 | ASCII digits, Hangul | [1](https://en.wikipedia.org/w/index.php?oldid=1376565406) |
+| KR | South Korea | 2/0 | ASCII digits, Hangul | [1](https://en.wikipedia.org/w/index.php?oldid=1376656300) |
+| KW | Kuwait | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1366902172) |
+| KY | Cayman Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345582883) |
+| KZ | Kazakhstan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375818980) |
+| LA | Laos | 1/0 | ASCII digits, Lao | [1](https://en.wikipedia.org/w/index.php?oldid=1338002945) |
+| LB | Lebanon | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1353201548) |
+| LC | St. Lucia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376852335) |
+| LI | Liechtenstein | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375193249) |
+| LK | Sri Lanka | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377836403) |
+| LR | Liberia | 0/0 | Gap | Unsourced grammar |
+| LS | Lesotho | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002955) |
+| LT | Lithuania | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367983335) |
+| LU | Luxembourg | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367984246) |
+| LV | Latvia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367304934) |
+| LY | Libya | 2/0 | ASCII digits, Arabic, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1349342004) |
+| MA | Morocco | 1/0 | ASCII digits, Arabic | [1](https://en.wikipedia.org/w/index.php?oldid=1368833711) |
+| MC | Monaco | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371826222) |
+| MD | Moldova | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1369300318) |
+| ME | Montenegro | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367985939) |
+| MF | St. Martin | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| MG | Madagascar | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368901238) |
+| MH | Marshall Islands | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338003012) |
+| MK | North Macedonia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1344572551) |
+| ML | Mali | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002998) |
+| MM | Myanmar | 2/1 | ASCII digits, Latin, Myanmar, Myanmar digits | [1](https://en.wikipedia.org/w/index.php?oldid=1377004889) |
+| MN | Mongolia | 1/0 | ASCII digits, Cyrillic | [1](https://en.wikipedia.org/w/index.php?oldid=1376727365) |
+| MO | Macao | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377063034) |
+| MP | Northern Mariana Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1344455877) |
+| MQ | Martinique | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| MR | Mauritania | 2/0 | ASCII digits, Arabic, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003015) |
+| MS | Montserrat | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345582883) |
+| MT | Malta | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367984289) |
+| MU | Mauritius | 1/0 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=223364766) |
+| MV | Maldives | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345469488) |
+| MW | Malawi | 0/0 | Gap | Unsourced grammar |
+| MX | Mexico | 2/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368484692) |
+| MY | Malaysia | 2/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377349409) |
+| MZ | Mozambique | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003047) |
+| NA | Namibia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1353001290) |
+| NC | New Caledonia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002775) |
+| NE | Niger | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374194988) |
+| NF | Norfolk Island | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1302829805) |
+| NG | Nigeria | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1358193040) |
+| NI | Nicaragua | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003071) |
+| NL | Netherlands | 6/7 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377707144) |
+| NO | Norway | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375361487) |
+| NP | Nepal | 1/1 | ASCII digits, Devanagari, Devanagari digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003064) |
+| NR | Nauru | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003058) |
+| NU | Niue | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338003086) |
+| NZ | New Zealand | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1372963488) |
+| OM | Oman | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1365425002) |
+| PA | Panama | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375336244) |
+| PE | Peru | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1349342190) |
+| PF | French Polynesia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002770) |
+| PG | Papua New Guinea | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375335304) |
+| PH | Philippines | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375973749) |
+| PK | Pakistan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375579015) |
+| PL | Poland | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376479133) |
+| PM | St. Pierre & Miquelon | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1375947292) |
+| PN | Pitcairn | 0/0 | Gap | Unsourced grammar |
+| PR | Puerto Rico | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1377653126) |
+| PS | Palestine | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374923642) |
+| PT | Portugal | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368649490) |
+| PW | Palau | 3/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003244) |
+| PY | Paraguay | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1359377651) |
+| QA | Qatar | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1365424249) |
+| RE | Réunion | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| RO | Romania | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367060445) |
+| RS | Serbia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371473039) |
+| RU | Russia | 1/0 | ASCII digits, Cyrillic, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1362238492) |
+| RW | Rwanda | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003284) |
+| SA | Saudi Arabia | 2/0 | ASCII digits, Arabic, Arabic-Indic digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1352834674) |
+| SB | Solomon Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003337) |
+| SC | Seychelles | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003315) |
+| SD | Sudan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003367) |
+| SE | Sweden | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1366420734) |
+| SG | Singapore | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374924505) |
+| SH | St. Helena | 3/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345582883) |
+| SI | Slovenia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1349122519) |
+| SJ | Svalbard & Jan Mayen | 1/0 | ASCII digits, Latin | [1](https://no.wikipedia.org/w/index.php?oldid=25912083) |
+| SK | Slovakia | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1371504047) |
+| SL | Sierra Leone | 2/0 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=260758379) |
+| SM | San Marino | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1365288456) |
+| SN | Senegal | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003309) |
+| SO | Somalia | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003340) |
+| SR | Suriname | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003369) |
+| SS | South Sudan | 1/1 | ASCII digits, Latin | [1](https://it.wikipedia.org/w/index.php?oldid=148177462) |
+| ST | São Tomé & Príncipe | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003303) |
+| SV | El Salvador | 0/1 | ASCII digits, Latin | [1](https://es.wikipedia.org/w/index.php?oldid=175169987) |
+| SX | Sint Maarten | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003322) |
+| SY | Syria | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1369673122) |
+| SZ | Eswatini | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338002752) |
+| TC | Turks & Caicos Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345582883) |
+| TD | Chad | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376836896) |
+| TF | French Southern Territories | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| TG | Togo | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003392) |
+| TH | Thailand | 1/0 | ASCII digits, Thai | [1](https://en.wikipedia.org/w/index.php?oldid=1365790767) |
+| TJ | Tajikistan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1350953028) |
+| TK | Tokelau | 0/0 | Gap | Unsourced grammar |
+| TL | Timor-Leste | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1340753182) |
+| TM | Turkmenistan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376735676) |
+| TN | Tunisia | 1/0 | ASCII digits, Arabic | [1](https://en.wikipedia.org/w/index.php?oldid=1372898331) |
+| TO | Tonga | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003394) |
+| TR | Türkiye | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1359024284) |
+| TT | Trinidad & Tobago | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1376191684) |
+| TV | Tuvalu | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003435) |
+| TW | Taiwan | 1/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1367199647) |
+| TZ | Tanzania | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003384) |
+| UA | Ukraine | 1/0 | ASCII digits, Cyrillic, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1370202866) |
+| UG | Uganda | 2/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003439) |
+| UM | U.S. Outlying Islands | 0/0 | Gap | Unsourced grammar |
+| US | US | 167/110 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1345368469), [2](https://en.wikipedia.org/w/index.php?oldid=1377655506) |
+| UY | Uruguay | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1341501926) |
+| UZ | Uzbekistan | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1356025945) |
+| VA | Vatican City | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003465) |
+| VC | St. Vincent & Grenadines | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003294) |
+| VE | Venezuela | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003469) |
+| VG | British Virgin Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338001878) |
+| VI | U.S. Virgin Islands | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1321235066) |
+| VN | Vietnam | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1369462169) |
+| VU | Vanuatu | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1338003464) |
+| WF | Wallis & Futuna | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1359837463) |
+| WS | Samoa | 1/0 | ASCII digits | [1](https://en.wikipedia.org/w/index.php?oldid=1338003299) |
+| XK | Kosovo | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1368693154) |
+| YE | Yemen | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1343643680) |
+| YT | Mayotte | 1/0 | ASCII digits, Latin | [1](https://fr.wikipedia.org/w/index.php?oldid=238942028) |
+| ZA | South Africa | 2/1 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1374562098) |
+| ZM | Zambia | 1/0 | ASCII digits, Latin | [1](https://de.wikipedia.org/w/index.php?oldid=242232989) |
+| ZW | Zimbabwe | 1/0 | ASCII digits, Latin | [1](https://en.wikipedia.org/w/index.php?oldid=1340353174) |
+
+### Explicit missing formats and incomplete issuing series
+
+- **AQ Antarctica**: No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.
+- **BI Burundi**: English article gives no standard serial grammar; German/Ukrainian/French article attempts unavailable. Commercial plate guide found but no reuse licence established. Native photo/OCR transcription not generalized into a national grammar.
+- **BV Bouvet Island**: No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.
+- **CC Cocos Islands**: English article says current Australian-standard plates since 2000, but its serial table is blank. Italian Australian article does not establish a complete Cocos grammar. Do not inherit every Australian format.
+- **DO Dominican Republic**: Only temporary and 1996–2003 truck/SUV rules collected. Current ordinary private series remains a gap; government brochure identified but reuse licence not established.
+- **EH Western Sahara**: English/German ordinary digit-count conflict retained. Only SADR issuing series and pre-1976 Spanish example pattern included; Moroccan-administered territorial allocation is not comprehensively mapped. Not a sovereignty inference.
+- **GS South Georgia & South Sandwich Islands**: No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.
+- **HM Heard & McDonald Islands**: No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.
+- **LR Liberia**: English article documents A/B/C vehicle-class prefixes but not ordinary serial length or complete syntax. German/Ukrainian articles unavailable. Diplomatic series also lacks a bounded serial length.
+- **MW Malawi**: English plate article contains no textual serial grammar; German/Ukrainian/French attempts unavailable. Reuse terms of specialist plate galleries unconfirmed.
+- **PN Pitcairn**: No reusable sourced issuing grammar found. Sparse claims about vehicles or absence of plates are insufficient to certify non-issuance.
+- **PW Palau**: Ngiwal ordinary, government and diplomatic templates only; most state serial fields are empty. Coverage is not all 16 states.
+- **SJ Svalbard & Jan Mayen**: Svalbard ZN five-digit car series only, overlapping Norway. Jan Mayen, motorcycles and historic Russian mining-company series not fully sourced.
+- **SL Sierra Leone**: Ordinary serial and diplomatic serial only. Printed office/type field, vanity choices and earlier series are not fully modeled.
+- **SV El Salvador**: Numeric private 2011 series only. The official 2021 announcement confirms retained numeric plates and hexadecimal expansion, but the latter is not normalized from a reusable pinned grammar.
+- **TK Tokelau**: No reusable sourced issuing grammar found. Sparse claims about vehicles or absence of plates are insufficient to certify non-issuance.
+- **UG Uganda**: Digital government, police and prisons rules only; ordinary private and older private formats remain gaps. English article has no ordinary serial grammar, German/Ukrainian attempts unavailable.
+- **UM U.S. Outlying Islands**: No ordinary issuing format established in fetched reusable sources. Issuer/non-issuer status is unverified; do not infer none or inherit a parent-country serial. Research did not establish a usable format.
