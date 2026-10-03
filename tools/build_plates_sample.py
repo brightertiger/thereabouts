@@ -4,14 +4,12 @@ import argparse
 import json
 import tempfile
 from pathlib import Path
-from typing import Any
-
-import pyarrow as pa
 
 from thereabouts import _core
 from tools.build_forward_samples import ROOT
 from tools.forward_sample import COUNTRIES, Subset
-from tools.plate_sample_inputs import CODE_FIELDS, load
+from tools.plate_dataset import write_tables
+from tools.plate_sample_inputs import load
 
 
 def main() -> None:
@@ -38,85 +36,7 @@ def main() -> None:
                 countries.extend(batch.to_pylist())
                 schema = batch.schema
             source.write("countries", countries, schema)
-        for kind, rows, schema in [
-            (
-                "plate_formats",
-                [
-                    {
-                        k: (
-                            json.dumps(r[k], ensure_ascii=False, sort_keys=True)
-                            if k == "provenance"
-                            else r.get(k)
-                        )
-                        for k in (
-                            "country_code",
-                            "series_id",
-                            "series_status",
-                            "pattern",
-                            "relaxed_pattern",
-                            "code_group",
-                            "scripts",
-                            "fixed_national_marks",
-                            "specificity_bits",
-                            "provenance",
-                        )
-                    }
-                    for r in bundle["formats"]
-                ],
-                pa.schema(
-                    [
-                        (k, pa.string())
-                        for k in (
-                            "country_code",
-                            "series_id",
-                            "series_status",
-                            "pattern",
-                            "relaxed_pattern",
-                            "code_group",
-                            "provenance",
-                        )
-                    ]
-                    + [
-                        ("scripts", pa.list_(pa.string())),
-                        ("fixed_national_marks", pa.list_(pa.string())),
-                        ("specificity_bits", pa.float64()),
-                    ]
-                ),
-            ),
-            (
-                "plate_codes",
-                bundle["codes"],
-                pa.schema(
-                    [
-                        (
-                            k,
-                            pa.list_(pa.string())
-                            if k == "subdivision_codes"
-                            else pa.string(),
-                        )
-                        for k in CODE_FIELDS
-                    ]
-                ),
-            ),
-            (
-                "plate_policy",
-                [
-                    {
-                        "policy_json": json.dumps(
-                            bundle["policy"], ensure_ascii=False, sort_keys=True
-                        )
-                    }
-                ],
-                pa.schema([("policy_json", pa.string())]),
-            ),
-        ]:
-            source.write(kind, rows, schema)
-        if bundle["priors"]:
-            prior_fields: list[pa.Field[Any]] = [
-                pa.field("country_code", pa.string()),
-                pa.field("vehicles", pa.uint64()),
-            ]
-            source.write("plate_priors", bundle["priors"], pa.schema(prior_fields))
+        write_tables(source, bundle)
         provenance = source.finish("plates", total)
         provenance["input_mode"] = mode
         provenance["subset_policy"] = (

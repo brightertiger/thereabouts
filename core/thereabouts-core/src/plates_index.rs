@@ -4,7 +4,7 @@ use crate::{
     error::ensure,
     format::plates::{Code, Rule, Tables},
 };
-use regex::Regex;
+use regex::{Regex, RegexSet};
 use std::collections::{BTreeMap, BTreeSet};
 use unicode_normalization::UnicodeNormalization;
 /// Normalize NFC, ASCII case and the exact Python whitespace set from the plate contract.
@@ -29,6 +29,7 @@ pub(crate) struct PlateIndex {
     pub(crate) tables: Tables,
     pub(crate) evidence: crate::format::plate_columns::PlateColumns,
     rules: Vec<Compiled>,
+    prefilter: RegexSet,
     codes: BTreeMap<(String, String), Vec<usize>>,
     scripts: Vec<(String, Regex, f64)>,
     priors: BTreeMap<String, u64>,
@@ -97,6 +98,12 @@ impl PlateIndex {
                 relaxed,
             });
         }
+        let prefilter = RegexSet::new(
+            rules
+                .iter()
+                .flat_map(|r| [r.exact.as_str(), r.relaxed.as_str()]),
+        )
+        .map_err(|e| Error::Corrupt(format!("Invalid plate prefilter: {e}")))?;
         let mut scripts = Vec::new();
         for (name, pattern) in &tables.policy.script_patterns {
             let countries = tables
@@ -127,6 +134,7 @@ impl PlateIndex {
             tables,
             evidence,
             rules,
+            prefilter,
             codes: BTreeMap::new(),
             scripts,
             priors,
@@ -198,7 +206,19 @@ impl PlateIndex {
                 .copied()
                 .ok_or_else(|| Error::Corrupt("Missing plate weight".into()))
         };
-        for (i, compiled) in self.rules.iter().enumerate() {
+        // The union selects rule ordinals only; individual regexes retain exact
+        // precedence, captures, deduplication and scoring in original rule order.
+        let matched = self
+            .prefilter
+            .matches(value)
+            .iter()
+            .map(|id| id / 2)
+            .collect::<BTreeSet<_>>();
+        for i in matched {
+            let compiled = self
+                .rules
+                .get(i)
+                .ok_or_else(|| Error::Corrupt("Missing filtered plate rule".into()))?;
             let rule = &compiled.rule;
             if country.is_some_and(|c| c != rule.country_code)
                 || series.is_some_and(|s| s != rule.series_id)

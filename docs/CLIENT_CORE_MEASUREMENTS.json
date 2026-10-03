@@ -1268,5 +1268,39 @@
       "Utrechx (NL)"
     ],
     "cpu_sample": ".tmp/geocode-profile.txt"
+  },
+  "plates_world_rules": {
+    "before": {
+      "queries": 20000,
+      "distinct_queries": 91,
+      "seed": 271828,
+      "status_counts": {
+        "ambiguous": 18901,
+        "not_found": 1099
+      },
+      "scalar_median_us": 83.1665,
+      "scalar_p99_us": 205.75,
+      "batch_points_per_second": 15167.106442742237,
+      "rules": 704,
+      "countries": 239,
+      "scope": "all committed rules; sample code assertions; no vehicle priors",
+      "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
+    },
+    "after": {
+      "queries": 20000,
+      "distinct_queries": 91,
+      "seed": 271828,
+      "status_counts": {
+        "ambiguous": 18901,
+        "not_found": 1099
+      },
+      "scalar_median_us": 27.5,
+      "scalar_p99_us": 155.333,
+      "batch_points_per_second": 67086.22571382453,
+      "rules": 704,
+      "countries": 239,
+      "scope": "all committed rules; sample code assertions; no vehicle priors",
+      "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
+    }
   }
 }

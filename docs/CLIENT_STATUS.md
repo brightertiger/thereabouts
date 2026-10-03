@@ -326,3 +326,21 @@ remain uncommitted inside this worktree.
 | names_fuzzy_common_grams | 11553.167 / 22356.124 | 83 |
 | names_miss | 10.584 / 48.218 | 114,410 |
 <!-- forward-scale:end -->
+
+## All-rule plate inference
+
+<!-- plates-rules:start -->
+| All-rule inference | Median / p99 (µs) | Batch rows/s |
+| --- | ---: | ---: |
+| before (704 rules) | 83.166 / 205.750 | 15,167 |
+| after (704 rules) | 27.500 / 155.333 | 67,086 |
+<!-- plates-rules:end -->
+
+Plate matching now uses one anchored RegexSet across exact and relaxed patterns
+to select eligible rule ordinals before capture extraction and scoring. Original
+rule order, exact-before-relaxed precedence and evidence remain unchanged. The
+all-rule benchmark uses every committed base, extension, supplemental and
+template rule, sample code assertions, the complete fixture country universe
+and no vehicle priors. Its before/after results have identical evidence-inclusive
+result digests over the same requests. This measures rule-count scaling, not
+world code-table coverage or plate-country accuracy.
