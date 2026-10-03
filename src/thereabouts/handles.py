@@ -33,7 +33,15 @@ class Handles:
             for family, path in self.paths.items():
                 self._identity(family, path)
         else:
-            for family in ("core", "postal", "airports", "locode", "phone", "ip"):
+            for family in (
+                "core",
+                "postal",
+                "airports",
+                "locode",
+                "phone",
+                "ip",
+                "plates",
+            ):
                 try:
                     self.get(family)
                 except DataNotInstalledError:

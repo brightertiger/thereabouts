@@ -20,3 +20,5 @@ pub mod observation;
 pub mod trie;
 
 pub mod intervals;
+
+pub mod plates;

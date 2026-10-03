@@ -13,6 +13,7 @@ mod inserts;
 mod ip;
 mod locode;
 mod phone;
+mod plates;
 mod postal;
 mod source;
 mod staging;
@@ -72,7 +73,7 @@ pub fn write_pack(
 ) -> Result<Manifest> {
     if !matches!(
         family,
-        "core" | "postal" | "airports" | "locode" | "phone" | "ip"
+        "core" | "postal" | "airports" | "locode" | "phone" | "ip" | "plates"
     ) {
         return Err(Error::Input("Unsupported export family".into()));
     }
@@ -84,20 +85,21 @@ pub fn write_pack(
     if family == "core" {
         data.validate_core(&options.allow_missing_tables)?;
     } else {
-        data.require_tables(
-            &[
-                primary_table(family),
-                "places",
-                "canonical_cities",
-                "place_to_city",
-                "countries",
-                "subdivisions",
-            ],
-            &options.allow_missing_tables,
-        )?;
-    }
-    if family == "phone" {
-        data.require_tables(&["phone_metadata"], &options.allow_missing_tables)?;
+        let mut required = vec![
+            primary_table(family),
+            "places",
+            "canonical_cities",
+            "place_to_city",
+            "countries",
+            "subdivisions",
+        ];
+        if family == "phone" {
+            required.push("phone_metadata");
+        }
+        if family == "plates" {
+            required.extend(["plate_codes", "plate_policy", "plate_priors"]);
+        }
+        data.require_tables(&required, &options.allow_missing_tables)?;
     }
     let mut identity =
         json!({"manifest_sha256":data.digest,"options":options,"writer":WRITER_REVISION});
@@ -172,6 +174,7 @@ fn build(
         "locode" => locode::load(data, &db)?,
         "phone" => phone::load(data, &db)?,
         "ip" => ip::load(data, &db)?,
+        "plates" => {}
         _ => return Err(Error::Input("Unsupported export family".into())),
     }
     db.execute_batch("COMMIT")?;
@@ -204,6 +207,8 @@ fn build(
     };
     if family == "core" {
         emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
+    } else if family == "plates" {
+        plates::emit(data, stage, &mut manifest, &options.allow_missing_tables)?;
     } else {
         forward::emit(&db, stage, &mut manifest)?;
     }
@@ -311,6 +316,7 @@ fn primary_table(family: &str) -> &str {
         "locode" => "trade_locations",
         "phone" => "phone_prefixes",
         "ip" => "ip_ranges",
+        "plates" => "plate_formats",
         other => other,
     }
 }
@@ -318,6 +324,7 @@ fn normalization(family: &str) -> &[&str] {
     match family {
         "postal" => &postal::NORMALIZATION,
         "ip" => &["ip_literal"],
+        "plates" => &["nfc", "upper_ascii", "collapse_python_whitespace"],
         "phone" => &["e164_plus", "strip_phone_presentation"],
         "airports" | "locode" => &airports::NORMALIZATION,
         _ => &[],

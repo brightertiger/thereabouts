@@ -269,6 +269,7 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | locode | 349,522 / 225 | 31 | 7.750 / 15.710 | 469,668 | 180,528,890 |
 | phone | 187,284 / 389 | 29 | 4.333 / 4.583 | 967,617 | 206,165,020 |
 | ip | 234,875 / 449 | 58 | 7.875 / 12.208 | 472,964 | 4,073,362,321 |
+| plates | 1,139,827 / 521 | 36 | 28.417 / 35.334 | 55,176 | 316,515,300 |
 <!-- forward-measurements:end -->
 
 ## Airports
@@ -332,3 +333,31 @@ The sample selects the first 32 ranges per country and address family, plus the
 ranges containing the two documented DNS examples. Its source extract is checked
 independently at every start, midpoint, end and successor. Shared vectors cover
 both families, misses and invalid input. No world export was run.
+
+## Plates and the missing plate-country release
+
+The plate/plate_columns methods and plates writer are implemented. Country hints
+remain exact for empty strings, unknown codes and unsupported formats. Unhinted
+serials return ranked candidates and retain the reference's open-world abstention
+even for a singleton. State fields require eligible current (or explicitly
+selected historic) source evidence. Offices and repeated Wikidata entity
+associations never become invented canonical cities. Source series and finer
+registration assertions are retained in evidence.
+
+The requested real normalized/plates_country directory and its vehicle-prior
+inputs are absent. The sample builder therefore uses the existing read-only
+normalized/plates tables, pinned India state table, and committed format rules.
+The manifest records this fallback and explicitly omits plate_priors. Scoring
+disables that term and reports plate_evidence_without_vehicle_prior. This is
+not claimed to reproduce the full plate-country release's prior ranking.
+When that release is available, the same builder reads its verified manifest,
+bundle and Parquet inventory. The pipeline's future plates dataset table replaces
+the input adapter; the pack schema stays the same.
+
+The first extraction measured 10,833,728 bytes and exceeded the fixture budget.
+The reduced sample retains all selected registration-unit assertions and one
+entity-association example per selected code, plus all format rules for the seven
+countries. Thirty-six shared vectors and independent comparisons with the Python
+reference cover normalization, ranking without the unavailable prior, geographic
+eligibility, historic-series restrictions and country fallback. Complete release
+ingestion and vehicle-prior ranking remain unverified against real inputs.

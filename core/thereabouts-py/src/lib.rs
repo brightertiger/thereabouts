@@ -220,6 +220,36 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, addresses, |address| pack.ip(address, false))
     }
+    #[pyo3(signature=(value, *, country=None, series=None, evidence=false))]
+    fn plate(
+        &self,
+        py: Python<'_>,
+        value: &str,
+        country: Option<&str>,
+        series: Option<&str>,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .plate(value, country, series, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    #[pyo3(signature=(values, *, country=None, series=None))]
+    fn plate_columns<'py>(
+        &self,
+        py: Python<'py>,
+        values: Vec<String>,
+        country: Option<&str>,
+        series: Option<&str>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        columns::forward(py, values, |value| {
+            pack.plate(value, country, series, false)
+        })
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

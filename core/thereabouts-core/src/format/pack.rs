@@ -47,6 +47,7 @@ pub struct Pack {
     pub(crate) place_count: usize,
     pub(crate) exacts: Vec<super::exact::Exact>,
     pub(crate) tries: Vec<super::trie::Trie>,
+    pub(crate) plates: Option<crate::plates_index::PlateIndex>,
     intervals: Vec<super::intervals::Intervals>,
     // One MiB bounds repeated exact-address queries without retaining full interval tables.
     address_cache: Mutex<Cache<super::intervals::Address, Vec<(usize, usize)>>>,
@@ -66,6 +67,7 @@ impl Pack {
         let mut exacts = Vec::new();
         let mut tries = Vec::new();
         let mut intervals = Vec::new();
+        let mut plates = None;
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
@@ -73,21 +75,9 @@ impl Pack {
             let path = manifest::artifact_path(root, &file.path)?;
             match file.kind.as_str() {
                 "catalogue" => {
-                    let shard = FileShard::open(&path, 2, &[80, 8, 1])?;
-                    catalogue::validate_header(&shard)?;
-                    let end = place_count
-                        .checked_add(shard.len(0)? / 80)
-                        .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
-                    ensure(
-                        u32::try_from(end).is_ok(),
-                        "Catalogue exceeds u32 references",
-                    )?;
-                    catalogues.push(CatalogueSource {
-                        first: place_count,
-                        end,
-                        shard,
-                    });
-                    place_count = end;
+                    let source = catalogue_source(&path, place_count)?;
+                    place_count = source.end;
+                    catalogues.push(source);
                 }
                 "metadata" => {
                     ensure(metadata.is_none(), "Repeated metadata table")?;
@@ -118,6 +108,13 @@ impl Pack {
                 "exact" => exacts.push(super::exact::Exact::open(&path)?),
                 "trie" => tries.push(super::trie::Trie::open(&path)?),
                 "intervals" => intervals.push(super::intervals::Intervals::open(&path)?),
+                "plates" => {
+                    ensure(plates.is_none(), "Repeated plate evidence")?;
+                    let c = Container::decode(fs::read(path)?, 7, &[1])?;
+                    plates = Some(serde_json::from_slice::<super::plates::Tables>(
+                        c.section(0),
+                    )?);
+                }
                 "notice" => {}
                 _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
             }
@@ -127,6 +124,7 @@ impl Pack {
                 "core" => true,
                 "phone" => !tries.is_empty(),
                 "ip" => !intervals.is_empty(),
+                "plates" => plates.is_some(),
                 _ => !exacts.is_empty(),
             },
             "Missing required exact index",
@@ -134,6 +132,9 @@ impl Pack {
         let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
         metadata.validate()?;
         let metadata_index = MetadataIndex::build(&metadata)?;
+        let plates = plates
+            .map(|tables| crate::plates_index::PlateIndex::new(tables, metadata.countries.len()))
+            .transpose()?;
         Ok(Self {
             manifest,
             metadata,
@@ -144,6 +145,7 @@ impl Pack {
             exacts,
             tries,
             intervals,
+            plates,
             address_cache: Mutex::new(Cache::new(1024 * 1024)),
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
@@ -326,4 +328,17 @@ impl Pack {
             .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
         Ok(Some(places.insert(reference, place, bytes)))
     }
+}
+
+fn catalogue_source(path: &Path, first: usize) -> Result<CatalogueSource> {
+    let shard = FileShard::open(path, 2, &[80, 8, 1])?;
+    catalogue::validate_header(&shard)?;
+    let end = first
+        .checked_add(shard.len(0)? / 80)
+        .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
+    ensure(
+        u32::try_from(end).is_ok(),
+        "Catalogue exceeds u32 references",
+    )?;
+    Ok(CatalogueSource { first, end, shard })
 }

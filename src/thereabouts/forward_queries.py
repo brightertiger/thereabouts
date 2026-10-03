@@ -129,3 +129,37 @@ class ForwardQueries:
         return self._handles.get("ip").ip_columns(
             [address if isinstance(address, str) else "" for address in addresss]
         )
+
+    def plate(
+        self,
+        value: str,
+        *,
+        country: str | None = None,
+        series: str | None = None,
+        evidence: bool = False,
+    ) -> Result:
+        """Find registration evidence; supplied country context remains exact."""
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("plates").plate(
+                value if isinstance(value, str) else "",
+                country=country,
+                series=series,
+                evidence=evidence,
+            )
+        )
+
+    def plate_columns(
+        self,
+        values: Iterable[str],
+        *,
+        country: str | None = None,
+        series: str | None = None,
+    ) -> dict[str, NDArray[Any]]:
+        """Return plate columns and ranked format-country candidates."""
+        self._ensure_open()
+        return self._handles.get("plates").plate_columns(
+            [v if isinstance(v, str) else "" for v in values],
+            country=country,
+            series=series,
+        )

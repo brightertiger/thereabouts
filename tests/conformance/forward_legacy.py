@@ -13,6 +13,13 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 def resolve(
     geo: Geocoder, request: dict[str, Any], *, evidence: bool = False
 ) -> Result:
+    if request["kind"] == "plate":
+        return geo.plate(
+            request["values"][0],
+            country=request.get("country"),
+            series=request.get("series"),
+            evidence=evidence,
+        )
     if request["kind"] == "ip":
         return geo.ip(request["values"][0], evidence=evidence)
     if request["kind"] == "phone":

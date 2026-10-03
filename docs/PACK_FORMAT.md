@@ -527,3 +527,78 @@ associations are projected. Observation name is the published city text, code
 is start + U+2013 + end, scheme is ipv4 or ipv6, and details JSON preserves
 country_code, region and city text, including explicit nulls. Source text remains
 available in evidence when it differs from canonical country/state/city fields.
+
+## Plates family (kind 7)
+
+The plates family currently takes an explicit adapter dataset with table kinds
+plate_formats, plate_codes, plate_policy, plate_priors, and the five geographic
+tables required by postal. The adapter reads the plate-country release's bundle
+and inventoried Parquet artifacts. When the pipeline supplies its plates dataset
+table, the adapter input switches to that table; the wire model is unchanged.
+Missing vehicle priors are allowed only by the explicit fixture option
+allow_missing_tables=["plate_priors"], and are recorded in the wire payload.
+
+A single kind-7 container has one byte section: UTF-8 JSON with the following
+required fields. Unknown JSON fields may be ignored. Null strings below are
+distinct from missing required fields.
+
+- policy: max_input_length (64), code_separators (string), levels (map of unit
+  kinds to "place"/"state"), script_patterns (map of script names to regexes),
+  weights (finite numbers for known_code, fixed_mark, script, specificity,
+  log_vehicle_prior, relaxed_penalty), geography (see below), decimal_zeroes
+  (array of Unicode code points, each beginning ten consecutive decimal digits),
+  decimal_unicode_version (the source Unicode database version).
+- geography: excluded_countries and allowed_scopes (string arrays), state_prefix
+  (country to prefix-length map), unknown_status_eligible,
+  block_if_non_geographic_format_matches, historic_requires_explicit_series
+  (booleans).
+- formats: ordered records containing country_code, series_id, series_status,
+  pattern, relaxed_pattern (strings), code_group (string/null), scripts and
+  fixed_national_marks (string arrays), specificity_bits (finite number), and
+  provenance (source JSON). Regex syntax uses explicit ranges and named captures;
+  patterns are anchored to the entire input. Invalid patterns/captures fail open.
+- codes: ordered records containing country_code, code, unit_kind, scope,
+  series_status, source_url, license (strings), name_en, name_local,
+  subdivision_scope (string/null), subdivision_codes (array of explicit ISO codes).
+- priors: records containing country_code and vehicles (u64).
+- prior_available: boolean; true requires nonempty priors, false requires empty
+  priors and disables the vehicle-prior term without substituting a guessed count.
+
+Normalization is exactly ["nfc", "upper_ascii", "collapse_python_whitespace"].
+NFC precedes ASCII-only uppercase. Whitespace is U+0009–000D, U+001C–001F,
+U+0020, U+0085, U+00A0, U+1680, U+2000–200A, U+2028–2029, U+202F, U+205F,
+U+3000. Runs become one ASCII space and are trimmed. No script transliteration
+or confusable folding occurs. More than 64 Unicode scalar values disables
+format inference. Captured-code equality additionally removes code_separators
+and maps the declared decimal ranges to ASCII, preserving leading zeroes.
+
+Matching, ranking and geographic eligibility follow docs/PLATES.md's
+"Deterministic reference contract" and "Geographic eligibility and reasons":
+try exact before relaxed per rule; country score is the maximum rule score;
+deduplicate (country, temporal status, used pattern, capture) in source order.
+Score is the weighted sum of known-code presence, fixed-mark presence, maximum
+observed non-Latin script rarity, exported specificity, log2 vehicle count and
+negative relaxed penalty. Rarity is log2(country-table count / max(1, countries
+whose format metadata contains the script)). Missing country priors use the
+median of supplied counts; an explicitly absent prior table disables that term.
+Round to six decimals, ties to even; sort descending score then ISO code.
+Matching-rule evidence sorts by score then series ID, preserving source-order ties.
+
+Only allowed registration-unit scopes and compatible temporal status supply
+geography; unknown status and narrower subdivision prerequisites are excluded
+under the policy. Historic geography requires explicit series. Non-geographic
+series may block geography; configured countries may require unsupported state
+context. State-prefix fallback uses only declared prefix lengths and source rows.
+All distinct eligible assertions remain in evidence; conflicting state names
+leave flat state null. When a unique state assertion has one explicit subdivision
+row, state fields come from that row; otherwise the published code/name is used.
+Registration offices and source entity associations never become canonical cities.
+
+A known country hint always returns that country with kind plate and match exact,
+even for empty input or unknown formats. Invalid country identifiers return
+invalid_input. Without a hint, inferred countries are ranked candidates with
+status ambiguous and flat fields null, including singleton candidates: this
+open-world catalogue does not certify country uniqueness. No matches return
+not_found. rank_basis is plate_evidence, or
+plate_evidence_without_vehicle_prior for an explicitly incomplete fixture.
+Source series, score, capture and geographic assertions are opt-in evidence.

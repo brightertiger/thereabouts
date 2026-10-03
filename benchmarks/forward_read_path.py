@@ -29,7 +29,7 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         raise ValueError("Benchmark needs matching US vectors")
     values = [queries[i % len(queries)] for i in range(iterations)]
     durations, rates = [], []
-    verb = "airport" if family == "airports" else family
+    verb = {"airports": "airport", "plates": "plate"}.get(family, family)
     kwargs: dict[str, Any] = {"country": country}
     if family in {"phone", "ip"}:
         kwargs = {}
@@ -115,7 +115,7 @@ def update_status(data: dict[str, Any]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "family", choices=["postal", "airports", "locode", "phone", "ip"]
+        "family", choices=["postal", "airports", "locode", "phone", "ip", "plates"]
     )
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument(

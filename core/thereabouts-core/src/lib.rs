@@ -17,3 +17,7 @@ pub mod postal;
 pub mod phone;
 
 pub mod ip;
+
+pub mod plates;
+mod plates_geography;
+mod plates_index;

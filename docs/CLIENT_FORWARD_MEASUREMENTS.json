@@ -120,6 +120,29 @@
         481729.4008556275,
         471813.563038312
       ]
+    },
+    "plates": {
+      "pack_bytes": 1139827,
+      "sample_rows": 521,
+      "world_source_rows": 144675,
+      "estimated_world_bytes": 316515300,
+      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "vectors": 36,
+      "iterations": 20000,
+      "distinct_queries": 3,
+      "country": "US",
+      "scalar_median_us": 28.417,
+      "scalar_p99_us": 35.33440999999993,
+      "batch_points_per_second": 55176.13030356115,
+      "batch_repeats": [
+        54300.96435718071,
+        54905.23989649256,
+        55176.13030356115,
+        53880.64081700032,
+        55250.59651046783,
+        55757.76138668121,
+        55447.58678274413
+      ]
     }
   }
 }
