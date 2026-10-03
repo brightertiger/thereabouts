@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -84,13 +83,8 @@ def test_numeric_input_types_and_column_stored_parent() -> None:
         assert bad.status.tolist() == ["invalid_input", "invalid_input"]
 
 
-def test_mixed_shards_stay_mapped_until_close(tmp_path: Path) -> None:
-    from pipeline.engines.serving.export import export
-    from tests.serve.fixtures import golden
-
-    manifest, release = golden(tmp_path / "input")
-    output = export(manifest, release, tmp_path / "pack", shard_bytes=256)
-    geo = Geocoder(output)
+def test_mixed_shards_stay_mapped_until_close() -> None:
+    geo = Geocoder(PACK)
     points = [(12.97, 77.59), (0, 179.99)]
     expected = [geo.reverse(*point) for point in points]
     mappings = dict(geo._pack.spatials)

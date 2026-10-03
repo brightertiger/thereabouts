@@ -6,6 +6,7 @@ from collections.abc import Sequence
 
 from pipeline.arguments import parse
 from pipeline.commands import execute_run, inspect_plan, inspect_status, invalidate
+from pipeline.content.command import main as digest_main
 from pipeline.migration.command import migrate
 from pipeline.pins.cli import main as pins_main
 from pipeline.runtime.context import context
@@ -15,6 +16,8 @@ from pipeline.runtime.ledger import Ledger
 def main(argv: Sequence[str] | None = None) -> int:
     try:
         arguments = list(sys.argv[1:] if argv is None else argv)
+        if arguments[:1] == ["digest"]:
+            return digest_main(arguments[1:])
         if arguments[:1] == ["pins"]:
             return pins_main(arguments[1:])
         options = parse(arguments)

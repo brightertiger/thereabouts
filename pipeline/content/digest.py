@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import tempfile
@@ -18,7 +17,6 @@ import pyarrow.parquet as pq
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.reconcile.common import Row
 from pipeline.runtime.jsonio import digest as fingerprint
-from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
 from .sorting import RowHashes
@@ -126,40 +124,3 @@ def digest_dataset(
             print(f"digested {kind}: {tables[kind]['rows']:,} rows", flush=True)
     result: Row = {"format": "thereabouts-golden-content-1", "tables": tables}
     return {**result, "sha256": fingerprint(result)}
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("dataset", type=Path)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument(
-        "--manifest",
-        type=Path,
-        help="Manifest whose paths are relative to dataset root",
-    )
-    parser.add_argument("--compare", type=Path, help="Fail if a saved digest differs")
-    parser.add_argument(
-        "--temp-dir",
-        type=Path,
-        required=True,
-        help="Scratch for bounded-memory sorting",
-    )
-    args = parser.parse_args()
-    if (
-        args.output.resolve()
-        == (args.manifest or args.dataset / "manifest.json").resolve()
-    ):
-        parser.error("--output must not overwrite the dataset manifest")
-    if args.compare and args.output.resolve() == args.compare.resolve():
-        parser.error("--output must not overwrite --compare")
-    value = digest_dataset(
-        args.dataset, temp_dir=args.temp_dir, manifest_path=args.manifest
-    )
-    write_json(args.output, value)
-    if args.compare and read_json(args.compare) != value:
-        raise SystemExit("Golden table contents differ; inspect the per-table digests")
-    print(value["sha256"])
-
-
-if __name__ == "__main__":
-    main()

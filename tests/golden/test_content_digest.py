@@ -7,9 +7,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
+from pipeline.cli import main
+from pipeline.content.digest import digest_dataset
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.reconcile.common import Row
-from pipeline.evaluation.content import digest_dataset, main
 from pipeline.runtime.jsonio import write_json
 
 
@@ -125,7 +126,8 @@ def test_cli_writes_comparable_json_and_returns_failure_for_differences(
         sys,
         "argv",
         [
-            "digest_golden",
+            "pipeline",
+            "digest",
             str(a),
             "--output",
             str(baseline),
@@ -133,12 +135,13 @@ def test_cli_writes_comparable_json_and_returns_failure_for_differences(
             str(tmp_path),
         ],
     )
-    main()
+    assert main() == 0
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "digest_golden",
+            "pipeline",
+            "digest",
             str(a),
             "--output",
             str(output),
@@ -148,13 +151,14 @@ def test_cli_writes_comparable_json_and_returns_failure_for_differences(
             str(tmp_path),
         ],
     )
-    main()
+    assert main() == 0
     assert baseline.read_bytes() == output.read_bytes()
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "digest_golden",
+            "pipeline",
+            "digest",
             str(b),
             "--output",
             str(output),
@@ -164,6 +168,21 @@ def test_cli_writes_comparable_json_and_returns_failure_for_differences(
             str(tmp_path),
         ],
     )
-    with pytest.raises(SystemExit, match="contents differ"):
-        main()
+    assert main() == 2
     assert read_json(output) != read_json(baseline)
+
+
+@pytest.mark.parametrize("target", ["output", "temp-dir"])
+def test_cli_refuses_writes_under_the_input_dataset(
+    tmp_path: Path, target: str
+) -> None:
+    source = dataset(tmp_path / "input", [pa.table({"id": [1]})])
+    output = source / "report.json" if target == "output" else tmp_path / "report.json"
+    scratch = source if target == "temp-dir" else tmp_path
+    assert (
+        main(
+            ["digest", str(source), "--output", str(output), "--temp-dir", str(scratch)]
+        )
+        == 2
+    )
+    assert not output.exists()

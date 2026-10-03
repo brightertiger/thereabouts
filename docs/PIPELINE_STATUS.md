@@ -114,6 +114,19 @@ Handover dry-run: **85,577 updates**, **317.48 s**,
 Both checks simulate adoption and verify mapping and hashes only. The real ledger
 SHA256 remains unchanged; no engine ran against that workspace.
 
+## Package 2–3 review checkpoint: fix 8
+
+Removed the pipeline's duplicated pack format and serving exporters, their
+export-only tests and three exporter benchmarks. Client decoder coverage keeps
+using committed binary fixtures; malformed test payloads use client constants.
+The future packs adapter calls the Rust client's `write_pack` binding; actual
+pack generation waits for the branches to merge. Removed unused cell comparison,
+moved plate benchmark support beside its tests, and exposed logical content
+hashing and its sorter together under `pipeline digest`. Full gate: **646 passed,
+8 skipped in 38.41 s**; Ruff and strict mypy pass. Read-only simulated plan:
+**85,577 current / 0 stale / 0 new**, **328.52 s**, **1,433,485,312 bytes RSS**.
+The per-stage table is unchanged. The real ledger SHA256 is unchanged.
+
 ## Package 3: engines and independent handover
 
 The executable registry now covers reconcile, cells, cities, evaluate,

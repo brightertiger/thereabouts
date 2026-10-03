@@ -33,3 +33,9 @@ handover only to copied JSON and a copied ledger, then verifies unchanged source
 bytes and idempotence. The other reconstructs a bounded Malaysia pilot and
 compares logical rows and complete Parquet SHA256 for radius OFF and ON. They
 require `THEREABOUTS_PIPELINE_DATA` and an explicit worktree `--basetemp`.
+
+The package-2/3 review removes the pipeline's duplicated pack exporters and 22
+exporter-specific tests. Client corruption, catalogue and mixed-shard read tests
+remain, using committed packs and malformed test payloads built from client-owned
+constants. The client writer owns binary generation tests on `feat/rust-core`;
+the pipeline release adapter gets contract tests with a fake in package 4.

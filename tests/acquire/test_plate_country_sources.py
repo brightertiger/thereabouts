@@ -12,8 +12,9 @@ from pipeline.engines.plate_country.syntax import (
     specificity,
     template_pattern,
 )
-from pipeline.evaluation import plates as evaluation
 from pipeline.runtime.jsonio import sha256_file, write_json
+
+from . import plate_evaluation as evaluation
 
 
 def wiki(path: Path, html: str) -> Row:

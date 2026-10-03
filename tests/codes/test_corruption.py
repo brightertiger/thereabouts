@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from pipeline.engines.serving_codes.encoding import Buffer
+from tests.support.pack_fixture import write_exact
 from thereabouts.client import Geocoder
 from thereabouts.packs.errors import CorruptPackError
 from thereabouts.packs.exact import Exact
@@ -36,10 +36,8 @@ def test_decompression_bound_and_trailing_stream_are_rejected(
         Exact(path, int(record["max_record_bytes"]))
 
     raw = canonical({"candidates": [None]})
-    buffer = Buffer()
-    buffer.add("AA\0X", 1, raw, zlib.compress(raw) + b"trailing")
     malformed = tmp_path / "trailing.bin"
-    buffer.write(malformed)
+    write_exact(malformed, [("AA\0X", 1, raw, zlib.compress(raw) + b"trailing")])
     shard = Exact(malformed, len(raw))
     try:
         with pytest.raises(CorruptPackError, match="framing"):
@@ -57,20 +55,25 @@ def test_bad_references_fail_full_verification(
     record = next(row for row in value["files"] if row["kind"] == "exact")
     path = target / record["path"]
     shard = Exact(path, record["max_record_bytes"])
-    buffer = Buffer()
+    records = []
     try:
         for i in range(shard.count):
             body = shard.payload(i)
             body["candidates"][0]["refs"][0] = value["place_count"] + 1
             raw = canonical(body)
-            buffer.add(
-                shard.key(i).decode(), len(body["candidates"]), raw, zlib.compress(raw)
+            records.append(
+                (
+                    shard.key(i).decode(),
+                    len(body["candidates"]),
+                    raw,
+                    zlib.compress(raw),
+                )
             )
     finally:
         shard.close()
-    buffer.write(path)
+    maximum = write_exact(path, records)
     record.update(
-        size=path.stat().st_size, sha256=sha256(path), max_record_bytes=buffer.maximum
+        size=path.stat().st_size, sha256=sha256(path), max_record_bytes=maximum
     )
     (target / "manifest.json").write_bytes(canonical(value))
     with pytest.raises(CorruptPackError, match="reference"):

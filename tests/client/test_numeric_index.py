@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from h3.api import basic_int as h3
 
-from pipeline.engines.serving.encoding import write_container
+from tests.support.pack_fixture import write_container
 from thereabouts.packs.address import address
 from thereabouts.packs.errors import CorruptPackError
 from thereabouts.packs.layout import (

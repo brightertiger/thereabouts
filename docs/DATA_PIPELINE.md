@@ -229,9 +229,10 @@ with immutable input-hash subdirectories. `cells/base/current.json` points to th
 base manifest; `cells/current.json` points to the verified normalized manifest.
 Every artifact record is relative to the workspace root. The table schema remains
 [GOLDEN_DATASET.md](GOLDEN_DATASET.md) until the package-4 dataset README replaces
-it. Build-side serving helpers can read a new manifest with
-`read_snapshot(manifest_path, root=workspace_root)`; retained golden manifests
-keep their historical relative root anchor. These helpers are not release stages.
+it. The release pack stage will call the client-owned
+`thereabouts._core.write_pack(dataset_dir, family, output_dir, options)` binding.
+The old pipeline pack format and exporters have been removed; real pack builds
+require the Rust client branch to merge.
 
 The old controller-specific tests were retired with their controllers. Their
 shared-runtime replacements and the preserved source/engine decisions are listed
@@ -388,3 +389,9 @@ instructions to rebuild the protected workspace. [SERVING_FORMAT.md](SERVING_FOR
 still defines the unchanged pack format. [GOLDEN_DATASET.md](GOLDEN_DATASET.md)
 is the current golden table schema until the release README replaces it. The new release README layout draft is
 [DATASET_README.md](DATASET_README.md); dataset and pack generation are package 4.
+
+Logical table comparisons are available through `python -m pipeline digest
+DATASET --output REPORT.json --temp-dir SCRATCH [--compare BASELINE.json]`.
+The command reads the dataset and writes only to the explicitly separate report
+and scratch directories. Row order, partitioning and Parquet metadata do not
+change its digest.

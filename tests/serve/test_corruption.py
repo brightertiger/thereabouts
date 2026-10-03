@@ -6,8 +6,7 @@ from typing import Any
 
 import pytest
 
-from pipeline.engines.serving.checkpoints import file_record
-from pipeline.engines.serving.metadata import write_manifest
+from tests.support.pack_fixture import file_record, write_manifest
 from thereabouts.packs.catalogue import Catalogue
 from thereabouts.packs.errors import CorruptPackError, UnsupportedPackError
 from thereabouts.packs.jsonio import parse

@@ -5,7 +5,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 import pytest
 
-from pipeline.engines.serving.snapshot import read_snapshot
+from pipeline.engines.artifacts import read_json
 from pipeline.runtime.execution import Executor
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
@@ -89,8 +89,10 @@ def test_country_block_and_city_stages_resume_and_repair_corruption(
         manifest = engine_io.artifact(
             ctx, "lookups", "manifest/current", suffix="manifest.json"
         )
-        snapshot = read_snapshot(manifest, root=tmp_path)
-        assert snapshot.tables("cells") and snapshot.tables("place_to_city")
+        snapshot = read_json(manifest)
+        assert snapshot["completed"]
+        kinds = {record["kind"] for record in snapshot["tables"]}
+        assert {"cells", "place_to_city"} <= kinds
         with pytest.raises(ValueError, match="pilot quality gate failed"):
             Executor(ctx, stages, lambda _: None).execute("reconcile")
         assert ledger.get("reconcile", "gate/pilot") is None
