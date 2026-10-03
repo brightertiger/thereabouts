@@ -7,6 +7,50 @@
       "request": {
         "kind": "geocode",
         "values": [
+          "Kidarakulam"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-KL",
+          "name": "Kerala"
+        },
+        "city": {
+          "id": "city:geonames:11189062",
+          "name": "Kidarakulam",
+          "name_en": "Karakulam",
+          "kind": "town",
+          "population": 29624,
+          "point": {
+            "lat": 8.56688,
+            "lon": 76.99129
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 8.56688,
+          "lon": 76.99129
+        },
+        "cell": "8860263ab1fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-001",
+      "request": {
+        "kind": "geocode",
+        "values": [
           "Marne La Vallée"
         ],
         "country": "FR"
@@ -47,7 +91,7 @@
       }
     },
     {
-      "id": "core-names-sample-001",
+      "id": "core-names-sample-002",
       "request": {
         "kind": "geocode",
         "values": [
@@ -91,7 +135,7 @@
       }
     },
     {
-      "id": "core-names-sample-002",
+      "id": "core-names-sample-003",
       "request": {
         "kind": "geocode",
         "values": [
@@ -129,50 +173,6 @@
           "lon": 73.85535
         },
         "cell": "8860885017fffff",
-        "distance_band": null,
-        "candidates": [],
-        "rank_basis": "population"
-      }
-    },
-    {
-      "id": "core-names-sample-003",
-      "request": {
-        "kind": "geocode",
-        "values": [
-          "Chennai"
-        ],
-        "country": "IN"
-      },
-      "result": {
-        "status": "matched",
-        "kind": "city",
-        "match": "exact",
-        "country": {
-          "code": "IN",
-          "code3": "IND",
-          "name": "India"
-        },
-        "state": {
-          "code": "IN-TN",
-          "name": "Tamil Nādu"
-        },
-        "city": {
-          "id": "city:geonames:1264527",
-          "name": "Chennai",
-          "name_en": "Chennai",
-          "kind": "city",
-          "population": 4681087,
-          "point": {
-            "lat": 13.08784,
-            "lon": 80.27847
-          }
-        },
-        "timezone": null,
-        "point": {
-          "lat": 13.08784,
-          "lon": 80.27847
-        },
-        "cell": "88618c48e3fffff",
         "distance_band": null,
         "candidates": [],
         "rank_basis": "population"
@@ -2840,6 +2840,50 @@
         "candidates": [],
         "rank_basis": null,
         "hint": "Use from_h3(cell) for H3 identifiers."
+      }
+    },
+    {
+      "id": "core-names-sample-051",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Karakulam"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "alternate_name",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-KL",
+          "name": "Kerala"
+        },
+        "city": {
+          "id": "city:geonames:11189062",
+          "name": "Kidarakulam",
+          "name_en": "Karakulam",
+          "kind": "town",
+          "population": 29624,
+          "point": {
+            "lat": 8.56688,
+            "lon": 76.99129
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 8.56688,
+          "lon": 76.99129
+        },
+        "cell": "8860263ab1fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
       }
     }
   ]

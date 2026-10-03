@@ -39,7 +39,7 @@
     "family": "core",
     "world_source_rows": 68923,
     "pyarrow": "23.0.1",
-    "subset_policy": "twelve most populous canonical cities per country plus named examples and all canonical Springfields in the seven countries",
+    "subset_policy": "twelve most populous canonical cities per country plus named examples and all canonical Springfields in the seven countries; Kidarakulam/Karakulam supplies a real differing English spelling",
     "parquet": {
       "version": "2.6",
       "compression": "zstd",
@@ -48,6 +48,16 @@
     }
   },
   "rows": [
+    {
+      "city_id": "city:geonames:11189062",
+      "name": "Kidarakulam",
+      "name_en": "Karakulam",
+      "kind": "town",
+      "population": 29624,
+      "latitude": 8.56688,
+      "longitude": 76.99129,
+      "country_code": "IN"
+    },
     {
       "city_id": "city:geonames:12278193",
       "name": "Marne La Vallée",

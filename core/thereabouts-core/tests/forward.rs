@@ -3,6 +3,7 @@
     test,
     allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
 )]
+mod support;
 use std::{fs, path::PathBuf};
 use thereabouts_core::format::Pack;
 #[test]
@@ -88,6 +89,7 @@ fn original_postal_expectations() {
                 previous["state"]["id"].as_str(),
                 evidence.state_id.as_deref()
             );
+            support::point(answer.point.as_ref(), previous);
             if case["id"] == 29 {
                 // Approved F6: source geography stays null; flat country comes from key.
                 assert!(previous["country"].is_null());

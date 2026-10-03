@@ -150,7 +150,8 @@ as unchanged snapshots. Rust and Python both check the following:
   allowance remain explicit. Code matches now use exact.
 
 The 19 forward legacy cases therefore assert 11 matched, 3 ambiguous, 2 not_found
-and 3 invalid_input results against original expectations. They run in addition
+and 3 invalid_input results against original expectations, including source
+coordinates with only the documented microdegree rounding tolerance. They run in addition
 to new shared snapshots and offline independent source checks.
 
 There are 139 real reverse vectors. Offline pytest independently checks 131 r8
@@ -159,9 +160,8 @@ and timezone rows. Every forward family has at least 20 shared real vectors;
 the table below lists counts. Additional synthetic vectors cover the 19 legacy
 forward cases, six phone cases and seven name cases. Independent forward checks
 use committed source observations, canonical links, inclusive IP boundaries,
-plate reference semantics and city population ordering. The real name subset
-has no differing English names; English and future alternate-table behavior is
-explicitly synthetic. Tests require no access to real data. Node execution
+plate reference semantics and city population ordering. The real name subset includes Kidarakulam/Karakulam as a differing English
+spelling. Future alternate-table behavior also has synthetic coverage. Tests require no access to real data. Node execution
 awaits its binding package; the JSON is shared.
 
 ## Measurements
@@ -206,7 +206,7 @@ query numbers remain historical records in the measurements JSON.
 | phone | 70,696 / 395 | 30 | 4.458 / 7.208 | 5.459 / 12.875 | 418,418 | 10,138,902 |
 | ip | 46,544 / 450 | 60 | 6.959 / 14.833 | 7.291 / 9.917 | 577,381 | 217,050,567 |
 | plates | 48,499 / 521 | 36 | 4.834 / 5.083 | 5.167 / 17.833 | 246,194 | 4,570,923 |
-| geocode | 210,397 / 101 | 51 | 7.875 / 13.584 | 8.334 / 42.583 | 367,764 | 11,846,553 |
+| geocode | 213,326 / 102 | 52 | 8.333 / 30.750 | 8.834 / 46.125 | 348,995 | 11,940,180 |
 <!-- forward-measurements:end -->
 
 ## Plates source limitation and remaining work
@@ -222,8 +222,10 @@ It does not claim the unavailable release's full prior ranking.
 The builder supports a verified plate-country release when supplied. The
 pipeline's future plates dataset table will replace this adapter without changing
 the wire model. Complete real release ingestion and vehicle-prior ranking remain
-unverified. Phone's real sample has country-only links; synthetic cases cover
-regional/city links, and strict world handling of unlinked territories is untested.
+unverified. Phone state/city output depends on pipeline prefix-to-place links: the real
+sample links only to country rows. Description text such as Mumbai is retained
+as evidence and never converted to city identity. Synthetic cases cover
+regional/city links; strict world handling of unlinked territories is untested.
 
 The real names table is pending; the writer already accepts its tested canonical
 alternate-name shape. Full-place names and scope="places" remain optional later
@@ -362,3 +364,7 @@ Candidate ordering and explicit country-hint behavior remain unchanged. Legacy
 case 29 retains its null source-country ID while its public country now comes
 from the AA key; this is an explicit allowance alongside the original case
 52 airport-default remap and canonical-name allowance.
+
+Review fix 8 corrects the public keyword `ip_columns(addresses=...)`, adds the
+real English-name vector and asserts legacy source points in Rust and Python.
+No original legacy expectation file is regenerated.

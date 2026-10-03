@@ -5,6 +5,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from thereabouts import Geocoder, Result
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -76,6 +78,25 @@ def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
             )
         )
         previous = candidates[identity]
+        # Legacy candidates store the published source point in observations.
+        anchor = sorted(
+            previous["observations"],
+            key=lambda o: (
+                o["source"],
+                o["source_id"],
+                o["fields"].get("name") or o["fields"].get("place_name") or "",
+            ),
+        )[0]["fields"]
+        if anchor["latitude"] is None:
+            assert anchor["longitude"] is None and answer.point is None
+        else:
+            assert answer.point is not None
+            assert answer.point.lat == pytest.approx(
+                anchor["latitude"], abs=0.00000051, rel=0
+            )
+            assert answer.point.lon == pytest.approx(
+                anchor["longitude"], abs=0.00000051, rel=0
+            )
         for field in ("country", "state", "city"):
             before = previous[field]
             after = getattr(answer, field)

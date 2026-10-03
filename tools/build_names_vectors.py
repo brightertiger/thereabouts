@@ -49,6 +49,7 @@ def main() -> None:
         ("SW1A1AA", {}),
         ("MH12AB1234", {}),
         ("8860145b49fffff", {}),
+        ("Karakulam", {"country": "IN"}),
     ]
     requests += [
         {"kind": "geocode", "values": [name], **kwargs} for name, kwargs in examples

@@ -80,7 +80,7 @@ def test_ip_columns() -> None:
     source = json.loads((FIXTURES / "ip-source.json").read_text())
     values = [r["ip_start"] for r in source["rows"][:10]] + ["invalid", "::1"]
     with Geocoder(FIXTURES / "packs/ip-sample") as geo:
-        columns = geo.ip_columns(values)
+        columns = geo.ip_columns(addresses=values)
         assert columns["status_categories"][columns["status"]].tolist() == [
             geo.ip(v).status for v in values
         ]

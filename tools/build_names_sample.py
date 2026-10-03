@@ -40,6 +40,8 @@ def choose(source: Subset) -> tuple[list[dict[str, Any]], pa.Schema]:
         "new delhi",
         "new york",
         "springfield",
+        "kidarakulam",
+        "karakulam",
     }
     for table in source.inventory("canonical_cities"):
         if table.get("country") not in COUNTRIES:
@@ -79,7 +81,8 @@ def main() -> None:
         provenance = source.finish("core", total)
         provenance["subset_policy"] = (
             "twelve most populous canonical cities per country plus named examples "
-            "and all canonical Springfields in the seven countries"
+            "and all canonical Springfields in the seven countries; "
+            "Kidarakulam/Karakulam supplies a real differing English spelling"
         )
         manifest_path = source.output / "manifest.json"
         manifest = json.loads(manifest_path.read_text())

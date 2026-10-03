@@ -1,5 +1,6 @@
 //! Original airport expectations remain the oracle; only the default scheme rule changes.
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
+mod support;
 use std::{fs, path::PathBuf};
 use thereabouts_core::format::Pack;
 #[test]
@@ -101,6 +102,7 @@ fn original_airport_expectations() {
                 .iter()
                 .find(|c| c["id"] == identity)
                 .unwrap();
+            support::point(answer.point.as_ref(), prior);
             assert_eq!(e.country_id.as_deref(), prior["country"]["id"].as_str());
             assert_eq!(e.state_id.as_deref(), prior["state"]["id"].as_str());
             assert_eq!(e.city_id.as_deref(), prior["city"]["id"].as_str());

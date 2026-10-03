@@ -123,11 +123,11 @@ class ForwardQueries:
             )
         )
 
-    def ip_columns(self, addresss: Iterable[str]) -> dict[str, NDArray[Any]]:
+    def ip_columns(self, addresses: Iterable[str]) -> dict[str, NDArray[Any]]:
         """Return ip interval columns."""
         self._ensure_open()
         return self._handles.get("ip").ip_columns(
-            [address if isinstance(address, str) else "" for address in addresss]
+            [address if isinstance(address, str) else "" for address in addresses]
         )
 
     def plate(

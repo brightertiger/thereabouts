@@ -85,3 +85,14 @@ def test_name_batch_filters_and_invalid_limit() -> None:
         assert geo.geocode("Paris", limit=10**100).status == "invalid_input"
         assert geo.geocode("Springfield", country="FR").status == "not_found"
         assert geo.geocode("Mumbai", subdivision="FR-IDF").status == "not_found"
+
+
+def test_real_english_name_is_an_alternate_exact_key() -> None:
+    rows = json.loads((FIXTURES / "geocode-source.json").read_text())["rows"]
+    row = next(r for r in rows if r["city_id"] == "city:geonames:11189062")
+    assert row["name"] == "Kidarakulam" and row["name_en"] == "Karakulam"
+    with Geocoder(FIXTURES / "packs/core-names-sample") as geo:
+        result = geo.geocode(row["name_en"], country=row["country_code"])
+        assert result.status == "matched" and result.match == "alternate_name"
+        assert result.city is not None and result.city.id == row["city_id"]
+        assert result.city.name == row["name"]

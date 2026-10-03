@@ -383,15 +383,15 @@
       "batch_points_per_second": 642180.0004512863
     },
     "geocode": {
-      "pack_bytes": 210397,
-      "sample_rows": 101,
+      "pack_bytes": 213326,
+      "sample_rows": 102,
       "world_source_rows": 68923,
-      "estimated_world_bytes": 11846553,
-      "data_artifact_bytes_per_row": 169.22772277227722,
-      "measured_catalogue_metadata_bytes": 182871,
+      "estimated_world_bytes": 11940180,
+      "data_artifact_bytes_per_row": 170.54901960784315,
+      "measured_catalogue_metadata_bytes": 185430,
       "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
-      "vectors": 51,
+      "vectors": 52,
       "workload_scope": "all source keys; plates use code/country assertions",
       "countries": [
         "BE",
@@ -410,21 +410,21 @@
           "status_counts": {
             "matched": 20000
           },
-          "scalar_median_us": 7.875,
-          "scalar_p99_us": 13.584409999999934,
-          "batch_points_per_second": 446326.4543861873
+          "scalar_median_us": 8.333,
+          "scalar_p99_us": 30.75,
+          "batch_points_per_second": 409061.7402460755
         },
         "random": {
           "queries": 20000,
-          "distinct_queries": 88,
+          "distinct_queries": 90,
           "seed": 271828,
           "status_counts": {
-            "ambiguous": 422,
-            "matched": 19578
+            "matched": 19574,
+            "ambiguous": 426
           },
-          "scalar_median_us": 8.334,
-          "scalar_p99_us": 42.583,
-          "batch_points_per_second": 367763.952322031
+          "scalar_median_us": 8.834,
+          "scalar_p99_us": 46.12540999999993,
+          "batch_points_per_second": 348994.96528980456
         },
         "miss": {
           "queries": 20000,
@@ -433,9 +433,9 @@
           "status_counts": {
             "not_found": 20000
           },
-          "scalar_median_us": 5.417,
-          "scalar_p99_us": 7.875419999999933,
-          "batch_points_per_second": 381615.6653641571
+          "scalar_median_us": 5.5,
+          "scalar_p99_us": 7.459,
+          "batch_points_per_second": 342532.47112176317
         },
         "fuzzy": {
           "queries": 1000,
@@ -444,9 +444,9 @@
           "status_counts": {
             "matched": 1000
           },
-          "scalar_median_us": 9.416,
-          "scalar_p99_us": 12.669749999999997,
-          "batch_points_per_second": 268585.5869498053
+          "scalar_median_us": 9.458,
+          "scalar_p99_us": 19.172499999999957,
+          "batch_points_per_second": 275824.02527594834
         }
       },
       "queries": 20000,
@@ -455,16 +455,16 @@
       "status_counts": {
         "matched": 20000
       },
-      "scalar_median_us": 7.875,
-      "scalar_p99_us": 13.584409999999934,
-      "batch_points_per_second": 446326.4543861873
+      "scalar_median_us": 8.333,
+      "scalar_p99_us": 30.75,
+      "batch_points_per_second": 409061.7402460755
     }
   },
   "fixture_packs": {
     "bytes_by_pack": {
       "airports-sample": 75947,
       "airports-synthetic": 6252,
-      "core-names-sample": 210397,
+      "core-names-sample": 213326,
       "core-names-synthetic": 5879,
       "ip-sample": 46544,
       "locode-sample": 76998,
@@ -474,7 +474,7 @@
       "postal-sample": 105111,
       "postal-synthetic": 5485
     },
-    "total_bytes": 656949
+    "total_bytes": 659878
   },
   "history": {
     "geocode": {
@@ -556,15 +556,15 @@
         "batch_points_per_second": 419432.6679162629
       },
       "after": {
-        "pack_bytes": 210397,
-        "sample_rows": 101,
+        "pack_bytes": 213326,
+        "sample_rows": 102,
         "world_source_rows": 68923,
-        "estimated_world_bytes": 11846553,
-        "data_artifact_bytes_per_row": 169.22772277227722,
-        "measured_catalogue_metadata_bytes": 182871,
+        "estimated_world_bytes": 11940180,
+        "data_artifact_bytes_per_row": 170.54901960784315,
+        "measured_catalogue_metadata_bytes": 185430,
         "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
         "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
-        "vectors": 51,
+        "vectors": 52,
         "workload_scope": "all source keys; plates use code/country assertions",
         "countries": [
           "BE",
@@ -583,21 +583,21 @@
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 7.875,
-            "scalar_p99_us": 13.584409999999934,
-            "batch_points_per_second": 446326.4543861873
+            "scalar_median_us": 8.333,
+            "scalar_p99_us": 30.75,
+            "batch_points_per_second": 409061.7402460755
           },
           "random": {
             "queries": 20000,
-            "distinct_queries": 88,
+            "distinct_queries": 90,
             "seed": 271828,
             "status_counts": {
-              "ambiguous": 422,
-              "matched": 19578
+              "matched": 19574,
+              "ambiguous": 426
             },
-            "scalar_median_us": 8.334,
-            "scalar_p99_us": 42.583,
-            "batch_points_per_second": 367763.952322031
+            "scalar_median_us": 8.834,
+            "scalar_p99_us": 46.12540999999993,
+            "batch_points_per_second": 348994.96528980456
           },
           "miss": {
             "queries": 20000,
@@ -606,9 +606,9 @@
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 5.417,
-            "scalar_p99_us": 7.875419999999933,
-            "batch_points_per_second": 381615.6653641571
+            "scalar_median_us": 5.5,
+            "scalar_p99_us": 7.459,
+            "batch_points_per_second": 342532.47112176317
           },
           "fuzzy": {
             "queries": 1000,
@@ -617,9 +617,9 @@
             "status_counts": {
               "matched": 1000
             },
-            "scalar_median_us": 9.416,
-            "scalar_p99_us": 12.669749999999997,
-            "batch_points_per_second": 268585.5869498053
+            "scalar_median_us": 9.458,
+            "scalar_p99_us": 19.172499999999957,
+            "batch_points_per_second": 275824.02527594834
           }
         },
         "queries": 20000,
@@ -628,9 +628,9 @@
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 7.875,
-        "scalar_p99_us": 13.584409999999934,
-        "batch_points_per_second": 446326.4543861873
+        "scalar_median_us": 8.333,
+        "scalar_p99_us": 30.75,
+        "batch_points_per_second": 409061.7402460755
       }
     },
     "postal": {
