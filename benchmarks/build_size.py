@@ -8,9 +8,8 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from build_data.source_pack import build as build_reference
-from build_data.sources import sha256
-from build_data.table import build_table
+from pipeline.runtime.jsonio import sha256_file as sha256
+from tests.support.table import build_table
 
 
 def report(path: Path, build_metrics: dict[str, Any]) -> dict[str, Any]:
@@ -44,11 +43,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, default=Path("data/h3-world"))
     parser.add_argument("--reference", type=Path, default=Path("data/reference"))
-    parser.add_argument("--cache", type=Path, default=Path("data/cache"))
     parser.add_argument("--output", type=Path, default=Path("benchmarks/build.json"))
     args = parser.parse_args()
     if not args.reference.exists():
-        build_reference(args.reference, args.cache, None)
+        parser.error("--reference must name an existing reference fixture")
     metrics = build_table(args.reference, args.data)
     text = json.dumps(report(args.data, metrics), indent=2) + "\n"
     args.output.write_text(text)

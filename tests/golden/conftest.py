@@ -6,10 +6,10 @@ from pathlib import Path
 import pytest
 import shapely
 
-from build_data.reconcile.common import Row, connect, pack
-from build_data.reconcile.entities import add_point, create_entities, save_entity
-from build_data.reconcile.lookup import Locator
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.reconcile.common import Row, connect, pack
+from pipeline.engines.reconcile.entities import add_point, create_entities, save_entity
+from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
 
 
 @pytest.fixture

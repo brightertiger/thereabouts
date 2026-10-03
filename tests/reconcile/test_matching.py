@@ -3,9 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from build_data.reconcile.classification import trusted_city
-from build_data.reconcile.common import connect, policy
-from build_data.reconcile.matching import default_perspective, link, prepare_catalog
+from pipeline.config.policies import reconcile as policy
+from pipeline.engines.reconcile.classification import trusted_city
+from pipeline.engines.reconcile.common import connect
+from pipeline.engines.reconcile.matching import (
+    default_perspective,
+    link,
+    prepare_catalog,
+)
 
 from .conftest import place, write_inputs
 

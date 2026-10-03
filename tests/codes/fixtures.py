@@ -4,11 +4,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 
-from build_data.acquire.lookup_schemas import LOOKUP_SCHEMAS
-from build_data.serve.checkpoints import file_record
-from build_data.serve.metadata import write_manifest
-from build_data.serve.snapshot import Row, read_snapshot
-from build_data.serve_codes.source import JOIN_FIELDS, cells
+from pipeline.engines.serving.checkpoints import file_record
+from pipeline.engines.serving.metadata import write_manifest
+from pipeline.engines.serving.snapshot import Row, read_snapshot
+from pipeline.engines.serving_codes.source import JOIN_FIELDS, cells
+from pipeline.sources.shared.lookup_schemas import LOOKUP_SCHEMAS
 from thereabouts.packs.jsonio import parse
 
 from ..client.test_api import BRANCHES, finest

@@ -1,12 +1,10 @@
 # Thereabouts pipeline
 
-The `pipeline` package supplies configuration, resumable source acquisition,
-normalization, and verified migration for the Thereabouts data build. Download
-and normalize discover units from source YAML and `pins.lock`; geographic
-engines remain retained stages until package 3. The old `build_data` entry points
-remain usable only on their original unmigrated workspaces.
-[PIPELINE_STATUS.md](PIPELINE_STATUS.md) records the implemented boundary,
-measurements, and remaining work.
+The `pipeline` package builds Thereabouts from frozen sources through verified
+geographic and lookup tables. All stages share configuration, a relative-path
+ledger, resource admission, and one fingerprint rule. The former `build_data`
+package has been removed. Release assembly and publication are the next work
+package; [PIPELINE_STATUS.md](PIPELINE_STATUS.md) records the measured boundary.
 
 A **stage** owns one kind of work. A **unit** is a resumable item within a stage,
 such as a source, country or H3 block. The **ledger** records a completed unit's
@@ -55,7 +53,7 @@ working directory. Reports must remain outside the inspected data workspace.
 
 ## Configuration and identity
 
-Structured defaults are merged with `config/sources/*.yaml`, then
+Structured defaults are merged with `config/sources/*.yaml`, `config/engines.yaml`, then
 `config/pipeline.yaml`, an optional `config/profiles/<name>.yaml`, and `key=value`
 overrides. Source adapters declare a typed `Options` dataclass; unknown adapter
 options fail during configuration loading:
@@ -135,6 +133,77 @@ outputs. Plate parsing rules now live in YAML. PDF evidence requires the
 configured Poppler `pdftotext` version (25.11.0 was measured on this laptop);
 this is a prerequisite for future PDF normalization, not evidence of the version
 used by every historical build.
+
+## Geographic stages
+
+Reconciliation extracts and links each country, builds canonical entities and
+land, then verifies country quality. Cells index resolution-3 blocks, derive
+compact resolution-8 answers, and retain an immutable base manifest. Cities
+build canonical city indexes and mappings; evaluate checks the pilot and its
+policy-bound review. Normalize-cells applies city semantics and checks stored
+output. Lookups preserve every source row while adding code or spatial links,
+then enforce cross-table references and publish the final manifest.
+
+```sh
+# Use a separate writable workspace with reviewed pins and local inputs/mirror.
+.venv/bin/python -m pipeline plan --root /path/to/new/workspace
+.venv/bin/python -m pipeline run --root /path/to/new/workspace --through reconcile
+.venv/bin/python -m pipeline run --root /path/to/new/workspace --through lookups
+```
+
+These are future build commands, never commands run against the protected data
+for this refactor. The default selection is worldwide. For a small development
+workspace, `engines.countries=[ZZ] engines.blocks=[83754efffffffff]` selects units;
+every country required by a selected block must be included. Full pilot
+acceptance still requires all configured pilot countries. A newly built block
+index refreshes discovery during the same run. Corruption invalidates its unit;
+unchanged verified outputs are skipped. Missing adopted inputs regenerate before
+a consumer actually runs, including the deliberately deleted source caches and
+reconciliation outputs.
+
+`config/policies/reconcile.yaml` holds reconciliation conventions. City policy
+is `config/policies/cities/common.yaml` plus country files. Their exact resolved
+canonical fingerprints match the previous JSON; tests cover every two-letter
+country projection. `config/reviews/cities-pilot.yaml` retains the historical
+owner approval and two precisely scoped boundary exceptions. Editing the policy
+requires a matching reviewed fingerprint. Review validation occurs before any
+writable workspace opens. Evaluation fixtures live under `eval/`, outside build
+identities; changing a fixture alone does not regenerate geographic data.
+Evaluation is an execution prerequisite for normalization: a failed gate stops
+the run. Its receipt is not consumed as geographic data, so a changed review
+alone does not rebuild unaffected countries. Country units hash their resolved
+common and country policy; blocks hash the policies of their contributing countries.
+
+The optional `plate_country` stage derives syntax, priors, coverage and an
+inference bundle from normalized pinned evidence. It has zero units while its
+source is disabled. Its resolver preserves ambiguity and verifies bundle/table
+checksums before use. The retained workspace has no reviewed plate-country raw
+inventory, so only synthetic inputs exercise this engine here.
+
+New outputs use configured `reconciled/`, `cities/`, `cells/` and `work/` paths,
+with immutable input-hash subdirectories. `cells/base/current.json` points to the
+base manifest; `cells/current.json` points to the verified normalized manifest.
+Every artifact record is relative to the workspace root. The table schema remains
+[GOLDEN_DATASET.md](GOLDEN_DATASET.md) until the package-4 dataset README replaces
+it. Build-side serving helpers can read a new manifest with
+`read_snapshot(manifest_path, root=workspace_root)`; retained golden manifests
+keep their historical relative root anchor. These helpers are not release stages.
+
+The old controller-specific tests were retired with their controllers. Their
+shared-runtime replacements and the preserved source/engine decisions are listed
+in [PIPELINE_TEST_COVERAGE.md](PIPELINE_TEST_COVERAGE.md). To reproduce the bounded
+read-only pilot proof, keep scratch in this checkout:
+
+```sh
+THEREABOUTS_PIPELINE_DATA=/path/to/existing/data TMPDIR="$PWD/data/pipeline-work/tmp" \
+  .venv/bin/pytest tests/pipeline/test_pilot_equivalence.py -q \
+  --basetemp data/pipeline-work/pilot-proof
+```
+
+This reads existing normalized sources, reconstructs only Malaysia and the
+complete land features intersecting one block's search window, writes locally,
+and compares both radius settings with the retained pilot Parquets. It does not
+execute a stage against the existing workspace.
 
 ## Migration and its boundary
 

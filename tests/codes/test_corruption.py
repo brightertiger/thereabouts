@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from build_data.serve_codes.encoding import Buffer
+from pipeline.engines.serving_codes.encoding import Buffer
 from thereabouts.client import Geocoder
 from thereabouts.packs.errors import CorruptPackError
 from thereabouts.packs.exact import Exact

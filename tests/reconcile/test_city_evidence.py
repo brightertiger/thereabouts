@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from build_data.acquire import Workspace
-from build_data.reconcile.build import build_country
-from build_data.reconcile.common import connect, policy, unpack
-from build_data.reconcile.lookup import Locator
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.config.policies import reconcile as policy
+from pipeline.engines.reconcile.common import connect, unpack
+from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from tests.reconcile.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
@@ -48,7 +48,7 @@ def test_ward_container_and_independent_suburb(
         divisions=[city, suburb, ward],
         areas=shapes,
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    output = reconciled(tmp_path, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
     db = connect(land)
     create_areas(db)
@@ -77,7 +77,7 @@ def test_country_catalogue_without_claiming_a_polygon(tmp_path: Path) -> None:
         divisions=[],
         areas=[],
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    output = reconciled(tmp_path, root, "ZZ", policy())
     db = connect(output, readonly=True)
     try:
         value = unpack(
@@ -138,10 +138,10 @@ def test_region_requires_exact_city_identity(
             }
         ],
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    output = reconciled(tmp_path, root, "ZZ", policy())
     db = connect(output, readonly=True)
     try:
-        from build_data.reconcile.lookup import choose_city, covering
+        from pipeline.engines.reconcile.lookup import choose_city, covering
 
         answer = choose_city(covering(db, 0.51, 0.51, "city"))
         assert answer is not None
@@ -191,7 +191,7 @@ def test_shared_city_footprint_beats_unlinked_town_and_keeps_linked_town(
             }
         ],
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+    output = reconciled(tmp_path, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
     db = connect(land)
     create_areas(db)

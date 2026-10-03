@@ -19,9 +19,14 @@ from pipeline.config import load
         "paths.work=../other",
         "h3.block_resolution=9",
         "h3.block_resolution=2",
+        "h3.cell_resolution=9",
+        "engines.limits.reader_cache_entries=0",
+        "engines.countries=[ZZ,ZZ]",
+        "engines.blocks=[invalid]",
         "resources.poll_seconds=0",
         "resources.ledger_timeout_seconds=-1",
         "storage.local=plain",
+        "engines.city_review=config/reviews/missing.yaml",
     ],
 )
 def test_invalid_configuration_has_no_side_effects(

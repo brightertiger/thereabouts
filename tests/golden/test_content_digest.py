@@ -7,11 +7,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from build_data.acquire.artifacts import read_json
-from build_data.acquire.io import write_json
-from build_data.digest_golden import digest_dataset, main
-from build_data.golden import paths
-from build_data.reconcile.common import Row
+from pipeline.engines.artifacts import read_json
+from pipeline.engines.reconcile.common import Row
+from pipeline.evaluation.content import digest_dataset, main
+from pipeline.runtime.jsonio import write_json
 
 
 def dataset(root: Path, parts: list[pa.Table], *, portable: bool = False) -> Path:
@@ -26,13 +25,9 @@ def dataset(root: Path, parts: list[pa.Table], *, portable: bool = False) -> Pat
             compression="zstd" if portable else "snappy",
             row_group_size=1 if portable else 10,
         )
-        records.append({"kind": "cells", "path": str(path), "rows": table.num_rows})
+        records.append({"kind": "cells", "path": path.name, "rows": table.num_rows})
     value: Row = {"completed": True, "tables": list(reversed(records))}
-    if portable:
-        value["data_root"] = ".."
-        paths.write(output / "manifest.json", value, root)
-    else:
-        write_json(output / "manifest.json", value)
+    write_json(output / "manifest.json", value)
     return output
 
 

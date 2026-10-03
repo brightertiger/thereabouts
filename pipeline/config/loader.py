@@ -14,6 +14,7 @@ from omegaconf.errors import OmegaConfBaseException
 
 from thereabouts.format import BLOCK_RESOLUTION
 
+from .engine_validation import validate as validate_engines
 from .schema import DISK_FLOOR, Config
 from .sources import load_sources, resolve_options, validate_source
 
@@ -26,7 +27,15 @@ def load(
     profile: str | None = None,
     overrides: Sequence[str] = (),
 ) -> Config:
-    files = [path, *sorted((path.parent / "sources").glob("*.yaml"))]
+    files = [
+        path,
+        *(
+            [path.parent / "engines.yaml"]
+            if (path.parent / "engines.yaml").exists()
+            else []
+        ),
+        *sorted((path.parent / "sources").glob("*.yaml")),
+    ]
     if profile is not None:
         if not re.fullmatch(r"[a-z][a-z0-9_-]*", profile):
             raise ValueError("Profile must name a file in config/profiles")
@@ -62,6 +71,9 @@ def _load(
                     for name, source in load_sources(path.parent / "sources").items()
                 }
             },
+            {"engines": OmegaConf.load(path.parent / "engines.yaml")}
+            if (path.parent / "engines.yaml").exists()
+            else {},
             OmegaConf.load(path),
         )
         if profile is not None:
@@ -94,6 +106,7 @@ def validate(config: Config) -> None:
             raise ValueError(f"Source key must match its name: {name}")
         validate_source(source)
         resolve_options(source)
+    validate_engines(config.engines, config.h3.block_resolution)
     resources = config.resources
     if resources.disk_floor < DISK_FLOOR:
         raise ValueError(f"resources.disk_floor must be at least {DISK_FLOOR}")
@@ -121,6 +134,8 @@ def validate(config: Config) -> None:
         raise ValueError("resources.workspace_scan_seconds must be finite and positive")
     if not 0 <= config.h3.block_resolution <= config.h3.cell_resolution <= 15:
         raise ValueError("h3 resolutions must satisfy 0 <= block <= cell <= 15")
+    if config.h3.cell_resolution != 8:
+        raise ValueError("h3.cell_resolution must match geographic table semantics (8)")
     if config.h3.block_resolution != BLOCK_RESOLUTION:
         raise ValueError(
             f"h3.block_resolution must match the cell codec ({BLOCK_RESOLUTION})"

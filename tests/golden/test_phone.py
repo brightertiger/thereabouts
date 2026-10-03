@@ -5,9 +5,9 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from build_data.golden.code_links import linked_rows
-from build_data.golden.inputs import Inputs
-from build_data.golden.phone import PhoneCountries
+from pipeline.engines.cells.code_links import linked_rows
+from pipeline.engines.cells.inputs import Inputs
+from pipeline.engines.cells.phone import PhoneCountries
 
 
 def test_numbering_prefixes_keep_overlap_and_missing_evidence(tmp_path: Path) -> None:
@@ -40,7 +40,7 @@ def test_numbering_prefixes_keep_overlap_and_missing_evidence(tmp_path: Path) ->
         ),
         path,
     )
-    inputs = Inputs({"US": {}, "CA": {}}, {}, {}, {}, "test", {"US", "CA"})
+    inputs = Inputs({"US": {}, "CA": {}}, {}, {}, {"US", "CA"})
     result = list(
         linked_rows(path, "phone_prefixes", inputs, {"US", "CA"}, {}, phone=phone)
     )

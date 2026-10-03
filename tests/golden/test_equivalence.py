@@ -6,11 +6,11 @@ import numpy as np
 import pytest
 from h3.api import basic_int as h3
 
-from build_data.golden.cells import compact
-from build_data.golden.oracle import Oracle
-from build_data.golden.reader import interval
-from build_data.hierarchy import descendants, label_block
-from build_data.reconcile.lookup import Locator
+from pipeline.engines.cells.compaction import compact
+from pipeline.engines.cells.oracle import Oracle
+from pipeline.engines.cells.reader import interval
+from pipeline.engines.hierarchy import descendants, label_block
+from pipeline.engines.reconcile.lookup import Locator
 
 
 def test_every_finest_centre_equals_independent_scalar_and_compacted_ancestors(

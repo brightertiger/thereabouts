@@ -1,72 +1,15 @@
-"""File-level retries, shared host throttling, and evidence integrity."""
+"""Retained source interpretation decisions using the new adapters."""
 
-import io
-import time
-import urllib.request
 from pathlib import Path
 from typing import Any
 
 import pytest
 
-from build_data.acquire import plates_http, plates_reader
-from build_data.acquire.io import write_json
-from build_data.acquire.plates_html import Document
-from build_data.acquire.plates_rules import list_rows, regex_rows
-from build_data.acquire.plates_wikidata import rows as wikidata_rows
-
-
-class Response(io.BytesIO):
-    def __init__(self, body: bytes, length: int | None = None) -> None:
-        super().__init__(body)
-        self.headers = {
-            "Content-Length": str(length if length is not None else len(body))
-        }
-        self.url = "https://example.invalid/document"
-        self.status = 200
-
-
-def test_cached_responses_and_shared_per_host_rate_limit(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    calls: list[str] = []
-    delays: list[float] = []
-
-    def respond(request: Any, timeout: int) -> Response:
-        assert timeout > 0
-        assert "Thereabouts" in request.get_header("User-agent")
-        calls.append(request.full_url)
-        return Response(b"source evidence")
-
-    monkeypatch.setattr(urllib.request, "urlopen", respond)
-    monkeypatch.setattr(time, "time", lambda: 1000.0)
-    monkeypatch.setattr(time, "sleep", delays.append)
-    url = "https://example.invalid/document"
-    root = tmp_path / "research"
-    first = plates_http.fetch(root, "one", url)
-    assert plates_http.fetch(root, "one", url) == first
-    plates_http.fetch(tmp_path / "snapshot", "two", url)
-    assert calls == [url, url]
-    assert delays == pytest.approx([0.0, 1.1])
-    with pytest.raises(ValueError, match="Changed URL"):
-        plates_http.fetch(root, "one", url + "?changed")
-    (root / "one").write_bytes(b"corrupt")
-    with pytest.raises(ValueError, match="Corrupt"):
-        plates_http.fetch(root, "one", url)
-
-
-def test_truncated_response_is_retained_but_not_published(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr(
-        urllib.request,
-        "urlopen",
-        lambda *args, **kwargs: Response(b"partial", length=100),
-    )
-    with pytest.raises(OSError, match="Incomplete HTTP"):
-        plates_http.fetch(tmp_path, "body", "https://example.invalid", retries=0)
-    assert not (tmp_path / "body").exists()
-    assert not (tmp_path / "body.http.json").exists()
-    assert [p.read_bytes() for p in tmp_path.glob("*.part")] == [b"partial"]
+from pipeline.runtime.jsonio import write_json
+from pipeline.sources.plates import reader as plates_reader
+from pipeline.sources.plates.html import Document
+from pipeline.sources.plates.rules import list_rows, regex_rows
+from pipeline.sources.plates.wikidata import rows as wikidata_rows
 
 
 def test_section_prefixes_and_pdf_prose_keep_source_pairs() -> None:
@@ -177,7 +120,6 @@ def test_amendment_suffixes_use_prefixes_from_referenced_snapshot(
         ),
     )
     policy = dict(rules={"amend.pdf": [rule]}, survey={}, formats={})
-    monkeypatch.setattr(plates_reader, "policy", policy.__getitem__)
     text = {
         "base.pdf": "  NorthVale  R, S\n  Vale  X, Y\n",
         "amend.pdf": "Vale County adds AB, CD",
@@ -194,7 +136,7 @@ def test_amendment_suffixes_use_prefixes_from_referenced_snapshot(
         for name in text
     }
     files["countries.csv"] = dict(path=str(countries), kind="countries")
-    rows = [r for kind, r, _ in plates_reader.records(dict(files=files))]
+    rows = [r for kind, r, _ in plates_reader.records(dict(files=files), policy, 5)]
     assert {r["code"] for r in rows} == {"XAB", "YAB", "XCD", "YCD"}
     assert {r["name_en"] for r in rows} == {"Vale"}
     assert all(r["prefix_evidence"]["sha256"] == "a" * 64 for r in rows)

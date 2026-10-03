@@ -47,33 +47,47 @@ def _prepare(ctx: Context, proposed: Context, stages: Sequence[Stage]) -> Handov
     for stage in ordered(stages):
         if isinstance(stage, RetainedStage):
             continue
-        previous = {recipe.key: recipe for recipe in ledger.recipes(stage.name)}
+        previous = {
+            (stage.name, str(row[0]))
+            for row in ledger.db.execute(
+                "SELECT unit_id FROM recipes WHERE stage=?", (stage.name,)
+            )
+        }
         discovered = stage.units(proposed)
         keys = {unit.key for unit in discovered}
-        if len(keys) != len(discovered) or keys != previous.keys():
+        if len(keys) != len(discovered) or keys != previous:
             raise ValueError(
                 f"Handover key mismatch for {stage.name}: "
-                f"missing={sorted(previous.keys() - keys)[:10]}, "
-                f"new={sorted(keys - previous.keys())[:10]}"
+                f"missing={sorted(previous - keys)[:10]}, "
+                f"new={sorted(keys - previous)[:10]}"
             )
-        recorded = {record.key: record for record in ledger.records(stage.name)}
-        if recorded.keys() != keys:
+        recorded = {
+            (stage.name, str(row[0]))
+            for row in ledger.db.execute(
+                "SELECT unit_id FROM units WHERE stage=?", (stage.name,)
+            )
+        }
+        if recorded != keys:
             raise ValueError(f"Handover requires every completion for {stage.name}")
         already = ledger.db.execute(
             "SELECT 1 FROM handovers WHERE stage=?", (stage.name,)
         ).fetchone()
         identity = stage.identity(proposed)
-        old = {str(record.metadata.get("identity")) for record in recorded.values()}
+        old: set[str] = set()
         changed = 0
         # Stage units may have dependencies in earlier stages; the whole graph is
         # checked by plan below, after identity/parameter changes are prepared.
         for initial in discovered:
-            record = recorded[initial.key]
+            record = ledger.get(*initial.key)
+            recipe = ledger.recipe(*initial.key)
+            if record is None or recipe is None:
+                raise ValueError(f"Handover lost completion/recipe: {initial.key}")
+            old.add(str(record.metadata.get("identity")))
             if not record.metadata.get("adopted"):
                 raise ValueError(f"Not an adopted completion: {initial.key}")
             if problem := ctx.verifier.completion_problem(record):
                 raise ValueError(f"Cannot hand over {initial.key}: {problem}")
-            if initial.recipe.dependencies != previous[initial.key].dependencies:
+            if initial.recipe.dependencies != recipe.dependencies:
                 raise ValueError(f"Handover cannot change dependencies: {initial.key}")
             unit = make_unit(proposed, initial.recipe, identity)
             if unit.dependency_hash != record.metadata.get("dependency_hash"):
@@ -81,7 +95,7 @@ def _prepare(ctx: Context, proposed: Context, stages: Sequence[Stage]) -> Handov
             needs_change = (
                 record.metadata.get("identity") != identity
                 or record.inputs_hash != unit.inputs_hash
-                or previous[unit.key].parameters != unit.recipe.parameters
+                or recipe.parameters != unit.recipe.parameters
             )
             if not needs_change:
                 continue
@@ -115,8 +129,9 @@ def _prepare(ctx: Context, proposed: Context, stages: Sequence[Stage]) -> Handov
         )
     ledger.db.commit()
     decisions = plan(proposed, stages)
-    if any(decision.state != "current" for decision in decisions):
-        raise ValueError("Handover would leave stale or new units; inspect plan")
+    invalid = [decision for decision in decisions if decision.state != "current"]
+    if invalid:
+        raise ValueError(f"Handover would leave stale or new units: {invalid[:5]}")
     return Handover(
         proposed,
         changes,

@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-from build_data.serve.export import export
+from pipeline.engines.serving.export import export
 from tests.codes.fixtures import snapshot
 from thereabouts.client import Geocoder
 from thereabouts.results import Resolution

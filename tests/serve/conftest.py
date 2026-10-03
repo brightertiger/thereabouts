@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from build_data.serve.export import export
+from pipeline.engines.serving.export import export
 
 from .fixtures import golden
 

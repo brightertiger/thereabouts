@@ -6,11 +6,11 @@ from pathlib import Path
 import numpy as np
 from h3.api import basic_int as h3
 
-from build_data.cities.schemas import CITIES, MAPPING
-from build_data.golden.schemas import CELLS
-from build_data.serve.export import export
-from build_data.serve.metadata import write_manifest
-from build_data.serve.snapshot import PLACE_SCHEMA, Row
+from pipeline.engines.cells.schemas import CELLS
+from pipeline.engines.cities.schemas import CITIES, MAPPING
+from pipeline.engines.serving.export import export
+from pipeline.engines.serving.metadata import write_manifest
+from pipeline.engines.serving.snapshot import PLACE_SCHEMA, Row
 from tests.serve.fixtures import cell, golden, place, write_table
 from thereabouts.packs.jsonio import canonical, parse
 from thereabouts.packs.layout import CITY_METHODS

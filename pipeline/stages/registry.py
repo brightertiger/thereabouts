@@ -3,13 +3,23 @@
 from collections.abc import Sequence
 from dataclasses import fields
 
-from pipeline.config import Config
+from pipeline.config import Config, policies, reviews
 from pipeline.pins.lock import read_lock
 from pipeline.runtime.fingerprints import REPOSITORY, native_versions
-from pipeline.runtime.paths import validate_relative
+from pipeline.runtime.paths import located, validate_relative
 
+from . import (
+    cells,
+    cities,
+    evaluate,
+    lookups,
+    normalize_cells,
+    plate_country,
+    reconcile,
+)
 from .contract import Stage
-from .retained import RetainedStage
+from .engine_discovery import Discovery
+from .geographic import GeographicStage
 from .sources import SourceStage
 
 
@@ -61,11 +71,31 @@ def registry(config: Config) -> list[Stage]:
     for name, source in config.sources.items():
         if source.enabled and (name not in pins or not pins[name].available):
             raise ValueError(f"Enabled source has no reviewed pin: {name}")
+    policies.reconcile(located(REPOSITORY, config.engines.reconcile_policy))
+    policy = policies.cities(located(REPOSITORY, config.engines.city_policies))
+    reviews.load(located(REPOSITORY, config.engines.city_review), policy)
+    discovery = Discovery()
+    implementations = {
+        "reconcile": (reconcile.run, reconcile.finish),
+        "cells": (cells.run, cells.finish),
+        "cities": (cities.run, cities.finish),
+        "evaluate": (evaluate.run, evaluate.finish),
+        "normalize_cells": (normalize_cells.run, normalize_cells.finish),
+        "lookups": (lookups.run, lookups.finish),
+        "plate_country": (plate_country.run, plate_country.finish),
+    }
+    unknown = {stage.name for stage in config.stages} - {
+        "download",
+        "normalize",
+        *implementations,
+    }
+    if unknown:
+        raise ValueError(f"Unknown stage implementations: {sorted(unknown)}")
     return ordered(
         [
             SourceStage(settings, pins)
             if settings.name in {"download", "normalize"}
-            else RetainedStage(settings)
+            else GeographicStage(settings, discovery, *implementations[settings.name])
             for settings in config.stages
         ]
     )

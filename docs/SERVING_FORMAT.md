@@ -1,27 +1,26 @@
 # Thereabouts serving packs
 
+> The format descriptions remain current. Historical `build_data` commands in
+> this document refer to the retired implementation. Current build instructions
+> are in [DATA_PIPELINE.md](DATA_PIPELINE.md); release stages arrive in package 4.
+
 A serving pack is an immutable directory containing a JSON manifest, binary
 shards and source notices. It preserves answers from verified golden v2 tables;
 it performs no geographic reconciliation. This document specifies format 1.0,
 `thereabouts-pack-1`, for reverse, postal and airport packs. The original
 `h3-table-v1` format is unrelated and is not accepted by this exporter.
 
-Export and verify locally, using this checkout's build dependencies:
-
-```sh
-python -m build_data.serve export \
-  --manifest sample/golden/manifest.json --release sample/release.json \
-  --output packs/reverse-sample
-python -m build_data.serve verify packs/reverse-sample
-```
+The exporter implementation now lives under `pipeline/engines/serving/` and is
+exercised by synthetic fixtures. Package 4 adds the public `packs` release stage;
+the old `build_data.serve` command was removed. Current geographic build commands
+are in [DATA_PIPELINE.md](DATA_PIPELINE.md).
 
 The golden manifest must be completed `golden-2`, with verified quality,
 normalization, canonical-city and place-mapping tables. All listed files are
 hashed; relevant Arrow schemas and row counts are checked. Pending spatial or
 static joins and failed quality gates are rejected. Select a family with `--family reverse|postal|airports`. Each export admits
 that family and its required canonical catalogue; other tables are hash-checked. The exporter never opens the
-golden ledger or writes to the source dataset. It is a separate stage, not yet
-wired into the world controller.
+golden ledger or writes to the source dataset. The release stage integration remains package-4 work.
 
 `release.json` supplies explicit release identity and attribution; it is not
 inferred from file names. This is a complete synthetic example (replace the

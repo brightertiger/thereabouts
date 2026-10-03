@@ -10,7 +10,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import shapely
 
-from build_data.acquire.schemas import SCHEMAS, Kind
+from pipeline.sources.shared.schemas import SCHEMAS, Kind
 
 
 def place(
@@ -120,3 +120,24 @@ def write_inputs(
             root / f"{name}.parquet",
         )
     return root
+
+
+def reconciled(
+    workspace: Path, extracted: Path, country: str, policy: dict[str, Any]
+) -> Path:
+    from pipeline.config.engines import EngineLimits
+    from pipeline.engines.reconcile.build import build_country
+    from pipeline.engines.reconcile.catalog import catalog
+
+    limits = EngineLimits()
+    linked = catalog(
+        extracted, workspace / "work" / f"{country}-links.sqlite", policy, limits
+    )
+    return build_country(
+        linked,
+        extracted,
+        workspace / "reconciled" / f"{country}.sqlite",
+        country,
+        policy,
+        limits,
+    )

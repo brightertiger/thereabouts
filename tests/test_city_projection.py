@@ -6,9 +6,9 @@ import numpy as np
 import pytest
 import shapely
 
-from build_data.cities.projection import project
-from build_data.reconcile.common import connect
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.cities.projection import project
+from pipeline.engines.reconcile.common import connect
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
 from tests.test_city_normalization import city, make_engine
 
 

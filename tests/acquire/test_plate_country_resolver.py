@@ -5,10 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from build_data.acquire.io import sha256_file, write_json
-from build_data.plate_country.policy import Row, code_key, normalize, policy
-from build_data.plate_country.resolver import Resolver
-from build_data.plate_country.syntax import relaxed_pattern, specificity
+from pipeline.engines.plate_country.policy import Row, code_key, normalize, policy
+from pipeline.engines.plate_country.resolver import Resolver
+from pipeline.engines.plate_country.syntax import relaxed_pattern, specificity
+from pipeline.engines.storage import file_record
+from pipeline.runtime.jsonio import write_json
 
 
 def rule(country: str, pattern: str, **extra: object) -> Row:
@@ -175,11 +176,12 @@ def test_artifact_integrity_precedes_loading(tmp_path: Path, bundle: Row) -> Non
     write_json(
         tmp_path / "manifest.json",
         dict(
-            bundle=artifact.name,
-            outputs=[dict(file=artifact.name, sha256=sha256_file(artifact))],
+            bundle=file_record(tmp_path, artifact),
+            coverage=file_record(tmp_path, artifact),
+            tables=[],
         ),
     )
-    Resolver.load(tmp_path)
+    Resolver.load(tmp_path, tmp_path / "manifest.json")
     artifact.write_text("{}")
     with pytest.raises(ValueError, match="Corrupt resolver artifact"):
-        Resolver.load(tmp_path)
+        Resolver.load(tmp_path, tmp_path / "manifest.json")

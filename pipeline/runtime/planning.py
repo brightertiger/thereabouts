@@ -77,7 +77,7 @@ def order_units(units: Sequence[Unit]) -> list[Unit]:
 
 def plan(ctx: Context, stages: Sequence[Stage]) -> list[Decision]:
     registered = {stage.name for stage in stages}
-    unknown = {r.stage for r in ctx.ledger.recipes()} - registered
+    unknown = ctx.ledger.recipe_stages() - registered
     if unknown:
         raise ValueError(f"Ledger has unregistered stages: {sorted(unknown)}")
     units = order_units(

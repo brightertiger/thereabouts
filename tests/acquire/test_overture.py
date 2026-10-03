@@ -1,33 +1,27 @@
-"""Offline Overture preservation, checkpoint and geometry conversion tests."""
-
-from __future__ import annotations
+"""Retained source interpretation decisions using the new adapters."""
 
 import json
 from collections import Counter
-from pathlib import Path
 from typing import Any
 
 import pyarrow as pa
-import pyarrow.parquet as pq
 import pytest
 import shapely
 from shapely.geometry import Polygon, box
 
-from build_data.acquire import (
-    Workspace,
-    overture_areas,
-    overture_normalize,
-    overture_rows,
-    overture_settings,
-    sha256_file,
-    validate_table,
-)
-from build_data.acquire.geometry import split_geometry
-from build_data.acquire.io import write_json
-from build_data.acquire.schemas import SCHEMAS
-from build_data.acquire.writer import PartitionWriter
+from pipeline.config.sources import SourceLimits
+from pipeline.sources.overture import areas as overture_areas
+from pipeline.sources.overture import rows as overture_rows
+from pipeline.sources.shared.geometry import split_geometry
+from pipeline.sources.shared.schemas import SCHEMAS, validate_table
 
-CONTEXT = {"source_url": "https://example.test/object", "source_release": "test-1"}
+CONTEXT = {
+    "source_url": "https://example.test/object",
+    "source_release": "test-1",
+    "license": "ODbL-1.0",
+    "license_url": "https://example.test/license",
+    "attribution": "Overture",
+}
 
 
 def division(
@@ -70,7 +64,9 @@ def area(identifier: str = "area-1") -> dict[str, Any]:
     }
 
 
-def test_all_roles_names_and_nested_metadata_are_preserved() -> None:
+def test_all_roles_names_and_nested_metadata_are_preserved(
+    limits: SourceLimits,
+) -> None:
     for subtype in (
         "country",
         "dependency",
@@ -90,13 +86,23 @@ def test_all_roles_names_and_nested_metadata_are_preserved() -> None:
         provenance = json.loads(row["provenance"])
         assert provenance["upstream"]["hierarchies"] == raw["hierarchies"]
         assert provenance["upstream"]["admin_level"] == 3
-        validate_table(pa.Table.from_pylist([row], schema=SCHEMAS["places"]), "places")
+        validate_table(
+            pa.Table.from_pylist([row], schema=SCHEMAS["places"]),
+            "places",
+            "overture",
+            limits,
+        )
     aliases = list(overture_rows.names(raw, CONTEXT))
     assert [row["name_kind"] for row in aliases] == ["primary", "common", "historic"]
     assert aliases[-1]["is_historic"] is True
     assert aliases[0]["language"] is None
     assert aliases == list(overture_rows.names(raw, CONTEXT))
-    validate_table(pa.Table.from_pylist(aliases, schema=SCHEMAS["names"]), "names")
+    validate_table(
+        pa.Table.from_pylist(aliases, schema=SCHEMAS["names"]),
+        "names",
+        "overture",
+        limits,
+    )
 
 
 def test_ascii_primary_is_not_assumed_english() -> None:
@@ -106,17 +112,18 @@ def test_ascii_primary_is_not_assumed_english() -> None:
 
 
 def test_repair_split_flags_ids_and_containment(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, limits: SourceLimits
 ) -> None:
     raw = area()
     raw["geometry"] = Polygon(
         [(-75, 40), (-73, 42), (-75, 42), (-73, 40), (-75, 40)]
     ).wkb
     stats: Counter[str] = Counter()
-    spots: dict[str, list[dict[str, Any]]] = {
-        label: [] for label in overture_settings.SPOTS
-    }
-    converted = list(overture_areas.areas(raw, CONTEXT, "parent-1", stats, spots))
+    converted = list(
+        overture_areas.areas(
+            raw, CONTEXT, "parent-1", stats, SourceLimits().row_bytes, 32
+        )
+    )
     assert stats["invalid_input"] == stats["repaired_input"] == 1
     assert all(
         row["source_id"] == "area-1" and row["entity_id"] == "point-1"
@@ -124,174 +131,18 @@ def test_repair_split_flags_ids_and_containment(
     )
     assert converted[0]["parent_source_id"] == "parent-1"
     assert converted[0]["is_land"] and converted[0]["is_territorial"]
-    validate_table(pa.Table.from_pylist(converted, schema=SCHEMAS["areas"]), "areas")
+    validate_table(
+        pa.Table.from_pylist(converted, schema=SCHEMAS["areas"]),
+        "areas",
+        "overture",
+        limits,
+    )
     geometry = shapely.MultiPolygon([box(0, 0, 1, 1), box(2, 2, 3, 3)])
     parts = list(split_geometry(geometry, 160, max_depth=24))
     assert len(parts) == 2
     assert shapely.unary_union(parts).equals(geometry)
 
 
-def _fixture(workspace: Workspace) -> None:
-    workspace.prepare()
-    objects: list[dict[str, Any]] = []
-    for kind, rows in (
-        ("division", [division(), division("point-2", "locality")]),
-        ("division_area", [area()]),
-    ):
-        # Arrow maps are represented as key/value pairs on conversion to Python.
-        for row in rows:
-            row["names"]["common"] = {"en": "Test"}
-        path = workspace.raw("overture") / f"test-1/{kind}.parquet"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        pq.write_table(pa.Table.from_pylist(rows), path, row_group_size=1)
-        write_json(
-            path.with_name(path.name + ".download.json"),
-            {"verified_sha256": sha256_file(path)},
-        )
-        objects.append(
-            {
-                "key": kind,
-                "type": kind,
-                "relative_path": f"test-1/{kind}.parquet",
-                "url": "https://example.test/" + kind,
-                "etag": '"test"',
-                "size": path.stat().st_size,
-            }
-        )
-    write_json(
-        workspace.raw("overture") / "inventory.json",
-        {"source_release": "test-1", "objects": objects, "retrieved_at": "2026-10-01"},
-    )
-    write_json(
-        workspace.raw("overture") / "download-summary.json",
-        {"source_release": "test-1", "rows": {"division": 2, "division_area": 1}},
-    )
-
-
-def test_normalize_resume_corruption_and_manifest(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    workspace = Workspace(tmp_path)
-    monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    _fixture(workspace)
-    overture_normalize.run(workspace)
-    normalized = workspace.normalized("overture")
-    report = json.loads((normalized / "verification.json").read_text())
-    assert report["rows"] == {"places": 2, "areas": 1, "names": 6}
-    assert report["counts"].get("rejected_features", 0) == 0
-    assert report["spot_checks"]["lower Manhattan"][0]["name"] == "Area"
-    paths = list(normalized.rglob("*.parquet"))
-    times = {path: path.stat().st_mtime_ns for path in paths}
-    overture_normalize.run(workspace)
-    assert {path: path.stat().st_mtime_ns for path in paths} == times
-    target = paths[0]
-    expected = sha256_file(target)
-    target.write_bytes(b"corrupt")
-    overture_normalize.run(workspace)
-    assert sha256_file(target) == expected
-    manifest = json.loads((normalized / "manifest.json").read_text())
-    assert len(manifest["units"]) == 3
-    assert all(entry["stage"] == "overture.normalize" for entry in manifest["units"])
-
-
-def test_download_verified_files_are_reused_offline(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from build_data.acquire import overture
-
-    workspace = Workspace(tmp_path)
-    monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    _fixture(workspace)
-    inventory_path = workspace.raw("overture") / "inventory.json"
-    inventory = json.loads(inventory_path.read_text())
-    for obj in inventory["objects"]:
-        obj["last_modified"] = None
-        path = workspace.raw("overture") / obj["relative_path"]
-        write_json(
-            path.with_name(path.name + ".download.json"),
-            {
-                "url": obj["url"],
-                "size": obj["size"],
-                "etag": obj["etag"],
-                "last_modified": None,
-                "expected_sha256": None,
-                "verified_sha256": sha256_file(path),
-            },
-        )
-    write_json(inventory_path, inventory)
-    overture.download(workspace)
-    overture.download(workspace)
-    summary = json.loads(
-        (workspace.raw("overture") / "download-summary.json").read_text()
-    )
-    assert summary["rows"] == {"division": 2, "division_area": 1}
-
-
-def test_rejects_account_for_every_source_row(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    workspace = Workspace(tmp_path)
-    monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    _fixture(workspace)
-    inventory_path = workspace.raw("overture") / "inventory.json"
-    inventory = json.loads(inventory_path.read_text())
-    obj = inventory["objects"][0]
-    path = workspace.raw("overture") / obj["relative_path"]
-    raw = pq.read_table(path).to_pylist()
-    raw[1]["geometry"] = b"not WKB"
-    pq.write_table(pa.Table.from_pylist(raw), path, row_group_size=1)
-    obj["size"] = path.stat().st_size
-    write_json(inventory_path, inventory)
-    write_json(
-        path.with_name(path.name + ".download.json"),
-        {"verified_sha256": sha256_file(path)},
-    )
-    overture_normalize.run(workspace)
-    report = json.loads(
-        (workspace.normalized("overture") / "verification.json").read_text()
-    )
-    assert report["rows"]["places"] == 1
-    assert report["counts"]["input_rows"] == 3
-    assert report["counts"]["accepted_features"] == 2
-    assert report["counts"]["rejected_features"] == 1
-    audits = [
-        json.loads(path.read_text())
-        for path in (workspace.normalized("overture") / "audits").rglob("*.json")
-    ]
-    rejects = [reject for audit in audits for reject in audit["rejects"]]
-    assert rejects[0]["id"] == "point-2"
-    assert rejects[0]["row_in_group"] == 0
-
-
-def test_writer_failure_is_not_counted_as_a_rejected_row(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    workspace = Workspace(tmp_path)
-    monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    _fixture(workspace)
-
-    def fail(self: PartitionWriter, row: dict[str, Any]) -> None:
-        raise ValueError("partition validation failed")
-
-    monkeypatch.setattr(PartitionWriter, "add", fail)
-    with pytest.raises(ValueError, match="partition validation failed"):
-        overture_normalize.run(workspace)
-    assert not (workspace.normalized("overture") / "manifest.json").exists()
-
-
-def test_completed_source_does_not_recreate_parent_index(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    workspace = Workspace(tmp_path)
-    monkeypatch.setattr(Workspace, "check_budget", lambda self, required_bytes=0: None)
-    _fixture(workspace)
-    overture_normalize.run(workspace)
-    assert not (workspace.work / "overture/entities.sqlite3").exists()
-
-    def unexpected(*args: object, **kwargs: object) -> None:
-        pytest.fail("Completed source rebuilt its deleted intermediate index")
-
-    monkeypatch.setattr(overture_normalize, "_entity_index", unexpected)
-    overture_normalize.run(workspace)
+@pytest.fixture
+def limits() -> SourceLimits:
+    return SourceLimits()

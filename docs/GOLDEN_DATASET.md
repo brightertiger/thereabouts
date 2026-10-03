@@ -23,15 +23,14 @@ its place assignment is the answer at its H3 cell's centre. These can differ nea
 boundaries. In v1, countries and cities inherit the reconciliation policy, without new
 name, boundary, or nearest-city overrides.
 
-## Normalized schema and controller
+## Normalized schema and current stages
 
-`build_data.rebuild_golden` runs or resumes the full source-to-dataset chain; see
-[DATA_PIPELINE.md](history/source-and-golden-pipeline.md#acquired-sources-to-normalized-golden-data).
-The base `build_data.golden` stage below remains the country/state/land and rural
-cell input. `build_data.cities` publishes canonical cities and place mappings;
-`build_data.normalize_cells` applies them, recompacts, refreshes spatial lookups,
-and verifies the final stored output. The base input is an explicit committed
-snapshot under `base_cells/` and survives local activation of the new output.
+The current `pipeline` registry runs reconcile, cells, cities, evaluate,
+normalize_cells and lookups; see [DATA_PIPELINE.md](DATA_PIPELINE.md).
+It retains an explicit immutable base snapshot, applies canonical-city mappings,
+refreshes lookup joins and verifies the completed output. The existing dataset
+still has its historical `golden-2` manifest; new stage outputs use the `cells`
+manifest with workspace-relative table paths and the same column semantics.
 
 Schema `golden-2` adds `canonical_cities` and `place_to_city` tables. `places` adds
 `normalized_city_id`, `normalization_method`, `settlement_kind`; absorbing roles
@@ -46,51 +45,12 @@ source attribution and limitations are in [GOLDEN_V2.md](history/city-normalizat
 
 The following sections document the base stage and its measured v1 snapshot.
 
-## Base-stage commands (historical v1 interface)
+## Building and inspecting data
 
-Use `build_data.rebuild_golden` above for the current dataset. These lower-level
-commands require acquired/reconciled inputs in a separate base-stage workspace;
-their default output is `golden/`, which must not be the active v2 symlink.
-
-```sh
-GOLDEN_DATA=/path/to/base-stage-data
-uv run --no-sync python -m build_data.golden static --data-dir "$GOLDEN_DATA"
-uv run --no-sync python -m build_data.golden pilot --countries BE NL LU CA --workers 2 --data-dir "$GOLDEN_DATA"
-uv run --no-sync python -m build_data.golden run --workers 2 --watch --data-dir "$GOLDEN_DATA"
-uv run --no-sync python -m build_data.golden status --data-dir "$GOLDEN_DATA"
-```
-
-`pilot` defaults to blocks whose conservative dependencies include BE, NL, LU or
-AU. The example command selects Benelux and Canada. It exhaustively compares all resolution-8 centres with
-direct vector labelling,
-checks every ancestor lookup, and compares 16 evenly spaced centres in each block
-with the independent scalar reconciliation oracle. The synthetic test region
-additionally compares **every** fine centre against that independent scalar oracle.
-`--verify-blocks` enables the same exhaustive checks for another run.
-
-`plan` caches the actual finest-centre envelope of every resolution-3 root.
-`--countries CC ...` selects country-dependent blocks; `--limit-blocks N` bounds a
-run. `lookups` refreshes joins and checks from existing committed cells without
-building more cells. `--watch` refreshes country availability after each complete
-pass, sleeping 300 seconds by default. A single golden lock prevents overlapping
-controllers. One or two worker processes own different blocks; two blocks at most
-are in flight. Reconciliation's lock, code and working files are untouched.
-
-The completed marker is `work/golden/run.json` with `completed: true`, together
-with a committed `golden/manifest.json` also having `completed: true`. Individual
-country and cell checkpoints are useful before then. `status` does not build or
-hash tables. The same command safely resumes verified units, rebuilds corrupt
-outputs, and fills pending lookup joins when more cells exist. An interrupted
-Parquet write cannot complete its ledger unit. Do not infer completion from a
-process exiting, a log line, or the existence of a Parquet file.
-
-The golden stage has an 8 GB logical disk cap for `golden/` plus `work/golden/`.
-It preserves 13 GB free. For this run, acquisition/reconciliation was externally
-configured with a 12 GB reserve; golden does not modify that setting. Temporary joins have a 512 MB memory limit and a 512 MB spill cap.
-A resource guard stops new units; `--watch` reports `waiting for disk` and retries
-after the polling interval. Other I/O failures remain visible failures. The stage
-never deletes another stage's data. Source
-raw custody is described in [DATA_PIPELINE.md](history/source-and-golden-pipeline.md#raw-offload-and-restore).
+Use [the pipeline guide](DATA_PIPELINE.md) for current commands, configuration,
+resource limits and checkpoint semantics. The retired controller's commands and
+resource measurements are archived in [base-controller-commands.md](history/base-controller-commands.md).
+The retained layout below describes files already built by that controller.
 
 ## Layout and manifest
 
@@ -561,13 +521,14 @@ The digest command reads only manifest-listed Parquet partitions and writes its
 result to a separate JSON file:
 
 ```sh
-python -m build_data.digest_golden data/golden --output before-base.json
-python -m build_data.digest_golden data/golden-v2 --output before-normalized.json
-# After regeneration, using the actual new output directories:
-python -m build_data.digest_golden data/golden --output after-base.json \
-  --compare before-base.json
-python -m build_data.digest_golden data/golden-v2 --output after-normalized.json \
-  --compare before-normalized.json
+INPUT_ROOT=/path/to/workspace
+MANIFEST="$INPUT_ROOT/cells/normalized/INPUTS_HASH/manifest.json"
+python -m pipeline.evaluation.content "$INPUT_ROOT" --manifest "$MANIFEST" \
+  --temp-dir data/pipeline-work/digest --output data/pipeline-work/before.json
+# After regeneration, point MANIFEST at the new manifest:
+python -m pipeline.evaluation.content "$INPUT_ROOT" --manifest "$MANIFEST" \
+  --temp-dir data/pipeline-work/digest --output data/pipeline-work/after.json \
+  --compare data/pipeline-work/before.json
 ```
 
 The result includes each logical table (`kind`), its columns/types, row count and
@@ -579,9 +540,10 @@ signed zero remains distinct. The command rejects incomplete manifests, duplicat
 partition references, inconsistent schemas and incorrect row counts. It does not
 substitute for the pipeline's integrity/quality verification.
 
-Rows are hashed in small batches. A disposable SQLite B-tree sorts the row hashes
-and retains duplicate multiplicities with bounded memory. Scratch disk grows with
-the number of distinct rows; `--temp-dir /path/to/scratch` chooses its location.
+Rows are hashed in small batches, sorted into bounded runs, and merged with
+a bounded fan-in while retaining duplicate multiplicities. Scratch disk grows
+with the number of rows; the required `--temp-dir` selects its location. Measure
+required scratch space before a full-dataset comparison.
 The JSON contains no run timestamp or machine path. `--compare` exits nonzero on
 any difference and leaves the new per-table digests available for diagnosis.
 

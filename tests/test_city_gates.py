@@ -4,11 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from build_data.acquire.artifacts import file_record
-from build_data.acquire.io import fingerprint, write_json
-from build_data.golden.inputs import Inputs
-from build_data.normalize_cells.gates import failures, reviewed
-from build_data.reconcile.common import Row
+from pipeline.engines.cities.gates import failures
+from pipeline.engines.reconcile.common import Row
 
 
 def test_spatial_gate_rejects_footprint_and_neighbour_losses() -> None:
@@ -36,56 +33,28 @@ def test_spatial_gate_rejects_footprint_and_neighbour_losses() -> None:
     }
 
 
-def test_reviewed_gate_refuses_mutated_pilot_report(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    monkeypatch.setattr("build_data.normalize_cells.gates.builder", lambda: "code")
+def test_reviewed_gate_refuses_changed_policy(tmp_path: Path) -> None:
+    from pipeline.config.reviews import load
+    from pipeline.runtime.jsonio import digest, write_json
+
     settings: Row = {"pilot": ["ZZ"], "town_radius": {"enabled": False}}
-    inputs = Inputs({}, {}, {}, {}, "source-code")
-    base: Row = {"completed": True}
-    ghsl: Row = {"source": "ghsl"}
-    normalized = {"builder": "code", "policy": settings}
-    report_path = tmp_path / "report.json"
-    write_json(report_path, {"before": 1, "after": 2})
-    normal_path = tmp_path / "normalization.json"
-    write_json(normal_path, normalized)
-    summary_path = tmp_path / "summary.json"
+    gate = tmp_path / "review.yaml"
     write_json(
-        summary_path,
+        gate,
         {
-            "normalization": fingerprint(normalized),
-            "base": fingerprint(base),
-            "variants": {
-                "off": {
-                    "automated_gate": True,
-                    "countries": {"ZZ": str(report_path)},
-                    "report_artifacts": [file_record(report_path)],
-                }
-            },
+            "accepted": True,
+            "review": "All measured losses reviewed",
+            "policy_fingerprint": digest(settings),
         },
     )
-    decision = {
-        "accepted": True,
-        "builder": "code",
-        "policy": fingerprint(settings),
-        "inputs": inputs.identity,
-        "base": fingerprint(base),
-        "ghsl": fingerprint(ghsl),
-        "review": "All observed losses reviewed",
-        "unresolved_losses": [],
-        "pilot_summary": file_record(summary_path),
-        "normalization_manifest": file_record(normal_path),
-    }
-    gate = tmp_path / "gate.json"
-    write_json(gate, decision)
-    reviewed(gate, settings, inputs, base, ghsl, root=tmp_path)
-    write_json(report_path, {"before": 1, "after": 0})
-    with pytest.raises(ValueError, match="verification failed"):
-        reviewed(gate, settings, inputs, base, ghsl, root=tmp_path)
+    load(gate, settings)
+    settings["town_radius"]["enabled"] = True
+    with pytest.raises(ValueError, match="Policy changed"):
+        load(gate, settings)
 
 
 def test_boundary_exception_is_exact_and_explained() -> None:
-    from build_data.normalize_cells.gates import unreviewed
+    from pipeline.engines.cities.gates import unreviewed
 
     loss = {"country": "ZZ", "city_id": "town", "lost_cells": 1, "lost_to": {"part": 1}}
     assert unreviewed([loss], [loss]) == [loss]
@@ -99,7 +68,7 @@ def test_boundary_exception_is_exact_and_explained() -> None:
 
 
 def test_distinct_boundaries_of_one_city_keep_separate_reviews() -> None:
-    from build_data.normalize_cells.gates import unreviewed
+    from pipeline.engines.cities.gates import unreviewed
 
     first = {
         "country": "ZZ",

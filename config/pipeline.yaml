@@ -16,7 +16,7 @@ resources:
 h3:
   block_resolution: 3
   cell_resolution: 8
-# Sources execute frozen pins. Engine stages retain adoption recipes until ported.
+# Every stage declares the production packages and native libraries it reads.
 stages:
   - name: download
     packages: [pipeline/stages/sources.py, pipeline/sources/download.py, pipeline/storage,
@@ -29,31 +29,215 @@ stages:
     config: [sources, h3]
     native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex]
   - name: reconcile
-    needs: [normalize]
-    packages: [pipeline/stages/retained.py]
-    native: [duckdb, shapely, h3]
+    needs:
+    - normalize
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/reconcile
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
   - name: cells
-    needs: [reconcile]
-    packages: [pipeline/stages/retained.py]
-    config: [h3]
-    native: [duckdb, shapely, h3]
+    needs:
+    - reconcile
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/cells.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/cells
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
     cell_format: true
   - name: cities
-    needs: [reconcile, normalize]
-    packages: [pipeline/stages/retained.py]
-    native: [duckdb, shapely, h3]
+    needs:
+    - reconcile
+    - normalize
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/cities.py
+    - pipeline/engines/cities
+    - pipeline/engines/cells/nearest.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
   - name: evaluate
-    needs: [cells, cities]
-    packages: [pipeline/stages/retained.py]
-    config: [h3]
-    native: [duckdb, shapely, h3]
+    needs:
+    - cells
+    - cities
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/evaluate.py
+    - pipeline/stages/development.py
+    - pipeline/stages/cities.py
+    - pipeline/stages/cells.py
+    - pipeline/stages/reconcile.py
+    - pipeline/stages/engine_views.py
+    - pipeline/config/reviews.py
+    - pipeline/engines/cities
+    - pipeline/engines/cells
+    - pipeline/engines/normalize_cells/score.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
   - name: normalize_cells
-    needs: [cells, cities, evaluate]
-    packages: [pipeline/stages/retained.py]
-    config: [h3]
-    native: [duckdb, shapely, h3]
+    needs:
+    - cells
+    - cities
+    - evaluate
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/normalize_cells.py
+    - pipeline/stages/cities.py
+    - pipeline/stages/reconcile.py
+    - pipeline/stages/engine_views.py
+    - pipeline/engines/query.py
+    - pipeline/engines/normalize_cells
+    - pipeline/engines/cities
+    - pipeline/engines/cells
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
     cell_format: true
   - name: lookups
-    needs: [normalize, normalize_cells]
-    packages: [pipeline/stages/retained.py]
-    native: [duckdb, h3]
+    needs:
+    - normalize
+    - normalize_cells
+    - plate_country
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/storage.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/lookups.py
+    - pipeline/stages/lookup_manifest.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/query.py
+    - pipeline/engines/cells
+    - pipeline/engines/cities/gates.py
+    - pipeline/engines/normalize_cells/references.py
+    - pipeline/config/reviews.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    native:
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
+  - name: plate_country
+    needs: [normalize]
+    packages: [pipeline/stages/plate_country.py, pipeline/stages/geographic.py,
+               pipeline/stages/engine_discovery.py, pipeline/stages/engine_recipes.py,
+               pipeline/stages/engine_data.py, pipeline/stages/engine_io.py,
+               pipeline/engines/plate_country, pipeline/engines/storage.py,
+               pipeline/config/policies.py, pipeline/sources/plates]
+    config: [engines]
+    native: [pyarrow, regex]

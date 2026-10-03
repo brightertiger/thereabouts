@@ -1,5 +1,6 @@
 """Opt-in, read-only world proof plus real application to copied JSON and ledger."""
 
+import hashlib
 import os
 import shutil
 import time
@@ -23,6 +24,17 @@ from pipeline.runtime.verification import Verifier
 from pipeline.stages.registry import registry
 
 from .helpers import peak_rss, retained_stages
+
+
+def output_digest(ledger: Ledger) -> str:
+    checksum = hashlib.sha256()
+    for row in ledger.db.execute(
+        "SELECT stage,unit_id,outputs,completed_at FROM units ORDER BY stage,unit_id"
+    ):
+        for value in row:
+            checksum.update(str(value).encode())
+            checksum.update(b"\0")
+    return checksum.hexdigest()
 
 
 @pytest.mark.world
@@ -77,6 +89,7 @@ def test_world_copy_application(tmp_path: Path) -> None:
         overlay = {
             name: (copied / name).read_bytes() for name in migration.rewrites.after
         }
+        migration.context.ledger.close()
         with Ledger(root, copied_ledger) as adopted:
             ctx = replace(
                 context(config, root, adopted), verifier=Verifier(root, overlay)
@@ -84,10 +97,22 @@ def test_world_copy_application(tmp_path: Path) -> None:
             handover = prepare(ctx, stages)
             try:
                 assert all(d.state == "current" for d in handover.decisions)
-                assert len(handover.changes) == 26
-                before_outputs = {
-                    record.key: record.outputs for record in adopted.records()
-                }
+                assert len(handover.changes) == 85_577
+                before_outputs = output_digest(adopted)
+                prepared_bytes = int(
+                    handover.context.ledger.db.execute("PRAGMA page_count").fetchone()[
+                        0
+                    ]
+                ) * int(
+                    handover.context.ledger.db.execute("PRAGMA page_size").fetchone()[0]
+                )
+                # Include growth plus a rollback journal of every original page.
+                required = max(prepared_bytes, copied_ledger.stat().st_size)
+                assert workspace_bytes(repository) + required < 3_000_000_000
+                assert (
+                    shutil.disk_usage(tmp_path).free - required
+                    >= config.resources.disk_floor
+                )
                 apply_handover(handover, adopted)
             finally:
                 handover.context.ledger.close()
@@ -95,9 +120,7 @@ def test_world_copy_application(tmp_path: Path) -> None:
             ctx = replace(
                 context(config, root, adopted), verifier=Verifier(root, overlay)
             )
-            assert {
-                record.key: record.outputs for record in adopted.records()
-            } == before_outputs
+            assert output_digest(adopted) == before_outputs
             decisions = plan(ctx, stages)
             assert all(d.state == "current" for d in decisions)
             before = sha256_file(copied_ledger)

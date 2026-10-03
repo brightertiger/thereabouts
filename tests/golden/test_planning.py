@@ -1,36 +1,32 @@
-from __future__ import annotations
+"""Block indexing updates country dependencies, including explicit ocean blocks."""
 
+import json
+import sqlite3
 from pathlib import Path
 
-import pytest
 from h3.api import basic_int as h3
 
-from build_data.golden import blocks
-from build_data.golden.planning import Dependencies
+from pipeline.config import load
+from pipeline.config.policies import reconcile
+from pipeline.engines.cells.inventory import index
 
 
-def test_changed_country_dependencies_reuse_finest_envelopes(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    root = h3.latlng_to_cell(0, 0, 3)
-    monkeypatch.setattr(blocks, "blocks", lambda: [root])
-    path = tmp_path / "blocks.sqlite"
-    plan = blocks.Plan(path, Dependencies({"bounds": [["AA", -5, -5, 5, 5]]}, 1000))
-    try:
-        plan.create()
-        assert plan.rows()[0]["countries"] == ["AA"]
-    finally:
-        plan.close()
-
-    def no_enumeration(*args: object) -> None:
-        raise AssertionError("unchanged H3 envelopes must be reused")
-
-    monkeypatch.setattr(blocks, "descendants", no_enumeration)
-    plan = blocks.Plan(path, Dependencies({"bounds": [["BB", -5, -5, 5, 5]]}, 1000))
-    try:
-        plan.create()
-        assert plan.rows()[0]["countries"] == ["BB"]
-        plan.create()
-        assert plan.rows()[0]["countries"] == ["BB"]
-    finally:
-        plan.close()
+def test_changed_country_dependencies_and_ocean_blocks(tmp_path: Path) -> None:
+    path = tmp_path / "blocks.sqlite3"
+    root = h3.int_to_str(h3.latlng_to_cell(0, 0, 3))
+    ocean = h3.int_to_str(h3.latlng_to_cell(0, -140, 3))
+    for cc in ("AA", "BB"):
+        index(
+            path,
+            {"bounds": [[cc, -5, -5, 5, 5]]},
+            reconcile(),
+            load().h3,
+            [root, ocean],
+        )
+        db = sqlite3.connect(path)
+        try:
+            rows = dict(db.execute("SELECT root,countries FROM blocks"))
+            assert json.loads(rows[root]) == [cc]
+            assert json.loads(rows[ocean]) == []
+        finally:
+            db.close()

@@ -45,6 +45,7 @@ class Executor:
             make_unit(self.ctx, unit.recipe, stage.identity(self.ctx)),
             required_bytes=unit.required_bytes,
             accounts_disk=unit.accounts_disk,
+            refresh_discovery=unit.refresh_discovery,
         )
 
     def missing(self, unit: Unit) -> bool:
@@ -66,8 +67,14 @@ class Executor:
         required: dict[tuple[str, str], Unit] = {}
         visiting: set[tuple[str, str]] = set()
         checked: set[tuple[str, str]] = set()
+        prepared: set[str] = set()
 
         def require(unit: Unit, *, payload: bool) -> None:
+            if unit.recipe.stage not in prepared:
+                prepared.add(unit.recipe.stage)
+                for prerequisite in self.discover(unit.recipe.stage).values():
+                    if prerequisite.refresh_discovery and prerequisite.key != unit.key:
+                        require(prerequisite, payload=False)
             if unit.key in visiting:
                 raise ValueError(f"Unit dependency cycle: {unit.key}")
             if unit.key in required:
@@ -94,13 +101,28 @@ class Executor:
                 required[unit.key] = unit
 
         for unit in (
-            requested if requested is not None else self.discover(name).values()
+            [self.discover(name)[unit.key] for unit in requested]
+            if requested is not None
+            else self.discover(name).values()
         ):
             require(unit, payload=materialize)
         for stage in self.stages:
             pending = {
                 key: unit for key, unit in required.items() if key[0] == stage.name
             }
+            refresh = {
+                key: unit for key, unit in pending.items() if unit.refresh_discovery
+            }
+            if refresh:
+                self._stage(stage, refresh)
+                self.cache.clear()
+                self.execute(
+                    name,
+                    materialize=materialize,
+                    requested=requested,
+                    finalize=finalize,
+                )
+                return
             participated = bool(pending)
             if participated:
                 self._stage(stage, pending)

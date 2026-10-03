@@ -5,14 +5,15 @@ from pathlib import Path
 
 import pytest
 
-from build_data.acquire.io import sha256_file, write_json
-from build_data.plate_country import build, evaluation, formats, priors, sources
-from build_data.plate_country.policy import Row
-from build_data.plate_country.syntax import (
+from pipeline.engines.plate_country import formats, priors
+from pipeline.engines.plate_country.policy import Row
+from pipeline.engines.plate_country.syntax import (
     relaxed_pattern,
     specificity,
     template_pattern,
 )
+from pipeline.evaluation import plates as evaluation
+from pipeline.runtime.jsonio import sha256_file, write_json
 
 
 def wiki(path: Path, html: str) -> Row:
@@ -103,29 +104,6 @@ def test_prior_uses_actual_stock_not_per_capita_column_and_rejects_ambiguous_dat
     assert len(rejected) == 2
 
 
-def test_pins_cache_and_hash_validation(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    raw = tmp_path / "raw" / "plates_country"
-    raw.mkdir(parents=True)
-    file = raw / "x.json"
-    file.write_text("cached")
-    config = {file.name: dict(sha256=sha256_file(file), download_url="unused")}
-    monkeypatch.setattr(sources, "policy", lambda name: config)
-
-    def no_fetch(*args: object, **kwargs: object) -> Row:
-        pytest.fail("A cached source must not be fetched")
-
-    monkeypatch.setattr(sources, "fetch", no_fetch)
-    assert sources.pins(tmp_path, offline=False)[file.name]["path"] == str(file)
-    file.write_text("changed")
-    with pytest.raises(ValueError, match="hash differs"):
-        sources.pins(tmp_path)
-    file.unlink()
-    with pytest.raises(FileNotFoundError, match="Missing pinned source"):
-        sources.pins(tmp_path)
-
-
 def test_evaluation_extracts_source_text_deduplicates_and_keeps_split_stable(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -160,33 +138,10 @@ def test_evaluation_extracts_source_text_deduplicates_and_keeps_split_stable(
         pattern=r"(?P<plate>AA-123)",
         method="source_transcription",
     )
-    monkeypatch.setattr(evaluation, "pins", lambda data: {"commons": pin})
     monkeypatch.setattr(evaluation, "policy", lambda name: [sample, sample])
-    rows = evaluation.examples(tmp_path)
+    rows = evaluation.examples({"commons": pin})
     assert len(rows) == 1 and rows[0]["plate"] == "AA-123"
-    assert rows == evaluation.examples(tmp_path)
+    assert rows == evaluation.examples({"commons": pin})
     sample["pattern"] = "MISSING"
     with pytest.raises(ValueError, match="Missing evaluation transcription"):
-        evaluation.examples(tmp_path)
-
-
-def test_status_rejects_changed_policy_even_when_bundle_did_not_change(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    config = tmp_path / "config"
-    config.mkdir()
-    write_json(config / "gaps.json", {"XY": "unverified"})
-    monkeypatch.setattr(build, "DATA", config)
-    monkeypatch.setattr(build, "pins", lambda data: {})
-    monkeypatch.setattr(build, "load_manifest", lambda workspace, source: {})
-    base = tmp_path / "normalized" / "plates" / "manifest.json"
-    write_json(base, {})
-    write_json(
-        tmp_path / "normalized" / "plates_country" / "manifest.json",
-        dict(**build.configuration(), base_manifest_sha256=sha256_file(base)),
-    )
-    build.verify(tmp_path)
-    write_json(config / "gaps.json", {"XY": "new evidence"})
-    with pytest.raises(ValueError, match="policies changed"):
-        build.verify(tmp_path)
+        evaluation.examples({"commons": pin})

@@ -7,13 +7,13 @@ import pytest
 import shapely
 from h3.api import basic_int as h3
 
-from build_data.golden.planning import Dependencies
-from build_data.golden.seam import oracle
-from build_data.golden.windows import envelopes
-from build_data.hierarchy import descendants, label_block
-from build_data.reconcile.common import connect, pack
-from build_data.reconcile.lookup import Locator
-from build_data.reconcile.spatial import insert_area
+from pipeline.engines.cells.planning import Dependencies
+from pipeline.engines.cells.seam import oracle
+from pipeline.engines.cells.windows import envelopes
+from pipeline.engines.hierarchy import descendants, label_block
+from pipeline.engines.reconcile.common import connect, pack
+from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.reconcile.spatial import insert_area
 
 
 @pytest.mark.parametrize("latitude", [0, 90, -90])

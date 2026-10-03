@@ -155,7 +155,7 @@ class Inventory:
             filename = name.split(marker)[1]
             if "/" in filename or not filename.endswith(".json"):
                 raise ValueError("Unexpected repository evidence in plates manifest")
-            source = REPOSITORY / "build_data/acquire/plates_data" / filename
+            source = REPOSITORY / "pipeline/migration/evidence/plates" / filename
             if (
                 source.stat().st_size != record["size"]
                 or sha256_file(source) != record["sha256"]

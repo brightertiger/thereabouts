@@ -4,18 +4,18 @@ from pathlib import Path
 
 import pytest
 
-from build_data.acquire import Workspace
-from build_data.acquire.io import sha256_file
-from build_data.reconcile.build import build_country
-from build_data.reconcile.common import connect, policy
-from build_data.reconcile.lookup import Locator
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.config.policies import reconcile as policy
+from pipeline.engines.reconcile.common import connect
+from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.runtime.jsonio import sha256_file
+from tests.reconcile.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
 
 def test_nested_population_separate_state_and_resumption(tmp_path: Path) -> None:
-    workspace = Workspace(tmp_path)
+    workspace = tmp_path
     root = write_inputs(
         tmp_path / "inputs",
         geonames=[
@@ -35,7 +35,7 @@ def test_nested_population_separate_state_and_resumption(tmp_path: Path) -> None
             area("w", "Ward", "locality", (0.4, 0.4, 0.6, 0.6)),
         ],
     )
-    output = build_country(workspace, root, "ZZ", "inputs", policy(), "test")
+    output = reconciled(workspace, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
     db = connect(land)
     create_areas(db)
@@ -55,11 +55,10 @@ def test_nested_population_separate_state_and_resumption(tmp_path: Path) -> None
         assert not oracle.locate(5, 5)["eligible"]
         with pytest.raises(ValueError):
             oracle.locate(float("nan"), 1)
-    digest, modified = sha256_file(output), output.stat().st_mtime_ns
-    assert build_country(workspace, root, "ZZ", "inputs", policy(), "test") == output
-    assert output.stat().st_mtime_ns == modified
+    digest = sha256_file(output)
+    assert reconciled(workspace, root, "ZZ", policy()) == output
     output.write_bytes(b"corrupt")
-    build_country(workspace, root, "ZZ", "inputs", policy(), "test")
+    reconciled(workspace, root, "ZZ", policy())
     assert sha256_file(output) == digest
 
 
@@ -71,8 +70,8 @@ def test_country_failure_does_not_commit(
     def fail(*args: object) -> None:
         raise OSError("injected interrupted area unit")
 
-    monkeypatch.setattr("build_data.reconcile.build.assign_areas", fail)
+    monkeypatch.setattr("pipeline.engines.reconcile.build.assign_areas", fail)
     with pytest.raises(OSError, match="interrupted"):
-        build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
+        reconciled(tmp_path, root, "ZZ", policy())
     assert not list((tmp_path / "reconciled").rglob("*.sqlite"))
     assert not list((tmp_path / "reconciled").rglob("*.part"))

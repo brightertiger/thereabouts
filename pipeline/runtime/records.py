@@ -26,6 +26,11 @@ class Dependency:
     stage: str
     unit_id: str
     paths: tuple[str, ...] = ()
+    control: bool = False
+
+    def __post_init__(self) -> None:
+        if self.control and self.paths:
+            raise ValueError("A control dependency cannot consume output paths")
 
     @property
     def key(self) -> tuple[str, str]:
@@ -74,7 +79,10 @@ def recipe_from_json(value: Object) -> Recipe:
         cast(Object, value["parameters"]),
         tuple(
             Dependency(
-                str(d["stage"]), str(d["unit_id"]), tuple(cast(list[str], d["paths"]))
+                str(d["stage"]),
+                str(d["unit_id"]),
+                tuple(cast(list[str], d["paths"])),
+                cast(bool, d.get("control", False)),
             )
             for d in dependencies
         ),

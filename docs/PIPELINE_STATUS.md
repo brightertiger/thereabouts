@@ -1,10 +1,115 @@
 # Pipeline redesign status
 
-Packages 1 and 2 and the package-1 review fixes are complete on `feat/pipeline`,
-with local commits only. The owner-approved auxiliary absence is committed as
-`316f5c6`. Download and normalize now independently discover thirteen units each
-from source YAML and the frozen lock. The real workspace has only been read.
-Package 3 is next; packages 4–5 remain outside the current request.
+Packages 1–3 and the package-1 review fixes are implemented on `feat/pipeline`,
+with local commits only. The protected workspace remains unmigrated and has only
+been read. Packages 4–5 await the next review. Commands and configuration are in
+[DATA_PIPELINE.md](DATA_PIPELINE.md); the current table schema remains
+[GOLDEN_DATASET.md](GOLDEN_DATASET.md).
+
+## Package 3: engines and independent handover
+
+The executable registry now covers reconcile, cells, cities, evaluate,
+normalize_cells, lookups and optional plate_country. `build_data/` is deleted.
+Build-side geometry, table, index, model and serving/pack helpers live under
+`pipeline/`, importing only `thereabouts.format` from the client. No client file
+changed in this package. Retained stand-ins remain solely for initial migration;
+they are not production stage implementations.
+
+Reconciliation and city policies moved mechanically to YAML. Equivalence tests
+cover all 676 two-letter country projections and preserve the previous canonical
+JSON fingerprints. The historical city review still binds
+`a065e704b04fd3340c5e212d1cd70f1f6212275a56e754747672db655230ce9c`.
+The previous JSON is retained only as test evidence. Country units include only
+the common and relevant country policy; block units include contributing countries.
+Evaluation is a required execution gate, rather than a consumed geographic input.
+Changing its receipt alone does not rebuild unaffected countries, and a failed
+gate still prevents execution, including a run targeting only normalization.
+
+Independent engine discovery initially reproduced all **85,551 engine keys**
+from normalized country columns and the retained block inventory in 9.35 s at
+511,049,728 bytes peak RSS. It does not enumerate saved recipes. Engine inspection
+then corrected four dependency details in both initial adoption and discovery:
+
+- Country-quality reports read the complete reconciled country set and land.
+- Static code/phone joins read reconciled aliases and state crosswalks.
+- Reconciliation manifest publication requires a successful pilot gate.
+- Normalization requires evaluation success without consuming its receipt bytes.
+
+Handover still refuses changed dependencies. **A ledger initially adopted with
+the older mapping will refuse these engine handovers; use a fresh initial
+adoption with this final code.** The owner's workspace is still unmigrated.
+These corrections change dependency/input hashes, never retained output bytes,
+unit keys, absence permissions or the approved metadata repair scope. The copied
+ledger proof below exercises fresh adoption and then explicit handover. Reports
+from the package-2 copy are retained; its copied metadata was removed to keep the
+worktree below 3 GB.
+
+Runtime tests exercise fresh and changed block discovery, all geographic stages
+through a verified lookup manifest, corruption repair, absent-input regeneration,
+and failed-gate ordering. Source/engine decision coverage retained from the old
+controllers is listed in [PIPELINE_TEST_COVERAGE.md](PIPELINE_TEST_COVERAGE.md).
+Plate-country builds and verifies small synthetic bundles; it has zero real units
+because its source is disabled pending a reviewed pin.
+
+One Malaysia block (`836505fffffffff`) was reconstructed from read-only normalized
+sources and compared with both retained radius variants. Both are byte-identical:
+
+| Variant | Rows | Parquet bytes | SHA256 |
+| --- | ---: | ---: | --- |
+| OFF | 8,019 | 79,690 | `f83e156e9b966c3b442cbaf2e08e08f35c40fb331e2d3f81cd484ff75d42cfd4` |
+| ON | 8,007 | 79,733 | `02f3b7bee9e6204f22928af12fdbbac3283b730189678be3c356eaa092fc4fb3` |
+
+The reproducible opt-in test passed in **25.64 wall seconds**, with
+**577,142,784 bytes peak RSS** and **140,388,737 created bytes**, including 97
+complete land features. These are one block's measured results, not a full-world
+rebuild claim. The reference input was read-only; reconstructed intermediates and
+outputs are inside this checkout. Evidence:
+`data/pipeline-work/pilot-proof/test_retained_pilot_bytes0/measurements.json`.
+
+Porting source tests exposed a GHSL attribution regression in package 2. Its YAML
+now exactly names CC-BY-4.0 and the original JRC/Pesaresi attribution. Archive
+extraction also rejects traversal member names before any write. Final source
+handover includes these corrections.
+
+A first final handover passed but peaked at **2,304,770,048 bytes RSS**, exceeding
+the intended roughly 2 GB process budget. Planning no longer decodes every saved
+recipe merely to list stages, and handover now reads completion/recipe pairs one
+at a time. A regression test prevents the former full-recipe allocation. Final
+measurements below supersede the initial run; this over-budget run is retained
+here explicitly rather than described as within the limit.
+
+Final acceptance on Apple M2 / 8 GiB / macOS / CPython 3.12.8:
+
+| Check | Result | Wall seconds | Peak RSS bytes |
+| --- | --- | ---: | ---: |
+| Real-workspace handover dry-run | 85,577 handovers; zero stale/new | 359.29 | 1,607,909,376 |
+| Real-workspace plan | 85,577 current; zero stale/new under simulation | 346.18 | 1,407,909,888 |
+| Copied-ledger adoption, handover, ordinary plan and idempotence | passed; zero stale/new without simulation | 541.96 | 1,480,228,864 |
+| Pilot block, both variants | byte and logical equality | 25.64 | 577,142,784 |
+
+The copied ledger is **523,980,800 bytes**; copied rewritten/imported JSON totals
+**30,689,281 bytes**. No Parquet tree was copied for migration. Handover preserved
+output records and completion timestamps; the real ledger hash/mtime and every
+original JSON remained unchanged. The final ledger SHA256 is still
+`d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
+Worktree files total **2,294,064,634 bytes**, with **49,010,413,568 bytes free** at
+final measurement. The proof checks both limits before copying and reserves
+measured SQLite growth plus rollback-journal space before handover application.
+
+Full suite: **639 passed, 8 skipped** in 187.68 s. The two explicitly selected
+world proofs above also passed. Ruff check and formatting passed (485 files);
+strict mypy passed (472 source files). `pins check --from-workspace` passed.
+The production `resolve()` calls were reviewed: they validate/locate filesystem
+paths or are geographic resolver methods; persisted artifact records remain
+workspace-relative. There are no production `build_data` imports and no pipeline
+imports from the client except `thereabouts.format`.
+
+[PIPELINE_ENGINE_MEASUREMENTS.json](PIPELINE_ENGINE_MEASUREMENTS.json) records
+stage-by-stage old → new identities, counts, pilot hashes and measurements.
+Full reports: `.cache/pipeline/engines-handover-final.json` and
+`.cache/pipeline/engines-plan-final.json`; copied-proof evidence is under
+`data/pipeline-work/engines-world-proof/`. The final dry-run hashes
+17,677,116,404 present payload bytes; remote custody remains unverified.
 
 ## Package 2: sources
 
@@ -912,19 +1017,22 @@ It copies no Parquet or other data tree.
 
 ## Current real-workspace plan and handover dry run
 
-Both commands report the following table after the approved absence extension:
+Final package-3 commands report the following table after simulated adoption and
+handover. **Zero stale under simulation checks mapping and hashes only, not
+engine equivalence.** Independent synthetic and pilot checks are described above.
 
-| Stage | Current | Stale | New | Units with absent outputs |
-| --- | ---: | ---: | ---: | ---: |
-| download | 13 | 0 | 0 | 4 |
-| normalize | 13 | 0 | 0 | 2 |
-| reconcile | 1,111 | 0 | 0 | 1,111 |
-| cells | 41,442 | 0 | 0 | 0 |
-| cities | 555 | 0 | 0 | 0 |
-| evaluate | 1 | 0 | 0 | 0 |
-| normalize_cells | 41,716 | 0 | 0 | 0 |
-| lookups | 726 | 0 | 0 | 0 |
-| **Total** | **85,577** | **0** | **0** | **1,117** |
+| Stage | Handover units | Current | Stale | New | Units with absent outputs |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| download | 13 | 13 | 0 | 0 | 4 |
+| normalize | 13 | 13 | 0 | 0 | 2 |
+| reconcile | 1,111 | 1,111 | 0 | 0 | 1,111 |
+| cells | 41,442 | 41,442 | 0 | 0 | 0 |
+| cities | 555 | 555 | 0 | 0 | 0 |
+| evaluate | 1 | 1 | 0 | 0 | 0 |
+| normalize_cells | 41,716 | 41,716 | 0 | 0 | 0 |
+| plate_country (disabled) | 0 | 0 | 0 | 0 | 0 |
+| lookups | 726 | 726 | 0 | 0 | 0 |
+| **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
 ## Migration changes and evidence
 
@@ -951,7 +1059,7 @@ output records across 1,117 units, including the approved four auxiliary payload
   Historical review hashes are never rebound to different evidence to make
   them pass. Unknown stages and corrupt retained payloads stop adoption.
 
-The detailed dry-run report is `.cache/pipeline/migration.json`. It records the
+The final detailed dry-run report is `.cache/pipeline/engines-handover-final.json`. It records the
 original ledger hash, per-row dispositions, relocations, new identities and unit
 input hashes, and before/after JSON sizes and hashes. Application saves the exact
 old ledger, journals JSON originals, and publishes the prepared ledger last.
@@ -968,8 +1076,7 @@ workspace):**
 ```
 
 Stop old builders before application; they must not run against the adopted
-ledger. Follow with `migrate check` and `plan` using the same `--root`. Production
-geographic rebuilding still requires package 3. The old checkout-name symlink is
+ledger. Follow with `migrate check` and `plan` using the same `--root`. The executable geographic stages are now available. The old checkout-name symlink is
 left for the reviewer because removing it would write outside this worktree.
 
 ## Original package-1 measurements (before review fixes)
@@ -1007,9 +1114,8 @@ workspace and no cloud data operation was performed.
 ## Next packages and owner follow-ups
 
 1. Package 2: completed above; world source normalization has not been rerun.
-2. Package 3: engine moves, policy JSON-to-YAML equivalence, fingerprint-bound
-   reviews, evaluation and plate-country stages, fixture/pilot digest comparisons;
-   then delete `build_data` and its temporary repository-evidence reader in migration.
+2. Package 3: completed above. Full-world geographic rebuilding, remote custody
+   verification and real plate-country input validation were deliberately not run.
 3. Package 4: measured release subset, coalesced cells, complete generated README,
    manifests/licences/card/changes, packs, local publish and registry output.
 4. Package 5: VM and monthly release procedure documentation/scripts, unexecuted.

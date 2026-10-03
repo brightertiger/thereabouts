@@ -6,6 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from pipeline.runtime.jsonio import atomic_output
+from pipeline.runtime.paths import validate_relative
 from pipeline.sources.contract import SourceContext
 
 
@@ -18,7 +19,7 @@ def extract(
             for member in archive.infolist()
             if not member.is_dir() and select(member.filename)
         ]
-        names = [Path(member.filename).name for member in members]
+        names = [Path(validate_relative(member.filename)).name for member in members]
         if not members or len(names) != len(set(names)):
             raise ValueError("Expected distinct selected archive members")
         reservation = sum(member.file_size for member in members)

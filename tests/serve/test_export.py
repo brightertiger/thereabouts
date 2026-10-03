@@ -6,10 +6,10 @@ import pyarrow.parquet as pq
 import pytest
 from h3.api import basic_int as h3
 
-from build_data.serve.checkpoints import file_record
-from build_data.serve.export import export
-from build_data.serve.metadata import write_manifest
-from build_data.serve.snapshot import Row, read_snapshot
+from pipeline.engines.serving.checkpoints import file_record
+from pipeline.engines.serving.export import export
+from pipeline.engines.serving.metadata import write_manifest
+from pipeline.engines.serving.snapshot import Row, read_snapshot
 from thereabouts.packs.address import address, cell_at
 from thereabouts.packs.catalogue import Catalogue
 from thereabouts.packs.jsonio import parse, sha256
@@ -121,7 +121,7 @@ def test_idempotent_portable_and_deterministic(
 def test_resume_reuses_complete_units(
     snapshot: tuple[Path, Path], tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    module = importlib.import_module("build_data.serve.export")
+    module = importlib.import_module("pipeline.engines.serving.export")
     original = module.write_cells
     calls = 0
 

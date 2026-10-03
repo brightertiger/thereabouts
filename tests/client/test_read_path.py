@@ -85,7 +85,7 @@ def test_numeric_input_types_and_column_stored_parent() -> None:
 
 
 def test_mixed_shards_stay_mapped_until_close(tmp_path: Path) -> None:
-    from build_data.serve.export import export
+    from pipeline.engines.serving.export import export
     from tests.serve.fixtures import golden
 
     manifest, release = golden(tmp_path / "input")

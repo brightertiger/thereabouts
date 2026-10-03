@@ -110,6 +110,19 @@ class Ledger:
         )
         return [recipe_from_json(json.loads(row[0])) for row in rows]
 
+    def recipe_stages(self) -> set[str]:
+        if not self.migrated:
+            return set()
+        return {
+            str(row[0]) for row in self.db.execute("SELECT DISTINCT stage FROM recipes")
+        }
+
+    def recipe(self, stage: str, unit_id: str) -> Recipe | None:
+        row = self.db.execute(
+            "SELECT recipe FROM recipes WHERE stage=? AND unit_id=?", (stage, unit_id)
+        ).fetchone()
+        return recipe_from_json(json.loads(row[0])) if row else None
+
     def register(self, recipe: Recipe) -> None:
         self.writable()
         self.db.execute(

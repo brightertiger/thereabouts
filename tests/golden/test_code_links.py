@@ -5,11 +5,10 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from build_data.acquire import Workspace
-from build_data.golden.code_links import CodeIndex, linked_rows
-from build_data.golden.inputs import Inputs
-from build_data.reconcile.build import build_country
-from build_data.reconcile.common import policy
+from pipeline.config.policies import reconcile as policy
+from pipeline.engines.cells.code_links import CodeIndex, linked_rows
+from pipeline.engines.cells.inputs import Inputs
+from tests.reconcile.conftest import reconciled
 
 from ..reconcile.conftest import area, write_inputs
 
@@ -29,8 +28,8 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
             area("unverified", "Unverified", "locality", (0.4, 0.4, 0.5, 0.5)),
         ],
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
-    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {}, "test", {"ZZ"})
+    output = reconciled(tmp_path, root, "ZZ", policy())
+    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"})
     index = CodeIndex(inputs)
     path = tmp_path / "codes.parquet"
     pq.write_table(
@@ -78,11 +77,9 @@ def test_subdivision_can_identify_a_separately_represented_territory(
         shape = area(cc, cc, "country", (0, 0, 1, 1))
         shape["country_code"] = cc
         root = write_inputs(tmp_path / cc, geonames=[], divisions=[], areas=[shape])
-        output = build_country(
-            Workspace(tmp_path), root, cc, "inputs", configured, "test"
-        )
+        output = reconciled(tmp_path, root, cc, configured)
         paths[cc] = {"path": str(output)}
-    index = CodeIndex(Inputs(paths, {}, {}, {}, "test"))
+    index = CodeIndex(Inputs(paths, {}, {}))
     matched, _ = index.subdivision(
         {"country_code": "ZZ", "code_system": "ISO-3166-2", "code": "ZZ-YY"}
     )
@@ -110,8 +107,8 @@ def test_source_qualified_aliases_preserve_type_scope_and_ambiguity(
             area("weak", "Weak District", "locality", (0, 0, 1, 1)),
         ],
     )
-    output = build_country(Workspace(tmp_path), root, "ZZ", "inputs", policy(), "test")
-    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {}, "test", {"ZZ"})
+    output = reconciled(tmp_path, root, "ZZ", policy())
+    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"})
     index = CodeIndex(inputs)
     path = tmp_path / "codes.parquet"
     cases = [

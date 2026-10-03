@@ -14,10 +14,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 
-from build_data.golden.schemas import CELLS
-from build_data.serve.checkpoints import file_record
-from build_data.serve.export import export
-from build_data.serve.metadata import write_manifest
+from pipeline.engines.cells.schemas import CELLS
+from pipeline.engines.serving.checkpoints import file_record
+from pipeline.engines.serving.export import export
+from pipeline.engines.serving.metadata import write_manifest
 from tests.serve.fixtures import cell, golden
 from thereabouts.packs.address import address
 from thereabouts.packs.jsonio import parse

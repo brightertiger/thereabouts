@@ -1,0 +1,94 @@
+"""Measure the frozen pilot and enforce policy-bound human review decisions."""
+
+from dataclasses import asdict
+from pathlib import Path
+from typing import cast
+
+from pipeline.config import reviews
+from pipeline.engines.artifacts import EVALUATION, read_json
+from pipeline.engines.cells.reader import Cells
+from pipeline.engines.cities.evaluate import Comparison
+from pipeline.engines.cities.gates import failures, unreviewed
+from pipeline.engines.cities.quality import country_report, named_checks
+from pipeline.engines.reconcile.common import Row
+from pipeline.engines.storage import file_record
+from pipeline.runtime.fingerprints import REPOSITORY
+from pipeline.runtime.jsonio import write_json
+from pipeline.runtime.paths import located
+
+from . import cells, cities, development
+from . import engine_io as io
+from .contract import Context, Unit
+from .engine_data import countries
+from .engine_views import Engines
+
+
+def run(ctx: Context, unit: Unit) -> list[Path]:
+    policy = cast(Row, unit.recipe.parameters["policy"])
+    settings = ctx.config.engines
+    approval = reviews.load(located(REPOSITORY, settings.city_review), policy)
+    base = io.receipt(ctx, "cells", "snapshot/current", suffix="manifest.json")
+    codes = countries(ctx)
+    if not base["completed"] or not set(policy["pilot"]) <= set(codes):
+        raise ValueError(
+            "Evaluation requires complete base cells and all pilot countries"
+        )
+    root = located(ctx.root, ctx.config.paths.work) / "evaluation" / unit.inputs_hash
+    tables = io.local(ctx, base["tables"])
+    reader = Cells(tables, ctx.config.engines.limits)
+    centres = cities.urban(ctx)
+    engines = Engines(ctx, codes, policy, centres)
+    inputs = cells.inputs(ctx, codes, policy)
+    comparison = Comparison(reader, engines, policy["town_radius"]["enabled"])
+    reports, outputs = [], []
+    probes = read_json(EVALUATION / "cities/probes.json")
+    for cc in policy["pilot"]:
+        report = country_report(comparison, cc, engines[cc], centres, probes)
+        report["country"] = cc
+        path = root / f"{cc}.json"
+        write_json(path, report)
+        reports.append(report)
+        outputs.append(path)
+    named = named_checks(comparison, inputs)
+    failed = failures(reports, named)
+    failed["all_boundaries"] = unreviewed(
+        failed["all_boundaries"],
+        [asdict(item) for item in approval.boundary_exceptions],
+    )
+    score = development.score(
+        ctx, located(REPOSITORY, settings.evaluation_points), tables, policy, codes
+    )
+    passed = (
+        not any(failed.values())
+        and score["after"]["counts"]["correct"] >= approval.minimum_dev_correct
+    )
+    path = root / "pilot.json"
+    write_json(
+        path,
+        {
+            "passed": passed,
+            "policy_fingerprint": approval.policy_fingerprint,
+            "inputs_hash": unit.inputs_hash,
+            "review": asdict(approval),
+            "countries": {
+                report["country"]: file_record(ctx.root, item)
+                for report, item in zip(reports, outputs, strict=True)
+            },
+            "named": named,
+            "failed_spatial_gates": failed,
+            "development": score,
+        },
+    )
+    if not passed:
+        raise ValueError(
+            f"Pilot evaluation failed; inspect {path.relative_to(ctx.root)}"
+        )
+    return [path, *outputs]
+
+
+def finish(ctx: Context) -> None:
+    record = ctx.ledger.get("evaluate", "pilot")
+    if record is not None and not record.metadata.get("adopted"):
+        value = io.receipt(ctx, "evaluate", "pilot", suffix="pilot.json")
+        if not value["passed"]:
+            raise ValueError("Pilot evaluation has not passed")

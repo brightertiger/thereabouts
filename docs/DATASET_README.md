@@ -21,8 +21,11 @@ This is the planned public layout for work package 4. The dataset generator,
 column reference, measured counts, examples, attribution and citation have not
 yet been implemented. This document is not a release inventory. A completed
 release will generate its README and measurements from its own manifest.
-The tree covers the current fourteen table families. Package 3 must define the
-plate-country table before package 4 adds it to this inventory.
+The tree covers the fourteen retained table families. The optional plate-country
+stage additionally defines `plate_country_formats`, `plate_country_vehicle_priors`
+and `plate_country_coverage` (country code plus structured evidence JSON); no real
+payload is built or pinned for that disabled source yet. Package 4 must document
+those columns and their nested evidence before releasing them.
 
 ```text
 dataset/<version>/                      Immutable release, YYYY.MM or YYYY.MM.patch.

@@ -8,12 +8,12 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import shapely
 
-from build_data.cities.candidates import eligible
-from build_data.cities.common import policy
-from build_data.cities.engine import Engine
-from build_data.cities.footprints import screen
-from build_data.cities.urban import Urban
-from build_data.reconcile.common import Row, pack
+from pipeline.config.policies import cities as policy
+from pipeline.engines.cities.candidates import eligible
+from pipeline.engines.cities.engine import Engine
+from pipeline.engines.cities.footprints import screen
+from pipeline.engines.cities.urban import Urban
+from pipeline.engines.reconcile.common import Row, pack
 
 
 def make_engine(
@@ -178,8 +178,8 @@ def test_source_anchor_just_outside_urban_grid_keeps_neighbour_core(
 
 
 def test_radius_uses_farther_town_when_nearest_radius_does_not_reach() -> None:
-    from build_data.cities.radius import assign
-    from build_data.reference.sphere import unit_vectors
+    from pipeline.engines.cities.radius import assign
+    from tests.support.reference.sphere import unit_vectors
 
     coords = np.array([[0.0, 0.0]])
     anchors = unit_vectors(np.array([[0.0, 0.009], [0.0, 0.010]]))

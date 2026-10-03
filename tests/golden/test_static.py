@@ -5,8 +5,8 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from build_data.golden.inputs import Inputs
-from build_data.golden.static import linked_rows
+from pipeline.engines.cells.code_links import linked_rows
+from pipeline.engines.cells.inputs import Inputs
 
 
 def test_shared_phone_code_does_not_claim_unique_place_before_all_countries_ready(
@@ -22,7 +22,7 @@ def test_shared_phone_code_does_not_claim_unique_place_before_all_countries_read
         ),
         path,
     )
-    inputs = Inputs({"US": {}}, {}, {}, {}, "test", {"US", "CA"})
+    inputs = Inputs({"US": {}}, {}, {}, {"US", "CA"})
     first = list(linked_rows(path, "phone_prefixes", inputs, {"US"}, {}))
     assert first[0]["link_status"] == "pending"
     assert first[0]["place_id"] is None
@@ -49,7 +49,7 @@ def test_subdivision_namespaces_and_non_geographic_phone_service(
         ),
         path,
     )
-    inputs = Inputs({"ZZ": {}}, {}, {}, {}, "test", {"ZZ"})
+    inputs = Inputs({"ZZ": {}}, {}, {}, {"ZZ"})
     values = list(
         linked_rows(
             path,

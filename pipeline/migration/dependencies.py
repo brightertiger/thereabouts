@@ -37,8 +37,11 @@ def dependencies(
         elif action == "country":
             keys.update((stage, f"{item}/{key}") for item in ("extract", "links"))
         elif action == "quality":
-            keys.update({(stage, "country/" + key), (stage, "land/world")})
+            group(stage, "country/")
+            keys.add((stage, "land/world"))
         elif action in {"gate", "manifest"}:
+            if action == "manifest":
+                keys.add((stage, "gate/pilot"))
             group(stage, "country/")
             group(stage, "quality/")
             keys.add((stage, "land/world"))
@@ -96,7 +99,8 @@ def dependencies(
         group("evaluate")
     elif stage == "lookups":
         if action == "static":
-            # Static joins read place identities and the relevant normalized source.
+            # Administrative aliases and crosswalks come from reconciled SQLite;
+            # the public place table does not retain the full state-code crosswalk.
             kind = key.split("/")[0]
             source = {
                 "countries": "codes",
@@ -108,7 +112,7 @@ def dependencies(
             }[kind]
             keys.add(("normalize", source))
             if source != "timezones":
-                group("cells", "places/")
+                group("reconcile", "country/")
         elif action == "spatial":
             source = {
                 "airports": "airports",
@@ -127,4 +131,7 @@ def dependencies(
         raise ValueError(
             f"Unmapped upstream units for {candidate.key}: {sorted(absent)}"
         )
-    return tuple(Dependency(*key) for key in sorted(keys))
+    return tuple(
+        Dependency(*key, control=stage == "normalize_cells" and key[0] == "evaluate")
+        for key in sorted(keys)
+    )

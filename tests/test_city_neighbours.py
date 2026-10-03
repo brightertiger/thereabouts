@@ -5,14 +5,14 @@ from pathlib import Path
 import h3
 import shapely
 
-from build_data.cities.evaluate import Comparison
-from build_data.cities.quality import neighbour_checks
-from build_data.golden.reader import Cells
-from build_data.golden.schemas import CELLS
-from build_data.golden.storage import parquet
-from build_data.normalize_cells.gates import failures
-from build_data.reconcile.common import Row, connect
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.cells.reader import Cells
+from pipeline.engines.cells.schemas import CELLS
+from pipeline.engines.cities.evaluate import Comparison
+from pipeline.engines.cities.gates import failures
+from pipeline.engines.cities.quality import neighbour_checks
+from pipeline.engines.reconcile.common import Row, connect
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.storage import parquet
 from tests.test_city_normalization import city, make_engine
 
 
@@ -30,6 +30,7 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
     db.close()
     root = h3.cell_to_parent(h3.latlng_to_cell(0, 0, 8), 3)
     table = parquet(
+        tmp_path,
         tmp_path / "base.parquet",
         [
             {
@@ -43,8 +44,9 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
             }
         ],
         CELLS,
+        1024,
     )
-    table.update(kind="cells", block=root)
+    table.update(kind="cells", block=root, path=str(tmp_path / table["path"]))
     comparison = Comparison(Cells([table]), {"ZZ": engine}, False)
     report = neighbour_checks(comparison, "ZZ", engine, {"ZZ": {"town": "Town"}})[0]
     assert not report["accepted_city_footprint"]
@@ -55,8 +57,8 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
 
 
 def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> None:
-    from build_data.cities.boundary_checks import boundary_checks
-    from build_data.reconcile.common import pack
+    from pipeline.engines.cities.boundary_checks import boundary_checks
+    from pipeline.engines.reconcile.common import pack
 
     engine = make_engine(tmp_path, [city("town", 0, 20000)], [])
     shape = shapely.box(-0.01, -0.01, 0.01, 0.01)

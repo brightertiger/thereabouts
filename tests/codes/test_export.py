@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from build_data.serve.export import export
+from pipeline.engines.serving.export import export
 from thereabouts.client import Geocoder
 from thereabouts.packs.exact import Exact
 from thereabouts.packs.jsonio import canonical, parse, sha256
@@ -65,7 +65,7 @@ def test_interrupted_exact_shards_resume_with_byte_identical_output(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     manifest, release = snapshot(tmp_path / "input")
-    encoding = importlib.import_module("build_data.serve_codes.encoding")
+    encoding = importlib.import_module("pipeline.engines.serving_codes.encoding")
     original = encoding.Buffer.write
     calls = []
 
@@ -107,7 +107,7 @@ def test_unlocated_only_pack_needs_no_catalogue(tmp_path: Path) -> None:
     import pyarrow as pa
     import pyarrow.parquet as pq
 
-    from build_data.serve.checkpoints import file_record
+    from pipeline.engines.serving.checkpoints import file_record
 
     manifest, release = snapshot(tmp_path / "input")
     value = parse(manifest.read_bytes())
@@ -130,7 +130,7 @@ def test_changed_join_cannot_silently_relabel_a_source_row(tmp_path: Path) -> No
     import pyarrow as pa
     import pyarrow.parquet as pq
 
-    from build_data.serve.checkpoints import file_record
+    from pipeline.engines.serving.checkpoints import file_record
 
     manifest, release = snapshot(tmp_path / "input")
     value = parse(manifest.read_bytes())

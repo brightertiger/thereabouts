@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import shapely
 
-from build_data.acquire.ghsl import inverse_mollweide, records
+from pipeline.sources.ghsl import inverse_mollweide, records
 
 
 def test_inverse_mollweide_known_equator() -> None:
@@ -33,7 +33,14 @@ def test_geopackage_header_and_source_evidence(tmp_path: Path) -> None:
     db.execute("INSERT INTO centres VALUES(1,?)", (blob,))
     db.commit()
     db.close()
-    (row,) = records(path)
+    from pipeline.runtime.ledger import Ledger
+    from tests.pipeline.sources.fixtures import source_context
+
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        ctx, _ = source_context(
+            tmp_path, ledger, "ghsl", {"archive.zip": (b"fixture", {})}
+        )
+        (row,) = records(ctx, path)
     assert row["source_id"] == "1"
     assert row["license"] == "CC-BY-4.0"
     geometry = shapely.from_wkb(row["geometry"])

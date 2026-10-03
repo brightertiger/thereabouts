@@ -8,9 +8,9 @@ import pyarrow.parquet as pq
 import pytest
 from shapely.geometry import Point, box
 
-from build_data.acquire import schemas
-from build_data.acquire.parquet import validate_parquet, write_partition
-from build_data.acquire.schemas import SCHEMAS, Kind, validate_table
+from pipeline.config.sources import SourceLimits
+from pipeline.sources.shared.parquet import validate_parquet, write_partition
+from pipeline.sources.shared.schemas import SCHEMAS, Kind, validate_table
 
 
 def example(kind: Kind, **updates: object) -> pa.Table:
@@ -61,24 +61,34 @@ def example(kind: Kind, **updates: object) -> pa.Table:
 
 
 @pytest.mark.parametrize("kind", ["areas", "places", "names"])
-def test_schema_roundtrip_and_partition(kind: Kind, tmp_path: Path) -> None:
+def test_schema_roundtrip_and_partition(
+    kind: Kind, tmp_path: Path, limits: SourceLimits
+) -> None:
     table = example(kind)
-    validate_table(table, kind)
+    validate_table(table, kind, "overture", limits)
     destination = tmp_path / "part.parquet"
-    write_partition(destination, kind, [table, *table.to_batches()])
-    validate_parquet(destination, kind)
+    write_partition(
+        destination,
+        kind,
+        "overture",
+        limits,
+        [table, pa.Table.from_batches(table.to_batches())],
+    )
+    validate_parquet(destination, kind, "overture", limits)
     assert pq.read_table(destination).equals(pa.concat_tables([table, table]))
 
 
 @pytest.mark.parametrize("kind", ["areas", "places", "names"])
-def test_rejects_wrong_schema_null_and_missing_provenance(kind: Kind) -> None:
+def test_rejects_wrong_schema_null_and_missing_provenance(
+    kind: Kind, limits: SourceLimits
+) -> None:
     table = example(kind)
     with pytest.raises(ValueError, match="schema"):
-        validate_table(table.drop(["source_id"]), kind)
+        validate_table(table.drop(["source_id"]), kind, "overture", limits)
     with pytest.raises(ValueError, match="null"):
-        validate_table(example(kind, source_id=None), kind)
+        validate_table(example(kind, source_id=None), kind, "overture", limits)
     with pytest.raises(ValueError, match="provenance"):
-        validate_table(example(kind, provenance="{}"), kind)
+        validate_table(example(kind, provenance="{}"), kind, "overture", limits)
 
 
 @pytest.mark.parametrize(
@@ -93,9 +103,9 @@ def test_rejects_wrong_schema_null_and_missing_provenance(kind: Kind) -> None:
         {"source": "unknown"},
     ],
 )
-def test_invalid_point_values(updates: dict[str, object]) -> None:
+def test_invalid_point_values(updates: dict[str, object], limits: SourceLimits) -> None:
     with pytest.raises(ValueError):
-        validate_table(example("places", **updates), "places")
+        validate_table(example("places", **updates), "places", "overture", limits)
 
 
 @pytest.mark.parametrize(
@@ -109,50 +119,70 @@ def test_invalid_point_values(updates: dict[str, object]) -> None:
         {"geometry": box(1, 2, 3, 4).buffer(-100).wkb},
     ],
 )
-def test_invalid_geometry_or_bbox(updates: dict[str, object]) -> None:
+def test_invalid_geometry_or_bbox(
+    updates: dict[str, object], limits: SourceLimits
+) -> None:
     with pytest.raises(ValueError):
-        validate_table(example("areas", **updates), "areas")
+        validate_table(example("areas", **updates), "areas", "overture", limits)
 
 
-def test_batch_and_row_limits(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_batch_and_row_limits(
+    monkeypatch: pytest.MonkeyPatch, limits: SourceLimits
+) -> None:
     table = example("places")
-    monkeypatch.setattr(schemas, "MAX_BATCH_BYTES", table.nbytes - 1)
+    limits.row_group_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Batch"):
-        validate_table(table, "places")
-    monkeypatch.setattr(schemas, "MAX_BATCH_BYTES", table.nbytes + 1)
-    monkeypatch.setattr(schemas, "MAX_ROW_BYTES", table.nbytes - 1)
+        validate_table(table, "places", "overture", limits)
+    limits.row_group_bytes = table.nbytes + 1
+    limits.row_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Row"):
-        validate_table(table, "places")
+        validate_table(table, "places", "overture", limits)
 
 
-def test_failed_parquet_write_preserves_previous_partition(tmp_path: Path) -> None:
+def test_failed_parquet_write_preserves_previous_partition(
+    tmp_path: Path, limits: SourceLimits
+) -> None:
     destination = tmp_path / "part.parquet"
     valid = example("places")
-    write_partition(destination, "places", [valid])
+    write_partition(destination, "places", "overture", limits, [valid])
     original = destination.read_bytes()
     with pytest.raises(ValueError):
-        write_partition(destination, "places", [valid, example("places", latitude=100)])
+        write_partition(
+            destination,
+            "places",
+            "geonames",
+            limits,
+            [valid, example("places", latitude=100)],
+        )
     assert destination.read_bytes() == original
     assert not list(tmp_path.glob("*.part"))
 
 
 def test_partition_cap_checked_on_write_and_read(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, limits: SourceLimits
 ) -> None:
-    from build_data.acquire import parquet
 
     destination = tmp_path / "part.parquet"
     table = example("places")
-    write_partition(destination, "places", [table])
-    monkeypatch.setattr(parquet, "MAX_PARTITION_BYTES", table.nbytes - 1)
+    write_partition(destination, "places", "overture", limits, [table])
+    limits.parquet_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Partition"):
-        write_partition(tmp_path / "too-large.parquet", "places", [table])
-    with pytest.raises(ValueError, match="128 MB"):
-        validate_parquet(destination, "places")
+        write_partition(
+            tmp_path / "too-large.parquet", "places", "overture", limits, [table]
+        )
+    with pytest.raises(ValueError, match="partition limit"):
+        validate_parquet(destination, "places", "overture", limits)
 
 
-def test_dictionary_expansion_is_rejected_before_decode(tmp_path: Path) -> None:
+def test_dictionary_expansion_is_rejected_before_decode(
+    tmp_path: Path, limits: SourceLimits
+) -> None:
     destination = tmp_path / "dictionary.parquet"
     pq.write_table(example("places"), destination, use_dictionary=True)
     with pytest.raises(ValueError, match="dictionary"):
-        validate_parquet(destination, "places")
+        validate_parquet(destination, "places", "overture", limits)
+
+
+@pytest.fixture
+def limits() -> SourceLimits:
+    return SourceLimits()

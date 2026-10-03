@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from build_data.acquire import Workspace
-from build_data.reconcile.build import build_country
-from build_data.reconcile.common import connect, policy, unpack
+from pipeline.config.policies import reconcile as policy
+from pipeline.engines.reconcile.common import connect, unpack
+from tests.reconcile.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
@@ -27,7 +27,7 @@ def test_division_english_name_survives_blank_area_name(tmp_path: Path) -> None:
         ],
         areas=[area("country", "Country", "country", (0, 0, 1, 1)), state],
     )
-    path = build_country(Workspace(tmp_path), root, "ZZ", "in", policy(), "test")
+    path = reconciled(tmp_path, root, "ZZ", policy())
     db = connect(path, readonly=True)
     try:
         entity = unpack(
@@ -77,7 +77,7 @@ def test_gb_whole_layer_and_ph_province_equivalent_city(tmp_path: Path) -> None:
         )
         selected = policy()
         selected["rollups"] = []
-        path = build_country(Workspace(tmp_path), root, cc, "in", selected, "test")
+        path = reconciled(tmp_path, root, cc, selected)
         db = connect(path, readonly=True)
         try:
             states = {

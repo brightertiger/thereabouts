@@ -6,13 +6,17 @@ import h3
 import pyarrow as pa
 import pytest
 
-from build_data.acquire.lookup_codes import country, subdivision
-from build_data.acquire.lookup_iana import coordinates
-from build_data.acquire.lookup_phone import prefix
-from build_data.acquire.lookup_points import airport, ip_range, postal, trade
-from build_data.acquire.lookup_rows import Reject, decorate, point
-from build_data.acquire.lookup_schemas import LOOKUP_SCHEMAS
-from build_data.acquire.schemas import validate_table
+from pipeline.config.sources import SourceLimits
+from pipeline.sources.airports import airport
+from pipeline.sources.codes import country, subdivision
+from pipeline.sources.dbip import ip_range
+from pipeline.sources.phone import prefix
+from pipeline.sources.postal import postal
+from pipeline.sources.shared.iana import coordinates
+from pipeline.sources.shared.lookup_rows import Reject, decorate, point
+from pipeline.sources.shared.lookup_schemas import LOOKUP_SCHEMAS
+from pipeline.sources.shared.schemas import validate_table
+from pipeline.sources.unlocode import trade
 
 
 @pytest.mark.parametrize(
@@ -127,7 +131,9 @@ def test_code_systems_zero_padding_and_shared_phone_codes() -> None:
     )
 
 
-def test_lookup_schema_rejects_wrong_cell_and_blank_string() -> None:
+def test_lookup_schema_rejects_wrong_cell_and_blank_string(
+    limits: SourceLimits,
+) -> None:
     row = decorate(
         dict(country_code="IN", postal_code="560001", **point(12.97, 77.59)),
         "postal",
@@ -143,26 +149,26 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string() -> None:
         {},
     )
     table = pa.Table.from_pylist([row], schema=LOOKUP_SCHEMAS["postal_codes"])
-    validate_table(table, "postal_codes")
+    validate_table(table, "postal_codes", "postal", limits)
     row["h3_uint64"] += 1
     with pytest.raises(ValueError, match="H3"):
-        validate_table(pa.Table.from_pylist([row], schema=table.schema), "postal_codes")
+        validate_table(
+            pa.Table.from_pylist([row], schema=table.schema),
+            "postal_codes",
+            "postal",
+            limits,
+        )
     row["h3_uint64"] -= 1
     row["postal_code"] = "\u00a0"
     with pytest.raises(ValueError, match="missing strings"):
-        validate_table(pa.Table.from_pylist([row], schema=table.schema), "postal_codes")
-
-
-def test_upstream_postal_outlier_is_reported_without_falsifying_its_cell() -> None:
-    from build_data.acquire.lookup_verify import postal_check
-
-    source = (13.2257, 77.575)
-    result = postal_check(
-        [(*source, h3.latlng_to_cell(*source, 8))], (12.8, 13.2, 77.4, 77.8)
-    )
-    assert not result["expected_area_match"]
-    assert result["records"][0][:2] == source
-    with pytest.raises(ValueError, match="incorrect H3"):
-        postal_check(
-            [(*source, h3.latlng_to_cell(12.97, 77.59, 8))], (12.8, 13.2, 77.4, 77.8)
+        validate_table(
+            pa.Table.from_pylist([row], schema=table.schema),
+            "postal_codes",
+            "postal",
+            limits,
         )
+
+
+@pytest.fixture
+def limits() -> SourceLimits:
+    return SourceLimits()

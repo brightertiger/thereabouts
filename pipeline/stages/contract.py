@@ -31,6 +31,7 @@ class Unit:
     dependency_hash: str
     required_bytes: int = 0
     accounts_disk: bool = False
+    refresh_discovery: bool = False
 
     @property
     def key(self) -> tuple[str, str]:
@@ -50,6 +51,8 @@ class Stage(Protocol):
 
 
 def dependency_value(ctx: Context, dependency: Dependency) -> object:
+    if dependency.control:
+        return {"stage": dependency.stage, "unit": dependency.unit_id, "control": True}
     record = ctx.ledger.get(*dependency.key)
     if record is None:
         return {"stage": dependency.stage, "unit": dependency.unit_id, "missing": True}

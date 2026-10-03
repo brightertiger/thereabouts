@@ -6,10 +6,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from build_data.serve.checkpoints import file_record
-from build_data.serve.export import export
-from build_data.serve.metadata import write_manifest
-from thereabouts.packs.errors import CorruptPackError
+from pipeline.engines.serving.checkpoints import file_record
+from pipeline.engines.serving.export import export
+from pipeline.engines.serving.metadata import write_manifest
+from pipeline.pack_format.errors import CorruptPackError
 from thereabouts.packs.jsonio import parse
 
 

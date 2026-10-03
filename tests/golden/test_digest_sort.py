@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from build_data import digest_sort
+from pipeline.evaluation import sorting as digest_sort
 
 
 def test_multiple_merge_passes_preserve_sorted_multiplicities(
