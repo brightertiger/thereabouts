@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import net from "node:net";
+import { lock } from "./lease.js";
+export { lock } from "./lease.js";
 import { safePath } from "./host.js";
 import {
   active,
@@ -16,33 +17,6 @@ import { integrity, usage, DataNotInstalledError } from "./errors.js";
 import { wasm } from "./wasm.js";
 import { extract } from "./archive.js";
 export const DISK_MARGIN_BYTES = 64 * 1024 * 1024;
-export async function lock(root) {
-  fs.mkdirSync(root, { recursive: true });
-  const fd = fs.openSync(safePath(root, ".install.lock"), "a+");
-  const server = net.createServer((socket) => socket.destroy());
-  try {
-    const port = (await wasm()).lockPort(fs.realpathSync(root));
-    await new Promise((resolve, reject) => {
-      server.once("error", () =>
-        reject(
-          integrity(
-            `Install lock coordination port 127.0.0.1:${port} is busy; another data operation or local process holds it`,
-          ),
-        ),
-      );
-      server.listen({ host: "127.0.0.1", port, exclusive: true }, resolve);
-    });
-    server.unref();
-    return async () => {
-      await new Promise((resolve) => server.close(resolve));
-      fs.closeSync(fd);
-    };
-  } catch (e) {
-    fs.closeSync(fd);
-    server.close();
-    throw e;
-  }
-}
 export function precheck(root, bytes) {
   const stat = fs.statfsSync(root),
     available = stat.bavail * stat.bsize,

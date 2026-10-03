@@ -145,21 +145,24 @@ test("checksum, ignored ranges and atomic version guard preserve existing pins",
   );
   assert.equal(fs.statSync(partial).size, 100);
 });
-test("OS advisory lock serializes Node and native installs and releases on close", async (t) => {
+test("exclusive file lease serializes Node and native installs and releases on close", async (t) => {
   const root = temporary(t),
     origin = path.join(root, "release"),
     store = path.join(root, "store");
   release(origin);
   const unlock = await lock(store);
-  await assert.rejects(lock(store), /Install lock/);
-  await assert.rejects(install(store, origin, ["phone"]), /[Ii]nstall lock/);
+  await assert.rejects(lock(store), /Another install is running/);
+  await assert.rejects(
+    install(store, origin, ["phone"]),
+    /Another install is running/,
+  );
   const native = spawnSync(
     path.join(ROOT, ".venv/bin/thereabouts"),
     ["--data-dir", store, "data", "remove", "phone", "--yes"],
     { encoding: "utf8", env: process.env },
   );
-  assert.equal(native.status, 4, native.stderr);
-  assert.match(native.stderr, /[Ii]nstall lock/);
+  assert.equal(native.status, 2, native.stderr);
+  assert.match(native.stderr, /Another install is running/);
   await unlock();
   await install(store, origin, ["phone"]);
   await remove(store, "phone");
@@ -254,7 +257,7 @@ test("two-family failure leaves the old activation untouched; remote list/update
   }
 });
 
-test("process termination releases shared coordination without stale cleanup", async (t) => {
+test("process termination permits stale PID lease recovery", async (t) => {
   const { spawn } = await import("node:child_process");
   const { once } = await import("node:events");
   const root = temporary(t);
@@ -268,7 +271,7 @@ test("process termination releases shared coordination without stale cleanup", a
   t.after(() => child.kill("SIGKILL"));
   const [bytes] = await once(child.stdout, "data");
   assert.ok(bytes.toString().startsWith("ready"));
-  await assert.rejects(lock(root), /[Ii]nstall lock/);
+  await assert.rejects(lock(root), /Another install is running/);
   child.kill("SIGKILL");
   await once(child, "close");
   const releaseLock = await lock(root);

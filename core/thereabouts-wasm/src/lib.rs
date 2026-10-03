@@ -161,9 +161,25 @@ pub fn render_rows(rows: &str, format: &str) -> Result<(), JsValue> {
     renderer.finish(&mut host::Host).map_err(cli_error)
 }
 
-/// Share the native transaction address policy without a platform addon.
-#[wasm_bindgen(js_name = lockPort)]
+/// Shared lease bounds; host IO uses the same wire format and recovery algorithm.
+#[wasm_bindgen(js_name = lockPolicy)]
+pub fn lock_policy() -> Result<String, JsValue> {
+    use thereabouts_cli_core::lease;
+    json(&serde_json::json!({"max_bytes":lease::MAX_BYTES,"max_depth":lease::MAX_RECOVERY_DEPTH}))
+}
+/// Parse a bounded record without probing processes inside WASM.
+#[wasm_bindgen(js_name = lockState)]
+pub fn lock_state(contents: &str, modified_ms: f64, now_ms: f64) -> Result<String, JsValue> {
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    json(&thereabouts_cli_core::lease::state(
+        contents,
+        modified_ms as u64,
+        now_ms as u64,
+    ))
+}
+/// Coordinate reapers of the exact same record across native and Node.
+#[wasm_bindgen(js_name = lockRecoveryName)]
 #[must_use]
-pub fn lock_port(canonical_root: &str) -> u16 {
-    thereabouts_cli_core::lock_port(canonical_root)
+pub fn lock_recovery_name(name: &str, contents: &str) -> String {
+    thereabouts_cli_core::lease::recovery_name(name, contents)
 }

@@ -156,18 +156,23 @@ def test_remote_inventory_update_and_missing_artifact(
     assert missing.returncode == 4
 
 
-@pytest.mark.skipif(__import__("os").name == "nt", reason="Unix lock interop test")
 def test_concurrent_console_install_lock(tmp_path: Path) -> None:
-    import fcntl
+    import os
+    import time
 
     source = tmp_path / "release"
     release(source)
     store = tmp_path / "store"
     store.mkdir()
-    with (store / ".install.lock").open("w") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        blocked = console(store, "data", "install", "phone", "--from", str(source))
-        assert blocked.returncode == 4 and "install lock" in blocked.stderr
+    marker = store / ".lock"
+    marker.write_text(
+        json.dumps(
+            dict(pid=os.getpid(), created_ms=int(time.time() * 1000), token="a" * 32)
+        )
+    )
+    blocked = console(store, "data", "install", "phone", "--from", str(source))
+    assert blocked.returncode == 2 and "Another install is running" in blocked.stderr
+    marker.unlink()
     assert not (store / "active.json").exists()
     installed = console(store, "data", "install", "phone", "--from", str(source))
     assert installed.returncode == 0

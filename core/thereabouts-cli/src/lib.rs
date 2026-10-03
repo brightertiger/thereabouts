@@ -12,6 +12,7 @@ mod args;
 mod batch;
 mod data;
 mod http;
+mod lease;
 mod query;
 mod read_timeout;
 mod runner;

@@ -211,7 +211,7 @@ The installed layout is:
 
     <data-dir>/
       active.json
-      .install.lock
+      .lock
       .downloads/<archive-sha256>.part
       .staging/<archive-sha256>/
       packs/<family>/<dataset-version>/
@@ -251,19 +251,22 @@ the first pin carries over other compatible old pointers of the same dataset
 version. Format-1 reverse pointers produce IncompatibleDataError; they are not
 read as format 2.
 
-Install/remove operations take a shared loopback OS socket lock. The native
-host also takes its advisory lock on .install.lock; Node opens that same marker
-but needs no native addon. Both hosts hash the UTF-8 canonical store path
-(normalized separators, Windows drive paths lowercased and extended prefix
-removed) with SHA-256. The coordination port is
-49152 + (the first two digest bytes as big-endian u16 & 16383), on 127.0.0.1.
-Binding is exclusive and lasts through activation/removal. No data is sent.
-Closing the host or process releases the socket; the marker filename does
-not block a later operation. A busy port, including a rare unrelated collision,
-fails closed with its address in the diagnostic (exit 4). Close the competing
-operation/process or use another store directory. Lookups do not bind sockets.
-This shared guard is required because Node 22/24 exposes no advisory file-lock
-API and the distribution contract forbids native addons.
+Install/remove operations acquire `<data-dir>/.lock` with exclusive file creation
+(`O_EXCL`/`create_new`). Its immutable JSON record is `{pid, created_ms, token}`:
+a positive OS PID, Unix milliseconds and a unique 32-hex-character incarnation.
+Both hosts use the same Rust wire validation and recovery-name policy. No port
+or network access is involved. Contention reports “Another install is running;
+retry after it finishes” and exits 2. A corrupt/unsafe lock path exits 4.
+
+A live owner never expires by age. A dead PID permits immediate takeover;
+permission failures count as live. An incomplete record has a 30-second creation
+grace period, measured against file mtime; backwards clock movement defers
+recovery. Reads are capped at 1 KiB. Takeovers acquire a per-incarnation sibling
+`.lock-reap-<sha256>` lease, reread/recheck the old record, then unlink it and
+retry exclusive creation. This serializes competing reapers so they cannot
+unlink a successor. The same protocol recovers dead reapers, bounded to eight
+nested recoveries; exhausted contention exits 2. Normal release removes only
+its own token. Completed recovery leases are removed on scope exit.
 
 ## Release index and install transaction
 
