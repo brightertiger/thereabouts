@@ -69,6 +69,9 @@ pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
         })?;
     }
     needed.flush()?;
+    if kind == "cells" {
+        db.execute("INSERT OR IGNORE INTO needed SELECT id FROM cities", [])?;
+    }
     loop {
         let changed = db.total_changes();
         for field in REF_FIELDS {

@@ -250,6 +250,58 @@ impl Geocoder {
             pack.plate(value, country, series, false)
         })
     }
+    #[pyo3(signature=(name, *, country=None, subdivision=None, limit=5, prefer=None, scope="cities", evidence=false))]
+    #[allow(clippy::too_many_arguments)] // Mirrors the public keyword-only Python API.
+    fn geocode(
+        &self,
+        py: Python<'_>,
+        name: &str,
+        country: Option<&str>,
+        subdivision: Option<&str>,
+        limit: usize,
+        prefer: Option<&str>,
+        scope: &str,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
+        let options = thereabouts_core::geocode::Options {
+            country,
+            subdivision,
+            limit,
+            prefer,
+            scope,
+            evidence,
+        };
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .geocode(name, options)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    #[pyo3(signature=(names, *, country=None, subdivision=None, limit=5, prefer=None, scope="cities"))]
+    #[allow(clippy::too_many_arguments)] // Same options as scalar geocoding; GIL released in the batch loop.
+    fn geocode_columns<'py>(
+        &self,
+        py: Python<'py>,
+        names: Vec<String>,
+        country: Option<&str>,
+        subdivision: Option<&str>,
+        limit: usize,
+        prefer: Option<&str>,
+        scope: &str,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        let options = thereabouts_core::geocode::Options {
+            country,
+            subdivision,
+            limit,
+            prefer,
+            scope,
+            evidence: false,
+        };
+        columns::forward(py, names, |name| pack.geocode(name, options))
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

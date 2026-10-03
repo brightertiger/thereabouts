@@ -22,3 +22,5 @@ pub mod trie;
 pub mod intervals;
 
 pub mod plates;
+
+pub mod names;

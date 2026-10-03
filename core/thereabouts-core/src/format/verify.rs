@@ -46,7 +46,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     "Catalogue exceeds u32 references",
                 )?;
             }
-            "cells" | "exact" | "trie" | "intervals" | "plates" | "notice" => {}
+            "cells" | "exact" | "trie" | "intervals" | "plates" | "names" | "notice" => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
     }
@@ -80,6 +80,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             }
             "exact" => super::exact::Exact::open(&path)?.verify(total)?,
             "trie" => super::trie::Trie::open(&path)?.verify(total)?,
+            "names" => super::names::Names::open(&path)?.verify(total)?,
             "plates" => {
                 let c = Container::decode(fs::read(path)?, 7, &[1])?;
                 crate::plates_index::PlateIndex::new(

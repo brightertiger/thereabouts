@@ -163,3 +163,53 @@ class ForwardQueries:
             country=country,
             series=series,
         )
+
+    def geocode(
+        self,
+        name: str,
+        *,
+        country: str | None = None,
+        subdivision: str | None = None,
+        limit: int = 5,
+        prefer: str | None = None,
+        scope: str = "cities",
+        evidence: bool = False,
+    ) -> Result:
+        """Finds towns and cities by name. Street addresses are not supported.
+
+        Country and subdivision are hard filters. Multiple cities remain
+        ambiguous unless prefer="population" explicitly selects the first.
+        """
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("core").geocode(
+                name if isinstance(name, str) else "",
+                country=country,
+                subdivision=subdivision,
+                limit=limit if isinstance(limit, int) and 1 <= limit <= 100 else 0,
+                prefer=prefer,
+                scope=scope,
+                evidence=evidence,
+            )
+        )
+
+    def geocode_columns(
+        self,
+        names: Iterable[str],
+        *,
+        country: str | None = None,
+        subdivision: str | None = None,
+        limit: int = 5,
+        prefer: str | None = None,
+        scope: str = "cities",
+    ) -> dict[str, NDArray[Any]]:
+        """Return city columns and ranked candidate columns for each input name."""
+        self._ensure_open()
+        return self._handles.get("core").geocode_columns(
+            [name if isinstance(name, str) else "" for name in names],
+            country=country,
+            subdivision=subdivision,
+            limit=limit if isinstance(limit, int) and 1 <= limit <= 100 else 0,
+            prefer=prefer,
+            scope=scope,
+        )

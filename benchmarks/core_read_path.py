@@ -165,6 +165,22 @@ def main() -> None:
     result = measure(args.iterations)
     if args.output and args.output.exists():
         previous = json.loads(args.output.read_text())
+        for key in ("multishard", "before_names"):
+            if key in previous:
+                result[key] = previous[key]
+        result.setdefault(
+            "before_names",
+            {
+                key: previous[key]
+                for key in (
+                    "open_seconds",
+                    "open_rss_delta_bytes",
+                    "cache_hot",
+                    "random",
+                )
+                if key in previous
+            },
+        )
         if "before_lazy_open" in previous:
             result["before_lazy_open"] = previous["before_lazy_open"]
         result["after_lazy_open"] = previous.get(

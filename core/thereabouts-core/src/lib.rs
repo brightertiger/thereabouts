@@ -21,3 +21,7 @@ pub mod ip;
 pub mod plates;
 mod plates_geography;
 mod plates_index;
+
+pub mod geocode;
+pub mod name_normalization;
+mod name_query;

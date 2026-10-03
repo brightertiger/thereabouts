@@ -47,6 +47,7 @@ pub struct Pack {
     pub(crate) place_count: usize,
     pub(crate) exacts: Vec<super::exact::Exact>,
     pub(crate) tries: Vec<super::trie::Trie>,
+    pub(crate) names: Vec<super::names::Names>,
     pub(crate) plates: Option<crate::plates_index::PlateIndex>,
     intervals: Vec<super::intervals::Intervals>,
     // One MiB bounds repeated exact-address queries without retaining full interval tables.
@@ -68,6 +69,7 @@ impl Pack {
         let mut tries = Vec::new();
         let mut intervals = Vec::new();
         let mut plates = None;
+        let mut names = Vec::new();
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
@@ -108,6 +110,7 @@ impl Pack {
                 "exact" => exacts.push(super::exact::Exact::open(&path)?),
                 "trie" => tries.push(super::trie::Trie::open(&path)?),
                 "intervals" => intervals.push(super::intervals::Intervals::open(&path)?),
+                "names" => names.push(super::names::Names::open(&path)?),
                 "plates" => {
                     ensure(plates.is_none(), "Repeated plate evidence")?;
                     let c = Container::decode(fs::read(path)?, 7, &[1])?;
@@ -146,6 +149,7 @@ impl Pack {
             tries,
             intervals,
             plates,
+            names,
             address_cache: Mutex::new(Cache::new(1024 * 1024)),
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),

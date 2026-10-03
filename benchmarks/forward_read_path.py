@@ -16,7 +16,8 @@ from thereabouts import Geocoder
 
 
 def measure(family: str, iterations: int) -> dict[str, Any]:
-    pack = ROOT / f"tests/fixtures/packs/{family}-sample"
+    pack_name = "core-names" if family == "geocode" else family
+    pack = ROOT / f"tests/fixtures/packs/{pack_name}-sample"
     bundle = json.loads((ROOT / f"tests/fixtures/{family}-vectors.json").read_text())
     cases = [c for c in bundle["cases"] if c["result"]["status"] == "matched"]
     country = "US"
@@ -62,6 +63,11 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         "estimate_method": (
             "linear sample byte/row ratio including sample fixed overhead; "
             "not a world measurement"
+        ),
+        "estimate_scope": (
+            "city-name index and supporting catalogue only; excludes spatial core"
+            if family == "geocode"
+            else "family pack including supporting catalogue"
         ),
         "vectors": len(bundle["cases"]),
         "iterations": iterations,
@@ -115,7 +121,8 @@ def update_status(data: dict[str, Any]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "family", choices=["postal", "airports", "locode", "phone", "ip", "plates"]
+        "family",
+        choices=["postal", "airports", "locode", "phone", "ip", "plates", "geocode"],
     )
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument(
@@ -149,9 +156,19 @@ def main() -> None:
         "python": platform.python_version(),
     }
     existing["families"][args.family] = measure(args.family, args.iterations)
+    packs = {
+        pack.name: sum(p.stat().st_size for p in pack.rglob("*") if p.is_file())
+        for pack in sorted((ROOT / "tests/fixtures/packs").iterdir())
+        if pack.is_dir() and pack.name not in {"core-sample", "core-synthetic"}
+    }
+    existing["fixture_packs"] = {
+        "bytes_by_pack": packs,
+        "total_bytes": sum(packs.values()),
+    }
     args.output.write_text(json.dumps(existing, indent=2) + "\n")
     update_status(existing)
     print(json.dumps(existing["families"][args.family], indent=2))
+    print(json.dumps(existing["fixture_packs"], indent=2))
 
 
 if __name__ == "__main__":

@@ -30,6 +30,8 @@ fn overlap_narrows_by_country_and_never_changes_geographic_status() {
         let dir = tempfile::tempdir().unwrap();
         let mut manifest = manifest::read(&fixture).unwrap();
         manifest.files.clear();
+        // This test replaces the inventory with only spatial/catalogue metadata.
+        manifest.name_normalization = None;
         let metadata = Metadata {
             timezone_sets: vec![vec![], vec!["Area/One".into(), "Area/Two".into()]],
             zone_tables: vec![

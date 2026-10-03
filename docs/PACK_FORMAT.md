@@ -3,8 +3,9 @@
 This is the normative specification of `thereabouts-pack-2`, version 2.0.
 A pack is an immutable directory: `manifest.json`, inventoried binary shards,
 and inventoried UTF-8 notices. All clients share the Rust implementation.
-This document defines the `core` family. Name search and additional families
-are reserved for later work; they are not implied by a core pack today.
+This document defines `core` (reverse and canonical-city names), `postal`,
+`airports`, `locode`, `phone`, `ip` and `plates`. Optional full-place names
+remain a separate future family.
 
 ## Identity and manifest
 
@@ -23,7 +24,7 @@ Required fields:
 | --- | --- |
 | `schema` | `thereabouts-pack-2` |
 | `format_version`, `required_features` | Integers 2 and 0 |
-| `family` | `core` |
+| `family` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, or `plates` |
 | `data_version` | Nonempty immutable dataset release, such as `2026.10` |
 | `reference_resolution`, `block_resolution` | Integers 8 and 3 |
 | `input_digest` | Lowercase SHA-256 of the compact JSON `inputs` object |
@@ -34,14 +35,15 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.1.0`. Options contain `data_version`, `sources`, `attribution`, `notices`
+`0.2.0` for core with names and `0.1.2` for forward code families. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
 rules in `input_provenance`. No absolute build paths or run timestamps enter
 pack identity. Different dataset versions must not be combined by a store.
 
 An artifact has exactly the required fields `path`, `kind`, `size`, `sha256`.
-Kinds are `cells`, `catalogue`, `metadata`, `notice`. Unknown kinds require a
+Kinds are `cells`, `catalogue`, `metadata`, `notice`, `exact`, `trie`,
+`intervals`, `plates`, and `names`. Unknown kinds require a
 new compatible reader. Paths are relative, slash-separated; empty components,
 `.`/`..`, backslashes, colons, absolute paths and symlink components are invalid.
 Paths are unique and cannot be `manifest.json`. Sizes are byte counts, hashes
@@ -51,7 +53,7 @@ ID order; spatial block IDs cannot occur in more than one shard. Empty packs
 may have no spatial or catalogue shards. Notices have no binary header.
 
 A reader rejects other format versions, nonzero required features, another
-family, and resolutions other than 8/3 before interpreting records. Maximum
+unsupported family, and resolutions other than 8/3 before interpreting records. Maximum
 artifact size is 64 MiB; maximum manifest size is 16 MiB. A writer must split
 catalogues before exceeding the artifact limit. The current writer emits one
 resolution-3 block per cell shard and targets 4 MiB catalogue shards.
@@ -67,8 +69,8 @@ Every shard starts with a 32-byte header:
 | 0 | 8 bytes | `54 48 45 52 45 50 4b 00` (`THEREPK` plus NUL) |
 | 8, 10 | uint16 each | Major 2, minor 0 |
 | 12 | uint32 | Required features: 0 |
-| 16 | uint32 | Kind: 1 spatial, 2 catalogue, 3 metadata |
-| 20 | uint32 | Section count: 4 spatial, 3 catalogue, 1 metadata |
+| 16 | uint32 | Kind: 1 spatial, 2 catalogue, 3 metadata, 4 exact, 5 trie, 6 intervals, 7 plates, 8 names |
+| 20 | uint32 | Section count, from the table below |
 | 24 | uint64 | Exact total file length |
 
 Immediately following are 32-byte section descriptors, each
@@ -84,6 +86,11 @@ are no overlaps, other gaps, or trailing bytes.
 | Spatial | blocks, sparse keys, values, label dictionary | 40, 2, 1, 20 |
 | Catalogue | places, string offsets, UTF-8 text | 80, 8, 1 |
 | Metadata | UTF-8 JSON object | 1 |
+| Exact | key offsets, UTF-8 keys, observations, string offsets, UTF-8 text | 8, 1, 44, 8, 1 |
+| Trie | decimal nodes, observations, string offsets, UTF-8 text | 48, 44, 8, 1 |
+| Intervals | bounds, observations, string offsets, UTF-8 text | 36, 44, 8, 1 |
+| Plates | UTF-8 JSON object | 1 |
+| Names | name FST, row offsets, spelling records, string offsets, UTF-8 text, trigram FST, posting offsets, postings | 1, 8, 20, 8, 1, 1, 8, 4 |
 
 Kind 3 was exact codes in format 1. It means metadata only in format 2;
 checking the version before the kind is mandatory.
@@ -602,3 +609,140 @@ open-world catalogue does not certify country uniqueness. No matches return
 not_found. rank_basis is plate_evidence, or
 plate_evidence_without_vehicle_prior for an explicitly incomplete fixture.
 Source series, score, capture and geographic assertions are opt-in evidence.
+
+## Canonical-city names in core (kind 8)
+
+Core exports include every canonical_cities row and its geographic ancestry.
+The primary name and non-null name_en feed the same index. An optional names
+table contributes city_id, name, kind; kind is primary, english, alternate or
+ascii. References must identify a canonical city. This adapter is tested with
+synthetic alternates pending publication of the real names table. Names are
+part of core, not a separate installable geocode family. A historical core pack
+without names remains usable for reverse; geocode reports incompatible_data.
+
+The manifest's name_normalization object is mandatory exactly when names
+artifacts exist. Its fields are steps (ordered string array), casefold_unicode,
+normalization_unicode (strings), and expansions (string-to-string object).
+Supported steps, in order, are nfkc, casefold_full_non_turkic,
+fold_latin_cyrillic_greek, collapse_punctuation_whitespace, expand_tokens.
+The Unicode casefold table is 9.0.0, and decomposition/composition is 17.0.0.
+Readers reject unsupported steps or table versions rather than substituting
+their host's Unicode version. Current expansions are st → saint, ste → sainte;
+keys and values must be nonempty lowercase ASCII words.
+
+Normalize as follows: NFKC, full non-Turkic casefold, then NFD. Drop combining
+marks after an alphanumeric base in these inclusive hexadecimal ranges:
+0041–024F, 0370–052F, 1C80–1C8F, 1D00–1FFF, 2C60–2C7F, A640–A69F,
+A720–A7FF, AB30–AB6F. Preserve other combining marks, including Japanese
+dakuten. Keep other alphanumeric characters; replace remaining characters
+with ASCII space and clear the base's mark-folding flag. Recompose NFC, split
+on whitespace, replace whole tokens using expansions once, and join with
+one ASCII space. Alphanumeric and mark properties use Unicode 17.0.0.
+Empty or longer-than-128-scalar normalized names are invalid.
+
+A names shard has these eight sections, in order:
+
+| Section | Width | Meaning |
+| --- | ---: | --- |
+| 1 | 1 | FST map from UTF-8 normalized key to zero-based key ordinal |
+| 2 | 8 | u64 spelling-row offsets, one per key plus terminal |
+| 3 | 20 | Spelling records |
+| 4 | 8 | u64 string offsets, including null and terminal |
+| 5 | 1 | UTF-8 source spellings |
+| 6 | 1 | FST map from UTF-8 trigram to zero-based trigram ordinal |
+| 7 | 8 | u64 posting offsets, one per trigram plus terminal |
+| 8 | 4 | u32 normalized-key ordinals |
+
+A spelling record is five u32 fields: country reference, state reference,
+canonical-city reference, source-spelling string reference, alternate flag.
+Country and city references are nonzero; state may be zero. Catalogue
+references use the pack's global ID space. Alternate is 0 for primary, 1 for
+English/alternate/ASCII. Source spelling must be non-null UTF-8. Strings use
+the catalogue's null-offset convention. Key and trigram IDs enumerate strictly
+ascending UTF-8 keys within each shard. Row and posting offsets start at zero,
+are strictly increasing between entries, and end at their section's record
+count (an empty map has the single offset zero). All keys have rows.
+Writers order records by key, city ID, alternate flag, then source spelling.
+A key may cross shard boundaries; retrieval merges and deduplicates by city.
+Current construction admits at most 4 MiB of input strings plus record overhead
+per shard, within the shared 512 MiB writer admission budget.
+
+For each normalized key, prepend ^ and append $, then enumerate unique windows
+of three Unicode scalar values. Each trigram's posting list contains every
+matching key ordinal once, in ascending order. No missing or extra postings
+are permitted. Trigram and key FSTs use the following identical wire encoding.
+
+### FST encoding
+
+This is the version-3 map representation emitted by fst 0.4.7. Integers are
+unsigned little endian; packed integers use a declared 0–8-byte width
+(zero bytes means zero). An FST begins with u64 version=3 and u64 type=0,
+followed by encoded nodes. Its final 20 bytes are u64 key_count, u64 root
+address, and u32 masked CRC32C of every preceding byte. CRC32C uses reflected
+Castagnoli polynomial 0x82F63B78, initial/final XOR 0xFFFFFFFF. The mask is
+rotate_right(crc,15)+0xA282EAD8 modulo 2^32. Addresses are byte offsets within
+the FST section, pointing at the node's final state byte. Root is the last
+encoded node; address zero denotes an implicit final node with output zero
+and no transitions, consuming no node bytes.
+
+Transitions consume one input byte and contribute an unsigned u64 output.
+A lookup follows the input bytes from the root; success requires a final
+node after the last byte. Its value is the sum of transition outputs and that
+node's final output, with overflow rejected. Nodes form an acyclic backward
+graph. Transitions have distinct input bytes in ascending logical order.
+
+Let A be a node address, V its state byte, and S the first byte of its encoded
+node. Three layouts are selected by the top two bits of V:
+
+- 11: one transition, nonfinal, zero output. Low six bits select the common
+  input byte below, or zero means a literal byte immediately before V.
+  S=A for a common input, otherwise A-1. Target address is S-1.
+- 10: one transition, nonfinal. Bytes from S are output (O bytes), target
+  delta (T bytes), size byte, optional literal input, V. The size byte's
+  high nibble is T and low nibble is O. Input selection is as above.
+  Target is zero if delta=0, otherwise S-delta.
+- 00 or 01: general node, final exactly when bit 6 is set. Low six bits
+  encode transition count N when nonzero. Otherwise the byte before V
+  encodes N; value 1 means 256, other values are literal (including zero).
+  The size byte immediately precedes that optional count byte or V.
+  Its nibbles give T and O as above. From S the fields are: final output
+  (O bytes, final nodes only), N outputs in reverse logical transition order,
+  N deltas in reverse order, N input bytes in reverse order, an optional
+  256-byte input-index table when N>32, size byte, optional count byte, V.
+  Each delta gives target zero or S-delta. For N>32, table[input] gives the
+  logical transition ordinal; values >=N denote no transition.
+
+The low-six-bit common-input codes 1–63 correspond, in order, to these ASCII
+characters (one uninterrupted sequence):
+
+    te/oasripcnw.hlm-du012g=:bf3y5&_4v9678k%?xCDASFIBEjPTzRNM+LOqHG
+
+Readers validate bounds, checksum, graph order, input order and declared key
+count before exposing the FST. Map values are ordinal IDs, not byte offsets.
+An empty key is not permitted in these name or trigram maps.
+
+### Retrieval, filters and result semantics
+
+Search exact keys first. If no result survives the filters, search keys with
+the query as a prefix. If still empty, take trigram candidates having Dice
+similarity at least 0.45, then retain those with Levenshtein distance at most
+clamp(floor(query scalar length / 4),1,3). Distances count Unicode scalars.
+Hard country and subdivision filters precede ranking, phase selection and
+candidate truncation. Country is ISO alpha-2; subdivision compares the full
+published code case-insensitively. Duplicated spellings yield one city.
+
+Results have kind city, centroid point, centroid's r8 cell, catalogue timezone
+when published, and rank_basis population. Primary exact keys use match exact;
+English/alternate/ASCII keys use alternate_name. Prefix and typo fallbacks use
+fuzzy, distinguished by opt-in evidence reasons name_prefix and name_trigram.
+Ties rank by population descending (unknown as zero), then stable city ID.
+Multiple surviving cities are ambiguous even if limit=1 truncates the list.
+Flat geographic fields remain null. prefer=population explicitly selects the
+first candidate; a unique city is matched without that preference.
+
+limit must be 1–100; scope currently accepts only cities. Malformed arguments
+and code-shaped queries are invalid_input with the appropriate verb in hint;
+street-address-shaped queries are unsupported_granularity. Known exact city
+names take precedence over airport/LOCODE and street-word heuristics, while IP,
+phone, H3 and purely numeric postal forms remain identifier requests.
+The Python geocode_columns method uses the shared candidate-offset layout.

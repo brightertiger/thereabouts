@@ -1,0 +1,2822 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/core-names-sample",
+  "cases": [
+    {
+      "id": "core-names-sample-000",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Marne La Vallée"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:12278193",
+          "name": "Marne La Vallée",
+          "name_en": null,
+          "kind": "city",
+          "population": 318325,
+          "point": {
+            "lat": 48.83584,
+            "lon": 2.64241
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.83584,
+          "lon": 2.64241
+        },
+        "cell": "881fb0901bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-001",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Surat"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-GJ",
+          "name": "Gujarāt"
+        },
+        "city": {
+          "id": "city:geonames:1255364",
+          "name": "Surat",
+          "name_en": "Surat",
+          "kind": "city",
+          "population": 4591246,
+          "point": {
+            "lat": 21.19594,
+            "lon": 72.83023
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 21.19594,
+          "lon": 72.83023
+        },
+        "cell": "8842d9d69bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-002",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Pune"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:1259229",
+          "name": "Pune",
+          "name_en": "Pune",
+          "kind": "city",
+          "population": 3124458,
+          "point": {
+            "lat": 18.51957,
+            "lon": 73.85535
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 18.51957,
+          "lon": 73.85535
+        },
+        "cell": "8860885017fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-003",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Chennai"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-TN",
+          "name": "Tamil Nādu"
+        },
+        "city": {
+          "id": "city:geonames:1264527",
+          "name": "Chennai",
+          "name_en": "Chennai",
+          "kind": "city",
+          "population": 4681087,
+          "point": {
+            "lat": 13.08784,
+            "lon": 80.27847
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 13.08784,
+          "lon": 80.27847
+        },
+        "cell": "88618c48e3fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-004",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Utrecht"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-UT",
+          "name": "Utrecht"
+        },
+        "city": {
+          "id": "city:geonames:2745912",
+          "name": "Utrecht",
+          "name_en": "Utrecht",
+          "kind": "city",
+          "population": 376435,
+          "point": {
+            "lat": 52.09083,
+            "lon": 5.12222
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.09083,
+          "lon": 5.12222
+        },
+        "cell": "8819690823fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-005",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Tilburg"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NB",
+          "name": "Noord-Brabant"
+        },
+        "city": {
+          "id": "city:geonames:2746301",
+          "name": "Tilburg",
+          "name_en": "Tilburg",
+          "kind": "city",
+          "population": 221947,
+          "point": {
+            "lat": 51.55551,
+            "lon": 5.0913
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 51.55551,
+          "lon": 5.0913
+        },
+        "cell": "881fa4b193fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-006",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "The Hague"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-ZH",
+          "name": "Zuid-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2747373",
+          "name": "The Hague",
+          "name_en": "The Hague",
+          "kind": "city",
+          "population": 474292,
+          "point": {
+            "lat": 52.07667,
+            "lon": 4.29861
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.07667,
+          "lon": 4.29861
+        },
+        "cell": "88196b85d9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-007",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Schaarbeek"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-BRU",
+          "name": "Bruxelles-Capitale, Région de"
+        },
+        "city": {
+          "id": "city:geonames:2787149",
+          "name": "Schaarbeek",
+          "name_en": "Schaarbeek",
+          "kind": "city",
+          "population": 132761,
+          "point": {
+            "lat": 50.86935,
+            "lon": 4.37737
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.86935,
+          "lon": 4.37737
+        },
+        "cell": "881fa441dbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-008",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Namur"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2790471",
+          "name": "Namur",
+          "name_en": "Namur",
+          "kind": "city",
+          "population": 110939,
+          "point": {
+            "lat": 50.4669,
+            "lon": 4.86746
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.4669,
+          "lon": 4.86746
+        },
+        "cell": "881fa0d82bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-009",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Mons"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-WAL",
+          "name": "wallonne, Région"
+        },
+        "city": {
+          "id": "city:geonames:2790869",
+          "name": "Mons",
+          "name_en": "Mons",
+          "kind": "city",
+          "population": 95299,
+          "point": {
+            "lat": 50.45413,
+            "lon": 3.95229
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.45413,
+          "lon": 3.95229
+        },
+        "cell": "881fa68891fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-010",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Wiltz"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": {
+          "id": "city:geonames:2959977",
+          "name": "Wiltz",
+          "name_en": "Wiltz",
+          "kind": "town",
+          "population": 4816,
+          "point": {
+            "lat": 49.96547,
+            "lon": 5.9339
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.96547,
+          "lon": 5.9339
+        },
+        "cell": "881fa06d63fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-011",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Schifflange"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": {
+          "id": "city:geonames:2960102",
+          "name": "Schifflange",
+          "name_en": "Schifflange",
+          "kind": "town",
+          "population": 8155,
+          "point": {
+            "lat": 49.50639,
+            "lon": 6.01278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.50639,
+          "lon": 6.01278
+        },
+        "cell": "881fa35149fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-012",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Pétange"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": null,
+        "city": {
+          "id": "city:geonames:2960187",
+          "name": "Pétange",
+          "name_en": "Pétange",
+          "kind": "town",
+          "population": 7187,
+          "point": {
+            "lat": 49.55833,
+            "lon": 5.88056
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.55833,
+          "lon": 5.88056
+        },
+        "cell": "881fa2261bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-013",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris 15 Vaugirard"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2970479",
+          "name": "Paris 15 Vaugirard",
+          "name_en": null,
+          "kind": "city",
+          "population": 229713,
+          "point": {
+            "lat": 48.8412,
+            "lon": 2.3003
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8412,
+          "lon": 2.3003
+        },
+        "cell": "881fb4670dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-014",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Toulouse"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-OCC",
+          "name": "Occitanie"
+        },
+        "city": {
+          "id": "city:geonames:2972315",
+          "name": "Toulouse",
+          "name_en": "Toulouse",
+          "kind": "city",
+          "population": 511684,
+          "point": {
+            "lat": 43.60426,
+            "lon": 1.44367
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 43.60426,
+          "lon": 1.44367
+        },
+        "cell": "8839601ae7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-015",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Konya"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-42",
+          "name": "Konya"
+        },
+        "city": {
+          "id": "city:geonames:306571",
+          "name": "Konya",
+          "name_en": "Konya",
+          "kind": "city",
+          "population": 1433861,
+          "point": {
+            "lat": 37.87135,
+            "lon": 32.48464
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 37.87135,
+          "lon": 32.48464
+        },
+        "cell": "883f6db931fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-016",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Kayseri"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-38",
+          "name": "Kayseri"
+        },
+        "city": {
+          "id": "city:geonames:308464",
+          "name": "Kayseri",
+          "name_en": "Kayseri",
+          "kind": "city",
+          "population": 1452458,
+          "point": {
+            "lat": 38.73222,
+            "lon": 35.48528
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 38.73222,
+          "lon": 35.48528
+        },
+        "cell": "882d1158b7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-017",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "İzmir"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-35",
+          "name": "İzmir"
+        },
+        "city": {
+          "id": "city:geonames:311046",
+          "name": "İzmir",
+          "name_en": "İzmir",
+          "kind": "city",
+          "population": 2938292,
+          "point": {
+            "lat": 38.41273,
+            "lon": 27.13838
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 38.41273,
+          "lon": 27.13838
+        },
+        "cell": "883f66a457fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-018",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Jacksonville"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-FL",
+          "name": "Florida"
+        },
+        "city": {
+          "id": "city:geonames:4160021",
+          "name": "Jacksonville",
+          "name_en": "Jacksonville",
+          "kind": "city",
+          "population": 1009833,
+          "point": {
+            "lat": 30.33218,
+            "lon": -81.65565
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 30.33218,
+          "lon": -81.65565
+        },
+        "cell": "8844f009cdfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-019",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-TX",
+              "name": "Texas"
+            },
+            "city": {
+              "id": "city:geonames:4717560",
+              "name": "Paris",
+              "name_en": null,
+              "kind": "town",
+              "population": 24782,
+              "point": {
+                "lat": 33.66094,
+                "lon": -95.55551
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 33.66094,
+              "lon": -95.55551
+            },
+            "cell": "8826cd0f5dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-TN",
+              "name": "Tennessee"
+            },
+            "city": {
+              "id": "city:geonames:4647963",
+              "name": "Paris",
+              "name_en": null,
+              "kind": "town",
+              "population": 10150,
+              "point": {
+                "lat": 36.302,
+                "lon": -88.32671
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 36.302,
+              "lon": -88.32671
+            },
+            "cell": "88264ea483fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-KY",
+              "name": "Kentucky"
+            },
+            "city": {
+              "id": "city:geonames:4303602",
+              "name": "Paris",
+              "name_en": null,
+              "kind": "town",
+              "population": 9870,
+              "point": {
+                "lat": 38.2098,
+                "lon": -84.25299
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.2098,
+              "lon": -84.25299
+            },
+            "cell": "88266db505fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-IL",
+              "name": "Illinois"
+            },
+            "city": {
+              "id": "city:geonames:4246659",
+              "name": "Paris",
+              "name_en": null,
+              "kind": "town",
+              "population": 8432,
+              "point": {
+                "lat": 39.61115,
+                "lon": -87.69614
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.61115,
+              "lon": -87.69614
+            },
+            "cell": "882663b8ddfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-ME",
+              "name": "Maine"
+            },
+            "city": {
+              "id": "city:geonames:4974617",
+              "name": "Paris",
+              "name_en": "Paris",
+              "kind": "town",
+              "population": 5073,
+              "point": {
+                "lat": 44.25979,
+                "lon": -70.50062
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 44.25979,
+              "lon": -70.50062
+            },
+            "cell": "882ba93083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-020",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MO",
+              "name": "Missouri"
+            },
+            "city": {
+              "id": "city:geonames:4409896",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 170188,
+              "point": {
+                "lat": 37.21533,
+                "lon": -93.29824
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.21533,
+              "lon": -93.29824
+            },
+            "cell": "8826533311fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MA",
+              "name": "Massachusetts"
+            },
+            "city": {
+              "id": "city:geonames:4951788",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 154341,
+              "point": {
+                "lat": 42.10148,
+                "lon": -72.58981
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 42.10148,
+              "lon": -72.58981
+            },
+            "cell": "882a148263fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-IL",
+              "name": "Illinois"
+            },
+            "city": {
+              "id": "city:geonames:4250542",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 114394,
+              "point": {
+                "lat": 39.80172,
+                "lon": -89.64371
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.80172,
+              "lon": -89.64371
+            },
+            "cell": "882644d083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OR",
+              "name": "Oregon"
+            },
+            "city": {
+              "id": "city:geonames:5754005",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 60870,
+              "point": {
+                "lat": 44.04624,
+                "lon": -123.02203
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 44.04624,
+              "lon": -123.02203
+            },
+            "cell": "8828f4969dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OH",
+              "name": "Ohio"
+            },
+            "city": {
+              "id": "city:geonames:4525353",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 59680,
+              "point": {
+                "lat": 39.92423,
+                "lon": -83.80882
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.92423,
+              "lon": -83.80882
+            },
+            "cell": "882a903a1bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-021",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ]
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MO",
+              "name": "Missouri"
+            },
+            "city": {
+              "id": "city:geonames:4409896",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 170188,
+              "point": {
+                "lat": 37.21533,
+                "lon": -93.29824
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.21533,
+              "lon": -93.29824
+            },
+            "cell": "8826533311fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MA",
+              "name": "Massachusetts"
+            },
+            "city": {
+              "id": "city:geonames:4951788",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 154341,
+              "point": {
+                "lat": 42.10148,
+                "lon": -72.58981
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 42.10148,
+              "lon": -72.58981
+            },
+            "cell": "882a148263fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-IL",
+              "name": "Illinois"
+            },
+            "city": {
+              "id": "city:geonames:4250542",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 114394,
+              "point": {
+                "lat": 39.80172,
+                "lon": -89.64371
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.80172,
+              "lon": -89.64371
+            },
+            "cell": "882644d083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OR",
+              "name": "Oregon"
+            },
+            "city": {
+              "id": "city:geonames:5754005",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 60870,
+              "point": {
+                "lat": 44.04624,
+                "lon": -123.02203
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 44.04624,
+              "lon": -123.02203
+            },
+            "cell": "8828f4969dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OH",
+              "name": "Ohio"
+            },
+            "city": {
+              "id": "city:geonames:4525353",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 59680,
+              "point": {
+                "lat": 39.92423,
+                "lon": -83.80882
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.92423,
+              "lon": -83.80882
+            },
+            "cell": "882a903a1bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-022",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "limit": 1
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MO",
+              "name": "Missouri"
+            },
+            "city": {
+              "id": "city:geonames:4409896",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 170188,
+              "point": {
+                "lat": 37.21533,
+                "lon": -93.29824
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.21533,
+              "lon": -93.29824
+            },
+            "cell": "8826533311fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-023",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "country": "US",
+        "subdivision": "US-IL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-IL",
+          "name": "Illinois"
+        },
+        "city": {
+          "id": "city:geonames:4250542",
+          "name": "Springfield",
+          "name_en": "Springfield",
+          "kind": "city",
+          "population": 114394,
+          "point": {
+            "lat": 39.80172,
+            "lon": -89.64371
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 39.80172,
+          "lon": -89.64371
+        },
+        "cell": "882644d083fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-024",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "core-names-sample-025",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "prefer": "population"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-MO",
+          "name": "Missouri"
+        },
+        "city": {
+          "id": "city:geonames:4409896",
+          "name": "Springfield",
+          "name_en": "Springfield",
+          "kind": "city",
+          "population": 170188,
+          "point": {
+            "lat": 37.21533,
+            "lon": -93.29824
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 37.21533,
+          "lon": -93.29824
+        },
+        "cell": "8826533311fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-026",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Springfield"
+        ],
+        "limit": 100
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MO",
+              "name": "Missouri"
+            },
+            "city": {
+              "id": "city:geonames:4409896",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 170188,
+              "point": {
+                "lat": 37.21533,
+                "lon": -93.29824
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.21533,
+              "lon": -93.29824
+            },
+            "cell": "8826533311fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MA",
+              "name": "Massachusetts"
+            },
+            "city": {
+              "id": "city:geonames:4951788",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 154341,
+              "point": {
+                "lat": 42.10148,
+                "lon": -72.58981
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 42.10148,
+              "lon": -72.58981
+            },
+            "cell": "882a148263fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-IL",
+              "name": "Illinois"
+            },
+            "city": {
+              "id": "city:geonames:4250542",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 114394,
+              "point": {
+                "lat": 39.80172,
+                "lon": -89.64371
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.80172,
+              "lon": -89.64371
+            },
+            "cell": "882644d083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OR",
+              "name": "Oregon"
+            },
+            "city": {
+              "id": "city:geonames:5754005",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 60870,
+              "point": {
+                "lat": 44.04624,
+                "lon": -123.02203
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 44.04624,
+              "lon": -123.02203
+            },
+            "cell": "8828f4969dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OH",
+              "name": "Ohio"
+            },
+            "city": {
+              "id": "city:geonames:4525353",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 59680,
+              "point": {
+                "lat": 39.92423,
+                "lon": -83.80882
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.92423,
+              "lon": -83.80882
+            },
+            "cell": "882a903a1bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-VA",
+              "name": "Virginia"
+            },
+            "city": {
+              "id": "city:geonames:4787117",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 30484,
+              "point": {
+                "lat": 38.78928,
+                "lon": -77.1872
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.78928,
+              "lon": -77.1872
+            },
+            "cell": "882aaab6e7fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-PA",
+              "name": "Pennsylvania"
+            },
+            "city": {
+              "id": "city:geonames:4561407",
+              "name": "Springfield",
+              "name_en": null,
+              "kind": "town",
+              "population": 23363,
+              "point": {
+                "lat": 39.93067,
+                "lon": -75.32019
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.93067,
+              "lon": -75.32019
+            },
+            "cell": "882aacb065fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-TN",
+              "name": "Tennessee"
+            },
+            "city": {
+              "id": "city:geonames:4659557",
+              "name": "Springfield",
+              "name_en": null,
+              "kind": "town",
+              "population": 16808,
+              "point": {
+                "lat": 36.50921,
+                "lon": -86.885
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 36.50921,
+              "lon": -86.885
+            },
+            "cell": "88266b6dadfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-NJ",
+              "name": "New Jersey"
+            },
+            "city": {
+              "id": "city:geonames:5104952",
+              "name": "Springfield",
+              "name_en": null,
+              "kind": "town",
+              "population": 14429,
+              "point": {
+                "lat": 40.70491,
+                "lon": -74.31723
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 40.70491,
+              "lon": -74.31723
+            },
+            "cell": "882a10783dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "exact",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-KY",
+              "name": "Kentucky"
+            },
+            "city": {
+              "id": "city:geonames:4309329",
+              "name": "Springfield",
+              "name_en": null,
+              "kind": "town",
+              "population": 3055,
+              "point": {
+                "lat": 37.68534,
+                "lon": -85.22218
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.68534,
+              "lon": -85.22218
+            },
+            "cell": "8826699933fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-027",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Pariss"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "fuzzy",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.85341,
+          "lon": 2.3488
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-028",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Sprngfield"
+        ]
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "fuzzy",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MO",
+              "name": "Missouri"
+            },
+            "city": {
+              "id": "city:geonames:4409896",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 170188,
+              "point": {
+                "lat": 37.21533,
+                "lon": -93.29824
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.21533,
+              "lon": -93.29824
+            },
+            "cell": "8826533311fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "fuzzy",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-MA",
+              "name": "Massachusetts"
+            },
+            "city": {
+              "id": "city:geonames:4951788",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 154341,
+              "point": {
+                "lat": 42.10148,
+                "lon": -72.58981
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 42.10148,
+              "lon": -72.58981
+            },
+            "cell": "882a148263fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "fuzzy",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-IL",
+              "name": "Illinois"
+            },
+            "city": {
+              "id": "city:geonames:4250542",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 114394,
+              "point": {
+                "lat": 39.80172,
+                "lon": -89.64371
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.80172,
+              "lon": -89.64371
+            },
+            "cell": "882644d083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "fuzzy",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OR",
+              "name": "Oregon"
+            },
+            "city": {
+              "id": "city:geonames:5754005",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 60870,
+              "point": {
+                "lat": 44.04624,
+                "lon": -123.02203
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 44.04624,
+              "lon": -123.02203
+            },
+            "cell": "8828f4969dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          },
+          {
+            "status": "matched",
+            "kind": "city",
+            "match": "fuzzy",
+            "country": {
+              "code": "US",
+              "code3": "USA",
+              "name": "United States"
+            },
+            "state": {
+              "code": "US-OH",
+              "name": "Ohio"
+            },
+            "city": {
+              "id": "city:geonames:4525353",
+              "name": "Springfield",
+              "name_en": "Springfield",
+              "kind": "city",
+              "population": 59680,
+              "point": {
+                "lat": 39.92423,
+                "lon": -83.80882
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 39.92423,
+              "lon": -83.80882
+            },
+            "cell": "882a903a1bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": "population"
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-029",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Amster"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "fuzzy",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.37403,
+          "lon": 4.88969
+        },
+        "cell": "881969c9b7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-030",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "St. Etienne"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-ARA",
+          "name": "Auvergne-Rhône-Alpes"
+        },
+        "city": {
+          "id": "city:geonames:2980291",
+          "name": "Saint-Etienne",
+          "name_en": "Saint-Etienne",
+          "kind": "city",
+          "population": 176280,
+          "point": {
+            "lat": 45.43389,
+            "lon": 4.39
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 45.43389,
+          "lon": 4.39
+        },
+        "cell": "881f9060e7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-031",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Ｓt. Étienne"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-ARA",
+          "name": "Auvergne-Rhône-Alpes"
+        },
+        "city": {
+          "id": "city:geonames:2980291",
+          "name": "Saint-Etienne",
+          "name_en": "Saint-Etienne",
+          "kind": "city",
+          "population": 176280,
+          "point": {
+            "lat": 45.43389,
+            "lon": 4.39
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 45.43389,
+          "lon": 4.39
+        },
+        "cell": "881f9060e7fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-032",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "BRUSSELS"
+        ],
+        "country": "be"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-BRU",
+          "name": "Bruxelles-Capitale, Région de"
+        },
+        "city": {
+          "id": "city:geonames:2800866",
+          "name": "Brussels",
+          "name_en": "Brussels",
+          "kind": "city",
+          "population": 1019022,
+          "point": {
+            "lat": 50.85045,
+            "lon": 4.34878
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.85045,
+          "lon": 4.34878
+        },
+        "cell": "881fa4418dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-033",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Mumbai"
+        ],
+        "subdivision": "FR-IDF"
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "core-names-sample-034",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris"
+        ],
+        "limit": 0
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use geocode(name, country=\"XX\", subdivision=code, limit=1..100, prefer=\"population\", scope=\"cities\")."
+      }
+    },
+    {
+      "id": "core-names-sample-035",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris"
+        ],
+        "limit": 101
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use geocode(name, country=\"XX\", subdivision=code, limit=1..100, prefer=\"population\", scope=\"cities\")."
+      }
+    },
+    {
+      "id": "core-names-sample-036",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris"
+        ],
+        "prefer": "nearest"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use geocode(name, country=\"XX\", subdivision=code, limit=1..100, prefer=\"population\", scope=\"cities\")."
+      }
+    },
+    {
+      "id": "core-names-sample-037",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Paris"
+        ],
+        "scope": "places"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use geocode(name, country=\"XX\", subdivision=code, limit=1..100, prefer=\"population\", scope=\"cities\")."
+      }
+    },
+    {
+      "id": "core-names-sample-038",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Lyon"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-ARA",
+          "name": "Auvergne-Rhône-Alpes"
+        },
+        "city": {
+          "id": "city:geonames:2996944",
+          "name": "Lyon",
+          "name_en": "Lyon",
+          "kind": "city",
+          "population": 520774,
+          "point": {
+            "lat": 45.74906,
+            "lon": 4.84789
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 45.74906,
+          "lon": 4.84789
+        },
+        "cell": "881f902561fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-sample-039",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "No such city qzxw"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "core-names-sample-040",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          ""
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use a town or city name with at most 128 normalized characters."
+      }
+    },
+    {
+      "id": "core-names-sample-041",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "75001"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\") for postal codes."
+      }
+    },
+    {
+      "id": "core-names-sample-042",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "8.8.8.8"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) for IP addresses."
+      }
+    },
+    {
+      "id": "core-names-sample-043",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "+44"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use phone(number) for international phone numbers."
+      }
+    },
+    {
+      "id": "core-names-sample-044",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "CDG"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code) for airport identifiers."
+      }
+    },
+    {
+      "id": "core-names-sample-045",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "INBOM"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use locode(code) for trade-location identifiers."
+      }
+    },
+    {
+      "id": "core-names-sample-046",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "12 Main Street"
+        ]
+      },
+      "result": {
+        "status": "unsupported_granularity",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Finds towns and cities by name. Street addresses are not supported."
+      }
+    },
+    {
+      "id": "core-names-sample-047",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "10 Downing St"
+        ]
+      },
+      "result": {
+        "status": "unsupported_granularity",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Finds towns and cities by name. Street addresses are not supported."
+      }
+    },
+    {
+      "id": "core-names-sample-048",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "SW1A1AA"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\") for postal codes."
+      }
+    },
+    {
+      "id": "core-names-sample-049",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "MH12AB1234"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use plate(value, country=\"XX\") for vehicle registrations."
+      }
+    },
+    {
+      "id": "core-names-sample-050",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "8860145b49fffff"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use from_h3(cell) for H3 identifiers."
+      }
+    }
+  ]
+}

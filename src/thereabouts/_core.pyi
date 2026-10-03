@@ -53,6 +53,27 @@ class Geocoder:
         country: str | None = None,
         series: str | None = None,
     ) -> dict[str, NDArray[Any]]: ...
+    def geocode(
+        self,
+        name: str,
+        *,
+        country: str | None = None,
+        subdivision: str | None = None,
+        limit: int = 5,
+        prefer: str | None = None,
+        scope: str = "cities",
+        evidence: bool = False,
+    ) -> dict[str, Any]: ...
+    def geocode_columns(
+        self,
+        names: list[str],
+        *,
+        country: str | None = None,
+        subdivision: str | None = None,
+        limit: int = 5,
+        prefer: str | None = None,
+        scope: str = "cities",
+    ) -> dict[str, NDArray[Any]]: ...
     def close(self) -> None: ...
 
 def open(path: str, *, verify: bool = False) -> Geocoder: ...

@@ -9,9 +9,11 @@ mod catalogue;
 mod emission;
 mod error;
 mod forward;
+mod geography;
 mod inserts;
 mod ip;
 mod locode;
+mod names;
 mod phone;
 mod plates;
 mod postal;
@@ -101,8 +103,12 @@ pub fn write_pack(
         }
         data.require_tables(&required, &options.allow_missing_tables)?;
     }
-    let mut identity =
-        json!({"manifest_sha256":data.digest,"options":options,"writer":WRITER_REVISION});
+    let revision = if family == "core" {
+        "0.2.0" // Core exports now include canonical-city spellings.
+    } else {
+        WRITER_REVISION
+    };
+    let mut identity = json!({"manifest_sha256":data.digest,"options":options,"writer":revision});
     if family != "core"
         && let Some(fields) = identity.as_object_mut()
     {
@@ -193,6 +199,11 @@ fn build(
         sources: options.sources.clone(),
         attribution: options.attribution.clone(),
         files: vec![],
+        name_normalization: if family == "core" {
+            Some(thereabouts_core::name_normalization::Policy::default())
+        } else {
+            None
+        },
         normalization: normalization(family).iter().map(|s| (*s).into()).collect(),
         distant_over_m: if family == "core" {
             source::policy_distance(policy, "distant_m")?
@@ -207,6 +218,7 @@ fn build(
     };
     if family == "core" {
         emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
+        names::emit(data, &db, stage, &mut manifest)?;
     } else if family == "plates" {
         plates::emit(data, stage, &mut manifest, &options.allow_missing_tables)?;
     } else {

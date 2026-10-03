@@ -13,6 +13,9 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 def resolve(
     geo: Geocoder, request: dict[str, Any], *, evidence: bool = False
 ) -> Result:
+    if request["kind"] == "geocode":
+        kwargs = {k: v for k, v in request.items() if k not in {"kind", "values"}}
+        return geo.geocode(request["values"][0], evidence=evidence, **kwargs)
     if request["kind"] == "plate":
         return geo.plate(
             request["values"][0],

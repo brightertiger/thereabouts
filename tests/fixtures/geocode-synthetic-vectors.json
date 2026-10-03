@@ -1,0 +1,268 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/core-names-synthetic",
+  "cases": [
+    {
+      "id": "core-names-synthetic-000",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "München 東京"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": "Munich Tokyo",
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.97,
+          "lon": 77.59
+        },
+        "cell": "8860145b4bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-synthetic-001",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "munchen 東京"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": "Munich Tokyo",
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.97,
+          "lon": 77.59
+        },
+        "cell": "8860145b4bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-synthetic-002",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Munich Tokyo"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "alternate_name",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": "Munich Tokyo",
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.97,
+          "lon": 77.59
+        },
+        "cell": "8860145b4bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-synthetic-003",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Minga Tokyo"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "alternate_name",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": "Munich Tokyo",
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.97,
+          "lon": 77.59
+        },
+        "cell": "8860145b4bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-synthetic-004",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "Ming Tokyo"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "city",
+        "match": "fuzzy",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": "AA.A",
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": "Munich Tokyo",
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.97,
+          "lon": 77.59
+        },
+        "cell": "8860145b4bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "core-names-synthetic-005",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "東京"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "core-names-synthetic-006",
+      "request": {
+        "kind": "geocode",
+        "values": [
+          "12345"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "city",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\") for postal codes."
+      }
+    }
+  ]
+}

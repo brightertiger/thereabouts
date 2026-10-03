@@ -143,6 +143,46 @@
         55757.76138668121,
         55447.58678274413
       ]
+    },
+    "geocode": {
+      "pack_bytes": 210397,
+      "sample_rows": 101,
+      "world_source_rows": 68923,
+      "estimated_world_bytes": 143576163,
+      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
+      "vectors": 51,
+      "iterations": 20000,
+      "distinct_queries": 2,
+      "country": "US",
+      "scalar_median_us": 43.25,
+      "scalar_p99_us": 108.583,
+      "batch_points_per_second": 120572.38749826705,
+      "batch_repeats": [
+        119968.71816295206,
+        120572.38749826705,
+        121056.33784715825,
+        120024.54524831926,
+        120973.13767203827,
+        121060.97843239685,
+        114081.53505983503
+      ]
     }
+  },
+  "fixture_packs": {
+    "bytes_by_pack": {
+      "airports-sample": 375778,
+      "airports-synthetic": 4462,
+      "core-names-sample": 210397,
+      "core-names-synthetic": 5879,
+      "ip-sample": 234875,
+      "locode-sample": 349522,
+      "phone-sample": 187284,
+      "phone-synthetic": 3463,
+      "plates-sample": 1139827,
+      "postal-sample": 363327,
+      "postal-synthetic": 3891
+    },
+    "total_bytes": 2878705
   }
 }

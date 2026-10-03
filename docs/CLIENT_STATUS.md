@@ -1,265 +1,190 @@
 # Thereabouts client status
 
-Work package 1 and the package-2 prerequisite fixes are complete on `feat/rust-core`.
-Postal is implemented in package 2; airports and the remaining families follow. The approved design is
-[the client redesign specification](superpowers/specs/2026-10-03-client-redesign-design.md);
-[PACK_FORMAT.md](PACK_FORMAT.md) defines the version-2 wire format.
+Work packages 1 and 2 are implemented on `feat/rust-core`, including the
+package-2 prerequisite fixes. The plate-country release was unavailable; the
+explicit sample fallback and remaining verification limit are described below.
+Package 3 has not started. The contract is the
+[approved design](superpowers/specs/2026-10-03-client-redesign-design.md);
+[PACK_FORMAT.md](PACK_FORMAT.md) is the normative version-2 specification.
 
-## What changed in the rework
+## Rework and package-2 changes
 
-The writer is separate from the portable reader. Opening reads inventories,
-headers, directories and metadata, then validates payloads on demand with
-bounded LRU caches. Panicking conversions were removed and Clippy denies
-unwrap/expect outside tests. Reverse overlap never creates ambiguity:
-country membership narrows timezone sets, with unresolved survivors in evidence.
-The result has distance_band and no selected or distance_km.
+The writer is a separate crate. The reader retains shard file handles, uses
+positioned reads, and range-reads individual catalogue records and strings.
+Its LRU caches have O(1) operations, with IO and decoding outside locks.
+Timezone narrowing falls back to the original set when no country-compatible
+zone survives. Overlap never makes reverse ambiguous. Result enums follow the
+specification; distance_band replaces invented distances, and selected is absent.
+Writer hot scans use typed Arrow fields and typed SQLite columns.
 
-Writer inputs now require all eight tables and explicit distance policy,
-with invalid populations rejected. Legacy conformance uses original expectations;
-an independent golden extract runs offline under pytest. Error codes distinguish
-discovery, explicit paths, corruption and export. Typed result enums and metadata
-indexes supply subdivision names from their published table. The binding builds
-scalar dictionaries directly and streams dictionary-coded columns. Typed Arrow
-reads, cached SQL and bounded insert batches improve the writer without a world
-run. Staging has a disk precheck. Coarse queries retain their own cell, batch
-coordinates are named, core discovery has no legacy-reader dependency, and
-timezone compaction cannot merge above a source cell's original resolution.
+Postal, airports and LOCODE use the shared exact index; phone uses a serialized
+decimal trie; IP uses sorted inclusive intervals. Plates carry source rules and
+registration evidence. Canonical-city names now live in core, with FST exact
+and prefix search plus trigram fallback. Name rules and Unicode versions are
+pack data. The refreshed core sample retains its previous reverse expectations.
 
-## Package 2 prerequisites (N1–N5 and writer fix 11)
+## Python API
 
-Shards retain open descriptors and use positioned reads. Catalogue misses read
-only the requested record, offset pairs and strings. Linked-key LRU operations
-are O(1), with IO and decoding outside locks. Country narrowing that removes
-every timezone now retains the original set. Result enums exactly follow the
-specification. Writer hot scans borrow typed Arrow fields and stage typed SQL
-columns; JSON remains only for published evidence and small metadata sections.
-Output bytes remain deterministic against the existing synthetic pack.
-SQLite scratch may use a separate filesystem. No world export was run.
-
-`uv run python -m benchmarks.multishard_read_path --record before|after` builds
-a local synthetic pack with 256 catalogue shards,
-16,384 places and 36,678,465 bytes. The same seeded
-100,000 random queries run before and after, with seven columnar repetitions.
-On the Apple M2 / 8 GiB machine, scalar median is
-18.459 → 13.209 µs, p99 is
-53.166 → 107.750 µs, and columns are
-39,707 → 140,439 points/s.
-The range-read implementation improves median and throughput on this workload,
-but its p99 is worse; it is not a claim of improved tail latency or world performance.
-The benchmark pack is generated under .tmp, not committed as a large fixture.
-
-## Built and usable
-
-The Rust workspace uses edition 2024 / Rust 1.99. `thereabouts-core` contains
-format codecs, lazy reading, reverse lookup and the typed result model.
-`thereabouts-writer` owns Arrow/Parquet and SQLite, behind the Python crate's
-optional `writer` feature (enabled by maturin). The portable core's normal
-direct dependencies are h3o 0.9.5, serde 1.0.229, serde_json 1.0.151, sha2 0.10.9
-and thiserror 2.0.21. Its normal dependency tree has no `*-sys` crates and
-`cargo check -p thereabouts-core --target wasm32-unknown-unknown` passes.
-
-The top-level Python API exports `Geocoder`, `reverse`, `Result`, and the
-current error classes: `GeocoderError`, `DataNotInstalledError`,
-`PackNotFoundError`, `IncompatibleDataError`, `CorruptPackError`,
-`ClosedGeocoderError`, `WriterError` and `WriterInputError`.
+The top-level exports remain Geocoder, reverse, Result and the current coded
+error classes. Results and nested geographic values are frozen dataclasses.
+Queries never download data. Select a family directly, or select several packs:
 
 ```python
-import numpy as np
+from pathlib import Path
 from thereabouts import Geocoder
 
-with Geocoder("tests/fixtures/packs/core-sample") as geo:
-    answer = geo.reverse(lat=50.8503, lon=4.3517, evidence=True)
-    cell = geo.from_h3("881fa44181fffff")
-    rows = list(geo.reverse_many([
-        {"lat": 50.8503, "lon": 4.3517},
-        {"lat": 52.3676, "lon": 4.9041},
-    ]))
-    columns = geo.reverse_columns(
-        np.array([50.8503, 52.3676]), np.array([4.3517, 4.9041])
-    )
+root = Path("tests/fixtures/packs")
+with Geocoder(packs={
+    "core": root / "core-names-sample",
+    "postal": root / "postal-sample",
+    "airports": root / "airports-sample",
+}) as geo:
+    city = geo.geocode("Springfield", country="US", subdivision="US-IL")
+    postal = geo.postal("75001", country="FR", evidence=True)
+    airport = geo.airport("CDG")
+    columns = geo.geocode_columns(["Lyon", "Springfield", "75001"])
 ```
 
-Results and nested values are frozen, detached dataclasses. Coordinate arguments
-are keyword-only. reverse_many accepts mappings with lat/lon keys or objects
-with those attributes; bare tuples are rejected. H3 resolutions 0–8 are admitted;
-0–2 have no stored ancestor and return not_found. Coarse queries return their
-own cell and centre, without choosing a descendant label. Reverse statuses are
-matched, not_found and invalid_input. Forward ambiguity remains for package 2.
+All selected packs must share a dataset version. Geocoder() uses explicit
+data_dir, then THEREABOUTS_DATA, then the platform user-data directory, retaining
+the existing packs/<family>/v-<version>/<digest>/ layout and current.json pointer.
+Explicit mappings open queried families lazily; default discovery opens the
+first installed family and opens other families on demand. A missing family names its exact
+`thereabouts data install <family>` command. The new installer is package 3.
 
-Contained results have null distance_band. Nearest results report
-greater_than_km=0 and at_most_km=25 for this dataset; distant-nearest uses
-greater_than_km=25 and at_most_km=50. These are published policy bounds for
-represented cell centres, not measured distances to a city centroid.
-State code/name come from the matching subdivision row, falling back to the
-place only when no row exists. Evidence includes stored cell, source geography
-IDs, assignment methods, miss reason, source IDs and unresolved timezone names.
+| Verb | Arguments and behavior |
+| --- | --- |
+| reverse | Keyword-only lat, lon; optional evidence |
+| from_h3 | H3 resolutions 0–8; resolves a stored ancestor, never a descendant |
+| postal | code, country required, optional evidence |
+| airport | code; default IATA and ICAO, or scheme IATA/ICAO/GPS/local/ident; local requires country |
+| locode | full five-character code, or three characters plus country |
+| phone | E.164 number with leading +; longest published prefix, including metadata fallbacks |
+| ip | IPv4 or IPv6 literal; ports, CIDRs and zones are invalid |
+| plate | serial; optional country, series and evidence; a country hint is exact |
+| geocode | name; country/subdivision hard filters, limit 1–100, prefer="population", scope="cities", evidence |
 
-Column strings use int32 codes and a `<field>_categories` string array.
-Code -1 means null; categories have their own length and contain no null.
-Numeric fields use `<field>_valid` masks (float64 for coordinates/band bounds,
-uint32 for population). Column output omits candidates and evidence. It copies
-strided inputs before releasing the GIL and fills fixed-width buffers without
-retaining result rows. Arrow conversion is
-`pa.DictionaryArray.from_arrays(pa.array(codes, mask=codes < 0), pa.array(categories))`.
+Geocode finds towns and cities only. Code-shaped requests include a hint naming
+the appropriate verb; street addresses return unsupported_granularity. Ranking
+is population, reported in rank_basis. Multiple cities remain ambiguous with
+null flat geography and ranked candidates, even with limit=1. prefer="population"
+opts into selection. Prefix matches and typo fallback report fuzzy; English and
+alternate exact spellings report alternate_name.
 
-`Geocoder()` and the lazy module-level reverse shortcut discover the existing
-`packs/core/v-<version>/<manifest_sha256>/` layout and current.json pointer.
-Explicit data_dir precedes THEREABOUTS_DATA and the platform user-data directory.
-A legacy reverse pointer raises the current IncompatibleDataError directly.
-Missing discovery data says exactly `thereabouts data install core`; the new
-installer/CLI belongs to package 3. A missing explicit pack includes its path
-and uses pack_not_found. Queries never download anything.
+Every forward verb also has a <verb>_columns batch method. String columns are
+int32 dictionary codes plus <field>_categories; -1 is null. Nullable numerics
+have <field>_valid masks. Forward columns include candidate_offsets and flattened
+candidate_* columns. Reverse columns omit candidates. Both omit evidence, fill
+fixed-width buffers while iterating, and release the GIL. reverse_many remains
+an ordered iterator. Coordinate arrays may be strided.
 
-Default open validates directories and sizes. `Geocoder(path, verify=True)`
-or `_core.verify_pack(path)` checks all hashes and structural invariants.
-Unused payload damage may remain undetected during a default open. Retained
-cache budgets are 8 MiB decoded blocks and 4 MiB decoded places; active readers can temporarily retain evicted values.
-Open shards retain their file handles and use positioned reads. Replacing paths is safe; in-place mutation of open files is unsupported.
+Missing queries and invalid values are statuses; missing, incompatible, corrupt
+or closed packs raise coded exceptions. State fields use subdivisions by code,
+falling back to published place fields only when that table has no row.
+Canonical city fields follow published associations. Postal/admin, airport,
+LOCODE, phone-description and IP city text remain available in evidence rather
+than being guessed into new canonical cities.
 
-## Writer and samples
+## Writer, runtime and reproducible samples
 
-`_core.write_pack(dataset_dir, "core", output_dir, options)` requires an explicit
-data_version and these inventory kinds: cells, places, canonical_cities,
-place_to_city, countries, subdivisions, timezone_cells and zone_tables.
-Deliberate fixture omissions must be listed in allow_missing_tables. Both
-normalization.policy distance bounds are required; population is null or a
-nonnegative u32 integer. Writer inputs raise a coded ValueError subclass.
+The mixed maturin project contains thereabouts-core, thereabouts-writer and
+thereabouts-py. Core is wasm-compatible and has no Arrow/Parquet/SQLite dependency.
+Its direct dependencies are fst, h3o, regex, serde, serde_json, sha2, thiserror,
+unicode-casefold and unicode-normalization. The Python writer feature owns
+dataset export; no application Rust unsafe was introduced.
 
-The 512 MiB admission budget covers bounded Arrow scans, block-local timezone
-joins, output shards and a 16 MiB SQLite cache; it is not a proven world RSS
-limit. Inserts are capped by rows and payload bytes inside the transaction.
-staging_directory chooses the output staging parent on the same filesystem.
-sqlite_directory can use a separate disk with its own admission check. Both
-options are excluded from pack identity. Preflight requires a 5 GiB floor
-plus eight times consumed compressed input size and a 64 MiB shard reserve.
-The estimate is not a world-build guarantee. Existing output is verified and
-reused only for the same input identity; changed inputs are never overwritten.
-Stale-stage errors name the directory to remove; cleanup preserves the original
-failure. Encoding revision changes when emitted bytes change.
+`_core.write_pack(dataset_dir, family, output_dir, options)` selects table kinds
+from a verified golden manifest. Required geographic and family tables are
+strict; deliberate fixture omissions must be listed explicitly. Inputs and
+counts are verified, no source defaults are guessed, and changed inputs never
+overwrite an existing output. The 512 MiB admission budget covers bounded scans,
+shards and SQLite staging; it is not a proven world RSS bound. Preflight retains
+a 5 GiB floor plus an input-based estimate. Staging defaults to the output parent;
+SQLite scratch may use a separately checked filesystem.
 
-The committed real sample is **4,498,635 bytes**, **29 resolution-3
-blocks**, dataset label **2026.10**. It covers continental Belgium, Netherlands
-and Luxembourg, plus Paris, Istanbul, Mumbai, Delhi, Springfield (Illinois)
-and one Montana block supplying distant-nearest examples. Source notices and
-original input digests are retained. The golden manifest SHA-256 is
-`e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832`.
+Default opening reads search indexes/directories and metadata. Spatial and
+catalogue payloads validate on demand. Full hashes and structural checks use
+verify=True or _core.verify_pack. Caches retain at most 8 MiB of decoded blocks,
+4 MiB of places, 4 MiB of observations, and 1 MiB of repeated IP-address hits;
+active calls may retain evicted values. Name FSTs/postings and plate rules are
+resident indexes. Open files must remain immutable.
 
-The builder requires --golden, pins Parquet settings and records PyArrow's
-version. Byte-identical subset regeneration requires that version; input
-identity changes if the subset encoding changes. It reads the source only
-and writes inside this worktree:
+Sample builders live in tools/build_sample_pack.py, build_forward_samples.py
+(postal/airports/LOCODE), build_phone_sample.py, build_ip_sample.py,
+build_plates_sample.py and build_names_sample.py. They read explicit source
+paths, select BE/NL/LU/FR/TR/IN/US where available, and write only worktree
+fixtures. Manifests retain source digests, dataset version, selection rules and
+Parquet settings; repeatability requires the recorded PyArrow version.
 
-```sh
-export PATH="$HOME/.cargo/bin:$PATH"
-export CARGO_HOME="$PWD/.cargo-cache" UV_CACHE_DIR="$PWD/.cache/uv" TMPDIR="$PWD/.tmp"
-uv sync --all-extras
-uv run python -m tools.build_sample_pack --golden /path/to/data/golden
-uv run python -m tools.build_core_vectors
-uv run python -m tools.check_sample_source
-```
-
-The synthetic Parquet dataset includes all eight kinds and overlapping zones.
-Both packs exercise writer determinism. Rebuilding a changed fixture requires
-moving its previous pack aside explicitly; the writer does not overwrite it.
+The reverse core sample is 4,636,487 bytes over 29 resolution-3 blocks: continental
+Belgium, Netherlands, Luxembourg, plus Paris, Istanbul, Mumbai, Delhi, Springfield
+(Illinois) and a Montana distant-nearest block. The dataset label is 2026.10.
+The names-only core sample selects 101 cities, including every selected
+Springfield and named normalization examples. It is a test subset with explicit
+spatial-table omissions, not a separately installable geocode family.
+New family/name pack fixtures, including synthetic packs, total 2,878,705 bytes
+under the 10 MB budget; their breakdown is in CLIENT_FORWARD_MEASUREMENTS.json.
 
 ## Conformance
 
-Exactly **35 of 54 legacy vectors** run against original expectations in Rust,
-pytest and the vector builder: **19 matches**, **1 unassigned → not_found with
-unassigned**, **4 ineligible → not_found with no_land**, **2 outside_coverage →
-not_found with outside_coverage**, **8 InvalidInputError → invalid_input**, and
-**1 intended change** (case 47 accepts r3 and returns no_stored_ancestor).
-The only other allow-list entry is the synthetic canonical city's display name.
-Matched assertions cover city/country/state IDs, country code, state name and
-method. The eight postal cases now also run against the original expectations in Rust and pytest: four matched, one ambiguous, one not_found and two invalid_input. The remaining eleven airport cases follow with that family. Code matches now say exact; the canonical-name allowance is unchanged.
+The original 54-vector bundle is asserted with explicit mappings, not described
+as unchanged snapshots. Rust and Python both check the following:
 
-There are **139 real reverse vectors** shared by Rust and Python. Their snapshot
-results supplement the independent oracle: offline pytest checks **131 r8
-requests**, including **123 matches**, against committed golden-cell extracts,
-source state fields, timezone rows and original stored-cell ancestry.
-No real-data directory is needed for tests. The old reader and CLI suites still
-run unchanged in scope. Node consumption awaits its binding package.
+- 35 legacy reverse requests: 19 matches; 1 unassigned, 4 no-land and 2
+  outside-coverage misses; 8 invalid inputs; one intentional change accepting
+  the r3 query and returning no_stored_ancestor. The only other allowance is
+  the synthetic canonical city's display name.
+- 8 legacy postal requests: 4 matched, 1 ambiguous, 1 not_found, 2 invalid_input.
+- 11 legacy airport requests: 7 matched, 2 ambiguous, 1 not_found, 1 invalid_input.
+  Legacy case 52 now searches IATA/ICAO and asserts the original case 32
+  candidates. Source identity/geography assertions and the canonical-name
+  allowance remain explicit. Code matches now use exact.
 
-## Measurements and verification
+The 19 forward legacy cases therefore assert 11 matched, 3 ambiguous, 2 not_found
+and 3 invalid_input results against original expectations. They run in addition
+to new shared snapshots and offline independent source checks.
 
-Only [benchmarks/core_read_path.py](../benchmarks/core_read_path.py) produces the
-figures below, recorded in [CLIENT_CORE_MEASUREMENTS.json](CLIENT_CORE_MEASUREMENTS.json).
-Machine: Apple M2, 8 GiB, macOS arm64, Python 3.12.8. The hot workload samples
-65 coordinate vectors for 20,000 calls. Random uses 100,000 seeded coordinates
-rejection-sampled inside inventoried r3 blocks. Batches repeat seven times.
+There are 139 real reverse vectors. Offline pytest independently checks 131 r8
+requests (123 matches) against committed golden-cell extracts, ancestry, state
+and timezone rows. Every forward family has at least 20 shared real vectors;
+the table below lists counts. Additional synthetic vectors cover the 19 legacy
+forward cases, six phone cases and seven name cases. Independent forward checks
+use committed source observations, canonical links, inclusive IP boundaries,
+plate reference semantics and city population ordering. The real name subset
+has no differing English names; English and future alternate-table behavior is
+explicitly synthetic. Tests require no access to real data. Node execution
+awaits its binding package; the JSON is shared.
 
-| Measure | Eager baseline before rework | Reworked reader |
-| --- | ---: | ---: |
-| Open | 59.041 ms | 2.950 ms |
-| Open RSS delta | 21,872,640 bytes | 1,048,576 bytes |
-| Hot scalar median / p99 | 8.833 / 22.917 µs | 7.584 / 8.250 µs |
-| Hot columns | 553,973 points/s | 763,474 points/s |
-| Random scalar median / p99 | 5.500 / 9.833 µs | 4.417 / 36.333 µs |
-| Random columns | 665,566 points/s | 426,341 points/s |
-| Process peak RSS | 300,318,720 bytes | 140,132,352 bytes |
+## Measurements
 
-The eager baseline retains all decoded records and used the pre-correction
-result semantics. Random throughput is lower with bounded catalogue caching;
-cache misses decode and validate records on demand. Hot lookup and opening
-improve, and batch memory use falls. The JSON also retains measurements taken
-immediately after lazy opening, before the binding optimization.
+All numbers come from benchmarks/core_read_path.py,
+benchmarks/multishard_read_path.py and benchmarks/forward_read_path.py, recorded
+in CLIENT_CORE_MEASUREMENTS.json and CLIENT_FORWARD_MEASUREMENTS.json.
+Machine: Apple M2, 8 GiB, macOS arm64, Python 3.12.8.
 
-Historical old-reader figures in the script are **10.291 µs / 531,994 points/s**
-for Cython and **12.750 µs / 530,437 points/s** for Python. Those used a different
-synthetic dataset (308,032 cells / 4,176 places), so they are context rather than
-a controlled comparison with this real sample.
+The prerequisite multi-shard workload has 256 catalogue shards, 16,384 places
+and 36,678,465 bytes, generated locally rather than committed. It uses 100,000
+seeded random requests and seven batch repetitions. Before → after N2–N3:
+median 18.459 → 13.209 µs; p99 53.166 → 107.750 µs; batch
+39,707 → 140,439 rows/s. The tail regression is real in this measurement;
+improved throughput does not establish improved p99 or world performance.
 
-Required gates are cargo fmt --check, cargo clippy --all-targets -- -D warnings,
-cargo test, pytest, ruff check, ruff format --check and strict mypy. Additional
-checks cover the wasm target and Clippy with all features. All passed at the
-end of the rework: 35 Rust tests, 674 Python tests (9 skipped), and mypy over
-429 source files. Property tests
-include invalid payloads with recomputed checksums, verified open, full verify
-and lazy access without panics. No application Rust unsafe is used.
+The refreshed core sample, now including names, opens in 11.806 ms with
+2,359,296 bytes RSS delta. Hot median/p99 are 7.833/23.750 µs and batch
+657,440 rows/s; seeded random median/p99 are 4.583/18.667 µs and batch
+617,282 rows/s. The historical pre-name rework measurement was 2.950 ms and
+1,048,576 bytes at open, and the eager baseline was 59.041 ms / 21,872,640 bytes.
+Those historical samples and code differ; the JSON preserves them.
+Old-reader synthetic figures (a different workload) were 10.291 µs / 531,994
+rows/s with Cython and 12.750 µs / 530,437 rows/s with Python.
 
-## Deliberately not done and unverified
-
-The remaining package-2 forward families and names index follow the postal commit. The new CLI,
-installer, MCP wiring and Node/WASM host adapter remain later packages.
-Legacy modules, their helper implementations and their tests remain importable
-until package 5; core discovery imports only retained helpers. build_data is
-unchanged. There is no world export or world performance qualification.
-Linux, Windows and other Python versions were not run; wasm was compile-checked.
-Disk use stayed inside the worktree with more than 5 GiB free. Real data was
-read-only; no source data was modified, and nothing was pushed or published.
-
-## Postal implementation
-
-The postal pack supplies country-scoped exact lookup, source points and published
-canonical-city roll-up. Unknown codes are ordinary misses; missing country and
-invalid values return invalid_input with a hint. Ambiguous flat fields are null,
-with ranked candidates. Source place and administrative names remain in evidence.
-A separate family pack can be opened directly with Geocoder(path), or several
-can be selected using Geocoder(packs={"core": core_path, "postal": postal_path}).
-All selected families must have the same dataset version. Existing store
-discovery supports a postal-only installation. No installer or CLI changes are
-part of this package.
-
-geo.postal(code, country="FR", evidence=True) returns a frozen Result.
-geo.postal_columns(codes, country="FR") releases the GIL and emits dictionary
-strings, numeric validity masks, candidate_offsets, and candidate_ columns.
-Column buffers are filled without retaining a full result per input.
-
-The committed sample contains the first 32 distinct codes per requested country
-plus named examples; every source observation of each selected code is retained.
-The sample builder takes an explicit --golden path. Countries are BE, NL, LU,
-FR, TR, IN and US. Independently extracted source rows and place_to_city mappings
-are checked offline by pytest, including source IDs, geography and point
-quantization. The synthetic pack comes from the unchanged legacy fixture builder.
-
-Forward figures below come only from benchmarks.forward_read_path and are saved
-in CLIENT_FORWARD_MEASUREMENTS.json. They use the Apple M2 / 8 GiB machine,
-20,000 scalar calls and seven native batch repetitions over three matching US
-codes. The world estimate multiplies total sample bytes per source row by the
-published source-row count. Fixed metadata and notices make that deliberately
-crude ratio strongly upward-biased; it is not a measured world pack size.
-
-## Forward measurements
+Forward measurements use 20,000 scalar calls over matching US vectors and
+seven native batch repetitions. distinct_queries is recorded per family
+(including the one-query phone case); these are repeated-key measurements,
+not a world-random claim. Size estimates multiply total sample bytes per source
+row by source row counts. Fixed metadata/notices make this crude ratio strongly
+upward-biased. The geocode estimate covers names and supporting catalogue only,
+excluding the spatial core. No world size or throughput was measured.
 
 <!-- forward-measurements:start -->
 | Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Batch rows/s | Estimated world bytes |
@@ -270,94 +195,41 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | phone | 187,284 / 389 | 29 | 4.333 / 4.583 | 967,617 | 206,165,020 |
 | ip | 234,875 / 449 | 58 | 7.875 / 12.208 | 472,964 | 4,073,362,321 |
 | plates | 1,139,827 / 521 | 36 | 28.417 / 35.334 | 55,176 | 316,515,300 |
+| geocode | 210,397 / 101 | 51 | 43.250 / 108.583 | 120,572 | 143,576,163 |
 <!-- forward-measurements:end -->
 
-## Airports
+## Plates source limitation and remaining work
 
-The airports pack and airport/airport_columns methods are implemented. Default
-lookup combines IATA and ICAO; scheme selects IATA, ICAO, GPS, local or ident.
-Local codes need a country. All schemes are checked against an independent
-committed source extract; 33 real vectors and 11 synthetic vectors also run in
-Rust and Python. Of the original 11 airport cases, seven remain matched, one
-not_found, one invalid_input (old context error), and two are ambiguous. The
-second ambiguous case is the one intended change: legacy case 52 now uses the
-default IATA/ICAO search and is asserted against case 32's original candidates.
-The seven matched cases retain source identity and geographic IDs; the same
-explicit canonical display-name allowance as reverse applies. Together with
-postal, all 19 legacy forward cases have direct assertions, not just snapshots.
+The requested normalized/plates_country release and vehicle-prior inputs were
+absent. The plate sample uses read-only normalized/plates tables, the pinned
+India state table and committed format rules, with the fallback recorded in its
+manifest. plate_priors is explicitly omitted and that score term is disabled;
+rank_basis is plate_evidence_without_vehicle_prior. The reduced sample retains
+selected registration-unit evidence plus one entity association per code.
+It does not claim the unavailable release's full prior ranking.
 
-The sample selects the first 32 airport identifiers per country where available,
-plus CDG, AMS, BRU, LUX, IST, BOM, DEL and SPI. It includes BE, NL, LU, FR, TR, IN
-and US. The writer retains all five published schemes and explicit nulls.
+The builder supports a verified plate-country release when supplied. The
+pipeline's future plates dataset table will replace this adapter without changing
+the wire model. Complete real release ingestion and vehicle-prior ranking remain
+unverified. Phone's real sample has country-only links; synthetic cases cover
+regional/city links, and strict world handling of unlinked territories is untested.
 
-## LOCODE
+The real names table is pending; the writer already accepts its tested canonical
+alternate-name shape. Full-place names and scope="places" remain optional later
+work. The new CLI, installer, MCP integration and Node/WASM host adapter are
+later packages. Legacy Python modules and suites remain until package 5.
+There was no world export. Linux/Windows and other Python versions were not run.
 
-The locode family implements locode(code, country=None) and locode_columns.
-Both a full LOCODE and country plus three-character location are accepted.
-Invalid formats and conflicting country hints return invalid_input. Source
-identity, names, coordinates and published canonical associations have an
-independent committed extract check. Shared real vectors run in Rust and Python.
-The sample includes the first 32 locations per requested country plus named
-airport-associated codes where available. Legacy conformance has no LOCODE cases.
+## Validation and boundaries
 
-## Phone
+Full gates run before each local commit: cargo fmt --check;
+cargo clippy --all-targets --all-features -- -D warnings; cargo test;
+uv run pytest; uv run ruff check; uv run ruff format --check; uv run mypy.
+The wasm target is also compile-checked. The final gate passed: 52 Rust tests,
+697 Python tests (9 skipped), formatting over 466 Python files and strict mypy
+over 446 source files. Old reader and pipeline tests remain in the gate.
 
-The phone pack uses a serialized decimal trie with longest-prefix lookup and
-phone/phone_columns methods. E.164 input requires a plus and an international
-calling code; presentation spaces, hyphens and parentheses are accepted.
-Calling-code metadata supplies country fallbacks. Shared codes remain ambiguous
-until a longer published prefix resolves them. Descriptions are retained as
-evidence, never guessed into a city. Twenty-nine real vectors and six synthetic
-vectors cover normalization, misses, invalid inputs, nested prefixes, a linked
-city and shared-country ambiguity in both Rust and Python. Source rows are also
-asserted independently under pytest.
-
-The sample keeps first 32 prefixes per country plus named examples and all
-observations of those prefixes; metadata covers the same seven countries.
-Cross-country prefix rows containing countries outside the subset are excluded.
-Thus this is a partial sample, not an authoritative complete calling-code map.
-The current real sample has country-only place links. Synthetic linked-city
-cases exercise regional projection. Non-geographic territory 001 is excluded;
-unlinked geographic territories fail strict export. World export is unverified.
-
-## IP
-
-The ip pack implements ip(address) and ip_columns over inclusive IPv4/IPv6
-intervals. Search uses positioned binary reads and a bounded repeated-address
-cache. Packed and textual endpoints must agree; export rejects overlaps.
-Canonical geographic fields follow published links; evidence retains DB-IP's
-country, region and city text, and the flat point is its published point.
-Malformed literals, ports, zones and CIDRs return invalid_input.
-
-The sample selects the first 32 ranges per country and address family, plus the
-ranges containing the two documented DNS examples. Its source extract is checked
-independently at every start, midpoint, end and successor. Shared vectors cover
-both families, misses and invalid input. No world export was run.
-
-## Plates and the missing plate-country release
-
-The plate/plate_columns methods and plates writer are implemented. Country hints
-remain exact for empty strings, unknown codes and unsupported formats. Unhinted
-serials return ranked candidates and retain the reference's open-world abstention
-even for a singleton. State fields require eligible current (or explicitly
-selected historic) source evidence. Offices and repeated Wikidata entity
-associations never become invented canonical cities. Source series and finer
-registration assertions are retained in evidence.
-
-The requested real normalized/plates_country directory and its vehicle-prior
-inputs are absent. The sample builder therefore uses the existing read-only
-normalized/plates tables, pinned India state table, and committed format rules.
-The manifest records this fallback and explicitly omits plate_priors. Scoring
-disables that term and reports plate_evidence_without_vehicle_prior. This is
-not claimed to reproduce the full plate-country release's prior ranking.
-When that release is available, the same builder reads its verified manifest,
-bundle and Parquet inventory. The pipeline's future plates dataset table replaces
-the input adapter; the pack schema stays the same.
-
-The first extraction measured 10,833,728 bytes and exceeded the fixture budget.
-The reduced sample retains all selected registration-unit assertions and one
-entity-association example per selected code, plus all format rules for the seven
-countries. Thirty-six shared vectors and independent comparisons with the Python
-reference cover normalization, ranking without the unavailable prior, geographic
-eligibility, historic-series restrictions and country fallback. Complete release
-ingestion and vehicle-prior ranking remain unverified against real inputs.
+Only worktree files and normal shared Git metadata were written. The real data
+tree was read-only, build_data source was unchanged, and nothing was pushed,
+published or uploaded. Disk use remained below the 4 GB additional-use budget,
+with more than 5 GB free.

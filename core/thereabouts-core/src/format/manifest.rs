@@ -52,6 +52,9 @@ pub struct Manifest {
     /// Ordered code normalization operations; required for forward code packs.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub normalization: Vec<String>,
+    /// Canonical-city spelling policy; required whenever name indexes are present.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_normalization: Option<crate::name_normalization::Policy>,
     /// Exclusive lower bound for distant-nearest, in metres.
     pub distant_over_m: u32,
     /// Inclusive upper bound for distant-nearest, in metres.
@@ -152,6 +155,13 @@ pub fn read(root: &Path) -> Result<Manifest> {
             "Unsupported plate normalization".into(),
         ));
     }
+    if let Some(policy) = &m.name_normalization {
+        policy.validate()?;
+    }
+    ensure(
+        m.files.iter().any(|f| f.kind == "names") == m.name_normalization.is_some(),
+        "Name policy/index inventory disagree",
+    )?;
     let mut names = BTreeSet::new();
     for f in &m.files {
         ensure(

@@ -42,7 +42,7 @@ pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
                         if place.refs[0] != country {
                             continue;
                         }
-                        let geography = geography(db, country, &id)?;
+                        let geography = crate::geography::geography(db, country, &id)?;
                         if !refs.contains(&geography) {
                             refs.push(geography);
                         }
@@ -90,30 +90,4 @@ fn record(row: Row<'_>, places: [u32; 3], prefix: &str, metadata: bool) -> Resul
             Some(serde_json::to_string(&details)?),
         ],
     })
-}
-fn geography(db: &Connection, country: u32, id: &str) -> Result<[u32; 3]> {
-    let place = catalogue::record(db, id)?;
-    let reference = catalogue::reference(db, Some(id))?;
-    let city = if place.refs[3] != 0 {
-        place.refs[3]
-    } else if place.field(4) == "city" {
-        reference
-    } else {
-        0
-    };
-    let mut state = 0;
-    let mut parent = Some(id.to_owned());
-    let mut seen = std::collections::BTreeSet::new();
-    while let Some(id) = parent {
-        ensure(seen.insert(id.clone()), "Cyclic phone place ancestry")?;
-        let place = catalogue::record(db, &id)?;
-        if place.field(4) == "state" {
-            state = catalogue::reference(db, Some(&id))?;
-            break;
-        }
-        parent = db.query_row("SELECT parent_id FROM places WHERE id=?", [id], |r| {
-            r.get(0)
-        })?;
-    }
-    Ok([country, state, city])
 }

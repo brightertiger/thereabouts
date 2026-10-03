@@ -10,41 +10,41 @@
     "iterations": 20000,
     "coordinate_vectors": 65,
     "seed": 20261003,
-    "pack_bytes": 4498635
+    "pack_bytes": 4636487
   },
-  "open_seconds": 0.0029504999984055758,
-  "open_rss_delta_bytes": 1048576,
+  "open_seconds": 0.011806166003225371,
+  "open_rss_delta_bytes": 2359296,
   "cache_hot": {
     "points": 20000,
-    "scalar_median_us": 7.584,
-    "scalar_p99_us": 8.25,
-    "reverse_columns_points_per_second": 763474.1448462022,
+    "scalar_median_us": 7.833,
+    "scalar_p99_us": 23.75,
+    "reverse_columns_points_per_second": 657439.6975157382,
     "reverse_columns_repeats": [
-      757984.8976888969,
-      762459.0768415825,
-      768087.2648201325,
-      766226.0430779664,
-      765633.264417793,
-      763474.1448462022,
-      762287.1255367569
+      652809.8631064963,
+      657439.6975157382,
+      656737.1515818745,
+      657175.9510784321,
+      658969.5509379732,
+      664263.3400195511,
+      667443.4815079797
     ]
   },
   "random": {
     "points": 100000,
-    "scalar_median_us": 4.417,
-    "scalar_p99_us": 36.333,
-    "reverse_columns_points_per_second": 426340.7540523758,
+    "scalar_median_us": 4.583,
+    "scalar_p99_us": 18.667,
+    "reverse_columns_points_per_second": 617282.0454795909,
     "reverse_columns_repeats": [
-      415574.6283381637,
-      408821.3424861365,
-      398229.4051761884,
-      428623.16889998957,
-      427218.29093327693,
-      426340.7540523758,
-      427607.78328170447
+      608406.1963291365,
+      610486.9434769086,
+      617431.1621829347,
+      615503.7693555134,
+      619048.111664593,
+      617789.2411206367,
+      617282.0454795909
     ]
   },
-  "peak_rss_bytes": 140132352,
+  "peak_rss_bytes": 122241024,
   "historical_reader": {
     "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",
@@ -52,6 +52,84 @@
     "python_scalar_median_us": 12.75,
     "cython_columns_points_per_second": 531994,
     "python_columns_points_per_second": 530437
+  },
+  "multishard": {
+    "before": {
+      "points": 100000,
+      "scalar_median_us": 18.4585,
+      "scalar_p99_us": 53.16600999999999,
+      "reverse_columns_points_per_second": 39706.65714406321,
+      "reverse_columns_repeats": [
+        40734.45166291532,
+        38877.61995333118,
+        37370.93771491131,
+        38826.11255236362,
+        40557.497948381075,
+        41118.219587185624,
+        39706.65714406321
+      ],
+      "open_seconds": 0.013366458006203175,
+      "open_rss_delta_bytes": 819200,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "after": {
+      "points": 100000,
+      "scalar_median_us": 13.209,
+      "scalar_p99_us": 107.75040999999979,
+      "reverse_columns_points_per_second": 140438.74592035104,
+      "reverse_columns_repeats": [
+        136172.28342340904,
+        139055.5463852437,
+        141935.54179639663,
+        141500.8571366643,
+        139262.47188178747,
+        140438.74592035104,
+        141104.5985455971
+      ],
+      "open_seconds": 0.04758241699892096,
+      "open_rss_delta_bytes": 524288,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    }
+  },
+  "before_names": {
+    "open_seconds": 0.0029504999984055758,
+    "open_rss_delta_bytes": 1048576,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 7.584,
+      "scalar_p99_us": 8.25,
+      "reverse_columns_points_per_second": 763474.1448462022,
+      "reverse_columns_repeats": [
+        757984.8976888969,
+        762459.0768415825,
+        768087.2648201325,
+        766226.0430779664,
+        765633.264417793,
+        763474.1448462022,
+        762287.1255367569
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 4.417,
+      "scalar_p99_us": 36.333,
+      "reverse_columns_points_per_second": 426340.7540523758,
+      "reverse_columns_repeats": [
+        415574.6283381637,
+        408821.3424861365,
+        398229.4051761884,
+        428623.16889998957,
+        427218.29093327693,
+        426340.7540523758,
+        427607.78328170447
+      ]
+    }
   },
   "before_lazy_open": {
     "machine": {
@@ -141,50 +219,6 @@
         322517.48583610053,
         319447.2713579062
       ]
-    }
-  },
-  "multishard": {
-    "before": {
-      "points": 100000,
-      "scalar_median_us": 18.4585,
-      "scalar_p99_us": 53.16600999999999,
-      "reverse_columns_points_per_second": 39706.65714406321,
-      "reverse_columns_repeats": [
-        40734.45166291532,
-        38877.61995333118,
-        37370.93771491131,
-        38826.11255236362,
-        40557.497948381075,
-        41118.219587185624,
-        39706.65714406321
-      ],
-      "open_seconds": 0.013366458006203175,
-      "open_rss_delta_bytes": 819200,
-      "catalogue_shards": 256,
-      "places": 16384,
-      "pack_bytes": 36678465,
-      "seed": 20261003
-    },
-    "after": {
-      "points": 100000,
-      "scalar_median_us": 13.209,
-      "scalar_p99_us": 107.75040999999979,
-      "reverse_columns_points_per_second": 140438.74592035104,
-      "reverse_columns_repeats": [
-        136172.28342340904,
-        139055.5463852437,
-        141935.54179639663,
-        141500.8571366643,
-        139262.47188178747,
-        140438.74592035104,
-        141104.5985455971
-      ],
-      "open_seconds": 0.04758241699892096,
-      "open_rss_delta_bytes": 524288,
-      "catalogue_shards": 256,
-      "places": 16384,
-      "pack_bytes": 36678465,
-      "seed": 20261003
     }
   }
 }
