@@ -93,8 +93,8 @@ recover also preflight permissions and print exact commands if any are missing.
 Do not use recursive chmod on the workspace.
 
 If interrupted, retain the report and directory list. Re-enable exactly those
-directories, run `python -m pipeline migrate recover --root "$PIPELINE_DATA"`,
-then repeat the combined apply/check/plan sequence and restore protection.
+directories and re-run the same `python -m pipeline migrate --root "$PIPELINE_DATA"`
+apply; it recovers first. Then repeat check/plan and restore protection.
 Do not delete the saved `work/ledger.pre-migration.sqlite3` or recovery journals.
 A simulation checks mapping and recorded hashes only; application must be followed
 by the ordinary on-disk plan with zero stale/new units. If native versions differ,
@@ -228,8 +228,10 @@ plan_status=0
 For the first release, omit `release.previous_version` and leave it empty in the
 configuration. Confirm country/block selection is empty for a full world release.
 The dataset stage will stop if its cap is too small; choose the cap from measured
-input/output size and available disk. Its default 3 GB is the redesign-task ceiling,
-not a guarantee that a future world release fits. Resource pressure pauses the run;
+input/output size and available disk. The laptop profile caps dataset output at
+3 GB; the VM profile derives its cap from `resources.max_workspace`. Actual free
+space and the workspace allowance remain enforced throughout the write.
+Resource pressure pauses the run;
 a failed spatial/evaluation gate requires investigation and a reviewed policy-bound
 approval, not an unconditional retry or a fabricated review file.
 

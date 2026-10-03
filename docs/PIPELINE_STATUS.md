@@ -6,6 +6,9 @@ Packages 1–5 and all eleven package-2/3 review fixes are implemented locally o
 `feat/pipeline`. The real workspace remains unmigrated. Use
 [DATA_PIPELINE.md](DATA_PIPELINE.md) for commands and configuration; the current
 schema is [DATASET_README.md](DATASET_README.md).
+Final-review fixes 1–3: corrected automatic recovery instructions, expanded
+per-file licence notices, and profile-specific dataset budgets. Fixes 4–8 follow;
+the rendered subset will be refreshed with the README/layout changes.
 
 Package 1 supplies configuration, the single ledger/fingerprint rule, resource
 admission, runner and recoverable migration. Package 2 supplies the 13 retained
@@ -43,8 +46,8 @@ are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
-config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 49.04 s**
-(the independent review measured 175 s before fixes). Current suite: **667
+config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 43.14 s**
+(the independent review measured 175 s before fixes). Current suite: **669
 passed, 8 skipped**; Ruff check/format and strict mypy pass. The six Malaysia
 artifacts, including base cells, city index and mapping, match retained SHA256:
 **20.32 s**, **435,535,872 bytes RSS**, **141,524,404 output bytes**.
@@ -69,9 +72,9 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 | dataset / packs / publish (disabled) | 0 | 0 | 0 | 0 | 0 |
 | **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
-Final package-5 plan: **331.26 s**, **1,443,315,712 bytes RSS**; package-4 handover:
-**331.70 s**, **1,473,708,032 bytes RSS**. Stage code is unchanged for package 5.
-Reports: `.cache/pipeline/wp5-plan.json` and `wp4-handover.json`.
+Latest final-review plan: **325.43 s**, **1,810,808,832 bytes RSS**.
+Latest handover: package 4, **331.70 s / 1,473,708,032 bytes RSS**; repeated at fix 8.
+Gate reports: [PIPELINE_FINAL_REVIEW_MEASUREMENTS.json](PIPELINE_FINAL_REVIEW_MEASUREMENTS.json).
 Real ledger SHA256 before/after:
 `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
 
@@ -129,8 +132,8 @@ restore_pipeline_permissions
 trap - EXIT
 ```
 
-If interrupted, use `pipeline migrate recover --root "$PIPELINE_DATA"` before
-retrying; keep the same directory list for restoring protection. Migration saves
+If interrupted, re-run the same `pipeline migrate --root "$PIPELINE_DATA"` apply;
+it recovers first; keep the same directory list for restoring protection. Migration saves
 `work/ledger.pre-migration.sqlite3` and journals JSON originals. The reviewer,
 not this task, removes the external `PyOfflineGeocoder` symlink after verification.
 
@@ -147,7 +150,9 @@ and 1 each of auxiliary metadata, pilot gate, pilot summary and retained base
 manifest. The base manifest repoints **42,160** table paths to `base_cells/`;
 metadata hashes and sizes are then cascaded. No Parquet content changes.
 
-Choose release contact, citation, publication locations and plate-country inputs.
+Owner licence decision: LGPL-2.1 iso-codes (pycountry) rows inside `subdivisions`
+of an ODbL database — keep, or re-source subdivisions from geoBoundaries/GeoNames
+only. Choose release contact, citation, publication locations and plate-country inputs.
 Approve changed pins and policy-bound reviews before a future rebuild. Pin
 proposals require explicit `--accept` to change the lock; real upstream proposal
 availability has not been tested in this task.
@@ -176,7 +181,7 @@ Retain this short status and linked detailed evidence. Update the frozen client'
 `src/thereabouts/manifest.py` missing-data command on the Rust branch; its current
 `python -m build_data` message and client test were intentionally left unchanged here.
 
-Worktree bytes: **826,193,527**; free disk: **50,555,064,320**. The initial scratch cleanup removed
+Worktree bytes: **839,022,265**; free disk: **49,292,718,080**. The initial scratch cleanup removed
 **1,049,266,242 bytes**. This task keeps new outputs below 3 GB and free disk above
 5 GB; all subsequent tests set workspace TMPDIR and pytest has a worktree basetemp.
 One early targeted pytest invocation omitted TMPDIR and wrote small synthetic

@@ -17,8 +17,8 @@ example_longitude: 101.6869
 schema: config/dataset.yaml
 readme_template: config/templates/dataset-readme.md
 dataset:
-  # Task output ceiling; lower it to the measured remaining local allowance.
-  max_output_bytes: 3000000000
+  # Workspace admission still checks available space before every write.
+  max_output_bytes: ${resources.max_workspace}
   # MY/SG proof: 8.74 MB output, 360 MB RSS with these batch sizes.
   # Up to 49 r3 blocks share an r1 group.
   batch_rows: 1024

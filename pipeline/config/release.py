@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass, field
 
 from h3.api import basic_int as h3
+from omegaconf import II
 
 from pipeline.runtime.paths import validate_relative
 
@@ -14,7 +15,7 @@ MULTIPART_MIN_BYTES = 5 * 1024 * 1024
 
 @dataclass
 class DatasetLimits:
-    max_output_bytes: int = 3_000_000_000
+    max_output_bytes: int = II("resources.max_workspace")
     batch_rows: int = 1024
     row_group_rows: int = 16384
     compression: str = "zstd"

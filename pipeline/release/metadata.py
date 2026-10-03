@@ -10,6 +10,7 @@ from pipeline.pins.lock import read_lock
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest
 
+from . import licensing
 from .source import Row
 
 
@@ -59,17 +60,15 @@ def licence_text(sources: Row) -> str:
         "and notices still apply. See "
         "https://opendatacommons.org/licenses/odbl/1-0/.",
         "",
-        "| Source | Licence | Attribution |",
-        "| --- | --- | --- |",
+        licensing.table(sources, include_files=True),
     ]
-    for name, source in sources.items():
-        lines.append(
-            f"| {name} | [{source['id']}]({source['url']}) | {source['attribution']} |"
-        )
     lines += [
         "",
-        "Exact pins and provenance are recorded in manifest.json. "
-        "This list records sources contributing to the exported data.",
+        "Exact licence URLs, pins and provenance are shipped in "
+        "`manifest.json.sources`: each source's `pin.files` records the filenames "
+        "above and their per-file metadata. Source-level notices apply where "
+        "file metadata does not override them. This list records inputs "
+        "contributing to the exported data.",
     ]
     return "\n".join(lines) + "\n"
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pipeline.config import Config
 
+from .licensing import table
 from .source import Row
 
 
@@ -57,11 +58,6 @@ def render(
     ]:
         tree.append(f"├── {name}  # {meaning}")
     tree[-1] = tree[-1].replace("├", "└", 1)
-    licence_lines = ["| Source | Licence | Attribution |", "| --- | --- | --- |"]
-    for name, source in sources.items():
-        licence_lines.append(
-            f"| {name} | [{source['id']}]({source['url']}) | {source['attribution']} |"
-        )
     coverage = (
         "This is the complete configured world export."
         if not settings.countries and not settings.blocks
@@ -78,7 +74,7 @@ def render(
         "coverage": coverage,
         "tree": "\n".join(tree),
         "tables": "\n".join(sections),
-        "licences": "\n".join(licence_lines),
+        "licences": table(sources, include_files=False),
         "group_resolution": str(settings.dataset.cell_group_resolution),
         "blocks_per_group": str(
             7 ** (config.h3.block_resolution - settings.dataset.cell_group_resolution)

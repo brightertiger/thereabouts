@@ -9,3 +9,6 @@ resources:
 
 storage:
   gcs_raw: gs://pyofflinegeocoder-summer-sector-488705-m8/raw
+release:
+  dataset:
+    max_output_bytes: ${resources.max_workspace}
