@@ -2678,6 +2678,18 @@ dev = [
     { name = "types-setuptools" },
     { name = "types-shapely" },
 ]
+pipeline = [
+    { name = "duckdb" },
+    { name = "fsspec" },
+    { name = "gcsfs" },
+    { name = "omegaconf" },
+    { name = "psutil" },
+    { name = "pyarrow" },
+    { name = "pyshp" },
+    { name = "regex" },
+    { name = "scipy" },
+    { name = "shapely" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -2719,6 +2731,18 @@ dev = [
     { name = "types-regex", specifier = ">=2026.9.10.20260911" },
     { name = "types-setuptools" },
     { name = "types-shapely", specifier = ">=2.1" },
+]
+pipeline = [
+    { name = "duckdb", specifier = ">=1.2,<2" },
+    { name = "fsspec", specifier = ">=2026.9,<2027" },
+    { name = "gcsfs", specifier = ">=2026.10.0" },
+    { name = "omegaconf", specifier = "==2.3.0" },
+    { name = "psutil", specifier = ">=7,<8" },
+    { name = "pyarrow", specifier = ">=19,<24" },
+    { name = "pyshp", specifier = ">=2.3,<3" },
+    { name = "regex", specifier = ">=2024.11,<2027" },
+    { name = "scipy", specifier = ">=1.14,<1.17" },
+    { name = "shapely", specifier = ">=2.1,<3" },
 ]
 
 [[package]]

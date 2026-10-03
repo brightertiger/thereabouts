@@ -274,5 +274,74 @@
     "ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
     "workspace_bytes": 982621443,
     "disk_free_bytes": 49834655744
+  },
+  "7": {
+    "plan": {
+      "seconds": 333.06,
+      "rss_bytes": 1410711552,
+      "report": ".cache/pipeline/final-review-7-plan.json",
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      }
+    },
+    "pytest": {
+      "seconds": 54.61,
+      "rss_bytes": 276234240,
+      "passed": 684,
+      "skipped": 8,
+      "pytest_seconds": 53.69
+    },
+    "ruff": "check and format passed",
+    "mypy": "strict passed",
+    "ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+    "workspace_bytes": 995195541,
+    "disk_free_bytes": 50093326336
   }
 }

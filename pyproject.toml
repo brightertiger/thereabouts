@@ -17,18 +17,21 @@ mcp = ["mcp==2.2.0"]
 thereabouts = "thereabouts.cli:main"
 
 [dependency-groups]
-dev = [
+pipeline = [
     "omegaconf==2.3.0",
     "fsspec>=2026.9,<2027",
-    "types-PyYAML",
     "psutil>=7,<8",
+    { include-group = "acquire" },
+    "scipy>=1.14,<1.17",
+]
+dev = [
+    { include-group = "pipeline" },
+    "types-PyYAML",
     "types-psutil>=7,<8",
     "mcp==2.2.0",
     "Cython==3.3.0",
     "setuptools>=77,<81",
     "types-setuptools",
-    { include-group = "acquire" },
-    "scipy>=1.14,<1.17",
     "pytest>=8,<10",
     "ruff>=0.11,<1",
     "mypy>=1.15,<2",

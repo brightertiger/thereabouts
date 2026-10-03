@@ -27,6 +27,12 @@ UV_CACHE_DIR="$PWD/data/pipeline-work/cache" uv sync --all-extras --locked
 .venv/bin/python -m pipeline status --root /path/to/existing/data
 ```
 
+Pipeline runtime libraries are declared in the `pipeline` dependency group;
+`dev` includes that group plus test, lint and typing tools. A runtime-only checkout
+can use `uv sync --group pipeline --no-default-groups --locked`. The development
+command above remains appropriate for running the full gate. Keep the locked
+native library versions unchanged when combining this branch with the client.
+
 `plan` reads the ledger and verifies output hashes. It reports current, stale and
 new units, with `--details` explaining noncurrent units. Intentionally absent
 reconciliation outputs and offloaded raw files have a separate `absent` count.
