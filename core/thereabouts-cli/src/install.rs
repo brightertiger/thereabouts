@@ -56,7 +56,7 @@ pub fn install(
     let index = index(source)?;
     let (version, dataset) = index.select(requested, version)?;
     let _lock = store::lock(root)?;
-    let mut pin = selection(root, version, requested)?;
+    let mut pin = selection(root, version, requested, source)?;
     let bytes = requested.iter().try_fold(0u64, |sum, name| {
         sum.checked_add(
             dataset
@@ -79,7 +79,15 @@ pub fn install(
     store::activate(root, &pin)?;
     Ok(pin)
 }
-fn selection(root: &Path, version: &str, requested: &[String]) -> Result<Active> {
+fn quote(value: &str) -> String {
+    format!("'{}'", value.replace('\'', "'\"'\"'"))
+}
+fn selection(
+    root: &Path,
+    version: &str,
+    requested: &[String],
+    source: &dyn Source,
+) -> Result<Active> {
     if let Some(pin) = store::active(root)? {
         if pin.data_version == version {
             return Ok(pin);
@@ -93,8 +101,14 @@ fn selection(root: &Path, version: &str, requested: &[String]) -> Result<Active>
                 .copied()
                 .collect::<Vec<_>>()
                 .join(" ");
+            let origin = source
+                .origin()
+                .map_or_else(String::new, |s| format!(" --from {}", quote(&s)));
+            let directory = quote(&root.to_string_lossy());
+            let current = &pin.data_version;
+            let requested = requested.join(" ");
             return Err(Error::Usage(format!(
-                "Changing dataset version requires every active family. Run:\nthereabouts data install {all} --version {version}"
+                "Changing dataset version requires every active family. Run:\nthereabouts data install {all} --version {version}{origin} --data-dir {directory}\nTo keep the active version:\nthereabouts data install {requested} --version {current}{origin} --data-dir {directory}"
             )));
         }
         return Ok(Active {

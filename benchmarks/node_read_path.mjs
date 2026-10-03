@@ -10,6 +10,12 @@ import { USAGE, argumentsFor } from "../clients/node/test/helpers.js";
 import { Geocoder } from "../clients/node/runtime/index.js";
 import { FIXTURES, ROOT, json, selection, lookup, fixtureStore } from "../clients/node/test/helpers.js";
 import { sha256 } from "../clients/node/runtime/store.js";
+// All subprocess caches, logs and temporary spools stay in this checkout.
+const scratch = path.join(ROOT, ".tmp");
+fs.mkdirSync(scratch, { recursive: true });
+process.env.TMPDIR = scratch;
+process.env.npm_config_cache = path.join(ROOT, ".cache/npm");
+process.env.npm_config_logs_dir = path.join(ROOT, ".cache/npm/_logs");
 const ITERATIONS = 10000, LAUNCHES = 30;
 function percentile(values, fraction) { return [...values].sort((a, b) => a - b)[Math.min(values.length - 1, Math.ceil(values.length * fraction) - 1)]; }
 const bundles = { reverse: "core-sample", postal: "postal", airport: "airports", locode: "locode", phone: "phone", ip: "ip", plate: "plates", geocode: "geocode" };

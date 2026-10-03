@@ -26,6 +26,8 @@ async function examples(): Promise<void> {
   const error: Error = new DataNotInstalledError();
   void error;
   void answers;
-  geo.close();
+  await geo[Symbol.asyncDispose]();
+  await using scoped = await Geocoder.open({ dataDir: "/packs" });
+  await scoped.reverse({ lat: 1, lon: 2 });
 }
 void examples;

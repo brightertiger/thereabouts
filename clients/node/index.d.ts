@@ -1,3 +1,4 @@
+/// <reference lib="esnext.disposable" />
 export type Status =
   | "matched"
   | "ambiguous"
@@ -132,6 +133,7 @@ export class Geocoder {
     options?: Options,
   ): AsyncIterable<Result>;
   close(): Promise<void>;
+  [Symbol.asyncDispose](): Promise<void>;
 }
 export function reverse(point: Point & Options): Promise<Result>;
 export class ThereaboutsError extends Error {

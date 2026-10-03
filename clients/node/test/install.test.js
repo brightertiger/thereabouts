@@ -119,7 +119,12 @@ test("checksum, ignored ranges and atomic version guard preserve existing pins",
     datasets: { 2099.1: { packs: { core: fixture.pack } } },
   };
   fs.writeFileSync(path.join(origin, "index.json"), JSON.stringify(changed));
-  await assert.rejects(install(store, origin, ["core"]), /every active family/);
+  await assert.rejects(install(store, origin, ["core"]), (error) => {
+    assert.match(error.message, /every active family/);
+    assert.ok(error.message.includes(`--from '${origin}'`));
+    assert.ok(error.message.includes(`--version ${fixture.version}`));
+    return error.exitCode === 2;
+  });
   assert.equal(
     fs.readFileSync(path.join(store, "active.json"), "utf8"),
     before,

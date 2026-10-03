@@ -31,6 +31,9 @@ fn changing_version_cannot_hide_an_active_family() {
         host.err
             .contains("thereabouts data install core phone --version 2027.01")
     );
+    assert!(host.err.contains(" --from "));
+    assert!(host.err.contains("--version 2026.10"));
+    assert!(host.err.contains(source.to_str().unwrap()));
     assert_eq!(fs::read(root.join("active.json")).unwrap(), before);
     assert!(!root.join(".downloads").exists());
 }

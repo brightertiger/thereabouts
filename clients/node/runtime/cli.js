@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { lineReader } from "./input.js";
 import { writeAll } from "./output.js";
 import { spawn } from "node:child_process";
 import { parse, help } from "./grammar.js";
@@ -135,27 +136,36 @@ async function execute(parsed, io) {
   try {
     if (command === "reverse" && values.length) {
       const filename = values[0];
-      if (filename !== "-")
-        try {
-          const stat = fs.statSync(filename);
-          if (!stat.isFile()) throw new Error("not a regular file");
-        } catch (e) {
-          throw usage(`Cannot open input file ${filename}: ${e.message}`);
+      let fd;
+      try {
+        if (filename !== "-") {
+          try {
+            fd = fs.openSync(filename, "r");
+            if (fs.fstatSync(fd).isDirectory())
+              throw new Error("input is a directory");
+          } catch (e) {
+            throw usage(`Cannot open input file ${filename}: ${e.message}`);
+          }
         }
-      return withIo(io, () =>
-        geo.handle("core").batch(
-          JSON.stringify({
-            filename,
-            lat_col: o["lat-col"] ?? null,
-            lon_col: o["lon-col"] ?? null,
-            evidence: !!o.evidence,
-            strict: !!o.strict,
-            fields: o.fields ?? null,
-            format,
-          }),
-          filename === "-" ? undefined : filename,
-        ),
-      );
+        const batchIo =
+          fd === undefined ? io : { ...io, readLine: lineReader(fd) };
+        return withIo(batchIo, () =>
+          geo.handle("core").batch(
+            JSON.stringify({
+              filename,
+              lat_col: o["lat-col"] ?? null,
+              lon_col: o["lon-col"] ?? null,
+              evidence: !!o.evidence,
+              strict: !!o.strict,
+              fields: o.fields ?? null,
+              format,
+            }),
+            undefined,
+          ),
+        );
+      } finally {
+        if (fd !== undefined) fs.closeSync(fd);
+      }
     }
     const result =
       command === "reverse"

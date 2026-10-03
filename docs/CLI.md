@@ -482,3 +482,13 @@ implementations differ. Compare these latitude/longitude values with absolute
 tolerance 1e-10 degrees, not byte-identical JSON or CSV text. Stored coordinate
 values, IDs, statuses, ordering and other fields retain exact conformance.
 No extra output rounding is applied.
+
+User-selected batch files may be regular files, named pipes or process
+substitution paths; they are sequential streams, not pack artifacts. Pack
+artifacts still require immutable regular files and positioned reads.
+Version-switch refusal prints commands retaining --from and --data-dir, both
+for switching all active families and for adding a family at the active version.
+Resume requests always send Accept-Encoding: identity. Node fetch adds this
+header for Range requests itself; the host sets it for other requests to avoid
+a duplicated wire value. Loopback tests assert the actual resumed header. Repository npm config
+and the Node benchmark keep cache/log files under .cache and scratch under .tmp.

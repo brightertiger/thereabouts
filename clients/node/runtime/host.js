@@ -1,5 +1,6 @@
 // Host IO only. Pack parsing, indexing and rendering live in WASM.
 import fs from "node:fs";
+import { lineReader } from "./input.js";
 import { writeAll } from "./output.js";
 import os from "node:os";
 import path from "node:path";
@@ -9,7 +10,7 @@ let output = {
   stdout: (s) => writeAll(1, s),
   stderr: (s) => writeAll(2, s),
 };
-let pending = Buffer.alloc(0);
+const stdinLine = lineReader(0);
 export function safePath(root, relative) {
   if (
     !relative ||
@@ -110,23 +111,9 @@ export function temporary() {
 }
 export function readLine() {
   if (output.readLine && output.readLine !== readLine) return output.readLine();
-  for (;;) {
-    const index = pending.indexOf(10);
-    if (index >= 0) {
-      const line = pending.subarray(0, index + 1);
-      pending = pending.subarray(index + 1);
-      return line.toString("utf8");
-    }
-    const bytes = Buffer.allocUnsafe(65536);
-    const n = fs.readSync(0, bytes, 0, bytes.length, null);
-    if (!n) {
-      const last = pending;
-      pending = Buffer.alloc(0);
-      return last.toString("utf8");
-    }
-    pending = Buffer.concat([pending, bytes.subarray(0, n)]);
-  }
+  return stdinLine();
 }
+
 export function stdout(value) {
   output.stdout(value);
 }

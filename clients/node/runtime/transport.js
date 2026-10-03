@@ -68,6 +68,8 @@ async function request(url, headers = {}) {
       try {
         response = await fetch(url, {
           headers: {
+            // Fetch appends identity for Range itself. Setting it twice sends
+            // "identity, identity"; the loopback resume test asserts one value.
             ...(headers.Range ? {} : { "Accept-Encoding": "identity" }),
             ...headers,
           },

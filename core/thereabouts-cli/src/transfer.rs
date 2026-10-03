@@ -9,6 +9,11 @@ use thereabouts_core::format::manifest;
 
 /// Transfer sources return bytes beginning at exactly the requested offset.
 pub trait Source {
+    /// Explicit source spelling retained in copyable version-switch commands.
+    fn origin(&self) -> Option<String> {
+        None
+    }
+
     /// Read a bounded release index.
     fn index(&self) -> Result<Vec<u8>>;
     /// Resume one immutable archive; implementations must validate Content-Range.
@@ -28,6 +33,9 @@ impl Directory {
     }
 }
 impl Source for Directory {
+    fn origin(&self) -> Option<String> {
+        Some(self.root.to_string_lossy().into_owned())
+    }
     fn index(&self) -> Result<Vec<u8>> {
         let path = manifest::artifact_path(&self.root, "index.json")?;
         if path.metadata()?.len() > 16 * 1024 * 1024 {

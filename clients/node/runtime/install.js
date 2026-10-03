@@ -112,8 +112,11 @@ export async function install(root, origin, requested, version) {
         const all = FAMILIES.filter(
           (f) => pin.packs[f] || requested.includes(f),
         );
+        const quote = (value) =>
+          `'${String(value).replaceAll("'", "'\"'\"'")}'`;
+        const location = ` --from ${quote(origin)} --data-dir ${quote(root)}`;
         throw usage(
-          `Changing dataset version requires every active family. Run:\nthereabouts data install ${all.join(" ")} --version ${selected}`,
+          `Changing dataset version requires every active family. Run:\nthereabouts data install ${all.join(" ")} --version ${selected}${location}\nTo keep the active version:\nthereabouts data install ${requested.join(" ")} --version ${pin.data_version}${location}`,
         );
       }
       pin = null;

@@ -96,6 +96,9 @@ fn validate_url(value: &str) -> Result<()> {
     Ok(())
 }
 impl Source for Http {
+    fn origin(&self) -> Option<String> {
+        Some(self.base.clone())
+    }
     fn index(&self) -> Result<Vec<u8>> {
         let response = self.get(&format!("{}/index.json", self.base), None)?;
         if response.status() != 200 {
