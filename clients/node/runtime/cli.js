@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { writeAll } from "./output.js";
 import { spawn } from "node:child_process";
 import { parse, help } from "./grammar.js";
 import { directory, installed } from "./store.js";
@@ -18,8 +19,8 @@ const verbs = {
 };
 export function systemIo() {
   return {
-    stdout: (s) => fs.writeSync(1, s),
-    stderr: (s) => fs.writeSync(2, s),
+    stdout: (s) => writeAll(1, s),
+    stderr: (s) => writeAll(2, s),
     readLine,
     env: process.env,
     stdinTTY: !!process.stdin.isTTY,
@@ -176,12 +177,10 @@ async function execute(parsed, io) {
     );
   } catch (e) {
     if (
-      e.exitCode === 2 ||
-      e instanceof DataNotInstalledError ||
-      e.code === "EPIPE"
+      ["corrupt_pack", "incompatible_data", "pack_not_found"].includes(e.code)
     )
-      throw e;
-    throw atPack(e, packs[selected], selected);
+      throw atPack(e, packs[selected], selected);
+    throw e;
   } finally {
     await geo.close();
   }

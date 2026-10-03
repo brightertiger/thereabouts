@@ -1,12 +1,13 @@
 // Host IO only. Pack parsing, indexing and rendering live in WASM.
 import fs from "node:fs";
+import { writeAll } from "./output.js";
 import os from "node:os";
 import path from "node:path";
 const handles = new Map();
 let sequence = 0;
 let output = {
-  stdout: (s) => fs.writeSync(1, s),
-  stderr: (s) => fs.writeSync(2, s),
+  stdout: (s) => writeAll(1, s),
+  stderr: (s) => writeAll(2, s),
 };
 let pending = Buffer.alloc(0);
 export function safePath(root, relative) {

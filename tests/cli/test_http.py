@@ -91,7 +91,7 @@ def test_interrupted_transfer_resumes_exact_range(
     store = tmp_path / "store"
     state.interrupt = True
     first = console(store, "data", "install", "phone", "--from", url, "--yes")
-    assert first.returncode == 4
+    assert first.returncode == 2
     assert not (store / "active.json").exists()
     partial = next((store / ".downloads").glob("*.part"))
     assert partial.stat().st_size == 1024

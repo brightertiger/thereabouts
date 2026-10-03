@@ -172,9 +172,9 @@ Batch and management examples:
 | --- | --- |
 | 0 | Success, including an ordinary miss without --strict |
 | 1 | No match with --strict |
-| 2 | Usage or input-shape error |
+| 2 | Usage, input-shape or environment/stream IO error |
 | 3 | Required data is not installed |
-| 4 | Incompatible/corrupt data, transfer/integrity or store IO failure |
+| 4 | Incompatible/corrupt data or transfer/store integrity failure |
 | 5 | One or more batch rows failed; remaining rows were processed |
 
 Missing-data diagnostics are the exact command
@@ -184,7 +184,9 @@ interactive removal asks for confirmation; non-interactive removal requires
 --yes. --no-input never implies consent. A declined prompt exits 2. Remove
 deletes all versions of the named family under the install lock; a missing
 family is harmless. Missing data, corrupt data and usage errors are not hidden
-by --quiet. A broken stdout pipe exits 0 without a traceback.
+by --quiet. A broken stdout pipe exits 0 without a traceback. Other stream/OS IO failures
+exit 2 without suggesting pack repair. Both Node sinks write all UTF-8 bytes,
+retrying partial writes, EINTR and EAGAIN while a slow reader drains the pipe.
 
 An invalid scalar query emits its result and exits 2; invalid command arguments
 emit a diagnostic without result JSON. Unsupported granularity also exits 2.

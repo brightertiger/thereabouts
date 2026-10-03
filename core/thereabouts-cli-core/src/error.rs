@@ -44,7 +44,7 @@ impl Error {
     #[must_use]
     pub const fn exit_code(&self) -> i32 {
         match self {
-            Self::Usage(_) => 2,
+            Self::Usage(_) | Self::Io(_) => 2,
             Self::Missing(_) => 3,
             _ => 4,
         }
