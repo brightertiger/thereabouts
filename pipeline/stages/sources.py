@@ -7,13 +7,21 @@ from typing import cast
 
 from pipeline.config.schema import StageSettings
 from pipeline.pins.models import SourcePin
+from pipeline.runtime.code import code_hashes
 from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
-from pipeline.runtime.jsonio import Object
+from pipeline.runtime.jsonio import Object, digest
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.sources.contract import Source, SourceContext
 from pipeline.sources.download import download
+from pipeline.sources.policy import policy_hashes
 
 from .contract import Context, Unit, make_unit
+
+
+def adapter_digest(module: str) -> str:
+    stem = REPOSITORY.joinpath(*module.split("."))
+    path = stem if stem.is_dir() else stem.with_suffix(".py")
+    return digest(code_hashes([path], REPOSITORY))
 
 
 class SourceStage:
@@ -30,11 +38,8 @@ class SourceStage:
                 "stage": asdict(self.settings),
                 **{name: tree[name] for name in self.settings.config},
             },
-            pins={
-                name: asdict(self.pins[name])
-                for name, source in ctx.config.sources.items()
-                if source.enabled
-            },
+            pins={},
+            repository=REPOSITORY,
             native=native_versions(self.settings.native, REPOSITORY / "uv.lock"),
         )
 
@@ -50,7 +55,15 @@ class SourceStage:
             recipe = Recipe(
                 self.name,
                 name,
-                cast(Object, {"source": asdict(settings), "release": pin.release}),
+                cast(
+                    Object,
+                    {
+                        "source": asdict(settings),
+                        "pin": asdict(pin),
+                        "adapter": adapter_digest(settings.adapter),
+                        "policies": policy_hashes(settings),
+                    },
+                ),
                 (Dependency("download", name),) if self.name == "normalize" else (),
             )
             unit = make_unit(ctx, recipe, current_identity)

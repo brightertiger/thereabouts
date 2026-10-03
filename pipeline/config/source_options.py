@@ -1,7 +1,6 @@
 """Typed normalization options declared by the source adapter modules."""
 
 from dataclasses import dataclass, field
-from typing import Any
 
 
 @dataclass
@@ -66,4 +65,3 @@ class Plates:
     pdf_version: str = ""
     example_limit: int = 0
     document_bytes: int = 0
-    policy: dict[str, Any] = field(default_factory=dict)

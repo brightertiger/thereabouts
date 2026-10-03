@@ -69,6 +69,7 @@ archs = ["auto"]
 archs = ["AMD64"]
 
 [tool.pytest.ini_options]
+addopts = "--basetemp=.cache/pytest"
 testpaths = ["tests"]
 markers = ["world: requires an explicitly built world pack"]
 

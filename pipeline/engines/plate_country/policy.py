@@ -46,4 +46,4 @@ def scripts(value: str, patterns: dict[str, str] | None = None) -> list[str]:
 
 
 def base_policy(name: str) -> Any:
-    return read(DIRECTORY.parent / "sources/plates.yaml")["options"]["policy"][name]
+    return read(DIRECTORY / "plates" / f"{name}.yaml")

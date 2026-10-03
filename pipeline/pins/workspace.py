@@ -65,6 +65,8 @@ def _file(source: str, spec: Row, record: Row, root: Path) -> PinFile:
 def from_manifest(root: Path, manifest: Row) -> SourcePin:
     source = str(manifest["source"])
     inventory = verified_json(root, manifest["inventory"])
+    if "pin_metadata" in inventory:
+        return reconstructed_pin(inventory, manifest, root)
     inputs = {workspace_name(r["path"], root): r for r in manifest["inputs"]}
     specs: dict[str, Row] = {}
     commits: dict[str, str] = {}
@@ -109,6 +111,8 @@ def from_manifest(root: Path, manifest: Row) -> SourcePin:
                 )
             metadata["mirror_base"] = custody["remote"]
             metadata["mirror_evidence"] = custody["verification"]
+    if "country_reference" in inventory:
+        metadata["country_reference"] = inventory["country_reference"]
     if commits:
         metadata["commits"] = commits
     if source == "geonames":
@@ -129,8 +133,27 @@ def from_manifest(root: Path, manifest: Row) -> SourcePin:
         str(manifest["source_release"]),
         str(retrieved),
         files=files,
-        inventory=portable(inventory, root),
         metadata=metadata,
+    )
+    result.validate()
+    return result
+
+
+def reconstructed_pin(inventory: Row, manifest: Row, root: Path) -> SourcePin:
+    inputs = {workspace_name(r["path"], root): r for r in manifest["inputs"]}
+    files = []
+    for record in inventory["files"].values():
+        name = workspace_name(record["path"], root)
+        if name not in inputs or any(
+            record[field] != inputs[name][field] for field in ("size", "sha256")
+        ):
+            raise ValueError(f"Inventory differs from manifest input: {name}")
+        files.append(PinFile(**{k: v for k, v in record.items() if k != "path"}))
+    result = SourcePin(
+        str(inventory["source_release"]),
+        str(inventory["pinned_at"]),
+        files=files,
+        metadata=inventory["pin_metadata"],
     )
     result.validate()
     return result

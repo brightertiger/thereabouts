@@ -117,7 +117,6 @@ def source_context(
         rss=lambda: 0,
     )
     files = []
-    inventory: dict[str, Any] = {"files": {}}
     for key, (payload, metadata) in payloads.items():
         url = f"memory://upstreams/{root.name}/{name}/{key}"
         fs, remote = backend(url)
@@ -131,13 +130,7 @@ def source_context(
             metadata={"key": key, "retrieved_at": "2026-10-03", **metadata},
         )
         files.append(pin)
-        inventory["files"][key] = {
-            "path": f"raw/{name}/{key}",
-            "sha256": pin.sha256,
-            "size": pin.size,
-            "url": url,
-        }
-    source_pin = SourcePin("synthetic", "2026-10-03", files=files, inventory=inventory)
+    source_pin = SourcePin("synthetic", "2026-10-03", files=files)
     stages = [SourceStage(setting, {name: source_pin}) for setting in config.stages[:2]]
     unit = stages[1].units(ctx)[0]
     return SourceContext(

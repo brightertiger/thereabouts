@@ -1,0 +1,328 @@
+{
+  "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.8",
+  "review_fixes": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "load_seconds_before": 2.646099834004417,
+  "pytest_seconds_before": 187.68,
+  "review_pytest_seconds_before": 175,
+  "load_seconds_after": [
+    0.179661208007019,
+    0.1717549579916522,
+    0.15592404099879786
+  ],
+  "plan": {
+    "wall_seconds": 367.32,
+    "peak_rss_bytes": 1413775360,
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    },
+    "simulation": "Mapping and output hashes only; does not prove world engine equivalence."
+  },
+  "handover": {
+    "wall_seconds": 365.78,
+    "peak_rss_bytes": 1390477312,
+    "changed_units": 85577,
+    "identities": [
+      {
+        "changed": 13,
+        "new_identity": "c6d2f7584278a2cced0646ae526a56b6c03f23ea4169294ff7bcf8a4f55a63e0",
+        "old_identity": [
+          "04d74a464b8d58125c30784d5798c97e71264847ead6460c2cc53bf967ba3f10"
+        ],
+        "stage": "download",
+        "units": 13
+      },
+      {
+        "changed": 13,
+        "new_identity": "bb3f469680f99483015ecd2a0290812b78d225e5a0e78af28bdc54f9bcfe0e2a",
+        "old_identity": [
+          "fa308e43751b05915b5e9d3f62671682f340d933f53e69248424c113cf86d9a5"
+        ],
+        "stage": "normalize",
+        "units": 13
+      },
+      {
+        "changed": 1111,
+        "new_identity": "a76641016500f812b8f550580edf27b6b2069cdc799a9ca02f4a0bddc880ca52",
+        "old_identity": [
+          "ab0237ebc3179f9a730153bb5482ae14f8698ab946442ea7094764a691673a29"
+        ],
+        "stage": "reconcile",
+        "units": 1111
+      },
+      {
+        "changed": 41442,
+        "new_identity": "3cbe0641a27369ef9449f38c615f4b2801603287e2f53bb46ec2d1ac097ee392",
+        "old_identity": [
+          "08c08287fb300dcacea41d2460719459d633ec348a7a93431044957fa2d9a3b0"
+        ],
+        "stage": "cells",
+        "units": 41442
+      },
+      {
+        "changed": 555,
+        "new_identity": "ffaa0502591ee1ee766f1f097c0337f899065edf86998d98a0d9251ba64fb487",
+        "old_identity": [
+          "8a8e2e3561a40ebe6494d55a4b97784b1f4d6fd7eb32d7a581c40c469e38eec0"
+        ],
+        "stage": "cities",
+        "units": 555
+      },
+      {
+        "changed": 1,
+        "new_identity": "cc55ebf6e4035ff085482ddc0ac11b2daee9206d6954565321793c82e042ce1b",
+        "old_identity": [
+          "4ca69c6c836ff304acb744dc07a16de2efa261cafd446a209929d8f1d0b6b052"
+        ],
+        "stage": "evaluate",
+        "units": 1
+      },
+      {
+        "changed": 41716,
+        "new_identity": "ecae4d1f6157ffef82153bb14202090b24b94f5269e27eaa56d2ec60d4843138",
+        "old_identity": [
+          "dea29912c47061e5a5eeeebc81e7e01ffe5a96f6bf987cafbc81d4de7fee248f"
+        ],
+        "stage": "normalize_cells",
+        "units": 41716
+      },
+      {
+        "changed": 0,
+        "new_identity": "8327f4eaebc80b3aaaca7b475f04adecbd559820d72c95aa72cc96835fcd2760",
+        "old_identity": [],
+        "stage": "plate_country",
+        "units": 0
+      },
+      {
+        "changed": 726,
+        "new_identity": "f6018d3b5c34d96b40fd50af84d04092bacc3d6363654c5c39e2fba4b6d652b4",
+        "old_identity": [
+          "25ce5cbc64db2231699901981e59b9ba0397298d0ebe7d435ea3dc9fa265e020"
+        ],
+        "stage": "lookups",
+        "units": 726
+      }
+    ],
+    "ledger_sha256": null,
+    "mode": "handover simulation",
+    "scope": "mapping and hashes only; no engine equivalence claim",
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    }
+  },
+  "migration": {
+    "adopted_units": 85577,
+    "dropped_rows": 42334,
+    "legacy_rows": 134312,
+    "json_files_changed": 588,
+    "json_files_created": 6,
+    "absent_paths_by_prefix": {
+      "raw/geoboundaries/": 63,
+      "raw/geonames/": 2,
+      "raw/osm_land/": 4,
+      "raw/overture/": 9,
+      "reconciled/": 834,
+      "work/geonames/": 3,
+      "work/overture/": 1,
+      "work/reconcile/": 1662
+    },
+    "bytes_hashed": 17677116404,
+    "metadata_repairs": {
+      "active dataset metadata": {
+        "files": 2,
+        "hashes_cascaded": 3,
+        "outside_spec": 2,
+        "paths_rewritten": 0,
+        "sizes_cascaded": 2,
+        "tables_repointed": 0
+      },
+      "city country metadata": {
+        "files": 554,
+        "hashes_cascaded": 0,
+        "outside_spec": 554,
+        "paths_rewritten": 831,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      },
+      "city manifest": {
+        "files": 1,
+        "hashes_cascaded": 1,
+        "outside_spec": 0,
+        "paths_rewritten": 31,
+        "sizes_cascaded": 1,
+        "tables_repointed": 0
+      },
+      "imported repository evidence": {
+        "files": 6,
+        "hashes_cascaded": 0,
+        "outside_spec": 6,
+        "paths_rewritten": 0,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      },
+      "normalized auxiliary metadata": {
+        "files": 1,
+        "hashes_cascaded": 0,
+        "outside_spec": 1,
+        "paths_rewritten": 1,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      },
+      "normalized source manifest": {
+        "files": 13,
+        "hashes_cascaded": 10,
+        "outside_spec": 0,
+        "paths_rewritten": 11884,
+        "sizes_cascaded": 10,
+        "tables_repointed": 0
+      },
+      "pilot gate receipt": {
+        "files": 2,
+        "hashes_cascaded": 3,
+        "outside_spec": 1,
+        "paths_rewritten": 3,
+        "sizes_cascaded": 3,
+        "tables_repointed": 0
+      },
+      "pilot summary": {
+        "files": 1,
+        "hashes_cascaded": 0,
+        "outside_spec": 1,
+        "paths_rewritten": 36,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      },
+      "raw source inventory": {
+        "files": 9,
+        "hashes_cascaded": 0,
+        "outside_spec": 8,
+        "paths_rewritten": 651,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      },
+      "retained base manifest": {
+        "files": 1,
+        "hashes_cascaded": 0,
+        "outside_spec": 1,
+        "paths_rewritten": 42160,
+        "sizes_cascaded": 0,
+        "tables_repointed": 42160
+      },
+      "source custody receipt": {
+        "files": 4,
+        "hashes_cascaded": 4,
+        "outside_spec": 4,
+        "paths_rewritten": 0,
+        "sizes_cascaded": 0,
+        "tables_repointed": 0
+      }
+    },
+    "original_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+    "remote_verified": false
+  },
+  "pytest_seconds_after": 46.62,
+  "pytest_result": {
+    "passed": 644,
+    "skipped": 8
+  },
+  "worktree_bytes": 1317830620,
+  "free_bytes": 49341775872
+}

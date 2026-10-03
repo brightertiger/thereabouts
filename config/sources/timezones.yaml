@@ -19,3 +19,4 @@ options:
   geometry_bytes: 4000000
   geometry_max_depth: 32
   semantics: res8-center; with-oceans; overlaps retained
+options_schema: pipeline.config.source_options.Timezones

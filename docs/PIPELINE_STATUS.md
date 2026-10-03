@@ -6,6 +6,63 @@ been read. Packages 4–5 await the next review. Commands and configuration are 
 [DATA_PIPELINE.md](DATA_PIPELINE.md); the current table schema remains
 [GOLDEN_DATASET.md](GOLDEN_DATASET.md).
 
+## Package 2–3 review checkpoint: fixes 1–4
+
+Stage identities now hash transitive pipeline imports, with runtime, contract
+and schema exclusions. Each source unit hashes only its own pin, settings,
+adapter closure and policy files. Tests prove that changing one source pin or
+adapter leaves another source and its readers current. Large plate policies
+moved to six YAML files; the resolved policy evidence is unchanged. The lock
+retains inventory fingerprints and required metadata without duplicate payload
+inventories; workspace pin verification and reconstructed-inventory round trips
+pass.
+
+On the same M2 / 8 GiB laptop, cold configuration load fell from **2.646 s** to
+**0.180 s** (subsequent independent loads: 0.172 and 0.156 s). The ordinary suite
+fell from the package-3 checkpoint's **187.68 s** to **46.62 s**, with **644 passed,
+8 skipped**. The review separately measured approximately 175 s before these
+changes. Import-closure parsing is cached by source bytes; native versions are
+cached for the lifetime of the process, while lock bytes are checked each time.
+Policy schema validation is cached by canonical policy bytes, not timestamps.
+
+Post-fix real-workspace plan: **85,577 current / 0 stale / 0 new**, **367.32 s**,
+**1,413,775,360 bytes peak RSS**. This is simulated adoption: zero stale checks
+mapping and recorded/output hashes only, not full-world engine equivalence.
+Handover: **85,577 identity/parameter/input-hash updates**, **365.78 s**,
+**1,390,477,312 bytes peak RSS**. All output records remain unchanged. Detailed
+measurements and old → new identities:
+[PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
+
+| Stage | Plan current | Stale | New | Handover units |
+| --- | ---: | ---: | ---: | ---: |
+| download | 13 | 0 | 0 | 13 |
+| normalize | 13 | 0 | 0 | 13 |
+| reconcile | 1,111 | 0 | 0 | 1,111 |
+| cells | 41,442 | 0 | 0 | 41,442 |
+| cities | 555 | 0 | 0 | 555 |
+| evaluate | 1 | 0 | 0 | 1 |
+| normalize_cells | 41,716 | 0 | 0 | 41,716 |
+| lookups | 726 | 0 | 0 | 726 |
+| **Total** | **85,577** | **0** | **0** | **85,577** |
+
+Migration scope remains 588 rewritten JSON files plus 6 imports, 42,334 retired
+rows and 2,578 explicitly absent paths under the previously approved prefixes.
+The protected ledger SHA256 remains `d71802b9…a37` (full value in measurements).
+The import-closure initializer regression fix was checked against every declared
+stage and source: their hashed file sets and digests are unchanged from these
+acceptance runs.
+
+Before work, **1,049,266,242 bytes** of redundant copied migration metadata and
+an older pilot reconstruction were removed inside this worktree. Measurement
+reports and the final pilot proof remain. Historical copied-ledger directories
+referenced below no longer remain; their recorded results are retained.
+
+Safety exception during this checkpoint: one targeted fingerprint-test invocation
+omitted `TMPDIR` and wrote small synthetic fixtures under the macOS temporary
+pytest directory (`pytest-233`), outside the worktree. No real-workspace data was
+touched. Pytest now defaults to `--basetemp=.cache/pytest` in this checkout as an
+additional safeguard. The external fixtures have not been modified or removed.
+
 ## Package 3: engines and independent handover
 
 The executable registry now covers reconcile, cells, cities, evaluate,

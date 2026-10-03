@@ -1,6 +1,7 @@
 """Structured source declarations, loaded independently from the version lock."""
 
 import importlib
+import importlib.util
 import math
 import re
 from dataclasses import asdict, dataclass, field, fields, is_dataclass
@@ -40,12 +41,14 @@ class SourceLimits:
 class SourceSettings:
     name: str = ""
     adapter: str = ""
+    options_schema: str = ""
     kind: str = ""
     enabled: bool = True
     upstream: dict[str, str] = field(default_factory=dict)
     licence: Licence = field(default_factory=Licence)
     limits: SourceLimits = field(default_factory=SourceLimits)
     options: dict[str, Any] = field(default_factory=dict)
+    policies: dict[str, str] = field(default_factory=dict)
 
 
 def load_sources(directory: Path) -> dict[str, SourceSettings]:
@@ -76,6 +79,11 @@ def validate_source(source: SourceSettings) -> None:
         (source.licence.id, source.licence.url, source.licence.attribution)
     ):
         raise ValueError(f"Source {source.name} needs kind and licence attribution")
+    for name, policy in source.policies.items():
+        if not name or Path(policy).is_absolute() or ".." in Path(policy).parts:
+            raise ValueError(
+                f"{source.name}.policies.{name} must be repository-relative"
+            )
     limits = source.limits
     for name in (
         "download_bytes",
@@ -112,15 +120,19 @@ def validate_source(source: SourceSettings) -> None:
 
 
 def resolve_options(source: SourceSettings) -> None:
+    module, _, name = source.options_schema.rpartition(".")
+    if not module.startswith("pipeline.") or not name:
+        raise ValueError(f"{source.name}.options_schema must name a pipeline dataclass")
     try:
-        adapter = importlib.import_module(source.adapter)
-    except ImportError as error:
+        if importlib.util.find_spec(source.adapter) is None:
+            raise ImportError(source.adapter)
+        schema = getattr(importlib.import_module(module), name)
+    except (ImportError, AttributeError) as error:
         raise ValueError(
-            f"Cannot load source adapter {source.adapter}: {error}"
+            f"Cannot load {source.name} adapter or options schema: {error}"
         ) from error
-    schema = getattr(adapter, "Options", None)
     if not isinstance(schema, type) or not is_dataclass(schema):
-        raise ValueError(f"{source.adapter}.Options must declare a dataclass")
+        raise ValueError(f"{source.options_schema} must declare a dataclass")
     try:
         tree = OmegaConf.merge(OmegaConf.structured(schema), source.options)
         resolved = OmegaConf.to_object(tree)

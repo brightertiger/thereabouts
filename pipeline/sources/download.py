@@ -1,11 +1,11 @@
 """Fetch frozen source bytes and verify their mirror before completing a unit."""
 
-import copy
 import time
 import urllib.error
 import urllib.request
 from collections.abc import Iterator
 from contextlib import contextmanager
+from dataclasses import asdict
 from http.client import HTTPException
 from pathlib import Path
 from typing import Any, BinaryIO, cast
@@ -81,20 +81,16 @@ def acquire(ctx: SourceContext, pin: PinFile, base: str) -> Path:
 
 
 def inventory(ctx: SourceContext) -> dict[str, Any]:
-    prefix = f"raw/{ctx.settings.name}/"
-
-    def translated(value: Any) -> Any:
-        if isinstance(value, dict):
-            return {key: translated(item) for key, item in value.items()}
-        if isinstance(value, list):
-            return [translated(item) for item in value]
-        if isinstance(value, str) and value.startswith(prefix):
-            return ctx.relative(ctx.input(value.removeprefix(prefix)))
-        return value
-
-    result: dict[str, Any] = translated(copy.deepcopy(ctx.pin.inventory))
-    result.update(source=ctx.settings.name, source_release=ctx.pin.release)
-    return result
+    return {
+        "source": ctx.settings.name,
+        "source_release": ctx.pin.release,
+        "pinned_at": ctx.pin.pinned_at,
+        "pin_metadata": ctx.pin.metadata,
+        "files": {
+            pin.name: {**asdict(pin), "path": ctx.relative(ctx.input(pin.name))}
+            for pin in ctx.pin.files
+        },
+    }
 
 
 def download(ctx: SourceContext) -> list[Path]:

@@ -1,6 +1,9 @@
 """Load typed policies while preserving their exact JSON semantic fingerprints."""
 
+import json
 import re
+from collections.abc import Hashable
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, cast
 
@@ -8,7 +11,7 @@ import yaml
 from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException
 
-from pipeline.runtime.jsonio import digest
+from pipeline.runtime.jsonio import encode
 
 from .city_policy import Cities
 from .reconcile_policy import Reconcile
@@ -24,14 +27,17 @@ def read(path: Path) -> Row:
     return cast(Row, value)
 
 
+@lru_cache(maxsize=128)
+def validate_payload(payload: bytes, schema: type[Cities] | type[Reconcile]) -> None:
+    OmegaConf.merge(OmegaConf.structured(schema), json.loads(payload))
+
+
 def validate(value: Row, schema: type[Cities] | type[Reconcile], path: Path) -> Row:
     try:
-        OmegaConf.merge(OmegaConf.structured(schema), value)
+        validate_payload(encode(value), cast(Hashable, schema))
     except OmegaConfBaseException as error:
         raise ValueError(f"Invalid policy {path}: {error}") from error
-    # Do not inject optional defaults or coerce 1 to 1.0: retained policy hashes
-    # bind the exact JSON value, including absent optional fields and numeric types.
-    digest(value)
+    # Keep the exact JSON values; never inject defaults or coerce numeric types.
     return value
 
 

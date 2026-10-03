@@ -11,3 +11,4 @@ licence:
 limits:
   download_bytes: 12734002
 options: {}
+options_schema: pipeline.config.source_options.Text

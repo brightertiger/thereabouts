@@ -15,3 +15,4 @@ limits:
   download_bytes: 6902089
 options:
   expected_rows: 11422
+options_schema: pipeline.config.source_options.UrbanCentres

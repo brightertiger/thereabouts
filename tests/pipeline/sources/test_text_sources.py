@@ -6,9 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.runner import run
+from pipeline.sources import policy as source_policy
 
 from .fixtures import archive, rows, source_context
 
@@ -147,7 +149,9 @@ def test_points_use_resolution_eight_and_preserve_country(
         assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}
 
 
-def test_plates_match_frozen_wikipedia_evidence(tmp_path: Path) -> None:
+def test_plates_match_frozen_wikipedia_evidence(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     wiki = json.dumps(
         {
             "parse": {
@@ -181,7 +185,7 @@ def test_plates_match_frozen_wikipedia_evidence(tmp_path: Path) -> None:
                 ),
             },
         )
-        source.settings.options["policy"] = {
+        policy = {
             "formats": {},
             "wikidata": {},
             "coverage": {},
@@ -207,6 +211,12 @@ def test_plates_match_frozen_wikipedia_evidence(tmp_path: Path) -> None:
                 ]
             },
         }
+        monkeypatch.setattr(source_policy, "REPOSITORY", tmp_path)
+        source.settings.policies = {}
+        for name, value in policy.items():
+            path = tmp_path / f"{name}.yaml"
+            path.write_text(yaml.safe_dump(value))
+            source.settings.policies[name] = path.name
         run(source.runtime, stages)
         [row] = rows(source, "plate_codes")
         assert row["code"] == "AA" and row["name_en"] == "North"

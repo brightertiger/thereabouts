@@ -3,23 +3,37 @@
 import importlib.metadata
 import tomllib
 from collections.abc import Mapping, Sequence
+from functools import lru_cache
 from pathlib import Path
 
 from shapely import geos_version_string
 
-from .jsonio import digest, sha256_file
+from .code import code_hashes
+from .jsonio import digest
 
 REPOSITORY = Path(__file__).parents[2]
 
 
+@lru_cache(maxsize=8)
+def locked_versions(payload: bytes) -> dict[str, str]:
+    packages = tomllib.loads(payload.decode())["package"]
+    return {p["name"]: p["version"] for p in packages}
+
+
+@lru_cache(maxsize=32)
+def installed_version(name: str) -> str:
+    # A running process keeps its loaded native libraries; changing uv.lock is
+    # still checked on every identity calculation against these versions.
+    return importlib.metadata.version(name)
+
+
 def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
-    packages = tomllib.loads(lock.read_text())["package"]
-    pinned = {p["name"]: p["version"] for p in packages}
+    pinned = locked_versions(lock.read_bytes())
     result = {}
     for name in names:
         if name not in pinned:
             raise ValueError(f"No uv.lock pin for native dependency {name}")
-        installed = importlib.metadata.version(name)
+        installed = installed_version(name)
         if installed != pinned[name]:
             raise ValueError(f"{name} {installed} differs from uv.lock {pinned[name]}")
         result[name] = installed
@@ -37,26 +51,9 @@ def identity(
     cell_format: int | None = None,
     repository: Path = REPOSITORY,
 ) -> str:
-    files = {}
-    for package in packages:
-        if (
-            ".." in package.parts
-            or not package.is_relative_to(repository / "pipeline")
-            or not package.resolve().is_relative_to((repository / "pipeline").resolve())
-        ):
-            raise ValueError("Stage code must live under pipeline/")
-        candidates = [package] if package.is_file() else sorted(package.rglob("*.py"))
-        if not candidates:
-            raise ValueError(f"Empty stage code package: {package}")
-        for path in candidates:
-            if path.suffix != ".py":
-                raise ValueError(f"Stage code file must be Python: {path}")
-            if not path.resolve().is_relative_to((repository / "pipeline").resolve()):
-                raise ValueError(f"Stage code symlink escapes pipeline/: {path}")
-            files[path.relative_to(repository).as_posix()] = sha256_file(path)
     return digest(
         {
-            "code": files,
+            "code": code_hashes(packages, repository),
             "config": config,
             "pins": pins,
             "native": native,

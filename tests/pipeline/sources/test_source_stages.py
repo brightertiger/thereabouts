@@ -1,9 +1,11 @@
 """Executable source discovery, resumability and relative paths after a move."""
 
+import json
 import shutil
 from dataclasses import replace
 from pathlib import Path
 
+from pipeline.pins.workspace import from_manifest
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.planning import plan
 from pipeline.runtime.runner import run
@@ -35,6 +37,8 @@ def test_completed_sources_plan_current_after_moving_workspace(tmp_path: Path) -
             ("normalize", "airports"),
         }
         assert run(source.runtime, stages) == {"completed": 2, "skipped": 0}
+        manifest = json.loads((source.normalized / "manifest.json").read_bytes())
+        assert from_manifest(root, manifest) == source.pin
     moved = tmp_path / "moved"
     shutil.move(root, moved)
     with Ledger(moved, moved / "work/ledger.sqlite3") as ledger:

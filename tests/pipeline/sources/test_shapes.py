@@ -57,7 +57,7 @@ def test_boundaries_keep_ids_licences_and_country_mapping(tmp_path: Path) -> Non
                 ),
             },
         )
-        source.pin.inventory["country_reference"] = {"GBR": {"alpha2": "GB"}}
+        source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
         run(source.runtime, stages)
         [row] = rows(source, "areas")
         assert (row["source_id"], row["country_code"], row["subdivision_code"]) == (

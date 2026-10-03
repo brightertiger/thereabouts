@@ -7,6 +7,7 @@ from typing import Any
 
 from pipeline.runtime.jsonio import digest, write_json
 from pipeline.sources.contract import SourceContext
+from pipeline.sources.policy import read_policies
 from pipeline.sources.shared.lookup_rows import decorate
 from pipeline.sources.shared.manifest import finish
 from pipeline.sources.shared.plates_schemas import PlateKind
@@ -20,7 +21,7 @@ Row = dict[str, Any]
 
 def normalize(ctx: SourceContext) -> list[Path]:
     """Only cached bytes are read; missing pins or unmatched rules fail closed."""
-    policies = ctx.settings.options["policy"]
+    policies = read_policies(ctx.settings)
     if any(pin.metadata.get("kind") == "pdf" for pin in ctx.pin.files):
         version = subprocess.run(
             ["pdftotext", "-v"], check=True, capture_output=True, text=True

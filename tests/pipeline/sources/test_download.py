@@ -39,19 +39,8 @@ def fixture(root: Path, ledger: Ledger, payload: bytes) -> SourceContext:
         "fixture",
         "2026-10-03",
         files=[pin],
-        inventory={
-            "source": "airports",
-            "source_release": "fixture",
-            "files": {
-                "airports.csv": {
-                    "path": "raw/airports/airports.csv",
-                    "url": url,
-                    "sha256": sha,
-                    "size": len(payload),
-                }
-            },
-        },
     )
+
     settings = SourceSettings(
         name="airports",
         adapter="pipeline.sources.airports",

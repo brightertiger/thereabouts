@@ -7,6 +7,8 @@ from typing import cast
 
 from pipeline.config import policies
 from pipeline.config.schema import StageSettings
+from pipeline.engines.plate_country.policy import DATA
+from pipeline.engines.plate_country.policy import policy as plate_policy
 from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
 from pipeline.runtime.jsonio import Object
 from pipeline.runtime.paths import located
@@ -84,9 +86,6 @@ class GeographicStage:
                 policy = cast(Object, cities)
             parameters: Object = {"policy": policy}
             if self.name == "plate_country":
-                from pipeline.engines.plate_country.policy import DATA
-                from pipeline.engines.plate_country.policy import policy as plate_policy
-
                 parameters = {
                     "policy": {
                         path.stem: plate_policy(path.stem)

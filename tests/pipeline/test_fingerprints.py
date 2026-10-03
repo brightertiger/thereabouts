@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.runtime.code import code_hashes
 from pipeline.runtime.fingerprints import identity
 
 
@@ -75,3 +76,53 @@ def test_non_python_package_file_is_not_an_empty_code_identity(tmp_path: Path) -
     path.write_text("not Python")
     with pytest.raises(ValueError, match="must be Python"):
         identity([path], config={}, pins={}, native={}, repository=tmp_path)
+
+
+def test_transitive_relative_inline_imports_and_exclusions(tmp_path: Path) -> None:
+    sources = {
+        "pipeline/stage.py": "from .engine import build\n",
+        "pipeline/engine/__init__.py": "from .geometry import build\n",
+        "pipeline/engine/geometry.py": (
+            "def build():\n from pipeline.shared import rule\n"
+        ),
+        "pipeline/shared.py": "from pipeline.runtime.ledger import Ledger\nrule = 1\n",
+        "pipeline/runtime/ledger.py": "class Ledger: pass\n",
+    }
+    for name, source in sources.items():
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source)
+    entry = tmp_path / "pipeline/stage.py"
+    before = code_hashes([entry], tmp_path)
+    assert set(before) == set(sources) - {"pipeline/runtime/ledger.py"}
+    shared = tmp_path / "pipeline/shared.py"
+    shared.write_text(shared.read_text().replace("rule = 1", "rule = 2"))
+    assert code_hashes([entry], tmp_path) != before
+
+
+def test_city_closure_covers_geometry_and_source_closure_covers_storage() -> None:
+    root = Path(__file__).parents[2]
+    city = code_hashes([root / "pipeline/stages/cities.py"], root)
+    assert "pipeline/engines/cells/windows.py" in city
+    assert "pipeline/engines/cells/offshore.py" in city
+    assert "pipeline/stages/reconcile.py" in city
+    source = code_hashes([root / "pipeline/stages/sources.py"], root)
+    assert "pipeline/storage/objects.py" in source
+    assert "pipeline/pins/models.py" in source
+
+
+def test_entry_module_hashes_parent_initializers_without_imports(
+    tmp_path: Path,
+) -> None:
+    package = tmp_path / "pipeline/engine"
+    package.mkdir(parents=True)
+    entry = package / "build.py"
+    entry.write_text("value = 1\n")
+    initializer = package / "__init__.py"
+    initializer.write_text("rule = 1\n")
+    root_initializer = package.parent / "__init__.py"
+    root_initializer.write_text("root_rule = 1\n")
+    before = code_hashes([entry], tmp_path)
+    assert len(before) == 3
+    initializer.write_text("rule = 2\n")
+    assert code_hashes([entry], tmp_path) != before

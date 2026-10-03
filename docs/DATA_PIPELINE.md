@@ -55,8 +55,8 @@ working directory. Reports must remain outside the inspected data workspace.
 
 Structured defaults are merged with `config/sources/*.yaml`, `config/engines.yaml`, then
 `config/pipeline.yaml`, an optional `config/profiles/<name>.yaml`, and `key=value`
-overrides. Source adapters declare a typed `Options` dataclass; unknown adapter
-options fail during configuration loading:
+overrides. Each source declares an `options_schema` dataclass, loaded without importing
+its normalizer. Unknown adapter options fail during configuration loading:
 
 ```sh
 .venv/bin/python -m pipeline plan --profile laptop \
@@ -70,9 +70,13 @@ subdirectories and persisted artifact paths are relative to it. Paths cannot
 escape through `..` or a symlink. Read-time symlink containment checks do not
 replace persisted logical paths with resolved machine paths.
 
-Each stage declares its production package files, configuration sections,
-source pins and native-library dependencies. SHA256 of those inputs is its
-identity. Native versions must match `uv.lock`; Shapely's GEOS version is also
+Each stage declares production entry modules, configuration sections and
+native-library dependencies. Its identity hashes the transitive closure of local
+Python imports, including shared helpers and package initializers. Runtime
+implementation, the stage contract and the configuration schema are excluded.
+The source stages share only their controller identity; each source unit adds
+its own adapter import closure, settings, pin and policy-file hashes. A pin or
+adapter edit therefore invalidates that source and consumers of its outputs. Native versions must match `uv.lock`; Shapely's GEOS version is also
 included. Tests, fixtures, documentation and client source files are excluded.
 The explicit `thereabouts.format.CELL_FORMAT_VERSION` participates where the cell
 codec matters. Adding that constant does not change the encoding.
@@ -93,7 +97,11 @@ workspace has no build or payload inventory for it; enabling it requires an
 explicit reviewed pin proposal.
 
 `pins.lock` records exact input names, sizes, SHA256, upstream metadata, and the
-inventory used by the retained source manifest. An inventory found later under
+fingerprint of the inventory used by the retained source manifest. It stores no
+duplicate inventory document. Download inventories are reconstructed from those
+file records and metadata. Large plate policies live in
+`config/policies/plates/`, outside the structured configuration graph, and are
+hashed only into the units that use them. An inventory found later under
 the same raw directory is not assumed to describe the built output. In particular,
 the committed geoBoundaries lock uses the manifest's resolved inventory.
 

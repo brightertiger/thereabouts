@@ -20,3 +20,4 @@ options:
   line_bytes: 1000000
   index_bytes: 1000000000
   sqlite_cache_kib: 32768
+options_schema: pipeline.config.source_options.Names

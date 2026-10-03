@@ -46,7 +46,6 @@ class SourcePin:
     pinned_at: str = ""
     available: bool = True
     files: list[PinFile] = field(default_factory=list)
-    inventory: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def validate(self) -> None:
@@ -54,7 +53,6 @@ class SourcePin:
             type(self.available) is not bool
             or not isinstance(self.release, str)
             or not isinstance(self.pinned_at, str)
-            or not isinstance(self.inventory, dict)
             or not isinstance(self.metadata, dict)
         ):
             raise ValueError("Invalid source pin types")

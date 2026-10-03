@@ -18,3 +18,4 @@ options:
   area_batch_rows: 8
   geometry_bytes: 5000000
   geometry_max_depth: 24
+options_schema: pipeline.config.source_options.Divisions

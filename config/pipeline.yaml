@@ -22,11 +22,12 @@ stages:
     packages: [pipeline/stages/sources.py, pipeline/sources/download.py, pipeline/storage,
                pipeline/pins/models.py, pipeline/sources/contract.py,
                pipeline/sources/shared/manifest.py]
-    config: [sources]
+    config: []
   - name: normalize
     needs: [download]
-    packages: [pipeline/stages/sources.py, pipeline/sources]
-    config: [sources, h3]
+    packages: [pipeline/stages/sources.py, pipeline/sources/contract.py,
+               pipeline/sources/shared, pipeline/sources/download.py, pipeline/storage]
+    config: [h3]
     native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex]
   - name: reconcile
     needs:

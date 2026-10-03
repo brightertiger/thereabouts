@@ -22,7 +22,7 @@ def _object(value: Any, allowed: set[str], label: str) -> dict[str, Any]:
 
 
 def read_lock(path: Path) -> dict[str, SourcePin]:
-    # Pin inventories are large evidence documents, not interpolated configuration.
+    # Pins are evidence documents, not interpolated configuration.
     # The C safe loader avoids a second graph of OmegaConf nodes for every receipt.
     try:
         data = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)

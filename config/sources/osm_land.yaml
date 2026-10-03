@@ -18,3 +18,4 @@ options:
   unit_bytes: 8000000
   shape_bytes: 6000000
   index_bytes: 200000000
+options_schema: pipeline.config.source_options.Land
