@@ -121,7 +121,7 @@ pub fn join(
             .collect();
         for parent in parents {
             let children: Vec<_> = parent.children(resolution).collect();
-            let label = cells.get(&children[0]).copied();
+            let label = children.first().and_then(|child| cells.get(child)).copied();
             if let Some(label) = label
                 && children.iter().all(|c| cells.get(c) == Some(&label))
             {

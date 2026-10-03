@@ -48,14 +48,20 @@ impl Place {
     /// Public identity and required display fields have already been validated.
     #[must_use]
     pub fn field(&self, index: usize) -> &str {
-        self.text[index].as_deref().unwrap_or("")
+        self.text
+            .get(index)
+            .and_then(Option::as_deref)
+            .unwrap_or("")
     }
     /// Check geographic bounds, required text and catalogue relationships.
     pub fn validate(&self, total: usize) -> Result<()> {
         ensure(
-            [0, 1, 4, 5, 6, 11]
-                .iter()
-                .all(|i| self.text[*i].as_ref().is_some_and(|s| !s.is_empty())),
+            [0, 1, 4, 5, 6, 11].iter().all(|i| {
+                self.text
+                    .get(*i)
+                    .and_then(Option::as_ref)
+                    .is_some_and(|s| !s.is_empty())
+            }),
             "Missing required catalogue text",
         )?;
         ensure(
@@ -73,6 +79,7 @@ impl Place {
     }
 }
 /// Encode first-use string references; zero always means null.
+#[allow(clippy::indexing_slicing)] // Every present string is inserted before its reference is written.
 pub fn encode_places(places: &[Place]) -> Result<Vec<u8>> {
     let mut refs = BTreeMap::new();
     let mut offsets = vec![0_u64, 0];
@@ -176,14 +183,20 @@ impl Catalogue {
             *value = self.string(uint(row, i * 4, 4)?)?;
         }
         for (i, value) in refs.iter_mut().enumerate() {
-            *value = u32::try_from(uint(row, 48 + i * 4, 4)?).expect("four bytes");
+            *value = u32::try_from(uint(row, 48 + i * 4, 4)?)
+                .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?;
         }
         Ok(Place {
             text,
             refs,
-            latitude: i32::from_le_bytes(row[64..68].try_into().expect("fixed record")),
-            longitude: i32::from_le_bytes(row[68..72].try_into().expect("fixed record")),
-            population: u32::try_from(uint(row, 72, 4)?).expect("four bytes"),
+            latitude: u32::try_from(uint(row, 64, 4)?)
+                .map_err(|_| crate::Error::Corrupt("Invalid latitude".into()))?
+                .cast_signed(),
+            longitude: u32::try_from(uint(row, 68, 4)?)
+                .map_err(|_| crate::Error::Corrupt("Invalid longitude".into()))?
+                .cast_signed(),
+            population: u32::try_from(uint(row, 72, 4)?)
+                .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?,
             timezone: self.string(uint(row, 76, 4)?)?,
         })
     }

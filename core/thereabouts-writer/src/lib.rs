@@ -1,4 +1,8 @@
 //! Deterministic, bounded dataset-to-pack export. Sources are opened read-only.
+#![cfg_attr(
+    test,
+    allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
+)]
 mod catalogue;
 mod emission;
 mod error;
@@ -121,7 +125,7 @@ fn build(
             })?;
         }
     }
-    let policy = &data.manifest["normalization"]["policy"];
+    let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {
         schema: "thereabouts-pack-2".into(),
         format_version: 2,
@@ -204,16 +208,18 @@ fn flags(row: &Value) -> Result<u32> {
             && (row["land_method"] == "land" || row["land_method"] == "offshore"),
         "Unknown assignment method",
     )?;
-    Ok(u32::try_from(city).expect("eight methods")
-        | if row["country_method"].is_null() {
-            0
-        } else {
-            8
-        }
-        | if row["state_method"].is_null() { 0 } else { 16 }
-        | if row["land_method"] == "offshore" {
-            32
-        } else {
-            0
-        })
+    Ok(
+        u32::try_from(city).map_err(|_| Error::Input("Invalid city method".into()))?
+            | if row["country_method"].is_null() {
+                0
+            } else {
+                8
+            }
+            | if row["state_method"].is_null() { 0 } else { 16 }
+            | if row["land_method"] == "offshore" {
+                32
+            } else {
+                0
+            },
+    )
 }

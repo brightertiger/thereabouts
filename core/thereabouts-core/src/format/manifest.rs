@@ -37,6 +37,7 @@ pub struct Manifest {
     pub cutoff_m: u32,
 }
 /// Hash a file in bounded chunks; never load Parquet just to fingerprint it.
+#[allow(clippy::indexing_slicing)] // Read returns at most the buffer length.
 pub fn digest(path: &Path) -> Result<String> {
     let mut file = fs::File::open(path)?;
     let mut hash = Sha256::new();
@@ -77,9 +78,12 @@ pub fn read(root: &Path) -> Result<Manifest> {
         "Oversized manifest",
     )?;
     let value: serde_json::Value = serde_json::from_slice(&fs::read(path)?)?;
-    if value["format_version"] != 2
-        || value["family"] != "core"
-        || value["schema"] != "thereabouts-pack-2"
+    if value
+        .get("format_version")
+        .and_then(serde_json::Value::as_u64)
+        != Some(2)
+        || value.get("family").and_then(serde_json::Value::as_str) != Some("core")
+        || value.get("schema").and_then(serde_json::Value::as_str) != Some("thereabouts-pack-2")
     {
         return Err(Error::Incompatible("Requires a format-2 core pack".into()));
     }

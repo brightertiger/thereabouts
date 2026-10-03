@@ -12,6 +12,9 @@ dependencies are h3o, serde, serde_json, sha2 and thiserror, with no `*-sys` cra
 Review fix 2 makes opening lazy: headers and block directories are read first,
 with 8 MiB decoded-block and 16 MiB raw-catalogue LRU caches. Pass
 `verify=True` to the Python constructor for full verification at open.
+Review fix 3 removes non-test expect calls and denies unwrap/expect in Clippy.
+The indexing warning is enabled; narrow allowances document validated wire
+spans, fixed schema arrays and serde_json reads that return null.
 Remaining review fixes are in progress.
 
 ## Built and usable

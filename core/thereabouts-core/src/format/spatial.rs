@@ -13,10 +13,12 @@ pub struct Label(pub [u32; 5]);
 impl Label {
     /// Shared twenty-byte wire layout; zero references are null.
     #[allow(clippy::many_single_char_names)] // Directory offsets mirror the wire layout.
+    #[allow(clippy::indexing_slicing)] // directory validates all section ranges before these slices.
     pub fn decode(bytes: &[u8], start: usize) -> Result<Self> {
         let mut fields = [0; 5];
         for (i, field) in fields.iter_mut().enumerate() {
-            *field = u32::try_from(uint(bytes, start + 4 * i, 4)?).expect("four-byte integer");
+            *field = u32::try_from(uint(bytes, start + 4 * i, 4)?)
+                .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?;
         }
         Ok(Self(fields))
     }
@@ -57,7 +59,7 @@ impl Block {
             self.keys
                 .binary_search(key)
                 .ok()
-                .map(|i| (*key, self.labels[i]))
+                .and_then(|i| self.labels.get(i).map(|label| (*key, *label)))
         })
     }
 }
@@ -70,11 +72,13 @@ pub(crate) struct Entry {
     dictionary_count: usize,
     pub(crate) spans: [(usize, usize); 3],
 }
+#[allow(clippy::indexing_slicing)] // Parallel three-element arrays are iterated only over 0..3.
 pub(crate) fn directory(bytes: &[u8], lengths: [usize; 3]) -> Result<Vec<Entry>> {
     let mut entries = Vec::new();
     let mut ends = [0; 3];
     for row in bytes.as_chunks::<40>().0 {
-        let block = u32::try_from(uint(row, 0, 4)?).expect("four-byte integer");
+        let block = u32::try_from(uint(row, 0, 4)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?;
         address::cell_at(block, 0)?;
         ensure(
             entries.last().is_none_or(|last: &Entry| last.block < block),
@@ -146,7 +150,8 @@ pub(crate) fn decode_block(
     let mut decoded_keys = Vec::with_capacity(entry.count);
     let mut decoded_labels = Vec::with_capacity(entry.count);
     for i in 0..entry.count {
-        let key = u16::try_from(uint(keys, i * 2, 2)?).expect("two-byte integer");
+        let key = u16::try_from(uint(keys, i * 2, 2)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid u16".into()))?;
         let cell = address::cell_at(entry.block, key)?;
         ensure(
             decoded_keys.last().is_none_or(|last| *last < key),
@@ -177,6 +182,7 @@ pub(crate) fn decode_block(
     })
 }
 /// Decode and validate the entire spatial shard, including ancestor disjointness.
+#[allow(clippy::indexing_slicing)] // directory validates all section ranges before these slices.
 pub fn decode(bytes: Vec<u8>, places: usize, zones: usize) -> Result<BTreeMap<u32, Block>> {
     let container = Container::decode(bytes, 1, &[40, 2, 1, 20])?;
     let entries = directory(
@@ -228,7 +234,10 @@ pub fn encode_blocks(blocks: &BTreeMap<u32, Vec<(u16, Label)>>) -> Result<Vec<u8
             } else {
                 put(
                     &mut values,
-                    labels.binary_search(label).expect("label was collected") as u64,
+                    labels
+                        .binary_search(label)
+                        .map_err(|_| crate::Error::Input("Missing encoded label".into()))?
+                        as u64,
                     width,
                 );
             }

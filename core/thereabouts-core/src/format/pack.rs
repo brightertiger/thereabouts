@@ -121,9 +121,11 @@ impl Pack {
         if let Some(value) = cache.get(block) {
             return Ok(Some(value));
         }
-        let mut spans = Vec::new();
+        let mut spans: [Vec<u8>; 3] = std::array::from_fn(|_| Vec::new());
         for (section, &(offset, length)) in source.entry.spans.iter().enumerate() {
-            spans.push(source.shard.range(section + 1, offset, length)?);
+            if let Some(span) = spans.get_mut(section) {
+                *span = source.shard.range(section + 1, offset, length)?;
+            }
         }
         let value = spatial::decode_block(
             &source.entry,

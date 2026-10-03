@@ -1,4 +1,6 @@
 //! Bounded Arrow scans of explicitly inventoried dataset tables.
+// serde_json read indexing returns Null for absent fields, including non-objects.
+#![allow(clippy::indexing_slicing)]
 use crate::{
     Error, Result,
     error::ensure,
@@ -92,6 +94,9 @@ impl Dataset {
             "Dataset changed during export",
         )
     }
+}
+pub(crate) fn field<'a>(row: &'a Value, key: &str) -> &'a Value {
+    row.get(key).unwrap_or(&Value::Null)
 }
 pub fn required<'a>(row: &'a Value, field: &str) -> Result<&'a str> {
     row[field]

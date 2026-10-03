@@ -19,10 +19,12 @@ pub fn initialize(db: &Connection) -> Result<()> {
         CREATE TABLE coarse_zones(cell INTEGER,zone TEXT,PRIMARY KEY(cell,zone)) WITHOUT ROWID;")?;
     Ok(())
 }
+#[allow(clippy::indexing_slicing)] // Arrow rows are objects; serde_json reads return Null.
 pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     for kind in ["places", "canonical_cities", "place_to_city"] {
         for table in data.tables(kind) {
             data.scan(table,|mut row| {
+                ensure(row.is_object(), "Dataset row must be an object")?;
                 match kind {
                     "places" => {
                         let evidence=json!({"source_ids":row["source_ids"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok()),"golden_table":table["path"],"name_provenance":row["name_provenance"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok())});
@@ -76,10 +78,12 @@ pub fn reference(db: &Connection, id: Option<&str>) -> Result<u32> {
         Some(id) => Ok(db.query_row("SELECT reference FROM ids WHERE id=?", [id], |r| r.get(0))?),
     }
 }
+#[allow(clippy::indexing_slicing)] // Stored rows are objects and field arrays have fixed schema lengths.
 pub fn record(db: &Connection, id: &str) -> Result<Place> {
     let payload: String =
         db.query_row("SELECT payload FROM places WHERE id=?", [id], |r| r.get(0))?;
     let mut row: Value = serde_json::from_str(&payload)?;
+    ensure(row.is_object(), "Catalogue payload must be an object")?;
     if let Some(canonical) = db
         .query_row("SELECT payload FROM cities WHERE id=?", [id], |r| {
             r.get::<_, String>(0)

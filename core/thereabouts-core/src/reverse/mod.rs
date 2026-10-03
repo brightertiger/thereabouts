@@ -78,7 +78,10 @@ impl Pack {
                 let method = label.0[3] & 7;
                 answer.evidence = Some(Evidence {
                     stored_cell: stored.map(|c| c.to_string()),
-                    city_method: (method != 0).then(|| METHODS[method as usize].into()),
+                    city_method: METHODS
+                        .get(method as usize)
+                        .filter(|m| !m.is_empty())
+                        .map(|m| (*m).into()),
                     land_method: Some(
                         if label.0[3] & 32 == 0 {
                             "land"
@@ -103,7 +106,11 @@ impl Pack {
                         .and_then(|v| v.get("source_ids").cloned()),
                 });
             }
-            let zones = &self.metadata.timezone_sets[label.0[4] as usize];
+            let zones = self
+                .metadata
+                .timezone_sets
+                .get(label.0[4] as usize)
+                .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
             if zones.len() > 1 {
                 answer.candidates = zones
                     .iter()
@@ -160,9 +167,13 @@ impl Pack {
             population: (p.population != 0).then_some(p.population),
             point: p.point(),
         });
-        let zones = &self.metadata.timezone_sets[tz as usize];
+        let zones = self
+            .metadata
+            .timezone_sets
+            .get(tz as usize)
+            .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
         if zones.len() == 1 {
-            answer.timezone = Some(zones[0].clone());
+            answer.timezone = zones.first().cloned();
         }
         if country != 0 || state != 0 || city != 0 {
             answer.status = "matched".into();

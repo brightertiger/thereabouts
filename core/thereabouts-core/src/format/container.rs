@@ -16,12 +16,14 @@ pub fn uint(bytes: &[u8], offset: usize, width: usize) -> Result<u64> {
         .ok_or_else(|| Error::Corrupt("Truncated integer".into()))?;
     ensure(width <= 8, "Invalid integer width")?;
     let mut value = [0; 8];
-    value[..width].copy_from_slice(span);
+    for (out, byte) in value.iter_mut().zip(span) {
+        *out = *byte;
+    }
     Ok(u64::from_le_bytes(value))
 }
 /// Append the least significant bytes of a checked wire value.
 pub fn put(bytes: &mut Vec<u8>, value: u64, width: usize) {
-    bytes.extend_from_slice(&value.to_le_bytes()[..width]);
+    bytes.extend(value.to_le_bytes().into_iter().take(width));
 }
 /// Checked host index conversion.
 pub fn index(value: u64) -> Result<usize> {
@@ -51,6 +53,7 @@ impl Container {
     }
     /// Section number is zero-based inside the implementation.
     #[must_use]
+    #[allow(clippy::indexing_slicing)] // Callers use schema section numbers; spans were validated by decode.
     pub fn section(&self, number: usize) -> &[u8] {
         let (a, b) = self.spans[number];
         &self.bytes[a..b]
@@ -170,6 +173,7 @@ impl FileShard {
     }
 }
 /// Encode exactly the layout that `Container::decode` accepts.
+#[allow(clippy::indexing_slicing)] // Header and directory allocation is sized before these fixed writes.
 pub fn encode(kind: u32, sections: &[(&[u8], usize)]) -> Result<Vec<u8>> {
     let mut bytes = vec![0; 32 + sections.len() * 32];
     bytes[..8].copy_from_slice(MAGIC);
@@ -181,7 +185,7 @@ pub fn encode(kind: u32, sections: &[(&[u8], usize)]) -> Result<Vec<u8>> {
             .to_le_bytes(),
     );
     for (i, (data, width)) in sections.iter().enumerate() {
-        ensure(data.len() % width == 0, "Partial record")?;
+        ensure(*width != 0 && data.len() % width == 0, "Partial record")?;
         bytes.resize(bytes.len().next_multiple_of(8), 0);
         let mut entry = Vec::new();
         put(&mut entry, (i + 1) as u64, 4);

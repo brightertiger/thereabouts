@@ -4,7 +4,8 @@ use h3o::{CellIndex, Resolution};
 
 /// First sparse key at a depth below resolution three.
 #[must_use]
-pub const fn offset(depth: u32) -> u16 {
+#[allow(clippy::indexing_slicing)] // Only depths 0..=5, checked by cell_at or the stored-cell caller.
+const fn offset(depth: u32) -> u16 {
     [0, 1, 8, 57, 400, 2801][depth as usize]
 }
 /// Split a validated stored cell into its block and sparse key.

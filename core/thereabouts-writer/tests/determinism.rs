@@ -1,4 +1,8 @@
 //! Export determinism uses the committed synthetic dataset.
+#![cfg_attr(
+    test,
+    allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
+)]
 use std::{fs, path::PathBuf};
 use thereabouts_core::format::verify;
 use thereabouts_writer::{self as writer, Options};

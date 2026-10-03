@@ -21,7 +21,7 @@ impl Metadata {
         for (index, names) in self.timezone_sets.iter().enumerate() {
             ensure(
                 (index == 0 || !names.is_empty())
-                    && names.windows(2).all(|p| p[0] < p[1])
+                    && names.iter().zip(names.iter().skip(1)).all(|(a, b)| a < b)
                     && names.iter().all(|n| !n.is_empty()),
                 "Invalid timezone set",
             )?;

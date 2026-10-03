@@ -1,4 +1,8 @@
 //! The same `snake_case` fixtures run through Rust, Python and later Node.
+#![cfg_attr(
+    test,
+    allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
+)]
 use serde_json::Value;
 use std::{fs, path::PathBuf};
 use thereabouts_core::{format::Pack, result::LookupResult};

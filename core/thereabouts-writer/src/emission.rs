@@ -1,4 +1,6 @@
 //! Bound each output unit independently of the dataset size.
+// serde_json read indexing returns Null for absent fields, including non-objects.
+#![allow(clippy::indexing_slicing)]
 use super::{
     add, catalogue, flags,
     source::{Dataset, required},
