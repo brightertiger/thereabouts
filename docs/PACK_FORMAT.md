@@ -1056,7 +1056,8 @@ identity naturally differs when file packaging changes.
 The native and WASM readers use the same codecs. A host source opens each
 artifact once during admission and returns a retained handle with its captured
 byte length and an exact positioned-read operation. Reads must fill the requested
-range or fail. The host rejects unsafe paths and symlink artifacts. Shards own
+range or fail. The host canonicalizes the explicitly selected root, then rejects unsafe paths
+and symlink artifacts below that root. Shards own
 their handles after admission; renaming a pathname does not select another file.
 Dropping the last shard reference closes its handle. Node supplies synchronous
 fs reads through wasm-bindgen imports; WASM has no filesystem or network calls.

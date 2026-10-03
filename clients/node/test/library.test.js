@@ -154,3 +154,15 @@ test("full verification detects same-length corruption and selected family misma
     /family or dataset/,
   );
 });
+
+test("trusted root aliases work while artifacts remain protected", async (t) => {
+  const root = temporary(t),
+    alias = path.join(root, "pack-alias");
+  fs.symlinkSync(path.join(FIXTURES, "packs/core-synthetic"), alias, "dir");
+  const geo = await Geocoder.open({ pack: alias, verify: true });
+  try {
+    assert.equal((await geo.fromH3("8860140001fffff")).status, "matched");
+  } finally {
+    await geo.close();
+  }
+});

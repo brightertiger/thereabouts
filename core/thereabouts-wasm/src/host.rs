@@ -6,6 +6,8 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(raw_module = "../runtime/host.js")]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = canonicalRoot)]
+    fn canonical_root(path: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(catch, js_name = openHandle)]
     fn open_handle(path: &str) -> Result<u32, JsValue>;
     #[wasm_bindgen(catch, js_name = fileSize)]
@@ -172,4 +174,10 @@ impl thereabouts_cli_core::io::Io for Host {
     fn temporary(&mut self) -> io::Result<Box<dyn thereabouts_cli_core::io::Temporary>> {
         Ok(Box::new(File::from_id(temporary().map_err(failure)?)?))
     }
+}
+
+pub(crate) fn root(path: &str) -> thereabouts_core::Result<std::path::PathBuf> {
+    Ok(std::path::PathBuf::from(
+        canonical_root(path).map_err(failure)?,
+    ))
 }

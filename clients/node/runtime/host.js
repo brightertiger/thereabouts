@@ -30,6 +30,11 @@ export function safePath(root, relative) {
   }
   return result;
 }
+// The explicit pack root is trusted, like the native reader's root argument.
+// Artifact paths below it still reject symlinks and traversal.
+export function canonicalRoot(filename) {
+  return fs.realpathSync(filename);
+}
 export function openHandle(filename) {
   const full = path.resolve(filename);
   safePath(

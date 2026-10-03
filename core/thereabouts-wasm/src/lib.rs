@@ -1,7 +1,7 @@
 //! Node supplies positioned IO; WASM owns pack admission, lookups and CLI policy.
 mod host;
 mod query;
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 use thereabouts_core::{
     Error,
     format::{Pack, manifest, reader::Reader},
@@ -48,8 +48,8 @@ impl Geocoder {
     /// Open one family without loading payloads or implicitly fetching data.
     #[wasm_bindgen(js_name = open)]
     pub fn open(path: &str, verify: bool) -> Result<Self, JsValue> {
-        let pack = Pack::open_with(&Reader::new(Path::new(path), &host::Host), verify)
-            .map_err(core_error)?;
+        let root = host::root(path).map_err(core_error)?;
+        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify).map_err(core_error)?;
         Ok(Self {
             pack: Some(Arc::new(pack)),
         })
@@ -57,7 +57,8 @@ impl Geocoder {
     /// Check the installed core namespace before enriching a forward pack.
     #[wasm_bindgen(js_name = openWithCore)]
     pub fn open_with_core(path: &str, verify: bool, core: &Self) -> Result<Self, JsValue> {
-        let pack = Pack::open_with(&Reader::new(Path::new(path), &host::Host), verify)
+        let root = host::root(path).map_err(core_error)?;
+        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify)
             .and_then(|p| p.with_core(Arc::clone(core.get().map_err(|_| Error::Closed)?)))
             .map_err(core_error)?;
         Ok(Self {
@@ -88,7 +89,7 @@ impl Geocoder {
         let options = serde_json::from_str(options).map_err(|e| cli_error(e.into()))?;
         let input: Option<Box<dyn std::io::BufRead>> = path
             .map(|p| {
-                host::File::open(Path::new(&p))
+                host::File::open(&host::root(&p).map_err(|e| std::io::Error::other(e.to_string()))?)
                     .map(|f| Box::new(std::io::BufReader::new(f)) as Box<dyn std::io::BufRead>)
             })
             .transpose()
@@ -137,7 +138,8 @@ pub fn render(
 /// Read and validate manifest and sizes, optionally all artifact hashes/structures.
 #[wasm_bindgen(js_name = packInfo)]
 pub fn pack_info(path: &str, full: bool) -> Result<String, JsValue> {
-    let reader = Reader::new(Path::new(path), &host::Host);
+    let root = host::root(path).map_err(core_error)?;
+    let reader = Reader::new(&root, &host::Host);
     let info = if full {
         thereabouts_core::format::verify::verify_with(&reader)
     } else {

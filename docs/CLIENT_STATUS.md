@@ -103,7 +103,7 @@ path. It carries no data and releases automatically on exit. Native retains
 its advisory file lock. Contention fails closed, including a rare unrelated
 port collision; the diagnostic names the port. Cross-client contention is tested.
 
-The ignored WASM artifact is **2,437,834 bytes**. npm run build
+The ignored WASM artifact is **2,438,752 bytes**. npm run build
 uses locked Cargo dependencies, release wasm32 and wasm-bindgen-cli 0.2.129;
 npm prepack builds it into the files whitelist. The artifact is not committed.
 Package metadata is publishable 0.1.0, with no publish action. The source licence
@@ -127,20 +127,20 @@ the public async iterator, not a columnar API.
 
 | Node verb | Hot median / p99 µs | Varied median / p99 µs | Batch results/s |
 | --- | ---: | ---: | ---: |
-| reverse | 6.375 / 10.250 | 6.667 / 10.500 | 149,521 |
-| postal | 9.000 / 12.666 | 9.417 / 25.917 | 90,031 |
-| airport | 8.791 / 11.167 | 9.625 / 12.209 | 106,564 |
-| locode | 8.709 / 12.208 | 8.709 / 12.333 | 112,490 |
-| phone | 10.542 / 14.750 | 7.583 / 13.167 | 134,187 |
-| ip | 8.333 / 11.667 | 8.500 / 12.000 | 122,258 |
-| plate | 4.750 / 6.584 | 5.500 / 16.917 | 154,999 |
-| geocode | 8.291 / 11.334 | 9.375 / 22.625 | 101,290 |
+| reverse | 6.375 / 8.750 | 6.625 / 9.125 | 148,126 |
+| postal | 8.875 / 11.375 | 9.292 / 24.875 | 91,486 |
+| airport | 8.792 / 10.084 | 9.584 / 11.041 | 108,518 |
+| locode | 8.708 / 9.208 | 8.666 / 9.542 | 115,651 |
+| phone | 10.417 / 11.625 | 7.500 / 10.958 | 137,180 |
+| ip | 8.250 / 8.792 | 8.375 / 9.083 | 122,388 |
+| plate | 4.792 / 6.291 | 5.500 / 16.250 | 157,259 |
+| geocode | 8.291 / 9.667 | 9.292 / 22.583 | 103,134 |
 
 Start to first flushed result, including opening the sample:
-direct Node bin **70.950 ms median /
-101.394 ms p99**;
-offline npx **242.308 ms median /
-272.665 ms p99**.
+direct Node bin **68.402 ms median /
+72.053 ms p99**;
+offline npx **239.537 ms median /
+256.831 ms p99**.
 Each has 30 fresh processes after three warmups.
 These measurements and conformance counts come from benchmarks/node_read_path.mjs
 and are also retained in CLIENT_NODE_MEASUREMENTS.json.
@@ -339,7 +339,7 @@ The full gate passed: 101 Rust tests; 757
 pytest passed and 9 skipped; strict mypy checked
 478 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and all three wasm target checks passed. The new Node suite has
-47 tests on Node 22 and 47
+48 tests on Node 22 and 48
 on Node 24; npm declarations/type examples and WASM build passed.
 Legacy Python reader and pipeline tests
 remain included. Skipped tests are reported separately from passing checks.
