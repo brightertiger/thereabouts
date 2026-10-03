@@ -1031,7 +1031,10 @@ file. All paths, file sizes, row counts and SHA-256 values remain inventoried.
   They must not also have `block`. Entries are strictly sorted by block and
   row groups are consecutive from zero, one per block. All blocks share one
   resolution-1 parent (at most 49 blocks). Entries cover every physical row
-  group, including an empty block's zero-row group. Per-group row counts must
+  group. A block entry must have positive rows. Empty files have `blocks: []`,
+  `rows: 0` and zero Parquet row groups; they contribute no stored blocks.
+  The `group=<resolution-1 H3 hex>` parent directory must match every block's
+  resolution-1 parent. Per-group row counts must
   match Parquet metadata and sum to the file's declared row count.
 
 Routing uses manifest entries, not filenames or inferred partition columns.

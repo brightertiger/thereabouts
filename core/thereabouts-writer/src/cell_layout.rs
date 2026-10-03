@@ -6,7 +6,7 @@ use crate::{
 };
 use h3o::{CellIndex, Resolution};
 use serde_json::Value;
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, path::Path};
 
 pub(crate) struct Block<'a> {
     pub table: &'a Value,
@@ -43,11 +43,24 @@ pub(crate) fn blocks(data: &Dataset) -> Result<Vec<Block<'_>>> {
                 .as_array()
                 .ok_or_else(|| Error::Input("Cells blocks must be an array".into()))?;
             ensure(
-                !entries.is_empty() && entries.len() <= 49,
-                "A cell group needs 1 to 49 blocks",
+                entries.len() <= 49,
+                "A cell group permits at most 49 blocks",
             )?;
+            let parent = Path::new(required(table, "path")?)
+                .parent()
+                .and_then(Path::file_name)
+                .and_then(|name| name.to_str())
+                .and_then(|name| name.strip_prefix("group="))
+                .and_then(|name| name.parse::<CellIndex>().ok())
+                .filter(|cell| cell.resolution() == Resolution::One)
+                .ok_or_else(|| Error::Input("Cells path needs group=<resolution-one H3>".into()))?;
+            if entries.is_empty() {
+                // Even an empty file is checksummed and its zero row-group footer admitted.
+                data.scan(table, |_| {
+                    Err(Error::Input("Empty cells group has rows".into()))
+                })?;
+            }
             let mut previous = None;
-            let mut parent = None;
             for (index, entry) in entries.iter().enumerate() {
                 let cell = cell(entry)?;
                 ensure(
@@ -56,14 +69,17 @@ pub(crate) fn blocks(data: &Dataset) -> Result<Vec<Block<'_>>> {
                 )?;
                 let group = cell.parent(Resolution::One);
                 ensure(
-                    parent.is_none_or(|p| Some(p) == group),
-                    "Cell blocks have different resolution-one parents",
+                    Some(parent) == group,
+                    "Cell block parent differs from group path",
                 )?;
-                parent = group;
                 previous = Some(cell);
                 ensure(
                     entry.get("row_group").and_then(Value::as_u64) == Some(index as u64),
                     "Cells row groups must follow block order from zero",
+                )?;
+                ensure(
+                    rows(entry)? > 0,
+                    "Grouped block entries must have positive rows",
                 )?;
                 result.push(Block {
                     table,
