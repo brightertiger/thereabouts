@@ -30,6 +30,12 @@ pub struct City {
     pub population: Option<u32>,
     pub point: Option<Point>,
 }
+/// Published nearest-distance interval; no exact distance is inferred.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct DistanceBand {
+    pub greater_than_km: f64,
+    pub at_most_km: f64,
+}
 /// Audit details are omitted unless explicitly requested.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Evidence {
@@ -37,8 +43,7 @@ pub struct Evidence {
     pub city_method: Option<String>,
     pub land_method: Option<String>,
     pub reason: Option<String>,
-    pub distance_greater_than_km: Option<f64>,
-    pub distance_at_most_km: Option<f64>,
+    pub timezones: Vec<String>,
     pub source_ids: Option<serde_json::Value>,
 }
 /// One detached lookup answer, serialized identically by every binding.
@@ -53,9 +58,8 @@ pub struct LookupResult {
     pub timezone: Option<String>,
     pub point: Option<Point>,
     pub cell: Option<String>,
-    pub distance_km: Option<f64>,
+    pub distance_band: Option<DistanceBand>,
     pub candidates: Vec<Self>,
-    pub selected: Option<Box<Self>>,
     pub rank_basis: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     pub evidence: Option<Evidence>,
@@ -74,9 +78,8 @@ impl LookupResult {
             timezone: None,
             point: None,
             cell: None,
-            distance_km: None,
+            distance_band: None,
             candidates: vec![],
-            selected: None,
             rank_basis: None,
             evidence: None,
         }
@@ -91,8 +94,8 @@ mod tests {
         let mut result = LookupResult::empty("ambiguous");
         result.candidates.push(LookupResult::empty("matched"));
         let encoded = serde_json::to_value(&result).unwrap();
-        assert!(encoded["selected"].is_null());
-        assert!(encoded["distance_km"].is_null());
+        assert!(encoded.get("selected").is_none());
+        assert!(encoded["distance_band"].is_null());
         assert_eq!(
             serde_json::from_value::<LookupResult>(encoded).unwrap(),
             result

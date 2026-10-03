@@ -117,7 +117,7 @@ def test_columns_strides_null_masks_and_order() -> None:
             r.country.code if r.country else None for r in results
         ]
         assert not columns["point_lat_valid"][-1]
-        assert not columns["distance_km_valid"].any()
+        assert not columns["distance_band_at_most_km_valid"].any()
         assert columns["city_population"].dtype == np.uint32
         assert all(len(value) == 4 for value in columns.values())
         assert all(
@@ -190,29 +190,22 @@ def test_native_pack_helpers() -> None:
     assert _core.verify_pack(str(SAMPLE))["family"] == "core"
 
 
-def test_ambiguous_and_distant_evidence() -> None:
+def test_distant_evidence() -> None:
     cases = json.loads((FIXTURES / "core-sample-vectors.json").read_text())["cases"]
     with Geocoder(SAMPLE) as geo:
-        for status, method in [("ambiguous", None), (None, "nearest_distant")]:
-            case = next(
-                c
-                for c in cases
-                if c["request"]["kind"] == "h3"
-                and (
-                    c["result"]["status"] == status
-                    if status is not None
-                    else c["result"]["match"] == method
-                )
-            )
-            result = geo.from_h3(case["request"]["values"][0], evidence=True)
-            if status == "ambiguous":
-                assert result.selected is None and result.timezone is None
-                assert len(result.candidates) > 1
-                assert all(c.status == "matched" for c in result.candidates)
-            else:
-                assert result.distance_km is None and result.evidence is not None
-                assert result.evidence.distance_greater_than_km == 25
-                assert result.evidence.distance_at_most_km == 50
+        case = next(
+            c
+            for c in cases
+            if c["request"]["kind"] == "h3"
+            and c["result"]["match"] == "nearest_distant"
+        )
+        result = geo.from_h3(case["request"]["values"][0], evidence=True)
+        assert result.status == "matched" and result.candidates == ()
+        assert result.distance_band is not None and result.evidence is not None
+        assert result.distance_band.greater_than_km == 25
+        assert result.distance_band.at_most_km == 50
+        assert "selected" not in result.to_dict()
+        assert "distance_km" not in result.to_dict()
 
 
 def test_lazy_shortcut_and_closed_native_handle(

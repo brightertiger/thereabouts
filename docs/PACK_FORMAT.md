@@ -160,9 +160,11 @@ project to the new public `not_found` status. Opt-in evidence distinguishes
 `outside_coverage`, `no_land`, `no_stored_ancestor`, and `unassigned`. In a subset,
 `no_land` means no admitted stored land row, not a global ocean assertion.
 Matches map methods 1–5 (and country/state-only context) to `contained`, 6 to
-`nearest`, 7 to `nearest_distant`. Exact distance was not published by golden:
-`distance_km` is always null. Evidence carries the actual policy band: nearest
-at most `distant_over_m`; distant strictly above that and at most `cutoff_m`.
+`nearest`, 7 to `nearest_distant`. Exact distance was not published by golden.
+The flat `distance_band` is null except for nearest and nearest_distant.
+For nearest it is `{greater_than_km: 0, at_most_km: distant_over_m / 1000}`;
+for nearest_distant it is `{greater_than_km: distant_over_m / 1000,
+at_most_km: cutoff_m / 1000}`. There is no `distance_km` field.
 These bounds describe represented r8 centres, not distance from the input point
 or from an inferred city centroid.
 
@@ -170,10 +172,14 @@ The writer joins all `timezone_cells` that contain each represented r8 centre.
 It can split a spatial ancestor at timezone boundaries, then compact identical
 five-field labels without crossing a block. Missing coverage produces set 0.
 Overlapping zones form a sorted unique set, without choosing a source winner.
-One zone produces `timezone`; multiple zones produce `ambiguous`, null timezone
-and `selected`, and one flat candidate per zone, ordered lexically with
-`rank_basis: "timezone_name"`. Common country/state/city context remains flat.
-This is timezone ambiguity; name ambiguity belongs to the later forward API.
+Timezone overlap never changes geographic status, including an all-zero
+(unassigned) label. When a country is assigned, retain only zone names whose
+`zone_tables.country_codes` comma-separated list contains that country code
+(across any row for the zone). With no country, retain the whole set.
+Exactly one survivor is returned as `timezone`; otherwise it is null and the
+sorted surviving list is in `evidence.timezones` when evidence is requested.
+Reverse never returns ambiguous or candidates. Forward ambiguity belongs to
+later packages: flat fields null, ranked candidates, and no `selected` field.
 
 ## Catalogue shards
 

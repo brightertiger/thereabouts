@@ -62,7 +62,7 @@ pub fn reverse<'py>(
             .collect::<PyResult<_>>()?;
         dict.set_item(name, PyArray1::from_vec(py, values))?;
     }
-    let floats: [FloatColumn; 5] = [
+    let floats: [FloatColumn; 6] = [
         ("point_lat", |r| r.point.as_ref().map(|p| p.lat)),
         ("point_lon", |r| r.point.as_ref().map(|p| p.lon)),
         ("city_point_lat", |r| {
@@ -71,7 +71,12 @@ pub fn reverse<'py>(
         ("city_point_lon", |r| {
             r.city.as_ref()?.point.as_ref().map(|p| p.lon)
         }),
-        ("distance_km", |r| r.distance_km),
+        ("distance_band_greater_than_km", |r| {
+            r.distance_band.as_ref().map(|b| b.greater_than_km)
+        }),
+        ("distance_band_at_most_km", |r| {
+            r.distance_band.as_ref().map(|b| b.at_most_km)
+        }),
     ];
     for (name, get) in floats {
         dict.set_item(

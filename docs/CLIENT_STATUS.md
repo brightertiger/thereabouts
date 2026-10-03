@@ -15,6 +15,9 @@ with 8 MiB decoded-block and 16 MiB raw-catalogue LRU caches. Pass
 Review fix 3 removes non-test expect calls and denies unwrap/expect in Clippy.
 The indexing warning is enabled; narrow allowances document validated wire
 spans, fixed schema arrays and serde_json reads that return null.
+Review fixes 4–5 keep timezone overlap in evidence without changing reverse
+status, narrow zones by country, remove selected, and replace distance_km with
+a published distance_band. Reverse candidates are always empty.
 Remaining review fixes are in progress.
 
 ## Built and usable
@@ -66,8 +69,8 @@ explicit `<column>_valid` boolean masks. Population uses uint32 storage with
 invalid zero slots, coordinates/distance use float64 with invalid NaN slots.
 Consumers must use validity masks when constructing Arrow arrays. Ambiguous
 rows preserve a `candidates` object column. Scalar JSON never substitutes zero
-or empty strings for missing values. Evidence is opt-in; exact nearest distance
-is null because the dataset publishes distance bands only.
+or empty strings for missing values. Evidence is opt-in; distance_band publishes the nearest policy bounds, since
+the dataset does not publish exact distances.
 
 Discovery reuses `packs/<family>/v-<version>/<manifest_sha256>/` and
 `packs/<family>/current.json`. Explicit `data_dir` takes precedence over
@@ -90,8 +93,9 @@ Resolution-3 directories and sparse resolution-3–8 keys remain. Labels grow
 from 16 to 20 bytes with a timezone-set reference; catalogue records grow from
 64 to 80 bytes with microdegree coordinates, population and a timezone string
 reference. New metadata holds countries, subdivisions and IANA zone tables.
-Timezone joins may split geographic ancestors and retain overlapping zones as
-ambiguous candidates, ordered by zone name, with `selected` null.
+Timezone joins may split geographic ancestors. Overlap is narrowed by country;
+a single survivor is timezone, otherwise the sorted list is evidence.timezones.
+Overlap never makes a reverse result ambiguous. There is no selected field.
 
 Canonical-city names, kind, point and population come from `canonical_cities`;
 rural places remain the golden final settlement. The old synthetic fixture's

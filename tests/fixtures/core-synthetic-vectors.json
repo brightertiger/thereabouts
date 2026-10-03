@@ -40,9 +40,8 @@
           "lon": 77.15559500254798
         },
         "cell": "8860140001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -84,9 +83,8 @@
           "lon": 77.00843234791073
         },
         "cell": "8860140401fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -128,9 +126,8 @@
           "lon": 77.18732265492372
         },
         "cell": "8860140801fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -172,9 +169,8 @@
           "lon": 77.04002577934997
         },
         "cell": "8860140c01fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -216,9 +212,8 @@
           "lon": 77.27123962262196
         },
         "cell": "8860141001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -260,9 +255,11 @@
           "lon": 77.12391121760197
         },
         "cell": "8860141401fffff",
-        "distance_km": null,
+        "distance_band": {
+          "greater_than_km": 0.0,
+          "at_most_km": 25.0
+        },
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -304,9 +301,11 @@
           "lon": 77.30305754986368
         },
         "cell": "8860141801fffff",
-        "distance_km": null,
+        "distance_band": {
+          "greater_than_km": 25.0,
+          "at_most_km": 50.0
+        },
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -331,9 +330,8 @@
           "lon": 76.746335979211
         },
         "cell": "8860142001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -365,9 +363,8 @@
           "lon": 77.36682549675709
         },
         "cell": "8860144001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -409,9 +406,8 @@
           "lon": 76.95607948123578
         },
         "cell": "8860146001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -453,9 +449,8 @@
           "lon": 77.35509472066732
         },
         "cell": "8860148001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -497,9 +492,8 @@
           "lon": 76.94537659371919
         },
         "cell": "886014a001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -524,9 +518,8 @@
           "lon": 77.56679176013843
         },
         "cell": "886014c001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -568,9 +561,8 @@
           "lon": 77.35509472066732
         },
         "cell": "8860148001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -612,9 +604,8 @@
           "lon": 76.94537659371919
         },
         "cell": "886014a001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -656,9 +647,8 @@
           "lon": 76.95607948123578
         },
         "cell": "8860146001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -700,9 +690,8 @@
           "lon": 76.9477171816232
         },
         "cell": "8860146003fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -744,9 +733,8 @@
           "lon": 10.536199075467694
         },
         "cell": "8808000001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -788,9 +776,8 @@
           "lon": -4.389923993545623
         },
         "cell": "88f29380adfffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -823,9 +810,8 @@
           "lon": 77.58605945932766
         },
         "cell": "8860145b4bfffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -851,9 +837,8 @@
           "lon": 77.76681069651902
         },
         "cell": "886014d34dfffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -879,9 +864,8 @@
           "lon": 179.99728962024483
         },
         "cell": "887eb57221fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -907,9 +891,8 @@
           "lon": 179.99728962024483
         },
         "cell": "887eb57221fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -935,9 +918,8 @@
           "lon": -1.6742331606444665
         },
         "cell": "880326233bfffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -980,9 +962,8 @@
           "lon": 178.32576683937054
         },
         "cell": "88f29380e1fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1008,9 +989,8 @@
           "lon": 4.897277258477509
         },
         "cell": "881969c9b3fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1033,9 +1013,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1058,9 +1037,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1083,9 +1061,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1108,9 +1085,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1133,9 +1109,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1157,9 +1132,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1184,9 +1158,8 @@
           "lon": 77.15559500254798
         },
         "cell": "8860140001fffff",
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1208,9 +1181,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     },
@@ -1232,9 +1204,8 @@
         "timezone": null,
         "point": null,
         "cell": null,
-        "distance_km": null,
+        "distance_band": null,
         "candidates": [],
-        "selected": null,
         "rank_basis": null
       }
     }

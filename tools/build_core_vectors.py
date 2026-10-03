@@ -117,8 +117,14 @@ def real() -> None:
     with Geocoder(pack) as geo:
         categories: set[str] = set()
         for cell in cells:
-            result = geo.from_h3(cell)
-            category = result.status + ":" + str(result.match)
+            result = geo.from_h3(cell, evidence=True)
+            category = (
+                result.status
+                + ":"
+                + str(result.match)
+                + ":"
+                + str(bool(result.evidence and result.evidence.timezones))
+            )
             if category not in categories:
                 categories.add(category)
                 fine = h3.cell_to_center_child(cell, 8)
@@ -140,11 +146,16 @@ def real() -> None:
             requests.append(
                 dict(kind="h3", values=[h3.latlng_to_cell(50.8503, 4.3517, resolution)])
             )
+        previous = FIXTURES / "core-sample-vectors.json"
+        if previous.exists():
+            requests = [
+                case["request"] for case in json.loads(previous.read_text())["cases"]
+            ]
         cases: list[dict[str, Any]] = [
             dict(id=f"real-{i:03}", request=request, result=resolve(geo, request))
             for i, request in enumerate(requests)
         ]
-    assert any(c["result"]["status"] == "ambiguous" for c in cases)
+    assert all(c["result"]["status"] != "ambiguous" for c in cases)
     assert any(c["result"]["match"] == "nearest_distant" for c in cases)
     write_json(
         FIXTURES / "core-sample-vectors.json",

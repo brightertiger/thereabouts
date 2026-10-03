@@ -12,6 +12,34 @@ pub struct Metadata {
     pub timezone_sets: Vec<Vec<String>>,
 }
 impl Metadata {
+    /// Country membership narrows overlap without creating a geographic ambiguity.
+    pub(crate) fn narrow_timezones(
+        &self,
+        reference: u32,
+        country: Option<&str>,
+    ) -> Result<Vec<String>> {
+        let zones = self
+            .timezone_sets
+            .get(reference as usize)
+            .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
+        Ok(zones
+            .iter()
+            .filter(|zone| {
+                country.is_none_or(|country| {
+                    self.zone_tables.iter().any(|row| {
+                        row.get("tzid").and_then(Value::as_str) == Some(zone.as_str())
+                            && row
+                                .get("country_codes")
+                                .and_then(Value::as_str)
+                                .is_some_and(|codes| {
+                                    codes.split(',').any(|code| code.trim() == country)
+                                })
+                    })
+                })
+            })
+            .cloned()
+            .collect())
+    }
     /// Validate fields used by lookup and preserve unknown source metadata.
     pub fn validate(&self) -> Result<()> {
         ensure(

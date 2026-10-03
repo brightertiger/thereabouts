@@ -1,7 +1,7 @@
 //! Reverse means reading published labels, never selecting a new nearest city.
 use crate::{
     format::{Pack, address, spatial::Label},
-    result::{City, Country, Evidence, LookupResult, Point, State},
+    result::{City, Country, DistanceBand, Evidence, LookupResult, Point, State},
 };
 use h3o::{CellIndex, LatLng, Resolution};
 
@@ -91,15 +91,7 @@ impl Pack {
                         .into(),
                     ),
                     reason: Some(reason.into()),
-                    distance_greater_than_km: (method == 7)
-                        .then(|| f64::from(self.manifest.distant_over_m) / 1000.0),
-                    distance_at_most_km: (method >= 6).then(|| {
-                        f64::from(if method == 7 {
-                            self.manifest.cutoff_m
-                        } else {
-                            self.manifest.distant_over_m
-                        }) / 1000.0
-                    }),
+                    timezones: vec![],
                     source_ids: self
                         .place(label.0[2])?
                         .and_then(|p| serde_json::from_str::<serde_json::Value>(p.field(11)).ok())
@@ -108,21 +100,12 @@ impl Pack {
             }
             let zones = self
                 .metadata
-                .timezone_sets
-                .get(label.0[4] as usize)
-                .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
-            if zones.len() > 1 {
-                answer.candidates = zones
-                    .iter()
-                    .map(|zone| {
-                        let mut candidate = answer.clone();
-                        candidate.timezone = Some(zone.clone());
-                        candidate
-                    })
-                    .collect();
-                answer.status = "ambiguous".into();
-                answer.timezone = None;
-                answer.rank_basis = Some("timezone_name".into());
+                .narrow_timezones(label.0[4], answer.country.as_ref().map(|c| c.code.as_str()))?;
+            answer.timezone = (zones.len() == 1).then(|| zones.first().cloned()).flatten();
+            if zones.len() != 1
+                && let Some(audit) = &mut answer.evidence
+            {
+                audit.timezones = zones;
             }
         } else if evidence {
             answer.evidence = Some(Evidence {
@@ -130,15 +113,14 @@ impl Pack {
                 city_method: None,
                 land_method: None,
                 reason: Some(reason.into()),
-                distance_greater_than_km: None,
-                distance_at_most_km: None,
+                timezones: vec![],
                 source_ids: None,
             });
         }
         Ok(answer)
     }
     fn project(&self, mut answer: LookupResult, label: Label) -> crate::Result<LookupResult> {
-        let [country, state, city, flags, tz] = label.0;
+        let [country, state, city, flags, _] = label.0;
         if let Some(place) = self.place(country)? {
             let code = place.field(6);
             let meta = self
@@ -167,16 +149,19 @@ impl Pack {
             population: (p.population != 0).then_some(p.population),
             point: p.point(),
         });
-        let zones = self
-            .metadata
-            .timezone_sets
-            .get(tz as usize)
-            .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
-        if zones.len() == 1 {
-            answer.timezone = zones.first().cloned();
-        }
         if country != 0 || state != 0 || city != 0 {
             answer.status = "matched".into();
+            answer.distance_band = match flags & 7 {
+                6 => Some(DistanceBand {
+                    greater_than_km: 0.0,
+                    at_most_km: f64::from(self.manifest.distant_over_m) / 1000.0,
+                }),
+                7 => Some(DistanceBand {
+                    greater_than_km: f64::from(self.manifest.distant_over_m) / 1000.0,
+                    at_most_km: f64::from(self.manifest.cutoff_m) / 1000.0,
+                }),
+                _ => None,
+            };
             answer.r#match = Some(
                 match flags & 7 {
                     6 => "nearest",
@@ -196,6 +181,6 @@ mod tests {
     fn omitted_evidence_and_null_distance() {
         let json = serde_json::to_value(LookupResult::empty("not_found")).unwrap();
         assert!(json.get("evidence").is_none());
-        assert!(json["distance_km"].is_null());
+        assert!(json["distance_band"].is_null());
     }
 }
