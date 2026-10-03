@@ -46,11 +46,11 @@ interruption/resume, ignored ranges, bad checksums, activation failure,
 concurrent locking and the absence of implicit network access.
 
 CLI process start to first flushed reverse result on the sample pack:
-**62.463 ms median,
-68.683 ms p99** across 30 fresh process
+**63.177 ms median,
+71.239 ms p99** across 30 fresh process
 launches after 3 warmups. File caches are warm; Python
 imports and pack opening are included. The initial launch took
-64.139 ms. These numbers come from
+68.922 ms. These numbers come from
 python -m benchmarks.cli_startup. The full per-launch series is in the JSON.
 
 ## Format follow-ups after package 3
@@ -71,12 +71,13 @@ three bounded positioned reads: 80 bytes, at most 112 offset bytes and at most
 65,536 string bytes. Full verification also checks record ownership of every
 string reference. Core now requires manifest minor 2; older core packs must be rebuilt.
 The 25,000-place, single-shard workload uses 2,000 distinct random queries and
-fresh decoded caches, with warm filesystem caches; timings include Python.
+fresh decoded caches, with warm filesystem caches (explicitly preloaded now);
+timings include Python.
 
 | Single shard | Median µs | p99 µs | Max hot strings B | Max offsets B |
 | --- | ---: | ---: | ---: | ---: |
 | before | 3784.646 | 7816.334 | 52,700,685 | 600,008 |
-| after | 88.708 | 281.082 | 31 | 48 |
+| after | 9.292 | 12.291 | 31 | 48 |
 
 These measurements come from benchmarks.single_shard_read_path; both the synthetic
 and real-sample physical spans are retained in CLIENT_CORE_MEASUREMENTS.json.
@@ -243,24 +244,24 @@ remain included. Skipped tests are reported separately from passing checks.
 Machine: Apple M2, 8,589,934,592 memory bytes,
 Python 3.12.8; platform details are in the JSON. Numbers below are
 script output, not hand-entered estimates. Reverse open time is
-22.277 ms; RSS delta is
-2,506,752 bytes.
+11.574 ms; RSS delta is
+4,800,512 bytes.
 
 | Reverse workload | Median / p99 µs | Batch points/s |
 | --- | ---: | ---: |
-| cache_hot | 8.542 / 32.545 | 576,685 |
-| random | 5.125 / 132.711 | 666,926 |
+| cache_hot | 7.750 / 9.584 | 636,292 |
+| random | 4.584 / 14.291 | 772,448 |
 
 <!-- forward-measurements:start -->
 | Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Random median / p99 (µs) | Random batch rows/s | Estimated world bytes |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| postal | 445,935 / 28,833 | 28 | 8.625 / 14.792 | 12.792 / 2642.812 | 20,056 | 74,990,618 |
-| airports | 134,628 / 2,475 | 33 | 7.958 / 8.584 | 9.542 / 93.625 | 298,733 | 3,808,534 |
-| locode | 148,371 / 3,265 | 33 | 7.958 / 15.834 | 8.042 / 83.958 | 387,735 | 4,392,835 |
-| phone | 66,126 / 395 | 30 | 4.875 / 5.292 | 6.459 / 10.292 | 302,444 | 6,111,549 |
-| ip | 115,492 / 7,170 | 60 | 7.834 / 26.584 | 8.792 / 142.709 | 342,898 | 100,098,143 |
-| plates | 43,463 / 521 | 36 | 4.125 / 11.875 | 4.334 / 20.959 | 1,185,311 | 3,095,294 |
-| geocode | 225,876 / 102 | 52 | 8.209 / 11.292 | 8.500 / 45.083 | 349,629 | 11,952,713 |
+| postal | 445,935 / 28,833 | 28 | 9.000 / 9.583 | 11.250 / 465.220 | 76,381 | 74,990,618 |
+| airports | 134,628 / 2,475 | 33 | 8.334 / 22.167 | 9.084 / 16.792 | 282,559 | 3,808,534 |
+| locode | 148,371 / 3,265 | 33 | 8.292 / 8.833 | 8.417 / 14.416 | 352,796 | 4,392,835 |
+| phone | 66,126 / 395 | 30 | 5.292 / 5.500 | 7.375 / 12.459 | 248,965 | 6,111,549 |
+| ip | 115,492 / 7,170 | 60 | 7.875 / 13.250 | 8.291 / 13.792 | 363,322 | 100,098,143 |
+| plates | 43,463 / 521 | 36 | 4.042 / 5.500 | 4.083 / 5.542 | 1,267,769 | 3,095,294 |
+| geocode | 225,876 / 102 | 52 | 7.916 / 10.500 | 8.417 / 44.167 | 351,233 | 11,952,713 |
 <!-- forward-measurements:end -->
 
 Random workloads visit all published sample keys, plus seeded repetitions.
@@ -285,7 +286,9 @@ and supporting tables. The enforced ceilings apply to all compressed blocks.
 World estimates scale complete data artifacts, including evidence and FSTs.
 IP/postal add historical measured world metadata only; their catalogue is now
 shared with core and excluded. Other estimates add sample metadata. These remain
-estimates, not measurements of new world exports.
+estimates, not measurements of new world exports. Estimates exclude manifests,
+notices and unmeasured supporting-table growth. The geocode figure is a name-index
+component estimate with sample catalogue/metadata, not a world spatial-core size.
 
 <!-- world-exports:start -->
 | Family | Measured pack bytes | Peak RSS bytes | Seconds | Output deleted |
@@ -300,7 +303,7 @@ revision, not final-codec world measurements. Exact manifests are retained under
 docs/measurements; both outputs were deleted. No second world export was run.
 Postal's measured catalogue alone uses
 61,177,911 bytes in that historical export.
-Current forward packs omit that catalogue
+Current writer 0.4.0 forward packs omit that catalogue
 entirely; the current estimates above use the new sample data bytes per row.
 IPv6 low words are preserved; the measured export contains
 7,836 nonzero low-word rows.
@@ -309,7 +312,7 @@ IPv6 low words are preserved; the measured export contains
 | Catalogue read path | Median µs | p99 µs | Batch rows/s |
 | --- | ---: | ---: | ---: |
 | before | 13.291 | 120.875 | 144578.55712150357 |
-| after | 7.25 | 12.583 | 497542.96862847265 |
+| after | 7.5 | 13.625 | 467161.92243314924 |
 <!-- catalogue-reads:end -->
 
 <!-- forward-scale:start -->
@@ -334,7 +337,7 @@ docs/measurements/geocode-profile.txt; it predates the million-key R4 measuremen
 | --- | ---: | ---: |
 | before (704 rules) | 83.166 / 205.750 | 15,167 |
 | after (704 rules) | 27.500 / 155.333 | 67,086 |
-| final (704 rules) | 28.500 / 193.718 | 64,432 |
+| final (704 rules) | 26.167 / 145.792 | 70,512 |
 <!-- plates-rules:end -->
 
 The all-rule benchmark retains original rule order and scoring. Its optimization
@@ -344,10 +347,16 @@ sample code assertions and no vehicle priors.
 
 ## Reproduction, remaining work and boundaries
 
-Run benchmarks.core_read_path, multishard_read_path with
+Run benchmarks.core_read_path with --output docs/CLIENT_CORE_MEASUREMENTS.json,
+single_shard_read_path --record after, multishard_read_path --record after
 --series catalogue_read_rework, forward_read_path for every family,
-forward_sizes --check, forward_scale and plates_world_rules --record final.
-Generate local scale fixtures with the Rust forward_scale example first.
+forward_sizes --check, shared_catalogue, cli_startup and
+plates_world_rules --record final. Run the Rust forward_scale example into
+.tmp/forward-scale before benchmarks.forward_scale --record after.
+These scripts preload file bytes without populating decoded caches; earlier
+filesystem-cache conditions remain labelled in measurement history.
+No real world export is part of this refresh. Final scratch is removed after
+the gate and status generation.
 The retained historical measurements include the old reader and earlier rework
 stages; workload and sample changes are explicit.
 

@@ -1,7 +1,8 @@
 """Measure scalar latency and column throughput on the committed real sample.
 
 uv run python -m benchmarks.core_read_path --output docs/CLIENT_CORE_MEASUREMENTS.json
-All documented new measurements originate here. Historical comparison figures
+Reverse measurements originate here; companion scripts record forward and scale work.
+Historical comparison figures
 are explicitly identified as measurements of the older synthetic workload.
 """
 
@@ -23,6 +24,16 @@ import numpy as np
 from thereabouts import Geocoder
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def warm_file_cache(pack: Path) -> None:
+    """Preload file bytes in bounded chunks without populating any decoded cache."""
+    buffer = bytearray(65536)
+    for path in sorted(pack.iterdir()):
+        if path.is_file():
+            with path.open("rb") as stream:
+                while stream.readinto(buffer):
+                    pass
 
 
 def current_rss() -> int:
@@ -90,6 +101,7 @@ def workload(
 
 def measure(iterations: int) -> dict[str, Any]:
     pack = ROOT / "tests/fixtures/packs/core-sample"
+    warm_file_cache(pack)
     rss_before = current_rss()
     start = time.perf_counter()
     geo = Geocoder(pack)
@@ -132,6 +144,7 @@ def measure(iterations: int) -> dict[str, Any]:
         ),
         "workload": dict(
             pack="core-sample",
+            filesystem_cache="preloaded",
             iterations=iterations,
             coordinate_vectors=len(points),
             seed=20261003,

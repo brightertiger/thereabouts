@@ -8,7 +8,7 @@ import time
 import numpy as np
 
 from benchmarks.catalogue_spans import spans
-from benchmarks.core_read_path import ROOT, current_rss
+from benchmarks.core_read_path import ROOT, current_rss, warm_file_cache
 from thereabouts import Geocoder
 
 
@@ -43,6 +43,7 @@ def main() -> None:
     indices = np.random.default_rng(20261003).permutation(len(points))[:2000]
     queries = points[indices]
     times = []
+    warm_file_cache(pack)
     rss = current_rss()
     start = time.perf_counter()
     with Geocoder(pack) as geo:
@@ -60,7 +61,7 @@ def main() -> None:
         batch = len(queries) / (time.perf_counter() - start)
     result = {
         "scope": (
-            "warm file cache; 2000 distinct random places; "
+            "preloaded file cache; 2000 distinct random places; "
             "fresh decoded caches for scalar and batch"
         ),
         "scalar_median_us": float(np.median(times)),
@@ -74,7 +75,10 @@ def main() -> None:
     }
     path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
-    data.setdefault("single_shard", {})[args.record] = result
+    series = data.setdefault("single_shard", {})
+    if args.record in series:
+        series.setdefault(f"{args.record}_history", []).append(series[args.record])
+    series[args.record] = result
     path.write_text(json.dumps(data, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 

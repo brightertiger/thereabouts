@@ -73,7 +73,13 @@ def estimate(pack: Path, world_rows: int, rows: int) -> dict[str, Any]:
     for artifact in manifest["files"]:
         roles[artifact["kind"]] = roles.get(artifact["kind"], 0) + artifact["size"]
     fixed = sum(roles.get(k, 0) for k in ("catalogue", "metadata"))
-    supporting_scope = "sample metadata; shared core catalogue excluded"
+    if manifest["family"] != "core" and roles.get("catalogue", 0):
+        raise ValueError("Forward packs cannot contain a catalogue")
+    supporting_scope = (
+        "sample core catalogue and metadata, not world core"
+        if manifest["family"] == "core"
+        else "sample metadata; shared core catalogue excluded"
+    )
     measured = ROOT / f"docs/measurements/{manifest['family']}-world-manifest.json"
     provenance = manifest["inputs"]["options"].get("input_provenance", {})
     if measured.exists():
@@ -93,6 +99,8 @@ def estimate(pack: Path, world_rows: int, rows: int) -> dict[str, Any]:
     )
     return {
         "estimated_world_bytes": round(data / rows * world_rows) + fixed,
+        "estimate_writer_revision": manifest["inputs"]["writer"],
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": data / rows,
         "measured_catalogue_metadata_bytes": fixed,
         "supporting_tables_scope": supporting_scope,

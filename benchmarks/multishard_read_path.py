@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from benchmarks.core_read_path import ROOT, current_rss, workload
+from benchmarks.core_read_path import ROOT, current_rss, warm_file_cache, workload
 from thereabouts import Geocoder
 
 
@@ -75,6 +75,7 @@ def main() -> None:
     points = np.asarray(json.loads(points_file.read_text()), dtype=np.float64)
     rng = np.random.default_rng(20261003)
     queries = points[rng.integers(0, len(points), size=100_000)]
+    warm_file_cache(pack)
     rss = current_rss()
     start = time.perf_counter()
     with Geocoder(pack) as geo:
@@ -82,6 +83,7 @@ def main() -> None:
         delta = current_rss() - rss
         result = workload(geo, queries)
     result.update(
+        filesystem_cache="preloaded",
         open_seconds=opened,
         open_rss_delta_bytes=delta,
         catalogue_shards=256,

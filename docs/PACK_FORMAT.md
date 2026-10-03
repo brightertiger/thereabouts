@@ -581,13 +581,19 @@ evidence/evidence4/evidence6, airport_evidence/airport_assertions and both plate
 evidence tables. Data artifact bytes include all forward data files, FSTs and
 container/directory overhead, excluding catalogue, metadata and notices.
 Measurements recompute these totals from headers rather than trusting reports.
-Sample query-block gates are IP ≤16 bytes/source row, postal ≤14, others ≤40;
-separate cold evidence and total pack sizes are always reported. World estimates
-scale all data artifacts including evidence, then add measured catalogue and
-metadata; they do not multiply fixed metadata by source-row count.
+Sample gates count **all compressed blocks: query plus evidence**. The ceilings
+are IP ≤16 bytes/source row, postal ≤14, and other forward families ≤40.
+FSTs, container/directory framing, metadata, manifests and notices are outside
+that specific compressed-block gate; their bytes are reported separately.
+World content estimates scale complete data artifacts, including evidence, FSTs
+and framing, then add measured metadata. Forward catalogue bytes are zero:
+core is a separate shared dependency. Historical world metadata is identified
+by its writer revision; otherwise sample metadata is explicitly labelled.
+Manifest/notices and unmeasured metadata growth are excluded from estimates.
+A sample-ratio estimate is not a measurement of a new world export.
 
-Readers retain file handles and directories. Each compressed table has an
-8 MiB decoded-block LRU; IO and decoding occur outside its lock. Evidence
+Readers retain file handles and directories. Forward tables share the per-pack
+512 MiB decoded-block LRU described above; IO and decoding occur outside its lock. Evidence
 directories are admitted at open but evidence payloads are fetched only for
 evidence=True or explicit full verification. Full verification checks every
 block, every reference, every key span and every source record. Forward packs contain no catalogue artifacts. They reference the core namespace

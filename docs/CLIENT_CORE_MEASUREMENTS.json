@@ -7,44 +7,45 @@
   },
   "workload": {
     "pack": "core-sample",
+    "filesystem_cache": "preloaded",
     "iterations": 20000,
     "coordinate_vectors": 65,
     "seed": 20261003,
-    "pack_bytes": 4636487
+    "pack_bytes": 14740365
   },
-  "open_seconds": 0.022276624978985637,
-  "open_rss_delta_bytes": 2506752,
+  "open_seconds": 0.01157370800501667,
+  "open_rss_delta_bytes": 4800512,
   "cache_hot": {
     "points": 20000,
-    "scalar_median_us": 8.542,
-    "scalar_p99_us": 32.54532999999947,
-    "reverse_columns_points_per_second": 576684.6396855033,
+    "scalar_median_us": 7.75,
+    "scalar_p99_us": 9.584409999999934,
+    "reverse_columns_points_per_second": 636291.6922252798,
     "reverse_columns_repeats": [
-      572024.4412022616,
-      586817.164030976,
-      576684.6396855033,
-      551805.3332296801,
-      587934.8421040919,
-      585448.6620069562,
-      567494.6178564132
+      616199.8953621484,
+      637442.580484575,
+      638364.9273351297,
+      638139.1862273286,
+      629827.8666875106,
+      636291.6922252798,
+      635089.4879509133
     ]
   },
   "random": {
     "points": 100000,
-    "scalar_median_us": 5.125,
-    "scalar_p99_us": 132.7110799999989,
-    "reverse_columns_points_per_second": 666926.025251422,
+    "scalar_median_us": 4.584,
+    "scalar_p99_us": 14.291009999999995,
+    "reverse_columns_points_per_second": 772447.8182020739,
     "reverse_columns_repeats": [
-      442590.40177608293,
-      394075.9228389412,
-      651136.6960526542,
-      666926.025251422,
-      684935.0253408115,
-      667580.8830588611,
-      689310.9116028636
+      769288.2173939028,
+      779336.6675752503,
+      758225.0796044527,
+      771960.0933655907,
+      772549.2664590434,
+      772447.8182020739,
+      777652.8513168518
     ]
   },
-  "peak_rss_bytes": 92340224,
+  "peak_rss_bytes": 125616128,
   "historical_reader": {
     "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",
@@ -253,6 +254,8 @@
       },
       "pack_bytes": 445935,
       "estimated_world_bytes": 74990618,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 14.86598689002185,
       "measured_catalogue_metadata_bytes": 124512,
       "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -302,6 +305,8 @@
       },
       "pack_bytes": 134628,
       "estimated_world_bytes": 3808534,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 44.07030303030303,
       "measured_catalogue_metadata_bytes": 11701,
       "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -345,6 +350,8 @@
       },
       "pack_bytes": 148371,
       "estimated_world_bytes": 4392835,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 37.69831546707504,
       "measured_catalogue_metadata_bytes": 11801,
       "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -388,6 +395,8 @@
       },
       "pack_bytes": 66126,
       "estimated_world_bytes": 6111549,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 14.270886075949367,
       "measured_catalogue_metadata_bytes": 513,
       "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -434,6 +443,8 @@
       },
       "pack_bytes": 115492,
       "estimated_world_bytes": 100098143,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 12.830125523012553,
       "measured_catalogue_metadata_bytes": 191700,
       "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -476,6 +487,8 @@
       },
       "pack_bytes": 43463,
       "estimated_world_bytes": 3095294,
+      "estimate_writer_revision": "0.4.0",
+      "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
       "data_artifact_bytes_per_row": 21.295585412667947,
       "measured_catalogue_metadata_bytes": 14355,
       "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -559,20 +572,21 @@
     },
     "after": {
       "points": 100000,
-      "scalar_median_us": 7.25,
-      "scalar_p99_us": 12.583,
-      "reverse_columns_points_per_second": 497542.96862847265,
+      "scalar_median_us": 7.5,
+      "scalar_p99_us": 13.625,
+      "reverse_columns_points_per_second": 467161.92243314924,
       "reverse_columns_repeats": [
-        454218.1263963801,
-        494448.6812650558,
-        498105.7462214188,
-        474452.324609831,
-        497542.96862847265,
-        506934.76365808316,
-        505350.60927765985
+        438457.1503611757,
+        440782.1967369879,
+        467161.92243314924,
+        470980.7185293979,
+        486831.71095673536,
+        475931.9249936878,
+        460940.1250654486
       ],
-      "open_seconds": 0.010226125014014542,
-      "open_rss_delta_bytes": 1392640,
+      "filesystem_cache": "preloaded",
+      "open_seconds": 0.006012750003719702,
+      "open_rss_delta_bytes": 1228800,
       "catalogue_shards": 256,
       "places": 16384,
       "pack_bytes": 37226859,
@@ -637,6 +651,27 @@
         ],
         "open_seconds": 0.006290708988672122,
         "open_rss_delta_bytes": 1327104,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 37226859,
+        "seed": 20261003
+      },
+      {
+        "points": 100000,
+        "scalar_median_us": 7.25,
+        "scalar_p99_us": 12.583,
+        "reverse_columns_points_per_second": 497542.96862847265,
+        "reverse_columns_repeats": [
+          454218.1263963801,
+          494448.6812650558,
+          498105.7462214188,
+          474452.324609831,
+          497542.96862847265,
+          506934.76365808316,
+          505350.60927765985
+        ],
+        "open_seconds": 0.010226125014014542,
+        "open_rss_delta_bytes": 1392640,
         "catalogue_shards": 256,
         "places": 16384,
         "pack_bytes": 37226859,
@@ -728,10 +763,12 @@
         "sample_rows": 102,
         "world_source_rows": 68923,
         "estimated_world_bytes": 11952713,
+        "estimate_writer_revision": "0.2.2",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 170.54901960784315,
         "measured_catalogue_metadata_bytes": 197963,
-        "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
-        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample metadata; shared core catalogue excluded",
+        "supporting_tables_scope": "sample core catalogue and metadata, not world core",
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured catalogue/metadata; sample core catalogue and metadata, not world core",
         "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
         "vectors": 52,
         "workload_scope": "all source keys; plates use code/country assertions",
@@ -746,19 +783,19 @@
         ],
         "workloads": {
           "hot": {
-            "filesystem_cache": "uncontrolled",
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 8.209,
-            "scalar_p99_us": 11.292,
-            "batch_points_per_second": 426555.19352180284
+            "scalar_median_us": 7.916,
+            "scalar_p99_us": 10.5,
+            "batch_points_per_second": 431451.7542601839
           },
           "random": {
-            "filesystem_cache": "uncontrolled",
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 90,
             "seed": 271828,
@@ -766,45 +803,45 @@
               "matched": 19574,
               "ambiguous": 426
             },
-            "scalar_median_us": 8.5,
-            "scalar_p99_us": 45.083,
-            "batch_points_per_second": 349629.2130863568
+            "scalar_median_us": 8.417,
+            "scalar_p99_us": 44.167,
+            "batch_points_per_second": 351232.78830721363
           },
           "miss": {
-            "filesystem_cache": "uncontrolled",
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 2,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 7.125,
-            "scalar_p99_us": 11.084409999999934,
-            "batch_points_per_second": 256240.79587341638
+            "scalar_median_us": 7.1455,
+            "scalar_p99_us": 8.417409999999935,
+            "batch_points_per_second": 260496.7999441647
           },
           "fuzzy": {
-            "filesystem_cache": "uncontrolled",
+            "filesystem_cache": "preloaded",
             "queries": 1000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 1000
             },
-            "scalar_median_us": 10.792,
-            "scalar_p99_us": 11.964829999999994,
-            "batch_points_per_second": 196426.684242301
+            "scalar_median_us": 10.667,
+            "scalar_p99_us": 10.95801,
+            "batch_points_per_second": 191716.24815051837
           }
         },
-        "filesystem_cache": "uncontrolled",
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 8.209,
-        "scalar_p99_us": 11.292,
-        "batch_points_per_second": 426555.19352180284
+        "scalar_median_us": 7.916,
+        "scalar_p99_us": 10.5,
+        "batch_points_per_second": 431451.7542601839
       }
     },
     "postal": {
@@ -813,6 +850,8 @@
         "sample_rows": 28833,
         "world_source_rows": 5036067,
         "estimated_world_bytes": 74990618,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 14.86598689002185,
         "measured_catalogue_metadata_bytes": 124512,
         "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -831,17 +870,19 @@
         ],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 8.625,
-            "scalar_p99_us": 14.792,
-            "batch_points_per_second": 354172.7080287534
+            "scalar_median_us": 9.0,
+            "scalar_p99_us": 9.583,
+            "batch_points_per_second": 317918.4833850853
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 7173,
             "seed": 271828,
@@ -849,31 +890,33 @@
               "matched": 16081,
               "ambiguous": 3919
             },
-            "scalar_median_us": 12.792,
-            "scalar_p99_us": 2642.81166999999,
-            "batch_points_per_second": 20056.073431716974
+            "scalar_median_us": 11.25,
+            "scalar_p99_us": 465.21966999999813,
+            "batch_points_per_second": 76381.42975891162
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 3,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 3.083,
-            "scalar_p99_us": 3.3330099999999985,
-            "batch_points_per_second": 2846299.6719109337
+            "scalar_median_us": 3.208,
+            "scalar_p99_us": 4.208009999999998,
+            "batch_points_per_second": 2710593.4540476184
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 8.625,
-        "scalar_p99_us": 14.792,
-        "batch_points_per_second": 354172.7080287534
+        "scalar_median_us": 9.0,
+        "scalar_p99_us": 9.583,
+        "batch_points_per_second": 317918.4833850853
       }
     },
     "airports": {
@@ -882,6 +925,8 @@
         "sample_rows": 2475,
         "world_source_rows": 86154,
         "estimated_world_bytes": 3808534,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 44.07030303030303,
         "measured_catalogue_metadata_bytes": 11701,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -900,59 +945,64 @@
         ],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 7.958,
-            "scalar_p99_us": 8.584409999999934,
-            "batch_points_per_second": 340990.4616456166
+            "scalar_median_us": 8.334,
+            "scalar_p99_us": 22.167,
+            "batch_points_per_second": 306304.5126133983
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 4614,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 9.542,
-            "scalar_p99_us": 93.625,
-            "batch_points_per_second": 298733.3719694046
+            "scalar_median_us": 9.084,
+            "scalar_p99_us": 16.792409999999933,
+            "batch_points_per_second": 282559.0417791391
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 2,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 3.208,
-            "scalar_p99_us": 3.375,
-            "batch_points_per_second": 1946172.1869185856
+            "scalar_median_us": 3.209,
+            "scalar_p99_us": 3.334,
+            "batch_points_per_second": 1946116.8899718756
           },
           "default_scheme": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 416,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 8.459,
-            "scalar_p99_us": 25.0,
-            "batch_points_per_second": 314364.69839807827
+            "scalar_median_us": 8.875,
+            "scalar_p99_us": 12.375,
+            "batch_points_per_second": 280712.754424004
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 7.958,
-        "scalar_p99_us": 8.584409999999934,
-        "batch_points_per_second": 340990.4616456166
+        "scalar_median_us": 8.334,
+        "scalar_p99_us": 22.167,
+        "batch_points_per_second": 306304.5126133983
       }
     },
     "locode": {
@@ -961,6 +1011,8 @@
         "sample_rows": 3265,
         "world_source_rows": 116213,
         "estimated_world_bytes": 4392835,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 37.69831546707504,
         "measured_catalogue_metadata_bytes": 11801,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -971,17 +1023,19 @@
         "countries": [],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 7.958,
-            "scalar_p99_us": 15.834,
-            "batch_points_per_second": 403546.83784185885
+            "scalar_median_us": 8.292,
+            "scalar_p99_us": 8.833009999999998,
+            "batch_points_per_second": 367617.21692068485
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 3262,
             "seed": 271828,
@@ -989,31 +1043,33 @@
               "matched": 19981,
               "ambiguous": 19
             },
-            "scalar_median_us": 8.042,
-            "scalar_p99_us": 83.95841999999992,
-            "batch_points_per_second": 387734.9733639505
+            "scalar_median_us": 8.417,
+            "scalar_p99_us": 14.416009999999998,
+            "batch_points_per_second": 352796.1689391591
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 2,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 2.917,
-            "scalar_p99_us": 3.042,
-            "batch_points_per_second": 3590207.274400461
+            "scalar_median_us": 3.0,
+            "scalar_p99_us": 3.125,
+            "batch_points_per_second": 3587604.83407538
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 7.958,
-        "scalar_p99_us": 15.834,
-        "batch_points_per_second": 403546.83784185885
+        "scalar_median_us": 8.292,
+        "scalar_p99_us": 8.833009999999998,
+        "batch_points_per_second": 367617.21692068485
       }
     },
     "phone": {
@@ -1022,6 +1078,8 @@
         "sample_rows": 395,
         "world_source_rows": 428217,
         "estimated_world_bytes": 6111549,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 14.270886075949367,
         "measured_catalogue_metadata_bytes": 513,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -1032,48 +1090,52 @@
         "countries": [],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 4.875,
-            "scalar_p99_us": 5.292,
-            "batch_points_per_second": 633582.247701585
+            "scalar_median_us": 5.292,
+            "scalar_p99_us": 5.5,
+            "batch_points_per_second": 547276.1041089986
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 173,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 6.459,
-            "scalar_p99_us": 10.292,
-            "batch_points_per_second": 302443.7454366026
+            "scalar_median_us": 7.375,
+            "scalar_p99_us": 12.4592499999998,
+            "batch_points_per_second": 248964.5904676071
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 3.042,
-            "scalar_p99_us": 3.292,
-            "batch_points_per_second": 2596391.013040938
+            "scalar_median_us": 3.084,
+            "scalar_p99_us": 4.1674099999999346,
+            "batch_points_per_second": 2573795.5533305756
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 4.875,
-        "scalar_p99_us": 5.292,
-        "batch_points_per_second": 633582.247701585
+        "scalar_median_us": 5.292,
+        "scalar_p99_us": 5.5,
+        "batch_points_per_second": 547276.1041089986
       }
     },
     "ip": {
@@ -1082,6 +1144,8 @@
         "sample_rows": 7170,
         "world_source_rows": 7786864,
         "estimated_world_bytes": 100098143,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 12.830125523012553,
         "measured_catalogue_metadata_bytes": 191700,
         "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -1092,48 +1156,52 @@
         "countries": [],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 7.834,
-            "scalar_p99_us": 26.5842499999998,
-            "batch_points_per_second": 289415.529979465
+            "scalar_median_us": 7.875,
+            "scalar_p99_us": 13.25,
+            "batch_points_per_second": 411688.87637930416
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 14338,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 8.792,
-            "scalar_p99_us": 142.7092499999998,
-            "batch_points_per_second": 342898.04568755557
+            "scalar_median_us": 8.291,
+            "scalar_p99_us": 13.792,
+            "batch_points_per_second": 363322.0306330345
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 2,
             "seed": 271828,
             "status_counts": {
               "not_found": 20000
             },
-            "scalar_median_us": 3.084,
-            "scalar_p99_us": 7.917,
-            "batch_points_per_second": 3131483.1490177317
+            "scalar_median_us": 2.958,
+            "scalar_p99_us": 3.125,
+            "batch_points_per_second": 3295616.6385230278
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 7.834,
-        "scalar_p99_us": 26.5842499999998,
-        "batch_points_per_second": 289415.529979465
+        "scalar_median_us": 7.875,
+        "scalar_p99_us": 13.25,
+        "batch_points_per_second": 411688.87637930416
       }
     },
     "plates": {
@@ -1142,6 +1210,8 @@
         "sample_rows": 521,
         "world_source_rows": 144675,
         "estimated_world_bytes": 3095294,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 21.295585412667947,
         "measured_catalogue_metadata_bytes": 14355,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -1158,28 +1228,31 @@
         ],
         "workloads": {
           "hot": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 4.125,
-            "scalar_p99_us": 11.875,
-            "batch_points_per_second": 1201252.2817564905
+            "scalar_median_us": 4.042,
+            "scalar_p99_us": 5.5,
+            "batch_points_per_second": 1375854.8614230615
           },
           "random": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 155,
             "seed": 271828,
             "status_counts": {
               "matched": 20000
             },
-            "scalar_median_us": 4.334,
-            "scalar_p99_us": 20.959,
-            "batch_points_per_second": 1185311.0570707265
+            "scalar_median_us": 4.083,
+            "scalar_p99_us": 5.542,
+            "batch_points_per_second": 1267768.5701551111
           },
           "miss": {
+            "filesystem_cache": "preloaded",
             "queries": 20000,
             "distinct_queries": 1,
             "seed": 271828,
@@ -1187,19 +1260,20 @@
               "not_found": 20000
             },
             "scalar_median_us": 4.0,
-            "scalar_p99_us": 5.75,
-            "batch_points_per_second": 720400.5516272308
+            "scalar_p99_us": 4.750419999999933,
+            "batch_points_per_second": 822984.6101149165
           }
         },
+        "filesystem_cache": "preloaded",
         "queries": 20000,
         "distinct_queries": 1,
         "seed": 271828,
         "status_counts": {
           "matched": 20000
         },
-        "scalar_median_us": 4.125,
-        "scalar_p99_us": 11.875,
-        "batch_points_per_second": 1201252.2817564905
+        "scalar_median_us": 4.042,
+        "scalar_p99_us": 5.5,
+        "batch_points_per_second": 1375854.8614230615
       }
     }
   },
@@ -1400,6 +1474,7 @@
       "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
     },
     "final": {
+      "filesystem_cache": "preloaded",
       "queries": 20000,
       "distinct_queries": 91,
       "seed": 271828,
@@ -1408,9 +1483,9 @@
         "matched": 5295,
         "not_found": 1310
       },
-      "scalar_median_us": 28.5,
-      "scalar_p99_us": 193.7177399999986,
-      "batch_points_per_second": 64432.30634708034,
+      "scalar_median_us": 26.167,
+      "scalar_p99_us": 145.79240999999993,
+      "batch_points_per_second": 70512.4137048104,
       "rules": 704,
       "countries": 239,
       "scope": "all committed rules; sample code assertions; no vehicle priors",
@@ -2386,74 +2461,74 @@
       "--lon",
       "2.3522"
     ],
-    "pack_manifest_sha256": "0e3a41bbce2d3cac55206737d4f7d612d3a66c8fb4ccb4a0951f9c2b5c0296bf",
-    "first_launch_ms": 64.138584,
-    "first_result_median_ms": 62.4632915,
-    "first_result_p99_ms": 68.682959,
-    "total_median_ms": 72.4597495,
+    "pack_manifest_sha256": "e36060803d9eac961834fe478e81f5cc7559c12da140e052126442a887760481",
+    "first_launch_ms": 68.922167,
+    "first_result_median_ms": 63.177041,
+    "first_result_p99_ms": 71.239458,
+    "total_median_ms": 72.04977099999999,
     "first_result_samples_ms": [
-      62.010083,
-      66.199959,
-      62.365875,
-      62.269792,
-      62.138167,
-      64.816625,
-      62.3045,
-      62.129666,
-      62.242542,
-      67.609833,
-      62.61975,
-      63.070791,
-      62.45025,
-      62.10725,
-      63.346625,
-      65.355583,
-      61.896333,
-      62.130833,
-      62.476333,
-      64.618,
-      64.103042,
-      65.29075,
-      68.682959,
-      68.422542,
-      67.00925,
-      62.169375,
-      61.866292,
-      65.13475,
-      61.85725,
-      61.826417
+      63.212917,
+      62.690125,
+      64.082125,
+      64.1415,
+      63.423041,
+      63.361,
+      64.101625,
+      63.192416,
+      63.38525,
+      64.147208,
+      62.990334,
+      62.687334,
+      63.041292,
+      62.48575,
+      62.928125,
+      63.701209,
+      63.028292,
+      62.679166,
+      63.05075,
+      64.842542,
+      63.161666,
+      63.009875,
+      62.920959,
+      63.082583,
+      62.796125,
+      64.287125,
+      63.030334,
+      71.239458,
+      63.859833,
+      63.46275
     ],
     "total_samples_ms": [
-      70.922875,
-      74.122625,
-      71.276875,
-      70.891,
-      71.056292,
-      73.21475,
-      70.425833,
-      71.016125,
-      71.126959,
-      76.527708,
-      71.436416,
-      71.736958,
-      70.429666,
-      71.010167,
-      82.307083,
-      74.270166,
-      70.442333,
-      70.432125,
-      71.353333,
-      73.547459,
-      72.708542,
-      74.334875,
-      79.3295,
-      78.771125,
-      77.630542,
-      72.800167,
-      72.490333,
-      75.60675,
-      72.483791,
-      72.435708
+      71.821834,
+      71.609833,
+      73.12275,
+      73.10475,
+      72.345916,
+      72.318042,
+      73.030667,
+      72.126291,
+      72.274084,
+      73.069583,
+      71.934667,
+      71.604125,
+      71.970625,
+      71.413125,
+      71.865583,
+      72.633042,
+      71.9605,
+      71.617291,
+      71.958375,
+      73.766375,
+      72.096125,
+      71.521125,
+      71.854292,
+      72.003417,
+      71.730833,
+      73.215208,
+      71.961042,
+      80.197,
+      72.802875,
+      72.397083
     ]
   },
   "shared_catalogue": {
@@ -2490,6 +2565,8 @@
         },
         "pack_bytes": 445935,
         "estimated_world_bytes": 74990618,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 14.86598689002185,
         "measured_catalogue_metadata_bytes": 124512,
         "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -2547,6 +2624,8 @@
         },
         "pack_bytes": 134628,
         "estimated_world_bytes": 3808534,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 44.07030303030303,
         "measured_catalogue_metadata_bytes": 11701,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -2597,6 +2676,8 @@
         },
         "pack_bytes": 148371,
         "estimated_world_bytes": 4392835,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 37.69831546707504,
         "measured_catalogue_metadata_bytes": 11801,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -2648,6 +2729,8 @@
         },
         "pack_bytes": 66126,
         "estimated_world_bytes": 6111549,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 14.270886075949367,
         "measured_catalogue_metadata_bytes": 513,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -2691,6 +2774,8 @@
         },
         "pack_bytes": 115492,
         "estimated_world_bytes": 100098143,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 12.830125523012553,
         "measured_catalogue_metadata_bytes": 191700,
         "supporting_tables_scope": "historical world metadata, writer 0.3.1; shared core excluded",
@@ -2764,6 +2849,8 @@
         },
         "pack_bytes": 43463,
         "estimated_world_bytes": 3095294,
+        "estimate_writer_revision": "0.4.0",
+        "estimate_excludes": "manifest, notices and unmeasured supporting-table growth",
         "data_artifact_bytes_per_row": 21.295585412667947,
         "measured_catalogue_metadata_bytes": 14355,
         "supporting_tables_scope": "sample metadata; shared core catalogue excluded",
@@ -2805,12 +2892,12 @@
       }
     },
     "after": {
-      "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
-      "scalar_median_us": 88.708,
-      "scalar_p99_us": 281.08183999999994,
-      "reverse_columns_points_per_second": 165459.0497555668,
-      "open_seconds": 0.0031696250080130994,
-      "open_rss_delta_bytes": 737280,
+      "scope": "preloaded file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+      "scalar_median_us": 9.292,
+      "scalar_p99_us": 12.29142,
+      "reverse_columns_points_per_second": 166426.26397713964,
+      "open_seconds": 0.0003786669985856861,
+      "open_rss_delta_bytes": 884736,
       "pack_bytes": 56704188,
       "single_shard_spans": {
         "catalogue_shards": 1,
@@ -2830,7 +2917,36 @@
         "hot_offsets_max_bytes": 88,
         "full_text_max_bytes": 457
       }
-    }
+    },
+    "after_history": [
+      {
+        "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+        "scalar_median_us": 88.708,
+        "scalar_p99_us": 281.08183999999994,
+        "reverse_columns_points_per_second": 165459.0497555668,
+        "open_seconds": 0.0031696250080130994,
+        "open_rss_delta_bytes": 737280,
+        "pack_bytes": 56704188,
+        "single_shard_spans": {
+          "catalogue_shards": 1,
+          "places": 25000,
+          "hot_text_median_bytes": 31.0,
+          "hot_text_p99_bytes": 31.0,
+          "hot_text_max_bytes": 31,
+          "hot_offsets_max_bytes": 48,
+          "full_text_max_bytes": 2119
+        },
+        "real_sample_spans": {
+          "catalogue_shards": 4,
+          "places": 29772,
+          "hot_text_median_bytes": 90.0,
+          "hot_text_p99_bytes": 107.0,
+          "hot_text_max_bytes": 162,
+          "hot_offsets_max_bytes": 88,
+          "full_text_max_bytes": 457
+        }
+      }
+    ]
   },
   "world_scale": {
     "before": {
@@ -3153,5 +3269,31 @@
         "process_peak_rss_bytes": 582041600
       }
     ]
+  },
+  "format_followups_baseline": {
+    "commit": "07fbae7",
+    "multishard": {
+      "points": 100000,
+      "scalar_median_us": 7.5,
+      "scalar_p99_us": 51.083,
+      "reverse_columns_points_per_second": 242767.4272936086,
+      "reverse_columns_repeats": [
+        245645.14634736843,
+        271152.4008534382,
+        225659.05120585594,
+        243881.59546650405,
+        177719.28839050845,
+        227841.0571117887,
+        242767.4272936086
+      ],
+      "open_seconds": 0.06216862500878051,
+      "open_rss_delta_bytes": 1015808,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "core_open_seconds": 0.022276624978985637,
+    "core_open_rss_delta_bytes": 2506752
   }
 }

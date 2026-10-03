@@ -127,6 +127,7 @@ def main() -> None:
         f"{v['single_shard_spans']['hot_text_max_bytes']:,} | "
         f"{v['single_shard_spans']['hot_offsets_max_bytes']:,} |"
         for phase, v in spans.items()
+        if phase in {"before", "after"}
     )
     world = core.get("world_scale", {})
     world_rows = "\n".join(
@@ -210,7 +211,8 @@ three bounded positioned reads: 80 bytes, at most 112 offset bytes and at most
 65,536 string bytes. Full verification also checks record ownership of every
 string reference. Core now requires manifest minor 2; older core packs must be rebuilt.
 The 25,000-place, single-shard workload uses 2,000 distinct random queries and
-fresh decoded caches, with warm filesystem caches; timings include Python.
+fresh decoded caches, with warm filesystem caches (explicitly preloaded now);
+timings include Python.
 
 | Single shard | Median µs | p99 µs | Max hot strings B | Max offsets B |
 | --- | ---: | ---: | ---: | ---: |
@@ -392,7 +394,9 @@ and supporting tables. The enforced ceilings apply to all compressed blocks.
 World estimates scale complete data artifacts, including evidence and FSTs.
 IP/postal add historical measured world metadata only; their catalogue is now
 shared with core and excluded. Other estimates add sample metadata. These remain
-estimates, not measurements of new world exports.
+estimates, not measurements of new world exports. Estimates exclude manifests,
+notices and unmeasured supporting-table growth. The geocode figure is a name-index
+component estimate with sample catalogue/metadata, not a world spatial-core size.
 
 {section(old, "world-exports")}
 
@@ -402,7 +406,7 @@ revision, not final-codec world measurements. Exact manifests are retained under
 docs/measurements; both outputs were deleted. No second world export was run.
 Postal's measured catalogue alone uses
 {exports["postal"]["storage"]["catalogue_bytes"]:,} bytes in that historical export.
-Current forward packs omit that catalogue
+Current writer 0.4.0 forward packs omit that catalogue
 entirely; the current estimates above use the new sample data bytes per row.
 IPv6 low words are preserved; the measured export contains
 {exports["ip"]["ipv6_nonzero_low64"]:,} nonzero low-word rows.
@@ -426,10 +430,16 @@ sample code assertions and no vehicle priors.
 
 ## Reproduction, remaining work and boundaries
 
-Run benchmarks.core_read_path, multishard_read_path with
+Run benchmarks.core_read_path with --output docs/CLIENT_CORE_MEASUREMENTS.json,
+single_shard_read_path --record after, multishard_read_path --record after
 --series catalogue_read_rework, forward_read_path for every family,
-forward_sizes --check, forward_scale and plates_world_rules --record final.
-Generate local scale fixtures with the Rust forward_scale example first.
+forward_sizes --check, shared_catalogue, cli_startup and
+plates_world_rules --record final. Run the Rust forward_scale example into
+.tmp/forward-scale before benchmarks.forward_scale --record after.
+These scripts preload file bytes without populating decoded caches; earlier
+filesystem-cache conditions remain labelled in measurement history.
+No real world export is part of this refresh. Final scratch is removed after
+the gate and status generation.
 The retained historical measurements include the old reader and earlier rework
 stages; workload and sample changes are explicit.
 

@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 
-from benchmarks.core_read_path import ROOT
+from benchmarks.core_read_path import ROOT, warm_file_cache
 from benchmarks.forward_queries import Query
 from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
@@ -18,16 +18,13 @@ SEED = 271828
 
 
 def run(
-    pack: Path, verb: str, queries: list[Query], count: int, *, warm_files: bool = False
+    pack: Path, verb: str, queries: list[Query], count: int, *, warm_files: bool = True
 ) -> dict[str, Any]:
     """Visit every key once, then sample uniformly; batch groups preserve options."""
+    packs = selection(pack) if pack.parent == ROOT / "tests/fixtures/packs" else None
     if warm_files:
-        buffer = bytearray(65536)
-        for path in sorted(pack.iterdir()):
-            if path.is_file():
-                with path.open("rb") as stream:
-                    while stream.readinto(buffer):
-                        pass
+        for source in packs.values() if packs else [pack]:
+            warm_file_cache(source)
     rng = random.Random(SEED)
     values = queries.copy()
     rng.shuffle(values)
@@ -38,8 +35,8 @@ def run(
     for query in values:
         groups[query.options].append(query.value)
     with Geocoder(
-        packs=selection(pack) if pack.parent == ROOT / "tests/fixtures/packs" else None,
-        pack=pack if pack.parent != ROOT / "tests/fixtures/packs" else None,
+        packs=packs,
+        pack=None if packs else pack,
     ) as geo:
         scalar, batch = getattr(geo, verb), getattr(geo, verb + "_columns")
         for query in values:

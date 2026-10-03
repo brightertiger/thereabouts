@@ -47,6 +47,18 @@ def main() -> None:
         values[family] = value
     path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
+    baseline = json.loads(
+        subprocess.check_output(
+            ["git", "show", f"{args.before}:docs/CLIENT_CORE_MEASUREMENTS.json"],
+            cwd=ROOT,
+        )
+    )
+    data["format_followups_baseline"] = {
+        "commit": args.before,
+        "multishard": baseline["catalogue_read_rework"]["after"],
+        "core_open_seconds": baseline["open_seconds"],
+        "core_open_rss_delta_bytes": baseline["open_rss_delta_bytes"],
+    }
     data["shared_catalogue"] = {
         "baseline_commit": args.before,
         "families": values,
