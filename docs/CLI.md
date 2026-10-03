@@ -304,8 +304,10 @@ with Content-Range: bytes N-(total-1)/total. If supplied, Content-Length must
 equal the remaining advertised length. Ignored/mismatched ranges fail and
 retain the partial file for retry. No bytes are appended before these checks.
 Requests use Accept-Encoding: identity; encoded responses are rejected.
-Redirects and environment proxies are disabled, and transfers have a
-120-second total timeout. Tests use only loopback HTTP and local directories.
+Redirects and environment proxies are currently disabled. Connections and headers
+have 30-second deadlines; each transport read has a fresh 60-second stall limit.
+There is no total download timeout. Failures retain verified-offset partial bytes
+for the next explicit install to resume. Tests use only loopback HTTP and local directories.
 
 The full archive length and SHA-256 are checked before extraction. Then every
 pack checksum and structure is verified, and family, dataset version and minor
