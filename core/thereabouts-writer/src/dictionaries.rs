@@ -18,7 +18,7 @@ impl<'a> Dictionaries<'a> {
             db.execute_batch(&format!(
                 "CREATE TABLE compact_{name}(id INTEGER PRIMARY KEY,value BLOB UNIQUE)"
             ))?;
-            let empty = if name.ends_with("strings") {
+            let empty = if name.ends_with("strings") || name == "locations" {
                 None
             } else {
                 Some(vec![
@@ -137,8 +137,8 @@ impl<'a> Dictionaries<'a> {
                         .iter()
                         .map(|b| u64::from_le_bytes(*b))
                         .collect::<Vec<_>>();
-                    if role == "details" && id == 0 {
-                        values = vec![0; details];
+                    if id == 0 && matches!(role, "details" | "locations") {
+                        values = vec![0; if role == "locations" { 4 } else { details }];
                     }
                     numeric.push((u128::from(id), values));
                     if numeric.len() == columns::BLOCK_ROWS {

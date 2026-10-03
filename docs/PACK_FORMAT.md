@@ -35,7 +35,7 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.2.0` for core with names and `0.3.0` for forward families. Options contain `data_version`, `sources`, `attribution`, `notices`
+`0.2.0` for core with names and `0.3.1` for forward families. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
 rules in `input_provenance`. No absolute build paths or run timestamps enter
@@ -280,7 +280,8 @@ another parent on the same filesystem. This operational option is excluded
 from pack identity. Preflight requires at least 5 GiB free plus an estimate of
 eight times the consumed compressed input size and one maximum-size shard
 (64 MiB). The estimate is admission policy, not a measured world-build bound.
-No world export has been qualified. On success all shards are verified and the directory is renamed
+World qualification measurements are recorded by benchmarks/world_export.py
+in CLIENT_CORE_MEASUREMENTS.json. On success all shards are verified and the directory is renamed
 atomically. Ordinary failures remove only the writer's own staging directory.
 An interrupted process leaves staging for inspection; automatic resume is not
 implemented. The caller must explicitly remove abandoned staging before retry.
@@ -290,9 +291,15 @@ Parquet row groups and Arrow batches at most 128 MiB uncompressed, a 16 MiB
 SQLite cache, borrowed typed Arrow fields and typed SQLite columns (no per-row JSON maps in cells, places, canonical cities, mappings or timezone scans), cached SQL
 statements and multi-row inserts (at most 256 rows / 999 bindings / 1 MiB, with a single
 larger row bounded at 128 MiB) within the existing transaction,
-block-local timezone joins, and bounded output shards. It rejects oversized
+block-local timezone joins, and bounded output shards. Forward closure selection
+admits at most 128 MiB of estimated owned ID sets and stages only their referenced
+places. Postal and IP intern numeric tuples and strings before disk sorting;
+IP staging keys are packed version/start/end bytes. No per-row evidence JSON
+is retained in their sort table. The temporary database transaction remains
+open through emission; no durable per-row commits are needed. Preflight counts
+only the tables consumed by the selected family. It rejects oversized
 units. Full verification visits one decoded shard at a time. This budget is
-not an allocator/RSS proof; world export remains unmeasured.
+not an allocator/RSS proof; the world measurement script separately records peak RSS.
 
 Runtime opening validates the manifest, inventory sizes, shard headers and
 directories, and the small metadata table. Spatial payloads are decoded and
@@ -428,6 +435,8 @@ The non-plate families require `forward_columns` in the manifest, containing
 | geographies | country, state, city catalogue references |
 | locations | geography ordinal, latitude bits, longitude bits, evidence name string |
 | evidence / evidence4 / evidence6 | source string, source-id prefix string, line-plus-one, code string, scheme string, details ordinal |
+| airport_evidence | first assertion ordinal, assertion count |
+| airport_assertions | name string, details ordinal |
 | details | One nullable JSON-scalar string reference per detail_fields entry |
 | starts4 / starts6 (IP only) | address high 64 bits, address low 64 bits, location ordinal |
 
@@ -437,7 +446,13 @@ both must be i32::MIN when absent. Geography references use the shared catalogue
 Records point to locations; their one-based ordinal supplies stable identity
 without fetching source strings. Source identity remains authoritative during
 writing. Airports have exactly one record per (source, source_id); conflicting
-geographic, coordinate, name or detail fields for that identity are rejected.
+geographic or coordinate fields for that identity are rejected. Different
+published names/details are preserved as assertions. Airport_evidence aligns
+with postings (not airport records), and selects a nonempty contiguous span in
+airport_assertions. Spans concatenate from zero; assertions are distinct
+name/details pairs in bytewise name/details order for that exact scheme key and
+airport. Thus a renamed assertion without a GPS code does not acquire the GPS
+scheme from another assertion. Both tables are evidence-only.
 
 The evidence table aligns exactly with records, or with each IP start table.
 A non-null source ID with a canonical decimal u32 suffix after its final colon
@@ -468,6 +483,19 @@ gap and has an all-zero evidence row. A final gap row follows the last covered
 interval unless coverage ends at the family maximum. Addresses before the first
 start are uncovered. The reader binary-searches block keys, decompresses one
 block, and binary-searches its starts. No ends are stored per row.
+
+The optional manifest storage object reports source_rows, query_compressed_bytes,
+evidence_compressed_bytes, data_artifact_bytes, catalogue_bytes and metadata_bytes,
+all u64. Query bytes sum compressed sections of query tables and the hot string
+pool. Evidence bytes sum compressed sections of details, evidence_strings,
+evidence/evidence4/evidence6, airport_evidence/airport_assertions and both plate
+evidence tables. Data artifact bytes include all forward data files, FSTs and
+container/directory overhead, excluding catalogue, metadata and notices.
+Measurements recompute these totals from headers rather than trusting reports.
+Sample query-block gates are IP ≤16 bytes/source row, postal ≤14, others ≤40;
+separate cold evidence and total pack sizes are always reported. World estimates
+scale all data artifacts including evidence, then add measured catalogue and
+metadata; they do not multiply fixed metadata by source-row count.
 
 Readers retain file handles and directories. Each compressed table has an
 8 MiB decoded-block LRU; IO and decoding occur outside its lock. Evidence

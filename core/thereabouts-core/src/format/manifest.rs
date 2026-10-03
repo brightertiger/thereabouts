@@ -22,6 +22,22 @@ pub struct Artifact {
     /// Lowercase SHA-256 checked by explicit full verification.
     pub sha256: String,
 }
+/// Writer accounting, independently reproducible from inventoried section lengths.
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct Storage {
+    /// Original observations, counting an airport once.
+    pub source_rows: u64,
+    /// Compressed query columns and hot strings, excluding evidence and container framing.
+    pub query_compressed_bytes: u64,
+    /// Separate compressed source, detail and provenance payloads.
+    pub evidence_compressed_bytes: u64,
+    /// All data artifacts, including FSTs, evidence, framing and directories.
+    pub data_artifact_bytes: u64,
+    /// Actual supporting catalogue bytes; not extrapolated per input row.
+    pub catalogue_bytes: u64,
+    /// Actual referenced metadata bytes; not extrapolated per input row.
+    pub metadata_bytes: u64,
+}
 /// Required pack identity and source attribution, independent of build paths.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
@@ -34,6 +50,9 @@ pub struct Manifest {
     /// Plate policy for columnar format/code assertions with cold provenance.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub plate_columns: Option<super::plates::Schema>,
+    /// Physical writer accounting; checked independently by measurement tools.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub storage: Option<Storage>,
     /// Required schema identifier, thereabouts-pack-2.
     pub schema: String,
     /// Wire format integer; this reader accepts 2.

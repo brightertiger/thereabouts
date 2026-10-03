@@ -3,6 +3,7 @@
     test,
     allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
 )]
+mod airport_evidence;
 mod airports;
 mod arrow;
 mod blocks;
@@ -14,17 +15,20 @@ mod dictionaries;
 mod emission;
 mod error;
 mod forward;
+mod forward_catalogue;
 mod geography;
 mod inserts;
 mod ip;
 mod locode;
 mod names;
+mod packed_staging;
 mod phone;
 mod plate_columns;
 mod plates;
 mod postal;
 mod source;
 mod staging;
+mod storage;
 mod timezones;
 use error::ensure;
 pub use error::{Error, Result};
@@ -36,7 +40,7 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.3.0";
+const WRITER_REVISION: &str = "0.3.1";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -111,10 +115,8 @@ pub fn write_pack(
     }
     let revision = if family == "core" {
         "0.2.0" // Core exports now include canonical-city spellings.
-    } else if family == "plates" {
-        WRITER_REVISION
     } else {
-        "0.3.0"
+        WRITER_REVISION
     };
     let mut identity = json!({"manifest_sha256":data.digest,"options":options,"writer":revision});
     if family != "core"
@@ -140,7 +142,7 @@ pub fn write_pack(
         .and_then(|s| s.to_str())
         .ok_or_else(|| Error::Input("Invalid output name".into()))?;
     let stage_parent = options.staging_directory.as_deref().unwrap_or(parent);
-    staging::preflight(&data, stage_parent, parent)?;
+    staging::preflight(&data, stage_parent, parent, family)?;
     let stage = stage_parent.join(format!(".{name}.building"));
     // create_dir is the exclusive writer lock; interrupted work is kept for review.
     fs::create_dir(&stage).map_err(|error| {
@@ -175,7 +177,7 @@ fn build(
     family: &str,
 ) -> Result<Manifest> {
     let sqlite_parent = options.sqlite_directory.as_deref().unwrap_or(stage);
-    staging::sqlite_preflight(data, sqlite_parent)?;
+    staging::sqlite_preflight(data, sqlite_parent, family)?;
     let db_file = tempfile::NamedTempFile::new_in(sqlite_parent)?;
     let db = Connection::open(db_file.path())?;
     catalogue::initialize(&db)?;
@@ -191,8 +193,7 @@ fn build(
         "plates" => {}
         _ => return Err(Error::Input("Unsupported export family".into())),
     }
-    db.execute_batch("COMMIT")?;
-    let mut metadata = metadata(data)?;
+    let mut metadata = metadata(data, family)?;
     if !matches!(family, "core" | "plates") {
         compact_metadata::trim(&db, &mut metadata)?;
     }
@@ -201,6 +202,7 @@ fn build(
         format_minor: 0,
         forward_columns: None,
         plate_columns: None,
+        storage: None,
         schema: "thereabouts-pack-2".into(),
         format_version: 2,
         family: family.into(),
@@ -246,6 +248,7 @@ fn build(
         compact::emit(&db, stage, &mut manifest)?;
     }
     emission::catalogue(&db, stage, &mut manifest)?;
+    db.execute_batch("COMMIT")?;
     add(
         stage,
         &mut manifest,
@@ -264,13 +267,14 @@ fn build(
     }
     drop(db);
     db_file.close()?;
+    storage::report(stage, &mut manifest)?;
     let mut json = serde_json::to_vec(&manifest)?;
     json.push(b'\n');
     fs::write(stage.join("manifest.json"), json)?;
     format::verify::verify(stage)?;
     Ok(manifest)
 }
-fn metadata(data: &Dataset) -> Result<Metadata> {
+fn metadata(data: &Dataset, family: &str) -> Result<Metadata> {
     let mut metadata = Metadata {
         timezone_sets: vec![vec![]],
         ..Metadata::default()
@@ -282,6 +286,9 @@ fn metadata(data: &Dataset) -> Result<Metadata> {
         ("subdivisions", &mut metadata.subdivisions),
         ("zone_tables", &mut metadata.zone_tables),
     ] {
+        if kind == "zone_tables" && family != "core" {
+            continue;
+        }
         for table in data.tables(kind) {
             data.scan(table, |row| {
                 let row = row.metadata()?;

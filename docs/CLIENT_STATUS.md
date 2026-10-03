@@ -23,7 +23,7 @@ evidence and smaller referenced metadata. Postal, airports and LOCODE use FST
 keys; airports have one record per source identity. Phone uses an FST of prefixes;
 IP uses sorted starts with implicit ends and explicit uncovered gap rows.
 Old forward packs are rejected and must be rebuilt. Remaining review fixes,
-size qualification and updated runtime measurements are still in progress. Plates carry source rules and
+updated runtime measurements and the later semantic fixes are still in progress. Plates carry source rules and
 registration evidence. Canonical-city names now live in core, with FST exact
 and prefix search plus trigram fallback. Name rules and Unicode versions are
 pack data. The refreshed core sample retains its previous reverse expectations.
@@ -102,8 +102,10 @@ dataset export; no application Rust unsafe was introduced.
 from a verified golden manifest. Required geographic and family tables are
 strict; deliberate fixture omissions must be listed explicitly. Inputs and
 counts are verified, no source defaults are guessed, and changed inputs never
-overwrite an existing output. The 512 MiB admission budget covers bounded scans,
-shards and SQLite staging; it is not a proven world RSS bound. Preflight retains
+overwrite an existing output. The 512 MiB admission design covers bounded scans, shards, ID selection and
+SQLite staging; process peak RSS is measured separately. Forward writers select
+only referenced catalogue ancestry, and the large IP/postal sorts stage
+dictionary IDs. Temporary SQLite writes share one transaction through emission. Preflight retains
 a 5 GiB floor plus an input-based estimate. Staging defaults to the output parent;
 SQLite scratch may use a separately checked filesystem.
 
@@ -183,13 +185,16 @@ Those historical samples and code differ; the JSON preserves them.
 Old-reader synthetic figures (a different workload) were 10.291 µs / 531,994
 rows/s with Cython and 12.750 µs / 530,437 rows/s with Python.
 
-Forward measurements use 20,000 scalar calls over matching US vectors and
+The following historical package-2 measurements predate format 2.1. They
+use 20,000 scalar calls over matching US vectors and
 seven native batch repetitions. distinct_queries is recorded per family
 (including the one-query phone case); these are repeated-key measurements,
 not a world-random claim. Size estimates multiply total sample bytes per source
 row by source row counts. Fixed metadata/notices make this crude ratio strongly
 upward-biased. The geocode estimate covers names and supporting catalogue only,
-excluding the spatial core. No world size or throughput was measured.
+excluding the spatial core. Those size estimates are obsolete; corrected data-
+artifact estimates and the measured IP/postal exports appear below. Random
+forward and world-scale throughput measurements are still pending review fix 4.
 
 <!-- forward-measurements:start -->
 | Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Batch rows/s | Estimated world bytes |
@@ -223,16 +228,17 @@ The real names table is pending; the writer already accepts its tested canonical
 alternate-name shape. Full-place names and scope="places" remain optional later
 work. The new CLI, installer, MCP integration and Node/WASM host adapter are
 later packages. Legacy Python modules and suites remain until package 5.
-There was no world export. Linux/Windows and other Python versions were not run.
+IP and postal world-size measurements are recorded below. Linux/Windows and
+other Python versions were not run.
 
 ## Validation and boundaries
 
 Full gates run before each local commit: cargo fmt --check;
 cargo clippy --all-targets --all-features -- -D warnings; cargo test;
 uv run pytest; uv run ruff check; uv run ruff format --check; uv run mypy.
-The wasm target is also compile-checked. The final gate passed: 52 Rust tests,
-697 Python tests (9 skipped), formatting over 466 Python files and strict mypy
-over 446 source files. Old reader and pipeline tests remain in the gate.
+The wasm target is also compile-checked. Old reader and pipeline tests remain
+in the gate. Current rework checks and final counts are recorded after the
+remaining ordered fixes.
 
 Only worktree files and normal shared Git metadata were written. The real data
 tree was read-only, build_data source was unchanged, and nothing was pushed,
@@ -248,12 +254,30 @@ artifact and manifest. Historical speed/size estimates above predate this rework
 ## Forward format measurements
 
 <!-- forward-format:start -->
-| Family | Old data-shard B/row | Query blocks B/row | All compressed B/row | Sample pack bytes |
-| --- | ---: | ---: | ---: | ---: |
-| postal | 129.99 | 10.21 | 25.95 | 104,960 |
-| airports | 403.32 | 15.42 | 54.14 | 72,658 |
-| locode | 257.08 | 13.23 | 65.48 | 76,762 |
-| phone | 266.83 | 2.07 | 19.06 | 70,262 |
-| ip | 194.68 | 11.81 | 24.73 | 45,356 |
-| plates | 654.10 | 25.88 | 29.65 | 48,334 |
+| Family | Old data-shard B/row | Query blocks B/row | All compressed B/row | Sample pack bytes | Estimated world bytes |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| postal | 129.99 | 10.25 | 25.93 | 105,111 | 143,127,131 |
+| airports | 403.32 | 15.42 | 65.99 | 75,947 | 7,219,281 |
+| locode | 257.08 | 13.23 | 65.48 | 76,930 | 8,823,901 |
+| phone | 266.83 | 2.07 | 19.06 | 70,425 | 10,075,099 |
+| ip | 194.68 | 11.81 | 24.73 | 45,523 | 215,105,432 |
+| plates | 654.10 | 25.88 | 29.65 | 48,499 | 4,570,923 |
 <!-- forward-format:end -->
+
+## Measured world exports
+
+<!-- world-exports:start -->
+| Family | Measured pack bytes | Peak RSS bytes | Seconds | Output deleted |
+| --- | ---: | ---: | ---: | --- |
+| ip | 94,643,648 | 1,086,291,968 | 233.533 | True |
+| postal | 134,347,594 | 902,545,408 | 190.210 | True |
+<!-- world-exports:end -->
+
+The two authorised world measurements are complete; their outputs were deleted
+and their exact manifests are retained under docs/measurements/. The measured
+postal total exceeds the design's approximate size estimate: its supporting
+catalogue is a substantial part of the complete pack. The measurements include
+cold evidence, all supporting tables and notices. Per-family query-block gates
+are separate from that complete-pack accounting. The IPv6 measurement counts
+nonzero low address words; the format preserves them instead of assuming /64
+alignment. Neither export qualifies a core world pack or the other families.

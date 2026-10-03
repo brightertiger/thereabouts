@@ -11,6 +11,8 @@ from benchmarks.core_read_path import ROOT
 
 FAMILIES = ("postal", "airports", "locode", "phone", "ip", "plates")
 COLD = {
+    "airport_evidence",
+    "airport_assertions",
     "evidence",
     "evidence4",
     "evidence6",
@@ -53,24 +55,48 @@ def measure(pack: Path) -> dict[str, Any]:
     }
 
 
+def estimate(pack: Path, world_rows: int, rows: int) -> dict[str, Any]:
+    """Scale data (including evidence and FSTs), adding measured supporting tables."""
+    manifest = json.loads((pack / "manifest.json").read_text())
+    roles: dict[str, int] = {}
+    for artifact in manifest["files"]:
+        roles[artifact["kind"]] = roles.get(artifact["kind"], 0) + artifact["size"]
+    fixed = sum(roles.get(k, 0) for k in ("catalogue", "metadata"))
+    data = sum(
+        n for k, n in roles.items() if k not in {"catalogue", "metadata", "notice"}
+    )
+    return {
+        "estimated_world_bytes": round(data / rows * world_rows) + fixed,
+        "data_artifact_bytes_per_row": data / rows,
+        "measured_catalogue_metadata_bytes": fixed,
+        "estimate_method": (
+            "all data artifacts (compressed query and evidence, FSTs, directories, "
+            "framing) / source rows * world rows + measured sample catalogue/metadata; "
+            "world catalogue growth is not modelled"
+        ),
+    }
+
+
 def update_status(values: dict[str, Any]) -> None:
     """Replace only this script's delimited table."""
     start, end = "<!-- forward-format:start -->", "<!-- forward-format:end -->"
     lines = [
         (
             "| Family | Old data-shard B/row | Query blocks B/row | "
-            "All compressed B/row | Sample pack bytes |"
+            "All compressed B/row | Sample pack bytes | Estimated world bytes |"
         ),
-        "| --- | ---: | ---: | ---: | ---: |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
     ]
     for family, value in values.items():
         old = value.get("before", {}).get("data_bytes_per_row")
         lines.append(
             f"| {family} | {old:.2f} | {value['query_bytes_per_row']:.2f} | "
-            f"{value['all_compressed_bytes_per_row']:.2f} | {value['pack_bytes']:,} |"
+            f"{value['all_compressed_bytes_per_row']:.2f} | {value['pack_bytes']:,} | "
+            f"{value['estimated_world_bytes']:,} |"
             if old is not None
             else f"| {family} | — | {value['query_bytes_per_row']:.2f} | "
-            f"{value['all_compressed_bytes_per_row']:.2f} | {value['pack_bytes']:,} |"
+            f"{value['all_compressed_bytes_per_row']:.2f} | {value['pack_bytes']:,} | "
+            f"{value['estimated_world_bytes']:,} |"
         )
     section = start + "\n" + "\n".join(lines) + "\n" + end
     path = ROOT / "docs/CLIENT_STATUS.md"
@@ -92,7 +118,13 @@ def main() -> None:
     previous = data.get("forward_format", {})
     values = {}
     for family in FAMILIES:
-        value = measure(ROOT / f"tests/fixtures/packs/{family}-sample")
+        pack = ROOT / f"tests/fixtures/packs/{family}-sample"
+        value = measure(pack)
+        manifest = json.loads((pack / "manifest.json").read_text())
+        world_rows = manifest["inputs"]["options"]["input_provenance"][
+            "world_source_rows"
+        ]
+        value.update(estimate(pack, world_rows, value["source_rows"]))
         if args.baseline:
             old_path = args.baseline / f"{family}-sample"
             manifest = json.loads((old_path / "manifest.json").read_text())

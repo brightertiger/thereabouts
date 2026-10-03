@@ -224,33 +224,37 @@
   "forward_format": {
     "postal": {
       "source_rows": 897,
-      "compressed_query_bytes": 9160,
-      "compressed_evidence_bytes": 14113,
-      "query_bytes_per_row": 10.211817168338907,
-      "all_compressed_bytes_per_row": 25.9453734671126,
+      "compressed_query_bytes": 9191,
+      "compressed_evidence_bytes": 14065,
+      "query_bytes_per_row": 10.246376811594203,
+      "all_compressed_bytes_per_row": 25.926421404682273,
       "compressed_bytes_by_role": {
-        "records": 1146,
-        "evidence": 3002,
+        "records": 1147,
+        "evidence": 2997,
         "strings": 9,
-        "evidence_strings": 10466,
-        "geographies": 789,
-        "locations": 7216,
-        "details": 645
+        "evidence_strings": 10430,
+        "geographies": 791,
+        "locations": 7244,
+        "details": 638
       },
       "artifact_bytes_by_role": {
-        "records": 1290,
-        "evidence": 3146,
+        "records": 1291,
+        "evidence": 3141,
         "keys": 1217,
         "strings": 153,
-        "evidence_strings": 10610,
-        "geographies": 933,
-        "locations": 7360,
-        "details": 789,
+        "evidence_strings": 10574,
+        "geographies": 935,
+        "locations": 7388,
+        "details": 782,
         "catalogue": 66320,
         "metadata": 1699,
         "notice": 2692
       },
-      "pack_bytes": 104960,
+      "pack_bytes": 105111,
+      "estimated_world_bytes": 143127131,
+      "data_artifact_bytes_per_row": 28.40691192865106,
+      "measured_catalogue_metadata_bytes": 68019,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 116604,
         "data_bytes_per_row": 129.9933110367893,
@@ -261,13 +265,15 @@
     "airports": {
       "source_rows": 213,
       "compressed_query_bytes": 3284,
-      "compressed_evidence_bytes": 8247,
+      "compressed_evidence_bytes": 10772,
       "query_bytes_per_row": 15.417840375586854,
-      "all_compressed_bytes_per_row": 54.136150234741784,
+      "all_compressed_bytes_per_row": 65.9906103286385,
       "compressed_bytes_by_role": {
         "records": 233,
         "evidence": 717,
         "postings": 471,
+        "airport_assertions": 1406,
+        "airport_evidence": 1119,
         "strings": 9,
         "evidence_strings": 6929,
         "geographies": 497,
@@ -278,6 +284,8 @@
         "records": 377,
         "evidence": 861,
         "postings": 615,
+        "airport_assertions": 1550,
+        "airport_evidence": 1263,
         "keys": 2238,
         "strings": 153,
         "evidence_strings": 7073,
@@ -288,7 +296,11 @@
         "metadata": 5415,
         "notice": 2692
       },
-      "pack_bytes": 72658,
+      "pack_bytes": 75947,
+      "estimated_world_bytes": 7219281,
+      "data_artifact_bytes_per_row": 83.25821596244131,
+      "measured_catalogue_metadata_bytes": 46253,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 85908,
         "data_bytes_per_row": 403.32394366197184,
@@ -324,7 +336,11 @@
         "metadata": 5329,
         "notice": 2692
       },
-      "pack_bytes": 76762,
+      "pack_bytes": 76930,
+      "estimated_world_bytes": 8823901,
+      "data_artifact_bytes_per_row": 75.51555555555555,
+      "measured_catalogue_metadata_bytes": 48012,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 57844,
         "data_bytes_per_row": 257.08444444444444,
@@ -360,7 +376,11 @@
         "metadata": 513,
         "notice": 2692
       },
-      "pack_bytes": 70262,
+      "pack_bytes": 70425,
+      "estimated_world_bytes": 10075099,
+      "data_artifact_bytes_per_row": 23.524421593830333,
+      "measured_catalogue_metadata_bytes": 1542,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 103797,
         "data_bytes_per_row": 266.8303341902314,
@@ -399,7 +419,11 @@
         "metadata": 2695,
         "notice": 2692
       },
-      "pack_bytes": 45356,
+      "pack_bytes": 45523,
+      "estimated_world_bytes": 215105432,
+      "data_artifact_bytes_per_row": 27.621380846325167,
+      "measured_catalogue_metadata_bytes": 21496,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 87412,
         "data_bytes_per_row": 194.6815144766147,
@@ -433,13 +457,63 @@
         "metadata": 14355,
         "notice": 2692
       },
-      "pack_bytes": 48334,
+      "pack_bytes": 48499,
+      "estimated_world_bytes": 4570923,
+      "data_artifact_bytes_per_row": 31.495201535508638,
+      "measured_catalogue_metadata_bytes": 14355,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "before": {
         "data_shard_bytes": 340787,
         "data_bytes_per_row": 654.101727447217,
         "pack_bytes": 1139827,
         "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
       }
+    }
+  },
+  "world_exports": {
+    "ip": {
+      "family": "ip",
+      "export_seconds": 233.53255816700403,
+      "peak_rss_bytes": 1086291968,
+      "pack_bytes": 94643648,
+      "input_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+      "storage": {
+        "catalogue_bytes": 20176096,
+        "data_artifact_bytes": 74265916,
+        "evidence_compressed_bytes": 27654798,
+        "metadata_bytes": 191700,
+        "query_compressed_bytes": 46411534,
+        "source_rows": 7786864
+      },
+      "ipv6_rows": 4166430,
+      "ipv6_nonzero_low64": 7836,
+      "monitored_peak_worktree_bytes": 2828644352,
+      "monitored_peak_output_bytes": 94643648,
+      "monitored_peak_rss_bytes": 1071726592,
+      "minimum_free_bytes": 49613615104,
+      "measurement_seconds": 239.29098037499352,
+      "output_deleted": true
+    },
+    "postal": {
+      "family": "postal",
+      "export_seconds": 190.20960654199007,
+      "peak_rss_bytes": 902545408,
+      "pack_bytes": 134347594,
+      "input_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+      "storage": {
+        "catalogue_bytes": 61177911,
+        "data_artifact_bytes": 73033272,
+        "evidence_compressed_bytes": 25353557,
+        "metadata_bytes": 124512,
+        "query_compressed_bytes": 41039789,
+        "source_rows": 5036067
+      },
+      "monitored_peak_worktree_bytes": 3300290560,
+      "monitored_peak_output_bytes": 134347594,
+      "monitored_peak_rss_bytes": 797671424,
+      "minimum_free_bytes": 49219751936,
+      "measurement_seconds": 190.7823931669991,
+      "output_deleted": true
     }
   }
 }

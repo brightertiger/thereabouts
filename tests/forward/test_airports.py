@@ -90,3 +90,15 @@ def test_airport_columns_candidates() -> None:
             "not_found",
         ]
         assert result["candidate_offsets"].tolist() == [0, 2, 2, 2]
+
+
+def test_duplicate_identity_names_follow_the_published_scheme() -> None:
+    with Geocoder(FIXTURES / "packs/airports-synthetic") as geo:
+        iata = geo.airport("ZZZ", scheme="iata", country="AA", evidence=True)
+        gps = geo.airport("GPS1", scheme="gps", evidence=True)
+    assert iata.evidence is not None and gps.evidence is not None
+    assert {dict(s)["name"] for s in iata.evidence.source_ids or ()} == {
+        "First airport",
+        "First airport renamed",
+    }
+    assert {dict(s)["name"] for s in gps.evidence.source_ids or ()} == {"First airport"}

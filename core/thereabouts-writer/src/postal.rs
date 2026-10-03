@@ -1,12 +1,11 @@
 //! Export country-scoped postal codes without losing source point or administrative names.
-use crate::{Error, Result, error::ensure, forward, inserts::Inserts, source::Dataset};
+use crate::{Error, Result, error::ensure, forward, packed_staging::Packed, source::Dataset};
 use rusqlite::Connection;
 use thereabouts_core::forward::normalize_code;
 pub(crate) const NORMALIZATION: [&str; 3] = ["strip_ascii", "upper_ascii", "remove_ascii_spaces"];
 pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
-    forward::initialize(db)?;
     let rules: Vec<_> = NORMALIZATION.iter().map(|s| (*s).to_owned()).collect();
-    let mut inserts = Inserts::new(db, "INSERT INTO observations", 12);
+    let mut inserts = Packed::new(db, "postal")?;
     for table in data.tables("postal_codes") {
         data.scan(table, |row| {
             let country = row.required("country_code")?;
@@ -39,8 +38,11 @@ pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
                 None,
                 Some(serde_json::to_string(&details)?),
             )?;
-            forward::insert(&mut inserts, format!("{country}\0{code}"), record)
+            inserts.push(
+                rusqlite::types::Value::Text(format!("{country}\0{code}")),
+                &record,
+            )
         })?;
     }
-    inserts.flush()
+    inserts.finish()
 }

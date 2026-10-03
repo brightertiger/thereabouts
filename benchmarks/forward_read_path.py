@@ -12,6 +12,7 @@ from typing import Any
 import numpy as np
 
 from benchmarks.core_read_path import ROOT
+from benchmarks.forward_sizes import estimate
 from thereabouts import Geocoder
 
 
@@ -59,11 +60,7 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         "pack_bytes": size,
         "sample_rows": len(source["rows"]),
         "world_source_rows": world_rows,
-        "estimated_world_bytes": round(size * world_rows / len(source["rows"])),
-        "estimate_method": (
-            "linear sample byte/row ratio including sample fixed overhead; "
-            "not a world measurement"
-        ),
+        **estimate(pack, world_rows, len(source["rows"])),
         "estimate_scope": (
             "city-name index and supporting catalogue only; excludes spatial core"
             if family == "geocode"

@@ -26,7 +26,10 @@ pub fn initialize(db: &Connection) -> Result<()> {
     Ok(())
 }
 pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
-    load_places(db, data)?;
+    if kind != "cells" {
+        return crate::forward_catalogue::load(db, data, kind);
+    }
+    load_places(db, data, None)?;
     load_cities(db, data)?;
     let mut mappings = Inserts::new(db, "INSERT INTO mappings", 2);
     for table in data.tables("place_to_city") {
@@ -38,6 +41,32 @@ pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
         })?;
     }
     mappings.flush()?;
+    seed(db, data, kind)?;
+    if kind == "cells" {
+        db.execute("INSERT OR IGNORE INTO needed SELECT id FROM cities", [])?;
+    }
+    loop {
+        let changed = db.total_changes();
+        for field in REF_FIELDS {
+            db.prepare_cached(&format!("INSERT OR IGNORE INTO needed SELECT p.{field} FROM places p JOIN needed n USING(id) WHERE p.{field} IS NOT NULL"))?.execute([])?;
+        }
+        if changed == db.total_changes() {
+            break;
+        }
+    }
+    let missing: Option<String> = db
+        .query_row(
+            "SELECT n.id FROM needed n LEFT JOIN places p USING(id) WHERE p.id IS NULL LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
+        .optional()?;
+    ensure(missing.is_none(), "Dangling dataset place reference")?;
+    db.prepare_cached("INSERT INTO ids(id) SELECT id FROM needed ORDER BY id COLLATE BINARY")?
+        .execute([])?;
+    Ok(())
+}
+pub(crate) fn seed(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
     let mut needed = Inserts::new(db, "INSERT OR IGNORE INTO needed", 1);
     let kinds = if kind == "phone_prefixes" {
         vec![kind, "phone_metadata"]
@@ -69,40 +98,34 @@ pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
         })?;
     }
     needed.flush()?;
-    if kind == "cells" {
-        db.execute("INSERT OR IGNORE INTO needed SELECT id FROM cities", [])?;
-    }
-    loop {
-        let changed = db.total_changes();
-        for field in REF_FIELDS {
-            db.prepare_cached(&format!("INSERT OR IGNORE INTO needed SELECT p.{field} FROM places p JOIN needed n USING(id) WHERE p.{field} IS NOT NULL"))?.execute([])?;
-        }
-        if changed == db.total_changes() {
-            break;
-        }
-    }
-    let missing: Option<String> = db
-        .query_row(
-            "SELECT n.id FROM needed n LEFT JOIN places p USING(id) WHERE p.id IS NULL LIMIT 1",
-            [],
-            |r| r.get(0),
-        )
-        .optional()?;
-    ensure(missing.is_none(), "Dangling dataset place reference")?;
-    db.prepare_cached("INSERT INTO ids(id) SELECT id FROM needed ORDER BY id COLLATE BINARY")?
-        .execute([])?;
     Ok(())
 }
-fn load_places(db: &Connection, data: &Dataset) -> Result<()> {
+pub(crate) fn load_places(
+    db: &Connection,
+    data: &Dataset,
+    mut selection: Option<&mut crate::forward_catalogue::Selection>,
+) -> Result<()> {
     let mut inserts = Inserts::new(db, "INSERT INTO places", 17);
     for table in data.tables("places") {
         let table_path = required(table, "path")?;
         data.scan(table, |row| {
-            row.required("place_id")?;
+            let id = row.required("place_id")?;
             let population = row.population()?;
+            if let Some(selected) = selection.as_deref_mut() {
+                if !selected.needed.contains(id) { return Ok(()); }
+                if let Some(generation) = selected.loaded.get(id) {
+                    ensure(*generation != selected.generation, "Duplicate referenced place ID")?;
+                    return Ok(());
+                }
+                selected.loaded.insert(id.into(), selected.generation);
+                for field in REF_FIELDS {
+                    if let Some(value) = row.text(field)? { selected.include(value)?; }
+                }
+                selected.include(&format!("country:{}", row.required("country_code")?))?;
+            }
             let mut values = Vec::with_capacity(17);
             for field in TEXT_FIELDS {
-                values.push(if field == "evidence" {
+                values.push(if selection.is_some() && matches!(field, "local_name" | "code_status" | "parent_method" | "normalization_method" | "evidence") { SqlValue::Null } else if field == "evidence" {
                     // These are published JSON provenance fields, not a serialized dataset row.
                     let evidence = json!({"source_ids":row.text("source_ids")?.and_then(|s| serde_json::from_str::<Value>(s).ok()), "golden_table":table_path, "name_provenance":row.text("name_provenance")?.and_then(|s| serde_json::from_str::<Value>(s).ok())});
                     SqlValue::Text(serde_json::to_string(&evidence)?)
@@ -117,7 +140,7 @@ fn load_places(db: &Connection, data: &Dataset) -> Result<()> {
     }
     inserts.flush()
 }
-fn load_cities(db: &Connection, data: &Dataset) -> Result<()> {
+pub(crate) fn load_cities(db: &Connection, data: &Dataset) -> Result<()> {
     let mut inserts = Inserts::new(db, "INSERT INTO cities", 7);
     for table in data.tables("canonical_cities") {
         data.scan(table, |row| {

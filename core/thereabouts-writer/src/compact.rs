@@ -118,9 +118,15 @@ pub(crate) fn encode_record(
 pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
     manifest.format_minor = 1;
     let family = manifest.family.clone();
-    let dict = Dictionaries::new(db)?;
+    let dict = if matches!(family.as_str(), "ip" | "postal") {
+        Dictionaries { db }
+    } else {
+        Dictionaries::new(db)?
+    };
     let count = if family == "ip" {
-        crate::compact_ip::emit(db, stage, manifest, &dict)?
+        crate::compact_ip::emit(db, stage, manifest)?
+    } else if family == "postal" {
+        packed_exact(db, stage, manifest)?
     } else {
         exact(db, stage, manifest, &dict)?
     };
@@ -194,10 +200,20 @@ fn exact(
             postings.push(manifest, postings.count as u128, vec![id])?;
         }
         postings.finish(manifest)?;
+        crate::airport_evidence::emit(db, stage, manifest, dict)?;
     }
+    finish_keys(keys, &file, stage, manifest)?;
+    Ok(count)
+}
+fn finish_keys(
+    keys: fst::MapBuilder<fs::File>,
+    file: &Path,
+    stage: &Path,
+    manifest: &mut Manifest,
+) -> Result<()> {
     keys.finish().map_err(fst_error)?;
     ensure(
-        fs::metadata(&file)?.len() <= container::MAX_SHARD_BYTES as u64 - 128,
+        fs::metadata(file)?.len() <= container::MAX_SHARD_BYTES as u64 - 128,
         "Forward FST exceeds shard limit",
     )?;
     add(
@@ -205,21 +221,41 @@ fn exact(
         manifest,
         "keys.bin",
         "keys",
-        &container::encode(11, &[(&fs::read(&file)?, 1)])?,
+        &container::encode(11, &[(&fs::read(file)?, 1)])?,
     )?;
     fs::remove_file(file)?;
+    Ok(())
+}
+fn packed_exact(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<usize> {
+    let mut query = db.prepare("SELECT * FROM packed_observations ORDER BY key COLLATE BINARY,sort_source COLLATE BINARY,sort_id COLLATE BINARY,sort_name COLLATE BINARY")?;
+    let file = stage.join(".keys.fst");
+    let mut keys = fst::MapBuilder::new(fs::File::create(&file)?).map_err(fst_error)?;
+    let mut records = Rows::new(stage, "records");
+    let mut evidence = Rows::new(stage, "evidence");
+    let mut previous = None;
+    for row in query.query_map([], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            crate::packed_staging::numeric(row)?,
+        ))
+    })? {
+        let (key, (location, fields)) = row?;
+        let ordinal = records.count;
+        if previous.as_ref() != Some(&key) {
+            keys.insert(&key, ordinal as u64).map_err(fst_error)?;
+            previous = Some(key);
+        }
+        records.push(manifest, ordinal as u128, vec![location])?;
+        evidence.push(manifest, ordinal as u128, fields)?;
+    }
+    let count = records.count;
+    records.finish(manifest)?;
+    evidence.finish(manifest)?;
+    finish_keys(keys, &file, stage, manifest)?;
     Ok(count)
 }
 fn validate_airport_identity(db: &Connection) -> Result<()> {
-    for field in [
-        "country",
-        "state",
-        "city",
-        "latitude",
-        "longitude",
-        "name",
-        "details",
-    ] {
+    for field in ["country", "state", "city", "latitude", "longitude"] {
         let sql = format!(
             "SELECT EXISTS(SELECT 1 FROM observations GROUP BY source,source_id HAVING MIN({field})<>MAX({field}) OR (COUNT({field})>0 AND COUNT({field})<COUNT(*)))"
         );

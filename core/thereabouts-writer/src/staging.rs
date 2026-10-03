@@ -10,7 +10,7 @@ const SHARD_RESERVE: u64 = thereabouts_core::format::container::MAX_SHARD_BYTES 
 /// Eight copies is deliberately conservative for the committed sample, not a world bound.
 const INPUT_EXPANSION: u64 = 8;
 
-pub(crate) fn preflight(data: &Dataset, stage: &Path, output: &Path) -> Result<()> {
+pub(crate) fn preflight(data: &Dataset, stage: &Path, output: &Path, family: &str) -> Result<()> {
     fs::create_dir_all(stage)?;
     #[cfg(unix)]
     {
@@ -20,32 +20,26 @@ pub(crate) fn preflight(data: &Dataset, stage: &Path, output: &Path) -> Result<(
             "Staging and output directories must be on the same filesystem for atomic rename",
         )?;
     }
-    sqlite_preflight(data, stage)
+    sqlite_preflight(data, stage, family)
 }
-pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
+pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path, family: &str) -> Result<()> {
     fs::create_dir_all(directory)?;
     let mut bytes = 0_u64;
-    for kind in [
-        "postal_codes",
-        "airports",
-        "trade_locations",
-        "phone_prefixes",
-        "phone_metadata",
-        "ip_ranges",
-        "plate_formats",
-        "plate_codes",
-        "plate_priors",
-        "plate_policy",
-        "cells",
+    let mut kinds = vec![
+        crate::primary_table(family),
         "places",
         "canonical_cities",
-        "names",
         "place_to_city",
         "countries",
         "subdivisions",
-        "timezone_cells",
-        "zone_tables",
-    ] {
+    ];
+    match family {
+        "core" => kinds.extend(["timezone_cells", "zone_tables"]),
+        "phone" => kinds.push("phone_metadata"),
+        "plates" => kinds.extend(["plate_codes", "plate_policy", "plate_priors"]),
+        _ => {}
+    }
+    for kind in kinds {
         for table in data.tables(kind) {
             let path = thereabouts_core::format::manifest::artifact_path(
                 &data.root,

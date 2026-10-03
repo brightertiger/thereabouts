@@ -1,10 +1,9 @@
 //! Typed IP endpoints are checked against their textual spelling before interval staging.
-use crate::{Error, Result, error::ensure, forward, inserts::Inserts, source::Dataset};
+use crate::{Error, Result, error::ensure, forward, packed_staging::Packed, source::Dataset};
 use rusqlite::Connection;
 use thereabouts_core::format::intervals::Bounds;
 pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
-    forward::initialize(db)?;
-    let mut inserts = Inserts::new(db, "INSERT INTO observations", 12);
+    let mut inserts = Packed::new(db, "ip")?;
     for table in data.tables("ip_ranges") {
         data.scan(table,|row| {
             let version=row.unsigned("ip_version")?.and_then(|n|u8::try_from(n).ok()).ok_or_else(||Error::Input("Missing IP version".into()))?;
@@ -19,8 +18,11 @@ pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
             let code=format!("{}–{}",row.required("ip_start")?,row.required("ip_end")?);
             let details=serde_json::json!({"region":row.text("region")?,"city":row.text("city")?,"country_code":row.text("country_code")?}).to_string();
             let record=forward::association(db,row,"city",&code,Some(if version==4 {"ipv4"} else {"ipv6"}),Some(details))?;
-            forward::insert(&mut inserts,bounds.key(),record)
+            let mut key = vec![bounds.version];
+            key.extend(bounds.first.to_be_bytes());
+            key.extend(bounds.last.to_be_bytes());
+            inserts.push(rusqlite::types::Value::Blob(key), &record)
         })?;
     }
-    inserts.flush()
+    inserts.finish()
 }
