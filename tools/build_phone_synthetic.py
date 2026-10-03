@@ -100,6 +100,7 @@ def main() -> None:
         "phone",
         str(ROOT / "tests/fixtures/packs/phone-synthetic"),
         {
+            "core_pack": str(ROOT / "tests/fixtures/packs/core-synthetic"),
             "data_version": "synthetic",
             "sources": ["synthetic phone cases"],
             "attribution": "Synthetic fixture; public domain",

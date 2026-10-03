@@ -1369,12 +1369,22 @@
     ],
     "files": {
       "golden-thereabouts/canonical_cities/BE.parquet": "1d9a8a13bacf6844ffa27d4fb730ecd3b34e18336f219e30fbca302f8aedea03",
+      "golden-thereabouts/canonical_cities/CA.parquet": "f7c11d487aa53e9e9709e3dba5a12882f376f08c907f36e63597078fd353886a",
+      "golden-thereabouts/canonical_cities/CP.parquet": "45419675b509f91a929211edfaacf15c668b00067f120ab69cdda264d9ec871a",
+      "golden-thereabouts/canonical_cities/DE.parquet": "98d5031c99d0597d62509dd59ca318d126648603347d14456a80d23f2c780c34",
+      "golden-thereabouts/canonical_cities/ES.parquet": "e3bce0d23fe38c6af8822f99dacc28bee77cb1c32a0b3c432745c9d0eef434de",
       "golden-thereabouts/canonical_cities/FR.parquet": "063b0d510cc68e85d47c55d16e06ca0766d01a3038fd426df5cf3689f40f4ad5",
       "golden-thereabouts/canonical_cities/IN.parquet": "1b19ad617b50ded918d5a887216481c7568f901709fe2be9883d2bf5cd10224a",
+      "golden-thereabouts/canonical_cities/KZ.parquet": "d6f5860a55cdd17dbad032f620d7440a6f9362e498c7b47d4f766171bd0e597a",
       "golden-thereabouts/canonical_cities/LU.parquet": "49690fdaaa12d6051e3da4943a27329782f7be94957750a5e86fbfc12224928e",
       "golden-thereabouts/canonical_cities/NL.parquet": "aa5eb8ce7c7bf56cef127e3562f15e682f3309bb030d11b3df24024fa146bbfc",
+      "golden-thereabouts/canonical_cities/RU.parquet": "c90068a43988766322cb5454b97479d2686579397634578f202bf13c6d61557a",
+      "golden-thereabouts/canonical_cities/SA.parquet": "ec63a9477f7afef7bbc35c9046d18d14734243a741b137d2700afcedaa0028c2",
+      "golden-thereabouts/canonical_cities/SY.parquet": "f27a1bf70d8e9430a4b760c906104a1cfc84565b90987b249f16b48c90c68bc9",
       "golden-thereabouts/canonical_cities/TR.parquet": "0f7c5679ba53edd33899dc0b32f9ba02ec5d71a0d82d7df2f8b6f4cf3d2f1684",
+      "golden-thereabouts/canonical_cities/UA.parquet": "89ea79398c27f3520c37210c11df94075f8c2485a49c9feb060528af8bd8e516",
       "golden-thereabouts/canonical_cities/US.parquet": "374353730af929105e8e981d884d31f686bb9a99a046cace491fbed833b16523",
+      "golden-thereabouts/canonical_cities/XX.parquet": "45419675b509f91a929211edfaacf15c668b00067f120ab69cdda264d9ec871a",
       "golden-thereabouts/cells/831945fffffffff.parquet": "7286a31bd7f9b41c701f2643ebd75dd9797799ddf68fd5f86032a91c67b8dc87",
       "golden-thereabouts/cells/831949fffffffff.parquet": "5c6127b21c84bd49d25f0fc9ba6e8cf642b51392d10be7eb51cc3d3b495b77be",
       "golden-thereabouts/cells/83194cfffffffff.parquet": "738b993dee74068793238a6097975a977e08c089febc8c89939d9ee453910310",
@@ -1864,19 +1874,39 @@
       "golden-thereabouts/lookups/timezone_cells/ffb8f5f3b061006954b499496b0e55413e125726f7edfcc1643205f2a5031a5b.parquet": "b91f076bb9945cdb4af900cd0aeb3f85196d7096e99c6695b051f0d9ab275e10",
       "golden-thereabouts/lookups/zone_tables/505adfde4b5359464470eeefa422d90e19c9da04630cc429581c5caa17f63e4f.parquet": "ec69beb26efa2835b4dfab3d5ed9835a24bb6a5d97f0825189ca3d8539a9fd5d",
       "golden-thereabouts/place_to_city/BE.parquet": "e67719e12e4e4eddc732cee73352cdb048d01be58498861cdc4ac1df7d2a3b29",
+      "golden-thereabouts/place_to_city/CA.parquet": "442c5d3ab040d4288045a204976adf3df9cd1cc46cbe99ec3917d4b9bcb9d637",
+      "golden-thereabouts/place_to_city/CP.parquet": "23f3ed5352268ae527b63943384b75e841b2eb58bc2958ca0005c889790f7c71",
+      "golden-thereabouts/place_to_city/DE.parquet": "b40a85a3f23f331b4012ad71fa5c1127f23ea5d4227ae4563ca8beaa325d969f",
+      "golden-thereabouts/place_to_city/ES.parquet": "5bf2b20bfa37f6a9b2dfbe427dcd64b260bc3ce56175387f331b72db1d84fa7b",
       "golden-thereabouts/place_to_city/FR.parquet": "a2b2b98c5e4baa9834773dca913ee5093957bbd0fe058c3ee980ca2ea52520a0",
       "golden-thereabouts/place_to_city/IN.parquet": "9b44f266b87e2e4ca5436b76347c41f85930f5f816c5da9ce2a1956723f86c8e",
+      "golden-thereabouts/place_to_city/KZ.parquet": "f714492db0b94b6c134ea389f409b66784568c6ed5adb2198e6a06331d3d4969",
       "golden-thereabouts/place_to_city/LU.parquet": "fa54895bc8eb9e0ec6cefc1cfe6315f3fdabdce5014d8382555c394b6dc7771b",
       "golden-thereabouts/place_to_city/NL.parquet": "8f6abc8a7802d600f3be406b9bc699553e2b73036e82f79e97803dab99ca650f",
+      "golden-thereabouts/place_to_city/RU.parquet": "7bd92792d1cbcd37e6680c7d89a598974e7867698cf4e2178dfdcdc4d2c300b0",
+      "golden-thereabouts/place_to_city/SA.parquet": "18313034d62a982aadcf44ff9f39dbd3b2252d6d058b69c3d3ac7e30411c13eb",
+      "golden-thereabouts/place_to_city/SY.parquet": "72cd33bdb7f6cb1707faacc0d1ddf7af9d1cff5cbc8690aabac1a9d3bff5ca35",
       "golden-thereabouts/place_to_city/TR.parquet": "ba375bc420cc3eb5c839e564bedfd4c0e554d9cc7b60ff8f921be959552ba85b",
+      "golden-thereabouts/place_to_city/UA.parquet": "46c952da3f19a518abee33dfe02c47ca98a053b497f60c044c85b95d96e0acc0",
       "golden-thereabouts/place_to_city/US.parquet": "8286c392ff4a4b1b1c20331d6b0fdf38a575e8aa139f7e16b07dbd5475e0d5fe",
+      "golden-thereabouts/place_to_city/XX.parquet": "fe697be7221733943a7897daa8fecd0e66e2b21430918dbb713ed4a696803729",
       "golden-thereabouts/places/BE.parquet": "7896dc40377708c09347eb55180753f4af815e2d2b8f5eb1573c095f5aeaa506",
+      "golden-thereabouts/places/CA.parquet": "003fd30a455ae9110e5dc769d0952c1c59f8fb14383c28cc2df6ca79041d307f",
+      "golden-thereabouts/places/CP.parquet": "e59bd358d8314b0c274a1385711e5fcd6d5a2899c38cd1a644f8248c90637605",
+      "golden-thereabouts/places/DE.parquet": "41c0699cc2e48901bef426dfc1fb0da6c7651b98bcaa4ac5fec46e41c4aecd69",
+      "golden-thereabouts/places/ES.parquet": "e8f89f369a3b0498eb902fcc3c2b08ae59147f900ad4859b73b2a89d707b0195",
       "golden-thereabouts/places/FR.parquet": "cc4b57441a1b7b9cb19ad64fd2d2681a7a019ebc82fbd58d1901e9f96d18efcd",
       "golden-thereabouts/places/IN.parquet": "bb6c81ea508c7d8364df864d81ea7c6d4993e51f13d55940ead3ae29a175b743",
+      "golden-thereabouts/places/KZ.parquet": "dcc5baf9a353b26f4d710b758e3be92e69f13180eb19a442796ad89d84080a56",
       "golden-thereabouts/places/LU.parquet": "af911bdd5452fdfeaf2366254c61cdc848bacd25b7c8e6b3c74e7139ee7bbaa9",
       "golden-thereabouts/places/NL.parquet": "0147cff82e88fef332c9f688b25a1b1b4292a3a9bb474968708be718d6438c9c",
+      "golden-thereabouts/places/RU.parquet": "a43de6a31f99749ce9dd770d39bf913b696e0b276e6a956d355330fe269a4513",
+      "golden-thereabouts/places/SA.parquet": "56c476f5743e88303fd6bd7fe2c309cf93549b55e9b88104eac32bcbcdf97a32",
+      "golden-thereabouts/places/SY.parquet": "e594c8cc73b35ca2c82355aef53e637af5611e7392e142635a025726134e1b4f",
       "golden-thereabouts/places/TR.parquet": "118d487d9a412a82603c32ec2344054d9531bca3147cca7775c4521110441ac2",
-      "golden-thereabouts/places/US.parquet": "14cb39127a22321af2bbd0d282bc6e719124fb45638b4b4d27bc91343b7a5e44"
+      "golden-thereabouts/places/UA.parquet": "d2ba71cb84b0b8c3f001d0446459f87b5eb009065f8cc15792d1d5bf0f7b636b",
+      "golden-thereabouts/places/US.parquet": "14cb39127a22321af2bbd0d282bc6e719124fb45638b4b4d27bc91343b7a5e44",
+      "golden-thereabouts/places/XX.parquet": "1720bbdf65bbcd4a8a49bc4804e7380ae80a8431748ae978358ef2b837aafe1e"
     },
     "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
     "stored_blocks": 29,
@@ -1906,40 +1936,232 @@
       "name": "Flanders"
     },
     {
+      "code": "CA.04",
+      "name": "New Brunswick"
+    },
+    {
+      "code": "CA.10",
+      "name": "Quebec"
+    },
+    {
+      "code": "DE.09",
+      "name": "Saarland"
+    },
+    {
+      "code": "DE.08",
+      "name": "Rheinland-Pfalz"
+    },
+    {
+      "code": "DE.07",
+      "name": "North Rhine-Westphalia"
+    },
+    {
+      "code": "DE.06",
+      "name": "Lower Saxony"
+    },
+    {
+      "code": "ES.56",
+      "name": "Catalonia"
+    },
+    {
+      "code": "FR.93",
+      "name": "Provence-Alpes-Côte d'Azur"
+    },
+    {
+      "code": "FR.52",
+      "name": "Pays de la Loire"
+    },
+    {
       "code": "FR.11",
       "name": "Île-de-France"
+    },
+    {
+      "code": "FR.94",
+      "name": "Corsica"
     },
     {
       "code": "FR.24",
       "name": "Centre-Val de Loire"
     },
     {
+      "code": "FR.53",
+      "name": "Brittany"
+    },
+    {
+      "code": "FR.27",
+      "name": "Bourgogne-Franche-Comté"
+    },
+    {
+      "code": "FR.75",
+      "name": "New Aquitaine"
+    },
+    {
       "code": "FR.28",
       "name": "Normandy"
+    },
+    {
+      "code": "FR.44",
+      "name": "Grand Est"
+    },
+    {
+      "code": "FR.76",
+      "name": "Occitanie"
     },
     {
       "code": "FR.32",
       "name": "Hauts-de-France"
     },
     {
+      "code": "FR.84",
+      "name": "Auvergne-Rhône-Alpes"
+    },
+    {
+      "code": "IN.28",
+      "name": "West Bengal"
+    },
+    {
       "code": "IN.36",
       "name": "Uttar Pradesh"
+    },
+    {
+      "code": "IN.26",
+      "name": "Tripura"
+    },
+    {
+      "code": "IN.40",
+      "name": "Telangana"
+    },
+    {
+      "code": "IN.25",
+      "name": "Tamil Nadu"
+    },
+    {
+      "code": "IN.29",
+      "name": "Sikkim"
     },
     {
       "code": "IN.24",
       "name": "Rajasthan"
     },
     {
+      "code": "IN.23",
+      "name": "Punjab"
+    },
+    {
+      "code": "IN.22",
+      "name": "Puducherry"
+    },
+    {
+      "code": "IN.21",
+      "name": "Odisha"
+    },
+    {
+      "code": "IN.20",
+      "name": "Nagaland"
+    },
+    {
+      "code": "IN.31",
+      "name": "Mizoram"
+    },
+    {
+      "code": "IN.18",
+      "name": "Meghalaya"
+    },
+    {
+      "code": "IN.17",
+      "name": "Manipur"
+    },
+    {
       "code": "IN.16",
       "name": "Maharashtra"
+    },
+    {
+      "code": "IN.35",
+      "name": "Madhya Pradesh"
+    },
+    {
+      "code": "IN.14",
+      "name": "Lakshadweep"
+    },
+    {
+      "code": "IN.13",
+      "name": "Kerala"
+    },
+    {
+      "code": "IN.19",
+      "name": "Karnataka"
+    },
+    {
+      "code": "IN.12",
+      "name": "Jammu and Kashmir"
+    },
+    {
+      "code": "IN.11",
+      "name": "Himachal Pradesh"
     },
     {
       "code": "IN.10",
       "name": "Haryana"
     },
     {
+      "code": "IN.09",
+      "name": "Gujarat"
+    },
+    {
+      "code": "IN.33",
+      "name": "Goa"
+    },
+    {
       "code": "IN.07",
       "name": "Delhi"
+    },
+    {
+      "code": "IN.05",
+      "name": "Chandigarh"
+    },
+    {
+      "code": "IN.34",
+      "name": "Bihar"
+    },
+    {
+      "code": "IN.03",
+      "name": "Assam"
+    },
+    {
+      "code": "IN.30",
+      "name": "Arunachal Pradesh"
+    },
+    {
+      "code": "IN.02",
+      "name": "Andhra Pradesh"
+    },
+    {
+      "code": "IN.01",
+      "name": "Andaman and Nicobar"
+    },
+    {
+      "code": "IN.37",
+      "name": "Chhattisgarh"
+    },
+    {
+      "code": "IN.38",
+      "name": "Jharkhand"
+    },
+    {
+      "code": "IN.39",
+      "name": "Uttarakhand"
+    },
+    {
+      "code": "IN.41",
+      "name": "Ladakh"
+    },
+    {
+      "code": "IN.52",
+      "name": "Dadra and Nagar Haveli and Daman and Diu"
+    },
+    {
+      "code": "KZ.13",
+      "name": "Kostanay"
     },
     {
       "code": "LU.LU",
@@ -1994,28 +2216,560 @@
       "name": "Flevoland"
     },
     {
+      "code": "RU.57",
+      "name": "Penza Oblast"
+    },
+    {
+      "code": "RU.13",
+      "name": "Chelyabinsk"
+    },
+    {
+      "code": "SA.20",
+      "name": "Al Jawf Region"
+    },
+    {
+      "code": "SY.12",
+      "name": "Idlib"
+    },
+    {
+      "code": "SY.09",
+      "name": "Aleppo"
+    },
+    {
+      "code": "TR.66",
+      "name": "Yozgat"
+    },
+    {
+      "code": "TR.65",
+      "name": "Van"
+    },
+    {
+      "code": "TR.64",
+      "name": "Uşak"
+    },
+    {
+      "code": "TR.63",
+      "name": "Şanlıurfa"
+    },
+    {
+      "code": "TR.62",
+      "name": "Tunceli"
+    },
+    {
+      "code": "TR.58",
+      "name": "Sivas"
+    },
+    {
+      "code": "TR.74",
+      "name": "Siirt"
+    },
+    {
+      "code": "TR.73",
+      "name": "Niğde Province"
+    },
+    {
+      "code": "TR.50",
+      "name": "Nevşehir Province"
+    },
+    {
+      "code": "TR.49",
+      "name": "Muş"
+    },
+    {
+      "code": "TR.48",
+      "name": "Muğla"
+    },
+    {
+      "code": "TR.72",
+      "name": "Mardin"
+    },
+    {
+      "code": "TR.45",
+      "name": "Manisa"
+    },
+    {
+      "code": "TR.44",
+      "name": "Malatya"
+    },
+    {
+      "code": "TR.43",
+      "name": "Kütahya"
+    },
+    {
+      "code": "TR.71",
+      "name": "Konya"
+    },
+    {
+      "code": "TR.40",
+      "name": "Kırşehir"
+    },
+    {
+      "code": "TR.38",
+      "name": "Kayseri"
+    },
+    {
+      "code": "TR.46",
+      "name": "Kahramanmaraş"
+    },
+    {
+      "code": "TR.35",
+      "name": "İzmir Province"
+    },
+    {
+      "code": "TR.33",
+      "name": "Isparta"
+    },
+    {
+      "code": "TR.32",
+      "name": "Mersin"
+    },
+    {
+      "code": "TR.31",
+      "name": "Hatay"
+    },
+    {
+      "code": "TR.70",
+      "name": "Hakkâri"
+    },
+    {
+      "code": "TR.83",
+      "name": "Gaziantep"
+    },
+    {
+      "code": "TR.26",
+      "name": "Eskişehir"
+    },
+    {
+      "code": "TR.25",
+      "name": "Erzurum"
+    },
+    {
+      "code": "TR.24",
+      "name": "Erzincan"
+    },
+    {
+      "code": "TR.23",
+      "name": "Elazığ"
+    },
+    {
+      "code": "TR.21",
+      "name": "Diyarbakır Province"
+    },
+    {
+      "code": "TR.20",
+      "name": "Denizli"
+    },
+    {
+      "code": "TR.15",
+      "name": "Burdur"
+    },
+    {
+      "code": "TR.13",
+      "name": "Bitlis"
+    },
+    {
+      "code": "TR.12",
+      "name": "Bingöl"
+    },
+    {
+      "code": "TR.11",
+      "name": "Bilecik"
+    },
+    {
+      "code": "TR.10",
+      "name": "Balıkesir"
+    },
+    {
+      "code": "TR.09",
+      "name": "Aydın"
+    },
+    {
+      "code": "TR.07",
+      "name": "Antalya"
+    },
+    {
+      "code": "TR.68",
+      "name": "Ankara"
+    },
+    {
+      "code": "TR.04",
+      "name": "Ağrı"
+    },
+    {
+      "code": "TR.03",
+      "name": "Afyonkarahisar Province"
+    },
+    {
+      "code": "TR.02",
+      "name": "Adıyaman Province"
+    },
+    {
+      "code": "TR.81",
+      "name": "Adana"
+    },
+    {
+      "code": "TR.91",
+      "name": "Osmaniye"
+    },
+    {
+      "code": "TR.88",
+      "name": "Iğdır"
+    },
+    {
+      "code": "TR.75",
+      "name": "Aksaray"
+    },
+    {
+      "code": "TR.76",
+      "name": "Batman"
+    },
+    {
+      "code": "TR.78",
+      "name": "Karaman"
+    },
+    {
+      "code": "TR.79",
+      "name": "Kırıkkale"
+    },
+    {
+      "code": "TR.80",
+      "name": "Şırnak"
+    },
+    {
+      "code": "TR.90",
+      "name": "Kilis"
+    },
+    {
+      "code": "TR.85",
+      "name": "Zonguldak Province"
+    },
+    {
+      "code": "TR.61",
+      "name": "Trabzon"
+    },
+    {
+      "code": "TR.60",
+      "name": "Tokat Province"
+    },
+    {
+      "code": "TR.59",
+      "name": "Tekirdağ"
+    },
+    {
+      "code": "TR.57",
+      "name": "Sinop"
+    },
+    {
+      "code": "TR.55",
+      "name": "Samsun"
+    },
+    {
+      "code": "TR.54",
+      "name": "Sakarya"
+    },
+    {
+      "code": "TR.53",
+      "name": "Rize Province"
+    },
+    {
+      "code": "TR.52",
+      "name": "Ordu"
+    },
+    {
       "code": "TR.41",
       "name": "Kocaeli"
+    },
+    {
+      "code": "TR.39",
+      "name": "Kırklareli"
+    },
+    {
+      "code": "TR.37",
+      "name": "Kastamonu"
+    },
+    {
+      "code": "TR.84",
+      "name": "Kars Province"
     },
     {
       "code": "TR.34",
       "name": "Istanbul"
     },
     {
+      "code": "TR.69",
+      "name": "Gümüşhane Province"
+    },
+    {
+      "code": "TR.28",
+      "name": "Giresun"
+    },
+    {
+      "code": "TR.22",
+      "name": "Edirne"
+    },
+    {
+      "code": "TR.19",
+      "name": "Çorum"
+    },
+    {
+      "code": "TR.82",
+      "name": "Çankırı"
+    },
+    {
+      "code": "TR.17",
+      "name": "Canakkale"
+    },
+    {
       "code": "TR.16",
       "name": "Bursa Province"
+    },
+    {
+      "code": "TR.14",
+      "name": "Bolu"
+    },
+    {
+      "code": "TR.08",
+      "name": "Artvin"
+    },
+    {
+      "code": "TR.05",
+      "name": "Amasya"
+    },
+    {
+      "code": "TR.87",
+      "name": "Bartın"
+    },
+    {
+      "code": "TR.89",
+      "name": "Karabük Province"
     },
     {
       "code": "TR.92",
       "name": "Yalova"
     },
     {
+      "code": "TR.86",
+      "name": "Ardahan"
+    },
+    {
+      "code": "TR.77",
+      "name": "Bayburt Province"
+    },
+    {
+      "code": "TR.93",
+      "name": "Düzce"
+    },
+    {
+      "code": "UA.21",
+      "name": "Sumy"
+    },
+    {
+      "code": "UA.02",
+      "name": "Chernihiv Oblast"
+    },
+    {
+      "code": "US.AR",
+      "name": "Arkansas"
+    },
+    {
+      "code": "US.DC",
+      "name": "District of Columbia"
+    },
+    {
+      "code": "US.DE",
+      "name": "Delaware"
+    },
+    {
+      "code": "US.FL",
+      "name": "Florida"
+    },
+    {
+      "code": "US.GA",
+      "name": "Georgia"
+    },
+    {
+      "code": "US.KS",
+      "name": "Kansas"
+    },
+    {
+      "code": "US.LA",
+      "name": "Louisiana"
+    },
+    {
+      "code": "US.MD",
+      "name": "Maryland"
+    },
+    {
+      "code": "US.MO",
+      "name": "Missouri"
+    },
+    {
+      "code": "US.MS",
+      "name": "Mississippi"
+    },
+    {
+      "code": "US.NC",
+      "name": "North Carolina"
+    },
+    {
+      "code": "US.OK",
+      "name": "Oklahoma"
+    },
+    {
+      "code": "US.SC",
+      "name": "South Carolina"
+    },
+    {
+      "code": "US.TN",
+      "name": "Tennessee"
+    },
+    {
+      "code": "US.TX",
+      "name": "Texas"
+    },
+    {
+      "code": "US.WV",
+      "name": "West Virginia"
+    },
+    {
+      "code": "US.AL",
+      "name": "Alabama"
+    },
+    {
+      "code": "US.CT",
+      "name": "Connecticut"
+    },
+    {
+      "code": "US.IA",
+      "name": "Iowa"
+    },
+    {
       "code": "US.IL",
       "name": "Illinois"
     },
     {
+      "code": "US.IN",
+      "name": "Indiana"
+    },
+    {
+      "code": "US.ME",
+      "name": "Maine"
+    },
+    {
+      "code": "US.MI",
+      "name": "Michigan"
+    },
+    {
+      "code": "US.MN",
+      "name": "Minnesota"
+    },
+    {
+      "code": "US.NE",
+      "name": "Nebraska"
+    },
+    {
+      "code": "US.NH",
+      "name": "New Hampshire"
+    },
+    {
+      "code": "US.NJ",
+      "name": "New Jersey"
+    },
+    {
+      "code": "US.NY",
+      "name": "New York"
+    },
+    {
+      "code": "US.OH",
+      "name": "Ohio"
+    },
+    {
+      "code": "US.RI",
+      "name": "Rhode Island"
+    },
+    {
+      "code": "US.VT",
+      "name": "Vermont"
+    },
+    {
+      "code": "US.WI",
+      "name": "Wisconsin"
+    },
+    {
+      "code": "US.CA",
+      "name": "California"
+    },
+    {
+      "code": "US.CO",
+      "name": "Colorado"
+    },
+    {
+      "code": "US.NM",
+      "name": "New Mexico"
+    },
+    {
+      "code": "US.NV",
+      "name": "Nevada"
+    },
+    {
+      "code": "US.UT",
+      "name": "Utah"
+    },
+    {
+      "code": "US.AZ",
+      "name": "Arizona"
+    },
+    {
+      "code": "US.ID",
+      "name": "Idaho"
+    },
+    {
       "code": "US.MT",
       "name": "Montana"
+    },
+    {
+      "code": "US.ND",
+      "name": "North Dakota"
+    },
+    {
+      "code": "US.OR",
+      "name": "Oregon"
+    },
+    {
+      "code": "US.SD",
+      "name": "South Dakota"
+    },
+    {
+      "code": "US.WA",
+      "name": "Washington"
+    },
+    {
+      "code": "US.WY",
+      "name": "Wyoming"
+    },
+    {
+      "code": "US.HI",
+      "name": "Hawaii"
+    },
+    {
+      "code": "US.AK",
+      "name": "Alaska"
+    },
+    {
+      "code": "US.KY",
+      "name": "Kentucky"
+    },
+    {
+      "code": "US.MA",
+      "name": "Massachusetts"
+    },
+    {
+      "code": "US.PA",
+      "name": "Pennsylvania"
+    },
+    {
+      "code": "US.VA",
+      "name": "Virginia"
     },
     {
       "code": "BE-BRU",
@@ -2030,8 +2784,60 @@
       "name": "wallonne, Région"
     },
     {
+      "code": "CA-NB",
+      "name": "New Brunswick"
+    },
+    {
+      "code": "CA-QC",
+      "name": "Quebec"
+    },
+    {
+      "code": "DE-NI",
+      "name": "Niedersachsen"
+    },
+    {
+      "code": "DE-NW",
+      "name": "Nordrhein-Westfalen"
+    },
+    {
+      "code": "DE-RP",
+      "name": "Rheinland-Pfalz"
+    },
+    {
+      "code": "DE-SL",
+      "name": "Saarland"
+    },
+    {
+      "code": "ES-CT",
+      "name": "Catalunya [Cataluña]"
+    },
+    {
+      "code": "FR-20R",
+      "name": "Corse"
+    },
+    {
+      "code": "FR-ARA",
+      "name": "Auvergne-Rhône-Alpes"
+    },
+    {
+      "code": "FR-BFC",
+      "name": "Bourgogne-Franche-Comté"
+    },
+    {
+      "code": "FR-BRE",
+      "name": "Bretagne"
+    },
+    {
+      "code": "FR-CP",
+      "name": "Clipperton"
+    },
+    {
       "code": "FR-CVL",
       "name": "Centre-Val de Loire"
+    },
+    {
+      "code": "FR-GES",
+      "name": "Grand-Est"
     },
     {
       "code": "FR-HDF",
@@ -2042,28 +2848,172 @@
       "name": "Île-de-France"
     },
     {
+      "code": "FR-NAQ",
+      "name": "Nouvelle-Aquitaine"
+    },
+    {
       "code": "FR-NOR",
       "name": "Normandie"
+    },
+    {
+      "code": "FR-OCC",
+      "name": "Occitanie"
+    },
+    {
+      "code": "FR-PAC",
+      "name": "Provence-Alpes-Côte-d’Azur"
+    },
+    {
+      "code": "FR-PDL",
+      "name": "Pays-de-la-Loire"
+    },
+    {
+      "code": "IN-AN",
+      "name": "Andaman and Nicobar Islands"
+    },
+    {
+      "code": "IN-AP",
+      "name": "Andhra Pradesh"
+    },
+    {
+      "code": "IN-AR",
+      "name": "Arunāchal Pradesh"
+    },
+    {
+      "code": "IN-AS",
+      "name": "Assam"
+    },
+    {
+      "code": "IN-BR",
+      "name": "Bihār"
+    },
+    {
+      "code": "IN-CG",
+      "name": "Chhattīsgarh"
+    },
+    {
+      "code": "IN-CH",
+      "name": "Chandīgarh"
+    },
+    {
+      "code": "IN-DH",
+      "name": "Dādra and Nagar Haveli and Damān and Diu"
     },
     {
       "code": "IN-DL",
       "name": "Delhi"
     },
     {
+      "code": "IN-GA",
+      "name": "Goa"
+    },
+    {
+      "code": "IN-GJ",
+      "name": "Gujarāt"
+    },
+    {
+      "code": "IN-HP",
+      "name": "Himāchal Pradesh"
+    },
+    {
       "code": "IN-HR",
       "name": "Haryāna"
+    },
+    {
+      "code": "IN-JH",
+      "name": "Jhārkhand"
+    },
+    {
+      "code": "IN-JK",
+      "name": "Jammu and Kashmīr"
+    },
+    {
+      "code": "IN-KA",
+      "name": "Karnātaka"
+    },
+    {
+      "code": "IN-KL",
+      "name": "Kerala"
+    },
+    {
+      "code": "IN-LA",
+      "name": "Ladākh"
+    },
+    {
+      "code": "IN-LD",
+      "name": "Lakshadweep"
     },
     {
       "code": "IN-MH",
       "name": "Mahārāshtra"
     },
     {
+      "code": "IN-ML",
+      "name": "Meghālaya"
+    },
+    {
+      "code": "IN-MN",
+      "name": "Manipur"
+    },
+    {
+      "code": "IN-MP",
+      "name": "Madhya Pradesh"
+    },
+    {
+      "code": "IN-MZ",
+      "name": "Mizoram"
+    },
+    {
+      "code": "IN-NL",
+      "name": "Nāgāland"
+    },
+    {
+      "code": "IN-OD",
+      "name": "Odisha"
+    },
+    {
+      "code": "IN-PB",
+      "name": "Punjab"
+    },
+    {
+      "code": "IN-PY",
+      "name": "Puducherry"
+    },
+    {
       "code": "IN-RJ",
       "name": "Rājasthān"
     },
     {
+      "code": "IN-SK",
+      "name": "Sikkim"
+    },
+    {
+      "code": "IN-TN",
+      "name": "Tamil Nādu"
+    },
+    {
+      "code": "IN-TR",
+      "name": "Tripura"
+    },
+    {
+      "code": "IN-TS",
+      "name": "Telangāna"
+    },
+    {
+      "code": "IN-UK",
+      "name": "Uttarākhand"
+    },
+    {
       "code": "IN-UP",
       "name": "Uttar Pradesh"
+    },
+    {
+      "code": "IN-WB",
+      "name": "West Bengal"
+    },
+    {
+      "code": "KZ-39",
+      "name": "Qostanay oblysy"
     },
     {
       "code": "LU-CA",
@@ -2162,28 +3112,560 @@
       "name": "Zuid-Holland"
     },
     {
+      "code": "RU-CHE",
+      "name": "Chelyabinskaya oblast'"
+    },
+    {
+      "code": "RU-PNZ",
+      "name": "Penzenskaya oblast'"
+    },
+    {
+      "code": "SA-12",
+      "name": "Al Jawf"
+    },
+    {
+      "code": "SY-HL",
+      "name": "Ḩalab"
+    },
+    {
+      "code": "SY-ID",
+      "name": "Idlib"
+    },
+    {
+      "code": "TR-01",
+      "name": "Adana"
+    },
+    {
+      "code": "TR-02",
+      "name": "Adıyaman"
+    },
+    {
+      "code": "TR-03",
+      "name": "Afyonkarahisar"
+    },
+    {
+      "code": "TR-04",
+      "name": "Ağrı"
+    },
+    {
+      "code": "TR-05",
+      "name": "Amasya"
+    },
+    {
+      "code": "TR-06",
+      "name": "Ankara"
+    },
+    {
+      "code": "TR-07",
+      "name": "Antalya"
+    },
+    {
+      "code": "TR-08",
+      "name": "Artvin"
+    },
+    {
+      "code": "TR-09",
+      "name": "Aydın"
+    },
+    {
+      "code": "TR-10",
+      "name": "Balıkesir"
+    },
+    {
+      "code": "TR-11",
+      "name": "Bilecik"
+    },
+    {
+      "code": "TR-12",
+      "name": "Bingöl"
+    },
+    {
+      "code": "TR-13",
+      "name": "Bitlis"
+    },
+    {
+      "code": "TR-14",
+      "name": "Bolu"
+    },
+    {
+      "code": "TR-15",
+      "name": "Burdur"
+    },
+    {
       "code": "TR-16",
       "name": "Bursa"
+    },
+    {
+      "code": "TR-17",
+      "name": "Çanakkale"
+    },
+    {
+      "code": "TR-18",
+      "name": "Çankırı"
+    },
+    {
+      "code": "TR-19",
+      "name": "Çorum"
+    },
+    {
+      "code": "TR-20",
+      "name": "Denizli"
+    },
+    {
+      "code": "TR-21",
+      "name": "Diyarbakır"
+    },
+    {
+      "code": "TR-22",
+      "name": "Edirne"
+    },
+    {
+      "code": "TR-23",
+      "name": "Elazığ"
+    },
+    {
+      "code": "TR-24",
+      "name": "Erzincan"
+    },
+    {
+      "code": "TR-25",
+      "name": "Erzurum"
+    },
+    {
+      "code": "TR-26",
+      "name": "Eskişehir"
+    },
+    {
+      "code": "TR-27",
+      "name": "Gaziantep"
+    },
+    {
+      "code": "TR-28",
+      "name": "Giresun"
+    },
+    {
+      "code": "TR-29",
+      "name": "Gümüşhane"
+    },
+    {
+      "code": "TR-30",
+      "name": "Hakkâri"
+    },
+    {
+      "code": "TR-31",
+      "name": "Hatay"
+    },
+    {
+      "code": "TR-32",
+      "name": "Isparta"
+    },
+    {
+      "code": "TR-33",
+      "name": "Mersin"
     },
     {
       "code": "TR-34",
       "name": "İstanbul"
     },
     {
+      "code": "TR-35",
+      "name": "İzmir"
+    },
+    {
+      "code": "TR-36",
+      "name": "Kars"
+    },
+    {
+      "code": "TR-37",
+      "name": "Kastamonu"
+    },
+    {
+      "code": "TR-38",
+      "name": "Kayseri"
+    },
+    {
+      "code": "TR-39",
+      "name": "Kırklareli"
+    },
+    {
+      "code": "TR-40",
+      "name": "Kırşehir"
+    },
+    {
       "code": "TR-41",
       "name": "Kocaeli"
+    },
+    {
+      "code": "TR-42",
+      "name": "Konya"
+    },
+    {
+      "code": "TR-43",
+      "name": "Kütahya"
+    },
+    {
+      "code": "TR-44",
+      "name": "Malatya"
+    },
+    {
+      "code": "TR-45",
+      "name": "Manisa"
+    },
+    {
+      "code": "TR-46",
+      "name": "Kahramanmaraş"
+    },
+    {
+      "code": "TR-47",
+      "name": "Mardin"
+    },
+    {
+      "code": "TR-48",
+      "name": "Muğla"
+    },
+    {
+      "code": "TR-49",
+      "name": "Muş"
+    },
+    {
+      "code": "TR-50",
+      "name": "Nevşehir"
+    },
+    {
+      "code": "TR-51",
+      "name": "Niğde"
+    },
+    {
+      "code": "TR-52",
+      "name": "Ordu"
+    },
+    {
+      "code": "TR-53",
+      "name": "Rize"
+    },
+    {
+      "code": "TR-54",
+      "name": "Sakarya"
+    },
+    {
+      "code": "TR-55",
+      "name": "Samsun"
+    },
+    {
+      "code": "TR-56",
+      "name": "Siirt"
+    },
+    {
+      "code": "TR-57",
+      "name": "Sinop"
+    },
+    {
+      "code": "TR-58",
+      "name": "Sivas"
+    },
+    {
+      "code": "TR-59",
+      "name": "Tekirdağ"
+    },
+    {
+      "code": "TR-60",
+      "name": "Tokat"
+    },
+    {
+      "code": "TR-61",
+      "name": "Trabzon"
+    },
+    {
+      "code": "TR-62",
+      "name": "Tunceli"
+    },
+    {
+      "code": "TR-63",
+      "name": "Şanlıurfa"
+    },
+    {
+      "code": "TR-64",
+      "name": "Uşak"
+    },
+    {
+      "code": "TR-65",
+      "name": "Van"
+    },
+    {
+      "code": "TR-66",
+      "name": "Yozgat"
+    },
+    {
+      "code": "TR-67",
+      "name": "Zonguldak"
+    },
+    {
+      "code": "TR-68",
+      "name": "Aksaray"
+    },
+    {
+      "code": "TR-69",
+      "name": "Bayburt"
+    },
+    {
+      "code": "TR-70",
+      "name": "Karaman"
+    },
+    {
+      "code": "TR-71",
+      "name": "Kırıkkale"
+    },
+    {
+      "code": "TR-72",
+      "name": "Batman"
+    },
+    {
+      "code": "TR-73",
+      "name": "Şırnak"
+    },
+    {
+      "code": "TR-74",
+      "name": "Bartın"
+    },
+    {
+      "code": "TR-75",
+      "name": "Ardahan"
+    },
+    {
+      "code": "TR-76",
+      "name": "Iğdır"
     },
     {
       "code": "TR-77",
       "name": "Yalova"
     },
     {
+      "code": "TR-78",
+      "name": "Karabük"
+    },
+    {
+      "code": "TR-79",
+      "name": "Kilis"
+    },
+    {
+      "code": "TR-80",
+      "name": "Osmaniye"
+    },
+    {
+      "code": "TR-81",
+      "name": "Düzce"
+    },
+    {
+      "code": "UA-59",
+      "name": "Sumska oblast"
+    },
+    {
+      "code": "UA-74",
+      "name": "Chernihivska oblast"
+    },
+    {
+      "code": "US-AK",
+      "name": "Alaska"
+    },
+    {
+      "code": "US-AL",
+      "name": "Alabama"
+    },
+    {
+      "code": "US-AR",
+      "name": "Arkansas"
+    },
+    {
+      "code": "US-AZ",
+      "name": "Arizona"
+    },
+    {
+      "code": "US-CA",
+      "name": "California"
+    },
+    {
+      "code": "US-CO",
+      "name": "Colorado"
+    },
+    {
+      "code": "US-CT",
+      "name": "Connecticut"
+    },
+    {
+      "code": "US-DC",
+      "name": "District of Columbia"
+    },
+    {
+      "code": "US-DE",
+      "name": "Delaware"
+    },
+    {
+      "code": "US-FL",
+      "name": "Florida"
+    },
+    {
+      "code": "US-GA",
+      "name": "Georgia"
+    },
+    {
+      "code": "US-HI",
+      "name": "Hawaii"
+    },
+    {
+      "code": "US-IA",
+      "name": "Iowa"
+    },
+    {
+      "code": "US-ID",
+      "name": "Idaho"
+    },
+    {
       "code": "US-IL",
       "name": "Illinois"
     },
     {
+      "code": "US-IN",
+      "name": "Indiana"
+    },
+    {
+      "code": "US-KS",
+      "name": "Kansas"
+    },
+    {
+      "code": "US-KY",
+      "name": "Kentucky"
+    },
+    {
+      "code": "US-LA",
+      "name": "Louisiana"
+    },
+    {
+      "code": "US-MA",
+      "name": "Massachusetts"
+    },
+    {
+      "code": "US-MD",
+      "name": "Maryland"
+    },
+    {
+      "code": "US-ME",
+      "name": "Maine"
+    },
+    {
+      "code": "US-MI",
+      "name": "Michigan"
+    },
+    {
+      "code": "US-MN",
+      "name": "Minnesota"
+    },
+    {
+      "code": "US-MO",
+      "name": "Missouri"
+    },
+    {
+      "code": "US-MS",
+      "name": "Mississippi"
+    },
+    {
       "code": "US-MT",
       "name": "Montana"
+    },
+    {
+      "code": "US-NC",
+      "name": "North Carolina"
+    },
+    {
+      "code": "US-ND",
+      "name": "North Dakota"
+    },
+    {
+      "code": "US-NE",
+      "name": "Nebraska"
+    },
+    {
+      "code": "US-NH",
+      "name": "New Hampshire"
+    },
+    {
+      "code": "US-NJ",
+      "name": "New Jersey"
+    },
+    {
+      "code": "US-NM",
+      "name": "New Mexico"
+    },
+    {
+      "code": "US-NV",
+      "name": "Nevada"
+    },
+    {
+      "code": "US-NY",
+      "name": "New York"
+    },
+    {
+      "code": "US-OH",
+      "name": "Ohio"
+    },
+    {
+      "code": "US-OK",
+      "name": "Oklahoma"
+    },
+    {
+      "code": "US-OR",
+      "name": "Oregon"
+    },
+    {
+      "code": "US-PA",
+      "name": "Pennsylvania"
+    },
+    {
+      "code": "US-RI",
+      "name": "Rhode Island"
+    },
+    {
+      "code": "US-SC",
+      "name": "South Carolina"
+    },
+    {
+      "code": "US-SD",
+      "name": "South Dakota"
+    },
+    {
+      "code": "US-TN",
+      "name": "Tennessee"
+    },
+    {
+      "code": "US-TX",
+      "name": "Texas"
+    },
+    {
+      "code": "US-UT",
+      "name": "Utah"
+    },
+    {
+      "code": "US-VA",
+      "name": "Virginia"
+    },
+    {
+      "code": "US-VT",
+      "name": "Vermont"
+    },
+    {
+      "code": "US-WA",
+      "name": "Washington"
+    },
+    {
+      "code": "US-WI",
+      "name": "Wisconsin"
+    },
+    {
+      "code": "US-WV",
+      "name": "West Virginia"
+    },
+    {
+      "code": "US-WY",
+      "name": "Wyoming"
     }
   ],
   "zone_tables": [

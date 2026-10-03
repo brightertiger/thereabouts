@@ -1,6 +1,7 @@
 """Own explicitly selected family handles and enforce one dataset version."""
 
 from collections.abc import Mapping
+from contextlib import suppress
 from pathlib import Path
 
 from . import _core
@@ -18,6 +19,7 @@ class Handles:
     ) -> None:
         if pack is not None and (data_dir is not None or packs is not None):
             raise ValueError("Select pack or data_dir/packs, not both")
+        self.explicit = pack is not None or packs is not None
         self.paths = dict(packs or {})
         self.data_dir = data_dir
         self.verify = verify
@@ -67,7 +69,11 @@ class Handles:
             if path is None:
                 path = active_pack(self.data_dir, family=family)
             self._identity(family, path)
-            self.readers[family] = _core.open(str(path), verify=self.verify)
+            core = None
+            if family != "core" and (not self.explicit or "core" in self.paths):
+                with suppress(DataNotInstalledError):
+                    core = self.get("core")
+            self.readers[family] = _core.open(str(path), verify=self.verify, core=core)
         return self.readers[family]
 
     def close(self) -> None:

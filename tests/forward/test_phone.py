@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -14,7 +15,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 @pytest.mark.parametrize("name", ["phone-vectors.json", "phone-synthetic-vectors.json"])
 def test_phone_vectors(name: str) -> None:
     bundle = json.loads((FIXTURES / name).read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             assert (
                 geo.phone(case["request"]["values"][0]).to_dict() == case["result"]
@@ -23,7 +24,7 @@ def test_phone_vectors(name: str) -> None:
 
 def test_independent_phone_prefixes() -> None:
     rows = read_source(FIXTURES / "phone-source.json.gz")["rows"]
-    with Geocoder(FIXTURES / "packs/phone-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/phone-sample")) as geo:
         for row in rows:
             prefix = row["prefix"] or row["calling_code"]
             result = geo.phone("+" + prefix, evidence=True)
@@ -50,7 +51,7 @@ def test_independent_phone_prefixes() -> None:
 
 
 def test_nested_prefix_and_shared_calling_code() -> None:
-    with Geocoder(FIXTURES / "packs/phone-synthetic") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/phone-synthetic")) as geo:
         ambiguous = geo.phone("+1")
         assert ambiguous.status == "ambiguous"
         assert ambiguous.country is None and ambiguous.point is None

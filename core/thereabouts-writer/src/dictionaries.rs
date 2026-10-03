@@ -24,7 +24,7 @@ impl<'a> Dictionaries<'a> {
                 Some(vec![
                     0;
                     match name {
-                        "geographies" => 3,
+                        "geographies" => 7,
                         "locations" => 4,
                         _ => 0,
                     } * 8

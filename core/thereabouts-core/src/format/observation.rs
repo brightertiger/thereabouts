@@ -4,9 +4,11 @@ use crate::{Error, Result, error::ensure, result::Point};
 use std::collections::BTreeMap;
 /// String fields in the observation record, after the geography and point fields.
 pub const FIELDS: [&str; 6] = ["source", "source_id", "name", "code", "scheme", "details"];
-/// One source association. Geography references are pack-global catalogue references.
+/// One source association. Compact geography references belong to the pinned core catalogue.
 #[derive(Clone, Debug)]
 pub struct Observation {
+    /// Hot pooled country and subdivision code/name pairs retained without the optional core.
+    pub fallback: [Option<String>; 4],
     /// Compact record ordinal used for identity without reading source evidence.
     pub identity: Option<u64>,
     /// Country, subdivision and canonical-city references; zero means absent.
@@ -137,6 +139,7 @@ pub(crate) fn read(
         *field = string(shard, section + 1, uint(&bytes, 20 + i * 4, 4)?)?;
     }
     let record = Observation {
+        fallback: [None, None, None, None],
         identity: None,
         places,
         latitude: u32::try_from(uint(&bytes, 12, 4)?)

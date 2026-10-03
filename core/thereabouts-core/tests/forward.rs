@@ -5,14 +5,13 @@
 )]
 mod support;
 use std::{fs, path::PathBuf};
-use thereabouts_core::format::Pack;
 #[test]
 fn postal_vectors() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures");
     for name in ["postal-vectors.json", "postal-synthetic-vectors.json"] {
         let bundle: serde_json::Value =
             serde_json::from_slice(&fs::read(root.join(name)).unwrap()).unwrap();
-        let pack = Pack::open(&root.join(bundle["pack"].as_str().unwrap()), true).unwrap();
+        let pack = support::pack(&root.join(bundle["pack"].as_str().unwrap()), true);
         for case in bundle["cases"].as_array().unwrap() {
             let request = &case["request"];
             let result = pack
@@ -34,7 +33,7 @@ fn postal_vectors() {
 #[test]
 fn original_postal_expectations() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures");
-    let pack = Pack::open(&root.join("packs/postal-synthetic"), true).unwrap();
+    let pack = support::pack(&root.join("packs/postal-synthetic"), true);
     let bundle: serde_json::Value =
         serde_json::from_slice(&fs::read(root.join("conformance.json")).unwrap()).unwrap();
     let mut counts = [0; 4];

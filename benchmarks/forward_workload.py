@@ -9,7 +9,9 @@ from typing import Any
 
 import numpy as np
 
+from benchmarks.core_read_path import ROOT
 from benchmarks.forward_queries import Query
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 
 SEED = 271828
@@ -26,7 +28,10 @@ def run(pack: Path, verb: str, queries: list[Query], count: int) -> dict[str, An
     groups: dict[tuple[tuple[str, str], ...], list[str]] = defaultdict(list)
     for query in values:
         groups[query.options].append(query.value)
-    with Geocoder(pack) as geo:
+    with Geocoder(
+        packs=selection(pack) if pack.parent == ROOT / "tests/fixtures/packs" else None,
+        pack=pack if pack.parent != ROOT / "tests/fixtures/packs" else None,
+    ) as geo:
         scalar, batch = getattr(geo, verb), getattr(geo, verb + "_columns")
         for query in values:
             kwargs = query.kwargs()

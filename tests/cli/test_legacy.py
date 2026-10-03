@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from tests.conformance.forward_legacy import assert_case, assert_result
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder, Result
 
 from .helpers import FIXTURES, console, install_fixture
@@ -15,7 +16,8 @@ from .test_vectors import arguments
 
 @pytest.mark.parametrize("family", ["postal", "airports"])
 def test_legacy_expectations(family: str, tmp_path: Path) -> None:
-    install_fixture(tmp_path, FIXTURES / f"packs/{family}-synthetic")
+    for pack in selection(FIXTURES / f"packs/{family}-synthetic").values():
+        install_fixture(tmp_path, pack)
     counts: Counter[str] = Counter()
     kind = "airport" if family == "airports" else family
     for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:
@@ -23,7 +25,9 @@ def test_legacy_expectations(family: str, tmp_path: Path) -> None:
             continue
         if case["id"] == 51:
             # The original integer-type rejection has no OS argv representation.
-            with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
+            with Geocoder(
+                packs=selection(FIXTURES / f"packs/{family}-synthetic")
+            ) as geo:
                 counts[assert_case(geo, case)] += 1
             continue
         output = console(tmp_path, "--evidence", *arguments(case["request"]))

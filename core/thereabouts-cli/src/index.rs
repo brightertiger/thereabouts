@@ -79,7 +79,7 @@ impl Index {
                 dataset
                     .packs
                     .get(name)
-                    .is_some_and(|p| p.format_minor == u16::from(name != "core"))
+                    .is_some_and(|p| p.format_minor == 2 * u16::from(name != "core"))
             })
         };
         if let Some(version) = version {

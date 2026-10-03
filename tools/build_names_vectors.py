@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
 from tools.source_fixture import read_source
@@ -70,7 +71,7 @@ def main() -> None:
         ("core-names-sample", requests, "geocode-vectors.json"),
         ("core-names-synthetic", synthetic, "geocode-synthetic-vectors.json"),
     ]:
-        with Geocoder(FIXTURES / "packs" / pack) as geo:
+        with Geocoder(packs=selection(FIXTURES / "packs" / pack)) as geo:
             cases = []
             for i, r in enumerate(queries):
                 kwargs = {k: v for k, v in r.items() if k not in {"kind", "values"}}

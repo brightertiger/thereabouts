@@ -57,7 +57,9 @@ def ip_start_statistics(golden: Path) -> dict[str, int]:
     return counts
 
 
-def child(golden: Path, family: str, output: Path, record: Path) -> None:
+def child(
+    golden: Path, family: str, output: Path, record: Path, core_pack: Path
+) -> None:
     from thereabouts import _core
 
     extra = ip_start_statistics(golden) if family == "ip" else {}
@@ -68,6 +70,7 @@ def child(golden: Path, family: str, output: Path, record: Path) -> None:
         str(output),
         {
             "data_version": "2026.10",
+            "core_pack": str(core_pack),
             "sources": ["golden dataset; source manifest digest retained"],
             "attribution": "Golden sources; see dataset notices",
             "notices": {
@@ -121,6 +124,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("family", choices=["ip", "postal"])
     parser.add_argument("--golden", type=Path, required=True)
+    parser.add_argument("--core-pack", type=Path, required=True)
     parser.add_argument("--child", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     parent = ROOT / ".tmp/world-exports"
@@ -128,7 +132,7 @@ def main() -> None:
     stage = parent / f".{output.name}.building"
     record = parent / f"{args.family}-measurement.json"
     if args.child:
-        child(args.golden, args.family, output, record)
+        child(args.golden, args.family, output, record, args.core_pack)
         return
     parent.mkdir(parents=True, exist_ok=True)
     if output.exists() or stage.exists():
@@ -156,6 +160,8 @@ def main() -> None:
                 args.family,
                 "--golden",
                 str(args.golden),
+                "--core-pack",
+                str(args.core_pack),
                 "--child",
             ],
             cwd=ROOT,

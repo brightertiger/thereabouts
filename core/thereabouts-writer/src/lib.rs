@@ -26,6 +26,7 @@ mod phone;
 mod plate_columns;
 mod plates;
 mod postal;
+mod shared_catalogue;
 mod source;
 mod staging;
 mod storage;
@@ -40,7 +41,7 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.3.3";
+const WRITER_REVISION: &str = "0.4.0";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -51,6 +52,9 @@ use thereabouts_core::format::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Options {
+    /// Core pack supplying the exact ordinal namespace for forward exports.
+    #[serde(default, skip_serializing)]
+    pub core_pack: Option<std::path::PathBuf>,
     /// Explicit release label; the writer never guesses a dataset version.
     pub data_version: String,
     /// Parent for both the exclusive stage and SQLite file; omitted from pack identity.
@@ -114,15 +118,25 @@ pub fn write_pack(
         data.require_tables(&required, &options.allow_missing_tables)?;
     }
     let revision = if family == "core" {
-        "0.2.0" // Core exports now include canonical-city spellings.
+        "0.2.1" // Shared geography closure and country-narrowed catalogue zones.
     } else {
         WRITER_REVISION
+    };
+    let core_pin = if family == "core" {
+        None
+    } else {
+        let path = options
+            .core_pack
+            .as_deref()
+            .ok_or_else(|| Error::Input("Forward exports require core_pack".into()))?;
+        Some(shared_catalogue::pin(path, &options.data_version)?)
     };
     let mut identity = json!({"manifest_sha256":data.digest,"options":options,"writer":revision});
     if family != "core"
         && let Some(fields) = identity.as_object_mut()
     {
         fields.insert("family".into(), family.into());
+        fields.insert("core_catalogue".into(), serde_json::to_value(core_pin)?);
     }
     let input_digest = format!("{:x}", Sha256::digest(serde_json::to_vec(&identity)?));
     if output.exists() {
@@ -183,22 +197,14 @@ fn build(
     catalogue::initialize(&db)?;
     db.execute_batch("BEGIN")?;
     catalogue::load(&db, data, primary_table(family))?;
-    match family {
-        "core" => timezones::load(&db, data)?,
-        "postal" => postal::load(data, &db)?,
-        "airports" => airports::load(data, &db)?,
-        "locode" => locode::load(data, &db)?,
-        "phone" => phone::load(data, &db)?,
-        "ip" => ip::load(data, &db)?,
-        "plates" => {}
-        _ => return Err(Error::Input("Unsupported export family".into())),
-    }
+    let core_catalogue = load_family(&db, data, options, family)?;
     let mut metadata = metadata(data, family)?;
     if !matches!(family, "core" | "plates") {
         compact_metadata::trim(&db, &mut metadata, family)?;
     }
     let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {
+        core_catalogue,
         format_minor: 0,
         forward_columns: None,
         plate_columns: None,
@@ -247,7 +253,9 @@ fn build(
     } else {
         compact::emit(&db, stage, &mut manifest)?;
     }
-    emission::catalogue(&db, stage, &mut manifest)?;
+    if family == "core" {
+        emission::catalogue(&db, stage, &mut manifest)?;
+    }
     db.execute_batch("COMMIT")?;
     add(
         stage,
@@ -369,4 +377,32 @@ fn normalization(family: &str) -> &[&str] {
         "airports" | "locode" => &airports::NORMALIZATION,
         _ => &[],
     }
+}
+
+fn load_family(
+    db: &Connection,
+    data: &Dataset,
+    options: &Options,
+    family: &str,
+) -> Result<Option<format::manifest::CoreCatalogue>> {
+    let core_catalogue = if family == "core" {
+        None
+    } else {
+        let path = options
+            .core_pack
+            .as_deref()
+            .ok_or_else(|| Error::Input("Forward exports require core_pack".into()))?;
+        Some(shared_catalogue::load(db, path, &options.data_version)?)
+    };
+    match family {
+        "core" => timezones::load(db, data)?,
+        "postal" => postal::load(data, db)?,
+        "airports" => airports::load(data, db)?,
+        "locode" => locode::load(data, db)?,
+        "phone" => phone::load(data, db)?,
+        "ip" => ip::load(data, db)?,
+        "plates" => {}
+        _ => return Err(Error::Input("Unsupported export family".into())),
+    }
+    Ok(core_catalogue)
 }

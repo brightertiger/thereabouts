@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from build_data.plate_country.resolver import Resolver
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -15,7 +16,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 def test_plate_vectors() -> None:
     bundle = json.loads((FIXTURES / "plates-vectors.json").read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             r = case["request"]
             assert (
@@ -36,7 +37,7 @@ def test_reference_plate_matches() -> None:
         reference["priors"] = [{"country_code": "US", "vehicles": 1}]
     resolver = Resolver(reference)
     vectors = json.loads((FIXTURES / "plates-vectors.json").read_text())
-    with Geocoder(FIXTURES / "packs/plates-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/plates-sample")) as geo:
         for case in vectors["cases"]:
             r = case["request"]
             if r.get("country") == "ZZ":
@@ -102,7 +103,7 @@ def compare_rules(
 
 
 def test_plate_columns_keep_supplied_country() -> None:
-    with Geocoder(FIXTURES / "packs/plates-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/plates-sample")) as geo:
         values = ["ABC 123", "", "unknown", "1A 12345"]
         columns = geo.plate_columns(values, country="US")
         assert (

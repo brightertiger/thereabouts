@@ -21,7 +21,7 @@
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -35,7 +35,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.576453,
           "lon": 77.155595
@@ -65,7 +65,7 @@
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": null,
@@ -84,7 +84,7 @@
               "name": "München 東京 country:AA"
             },
             "state": {
-              "code": null,
+              "code": "AA.A",
               "name": "München 東京 state:synthetic:A"
             },
             "city": {
@@ -98,7 +98,7 @@
                 "lon": 77.59
               }
             },
-            "timezone": null,
+            "timezone": "Fixture/One",
             "point": {
               "lat": 12.576453,
               "lon": 77.155595
@@ -118,7 +118,7 @@
               "name": "München 東京 country:AA"
             },
             "state": {
-              "code": null,
+              "code": "AA.A",
               "name": "München 東京 state:synthetic:A"
             },
             "city": {
@@ -162,7 +162,7 @@
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -231,7 +231,7 @@
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -245,7 +245,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.576453,
           "lon": 77.155595

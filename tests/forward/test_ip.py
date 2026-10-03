@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -14,7 +15,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 def test_ip_vectors() -> None:
     bundle = json.loads((FIXTURES / "ip-vectors.json").read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             assert geo.ip(case["request"]["values"][0]).to_dict() == case["result"], (
                 case["id"]
@@ -33,7 +34,7 @@ def test_independent_interval_boundaries() -> None:
         )
         for r in rows
     ]
-    with Geocoder(FIXTURES / "packs/ip-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/ip-sample")) as geo:
         for version, first, last, row in ranges:
             cls = ipaddress.IPv4Address if version == 4 else ipaddress.IPv6Address
             for address in (first, (first + last) // 2, last):
@@ -80,7 +81,7 @@ def test_independent_interval_boundaries() -> None:
 def test_ip_columns() -> None:
     source = read_source(FIXTURES / "ip-source.json.gz")
     values = [r["ip_start"] for r in source["rows"][:10]] + ["invalid", "::1"]
-    with Geocoder(FIXTURES / "packs/ip-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/ip-sample")) as geo:
         columns = geo.ip_columns(addresses=values)
         assert columns["status_categories"][columns["status"]].tolist() == [
             geo.ip(v).status for v in values

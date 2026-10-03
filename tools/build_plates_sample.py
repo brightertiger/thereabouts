@@ -51,6 +51,7 @@ def main() -> None:
             "plates",
             str(output),
             {
+                "core_pack": str(ROOT / "tests/fixtures/packs/core-sample"),
                 "data_version": "2026.10",
                 "input_provenance": provenance,
                 "allow_missing_tables": [] if bundle["priors"] else ["plate_priors"],

@@ -89,7 +89,8 @@ def build() -> tuple[Path, int]:
         "plates",
         str(output),
         {
-            "data_version": "synthetic-world-rules",
+            "data_version": "synthetic",
+            "core_pack": str(ROOT / "tests/fixtures/packs/core-synthetic"),
             "allow_missing_tables": ["plate_priors"],
             "input_provenance": provenance,
             "sources": ["all committed plate format policies"],

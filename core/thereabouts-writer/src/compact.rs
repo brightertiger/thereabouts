@@ -40,6 +40,7 @@ pub(crate) fn record(row: &rusqlite::Row<'_>) -> rusqlite::Result<(String, Obser
     Ok((
         row.get(0)?,
         Observation {
+            fallback: [None, None, None, None],
             identity: None,
             places: [row.get(1)?, row.get(2)?, row.get(3)?],
             latitude: row.get(4)?,
@@ -53,7 +54,10 @@ pub(crate) fn encode_record(
     record: &Observation,
     family: &str,
 ) -> Result<(u64, Vec<u64>)> {
-    let geo = dict.tuple("geographies", &record.places.map(u64::from))?;
+    let geo = dict.tuple(
+        "geographies",
+        &crate::shared_catalogue::geography(dict, record.places)?,
+    )?;
     let name = dict.string(record.text.get(2).and_then(Option::as_deref), true)?;
     let location = dict.tuple(
         "locations",
@@ -121,7 +125,7 @@ pub(crate) fn encode_record(
     ))
 }
 pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
-    manifest.format_minor = 1;
+    manifest.format_minor = 2;
     let family = manifest.family.clone();
     let dict = if matches!(family.as_str(), "ip" | "postal") {
         Dictionaries { db }

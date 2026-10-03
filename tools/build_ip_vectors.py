@@ -2,6 +2,7 @@
 
 import ipaddress
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
 from tools.source_fixture import read_source
@@ -56,7 +57,7 @@ def main() -> None:
                 {"kind": "ip", "values": [row[k]], "country": "CA"}
                 for k in ("ip_start", "ip_end")
             )
-    with Geocoder(FIXTURES / "packs/ip-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/ip-sample")) as geo:
         cases = [
             {
                 "id": f"ip-{i:03}",

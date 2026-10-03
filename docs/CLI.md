@@ -274,7 +274,7 @@ The release index schema is:
               "url": "postal.tar",
               "bytes": 234567,
               "sha256": "<64 lowercase hexadecimal characters>",
-              "format_minor": 1
+              "format_minor": 2
             }
           }
         }
@@ -283,7 +283,7 @@ The release index schema is:
 
 Index JSON is limited to 16 MiB. Archive size is positive and at most 1 GiB.
 Unknown fields are rejected. The default release is the newest whose requested
-families exist and have supported format minors: core 0, forward families 1.
+families exist and have supported format minors: core 0, forward families 2.
 Dotted numeric version components compare numerically; other components
 compare bytewise. Explicit unavailable/incompatible versions fail.
 
@@ -347,3 +347,16 @@ The 19 legacy forward cases retain their original assertions and explicit
 migration allowances: 18 run through the console, and one integer-type
 rejection remains at the typed API boundary. No expected snapshots are replaced
 with the new CLI's output.
+
+### Optional core enrichment for forward packs
+
+Forward format 2.2 pins the core dataset version, catalogue digest and place
+count. Installing core alongside a forward family enables canonical city,
+state/country metadata and catalogue timezone projection. The active release
+must agree and the catalogue digest must match; otherwise lookup exits 4.
+Forward lookup never installs core implicitly. With only the forward pack
+installed it still returns its keys, source points and published country/state
+context; city detail and timezone are null. A partial core sample supplies
+only the places it contains. Python explicit paths select enrichment with
+`Geocoder(packs={"core": core_path, "postal": postal_path})`; a lone forward
+`Geocoder(path)` is deliberately standalone. Names lookups continue to use core.

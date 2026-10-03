@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.conformance.forward_legacy import resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -14,14 +15,14 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 
 def test_locode_vectors() -> None:
     bundle = json.loads((FIXTURES / "locode-vectors.json").read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             assert resolve(geo, case["request"]).to_dict() == case["result"], case["id"]
 
 
 def test_independent_locode_sources() -> None:
     oracle = read_source(FIXTURES / "locode-source.json.gz")
-    with Geocoder(FIXTURES / "packs/locode-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/locode-sample")) as geo:
         for row in oracle["rows"]:
             result = geo.locode(row["locode"], evidence=True)
             assert (
@@ -67,7 +68,7 @@ def test_independent_locode_sources() -> None:
 def test_locode_columns() -> None:
     oracle = read_source(FIXTURES / "locode-source.json.gz")
     codes = [r["locode"] for r in oracle["rows"][:12]] + ["", "ZZZZZ", "BOM"]
-    with Geocoder(FIXTURES / "packs/locode-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/locode-sample")) as geo:
         columns = geo.locode_columns(codes)
         assert columns["status_categories"][columns["status"]].tolist() == [
             geo.locode(c).status for c in codes

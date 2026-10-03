@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from tests.conformance.forward_legacy import assert_case, resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -100,7 +101,7 @@ def main() -> None:
                 ("ZZZZZ", {}),
             ]
         ]
-    with Geocoder(FIXTURES / f"packs/{family}-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / f"packs/{family}-sample")) as geo:
         cases = [
             {
                 "id": f"{family}-{i:03}",
@@ -114,7 +115,7 @@ def main() -> None:
     if family not in {"postal", "airports"}:
         print(f"Frozen {len(cases)} {family} vectors")
         return
-    with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
+    with Geocoder(packs=selection(FIXTURES / f"packs/{family}-synthetic")) as geo:
         cases = []
         for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:
             if case["request"]["kind"] != verb:

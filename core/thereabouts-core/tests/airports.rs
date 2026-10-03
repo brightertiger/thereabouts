@@ -2,14 +2,13 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod support;
 use std::{fs, path::PathBuf};
-use thereabouts_core::format::Pack;
 #[test]
 fn airport_vectors() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures");
     for name in ["airports-vectors.json", "airports-synthetic-vectors.json"] {
         let bundle: serde_json::Value =
             serde_json::from_slice(&fs::read(root.join(name)).unwrap()).unwrap();
-        let pack = Pack::open(&root.join(bundle["pack"].as_str().unwrap()), true).unwrap();
+        let pack = support::pack(&root.join(bundle["pack"].as_str().unwrap()), true);
         for case in bundle["cases"].as_array().unwrap() {
             let r = &case["request"];
             let answer = pack
@@ -32,7 +31,7 @@ fn airport_vectors() {
 #[test]
 fn original_airport_expectations() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures");
-    let pack = Pack::open(&root.join("packs/airports-synthetic"), true).unwrap();
+    let pack = support::pack(&root.join("packs/airports-synthetic"), true);
     let bundle: serde_json::Value =
         serde_json::from_slice(&fs::read(root.join("conformance.json")).unwrap()).unwrap();
     let cases = bundle["cases"].as_array().unwrap();

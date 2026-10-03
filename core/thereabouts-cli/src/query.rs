@@ -24,7 +24,15 @@ pub(crate) fn family(command: &Command) -> Option<&'static str> {
 }
 pub(crate) fn open(root: &Path, command: &Command) -> Result<Pack> {
     let family = family(command).ok_or_else(|| Error::Usage("Expected a lookup verb".into()))?;
-    Ok(Pack::open(&store::installed(root, family)?, false)?)
+    let mut pack = Pack::open(&store::installed(root, family)?, false)?;
+    if family != "core" {
+        match store::installed(root, "core") {
+            Ok(path) => pack = pack.with_core(std::sync::Arc::new(Pack::open(&path, false)?))?,
+            Err(Error::Missing(_)) => {}
+            Err(error) => return Err(error),
+        }
+    }
+    Ok(pack)
 }
 pub(crate) fn run(pack: &Pack, command: &Command, evidence: bool) -> Result<LookupResult> {
     Ok(match command {

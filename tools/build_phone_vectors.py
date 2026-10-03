@@ -1,5 +1,6 @@
 """Freeze shared phone vectors; source assertions remain independent."""
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
 from tools.source_fixture import read_source
@@ -50,7 +51,7 @@ def main() -> None:
             ],
         ),
     ]:
-        with Geocoder(FIXTURES / "packs" / pack) as geo:
+        with Geocoder(packs=selection(FIXTURES / "packs" / pack)) as geo:
             cases = [
                 {
                     "id": f"{pack}-{i:03}",

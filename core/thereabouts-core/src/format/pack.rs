@@ -37,6 +37,7 @@ struct CatalogueSource {
 /// Concurrent pack handle. Open checks inventories; lookups validate accessed payloads.
 #[derive(Debug)]
 pub struct Pack {
+    pub(crate) core: Option<Arc<Pack>>,
     compact: Option<super::compact::Compact>,
     /// Validated release identity and policy used when projecting results.
     pub manifest: Manifest,
@@ -58,6 +59,26 @@ pub struct Pack {
     observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
 }
 impl Pack {
+    /// Attach an optional installed core; a mismatched namespace is never silently used.
+    pub fn with_core(mut self, core: Arc<Self>) -> Result<Self> {
+        let pin = self
+            .manifest
+            .core_catalogue
+            .as_ref()
+            .ok_or_else(|| Error::Incompatible("Pack has no core dependency".into()))?;
+        if core.manifest.family != "core"
+            || core.manifest.data_version != pin.data_version
+            || manifest::catalogue_digest(&core.manifest)? != pin.sha256
+            || core.place_count != pin.place_count as usize
+        {
+            return Err(Error::Incompatible(
+                "Core catalogue identity does not match forward pack".into(),
+            ));
+        }
+        self.core = Some(core);
+        Ok(self)
+    }
+
     /// Read headers/directories only; opt in to full hashes and structural verification.
     #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
     pub fn open(root: &Path, verify: bool) -> Result<Self> {
@@ -147,7 +168,11 @@ impl Pack {
         } else {
             None
         };
+        if let Some(pin) = &manifest.core_catalogue {
+            place_count = pin.place_count as usize;
+        }
         Ok(Self {
+            core: None,
             compact,
             manifest,
             metadata,
@@ -322,6 +347,12 @@ impl Pack {
     }
     /// Reference zero is null; other references project one record, with opt-in source evidence.
     pub fn place(&self, reference: u32, evidence: bool) -> Result<Option<Arc<Place>>> {
+        if self.manifest.core_catalogue.is_some() {
+            return self
+                .core
+                .as_ref()
+                .map_or(Ok(None), |core| core.place(reference, evidence));
+        }
         let Some(index) = reference.checked_sub(1).map(|v| v as usize) else {
             return Ok(None);
         };

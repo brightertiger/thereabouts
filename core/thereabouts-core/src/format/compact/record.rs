@@ -20,13 +20,19 @@ impl Compact {
         let location = self.table("locations")?.row(index(location)?)?;
         ensure(location.len() == 4, "Invalid location tuple")?;
         let geo = self.table("geographies")?.row(index(first(&location)?)?)?;
-        ensure(geo.len() == 3, "Invalid geographic tuple")?;
+        ensure(geo.len() == 7, "Invalid geographic tuple")?;
         let mut places = [0; 3];
-        for (target, value) in places.iter_mut().zip(geo) {
+        for (target, value) in places.iter_mut().zip(geo.iter().copied()) {
             *target = u32::try_from(value)
                 .map_err(|_| Error::Corrupt("Invalid geography reference".into()))?;
         }
         let mut record = Observation {
+            fallback: [
+                self.text(geo[3])?,
+                self.text(geo[4])?,
+                self.text(geo[5])?,
+                self.text(geo[6])?,
+            ],
             identity: Some(identity),
             places,
             latitude: coordinate(&location, 1)?,

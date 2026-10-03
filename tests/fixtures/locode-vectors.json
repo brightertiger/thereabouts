@@ -35,7 +35,7 @@
             "lon": 4.175286
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.55,
           "lon": 4.183333
@@ -492,7 +492,7 @@
             "lon": 5.88056
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.55,
           "lon": 5.883333
@@ -618,7 +618,7 @@
             "lon": 4.84862
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.716667,
           "lon": 4.866667
@@ -662,7 +662,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.016667,
           "lon": 29.266667
@@ -706,7 +706,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.083333,
           "lon": 28.816667
@@ -750,7 +750,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.083333,
           "lon": 28.933333
@@ -917,7 +917,7 @@
             "lon": 4.175286
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.55,
           "lon": 4.183333
@@ -961,7 +961,7 @@
             "lon": 4.175286
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.55,
           "lon": 4.183333
@@ -1028,7 +1028,7 @@
             "lon": 72.88261
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 18.966667,
           "lon": 72.816667
@@ -1072,7 +1072,7 @@
             "lon": 72.88261
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 18.966667,
           "lon": 72.816667

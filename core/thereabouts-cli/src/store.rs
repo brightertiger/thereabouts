@@ -225,6 +225,7 @@ pub fn activate(root: &Path, pin: &Active) -> Result<()> {
     for (name, pointer) in &pin.packs {
         resolve(root, name, pointer, Some(&pin.data_version))?;
     }
+    validate_core_pins(root, pin)?;
     let path = manifest::artifact_path(root, "active.json")?;
     let temporary = manifest::artifact_path(root, ".active.json.tmp")?;
     let mut file = OpenOptions::new()
@@ -248,6 +249,28 @@ pub fn remove(root: &Path, name: &str) -> Result<()> {
     let path = manifest::artifact_path(root, &format!("packs/{name}"))?;
     if path.exists() {
         fs::remove_dir_all(path)?;
+    }
+    Ok(())
+}
+
+fn validate_core_pins(root: &Path, pin: &Active) -> Result<()> {
+    use std::sync::Arc;
+    use thereabouts_core::format::Pack;
+    let Some(pointer) = pin.packs.get("core") else {
+        return Ok(());
+    };
+    let core = Arc::new(Pack::open(
+        &resolve(root, "core", pointer, Some(&pin.data_version))?,
+        false,
+    )?);
+    for (family, pointer) in &pin.packs {
+        if family != "core" {
+            Pack::open(
+                &resolve(root, family, pointer, Some(&pin.data_version))?,
+                false,
+            )?
+            .with_core(Arc::clone(&core))?;
+        }
     }
     Ok(())
 }

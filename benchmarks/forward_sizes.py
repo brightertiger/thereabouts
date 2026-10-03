@@ -73,7 +73,7 @@ def estimate(pack: Path, world_rows: int, rows: int) -> dict[str, Any]:
     for artifact in manifest["files"]:
         roles[artifact["kind"]] = roles.get(artifact["kind"], 0) + artifact["size"]
     fixed = sum(roles.get(k, 0) for k in ("catalogue", "metadata"))
-    supporting_scope = "sample; world catalogue growth is not modelled"
+    supporting_scope = "sample metadata; shared core catalogue excluded"
     measured = ROOT / f"docs/measurements/{manifest['family']}-world-manifest.json"
     provenance = manifest["inputs"]["options"].get("input_provenance", {})
     if measured.exists():
@@ -83,11 +83,10 @@ def estimate(pack: Path, world_rows: int, rows: int) -> dict[str, Any]:
             == provenance.get("golden_manifest_sha256")
             and world["storage"]["source_rows"] == world_rows
         ):
-            fixed = sum(
-                world["storage"][k] for k in ("catalogue_bytes", "metadata_bytes")
-            )
+            fixed = sum(world["storage"][k] for k in ("metadata_bytes",))
             supporting_scope = (
-                f"measured world supporting tables, writer {world['inputs']['writer']}"
+                f"historical world metadata, writer {world['inputs']['writer']}; "
+                "shared core excluded"
             )
     data = sum(
         n for k, n in roles.items() if k not in {"catalogue", "metadata", "notice"}

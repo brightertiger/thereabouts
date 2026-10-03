@@ -15,7 +15,7 @@ pub(crate) fn emit(
     code_evidence: &[[String; 2]],
 ) -> Result<()> {
     let dict = Dictionaries::new(db)?;
-    manifest.format_minor = 1;
+    manifest.format_minor = 2;
     manifest.plate_columns = Some(Schema {
         policy: tables.policy.clone(),
         prior_available: tables.prior_available,

@@ -34,6 +34,7 @@ def build(family: str) -> None:
         family,
         str(FIXTURES / f"packs/{family}-synthetic"),
         {
+            "core_pack": str(ROOT / "tests/fixtures/packs/core-synthetic"),
             "data_version": "synthetic",
             "sources": ["legacy synthetic fixture"],
             "attribution": "Synthetic fixture; public domain",

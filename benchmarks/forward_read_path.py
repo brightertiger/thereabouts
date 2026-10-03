@@ -11,6 +11,7 @@ from benchmarks.core_read_path import ROOT
 from benchmarks.forward_queries import Query, airport_defaults, misses, queries
 from benchmarks.forward_sizes import estimate
 from benchmarks.forward_workload import run
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -22,7 +23,10 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
     population = queries(family)
     verb = {"airports": "airport", "plates": "plate"}.get(family, family)
     absent = misses(family)
-    with Geocoder(pack) as geo:
+    with Geocoder(
+        packs=selection(pack) if pack.parent == ROOT / "tests/fixtures/packs" else None,
+        pack=pack if pack.parent != ROOT / "tests/fixtures/packs" else None,
+    ) as geo:
         scalar = getattr(geo, verb)
         assert all(scalar(q.value, **q.kwargs()).status == "not_found" for q in absent)
         hot = next(
@@ -52,7 +56,7 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         "estimate_scope": (
             "city-name index and supporting catalogue only; excludes spatial core"
             if family == "geocode"
-            else "family pack including supporting catalogue"
+            else "family pack plus metadata; shared core catalogue excluded"
         ),
         "vectors": len(bundle["cases"]),
         "workload_scope": "all source keys; plates use code/country assertions",

@@ -27,6 +27,7 @@ pub(crate) fn association(
     let city = canonical.as_deref().or(city);
     let (latitude, longitude) = point(row.number("latitude")?, row.number("longitude")?)?;
     Ok(Observation {
+        fallback: [None, None, None, None],
         identity: None,
         places: [
             catalogue::reference(db, row.text("country_id")?)?,

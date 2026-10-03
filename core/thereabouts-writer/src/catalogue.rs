@@ -22,6 +22,7 @@ pub fn initialize(db: &Connection) -> Result<()> {
         CREATE TABLE needed(id TEXT PRIMARY KEY) WITHOUT ROWID;
         CREATE TABLE ids(reference INTEGER PRIMARY KEY,id TEXT UNIQUE);
         CREATE TABLE zones(block INTEGER,key INTEGER,zone TEXT,PRIMARY KEY(block,key,zone)) WITHOUT ROWID;
+        CREATE TABLE zone_countries(zone TEXT,country TEXT,PRIMARY KEY(zone,country)) WITHOUT ROWID;
         CREATE TABLE coarse_zones(cell INTEGER,zone TEXT,PRIMARY KEY(cell,zone)) WITHOUT ROWID;")?;
     Ok(())
 }
@@ -44,6 +45,10 @@ pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
     seed(db, data, kind)?;
     if kind == "cells" {
         db.execute("INSERT OR IGNORE INTO needed SELECT id FROM cities", [])?;
+        db.execute(
+            "INSERT OR IGNORE INTO needed SELECT id FROM places WHERE role IN ('country','state','city') OR normalized_city_id=id",
+            [],
+        )?;
     }
     loop {
         let changed = db.total_changes();

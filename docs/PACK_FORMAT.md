@@ -1,6 +1,6 @@
 # Thereabouts pack format 2
 
-This is the normative specification of `thereabouts-pack-2`, version 2.1 (forward) and the unchanged 2.0 core layouts.
+This is the normative specification of `thereabouts-pack-2`, version 2.2 (forward) and the unchanged 2.0 core layouts.
 A pack is an immutable directory: `manifest.json`, inventoried binary shards,
 and inventoried UTF-8 notices. All clients share the Rust implementation.
 This document defines `core` (reverse and canonical-city names), `postal`,
@@ -93,7 +93,7 @@ are no overlaps, other gaps, or trailing bytes.
 | Key FST | FST bytes | 1 |
 
 Kinds 4–7 are obsolete format-2.0 forward artifacts and are not admitted by a
-format-2.1 forward pack. Kind 3 was exact codes in format 1. It means metadata only in format 2;
+format-2.2 forward pack. Kind 3 was exact codes in format 1. It means metadata only in format 2;
 checking the version before the kind is mandatory.
 
 ## Spatial shards
@@ -196,9 +196,11 @@ Point equality compares both stored coordinates exactly; no averaging occurs.
 ## Catalogue shards
 
 IDs start at 1 and concatenate catalogue shards in manifest order. Public place
-IDs sort by unsigned UTF-8 bytes, are unique, and are never joined across packs
-using their numeric references. The writer includes the transitive closure of
-cell country/state/city references through the four relationships below.
+IDs sort by unsigned UTF-8 bytes and are unique. Numeric references belong to
+this namespace; a forward pack can use them only with the exact manifest pin
+described below. The writer includes canonical-city rows, countries/states,
+city-role places and published self-normalized cities, plus the transitive
+closure of cell country/state/city references through the four relationships below.
 
 An 80-byte record has twelve string references (uint32) at offsets 0..47:
 
@@ -214,7 +216,8 @@ Both are `-2147483648` for a missing point; otherwise latitude lies in
 [-90000000,90000000], longitude in [-180000000,180000000]. Round source degrees
 to nearest microdegree, halfway away from zero. Offset 72 is uint32 population,
 with 0 meaning unknown. Offset 76 is a nullable **shard-local string reference**
-to the unambiguous timezone of the catalogue anchor.
+to the unambiguous timezone of the catalogue anchor, narrowed by its country using zone_tables country_codes
+(with the unnarrowed set retained when narrowing leaves no zones).
 
 Canonical city rows supply preferred names, kind, centroid and population.
 Other settlements have null points when the published place has no coordinate;
@@ -362,9 +365,9 @@ uint32 and its own validity mask. Invalid slots contain NaN or zero but must
 be interpreted through masks. Buffers are filled while iterating, without
 retaining a batch of result objects.
 
-## Compressed forward tables (format 2.1)
+## Compressed forward tables (format 2.2)
 
-Every forward family requires manifest `format_minor: 1`; older forward
+Every forward family requires manifest `format_minor: 2`; older forward
 packs are incompatible and must be rebuilt. Core spatial/name packs retain
 minor zero. Shared catalogue and metadata containers keep their unchanged
 minor-zero layouts; kinds 9, 10 and 11 require container minor one.
@@ -495,7 +498,7 @@ integer columns:
 | --- | --- |
 | records | location ordinal |
 | postings (airports only) | record ordinal |
-| geographies | country, state, city catalogue references |
+| geographies | core country ordinal, core state ordinal, core city ordinal, fallback country-code/name string IDs, fallback subdivision-code/name string IDs |
 | locations | geography ordinal, latitude bits, longitude bits, evidence name string |
 | evidence / evidence4 / evidence6 | source string, source-id prefix string, line-plus-one, code string, scheme string, details ordinal |
 | airport_evidence | first assertion ordinal, assertion count |
@@ -570,12 +573,43 @@ Readers retain file handles and directories. Each compressed table has an
 8 MiB decoded-block LRU; IO and decoding occur outside its lock. Evidence
 directories are admitted at open but evidence payloads are fetched only for
 evidence=True or explicit full verification. Full verification checks every
-block, every reference, every key span and every source record. The shared
-forward catalogue omits local_name, code_status, parent_method,
-normalization_method and evidence strings; their record slots are null.
+block, every reference, every key span and every source record. Forward packs contain no catalogue artifacts. They reference the core namespace
+described below; source evidence remains in the forward cold sections.
 Forward metadata keeps country_code/alpha3/name and subdivision
 code/country_code/name for referenced rows, without provenance or timezone
 tables. Plates retains all countries because each is a valid explicit hint.
+
+## Shared core catalogue dependency
+
+Every forward manifest (including plates) has `core_catalogue` with
+`data_version` (equal to its own release), `sha256`, and `place_count` (u32).
+The digest is SHA-256 of the UTF-8 compact JSON array of `[path,size,sha256]`
+arrays for every `catalogue` artifact in the core manifest's inventory order.
+There is no whitespace, escaping is standard JSON, and sizes are unsigned
+integers. `place_count` is the sum of core record counts. It bounds references
+when the core is absent. Core manifests do not have this dependency.
+
+Geography tuple columns 0–2 hold one-based ordinals in this exact core catalogue;
+zero means no published association or a place outside a deliberately partial
+core sample. The exporter receives `core_pack` explicitly, validates its release
+and hashes, and maps published IDs to its ordinals. Paths are excluded from
+reproducible input identity; the catalogue pin is included. Forward artifacts
+must not contain catalogue shards. Historical forward minors 0 and 1 are rejected.
+
+An attached core must match all three pin fields. A different core is an
+incompatibility, even if its release label matches. Runtime projection uses its
+place records and country/subdivision metadata. A city's single catalogue time
+zone becomes the forward result's timezone; absent or overlapping zones stay
+null. The forward source point remains separate from the canonical city point.
+
+Core installation is optional for forward queries. Without it, country and
+subdivision code/name pairs in geography columns 3–6 resolve through the forward metadata;
+source keys, names and points remain available in the forward pools/tables.
+City detail and timezone are null. The same fallback applies to ordinal-zero
+places outside a partial core sample. No reverse lookup or nearest-place guess
+fills missing detail. Candidates remain grouped by the stored core ordinals,
+so removing core does not merge distinct source associations. Plates already
+carry their country/rule assertions and retain that behavior without core.
 
 ## Postal family
 
@@ -588,9 +622,9 @@ a different postal rule sequence are incompatible data. The key is the uppercase
 two-letter source country, one NUL byte, then normalized postal code. Source
 country and the country assigned by the dataset may differ; neither is rewritten.
 
-Each postal pack contains metadata, any referenced catalogue shards, at least
-one **keys** FST and the required compressed tables, and notices. Catalogue references are local to this pack,
-with the same records and global ordering as core. Empty indexes are explicit.
+Each postal pack contains metadata, at least one **keys** FST, the required
+compressed tables, and notices. Geography ordinals reference the pinned core
+catalogue. Empty indexes are explicit.
 The exporter requires postal_codes, places, canonical_cities,
 place_to_city, countries, and subdivisions; fixture exceptions must be
 explicit. Catalogue closure includes every assigned country, state and city and
@@ -627,7 +661,7 @@ dictionary string column. Scalar and batch calls use the same core lookup.
 
 ## Airports family
 
-The airports family requires the same catalogue and metadata tables as postal.
+The airports family requires the same core catalogue pin and metadata tables as postal.
 Its primary input is the dataset table airports. Every non-null published
 iata_code, icao_code, gps_code, local_code and ident is indexed under the respective
 scheme iata, icao, gps, local and ident. No scheme is inferred from another field.

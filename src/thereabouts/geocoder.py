@@ -25,7 +25,12 @@ class Coordinates(Protocol):
 
 
 class Geocoder(ForwardQueries):
-    """Open selected families or discover installed packs from one dataset version."""
+    """Open selected families or discover installed packs from one dataset version.
+
+    Forward families use the selected core's pinned catalogue for city detail and
+    timezone. A standalone forward path retains source points and country/state
+    context; city detail and timezone are null. Use packs to attach a core path.
+    """
 
     def __init__(
         self,

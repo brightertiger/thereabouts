@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
 
@@ -41,7 +42,7 @@ def main() -> None:
         {"kind": "plate", "values": ["A" * 65], "country": "US"},
         {"kind": "plate", "values": ["A" * 65]},
     ]
-    with Geocoder(FIXTURES / "packs/plates-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/plates-sample")) as geo:
         cases = [
             {
                 "id": f"plate-{i:03}",

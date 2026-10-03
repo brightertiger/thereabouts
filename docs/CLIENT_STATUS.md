@@ -39,7 +39,8 @@ cases use the same embedded runner because OS argv cannot contain NUL. One
 integer-type case remains a typed API assertion. Six invalid grammar cases
 assert usage exit 2. The original 19 forward cases retain their old assertions:
 18 execute the console; the integer-type rejection stays at the typed boundary.
-There are no regenerated expected snapshots. Native IO tests exercise every
+The legacy expectations are never regenerated; current forward snapshots reflect
+optional core enrichment. Native IO tests exercise every
 command, output modes, failures, prompts and field selection. HTTP tests cover
 interruption/resume, ignored ranges, bad checksums, activation failure,
 concurrent locking and the absence of implicit network access.
@@ -52,14 +53,27 @@ imports and pack opening are included. The initial launch took
 64.139 ms. These numbers come from
 python -m benchmarks.cli_startup. The full per-launch series is in the JSON.
 
+## Format follow-ups after package 3
+
+Forward packs now pin the core catalogue's dataset version, digest and ordinal
+count. They contain no duplicated catalogue. Explicit or installed matching core
+supplies canonical city detail and its timezone. Standalone forward packs retain
+source points and pooled country/subdivision names and codes, with city detail
+and timezone null. A different core catalogue is incompatible, including at
+store activation. Core fixtures include the forward extracts' geographic closure;
+the reverse spatial coverage is unchanged. The writer accepts core_pack explicitly.
+The shared core sample uses 11,643,770 bytes.
+It is larger than the original reverse-only sample because the independent
+forward source checks now resolve their full place closure through that one core.
+
 ## What changed in the package-2 rework
 
-Forward packs use format 2.1: bounded LZ4 column blocks, dictionary IDs, FST
+Forward packs use format 2.2: bounded LZ4 column blocks, dictionary IDs, FST
 keys, implicit IP ends with gap rows, pooled strings and separate cold evidence.
 Numeric columns can use lossless scaling, deltas and byte alignment; string
 blocks choose direct, prefix or suffix coding. Detail strings share the name
 pool, and airport keys reuse the base source assertion unless evidence differs.
-Older format-2.0 forward packs are rejected.
+Older forward minors 0 and 1 are rejected.
 
 The final audit tightened size tests to count **all compressed blocks,
 including evidence**. The earlier query-only check was insufficient. Expanded
@@ -91,12 +105,12 @@ from thereabouts import Geocoder
 
 root = Path("tests/fixtures/packs")
 with Geocoder(packs={
-    "core": root / "core-names-sample",
+    "core": root / "core-sample",
     "postal": root / "postal-sample",
     "airports": root / "airports-sample",
     "ip": root / "ip-sample",
 }) as geo:
-    city = geo.geocode("Springfield", country="US", subdivision="US-IL")
+    city = geo.geocode("Paris", country="FR")
     postal = geo.postal("75001", country="FR", evidence=True)
     airport = geo.airport("CDG")
     batch = geo.ip_columns(addresses=["8.8.8.8"])
@@ -150,9 +164,9 @@ included. Golden has no literal 9122 phone row: all six published Mumbai child
 prefixes are retained instead. Kidarakulam/Karakulam supplies a real differing
 English-name vector. The reverse sample retains its original geographic subset.
 
-Forward/name packs total 4,105,661 bytes; compressed source
+Forward/name packs total 1,188,122 bytes; compressed source
 extracts use 1,328,164 bytes. Packs, extracts and shared
-vectors total 5,773,455 bytes, below the fixture
+vectors total 2,856,860 bytes, below the fixture
 budget. Builders are idempotent for the recorded inputs and writer revision.
 
 ## Conformance and validation
@@ -176,9 +190,9 @@ table below lists real vector counts; synthetic vectors additionally cover
 legacy codes, shared calling codes and alternate names. Pytest requires no real
 data. Node execution awaits its binding package.
 
-The full gate passed: 81 Rust tests; 742
+The full gate passed: 83 Rust tests; 745
 pytest passed and 9 skipped; strict mypy checked
-472 files. Rustfmt, Clippy with all targets/features, Ruff check,
+475 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and the wasm target check passed. Legacy reader and pipeline tests
 remain included. Skipped tests are reported separately from passing checks.
 
@@ -198,13 +212,13 @@ script output, not hand-entered estimates. Reverse open time is
 <!-- forward-measurements:start -->
 | Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Random median / p99 (µs) | Random batch rows/s | Estimated world bytes |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| postal | 2,540,756 / 28,833 | 28 | 8.500 / 66.174 | 10.875 / 1073.404 | 42,483 | 135,555,461 |
-| airports | 431,684 / 2,475 | 33 | 7.917 / 10.666 | 8.625 / 19.667 | 359,238 | 3,839,646 |
-| locode | 479,648 / 3,265 | 33 | 7.958 / 8.458 | 7.917 / 22.042 | 451,740 | 4,404,536 |
-| phone | 66,865 / 395 | 30 | 4.666 / 6.042 | 5.792 / 7.500 | 318,132 | 5,948,880 |
-| ip | 307,391 / 7,170 | 60 | 7.500 / 9.750 | 8.000 / 32.666 | 301,025 | 116,196,181 |
-| plates | 43,183 / 521 | 36 | 4.292 / 5.959 | 4.375 / 5.875 | 1,143,791 | 3,095,294 |
-| geocode | 213,326 / 102 | 52 | 8.334 / 10.042 | 8.834 / 45.875 | 339,277 | 11,940,180 |
+| postal | 445,935 / 28,833 | 28 | 8.625 / 14.792 | 12.792 / 2642.812 | 20,056 | 74,990,618 |
+| airports | 134,628 / 2,475 | 33 | 7.958 / 8.584 | 9.542 / 93.625 | 298,733 | 3,808,534 |
+| locode | 148,371 / 3,265 | 33 | 7.958 / 15.834 | 8.042 / 83.958 | 387,735 | 4,392,835 |
+| phone | 66,126 / 395 | 30 | 4.875 / 5.292 | 6.459 / 10.292 | 302,444 | 6,111,549 |
+| ip | 115,492 / 7,170 | 60 | 7.834 / 26.584 | 8.792 / 142.709 | 342,898 | 100,098,143 |
+| plates | 43,463 / 521 | 36 | 4.125 / 11.875 | 4.334 / 20.959 | 1,185,311 | 3,095,294 |
+| geocode | 213,326 / 102 | 52 | 8.250 / 35.083 | 8.750 / 49.917 | 333,519 | 11,940,180 |
 <!-- forward-measurements:end -->
 
 Random workloads visit all published sample keys, plus seeded repetitions.
@@ -215,20 +229,21 @@ batches cover code/country assertions; all-rule inference is measured below.
 <!-- forward-format:start -->
 | Family | Old data-shard B/row | Query blocks B/row | All compressed B/row | Sample pack bytes | Estimated world bytes |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| postal | 129.99 | 7.22 | 13.77 | 2,540,756 | 135,555,461 |
-| airports | 403.32 | 11.87 | 35.32 | 431,684 | 3,839,646 |
-| locode | 257.08 | 9.56 | 30.14 | 479,648 | 4,404,536 |
-| phone | 266.83 | 1.03 | 9.43 | 66,865 | 5,948,880 |
-| ip | 194.68 | 6.41 | 12.10 | 307,391 | 116,196,181 |
-| plates | 654.10 | 15.89 | 19.45 | 43,183 | 3,095,294 |
+| postal | 129.99 | 7.35 | 13.89 | 445,935 | 74,990,618 |
+| airports | 403.32 | 15.22 | 38.48 | 134,628 | 3,808,534 |
+| locode | 257.08 | 12.40 | 32.97 | 148,371 | 4,392,835 |
+| phone | 266.83 | 1.36 | 9.81 | 66,126 | 6,111,549 |
+| ip | 194.68 | 7.23 | 12.62 | 115,492 | 100,098,143 |
+| plates | 654.10 | 15.89 | 19.45 | 43,463 | 3,095,294 |
 <!-- forward-format:end -->
 
 The old column counts full legacy data shards. Current query/all columns count
 compressed payloads; all includes evidence but excludes FST/container framing
 and supporting tables. The enforced ceilings apply to all compressed blocks.
 World estimates scale complete data artifacts, including evidence and FSTs.
-IP/postal add their measured world catalogue/metadata; other estimates add
-sample supporting tables and therefore do not model catalogue growth.
+IP/postal add historical measured world metadata only; their catalogue is now
+shared with core and excluded. Other estimates add sample metadata. These remain
+estimates, not measurements of new world exports.
 
 <!-- world-exports:start -->
 | Family | Measured pack bytes | Peak RSS bytes | Seconds | Output deleted |
@@ -242,8 +257,9 @@ final numeric/string refinements. They are measurements of that recorded
 revision, not final-codec world measurements. Exact manifests are retained under
 docs/measurements; both outputs were deleted. No second world export was run.
 Postal's measured catalogue alone uses
-61,177,911 bytes, so the complete pack
-exceeds the design's approximate total-size target despite compact data blocks.
+61,177,911 bytes in that historical export.
+Current forward packs omit that catalogue
+entirely; the current estimates above use the new sample data bytes per row.
 IPv6 low words are preserved; the measured export contains
 7,836 nonzero low-word rows.
 

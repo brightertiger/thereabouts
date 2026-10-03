@@ -162,7 +162,8 @@ cases use the same embedded runner because OS argv cannot contain NUL. One
 integer-type case remains a typed API assertion. Six invalid grammar cases
 assert usage exit 2. The original 19 forward cases retain their old assertions:
 18 execute the console; the integer-type rejection stays at the typed boundary.
-There are no regenerated expected snapshots. Native IO tests exercise every
+The legacy expectations are never regenerated; current forward snapshots reflect
+optional core enrichment. Native IO tests exercise every
 command, output modes, failures, prompts and field selection. HTTP tests cover
 interruption/resume, ignored ranges, bad checksums, activation failure,
 concurrent locking and the absence of implicit network access.
@@ -175,14 +176,27 @@ imports and pack opening are included. The initial launch took
 {cli["first_launch_ms"]:.3f} ms. These numbers come from
 python -m benchmarks.cli_startup. The full per-launch series is in the JSON.
 
+## Format follow-ups after package 3
+
+Forward packs now pin the core catalogue's dataset version, digest and ordinal
+count. They contain no duplicated catalogue. Explicit or installed matching core
+supplies canonical city detail and its timezone. Standalone forward packs retain
+source points and pooled country/subdivision names and codes, with city detail
+and timezone null. A different core catalogue is incompatible, including at
+store activation. Core fixtures include the forward extracts' geographic closure;
+the reverse spatial coverage is unchanged. The writer accepts core_pack explicitly.
+The shared core sample uses {core["shared_catalogue"]["core_sample_bytes"]:,} bytes.
+It is larger than the original reverse-only sample because the independent
+forward source checks now resolve their full place closure through that one core.
+
 ## What changed in the package-2 rework
 
-Forward packs use format 2.1: bounded LZ4 column blocks, dictionary IDs, FST
+Forward packs use format 2.2: bounded LZ4 column blocks, dictionary IDs, FST
 keys, implicit IP ends with gap rows, pooled strings and separate cold evidence.
 Numeric columns can use lossless scaling, deltas and byte alignment; string
 blocks choose direct, prefix or suffix coding. Detail strings share the name
 pool, and airport keys reuse the base source assertion unless evidence differs.
-Older format-2.0 forward packs are rejected.
+Older forward minors 0 and 1 are rejected.
 
 The final audit tightened size tests to count **all compressed blocks,
 including evidence**. The earlier query-only check was insufficient. Expanded
@@ -214,12 +228,12 @@ from thereabouts import Geocoder
 
 root = Path("tests/fixtures/packs")
 with Geocoder(packs={{
-    "core": root / "core-names-sample",
+    "core": root / "core-sample",
     "postal": root / "postal-sample",
     "airports": root / "airports-sample",
     "ip": root / "ip-sample",
 }}) as geo:
-    city = geo.geocode("Springfield", country="US", subdivision="US-IL")
+    city = geo.geocode("Paris", country="FR")
     postal = geo.postal("75001", country="FR", evidence=True)
     airport = geo.airport("CDG")
     batch = geo.ip_columns(addresses=["8.8.8.8"])
@@ -326,8 +340,9 @@ The old column counts full legacy data shards. Current query/all columns count
 compressed payloads; all includes evidence but excludes FST/container framing
 and supporting tables. The enforced ceilings apply to all compressed blocks.
 World estimates scale complete data artifacts, including evidence and FSTs.
-IP/postal add their measured world catalogue/metadata; other estimates add
-sample supporting tables and therefore do not model catalogue growth.
+IP/postal add historical measured world metadata only; their catalogue is now
+shared with core and excluded. Other estimates add sample metadata. These remain
+estimates, not measurements of new world exports.
 
 {section(old, "world-exports")}
 
@@ -336,8 +351,9 @@ final numeric/string refinements. They are measurements of that recorded
 revision, not final-codec world measurements. Exact manifests are retained under
 docs/measurements; both outputs were deleted. No second world export was run.
 Postal's measured catalogue alone uses
-{exports["postal"]["storage"]["catalogue_bytes"]:,} bytes, so the complete pack
-exceeds the design's approximate total-size target despite compact data blocks.
+{exports["postal"]["storage"]["catalogue_bytes"]:,} bytes in that historical export.
+Current forward packs omit that catalogue
+entirely; the current estimates above use the new sample data bytes per row.
 IPv6 low words are preserved; the measured export contains
 {exports["ip"]["ipv6_nonzero_low64"]:,} nonzero low-word rows.
 

@@ -41,7 +41,10 @@ pub struct Storage {
 /// Required pack identity and source attribution, independent of build paths.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
-    /// Forward columnar packs require minor one; historical core packs retain zero.
+    /// Exact shared core catalogue identity; required for forward format 2.2.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub core_catalogue: Option<CoreCatalogue>,
+    /// Shared-catalogue forward packs require minor two; core retains zero.
     #[serde(default, skip_serializing_if = "zero")]
     pub format_minor: u16,
     /// Compressed forward dictionary schema, absent for spatial/name-only core.
@@ -150,6 +153,7 @@ pub fn read(root: &Path) -> Result<Manifest> {
     }
     let m: Manifest = serde_json::from_value(value)?;
     compatible_minor(&m)?;
+    validate_pin(&m)?;
     if m.required_features != 0 || m.reference_resolution != 8 || m.block_resolution != 3 {
         return Err(Error::Incompatible(
             "Unsupported pack features or resolutions".into(),
@@ -241,7 +245,9 @@ fn compatible_minor(m: &Manifest) -> Result<()> {
         ));
     }
     if m.family != "core"
-        && (m.format_minor != 1
+        && (m.format_minor != 2
+            || m.core_catalogue.is_none()
+            || m.files.iter().any(|f| f.kind == "catalogue")
             || if m.family == "plates" {
                 m.plate_columns.is_none()
             } else {
@@ -249,7 +255,7 @@ fn compatible_minor(m: &Manifest) -> Result<()> {
             })
     {
         return Err(Error::Incompatible(
-            "Forward packs require format 2.1; rebuild this pack".into(),
+            "Forward packs require format 2.2; rebuild this pack".into(),
         ));
     }
     Ok(())
@@ -271,4 +277,45 @@ mod tests {
             assert!(artifact_path(temp.path(), "link").is_err());
         }
     }
+}
+
+/// A forward pack's ordinal namespace, independent of installation paths.
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CoreCatalogue {
+    /// Dataset release; must equal the forward release.
+    pub data_version: String,
+    /// SHA-256 of the ordered catalogue inventory, including sizes and content hashes.
+    pub sha256: String,
+    /// Maximum one-based place ordinal; zero always means absent.
+    pub place_count: u32,
+}
+/// Fingerprint the catalogue namespace without rereading catalogue payloads.
+/// SHA-256 covers JSON arrays [path,size,sha256] in manifest inventory order.
+pub fn catalogue_digest(manifest: &Manifest) -> Result<String> {
+    let inventory = manifest
+        .files
+        .iter()
+        .filter(|f| f.kind == "catalogue")
+        .map(|f| (&f.path, f.size, &f.sha256))
+        .collect::<Vec<_>>();
+    Ok(format!(
+        "{:x}",
+        Sha256::digest(serde_json::to_vec(&inventory)?)
+    ))
+}
+
+fn validate_pin(m: &Manifest) -> Result<()> {
+    if let Some(pin) = &m.core_catalogue {
+        ensure(
+            m.family != "core"
+                && pin.data_version == m.data_version
+                && pin.sha256.len() == 64
+                && pin
+                    .sha256
+                    .bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+            "Invalid core catalogue pin",
+        )?;
+    }
+    Ok(())
 }

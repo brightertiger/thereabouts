@@ -1,4 +1,4 @@
-//! Format-2.1 forward tables: geography dictionaries, FST keys and cold evidence.
+//! Format-2.2 forward tables: geography dictionaries, FST keys and cold evidence.
 use super::{
     container::{Container, index},
     manifest::{self, Manifest},

@@ -8,6 +8,7 @@ from typing import Any
 import pytest
 
 from tests.conformance.forward_legacy import resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder, _core
 
 from .helpers import FIXTURES, console, install_fixture
@@ -59,12 +60,13 @@ def test_console_vectors(
     name: str, tmp_path: Path, capfd: pytest.CaptureFixture[str]
 ) -> None:
     bundle = json.loads((FIXTURES / f"{name}-vectors.json").read_text())
-    install_fixture(tmp_path, FIXTURES / bundle["pack"])
+    for pack in selection(FIXTURES / bundle["pack"]).values():
+        install_fixture(tmp_path, pack)
     for case in bundle["cases"]:
         if case["id"] == "postal-025":
             # Numeric values cannot be preserved as typed values in OS argv.
             assert not isinstance(case["request"]["values"][0], str)
-            with Geocoder(FIXTURES / bundle["pack"]) as geo:
+            with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
                 assert resolve(geo, case["request"]).to_dict() == case["result"]
             with pytest.raises(TypeError):
                 _core.run_cli(["thereabouts", "postal", case["request"]["values"][0]])

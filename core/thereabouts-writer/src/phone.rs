@@ -78,6 +78,7 @@ fn record(row: Row<'_>, places: [u32; 3], prefix: &str, metadata: bool) -> Resul
         }
     }
     Ok(Observation {
+        fallback: [None, None, None, None],
         identity: None,
         places,
         latitude: i32::MIN,

@@ -54,10 +54,12 @@ impl Pack {
         let mut records = Vec::new();
         for record in observations {
             let code = self.place(*record.places.first().unwrap_or(&0), false)?;
-            if country
-                .as_deref()
-                .is_none_or(|wanted| code.as_ref().is_some_and(|p| p.field(6) == wanted))
-            {
+            if country.as_deref().is_none_or(|wanted| {
+                code.as_ref()
+                    .map(|p| p.field(6))
+                    .or(record.fallback[0].as_deref())
+                    == Some(wanted)
+            }) {
                 records.push(record);
             }
         }

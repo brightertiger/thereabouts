@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from tests.conformance.forward_legacy import check, resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import ClosedGeocoderError, Geocoder, IncompatibleDataError
 from tools.source_fixture import read_source
 
@@ -18,7 +19,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 )
 def test_shared_vectors(name: str) -> None:
     bundle = json.loads((FIXTURES / name).read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             assert resolve(geo, case["request"]).to_dict() == case["result"], case["id"]
 
@@ -31,7 +32,7 @@ def test_independent_postal_source_rows() -> None:
     oracle = read_source(FIXTURES / "postal-source.json.gz")
     rows = oracle["rows"]
     indexed = {(r["source"], r["source_id"]): r for r in rows}
-    with Geocoder(FIXTURES / "packs/postal-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/postal-sample")) as geo:
         for row in rows:
             result = geo.postal(
                 row["postal_code"], country=row["country_code"], evidence=True
@@ -73,7 +74,7 @@ def test_independent_postal_source_rows() -> None:
 
 
 def test_columns_preserve_ambiguous_candidates_and_close() -> None:
-    geo = Geocoder(FIXTURES / "packs/postal-synthetic")
+    geo = Geocoder(packs=selection(FIXTURES / "packs/postal-synthetic"))
     columns = geo.postal_columns(["00100", "AMB", "missing"], country="AA")
     status = columns["status_categories"][columns["status"]].tolist()
     assert status == ["matched", "ambiguous", "not_found"]

@@ -35,7 +35,7 @@
             "lon": 6.5625
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.9971,
           "lon": 6.5699
@@ -79,7 +79,7 @@
             "lon": 6.5625
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.9984,
           "lon": 6.5661
@@ -123,7 +123,7 @@
             "lon": 6.5625
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.9989,
           "lon": 6.5687
@@ -167,7 +167,7 @@
             "lon": 4.34878
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.8504,
           "lon": 4.3488
@@ -211,7 +211,7 @@
             "lon": 4.34878
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.8759,
           "lon": 4.3484
@@ -255,7 +255,7 @@
             "lon": 4.37737
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.8694,
           "lon": 4.3774
@@ -299,7 +299,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8534,
           "lon": 2.3488
@@ -343,7 +343,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8534,
           "lon": 2.3488
@@ -387,7 +387,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8534,
           "lon": 2.3488
@@ -3165,7 +3165,7 @@
             "lon": 6.5625
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.9971,
           "lon": 6.5699

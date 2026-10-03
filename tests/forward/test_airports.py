@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.conformance.forward_legacy import check, resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source
 
@@ -17,7 +18,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 )
 def test_airport_vectors(name: str) -> None:
     bundle = json.loads((FIXTURES / name).read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             assert resolve(geo, case["request"]).to_dict() == case["result"], case["id"]
 
@@ -33,7 +34,7 @@ def test_airport_legacy_expectations() -> None:
 
 def test_independent_airport_sources() -> None:
     oracle = read_source(FIXTURES / "airports-source.json.gz")
-    with Geocoder(FIXTURES / "packs/airports-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/airports-sample")) as geo:
         for row in oracle["rows"]:
             for scheme, field in [
                 ("iata", "iata_code"),
@@ -83,7 +84,7 @@ def test_independent_airport_sources() -> None:
 
 
 def test_airport_columns_candidates() -> None:
-    with Geocoder(FIXTURES / "packs/airports-synthetic") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/airports-synthetic")) as geo:
         result = geo.airport_columns(["ZZZ", "AAAA", "bad"])
         assert result["status_categories"][result["status"]].tolist() == [
             "ambiguous",
@@ -94,7 +95,7 @@ def test_airport_columns_candidates() -> None:
 
 
 def test_duplicate_identity_names_follow_the_published_scheme() -> None:
-    with Geocoder(FIXTURES / "packs/airports-synthetic") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/airports-synthetic")) as geo:
         iata = geo.airport("ZZZ", scheme="iata", country="AA", evidence=True)
         gps = geo.airport("GPS1", scheme="gps", evidence=True)
     assert iata.evidence is not None and gps.evidence is not None

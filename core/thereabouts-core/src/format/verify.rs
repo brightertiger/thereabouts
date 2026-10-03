@@ -100,14 +100,22 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             _ => {}
         }
     }
+    verify_forward(root, &manifest, total, metadata.countries.len())?;
+    Ok(manifest)
+}
+fn verify_forward(root: &Path, manifest: &Manifest, total: usize, countries: usize) -> Result<()> {
     if manifest.forward_columns.is_some() {
-        super::compact::Compact::open(root, &manifest)?.verify(total)?;
+        let count = manifest
+            .core_catalogue
+            .as_ref()
+            .map_or(total, |p| p.place_count as usize);
+        super::compact::Compact::open(root, manifest)?.verify(count)?;
     }
     if manifest.plate_columns.is_some() {
-        let evidence = super::plate_columns::PlateColumns::open(root, &manifest)?;
-        let tables = evidence.decode(&manifest)?;
+        let evidence = super::plate_columns::PlateColumns::open(root, manifest)?;
+        let tables = evidence.decode(manifest)?;
         evidence.verify(&tables)?;
-        crate::plates_index::PlateIndex::new(tables, evidence, metadata.countries.len())?;
+        crate::plates_index::PlateIndex::new(tables, evidence, countries)?;
     }
-    Ok(manifest)
+    Ok(())
 }

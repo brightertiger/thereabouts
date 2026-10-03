@@ -126,7 +126,7 @@ pub fn release(root: &Path) {
     let file = root.join("phone.tar");
     fs::write(&file, &archive).unwrap();
     let index = serde_json::json!({"format":2,"datasets":{info.data_version:{"packs":{"phone":{
-        "url":"phone.tar","bytes":archive.len(),"sha256":manifest::digest(&file).unwrap(),"format_minor":1
+        "url":"phone.tar","bytes":archive.len(),"sha256":manifest::digest(&file).unwrap(),"format_minor":2
     }}}}});
     fs::write(root.join("index.json"), serde_json::to_vec(&index).unwrap()).unwrap();
 }

@@ -325,10 +325,18 @@ impl Geocoder {
     }
 }
 #[pyfunction]
-#[pyo3(signature=(path, *, verify=false))]
-fn open(py: Python<'_>, path: &str, verify: bool) -> PyResult<Geocoder> {
+#[pyo3(signature=(path, *, verify=false, core=None))]
+fn open(py: Python<'_>, path: &str, verify: bool, core: Option<&Geocoder>) -> PyResult<Geocoder> {
+    let shared = core.map(|c| c.pack(py)).transpose()?;
     let pack = py
-        .detach(|| Pack::open(Path::new(path), verify))
+        .detach(|| {
+            let pack = Pack::open(Path::new(path), verify)?;
+            if let Some(core) = shared {
+                pack.with_core(core)
+            } else {
+                Ok(pack)
+            }
+        })
         .map_err(|e| error(py, &e))?;
     Ok(Geocoder {
         pack: Mutex::new(Some(Arc::new(pack))),

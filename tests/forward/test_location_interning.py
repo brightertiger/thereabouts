@@ -37,7 +37,17 @@ def test_unassigned_origin_survives_location_interning(
     )
     path.write_text(json.dumps(manifest))
     pack = tmp_path / "postal"
-    _core.write_pack(str(path.parent), "postal", str(pack), {"data_version": "test"})
+    _core.write_pack(
+        str(path.parent),
+        "postal",
+        str(pack),
+        {
+            "data_version": "synthetic",
+            "core_pack": str(
+                Path(__file__).parents[1] / "fixtures/packs/core-synthetic"
+            ),
+        },
+    )
     with Geocoder(pack, verify=True) as geo:
         answer = geo.postal("VOID", country="AA", evidence=True)
         assert answer.status == "matched"

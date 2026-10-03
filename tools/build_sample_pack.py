@@ -107,6 +107,20 @@ def subset(source: Path, output: Path) -> dict[str, Any]:
             if row["country_id"]:
                 countries.add(row["country_id"].removeprefix("country:"))
         write("cells", rows, data.schema, block=table["block"])
+    # Forward samples share this catalogue. Only committed extract IDs enlarge its
+    # geographic closure; the spatial sample and its source oracle remain unchanged.
+    from tools.source_fixture import read_source
+
+    for name in ("postal", "airports", "locode", "ip", "phone"):
+        extract_path = ROOT / f"tests/fixtures/{name}-source.json.gz"
+        if extract_path.exists():
+            context = read_source(extract_path)
+            for row in context["rows"]:
+                for field in ("country_id", "state_id", "city_id", "place_id"):
+                    if row.get(field):
+                        needed.add(row[field])
+                needed.update(row.get("place_ids") or [])
+            needed.update(v for v in context.get("place_to_city", {}).values() if v)
     # Read relevant country catalogues in Arrow batches; do not materialize a
     # country's millions of records as Python dictionaries at once.
     selected: dict[str, dict[str, Any]] = {}

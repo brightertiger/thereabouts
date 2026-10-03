@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder, Result
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -124,6 +125,9 @@ def assert_result(result: Result, case: dict[str, Any]) -> str:
                     assert after.name == before["name"]
                 if field == "country":
                     assert after.code == before["country_code"]
+                if field == "state" and before["id"] == "state:synthetic:A":
+                    # R2/R3: the shared core supplies the published subdivision code.
+                    assert before["code"] is None and after.code == "AA.A"
         assert {(s["source"], s["source_id"]) for s in sources} == {
             (o["source"], o["source_id"]) for o in previous["observations"]
         }
@@ -139,7 +143,7 @@ def assert_result(result: Result, case: dict[str, Any]) -> str:
 
 def check(family: str = "postal") -> dict[str, int]:
     counts: Counter[str] = Counter()
-    with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
+    with Geocoder(packs=selection(FIXTURES / f"packs/{family}-synthetic")) as geo:
         for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:
             if case["request"]["kind"] == (
                 "airport" if family == "airports" else family

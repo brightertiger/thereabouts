@@ -105,6 +105,7 @@ def main() -> None:
             args.family,
             str(output),
             {
+                "core_pack": str(ROOT / "tests/fixtures/packs/core-sample"),
                 "data_version": "2026.10",
                 "input_provenance": provenance,
                 "sources": ["golden dataset; original digests retained"],

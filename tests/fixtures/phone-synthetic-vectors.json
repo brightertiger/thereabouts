@@ -80,7 +80,7 @@
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -94,7 +94,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": null,
         "cell": null,
         "distance_band": null,

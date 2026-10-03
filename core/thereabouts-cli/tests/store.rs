@@ -74,7 +74,7 @@ fn source(root: &Path) -> (Directory, String) {
         url: "phone.tar".into(),
         bytes: archive.len() as u64,
         sha256: manifest::digest(&file).unwrap(),
-        format_minor: 1,
+        format_minor: 2,
     };
     let index = Index {
         format: 2,
@@ -284,4 +284,35 @@ fn version_components_are_portable_and_cannot_traverse() {
     for value in ["2026.10", "synthetic-phone", "test_2"] {
         assert!(store::component(value).is_ok(), "{value}");
     }
+}
+
+#[test]
+fn mismatched_core_never_activates_over_a_working_forward_install() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().join("store");
+    let (source, _) = source(&temp.path().join("release"));
+    let mut pin = install::install(&root, &source, &["phone".into()], None).unwrap();
+    let before = fs::read(root.join("active.json")).unwrap();
+    let wrong = fixture().parent().unwrap().join("core-names-synthetic");
+    let relative = "packs/core/synthetic";
+    let target = root.join(relative);
+    fs::create_dir_all(&target).unwrap();
+    for entry in fs::read_dir(wrong).unwrap() {
+        let path = entry.unwrap().path();
+        fs::copy(&path, target.join(path.file_name().unwrap())).unwrap();
+    }
+    pin.packs.insert(
+        "core".into(),
+        store::Pointer {
+            path: relative.into(),
+            manifest_sha256: manifest::digest(&target.join("manifest.json")).unwrap(),
+        },
+    );
+    assert!(
+        store::activate(&root, &pin)
+            .unwrap_err()
+            .to_string()
+            .contains("catalogue identity")
+    );
+    assert_eq!(fs::read(root.join("active.json")).unwrap(), before);
 }

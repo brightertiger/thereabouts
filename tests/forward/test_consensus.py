@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tests.conformance.forward_legacy import resolve
+from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
@@ -26,7 +27,7 @@ FIELDS = (
 )
 def test_flat_fields_are_the_consensus_of_all_candidates(family: str) -> None:
     bundle = json.loads((FIXTURES / f"{family}-vectors.json").read_text())
-    with Geocoder(FIXTURES / bundle["pack"]) as geo:
+    with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             request = case["request"]
             result = resolve(geo, request)
@@ -48,7 +49,7 @@ def test_flat_fields_are_the_consensus_of_all_candidates(family: str) -> None:
 
 
 def test_unlinked_postal_candidates_inherit_only_source_country() -> None:
-    with Geocoder(FIXTURES / "packs/postal-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/postal-sample")) as geo:
         result = geo.postal("744301", country="IN", evidence=True)
         assert result.status == "ambiguous"
         assert result.country is not None and result.country.code == "IN"
@@ -64,7 +65,7 @@ def test_unlinked_postal_candidates_inherit_only_source_country() -> None:
 
 
 def test_single_plate_inference_and_unknown_placeholder() -> None:
-    with Geocoder(FIXTURES / "packs/plates-sample") as geo:
+    with Geocoder(packs=selection(FIXTURES / "packs/plates-sample")) as geo:
         result = geo.plate("AB-123-CD", evidence=True)
         assert result.status == "matched" and not result.candidates
         assert result.country is not None and result.country.code == "FR"

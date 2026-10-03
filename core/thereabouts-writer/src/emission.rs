@@ -87,7 +87,7 @@ pub fn catalogue(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Resu
             let cell = LatLng::new(point.lat, point.lon)
                 .map_err(|_| Error::Input("Invalid point".into()))?
                 .to_cell(Resolution::Eight);
-            place.timezone = timezones::at_point(db, cell)?;
+            place.timezone = timezones::at_point(db, cell, Some(place.field(6)))?;
         }
         let added = 80
             + place

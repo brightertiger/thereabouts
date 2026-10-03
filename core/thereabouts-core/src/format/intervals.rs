@@ -191,7 +191,7 @@ mod tests {
         fn round_trip_inclusive_bounds(start in 0_u32..u32::MAX-1024, width in 0_u32..1024) {
             let dir=tempfile::tempdir().unwrap();let path=dir.path().join("ip.bin");
             let range=Bounds{version:4,first:u128::from(start),last:u128::from(start+width)};
-            let record=Observation{identity:None,places:[0;3],latitude:i32::MIN,longitude:i32::MIN,text:[Some("s".into()),Some("id".into()),None,None,None,None]};
+            let record=Observation{fallback:[None,None,None,None],identity:None,places:[0;3],latitude:i32::MIN,longitude:i32::MIN,text:[Some("s".into()),Some("id".into()),None,None,None,None]};
             std::fs::write(&path,encode_entries(&[(range.key(),record)]).unwrap()).unwrap();
             let index=Intervals::open(&path).unwrap();
             prop_assert_eq!(index.lookup((4,range.first)).unwrap(),Some(0));

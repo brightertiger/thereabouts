@@ -35,7 +35,7 @@
             "lon": 73.01582
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 19.17,
           "lon": 73.0014
@@ -79,7 +79,7 @@
             "lon": 73.01582
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 19.17,
           "lon": 73.0014
@@ -123,7 +123,7 @@
             "lon": 73.01582
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 19.17,
           "lon": 73.0014
@@ -299,7 +299,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3676,
           "lon": 4.90414
@@ -343,7 +343,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3676,
           "lon": 4.90414
@@ -387,7 +387,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3676,
           "lon": 4.90414
@@ -431,7 +431,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8575,
           "lon": 2.35138
@@ -475,7 +475,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8575,
           "lon": 2.35138
@@ -519,7 +519,7 @@
             "lon": 2.3488
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Paris",
         "point": {
           "lat": 48.8575,
           "lon": 2.35138
@@ -563,7 +563,7 @@
             "lon": 4.44174
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.894,
           "lon": 4.43626
@@ -607,7 +607,7 @@
             "lon": 4.44174
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.894,
           "lon": 4.43626
@@ -651,7 +651,7 @@
             "lon": 4.44174
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 50.894,
           "lon": 4.43626
@@ -695,7 +695,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0082,
           "lon": 28.9784
@@ -739,7 +739,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0082,
           "lon": 28.9784
@@ -783,7 +783,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0082,
           "lon": 28.9784
@@ -827,7 +827,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5192,
           "lon": 6.10025
@@ -871,7 +871,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5192,
           "lon": 6.10025
@@ -915,7 +915,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5192,
           "lon": 6.10025
@@ -1091,7 +1091,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3783,
           "lon": 4.90073
@@ -1135,7 +1135,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3783,
           "lon": 4.90073
@@ -1179,7 +1179,7 @@
             "lon": 4.88969
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Amsterdam",
         "point": {
           "lat": 52.3783,
           "lon": 4.90073
@@ -1223,7 +1223,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0796,
           "lon": 29.0073
@@ -1267,7 +1267,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0796,
           "lon": 29.0073
@@ -1311,7 +1311,7 @@
             "lon": 28.94966
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Istanbul",
         "point": {
           "lat": 41.0796,
           "lon": 29.0073
@@ -1355,7 +1355,7 @@
             "lon": 4.0403
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 51.0705,
           "lon": 4.03988
@@ -1399,7 +1399,7 @@
             "lon": 4.0403
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 51.0705,
           "lon": 4.03988
@@ -1443,7 +1443,7 @@
             "lon": 4.0403
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Brussels",
         "point": {
           "lat": 51.0705,
           "lon": 4.03988
@@ -1619,7 +1619,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5048,
           "lon": 6.11276
@@ -1663,7 +1663,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5048,
           "lon": 6.11276
@@ -1707,7 +1707,7 @@
             "lon": 6.10278
           }
         },
-        "timezone": null,
+        "timezone": "Europe/Luxembourg",
         "point": {
           "lat": 49.5048,
           "lon": 6.11276
@@ -1751,7 +1751,7 @@
             "lon": 77.23149
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 28.6139,
           "lon": 77.2088
@@ -1795,7 +1795,7 @@
             "lon": 77.23149
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 28.6139,
           "lon": 77.2088
@@ -1839,7 +1839,7 @@
             "lon": 77.23149
           }
         },
-        "timezone": null,
+        "timezone": "Asia/Kolkata",
         "point": {
           "lat": 28.6139,
           "lon": 77.2088

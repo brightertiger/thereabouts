@@ -43,6 +43,25 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
             Ok(())
         })?;
     }
+    let mut countries = Inserts::new(db, "INSERT OR IGNORE INTO zone_countries", 2);
+    for table in data.tables("zone_tables") {
+        data.scan(table, |row| {
+            for country in row
+                .text("country_codes")?
+                .unwrap_or("")
+                .split(',')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+            {
+                countries.push([
+                    Value::Text(row.required("tzid")?.into()),
+                    Value::Text(country.into()),
+                ])?;
+            }
+            Ok(())
+        })?;
+    }
+    countries.flush()?;
     coarse.flush()?;
     fine.flush()?;
     Ok(())
@@ -154,7 +173,7 @@ pub fn join(
 }
 
 /// Catalogue anchors need only their matching ancestors, not expanded blocks.
-pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
+pub fn at_point(db: &Connection, cell: CellIndex, country: Option<&str>) -> Result<Option<String>> {
     let mut names = BTreeSet::new();
     let (block, _) = address::address(cell);
     for r in 0..=8 {
@@ -175,6 +194,22 @@ pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
                     names.insert(zone?);
                 }
             }
+        }
+    }
+    if let Some(country) = country {
+        let mut narrowed = BTreeSet::new();
+        for name in &names {
+            let present: bool = db
+                .prepare_cached(
+                    "SELECT EXISTS(SELECT 1 FROM zone_countries WHERE zone=? AND country=?)",
+                )?
+                .query_row(params![name, country], |row| row.get(0))?;
+            if present {
+                narrowed.insert(name.clone());
+            }
+        }
+        if !narrowed.is_empty() {
+            names = narrowed;
         }
     }
     Ok(if names.len() == 1 {
@@ -233,7 +268,23 @@ mod tests {
         let rows = join(&db, block, vec![(0, Label([0; 5]))], &mut sets).unwrap();
         assert_eq!(sets[1], vec!["Europe/Amsterdam", "Europe/Berlin"]);
         assert_eq!(rows.iter().find(|(k, _)| *k == key).unwrap().1.0[4], 1);
-        assert_eq!(at_point(&db, fine).unwrap(), None);
+        assert_eq!(at_point(&db, fine, None).unwrap(), None);
+        db.execute(
+            "INSERT INTO zone_countries VALUES ('Europe/Amsterdam','NL')",
+            [],
+        )
+        .unwrap();
+        assert_eq!(
+            at_point(&db, fine, Some("NL")).unwrap().as_deref(),
+            Some("Europe/Amsterdam")
+        );
+        assert_eq!(at_point(&db, fine, Some("ZZ")).unwrap(), None);
+        db.execute("DELETE FROM zones WHERE zone='Europe/Berlin'", [])
+            .unwrap();
+        assert_eq!(
+            at_point(&db, fine, Some("ZZ")).unwrap().as_deref(),
+            Some("Europe/Amsterdam")
+        );
         assert!(rows.len() > 1);
     }
 }
