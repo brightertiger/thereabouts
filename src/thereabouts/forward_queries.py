@@ -96,12 +96,15 @@ class ForwardQueries:
             [code if isinstance(code, str) else "" for code in codes], country=country
         )
 
-    def phone(self, number: str, *, evidence: bool = False) -> Result:
+    def phone(
+        self, number: str, *, country: str | None = None, evidence: bool = False
+    ) -> Result:
         """Find the longest published prefix of an international E.164 number."""
         self._ensure_open()
         return Result.from_dict(
             self._handles.get("phone").phone(
                 number if isinstance(number, str) else "",
+                country=country,
                 evidence=evidence,
             )
         )

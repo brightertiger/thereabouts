@@ -3,9 +3,9 @@ from typing import Any, Literal
 
 import pytest
 
-from thereabouts.cli import main
 from thereabouts.client import Geocoder
 from thereabouts.client_errors import InvalidInputError
+from thereabouts.commandline.application import main
 
 from .generate import FIXTURES, OUTPUT, bundle, resolve
 

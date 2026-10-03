@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from thereabouts.cli import main
 from thereabouts.client import Geocoder
 from thereabouts.client_errors import IncompatibleDataError
+from thereabouts.commandline.application import main
 from thereabouts.installing.install import install
 from thereabouts.packs.jsonio import canonical, digest, parse, sha256
 from thereabouts.store import installed_pack, list_packs

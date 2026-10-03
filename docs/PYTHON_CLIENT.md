@@ -1,5 +1,10 @@
 # Reading golden serving packs in Python
 
+> Historical format-1 Python API documentation. Current commands, data store and
+> MCP are documented in [CLI.md](CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> `python -m thereabouts.commandline.application` in place of `thereabouts`.
+
 `thereabouts.client.Geocoder` reads an immutable `thereabouts-pack-1` reverse
 pack without network access. Install the project and its NumPy/H3 dependencies
 in this worktree's environment, then select a pack directory explicitly:
@@ -21,9 +26,8 @@ with Geocoder("tests/fixtures/serving", verify=True) as geo:
 
 The committed fixture is synthetic and is not geographic evidence. For another
 verified golden snapshot, use the exporter described in
-[SERVING_FORMAT.md](SERVING_FORMAT.md). The old `thereabouts.Geocoder` is still
-the original reader: its files and top-level exports are frozen pending pipeline
-integration. Use the explicit `thereabouts.client` import for these packs.
+[SERVING_FORMAT.md](SERVING_FORMAT.md). The top-level `thereabouts.Geocoder` now uses the Rust format-2 reader.
+Use the explicit `thereabouts.client` import for historical format-1 packs.
 
 ## Results and evidence
 

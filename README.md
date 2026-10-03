@@ -1,22 +1,30 @@
 # Thereabouts
 
-The golden-pack clients use `thereabouts.client.Geocoder` in Python and
-`clients/node/` in Node. They read explicitly installed reverse, postal and
-airport packs, preserving canonical identities, methods, evidence and ambiguity.
-The optional `thereabouts mcp` command exposes the Python API over stdio.
+The current Python API uses the Rust core: `from thereabouts import Geocoder`.
+It reads installed format-2 core packs and format-2.1 forward packs without
+implicit downloads. The `thereabouts` console exposes explicit lookup verbs,
+batch reverse lookup and transactional data management. Optional MCP tools
+return the same result JSON.
 
-Start with the [Python API](docs/PYTHON_CLIENT.md),
-[data installation](docs/DATA_INSTALLATION.md), [code packs](docs/CODE_PACKS.md),
-[Node reader](clients/node/README.md) or [MCP server](docs/MCP_SERVER.md).
-[Client status](docs/CLIENT_STATUS.md) records completed phases, measurements,
-validation and release follow-ups. Nothing has been published.
+Start with the [command and data-store contract](docs/CLI.md) and the
+[Python API, measurements and qualification](docs/CLIENT_STATUS.md).
+The current Node/WASM binding is the next work package; the retained
+[Node reader](clients/node/README.md) describes the older format-1 client.
+Nothing has been published.
+
+```python
+from thereabouts import Geocoder
+
+with Geocoder("tests/fixtures/packs/core-sample") as geo:
+    print(geo.reverse(lat=50.8503, lon=4.3517).to_dict())
+```
 
 ## Original runtime retained during pipeline integration
 
-The API and measurements below describe the first table format. Its code remains
-in place because the pipeline imports and hashes it; the new reader's eventual
-top-level switch is documented in the client status. The first release will use
-golden packs.
+The API, examples and measurements below are historical first-table-format
+documentation. They do not describe the current top-level Python API or CLI.
+The retained code and old clients remain for pipeline compatibility until the
+scheduled cleanup; use the current documentation linked above.
 
 Give a latitude/longitude, get city, state and country, entirely offline.
 Python 3.11+; runtime dependencies are **H3 and NumPy only**.

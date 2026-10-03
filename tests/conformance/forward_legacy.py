@@ -46,7 +46,11 @@ def resolve(
 
 
 def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
-    result = resolve(geo, case["request"], evidence=True)
+    return assert_result(resolve(geo, case["request"], evidence=True), case)
+
+
+def assert_result(result: Result, case: dict[str, Any]) -> str:
+    """Assert library or console results against the original expectations."""
     if case["id"] == 52:
         # Approved default now searches IATA + ICAO; assert against case 32's
         # unchanged airport expectations, not against a regenerated snapshot.

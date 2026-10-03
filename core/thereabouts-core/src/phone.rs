@@ -23,7 +23,23 @@ pub fn normalize(value: &str) -> Option<String> {
 impl Pack {
     /// Match the longest stored E.164 prefix; unresolved shared codes return countries as candidates.
     pub fn phone(&self, value: &str, evidence: bool) -> Result<LookupResult> {
+        self.phone_in_country(value, None, evidence)
+    }
+    /// Narrow the longest E.164 prefix by an explicit country; never guess a national dial plan.
+    pub fn phone_in_country(
+        &self,
+        value: &str,
+        hint: Option<&str>,
+        evidence: bool,
+    ) -> Result<LookupResult> {
         self.require_family("phone")?;
+        let country = hint.and_then(crate::forward::country);
+        if hint.is_some() && country.is_none() {
+            let mut result = LookupResult::empty(Status::InvalidInput);
+            result.kind = Kind::PhonePrefix;
+            result.hint = Some("Use a two-letter country code.".into());
+            return Ok(result);
+        }
         let Some(digits) = normalize(value) else {
             let mut result = LookupResult::empty(Status::InvalidInput);
             result.kind = Kind::PhonePrefix;
@@ -31,11 +47,21 @@ impl Pack {
                 Some("Use phone(\"+91 22 1234 5678\") with an international calling code.".into());
             return Ok(result);
         };
-        self.forward_result(
-            self.prefix_observations(&digits, evidence)?,
-            Kind::PhonePrefix,
-            evidence,
-        )
+        let observations = self.prefix_observations(&digits, evidence)?;
+        if country.is_none() {
+            return self.forward_result(observations, Kind::PhonePrefix, evidence);
+        }
+        let mut records = Vec::new();
+        for record in observations {
+            let code = self.place(*record.places.first().unwrap_or(&0), false)?;
+            if country
+                .as_deref()
+                .is_none_or(|wanted| code.as_ref().is_some_and(|p| p.field(6) == wanted))
+            {
+                records.push(record);
+            }
+        }
+        self.forward_result(records, Kind::PhonePrefix, evidence)
     }
 }
 #[cfg(test)]

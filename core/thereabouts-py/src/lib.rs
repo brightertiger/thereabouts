@@ -1,4 +1,5 @@
 //! Thin `CPython` boundary. Dataset policy and lookup semantics live in the core.
+mod cli;
 mod columns;
 mod result;
 mod store;
@@ -185,13 +186,19 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, codes, |code| pack.locode(code, country, false))
     }
-    #[pyo3(signature=(number, *, evidence=false))]
-    fn phone(&self, py: Python<'_>, number: &str, evidence: bool) -> PyResult<Py<PyAny>> {
+    #[pyo3(signature=(number, *, country=None, evidence=false))]
+    fn phone(
+        &self,
+        py: Python<'_>,
+        number: &str,
+        country: Option<&str>,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
         result::encode(
             py,
             &self
                 .pack(py)?
-                .phone(number, evidence)
+                .phone_in_country(number, country, evidence)
                 .map_err(|e| error(py, &e))?,
         )
     }
@@ -379,6 +386,7 @@ fn pack_info(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
 #[pymodule]
 fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     store::register(m)?;
+    cli::register(m)?;
     m.add_class::<Geocoder>()?;
     m.add_function(wrap_pyfunction!(open, m)?)?;
     #[cfg(feature = "writer")]

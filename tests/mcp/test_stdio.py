@@ -7,8 +7,8 @@ import pytest
 from mcp import Client, StdioServerParameters
 
 from tests.conformance.generate import FIXTURES
-from thereabouts.cli import main
 from thereabouts.client import Geocoder
+from thereabouts.commandline.application import main
 from thereabouts.installing.install import install
 from thereabouts.packs.jsonio import sha256
 
@@ -115,7 +115,7 @@ class BlockMCP(MetaPathFinder):
         if fullname == "mcp" or fullname.startswith("mcp."):
             raise ModuleNotFoundError("MCP intentionally absent", name="mcp")
 sys.meta_path.insert(0, BlockMCP())
-from thereabouts.cli import main
+from thereabouts.commandline.application import main
 from thereabouts.client import Geocoder
 with Geocoder("tests/fixtures/serving") as geo:
     assert geo.reverse(12.97, 77.59).status == "matched"

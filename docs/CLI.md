@@ -1,10 +1,10 @@
 # Thereabouts command and store contract
 
-This is the normative package-3 grammar for the Rust CLI and the later Node
-command tree. **Implementation is incomplete:** native store transactions and
-the new MCP verbs are available; the console command still runs the legacy
-interface. The clap command runner, HTTP transport and command examples below
-await offline dependency sources. See [CLIENT_STATUS.md](CLIENT_STATUS.md).
+This is the normative grammar for the Rust CLI and the later Node command
+tree. The console entry and python -m thereabouts invoke the same Rust
+run(argv, io) function. argv includes its program name; Io owns standard
+streams, environment and TTY detection. Python supplies the optional MCP host.
+See [CLIENT_STATUS.md](CLIENT_STATUS.md) for qualification and measurements.
 
 ## Commands
 
@@ -18,11 +18,11 @@ global options may appear before or after a command.
 | h3 | CELL | Stored ancestor at resolutions zero through eight |
 | geocode | TEXT; --country CC --subdivision CODE --limit N --prefer population | Towns and cities |
 | postal | CODE --country CC | Postal-code context; country is required |
-| airport | CODE; --scheme iata\|icao\|gps\|local\|ident | Airport context |
-| locode | CODE | Five-character country/location code |
+| airport | CODE; --scheme iata\|icao\|gps\|local\|ident --country CC | Airport context |
+| locode | CODE; --country CC | Five-character code or country plus three-character location |
 | ip | ADDRESS | IPv4 or IPv6 literal |
 | phone | NUMBER; --country CC | Telephone prefix context |
-| plate | TEXT; --country CC | Registration format context |
+| plate | TEXT; --country CC --series NAME | Registration format context |
 | data install | PACK…; --version V --from URL\|DIR --yes | Explicit install transaction |
 | data list | --remote | Local inventory or available releases |
 | data verify | --full | Sizes; hashes with --full |
@@ -30,6 +30,7 @@ global options may appear before or after a command.
 | data path | none | Resolved data directory |
 | data update | --check | Compare active version with the release index |
 | info | none | Installed data identities and capabilities |
+| mcp | none | Optional read-only Python MCP server on stdio |
 
 PACK is core, postal, airports, locode, phone, ip or plates. Names are part of
 core. Reverse coordinates and batch input are mutually exclusive; both
@@ -39,7 +40,13 @@ The first line of geocode help is:
 “Finds towns and cities by name. Street addresses are not supported.”
 Country/subdivision are hard filters, limit bounds candidates, and population
 preference explicitly chooses the population-ranked winner. Airport without a
-scheme searches IATA/ICAO according to the core's ambiguity policy.
+scheme searches IATA/ICAO according to the core's ambiguity policy. Schemes
+are case-insensitive. Airport --country supplies required local-code context.
+LOCODE country context is validated even for a full five-character code.
+Plate --series selects a published series, such as historic-geographic.
+Phone requires international E.164 input; --country narrows matching countries
+and does not infer a national dialing plan. Geocode limit defaults to 5 and
+must be between 1 and 100. These context flags mirror library semantics.
 
 ## Global options
 
@@ -60,6 +67,19 @@ scheme searches IATA/ICAO according to the core's ambiguity policy.
 
 Conflicting output selectors are usage errors. Unknown commands, flags or
 field paths are usage errors. No lookup invokes installation or release checks.
+Use thereabouts --fields to list result paths without query arguments. Available
+paths are status, kind, match, country (code, code3, name), state (code, name),
+city (id, name, name_en, kind, population, point.lat, point.lon), timezone,
+point (lat, lon), cell, distance_band (greater_than_km, at_most_km), candidates,
+rank_basis, hint and evidence. Container paths, including city.point, are also
+selectable. Selections use literal dotted keys in output, for example
+"city.name". Named field selection and evidence apply to lookup results.
+Data/info output retains its documented structure. --version works at every
+command except data install, where --version V selects the dataset.
+
+Install is explicit consent to transfer; --yes is accepted for automation and
+does not change this behavior. There is currently no progress output, so --quiet
+preserves results and error diagnostics while producing no progress text.
 
 ## Output and batch input
 
@@ -67,7 +87,26 @@ TTY output defaults to a human table. Piped output defaults to NDJSON, one
 object per result. --json produces one pretty JSON object. Result keys and
 nulls are the exact snake_case public result contract in the design and
 [PACK_FORMAT.md](PACK_FORMAT.md). NO_COLOR disables terminal colour; plain
-tables need no colour to convey status.
+tables need no colour to convey status. The implementation emits no ANSI
+colour sequences in any mode, including with NO_COLOR. Table cells replace
+control characters with spaces.
+
+Scalar JSON/NDJSON is one result object. Batch --json streams one object with
+a results array; it does not retain the whole batch. CSV has an alphabetically
+ordered header; object/array values are compact JSON in quoted CSV cells, null
+is an empty cell, and quoting follows RFC 4180. JSON keys are alphabetically
+ordered by the current renderer; consumers must address keys by name.
+
+Management outputs are objects: data path returns {"path": ...}; data list
+returns {"packs": [...]} with family, data_version, path, active and
+format_minor; data install returns {"installed": <active pointer>}; data verify
+returns {"verified": "inventory" or "full", "packs": count}; remove returns
+{"removed": family}; update returns active_version, available_version and
+update_available. The latter is true only for a newer supported version or
+an empty store. Info includes client_version and active pack manifests. Local
+inventory and verify include retained inactive versions. Table/CSV inventory
+has one row per pack; table info gives identity and attribution columns.
+Remote listing emits the release index schema below.
 
 reverse FILE reads a file; reverse - reads stdin. CSV has a header. Automatic
 coordinate header names are exactly lat/latitude and lon/longitude/lng,
@@ -75,7 +114,26 @@ case-sensitive. Any other names require --lat-col and --lon-col. Multiple
 eligible coordinate columns require explicit selection. NDJSON objects use
 lat and lon. Input columns pass through, and result columns are appended with
 the prefix thereabouts_. Bad rows emit invalid_input and processing continues
-in input order. CSV quoting must preserve commas, quotes and embedded newlines.
+in input order. CSV quoting preserves commas, quotes and embedded newlines.
+CSV header errors (duplicates, empty names, ambiguous coordinates) are usage
+errors. Input names beginning thereabouts_ are reserved and rejected. JSON
+numeric lat/lon must be numbers, not strings or booleans; CSV fields parse as
+floating-point numbers. Out-of-range coordinates produce invalid_input.
+Malformed NDJSON records retain their raw text in an input field.
+
+Input encoding is independent of --format, which selects output. Files ending
+in .ndjson or .jsonl (case-insensitive) use NDJSON; otherwise the first nonblank
+line beginning with { or [ selects NDJSON. A line without a comma and without
+explicit column flags also selects NDJSON, allowing a malformed first row to
+be reported. Other input uses CSV. Empty input emits no rows (or
+{"results": []} with --json).
+
+NDJSON-to-CSV/table needs the union of input keys before writing a header.
+It spools input to an automatically removed temporary file, retaining at most
+4,096 keys and 1 MiB of key names. The spool observes the 5 GiB free-space
+floor. JSON/NDJSON output and CSV input stream directly. Missing input fields
+become null tabular cells. Batch hint is always present (nullable), and evidence
+is nullable when requested, so failed rows cannot change the CSV result schema.
 
 Single-query examples:
 
@@ -116,7 +174,16 @@ Missing-data diagnostics are the exact command
 thereabouts data install core, or the required forward family name. Human
 prompts and diagnostics go to stderr. Result output goes to stdout. An
 interactive removal asks for confirmation; non-interactive removal requires
---yes. --no-input never implies consent.
+--yes. --no-input never implies consent. A declined prompt exits 2. Remove
+deletes all versions of the named family under the install lock; a missing
+family is harmless. Missing data, corrupt data and usage errors are not hidden
+by --quiet. A broken stdout pipe exits 0 without a traceback.
+
+An invalid scalar query emits its result and exits 2; invalid command arguments
+emit a diagnostic without result JSON. Unsupported granularity also exits 2.
+In batches, row failures take precedence over strict misses: exit 5 if any row
+failed, otherwise 1 if --strict found a not_found result. Ambiguous is not
+not_found and does not itself trigger --strict.
 
 ## Data store
 
@@ -185,7 +252,11 @@ operation fails explicitly instead of proceeding without a lock.
 
 The source is a directory containing index.json and archives, or a configured
 base URL. The placeholder default is https://thereabouts-releases.invalid;
-no service is currently published. --from overrides the source for install.
+no service is currently published. THEREABOUTS_RELEASE_URL configures the
+source for install, remote list and update --check; it may also be a local
+directory. --from overrides it for install. URLs are HTTP(S) base URLs;
+index.json is appended. An archive URL may be absolute or base-relative.
+Local indexes use relative artifact paths.
 The release index schema is:
 
     {
@@ -227,9 +298,14 @@ reserved installer .archive.json receipt.
 Before download the installer reserves twice the requested archive byte sum
 plus a 5 GiB free-space floor. Each transfer chunk rechecks that floor. Partial
 downloads remain in .downloads and resume at their exact byte offset. HTTP
-transport must send Range and validate the returned Content-Range before
-appending; this transport is pending implementation. The implemented Source
-interface and local directory source enforce exact-offset reads.
+uses ureq with rustls and its certificate verification enabled. Initial
+transfers require HTTP 200; resumes send Range: bytes=N- and require HTTP 206
+with Content-Range: bytes N-(total-1)/total. If supplied, Content-Length must
+equal the remaining advertised length. Ignored/mismatched ranges fail and
+retain the partial file for retry. No bytes are appended before these checks.
+Requests use Accept-Encoding: identity; encoded responses are rejected.
+Redirects and environment proxies are disabled, and transfers have a
+120-second total timeout. Tests use only loopback HTTP and local directories.
 
 The full archive length and SHA-256 are checked before extraction. Then every
 pack checksum and structure is verified, and family, dataset version and minor
@@ -241,16 +317,33 @@ version.
 active.json is written and synced to a temporary sibling, then replaced
 atomically only after all requested packs verify. A failed transaction keeps
 the previous pin. Already verified, unactivated directories may remain for a
-retry; failed extraction staging is removed. Hash failures discard their
+retry; failed extraction staging is removed. Archive hash failures discard their
 partial archive. No lookup contacts the index or any transfer source.
 
 ## MCP
 
 The current optional server is available with:
 
+    thereabouts --data-dir ./store mcp
+    # Equivalent direct Python host:
     THEREABOUTS_DATA=./store python -m thereabouts.mcp_service.server
 
 It provides reverse, h3, geocode, postal, airport, locode, phone, ip and plate,
 returning the same result JSON as Python, including evidence when requested.
-There are no install or arbitrary-path tools. The old CLI's MCP route remains
-on the preserved catalogue server until the native console runner replaces it.
+There are no install or arbitrary-path tools. The optional thereabouts[mcp]
+extra is imported only for mcp; startup without it exits 2 with an explicit
+installation hint. No banner is printed on the MCP protocol stream.
+Legacy CLI and catalogue MCP modules remain under commandline/application.py
+and mcp_service/catalogue_server.py for existing callers until package 5.
+
+## Conformance boundaries
+
+The current bundle has 411 vectors. The real console runs 405; six of these
+invalid grammar cases assert exit 2 without a result object. Five NUL-containing
+cases run through _core.run_cli because operating systems forbid NUL in argv.
+One integer-type postal input is asserted through the typed API and rejected
+by the run_cli argument conversion: OS arguments cannot preserve integer types.
+The 19 legacy forward cases retain their original assertions and explicit
+migration allowances: 18 run through the console, and one integer-type
+rejection remains at the typed API boundary. No expected snapshots are replaced
+with the new CLI's output.

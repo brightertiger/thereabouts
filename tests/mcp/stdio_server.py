@@ -3,7 +3,7 @@
 import pytest
 
 from tests.network_guard import install
-from thereabouts.cli import main
+from thereabouts.commandline.application import main
 
 if __name__ == "__main__":
     with pytest.MonkeyPatch.context() as patch:

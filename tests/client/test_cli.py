@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from thereabouts.cli import main
 from thereabouts.client import Geocoder
 from thereabouts.client_errors import InvalidInputError
+from thereabouts.commandline.application import main
 from thereabouts.errors import DataNotInstalledError
 from thereabouts.packs.jsonio import sha256
 from thereabouts.store import data_directory
@@ -159,7 +159,14 @@ def test_broken_pipe_has_no_traceback() -> None:
     import subprocess
 
     root = Path(__file__).parents[2]
-    command = [sys.executable, "-m", "thereabouts", "--pack", str(PACK), "batch"]
+    command = [
+        sys.executable,
+        "-m",
+        "thereabouts.commandline.application",
+        "--pack",
+        str(PACK),
+        "batch",
+    ]
     with subprocess.Popen(
         command,
         cwd=root,

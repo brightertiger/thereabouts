@@ -86,11 +86,16 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
 
     @server.tool(annotations=READ_ONLY)
     def airport(
-        code: str, scheme: str | None = None, evidence: bool = False
+        code: str,
+        scheme: str | None = None,
+        country: str | None = None,
+        evidence: bool = False,
     ) -> dict[str, Any]:
         """Find an airport by IATA/ICAO or a specified code scheme."""
         with tool_errors():
-            return geo.airport(code, scheme=scheme, evidence=evidence).to_dict()
+            return geo.airport(
+                code, scheme=scheme, country=country, evidence=evidence
+            ).to_dict()
 
     @server.tool(annotations=READ_ONLY)
     def locode(code: str, evidence: bool = False) -> dict[str, Any]:
@@ -105,18 +110,25 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
             return geo.ip(address, evidence=evidence).to_dict()
 
     @server.tool(annotations=READ_ONLY)
-    def phone(number: str, evidence: bool = False) -> dict[str, Any]:
+    def phone(
+        number: str, country: str | None = None, evidence: bool = False
+    ) -> dict[str, Any]:
         """Find the longest published prefix of an international E.164 number."""
         with tool_errors():
-            return geo.phone(number, evidence=evidence).to_dict()
+            return geo.phone(number, country=country, evidence=evidence).to_dict()
 
     @server.tool(annotations=READ_ONLY)
     def plate(
-        text: str, country: str | None = None, evidence: bool = False
+        text: str,
+        country: str | None = None,
+        series: str | None = None,
+        evidence: bool = False,
     ) -> dict[str, Any]:
         """Find recorded registration formats, preserving country ambiguity."""
         with tool_errors():
-            return geo.plate(text, country=country, evidence=evidence).to_dict()
+            return geo.plate(
+                text, country=country, series=series, evidence=evidence
+            ).to_dict()
 
     return server
 

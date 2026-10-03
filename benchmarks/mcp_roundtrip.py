@@ -22,7 +22,7 @@ async def measure(pack: Path, queries: Path) -> dict[str, Any]:
     points = np.load(queries)[:1000].tolist()
     args = StdioServerParameters(
         command=sys.executable,
-        args=["-m", "thereabouts", "--pack", str(pack), "mcp"],
+        args=["-m", "thereabouts.commandline.application", "--pack", str(pack), "mcp"],
         env={"PYTHONDONTWRITEBYTECODE": "1"},
     )
     start = perf_counter()

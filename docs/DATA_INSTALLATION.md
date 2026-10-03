@@ -1,5 +1,10 @@
 # Installing data and using the CLI
 
+> Historical format-1 installation documentation. Current commands, data store and
+> MCP are documented in [CLI.md](CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> `python -m thereabouts.commandline.application` in place of `thereabouts`.
+
 Thereabouts installs data explicitly. Queries, imports and opening a reader never
 contact a data host. Install the Python project with its NumPy/H3 dependencies;
 the `thereabouts` command and `python -m thereabouts` call the same Python API.

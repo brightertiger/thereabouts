@@ -101,7 +101,7 @@ impl Index {
     }
 }
 /// Compare dotted numeric releases naturally, with byte-order text tie breaking.
-fn compare_versions(a: &str, b: &str) -> Ordering {
+pub(crate) fn compare_versions(a: &str, b: &str) -> Ordering {
     for (left, right) in a.split('.').zip(b.split('.')) {
         let order = match (left.parse::<u64>(), right.parse::<u64>()) {
             (Ok(l), Ok(r)) => l.cmp(&r),

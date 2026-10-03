@@ -16,7 +16,14 @@ async def check(pack: Path) -> None:
         expected = geo.reverse(12.97, 77.59).to_dict()
     launch = StdioServerParameters(
         command=sys.executable,
-        args=["-I", "-m", "thereabouts", "--pack", str(pack.resolve()), "mcp"],
+        args=[
+            "-I",
+            "-m",
+            "thereabouts.commandline.application",
+            "--pack",
+            str(pack.resolve()),
+            "mcp",
+        ],
     )
     async with Client(launch) as host:
         result = await host.call_tool(

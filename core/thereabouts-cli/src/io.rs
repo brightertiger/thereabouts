@@ -15,6 +15,12 @@ pub trait Io {
     fn stdin_tty(&self) -> bool;
     /// Whether default output should be a human table.
     fn stdout_tty(&self) -> bool;
+    /// Optional host-owned MCP server; the native library has no Python SDK dependency.
+    fn mcp(&mut self, _root: &std::path::Path) -> crate::error::Result<i32> {
+        Err(crate::error::Error::Usage(
+            "MCP requires the Python host with thereabouts[mcp] installed".into(),
+        ))
+    }
 }
 
 /// Native stdio adapter, also used by the Python console entry.
