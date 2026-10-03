@@ -4,7 +4,14 @@ import path from "node:path";
 import { EnvHttpProxyAgent } from "undici";
 import { safePath } from "./host.js";
 import { MAX_METADATA, readJson, component, keys, family } from "./store.js";
-import { integrity, usage } from "./errors.js";
+import { integrity, usage, ThereaboutsError } from "./errors.js";
+export function interrupted(error) {
+  if (error instanceof ThereaboutsError || error.exitCode !== undefined)
+    return error;
+  return usage(
+    `Download interrupted; run the same data install again to resume: ${error.message}`,
+  );
+}
 export const DEFAULT_SOURCE = "https://thereabouts-releases.invalid";
 export const HEADER_TIMEOUT_MS = 30_000,
   READ_TIMEOUT_MS = 60_000;
@@ -97,10 +104,10 @@ async function request(url, headers = {}) {
   } catch (e) {
     controller.abort();
     await dispatcher.close();
-    throw e;
+    throw interrupted(e);
   }
 }
-async function* body(opened, maximum) {
+async function* body(opened, maximum, readTimeout = READ_TIMEOUT_MS) {
   const { response, controller, dispatcher } = opened;
   const reader = response.body?.getReader();
   let total = 0;
@@ -109,7 +116,7 @@ async function* body(opened, maximum) {
     for (;;) {
       const timer = setTimeout(
         () => controller.abort(new Error("Download read stalled")),
-        READ_TIMEOUT_MS,
+        readTimeout,
       );
       let next;
       try {
@@ -122,6 +129,8 @@ async function* body(opened, maximum) {
       if (total > maximum) throw integrity("Download exceeds advertised size");
       yield next.value;
     }
+  } catch (e) {
+    throw interrupted(e);
   } finally {
     await reader?.cancel().catch(() => {});
     controller.abort();
@@ -204,7 +213,12 @@ export function select(value, requested, version) {
     throw integrity("Requested dataset is unavailable or incompatible");
   return candidates[0];
 }
-export async function* archive(origin, pack, offset) {
+export async function* archive(
+  origin,
+  pack,
+  offset,
+  readTimeout = READ_TIMEOUT_MS,
+) {
   if (typeof origin === "string") {
     const filename = safePath(origin, pack.url);
     if (fs.statSync(filename).size !== pack.bytes)
@@ -235,5 +249,5 @@ export async function* archive(origin, pack, offset) {
     await opened.dispatcher.close();
     throw integrity("Invalid download status, length or resume range");
   }
-  yield* body(opened, pack.bytes - offset);
+  yield* body(opened, pack.bytes - offset, readTimeout);
 }

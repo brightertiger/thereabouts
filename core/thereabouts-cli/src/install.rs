@@ -210,7 +210,9 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
         let mut remaining = pack.bytes - offset;
         let mut buffer = vec![0; 65536];
         loop {
-            let count = input.read(&mut buffer)?;
+            let count = input
+                .read(&mut buffer)
+                .map_err(Error::download_interrupted)?;
             if count == 0 {
                 break;
             }
@@ -228,9 +230,7 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
         }
         file.sync_all()?;
         if remaining != 0 {
-            return Err(Error::Integrity(
-                "Interrupted download; run install again to resume".into(),
-            ));
+            return Err(Error::download_interrupted("incomplete response"));
         }
     }
     drop(file);

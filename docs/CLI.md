@@ -456,3 +456,8 @@ Pass that version directory to data install --from. Core must be included when
 building forward packs so their catalogue pins have a concrete dependency.
 See [DATA_PIPELINE.md](DATA_PIPELINE.md) for prepared-dataset commands and
 [CLIENT_RELEASE.md](CLIENT_RELEASE.md) for package artifact workflows.
+
+Interrupted transfers (including connection resets, short EOF and per-read
+stalls) retain partial archives and exit 2 with “Download interrupted; run the
+same data install again to resume”. A retry validates the exact Range response
+before appending. Checksum and protocol identity failures still exit 4.

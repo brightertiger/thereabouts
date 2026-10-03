@@ -61,9 +61,13 @@ impl Http {
         if let Some(offset) = offset {
             request = request.header("Range", format!("bytes={offset}-"));
         }
-        let response = request
-            .call()
-            .map_err(|e| Error::Integrity(format!("Download failed: {e}")))?;
+        let response = request.call().map_err(|e| {
+            if matches!(e, ureq::Error::StatusCode(_)) {
+                Error::Integrity(format!("Download failed: {e}"))
+            } else {
+                Error::download_interrupted(e)
+            }
+        })?;
         if response
             .headers()
             .get("content-encoding")
@@ -102,7 +106,8 @@ impl Source for Http {
             .into_body()
             .into_reader()
             .take(16 * 1024 * 1024 + 1)
-            .read_to_end(&mut bytes)?;
+            .read_to_end(&mut bytes)
+            .map_err(Error::download_interrupted)?;
         if bytes.len() > 16 * 1024 * 1024 {
             return Err(Error::Integrity("Release index exceeds 16 MiB".into()));
         }

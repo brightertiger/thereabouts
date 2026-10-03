@@ -92,6 +92,10 @@ def test_interrupted_transfer_resumes_exact_range(
     state.interrupt = True
     first = console(store, "data", "install", "phone", "--from", url, "--yes")
     assert first.returncode == 2
+    assert (
+        "Download interrupted; run the same data install again to resume"
+        in first.stderr
+    )
     assert not (store / "active.json").exists()
     partial = next((store / ".downloads").glob("*.part"))
     assert partial.stat().st_size == 1024

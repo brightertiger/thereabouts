@@ -24,10 +24,17 @@ pub enum Error {
     Json(#[from] serde_json::Error),
 }
 impl Error {
+    /// Preserve partial downloads and give the same retry instruction for reset, EOF or stall.
+    pub fn download_interrupted(detail: impl std::fmt::Display) -> Self {
+        Self::Usage(format!(
+            "Download interrupted; run the same data install again to resume: {detail}"
+        ))
+    }
+
     /// Add repair instructions while preserving missing, usage and incompatibility codes.
     #[must_use]
     pub fn at_pack(self, path: &std::path::Path, family: &str) -> Self {
-        if matches!(self, Self::Usage(_) | Self::Missing(_)) {
+        if matches!(self, Self::Usage(_) | Self::Missing(_) | Self::Io(_)) {
             return self;
         }
         let message = format!(

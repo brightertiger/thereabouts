@@ -88,7 +88,9 @@ async function download(root, origin, pack) {
       }
     fs.fsyncSync(fd);
     if (offset !== pack.bytes)
-      throw integrity("Interrupted download; run install again to resume");
+      throw usage(
+        "Download interrupted; run the same data install again to resume: incomplete response",
+      );
   } finally {
     fs.closeSync(fd);
   }

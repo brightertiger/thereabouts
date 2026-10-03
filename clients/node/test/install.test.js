@@ -86,7 +86,10 @@ test("loopback interrupted download resumes with exact Range and integrity verif
     });
     response.end(fixture.bytes.subarray(offset));
   });
-  await assert.rejects(install(store, origin, ["phone"]));
+  await assert.rejects(install(store, origin, ["phone"]), {
+    exitCode: 2,
+    message: /Download interrupted; run the same data install again to resume/,
+  });
   assert.equal(active(store), null);
   const partial = path.join(store, ".downloads", fixture.pack.sha256 + ".part");
   assert.equal(fs.statSync(partial).size, 1024);
