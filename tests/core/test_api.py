@@ -169,7 +169,7 @@ def test_discovery_exact_command_and_integrity(
     content[-1] ^= 1
     data_file.write_bytes(content)
     with pytest.raises(CorruptPackError) as corrupt:
-        Geocoder()
+        _core.open(str(destination), verify=True)
     assert corrupt.value.code == "corrupt_pack"
 
 

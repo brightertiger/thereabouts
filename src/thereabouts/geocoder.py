@@ -19,12 +19,16 @@ class Geocoder:
     """Open a core pack, or discover an installed pack in the existing store."""
 
     def __init__(
-        self, pack: str | Path | None = None, *, data_dir: str | Path | None = None
+        self,
+        pack: str | Path | None = None,
+        *,
+        data_dir: str | Path | None = None,
+        verify: bool = False,
     ) -> None:
         if pack is not None and data_dir is not None:
             raise ValueError("Select pack or data_dir, not both")
         self._reader = _core.open(
-            str(pack if pack is not None else core_pack(data_dir))
+            str(pack if pack is not None else core_pack(data_dir)), verify=verify
         )
         self._closed = False
 

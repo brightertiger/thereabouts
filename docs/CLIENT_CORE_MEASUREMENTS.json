@@ -12,19 +12,39 @@
     "seed": 20261003,
     "pack_bytes": 4498416
   },
-  "scalar_median_us": 8.541,
-  "scalar_p99_us": 22.291,
-  "reverse_columns_points_per_second": 577891.3278822618,
-  "reverse_columns_repeats": [
-    577891.3278822618,
-    586144.9975133556,
-    568343.957699736,
-    519849.0317565203,
-    535460.8982946872,
-    591548.9772306297,
-    608871.248058867
-  ],
-  "peak_rss_bytes": 128892928,
+  "open_seconds": 0.01010208300431259,
+  "open_rss_delta_bytes": 1015808,
+  "cache_hot": {
+    "points": 20000,
+    "scalar_median_us": 12.917,
+    "scalar_p99_us": 27.667,
+    "reverse_columns_points_per_second": 184956.13070533614,
+    "reverse_columns_repeats": [
+      190597.1288962652,
+      184956.13070533614,
+      180495.2337758869,
+      183496.05975045476,
+      184222.21134472452,
+      185999.8680208291,
+      185980.33725665938
+    ]
+  },
+  "random": {
+    "points": 100000,
+    "scalar_median_us": 5.542,
+    "scalar_p99_us": 14.0,
+    "reverse_columns_points_per_second": 320130.01480034285,
+    "reverse_columns_repeats": [
+      327693.6352236071,
+      304140.33878259815,
+      316036.6066421557,
+      320130.01480034285,
+      322095.38144402293,
+      322517.48583610053,
+      319447.2713579062
+    ]
+  },
+  "peak_rss_bytes": 672710656,
   "historical_reader": {
     "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",
@@ -32,5 +52,61 @@
     "python_scalar_median_us": 12.75,
     "cython_columns_points_per_second": 531994,
     "python_columns_points_per_second": 530437
+  },
+  "before_lazy_open": {
+    "machine": {
+      "chip": "Apple M2",
+      "memory_bytes": 8589934592,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "python": "3.12.8"
+    },
+    "workload": {
+      "pack": "core-sample",
+      "iterations": 20000,
+      "coordinate_vectors": 65,
+      "seed": 20261003,
+      "pack_bytes": 4498416
+    },
+    "open_seconds": 0.05904149997513741,
+    "open_rss_delta_bytes": 21872640,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 8.833,
+      "scalar_p99_us": 22.917,
+      "reverse_columns_points_per_second": 553973.1311199064,
+      "reverse_columns_repeats": [
+        524335.154640723,
+        552209.0609545675,
+        547858.2686436173,
+        553973.1311199064,
+        568358.0900586214,
+        580982.9689514606,
+        578191.3451912963
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 5.5,
+      "scalar_p99_us": 9.833,
+      "reverse_columns_points_per_second": 665566.4498548141,
+      "reverse_columns_repeats": [
+        699513.2828711045,
+        659877.987054989,
+        658233.4153214697,
+        664287.2253504216,
+        665566.4498548141,
+        670492.9463039051,
+        679189.4115716703
+      ]
+    },
+    "peak_rss_bytes": 300318720,
+    "historical_reader": {
+      "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
+      "workload": "synthetic 308032 cells / 4176 places; not the real sample",
+      "cython_scalar_median_us": 10.291,
+      "python_scalar_median_us": 12.75,
+      "cython_columns_points_per_second": 531994,
+      "python_columns_points_per_second": 530437
+    }
   }
 }

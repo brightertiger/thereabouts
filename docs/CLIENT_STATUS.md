@@ -9,6 +9,9 @@ remote push, pull request, merge or publication is included.
 Review fix 1 separates the writer from the runtime. The portable core passes
 `cargo check -p thereabouts-core --target wasm32-unknown-unknown`; its normal
 dependencies are h3o, serde, serde_json, sha2 and thiserror, with no `*-sys` crates.
+Review fix 2 makes opening lazy: headers and block directories are read first,
+with 8 MiB decoded-block and 16 MiB raw-catalogue LRU caches. Pass
+`verify=True` to the Python constructor for full verification at open.
 Remaining review fixes are in progress.
 
 ## Built and usable
@@ -74,8 +77,8 @@ The extension also exposes `open`, `write_pack`, `verify_pack`, and `pack_info`.
 see [PACK_FORMAT.md](PACK_FORMAT.md) and [the sample builder](../tools/build_sample_pack.py).
 Its disk-backed place joins and block-local timezone joins avoid a world-sized
 in-memory build index. Full verification visits one shard at a time. Runtime
-opening currently loads decoded cells and places; world runtime memory is not
-qualified. The writer admission budget is 512 MiB, not a proven RSS ceiling.
+opening retains only directories and metadata; blocks and catalogue payloads
+are validated on demand. World runtime memory is not qualified. The writer admission budget is 512 MiB, not a proven RSS ceiling.
 
 ## Format and retained compatibility
 
@@ -153,10 +156,18 @@ sample size, repetitions, latency, throughput and process peak RSS.
 
 | New Python path, real sample | Measured result |
 | --- | ---: |
-| Scalar median | 8.541 µs |
-| Scalar p99 | 22.291 µs |
-| `reverse_columns` median | 577,891 points/s |
-| Process peak RSS | 128,892,928 bytes |
+| Open | 10.102 ms |
+| Open RSS delta | 1,015,808.000 bytes |
+| cache_hot scalar median / p99 | 12.917 / 27.667 µs |
+| cache_hot columns | 184,956 points/s |
+| random scalar median / p99 | 5.542 / 14.000 µs |
+| random columns | 320,130 points/s |
+
+Before lazy opening, the same script measured 59.041 ms
+and an RSS delta of 21,872,640 bytes. The random workload
+uses 100,000 coordinates rejection-sampled inside inventoried r3 blocks.
+Lookup throughput currently regressed because on-demand places are repeatedly
+decoded and validated; review fix 10 addresses the binding allocation path.
 
 The historical reader figures are 10.291 µs scalar median / 531,994 column
 rows/s for Cython and 12.750 µs / 530,437 for Python. They came from

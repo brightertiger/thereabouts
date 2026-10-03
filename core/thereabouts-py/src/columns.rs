@@ -6,6 +6,28 @@ use thereabouts_core::{format::Pack, result::LookupResult};
 
 type TextColumn = (&'static str, fn(&LookupResult) -> Option<&str>);
 type FloatColumn = (&'static str, fn(&LookupResult) -> Option<f64>);
+const TEXT_COLUMNS: [TextColumn; 15] = [
+    ("status", |r| Some(&r.status)),
+    ("kind", |r| Some(&r.kind)),
+    ("match", |r| r.r#match.as_deref()),
+    ("country_code", |r| {
+        r.country.as_ref().map(|v| v.code.as_str())
+    }),
+    ("country_code3", |r| r.country.as_ref()?.code3.as_deref()),
+    ("country_name", |r| {
+        r.country.as_ref().map(|v| v.name.as_str())
+    }),
+    ("state_code", |r| r.state.as_ref()?.code.as_deref()),
+    ("state_name", |r| r.state.as_ref().map(|v| v.name.as_str())),
+    ("city_id", |r| r.city.as_ref().map(|v| v.id.as_str())),
+    ("city_name", |r| r.city.as_ref().map(|v| v.name.as_str())),
+    ("city_name_en", |r| r.city.as_ref()?.name_en.as_deref()),
+    ("city_kind", |r| r.city.as_ref().map(|v| v.kind.as_str())),
+    ("timezone", |r| r.timezone.as_deref()),
+    ("cell", |r| r.cell.as_deref()),
+    ("rank_basis", |r| r.rank_basis.as_deref()),
+];
+
 pub fn reverse<'py>(
     py: Python<'py>,
     pack: &Arc<Pack>,
@@ -19,35 +41,16 @@ pub fn reverse<'py>(
     if lat.len() != lon.len() {
         return Err(PyValueError::new_err("lat and lon must have equal lengths"));
     }
-    let rows: Vec<_> = py.detach(|| {
-        lat.into_iter()
-            .zip(lon)
-            .map(|(a, b)| pack.reverse(a, b, false))
-            .collect()
-    });
+    let rows: Vec<_> = py
+        .detach(|| {
+            lat.into_iter()
+                .zip(lon)
+                .map(|(a, b)| pack.reverse(a, b, false))
+                .collect::<thereabouts_core::Result<Vec<_>>>()
+        })
+        .map_err(|e| crate::error(py, &e))?;
     let dict = PyDict::new(py);
-    let text_columns: [TextColumn; 15] = [
-        ("status", |r| Some(&r.status)),
-        ("kind", |r| Some(&r.kind)),
-        ("match", |r| r.r#match.as_deref()),
-        ("country_code", |r| {
-            r.country.as_ref().map(|v| v.code.as_str())
-        }),
-        ("country_code3", |r| r.country.as_ref()?.code3.as_deref()),
-        ("country_name", |r| {
-            r.country.as_ref().map(|v| v.name.as_str())
-        }),
-        ("state_code", |r| r.state.as_ref()?.code.as_deref()),
-        ("state_name", |r| r.state.as_ref().map(|v| v.name.as_str())),
-        ("city_id", |r| r.city.as_ref().map(|v| v.id.as_str())),
-        ("city_name", |r| r.city.as_ref().map(|v| v.name.as_str())),
-        ("city_name_en", |r| r.city.as_ref()?.name_en.as_deref()),
-        ("city_kind", |r| r.city.as_ref().map(|v| v.kind.as_str())),
-        ("timezone", |r| r.timezone.as_deref()),
-        ("cell", |r| r.cell.as_deref()),
-        ("rank_basis", |r| r.rank_basis.as_deref()),
-    ];
-    for (name, get) in text_columns {
+    for (name, get) in TEXT_COLUMNS {
         let values: Vec<Py<PyAny>> = rows
             .iter()
             .map(|r| {

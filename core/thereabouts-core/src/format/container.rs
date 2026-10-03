@@ -36,53 +36,17 @@ pub struct Container {
 impl Container {
     /// Validate the complete section directory before exposing any record.
     pub fn decode(bytes: Vec<u8>, kind: u32, widths: &[usize]) -> Result<Self> {
-        ensure(
-            bytes.len() <= MAX_SHARD_BYTES && bytes.get(..8) == Some(MAGIC),
-            "Invalid shard magic or size",
-        )?;
-        ensure(
-            uint(&bytes, 8, 2)? == 2 && uint(&bytes, 10, 2)? == 0,
-            "Invalid shard version",
-        )?;
-        ensure(
-            uint(&bytes, 12, 4)? == 0 && uint(&bytes, 16, 4)? == u64::from(kind),
-            "Invalid shard flags or kind",
-        )?;
-        ensure(
-            index(uint(&bytes, 20, 4)?)? == widths.len()
-                && index(uint(&bytes, 24, 8)?)? == bytes.len(),
-            "Invalid shard length",
-        )?;
+        let spans = directory(&bytes, bytes.len(), kind, widths)?;
         let mut end = 32 + widths.len() * 32;
-        let mut spans = Vec::new();
-        for (i, width) in widths.iter().enumerate() {
-            let pos = 32 + i * 32;
-            ensure(
-                uint(&bytes, pos, 4)? == (i + 1) as u64 && uint(&bytes, pos + 4, 4)? == 0,
-                "Invalid section type or flags",
-            )?;
-            let start = index(uint(&bytes, pos + 8, 8)?)?;
-            let len = index(uint(&bytes, pos + 16, 8)?)?;
-            let count = index(uint(&bytes, pos + 24, 8)?)?;
-            let stop = start
-                .checked_add(len)
-                .ok_or_else(|| Error::Corrupt("Span overflow".into()))?;
-            ensure(
-                start == end.next_multiple_of(8)
-                    && stop <= bytes.len()
-                    && count.checked_mul(*width) == Some(len),
-                "Invalid section span",
-            )?;
+        for &(start, stop) in &spans {
             ensure(
                 bytes
                     .get(end..start)
                     .is_some_and(|p| p.iter().all(|b| *b == 0)),
                 "Nonzero alignment padding",
             )?;
-            spans.push((start, stop));
             end = stop;
         }
-        ensure(end == bytes.len(), "Trailing bytes")?;
         Ok(Self { bytes, spans })
     }
     /// Section number is zero-based inside the implementation.
@@ -90,6 +54,119 @@ impl Container {
     pub fn section(&self, number: usize) -> &[u8] {
         let (a, b) = self.spans[number];
         &self.bytes[a..b]
+    }
+}
+fn directory(
+    bytes: &[u8],
+    length: usize,
+    kind: u32,
+    widths: &[usize],
+) -> Result<Vec<(usize, usize)>> {
+    ensure(
+        length <= MAX_SHARD_BYTES && bytes.get(..8) == Some(MAGIC),
+        "Invalid shard magic or size",
+    )?;
+    ensure(
+        uint(bytes, 8, 2)? == 2 && uint(bytes, 10, 2)? == 0,
+        "Invalid shard version",
+    )?;
+    ensure(
+        uint(bytes, 12, 4)? == 0 && uint(bytes, 16, 4)? == u64::from(kind),
+        "Invalid shard flags or kind",
+    )?;
+    ensure(
+        index(uint(bytes, 20, 4)?)? == widths.len() && index(uint(bytes, 24, 8)?)? == length,
+        "Invalid shard length",
+    )?;
+    let mut end = 32 + widths.len() * 32;
+    let mut spans = Vec::new();
+    for (i, width) in widths.iter().enumerate() {
+        let pos = 32 + i * 32;
+        ensure(
+            uint(bytes, pos, 4)? == (i + 1) as u64 && uint(bytes, pos + 4, 4)? == 0,
+            "Invalid section type or flags",
+        )?;
+        let start = index(uint(bytes, pos + 8, 8)?)?;
+        let len = index(uint(bytes, pos + 16, 8)?)?;
+        let count = index(uint(bytes, pos + 24, 8)?)?;
+        let stop = start
+            .checked_add(len)
+            .ok_or_else(|| Error::Corrupt("Span overflow".into()))?;
+        ensure(
+            start == end.next_multiple_of(8)
+                && stop <= length
+                && count.checked_mul(*width) == Some(len),
+            "Invalid section span",
+        )?;
+        spans.push((start, stop));
+        end = stop;
+    }
+    ensure(end == length, "Trailing bytes")?;
+    Ok(spans)
+}
+
+/// A file-backed shard whose header and directory are checked before range reads.
+#[derive(Debug)]
+pub(crate) struct FileShard {
+    path: std::path::PathBuf,
+    spans: Vec<(usize, usize)>,
+    length: usize,
+}
+impl FileShard {
+    pub(crate) fn open(path: &std::path::Path, kind: u32, widths: &[usize]) -> Result<Self> {
+        use std::io::Read;
+        let mut file = std::fs::File::open(path)?;
+        let length = index(file.metadata()?.len())?;
+        let mut header = vec![0; 32 + widths.len() * 32];
+        file.read_exact(&mut header)?;
+        let spans = directory(&header, length, kind, widths)?;
+        let shard = Self {
+            path: path.to_owned(),
+            spans,
+            length,
+        };
+        let mut end = header.len();
+        for &(start, stop) in &shard.spans {
+            ensure(
+                shard.read(end, start - end)?.iter().all(|b| *b == 0),
+                "Nonzero alignment padding",
+            )?;
+            end = stop;
+        }
+        Ok(shard)
+    }
+    pub(crate) fn len(&self, section: usize) -> Result<usize> {
+        self.spans
+            .get(section)
+            .map(|(a, b)| b - a)
+            .ok_or_else(|| Error::Corrupt("Missing section".into()))
+    }
+    pub(crate) fn section(&self, section: usize) -> Result<Vec<u8>> {
+        self.range(section, 0, self.len(section)?)
+    }
+    pub(crate) fn range(&self, section: usize, offset: usize, length: usize) -> Result<Vec<u8>> {
+        let &(start, stop) = self
+            .spans
+            .get(section)
+            .ok_or_else(|| Error::Corrupt("Missing section".into()))?;
+        ensure(
+            offset
+                .checked_add(length)
+                .is_some_and(|end| end <= stop - start),
+            "Invalid read span",
+        )?;
+        self.read(start + offset, length)
+    }
+    pub(crate) fn all(&self) -> Result<Vec<u8>> {
+        self.read(0, self.length)
+    }
+    fn read(&self, start: usize, length: usize) -> Result<Vec<u8>> {
+        use std::io::{Read, Seek, SeekFrom};
+        let mut file = std::fs::File::open(&self.path)?;
+        file.seek(SeekFrom::Start(start as u64))?;
+        let mut bytes = vec![0; length];
+        file.read_exact(&mut bytes)?;
+        Ok(bytes)
     }
 }
 /// Encode exactly the layout that `Container::decode` accepts.

@@ -29,14 +29,15 @@ fn close(actual: &Value, expected: &Value) {
 fn run(bundle: &str) {
     let root = fixtures();
     let value: Value = serde_json::from_slice(&fs::read(root.join(bundle)).unwrap()).unwrap();
-    let pack = Pack::open(&root.join(value["pack"].as_str().unwrap())).unwrap();
+    let pack = Pack::open(&root.join(value["pack"].as_str().unwrap()), false).unwrap();
     for case in value["cases"].as_array().unwrap() {
         let request = &case["request"];
         let values = &request["values"];
         let result = if request["kind"] == "h3" {
             pack.from_h3(values[0].as_str().unwrap_or(""), false)
+                .unwrap()
         } else if let (Some(lat), Some(lon)) = (values[0].as_f64(), values[1].as_f64()) {
-            pack.reverse(lat, lon, false)
+            pack.reverse(lat, lon, false).unwrap()
         } else {
             LookupResult::empty("invalid_input")
         };

@@ -61,83 +61,139 @@ impl Block {
         })
     }
 }
-/// Decode and validate the entire spatial shard, including ancestor disjointness.
-#[allow(clippy::many_single_char_names)] // Directory offsets mirror the wire layout.
-pub fn decode(bytes: Vec<u8>, places: usize, zones: usize) -> Result<BTreeMap<u32, Block>> {
-    let c = Container::decode(bytes, 1, &[40, 2, 1, 20])?;
-    let mut blocks = BTreeMap::new();
+/// Offsets into the three spatial data sections, validated without reading payloads.
+#[derive(Clone, Debug)]
+pub(crate) struct Entry {
+    pub(crate) block: u32,
+    count: usize,
+    width: usize,
+    dictionary_count: usize,
+    pub(crate) spans: [(usize, usize); 3],
+}
+pub(crate) fn directory(bytes: &[u8], lengths: [usize; 3]) -> Result<Vec<Entry>> {
+    let mut entries = Vec::new();
     let mut ends = [0; 3];
-    for row in c.section(0).as_chunks::<40>().0 {
-        let b = u32::try_from(uint(row, 0, 4)?).expect("four-byte integer");
-        address::cell_at(b, 0)?;
+    for row in bytes.as_chunks::<40>().0 {
+        let block = u32::try_from(uint(row, 0, 4)?).expect("four-byte integer");
+        address::cell_at(block, 0)?;
         ensure(
-            blocks.last_key_value().is_none_or(|(last, _)| *last < b),
+            entries.last().is_none_or(|last: &Entry| last.block < block),
             "Unsorted blocks",
         )?;
         let count = index(uint(row, 4, 4)?)?;
-        let k = index(uint(row, 8, 8)?)?;
         let width = index(uint(row, 16, 4)?)?;
-        let n = index(uint(row, 20, 4)?)?;
-        let v = index(uint(row, 24, 8)?)?;
-        let d = index(uint(row, 32, 8)?)?;
+        let dictionary_count = index(uint(row, 20, 4)?)?;
+        let starts = [
+            index(uint(row, 8, 8)?)?,
+            index(uint(row, 24, 8)?)?,
+            index(uint(row, 32, 8)?)?,
+        ];
         ensure(
-            count <= 16807 && width <= 2 && [k, v, d] == ends,
+            count <= 16807 && width <= 2 && starts == ends,
             "Invalid block spans",
         )?;
         ensure(
             if width == 0 {
-                n == 0
+                dictionary_count == 0
             } else {
-                n > 0 && n <= count && n <= (1 << (8 * width))
+                dictionary_count > 0
+                    && dictionary_count <= count
+                    && dictionary_count <= (1 << (8 * width))
             },
             "Invalid dictionary size",
         )?;
-        let value_width = if width == 0 { 20 } else { width };
-        ends = [k + count * 2, v + count * value_width, d + n * 20];
-        ensure(
-            (1..=3).all(|i| ends[i - 1] <= c.section(i).len()),
-            "Block exceeds sections",
-        )?;
-        let mut dictionary = Vec::new();
-        for i in 0..n {
-            let label = Label::decode(c.section(3), d + i * 20)?;
-            label.validate(places, zones)?;
-            ensure(
-                dictionary.last().is_none_or(|last| *last < label),
-                "Unsorted label dictionary",
-            )?;
-            dictionary.push(label);
+        let sizes = [
+            count * 2,
+            count * if width == 0 { 20 } else { width },
+            dictionary_count * 20,
+        ];
+        let spans = std::array::from_fn(|i| (starts[i], sizes[i]));
+        for i in 0..3 {
+            ends[i] = starts[i]
+                .checked_add(sizes[i])
+                .ok_or_else(|| crate::Error::Corrupt("Block span overflow".into()))?;
+            ensure(ends[i] <= lengths[i], "Block exceeds sections")?;
         }
-        let mut keys = Vec::new();
-        let mut labels = Vec::new();
-        for i in 0..count {
-            let key = u16::try_from(uint(c.section(1), k + i * 2, 2)?).expect("two-byte integer");
-            let cell = address::cell_at(b, key)?;
-            ensure(keys.last().is_none_or(|last| *last < key), "Unsorted keys")?;
-            ensure(
-                address::ancestors(cell)
-                    .iter()
-                    .skip(1)
-                    .all(|a| keys.binary_search(a).is_err()),
-                "Overlapping stored ancestors",
-            )?;
-            let label = if width == 0 {
-                Label::decode(c.section(2), v + i * 20)?
-            } else {
-                let selector = index(uint(c.section(2), v + i * width, width)?)?;
-                ensure(selector < n, "Dangling dictionary selector")?;
-                dictionary[selector]
-            };
-            label.validate(places, zones)?;
-            keys.push(key);
-            labels.push(label);
-        }
-        blocks.insert(b, Block { keys, labels });
+        entries.push(Entry {
+            block,
+            count,
+            width,
+            dictionary_count,
+            spans,
+        });
     }
-    ensure(
-        (1..=3).all(|i| ends[i - 1] == c.section(i).len()),
-        "Unconsumed spatial bytes",
+    ensure(ends == lengths, "Unconsumed spatial bytes")?;
+    Ok(entries)
+}
+pub(crate) fn decode_block(
+    entry: &Entry,
+    keys: &[u8],
+    values: &[u8],
+    labels: &[u8],
+    places: usize,
+    zones: usize,
+) -> Result<Block> {
+    let mut dictionary = Vec::new();
+    for i in 0..entry.dictionary_count {
+        let label = Label::decode(labels, i * 20)?;
+        label.validate(places, zones)?;
+        ensure(
+            dictionary.last().is_none_or(|last| *last < label),
+            "Unsorted label dictionary",
+        )?;
+        dictionary.push(label);
+    }
+    let mut decoded_keys = Vec::with_capacity(entry.count);
+    let mut decoded_labels = Vec::with_capacity(entry.count);
+    for i in 0..entry.count {
+        let key = u16::try_from(uint(keys, i * 2, 2)?).expect("two-byte integer");
+        let cell = address::cell_at(entry.block, key)?;
+        ensure(
+            decoded_keys.last().is_none_or(|last| *last < key),
+            "Unsorted keys",
+        )?;
+        ensure(
+            address::ancestors(cell)
+                .iter()
+                .skip(1)
+                .all(|a| decoded_keys.binary_search(a).is_err()),
+            "Overlapping stored ancestors",
+        )?;
+        let label = if entry.width == 0 {
+            Label::decode(values, i * 20)?
+        } else {
+            let selector = index(uint(values, i * entry.width, entry.width)?)?;
+            *dictionary
+                .get(selector)
+                .ok_or_else(|| crate::Error::Corrupt("Dangling dictionary selector".into()))?
+        };
+        label.validate(places, zones)?;
+        decoded_keys.push(key);
+        decoded_labels.push(label);
+    }
+    Ok(Block {
+        keys: decoded_keys,
+        labels: decoded_labels,
+    })
+}
+/// Decode and validate the entire spatial shard, including ancestor disjointness.
+pub fn decode(bytes: Vec<u8>, places: usize, zones: usize) -> Result<BTreeMap<u32, Block>> {
+    let container = Container::decode(bytes, 1, &[40, 2, 1, 20])?;
+    let entries = directory(
+        container.section(0),
+        std::array::from_fn(|i| container.section(i + 1).len()),
     )?;
+    let mut blocks = BTreeMap::new();
+    for entry in entries {
+        let spans: [&[u8]; 3] = std::array::from_fn(|i| {
+            let (start, len) = entry.spans[i];
+            &container.section(i + 1)[start..start + len]
+        });
+        blocks.insert(
+            entry.block,
+            decode_block(&entry, spans[0], spans[1], spans[2], places, zones)?,
+        );
+    }
     Ok(blocks)
 }
 /// Encode sorted blocks using a dictionary only when it saves bytes.

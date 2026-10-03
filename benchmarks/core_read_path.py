@@ -7,14 +7,17 @@ are explicitly identified as measurements of the older synthetic workload.
 
 import argparse
 import json
+import os
 import platform
 import resource
 import statistics
+import struct
 import subprocess
 import time
 from pathlib import Path
 from typing import Any
 
+import h3
 import numpy as np
 
 from thereabouts import Geocoder
@@ -22,7 +25,76 @@ from thereabouts import Geocoder
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def current_rss() -> int:
+    """Resident bytes immediately around open, excluding workload allocation."""
+    return 1024 * int(
+        subprocess.check_output(["ps", "-o", "rss=", "-p", str(os.getpid())], text=True)
+    )
+
+
+def random_points(pack: Path, count: int) -> np.ndarray[Any, np.dtype[np.float64]]:
+    """Uniformly choose an inventoried r3 block, then rejection-sample its bounds."""
+    blocks = []
+    for path in sorted(pack.glob("cells-*.bin")):
+        with path.open("rb") as stream:
+            header = stream.read(64)
+            offset, _, rows = struct.unpack_from("<QQQ", header, 40)
+            stream.seek(offset)
+            for _ in range(rows):
+                block = struct.unpack_from("<I", stream.read(40))[0]
+                base, digits = divmod(block, 343)
+                cell = (1 << 59) | (3 << 52) | (base << 45) | ((1 << 45) - 1)
+                for resolution in range(3, 0, -1):
+                    digits, digit = divmod(digits, 7)
+                    shift = 3 * (15 - resolution)
+                    cell = (cell & ~(7 << shift)) | (digit << shift)
+                blocks.append(h3.int_to_str(cell))
+    rng = np.random.default_rng(20261003)
+    points = []
+    boundaries = [np.asarray(h3.cell_to_boundary(cell)) for cell in blocks]
+    for index in rng.integers(0, len(blocks), size=count):
+        boundary = boundaries[index]
+        low, high = boundary.min(axis=0), boundary.max(axis=0)
+        while True:
+            lat, lon = rng.uniform(low, high)
+            if h3.latlng_to_cell(lat, lon, 3) == blocks[index]:
+                points.append((lat, lon))
+                break
+    return np.asarray(points, dtype=np.float64)
+
+
+def workload(
+    geo: Geocoder, points: np.ndarray[Any, np.dtype[np.float64]]
+) -> dict[str, Any]:
+    lat, lon = points[:, 0], points[:, 1]
+    durations = []
+    for a, b in zip(lat, lon, strict=True):
+        start = time.perf_counter_ns()
+        geo.reverse(lat=a, lon=b)
+        durations.append(time.perf_counter_ns() - start)
+    rates = []
+    for _ in range(7):
+        batch_start = time.perf_counter()
+        columns = geo.reverse_columns(lat, lon)
+        elapsed = time.perf_counter() - batch_start
+        assert len(columns["status"]) == len(points)
+        rates.append(len(points) / elapsed)
+    return {
+        "points": len(points),
+        "scalar_median_us": statistics.median(durations) / 1000,
+        "scalar_p99_us": float(np.percentile(durations, 99)) / 1000,
+        "reverse_columns_points_per_second": statistics.median(rates),
+        "reverse_columns_repeats": rates,
+    }
+
+
 def measure(iterations: int) -> dict[str, Any]:
+    pack = ROOT / "tests/fixtures/packs/core-sample"
+    rss_before = current_rss()
+    start = time.perf_counter()
+    geo = Geocoder(pack)
+    open_seconds = time.perf_counter() - start
+    open_rss_delta_bytes = current_rss() - rss_before
     vectors = json.loads((ROOT / "tests/fixtures/core-sample-vectors.json").read_text())
     points = np.array(
         [
@@ -34,23 +106,11 @@ def measure(iterations: int) -> dict[str, Any]:
     )
     rng = np.random.default_rng(20261003)
     indices = rng.integers(0, len(points), size=iterations)
-    lat, lon = points[indices, 0], points[indices, 1]
-    pack = ROOT / "tests/fixtures/packs/core-sample"
-    with Geocoder(pack) as geo:
+    with geo:
         for a, b in points:
             geo.reverse(lat=a, lon=b)
-        durations = []
-        for a, b in zip(lat, lon, strict=True):
-            start = time.perf_counter_ns()
-            geo.reverse(lat=a, lon=b)
-            durations.append(time.perf_counter_ns() - start)
-        rates = []
-        for _ in range(7):
-            batch_start = time.perf_counter()
-            columns = geo.reverse_columns(lat, lon)
-            elapsed = time.perf_counter() - batch_start
-            assert len(columns["status"]) == iterations
-            rates.append(iterations / elapsed)
+        hot = workload(geo, points[indices])
+        random = workload(geo, random_points(pack, 100_000))
     chip = (
         subprocess.check_output(
             ["sysctl", "-n", "machdep.cpu.brand_string"], text=True
@@ -77,10 +137,10 @@ def measure(iterations: int) -> dict[str, Any]:
             seed=20261003,
             pack_bytes=sum(p.stat().st_size for p in pack.iterdir() if p.is_file()),
         ),
-        "scalar_median_us": statistics.median(durations) / 1000,
-        "scalar_p99_us": float(np.percentile(durations, 99)) / 1000,
-        "reverse_columns_points_per_second": statistics.median(rates),
-        "reverse_columns_repeats": rates,
+        "open_seconds": open_seconds,
+        "open_rss_delta_bytes": open_rss_delta_bytes,
+        "cache_hot": hot,
+        "random": random,
         "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         * (1 if platform.system() == "Darwin" else 1024),
         "historical_reader": {
@@ -98,10 +158,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--baseline", type=Path)
     args = parser.parse_args()
     if args.iterations < 100:
         parser.error("at least 100 iterations are required")
     result = measure(args.iterations)
+    if args.baseline:
+        result["before_lazy_open"] = json.loads(args.baseline.read_text())
     payload = json.dumps(result, indent=2) + "\n"
     if args.output:
         args.output.write_text(payload)

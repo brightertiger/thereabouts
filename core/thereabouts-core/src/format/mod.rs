@@ -8,3 +8,5 @@ pub mod spatial;
 pub use pack::Pack;
 pub mod metadata;
 pub mod verify;
+
+mod cache;

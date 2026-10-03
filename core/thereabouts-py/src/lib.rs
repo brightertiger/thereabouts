@@ -90,12 +90,24 @@ impl Geocoder {
 impl Geocoder {
     #[pyo3(signature=(lat,lon,*,evidence=false))]
     fn reverse(&self, py: Python<'_>, lat: f64, lon: f64, evidence: bool) -> PyResult<Py<PyAny>> {
-        result_value(py, &self.pack(py)?.reverse(lat, lon, evidence))
+        result_value(
+            py,
+            &self
+                .pack(py)?
+                .reverse(lat, lon, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
     }
     #[pyo3(signature=(cell,*,evidence=false))]
     #[allow(clippy::wrong_self_convention)] // Public API verb, not a constructor.
     fn from_h3(&self, py: Python<'_>, cell: &str, evidence: bool) -> PyResult<Py<PyAny>> {
-        result_value(py, &self.pack(py)?.from_h3(cell, evidence))
+        result_value(
+            py,
+            &self
+                .pack(py)?
+                .from_h3(cell, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
     }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
@@ -112,9 +124,10 @@ impl Geocoder {
     }
 }
 #[pyfunction]
-fn open(py: Python<'_>, path: &str) -> PyResult<Geocoder> {
+#[pyo3(signature=(path, *, verify=false))]
+fn open(py: Python<'_>, path: &str, verify: bool) -> PyResult<Geocoder> {
     let pack = py
-        .detach(|| Pack::open(Path::new(path)))
+        .detach(|| Pack::open(Path::new(path), verify))
         .map_err(|e| error(py, &e))?;
     Ok(Geocoder {
         pack: Mutex::new(Some(Arc::new(pack))),

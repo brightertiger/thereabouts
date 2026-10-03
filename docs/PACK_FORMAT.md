@@ -256,13 +256,23 @@ The writer's admission budget constant is 512 MiB: 1,024-row Arrow batches,
 Parquet row groups at most 128 MiB uncompressed, a 16 MiB SQLite cache,
 block-local timezone joins, and bounded output shards. It rejects oversized
 units. Full verification visits one decoded shard at a time. This budget is
-not an allocator/RSS proof; world export remains unmeasured. Runtime opening
-currently loads the decoded spatial index and catalogue into memory.
+not an allocator/RSS proof; world export remains unmeasured.
 
-Opening validates checksums, containers, UTF-8, references, H3 validity, key
-ordering, ancestor disjointness, dictionaries and method/null rules. Opening and full verification both validate catalogue ordering across shard
-boundaries. Neither
-lookup nor verification performs network I/O. Missing packs raise
+Runtime opening validates the manifest, inventory sizes, shard headers and
+directories, and the small metadata table. Spatial payloads are decoded and
+validated on first access (UTF-8, references, H3 validity, key ordering, ancestor
+disjointness, dictionaries and method/null rules as applicable). Catalogue
+shards retain raw records and string pools; individual places are constructed
+on demand. Retained caches use byte-budgeted LRU eviction: 8 MiB for decoded
+blocks and 16 MiB for raw catalogue bytes. Active concurrent lookups can retain
+evicted values until they finish. Files are reopened for cache misses; the pack
+directory must remain available and immutable while a handle is open.
+
+SHA-256 and whole-pack structural verification are opt-in at open
+(`Pack::open(path, true)`, Python `Geocoder(path, verify=True)`).
+`verify_pack` always checks every hash, every record and catalogue ordering
+across shard boundaries. Default opening does not promise detection of damage
+in unused payloads. Neither lookup nor verification performs network I/O. Missing packs raise
 `data_not_installed` with message `thereabouts data install core`; unsupported
 format/family raises `incompatible_data`, damage raises `corrupt_pack`, and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query

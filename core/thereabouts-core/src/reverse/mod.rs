@@ -17,35 +17,33 @@ const METHODS: [&str; 8] = [
 ];
 impl Pack {
     /// Index a valid coordinate once at resolution eight, then walk logical ancestors.
-    #[must_use]
-    pub fn reverse(&self, lat: f64, lon: f64, evidence: bool) -> LookupResult {
+    pub fn reverse(&self, lat: f64, lon: f64, evidence: bool) -> crate::Result<LookupResult> {
         if !lat.is_finite()
             || !lon.is_finite()
             || !(-90.0..=90.0).contains(&lat)
             || !(-180.0..=180.0).contains(&lon)
         {
-            return LookupResult::empty("invalid_input");
+            return Ok(LookupResult::empty("invalid_input"));
         }
         let Ok(point) = LatLng::new(lat, lon) else {
-            return LookupResult::empty("invalid_input");
+            return Ok(LookupResult::empty("invalid_input"));
         };
         self.lookup(point.to_cell(Resolution::Eight), evidence)
     }
     /// Accept canonical H3 cells at any resolution through eight.
-    #[must_use]
-    pub fn from_h3(&self, text: &str, evidence: bool) -> LookupResult {
+    pub fn from_h3(&self, text: &str, evidence: bool) -> crate::Result<LookupResult> {
         if text.len() != 15 || !text.bytes().all(|b| b.is_ascii_hexdigit()) {
-            return LookupResult::empty("invalid_input");
+            return Ok(LookupResult::empty("invalid_input"));
         }
         let Ok(cell) = text.parse::<CellIndex>() else {
-            return LookupResult::empty("invalid_input");
+            return Ok(LookupResult::empty("invalid_input"));
         };
         if cell.resolution() > Resolution::Eight {
-            return LookupResult::empty("invalid_input");
+            return Ok(LookupResult::empty("invalid_input"));
         }
         self.lookup(cell, evidence)
     }
-    fn lookup(&self, cell: CellIndex, evidence: bool) -> LookupResult {
+    fn lookup(&self, cell: CellIndex, evidence: bool) -> crate::Result<LookupResult> {
         let mut answer = LookupResult::empty("not_found");
         let centre = LatLng::from(cell);
         answer.point = Some(Point {
@@ -59,20 +57,18 @@ impl Pack {
             reason = "no_stored_ancestor";
             None
         } else {
-            self.blocks
-                .get(&address::address(cell).0)
-                .and_then(|block| {
-                    reason = if cell.resolution() == Resolution::Eight {
-                        "no_land"
-                    } else {
-                        "no_stored_ancestor"
-                    };
-                    block.lookup(cell)
-                })
+            self.block(address::address(cell).0)?.and_then(|block| {
+                reason = if cell.resolution() == Resolution::Eight {
+                    "no_land"
+                } else {
+                    "no_stored_ancestor"
+                };
+                block.lookup(cell)
+            })
         };
         if let Some((key, label)) = found {
             let stored = address::cell_at(address::address(cell).0, key).ok();
-            answer = self.project(answer, label);
+            answer = self.project(answer, label)?;
             reason = if answer.status == "matched" {
                 "matched"
             } else {
@@ -102,7 +98,7 @@ impl Pack {
                         }) / 1000.0
                     }),
                     source_ids: self
-                        .place(label.0[2])
+                        .place(label.0[2])?
                         .and_then(|p| serde_json::from_str::<serde_json::Value>(p.field(11)).ok())
                         .and_then(|v| v.get("source_ids").cloned()),
                 });
@@ -132,11 +128,11 @@ impl Pack {
                 source_ids: None,
             });
         }
-        answer
+        Ok(answer)
     }
-    fn project(&self, mut answer: LookupResult, label: Label) -> LookupResult {
+    fn project(&self, mut answer: LookupResult, label: Label) -> crate::Result<LookupResult> {
         let [country, state, city, flags, tz] = label.0;
-        if let Some(place) = self.place(country) {
+        if let Some(place) = self.place(country)? {
             let code = place.field(6);
             let meta = self
                 .metadata
@@ -152,11 +148,11 @@ impl Pack {
                 name: place.field(1).into(),
             });
         }
-        answer.state = self.place(state).map(|p| State {
+        answer.state = self.place(state)?.map(|p| State {
             code: p.text[7].clone().filter(|s| !s.is_empty()),
             name: p.field(1).into(),
         });
-        answer.city = self.place(city).map(|p| City {
+        answer.city = self.place(city)?.map(|p| City {
             id: p.field(0).into(),
             name: p.field(1).into(),
             name_en: p.text[2].clone().filter(|s| !s.is_empty()),
@@ -179,7 +175,7 @@ impl Pack {
                 .into(),
             );
         }
-        answer
+        Ok(answer)
     }
 }
 #[cfg(test)]

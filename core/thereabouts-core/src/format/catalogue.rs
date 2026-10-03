@@ -113,55 +113,85 @@ pub fn encode_places(places: &[Place]) -> Result<Vec<u8>> {
     }
     encode(2, &[(&records, 80), (&offset_bytes, 8), (&text, 1)])
 }
-/// Decode all records only after validating the complete pool.
-pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
-    let c = Container::decode(bytes, 2, &[80, 8, 1])?;
-    let mut offsets = vec![];
-    for i in (0..c.section(1).len()).step_by(8) {
-        let offset = index(uint(c.section(1), i, 8)?)?;
+/// Raw catalogue storage: record/string bytes are retained without allocating places.
+#[derive(Debug)]
+pub(crate) struct Catalogue {
+    container: Container,
+}
+impl Catalogue {
+    pub(crate) fn decode(bytes: Vec<u8>) -> Result<Self> {
+        let container = Container::decode(bytes, 2, &[80, 8, 1])?;
+        let pool = container.section(2);
+        let mut previous = 0;
+        let offsets = container.section(1);
         ensure(
-            offset <= c.section(2).len() && offsets.last().is_none_or(|p| *p <= offset),
-            "Invalid string offsets",
+            offsets.len() >= 16 && uint(offsets, 0, 8)? == 0 && uint(offsets, 8, 8)? == 0,
+            "Invalid null string offset",
         )?;
-        offsets.push(offset);
+        for position in (0..offsets.len()).step_by(8) {
+            let offset = index(uint(offsets, position, 8)?)?;
+            let text = pool
+                .get(previous..offset)
+                .ok_or_else(|| crate::Error::Corrupt("Invalid string offsets".into()))?;
+            std::str::from_utf8(text).map_err(|_| crate::Error::Corrupt("Invalid UTF-8".into()))?;
+            previous = offset;
+        }
+        ensure(previous == pool.len(), "Invalid terminal string offset")?;
+        Ok(Self { container })
     }
-    ensure(
-        offsets.len() >= 2 && offsets[..2] == [0, 0] && offsets.last() == Some(&c.section(2).len()),
-        "Invalid null or terminal offset",
-    )?;
-    let mut strings = vec![];
-    for pair in offsets.windows(2) {
-        strings.push(
-            std::str::from_utf8(&c.section(2)[pair[0]..pair[1]])
-                .map_err(|_| crate::Error::Corrupt("Invalid UTF-8".into()))?
-                .to_owned(),
-        );
+    pub(crate) fn bytes(&self) -> usize {
+        self.container.bytes.len()
     }
-    let string = |r: u64| -> Result<Option<String>> {
-        let i = index(r)?;
-        ensure(i < strings.len(), "Dangling string reference")?;
-        Ok((i != 0).then(|| strings[i].clone()))
-    };
-    let mut places = vec![];
-    for row in c.section(0).as_chunks::<80>().0 {
+    pub(crate) fn len(&self) -> usize {
+        self.container.section(0).len() / 80
+    }
+    fn string(&self, reference: u64) -> Result<Option<String>> {
+        let position = index(reference)?
+            .checked_mul(8)
+            .ok_or_else(|| crate::Error::Corrupt("String reference overflow".into()))?;
+        let offsets = self.container.section(1);
+        let start = index(uint(offsets, position, 8)?)?;
+        let end = index(uint(offsets, position + 8, 8)?)?;
+        let text = self
+            .container
+            .section(2)
+            .get(start..end)
+            .ok_or_else(|| crate::Error::Corrupt("Dangling string reference".into()))?;
+        let text =
+            std::str::from_utf8(text).map_err(|_| crate::Error::Corrupt("Invalid UTF-8".into()))?;
+        Ok((reference != 0).then(|| text.to_owned()))
+    }
+    pub(crate) fn place(&self, index: usize) -> Result<Place> {
+        let start = index
+            .checked_mul(80)
+            .ok_or_else(|| crate::Error::Corrupt("Record overflow".into()))?;
+        let row = self
+            .container
+            .section(0)
+            .get(start..start + 80)
+            .ok_or_else(|| crate::Error::Corrupt("Dangling place reference".into()))?;
         let mut text = std::array::from_fn(|_| None);
         let mut refs = [0; 4];
-        for (i, s) in text.iter_mut().enumerate() {
-            *s = string(uint(row, i * 4, 4)?)?;
+        for (i, value) in text.iter_mut().enumerate() {
+            *value = self.string(uint(row, i * 4, 4)?)?;
         }
-        for (i, r) in refs.iter_mut().enumerate() {
-            *r = u32::try_from(uint(row, 48 + i * 4, 4)?).expect("four bytes");
+        for (i, value) in refs.iter_mut().enumerate() {
+            *value = u32::try_from(uint(row, 48 + i * 4, 4)?).expect("four bytes");
         }
-        places.push(Place {
+        Ok(Place {
             text,
             refs,
             latitude: i32::from_le_bytes(row[64..68].try_into().expect("fixed record")),
             longitude: i32::from_le_bytes(row[68..72].try_into().expect("fixed record")),
             population: u32::try_from(uint(row, 72, 4)?).expect("four bytes"),
-            timezone: string(uint(row, 76, 4)?)?,
-        });
+            timezone: self.string(uint(row, 76, 4)?)?,
+        })
     }
-    Ok(places)
+}
+/// Full verification materializes one shard at a time; runtime decodes on demand.
+pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
+    let catalogue = Catalogue::decode(bytes)?;
+    (0..catalogue.len()).map(|i| catalogue.place(i)).collect()
 }
 
 #[cfg(test)]
