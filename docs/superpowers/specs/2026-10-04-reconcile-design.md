@@ -1,6 +1,6 @@
 # Thereabouts reconcile: observations, entities and correspondence
 
-Status: draft for owner review, 2026-10-04. Builds on the exploration memo
+Status: reviewed by the owner 2026-10-04; **parked** — to be revisited after the client work completes. No implementation started. Builds on the exploration memo
 `docs/explorations/2026-10-04-point-conflation.md` (branch
 `explore/georeconcile`) and the owner's decisions of the same day.
 
@@ -139,6 +139,35 @@ Position(lat_deg, lon_deg, height_m=None, height_datum=None,
   partition keys for distribution, never as identity.
 
 Scalar and Arrow-batch forms share units, null handling and validation.
+
+### 4.1 Deriving covariance when absent
+
+Most POI and place data carries no positional covariance. The layer derives
+one, tries the sources of information in this order, and records which was
+used (`covariance_source`) so the separation statistic can weight it:
+
+1. **Declared precision.** Coordinate quantisation (a grid of spacing Δ has
+   variance Δ²/12 per axis; a cell-centre point carries its cell's extent), a
+   documented accuracy class, a GPS accuracy field, or a CEP with its
+   percentile and model.
+2. **Representation.** Centroid and rooftop points carry an error that scales
+   with the object's extent: a per-`kind` prior learned from footprint area or
+   population class and stored in the policy.
+3. **Statistics on trusted pairs.** Residual displacements between
+   identifier-confirmed or reviewed matches give the empirical covariance per
+   source, kind and region. With two sources only the sum Σa+Σb is
+   identifiable, which is what the pairwise statistic needs; with three or
+   more sources the per-source split is solved by the three-cornered-hat
+   method; a sensor's repeated readings of a fixed station give its own
+   measurement covariance directly.
+4. **Policy default** with low evidential weight, never zero.
+
+Derived covariances describe a population, not the individual record, and are
+never reported as that record's accuracy. Estimation uses only pairs confirmed
+independently of the distance signal, and the estimation set is recorded in
+the snapshot manifest. Functions: `covariance_from_precision`,
+`covariance_from_kind`, `estimate_source_covariance(trusted_pairs)`,
+`three_cornered_hat(...)` — part of work package 1.
 
 ## 5. Matching pipeline
 
