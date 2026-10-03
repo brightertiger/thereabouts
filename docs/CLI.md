@@ -130,8 +130,7 @@ be reported. Other input uses CSV. Empty input emits no rows (or
 
 NDJSON-to-CSV/table needs the union of input keys before writing a header.
 It spools input to an automatically removed temporary file, retaining at most
-4,096 keys and 1 MiB of key names. The spool observes the 5 GiB free-space
-floor. JSON/NDJSON output and CSV input stream directly. Missing input fields
+4,096 keys and 1 MiB of key names. Disk exhaustion during spooling reports “not enough disk” (exit 2). JSON/NDJSON output and CSV input stream directly. Missing input fields
 become null tabular cells. Batch hint is always present (nullable), and evidence
 is nullable when requested, so failed rows cannot change the CSV result schema.
 
@@ -296,7 +295,8 @@ is bounded by the advertised archive length; archives cannot supply the
 reserved installer .archive.json receipt.
 
 Before download the installer reserves twice the requested archive byte sum
-plus a 5 GiB free-space floor. Each transfer chunk rechecks that floor. Partial
+plus a 64 MiB bookkeeping margin. Insufficient space is an environment error
+(exit 2); there is no fixed free-space floor in the product. Partial
 downloads remain in .downloads and resume at their exact byte offset. HTTP
 uses ureq with rustls and its certificate verification enabled. Initial
 transfers require HTTP 200; resumes send Range: bytes=N- and require HTTP 206

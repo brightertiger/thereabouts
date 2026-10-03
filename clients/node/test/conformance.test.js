@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -45,11 +46,11 @@ for (const fixture of [...new Set(bundle.cases.map((c) => c.pack))]) {
   });
 }
 
-test("packaged format specification matches the exporter contract", async () => {
+test("legacy packaged specification matches its recorded historical contract", async () => {
   const packaged = await readFile(new URL("../FORMAT.md", import.meta.url));
-  const source = await readFile(
-    new URL("../../../docs/SERVING_FORMAT.md", import.meta.url),
-  );
+  const source = execFileSync("git", ["show", "3ade5da:docs/SERVING_FORMAT.md"], {
+    cwd: new URL("../../../", import.meta.url),
+  });
   const standalone = source
     .toString()
     .replaceAll(

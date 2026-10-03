@@ -1,8 +1,5 @@
 //! Tabular NDJSON needs the union of input keys before emitting its header.
-use crate::{
-    error::{Error, Result},
-    install::FREE_SPACE_FLOOR,
-};
+use crate::error::{Error, Result};
 use serde_json::{Map, Value};
 use std::{
     collections::BTreeSet,
@@ -39,11 +36,6 @@ pub(crate) fn collect(
         if fields.len() > MAX_FIELDS || bytes > MAX_FIELD_BYTES {
             return Err(Error::Usage(
                 "Tabular input exceeds column limit; use NDJSON output".into(),
-            ));
-        }
-        if fs2::available_space(file.path())? < FREE_SPACE_FLOOR + line.len() as u64 {
-            return Err(Error::Integrity(
-                "Batch spool would cross the 5 GiB free-space floor".into(),
             ));
         }
         file.write_all(line.as_bytes())?;

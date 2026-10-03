@@ -18,7 +18,7 @@ pub enum Error {
     Integrity(String),
     /// IO failure during an explicit command.
     #[error(transparent)]
-    Io(#[from] std::io::Error),
+    Io(std::io::Error),
     /// Malformed store or release metadata.
     #[error(transparent)]
     Json(#[from] serde_json::Error),
@@ -36,3 +36,13 @@ impl Error {
 }
 /// Native command operation result.
 pub type Result<T> = std::result::Result<T, Error>;
+
+impl From<std::io::Error> for Error {
+    fn from(error: std::io::Error) -> Self {
+        if error.kind() == std::io::ErrorKind::StorageFull {
+            Self::Usage("Not enough disk space to finish the operation".into())
+        } else {
+            Self::Io(error)
+        }
+    }
+}

@@ -14,19 +14,22 @@ use std::{
 };
 use thereabouts_core::format::{manifest, verify};
 
-/// Reserve five GiB beyond the peak download plus expanded archive size.
-pub const FREE_SPACE_FLOOR: u64 = 5 * 1024 * 1024 * 1024;
+/// Allow for filesystem bookkeeping beyond the download and expanded archive.
+pub const DISK_MARGIN_BYTES: u64 = 64 * 1024 * 1024;
 
-/// Reject an install before any downloads when its conservative peak does not fit.
+/// Reject an install before downloading when its conservative peak does not fit.
 pub fn precheck(root: &Path, bytes: u64) -> Result<()> {
+    admit(fs2::available_space(root)?, bytes)
+}
+fn admit(available: u64, bytes: u64) -> Result<()> {
     let needed = bytes
         .checked_mul(2)
-        .and_then(|v| v.checked_add(FREE_SPACE_FLOOR))
-        .ok_or_else(|| Error::Integrity("Install size overflow".into()))?;
-    if fs2::available_space(root)? < needed {
-        return Err(Error::Integrity(
-            "Install would leave less than 5 GiB free".into(),
-        ));
+        .and_then(|v| v.checked_add(DISK_MARGIN_BYTES))
+        .ok_or_else(|| Error::Usage("Install size overflow".into()))?;
+    if available < needed {
+        return Err(Error::Usage(format!(
+            "Not enough disk space: need {needed} bytes, available {available} bytes"
+        )));
     }
     Ok(())
 }
@@ -204,11 +207,6 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
             if count64 > remaining {
                 return Err(Error::Integrity("Download exceeds advertised size".into()));
             }
-            if fs2::available_space(root)? < FREE_SPACE_FLOOR + count64 {
-                return Err(Error::Integrity(
-                    "Download reached the 5 GiB free-space floor".into(),
-                ));
-            }
             file.write_all(
                 buffer
                     .get(..count)
@@ -231,4 +229,18 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
         ));
     }
     Ok(path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn admission_needs_archive_expansion_and_small_margin_only() {
+        assert!(admit(128 * 1024 * 1024, 1024).is_ok());
+        let needed = DISK_MARGIN_BYTES + 2048;
+        assert!(admit(needed, 1024).is_ok());
+        let error = admit(needed - 1, 1024).unwrap_err();
+        assert_eq!(error.exit_code(), 2);
+        assert!(error.to_string().contains("Not enough disk"));
+    }
 }
