@@ -107,7 +107,7 @@ impl Pack {
                     answer.kind = Kind::City;
                     answer.r#match = Some(method);
                     answer.rank_basis = Some("population".into());
-                    answer.timezone = self.place(city)?.and_then(|p| p.timezone.clone());
+                    answer.timezone = self.place(city, false)?.and_then(|p| p.timezone.clone());
                     answer.point = answer.city.as_ref().and_then(|c| c.point.clone());
                     answer.cell = answer
                         .point
@@ -139,9 +139,9 @@ impl Pack {
         let [country, state, city] = places;
         Ok(Evidence {
             stored_cell: None,
-            country_id: self.place(country)?.map(|p| p.field(0).into()),
-            state_id: self.place(state)?.map(|p| p.field(0).into()),
-            city_id: self.place(city)?.map(|p| p.field(0).into()),
+            country_id: self.place(country, false)?.map(|p| p.field(0).into()),
+            state_id: self.place(state, false)?.map(|p| p.field(0).into()),
+            city_id: self.place(city, false)?.map(|p| p.field(0).into()),
             city_method: None,
             land_method: None,
             reason: Some(

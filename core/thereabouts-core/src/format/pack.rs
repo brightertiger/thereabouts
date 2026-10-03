@@ -54,7 +54,7 @@ pub struct Pack {
     // One MiB bounds repeated exact-address queries without retaining full interval tables.
     address_cache: Mutex<Cache<super::intervals::Address, Vec<(usize, usize)>>>,
     block_cache: Mutex<Cache<u32, Block>>,
-    place_cache: Mutex<Cache<u32, Place>>,
+    place_cache: Mutex<Cache<(u32, bool), Place>>,
     observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
 }
 impl Pack {
@@ -320,8 +320,8 @@ impl Pack {
             .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
         Ok(Some(cache.insert(block, value, bytes)))
     }
-    /// Reference zero is null; other references decode and validate one raw record.
-    pub fn place(&self, reference: u32) -> Result<Option<Arc<Place>>> {
+    /// Reference zero is null; other references project one record, with opt-in source evidence.
+    pub fn place(&self, reference: u32, evidence: bool) -> Result<Option<Arc<Place>>> {
         let Some(index) = reference.checked_sub(1).map(|v| v as usize) else {
             return Ok(None);
         };
@@ -329,7 +329,7 @@ impl Pack {
             .place_cache
             .lock()
             .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
-        if let Some(place) = places.get(reference) {
+        if let Some(place) = places.get((reference, evidence)) {
             return Ok(Some(place));
         }
         drop(places);
@@ -338,8 +338,12 @@ impl Pack {
             .catalogues
             .get(shard_index)
             .ok_or_else(|| Error::Corrupt("Dangling place reference".into()))?;
-        let place = catalogue::read_place(&source.shard, index - source.first)?;
+        let place = catalogue::read_place(&source.shard, index - source.first, evidence)?;
         place.validate(self.place_count)?;
+        ensure(
+            self.manifest.family != "core" || !evidence || !place.field(11).is_empty(),
+            "Missing core catalogue evidence",
+        )?;
         let bytes = size_of::<Place>()
             + place
                 .text
@@ -352,7 +356,7 @@ impl Pack {
             .place_cache
             .lock()
             .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
-        Ok(Some(places.insert(reference, place, bytes)))
+        Ok(Some(places.insert((reference, evidence), place, bytes)))
     }
 }
 

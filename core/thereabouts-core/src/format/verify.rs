@@ -67,6 +67,10 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                 for place in catalogue::decode(fs::read(path)?)? {
                     place.validate(total)?;
                     ensure(
+                        manifest.family != "core" || !place.field(11).is_empty(),
+                        "Missing core catalogue evidence",
+                    )?;
+                    ensure(
                         previous_id
                             .as_ref()
                             .is_none_or(|last: &String| last.as_str() < place.field(0)),

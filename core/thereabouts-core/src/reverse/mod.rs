@@ -79,9 +79,9 @@ impl Pack {
                 let method = label.0[3] & 7;
                 answer.evidence = Some(Evidence {
                     stored_cell: stored.map(|c| c.to_string()),
-                    country_id: self.place(label.0[0])?.map(|p| p.field(0).into()),
-                    state_id: self.place(label.0[1])?.map(|p| p.field(0).into()),
-                    city_id: self.place(label.0[2])?.map(|p| p.field(0).into()),
+                    country_id: self.place(label.0[0], false)?.map(|p| p.field(0).into()),
+                    state_id: self.place(label.0[1], false)?.map(|p| p.field(0).into()),
+                    city_id: self.place(label.0[2], false)?.map(|p| p.field(0).into()),
                     city_method: METHODS
                         .get(method as usize)
                         .filter(|m| !m.is_empty())
@@ -97,7 +97,7 @@ impl Pack {
                     reason: Some(reason.into()),
                     timezones: vec![],
                     source_ids: self
-                        .place(label.0[2])?
+                        .place(label.0[2], true)?
                         .and_then(|p| serde_json::from_str::<serde_json::Value>(p.field(11)).ok())
                         .and_then(|v| v.get("source_ids").cloned()),
                 });
@@ -134,7 +134,7 @@ impl Pack {
         label: Label,
     ) -> crate::Result<LookupResult> {
         let [country, state, city, flags, _] = label.0;
-        if let Some(place) = self.place(country)? {
+        if let Some(place) = self.place(country, false)? {
             let code = place.field(6);
             let meta = self
                 .metadata_index
@@ -151,7 +151,7 @@ impl Pack {
             });
         }
         answer.state = self
-            .place(state)?
+            .place(state, false)?
             .map(|place| -> crate::Result<State> {
                 let meta = self
                     .metadata_index
@@ -180,7 +180,7 @@ impl Pack {
                 }
             })
             .transpose()?;
-        answer.city = self.place(city)?.map(|p| City {
+        answer.city = self.place(city, false)?.map(|p| City {
             id: p.field(0).into(),
             name: p.field(1).into(),
             name_en: p.text[2].clone().filter(|s| !s.is_empty()),

@@ -24,7 +24,7 @@ impl Pack {
         for record in records {
             let [country, state, city] = record.places;
             let identity = if kind == Kind::Postal && city != 0 {
-                self.place(city)?
+                self.place(city, false)?
                     .map(|p| format!("{}:{country}:{state}", p.field(0)))
                     .ok_or_else(|| Error::Corrupt("Missing canonical city".into()))?
             } else if kind == Kind::PhonePrefix {
@@ -64,9 +64,9 @@ impl Pack {
             if evidence {
                 answer.evidence = Some(Evidence {
                     stored_cell: None,
-                    country_id: self.place(country)?.map(|p| p.field(0).into()),
-                    state_id: self.place(state)?.map(|p| p.field(0).into()),
-                    city_id: self.place(city)?.map(|p| p.field(0).into()),
+                    country_id: self.place(country, false)?.map(|p| p.field(0).into()),
+                    state_id: self.place(state, false)?.map(|p| p.field(0).into()),
+                    city_id: self.place(city, false)?.map(|p| p.field(0).into()),
                     city_method: None,
                     land_method: None,
                     reason: Some("exact_code".into()),

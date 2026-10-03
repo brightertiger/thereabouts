@@ -305,10 +305,14 @@ Runtime opening validates the manifest, inventory sizes, shard headers and
 directories, and the small metadata table. Spatial payloads are decoded and
 validated on first access (UTF-8, references, H3 validity, key ordering, ancestor
 disjointness, dictionaries and method/null rules as applicable). Catalogue
-records range-read their 80-byte record, referenced offset pairs and UTF-8
-spans only. No catalogue miss loads or validates an entire shard. Retained
+records use three positioned reads on a miss: the 80-byte record, one span
+covering the minimum through maximum requested string offsets, then the
+corresponding UTF-8 text span. Only referenced strings are decoded/validated.
+Coalesced spans may contain intervening bytes; unrelated text is not decoded.
+The evidence reference is excluded unless evidence was requested. No catalogue miss loads or validates an entire shard. Retained
 caches use constant-time linked-key LRU eviction: 8 MiB for decoded blocks and
-4 MiB for decoded places. IO and decoding occur outside the cache mutex.
+4 MiB for decoded places, with separate cache identities for query-only and
+evidence-bearing values. IO and decoding occur outside the cache mutex.
 Concurrent misses may decode the same immutable record; insertion reuses an
 existing cached value. Active readers can retain evicted values until finished.
 Every shard retains the file handle opened with its validated directory and

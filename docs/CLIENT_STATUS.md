@@ -10,7 +10,9 @@ Package 3 has not started. The contract is the
 ## Rework and package-2 changes
 
 The writer is a separate crate. The reader retains shard file handles, uses
-positioned reads, and range-reads individual catalogue records and strings.
+positioned reads, and coalesces a catalogue miss into three reads. Ordinary
+lookups exclude the evidence reference and JSON parsing; evidence-bearing places
+have a separate cache identity.
 Its LRU caches have O(1) operations, with IO and decoding outside locks.
 Timezone narrowing falls back to the original set when no country-compatible
 zone survives. Overlap never makes reverse ambiguous. Result enums follow the
@@ -174,7 +176,8 @@ and 36,678,465 bytes, generated locally rather than committed. It uses 100,000
 seeded random requests and seven batch repetitions. Before → after N2–N3:
 median 18.459 → 13.209 µs; p99 53.166 → 107.750 µs; batch
 39,707 → 140,439 rows/s. The tail regression is real in this measurement;
-improved throughput does not establish improved p99 or world performance.
+improved throughput did not establish improved p99 or world performance. The
+catalogue-read rework measurements below supersede that regression.
 
 The refreshed core sample, now including names, opens in 11.806 ms with
 2,359,296 bytes RSS delta. Hot median/p99 are 7.833/23.750 µs and batch
@@ -281,3 +284,12 @@ cold evidence, all supporting tables and notices. Per-family query-block gates
 are separate from that complete-pack accounting. The IPv6 measurement counts
 nonzero low address words; the format preserves them instead of assuming /64
 alignment. Neither export qualifies a core world pack or the other families.
+
+## Catalogue read measurements
+
+<!-- catalogue-reads:start -->
+| Catalogue read path | Median µs | p99 µs | Batch rows/s |
+| --- | ---: | ---: | ---: |
+| before | 13.291 | 120.875 | 144578.55712150357 |
+| after | 7.25 | 18.667 | 298081.435803999 |
+<!-- catalogue-reads:end -->

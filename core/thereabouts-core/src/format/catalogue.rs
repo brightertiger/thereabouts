@@ -226,28 +226,56 @@ pub(crate) fn validate_header(shard: &FileShard) -> Result<()> {
         "Invalid terminal string offset",
     )
 }
-/// Read only the requested record and referenced offset pairs and UTF-8 spans.
-pub(crate) fn read_place(shard: &FileShard, record: usize) -> Result<Place> {
+/// Coalesce one record's requested offsets and text into two positioned reads.
+/// Evidence is excluded from the reference span unless the caller requests it.
+pub(crate) fn read_place(shard: &FileShard, record: usize, evidence: bool) -> Result<Place> {
     let offset = record
         .checked_mul(80)
         .ok_or_else(|| crate::Error::Corrupt("Record overflow".into()))?;
-    let row = shard.range(0, offset, 80)?;
+    let mut row = shard.range(0, offset, 80)?;
+    if !evidence {
+        row.get_mut(44..48)
+            .ok_or_else(|| crate::Error::Corrupt("Missing evidence slot".into()))?
+            .fill(0);
+    }
+    let mut references = Vec::with_capacity(13);
+    for offset in (0..48).step_by(4).chain(std::iter::once(76)) {
+        let reference = uint(&row, offset, 4)?;
+        if reference != 0 {
+            references.push(reference);
+        }
+    }
+    let first = references.iter().copied().min().unwrap_or(0);
+    let last = references.iter().copied().max().unwrap_or(0);
+    let position = index(first)?
+        .checked_mul(8)
+        .ok_or_else(|| crate::Error::Corrupt("String offset overflow".into()))?;
+    let length = index(last - first + 2)?
+        .checked_mul(8)
+        .ok_or_else(|| crate::Error::Corrupt("String span overflow".into()))?;
+    let offsets = shard.range(1, position, length)?;
+    let text_start = index(uint(&offsets, 0, 8)?)?;
+    let text_end = index(uint(&offsets, length - 8, 8)?)?;
+    let length = text_end
+        .checked_sub(text_start)
+        .ok_or_else(|| crate::Error::Corrupt("Reversed text span".into()))?;
+    let text = shard.range(2, text_start, length)?;
     decode_record(&row, |reference| {
         if reference == 0 {
             return Ok(None);
         }
-        let offset = index(reference)?
-            .checked_mul(8)
-            .ok_or_else(|| crate::Error::Corrupt("String reference overflow".into()))?;
-        let pair = shard.range(1, offset, 16)?;
-        let start = index(uint(&pair, 0, 8)?)?;
-        let end = index(uint(&pair, 8, 8)?)?;
-        let length = end
-            .checked_sub(start)
-            .ok_or_else(|| crate::Error::Corrupt("Invalid string offsets".into()))?;
-        let text = shard.range(2, start, length)?;
-        String::from_utf8(text)
-            .map(Some)
+        let position = index(reference - first)? * 8;
+        let start = index(uint(&offsets, position, 8)?)?
+            .checked_sub(text_start)
+            .ok_or_else(|| crate::Error::Corrupt("Invalid string start".into()))?;
+        let end = index(uint(&offsets, position + 8, 8)?)?
+            .checked_sub(text_start)
+            .ok_or_else(|| crate::Error::Corrupt("Invalid string end".into()))?;
+        let value = text
+            .get(start..end)
+            .ok_or_else(|| crate::Error::Corrupt("Invalid string span".into()))?;
+        std::str::from_utf8(value)
+            .map(|v| Some(v.to_owned()))
             .map_err(|_| crate::Error::Corrupt("Invalid UTF-8".into()))
     })
 }
@@ -262,7 +290,7 @@ pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
 mod tests {
     use super::*;
     #[test]
-    fn record_miss_neither_reads_nor_validates_unrelated_strings() {
+    fn record_miss_does_not_validate_unrelated_strings() {
         let first = Place {
             text: std::array::from_fn(|i| Some(if i == 11 { "{}".into() } else { "first".into() })),
             refs: [0; 4],
@@ -281,9 +309,34 @@ mod tests {
         std::fs::write(&path, &bytes).unwrap();
         let shard = FileShard::open(&path, 2, &[80, 8, 1]).unwrap();
         validate_header(&shard).unwrap();
-        assert_eq!(read_place(&shard, 0).unwrap().field(0), "first");
-        assert!(read_place(&shard, 1).is_err());
+        assert_eq!(read_place(&shard, 0, false).unwrap().field(0), "first");
+        assert!(read_place(&shard, 1, false).is_err());
         assert!(Catalogue::decode(bytes).is_err());
+    }
+    #[test]
+    fn malformed_evidence_is_cold_until_requested() {
+        let place = Place {
+            text: std::array::from_fn(|i| {
+                Some(if i == 11 {
+                    "{broken".into()
+                } else {
+                    "query".into()
+                })
+            }),
+            refs: [0; 4],
+            latitude: i32::MIN,
+            longitude: i32::MIN,
+            population: 0,
+            timezone: None,
+        };
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("catalogue.bin");
+        std::fs::write(&path, encode_places(&[place]).unwrap()).unwrap();
+        let shard = FileShard::open(&path, 2, &[80, 8, 1]).unwrap();
+        let hot = read_place(&shard, 0, false).unwrap();
+        hot.validate(1).unwrap();
+        assert!(hot.text[11].is_none());
+        assert!(read_place(&shard, 0, true).unwrap().validate(1).is_err());
     }
     #[test]
     fn invalid_point_and_dangling_reference() {

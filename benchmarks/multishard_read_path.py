@@ -1,6 +1,7 @@
 """Measure random catalogue misses over 256 locally generated small shards.
 
 uv run python -m benchmarks.multishard_read_path --record before
+Use --series catalogue_read_rework to preserve prerequisite measurements.
 Repeat with --record after after rebuilding the extension. Both runs use the
 same seed, pack and number of lookups; the script alone records the measurements.
 """
@@ -17,9 +18,35 @@ from benchmarks.core_read_path import ROOT, current_rss, workload
 from thereabouts import Geocoder
 
 
+def update_status(series: dict[str, dict[str, object]]) -> None:
+    """Keep review measurements separate from the earlier prerequisite runs."""
+    start, end = "<!-- catalogue-reads:start -->", "<!-- catalogue-reads:end -->"
+    lines = [
+        "| Catalogue read path | Median µs | p99 µs | Batch rows/s |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    for name in ("before", "after"):
+        if name in series:
+            value = series[name]
+            lines.append(
+                f"| {name} | {value['scalar_median_us']} | {value['scalar_p99_us']} | "
+                f"{value['reverse_columns_points_per_second']} |"
+            )
+    section = start + "\n" + "\n".join(lines) + "\n" + end
+    status = ROOT / "docs/CLIENT_STATUS.md"
+    text = status.read_text()
+    if start in text:
+        a, b = text.index(start), text.index(end) + len(end)
+        text = text[:a] + section + text[b:]
+    else:
+        text += "\n## Catalogue read measurements\n\n" + section + "\n"
+    status.write_text(text)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--record", choices=["before", "after"], required=True)
+    parser.add_argument("--series", default="multishard")
     parser.add_argument(
         "--output", type=Path, default=ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
     )
@@ -63,8 +90,10 @@ def main() -> None:
         seed=20261003,
     )
     data = json.loads(args.output.read_text())
-    data.setdefault("multishard", {})[args.record] = result
+    data.setdefault(args.series, {})[args.record] = result
     args.output.write_text(json.dumps(data, indent=2) + "\n")
+    if args.series == "catalogue_read_rework":
+        update_status(data[args.series])
     print(json.dumps(result, indent=2))
 
 

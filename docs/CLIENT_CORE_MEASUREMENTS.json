@@ -515,5 +515,49 @@
       "measurement_seconds": 190.7823931669991,
       "output_deleted": true
     }
+  },
+  "catalogue_read_rework": {
+    "before": {
+      "points": 100000,
+      "scalar_median_us": 13.291,
+      "scalar_p99_us": 120.875,
+      "reverse_columns_points_per_second": 144578.55712150357,
+      "reverse_columns_repeats": [
+        143230.01827282293,
+        141612.88832389994,
+        144207.50876562396,
+        144578.55712150357,
+        144614.15317459992,
+        145112.22139456918,
+        145015.7364838989
+      ],
+      "open_seconds": 0.05511774998740293,
+      "open_rss_delta_bytes": 1245184,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "after": {
+      "points": 100000,
+      "scalar_median_us": 7.25,
+      "scalar_p99_us": 18.667,
+      "reverse_columns_points_per_second": 298081.435803999,
+      "reverse_columns_repeats": [
+        297983.6190561062,
+        295941.6415933958,
+        298081.435803999,
+        299058.04194912204,
+        295907.96332025586,
+        298453.34018786624,
+        299228.8865564779
+      ],
+      "open_seconds": 0.056508250010665506,
+      "open_rss_delta_bytes": 999424,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    }
   }
 }
