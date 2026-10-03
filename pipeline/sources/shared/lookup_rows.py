@@ -7,6 +7,8 @@ from typing import Any
 
 import h3
 
+from pipeline.config.schema import H3
+
 Row = dict[str, Any]
 
 
@@ -20,7 +22,9 @@ def clean(value: str | None) -> str | None:
     return " ".join(unicodedata.normalize("NFC", value).split()) or None
 
 
-def point(latitude: str | float | None, longitude: str | float | None) -> Row:
+def point(
+    latitude: str | float | None, longitude: str | float | None, *, grid: H3
+) -> Row:
     result: Row = dict(
         latitude=None, longitude=None, h3=None, h3_uint64=None, h3_resolution=None
     )
@@ -38,13 +42,13 @@ def point(latitude: str | float | None, longitude: str | float | None) -> Row:
     except ValueError:
         result["coordinate_error"] = "invalid coordinates retained in provenance"
         return result
-    cell = h3.latlng_to_cell(lat, lon, 8)
+    cell = h3.latlng_to_cell(lat, lon, grid.cell_resolution)
     return dict(
         latitude=lat,
         longitude=lon,
         h3=cell,
         h3_uint64=h3.str_to_int(cell),
-        h3_resolution=8,
+        h3_resolution=grid.cell_resolution,
     )
 
 

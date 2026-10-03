@@ -8,6 +8,7 @@ from typing import Any, cast, overload
 import numpy as np
 from numpy.typing import NDArray
 
+from pipeline.config.schema import H3
 from thereabouts.format import (
     BITMAP_FLAG,
     BLOCK_COUNT,
@@ -133,10 +134,10 @@ def invalid(condition: np.bool_ | NDArray[np.bool_]) -> bool:
 
 
 class Table:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, grid: H3) -> None:
         self.path = path
         self.arrays: list[Array] = []
-        self.manifest = read_manifest(path)
+        self.manifest = read_manifest(path, grid=grid)
         self.resolution = int(self.manifest["resolution"])
         try:
             self._check_file("catalog.json")

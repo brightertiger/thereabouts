@@ -6,6 +6,7 @@ import h3
 import pyarrow as pa
 import pytest
 
+from pipeline.config.schema import H3
 from pipeline.config.sources import SourceLimits
 from pipeline.sources.airports import airport
 from pipeline.sources.codes import country, subdivision
@@ -22,13 +23,14 @@ from pipeline.sources.unlocode import trade
 @pytest.mark.parametrize(
     "lat,lon", [(12.9716, 77.5946), (40.7128, -74.006), (90, 180), (-90, -180), (0, 0)]
 )
+@pytest.mark.parametrize("resolution", [7, 8])
 def test_point_keys_are_canonical_and_contain_the_coordinate(
-    lat: float, lon: float
+    lat: float, lon: float, resolution: int
 ) -> None:
-    row = point(lat, lon)
-    assert row["h3"] == h3.latlng_to_cell(lat, lon, 8)
+    row = point(lat, lon, grid=H3(cell_resolution=resolution))
+    assert row["h3"] == h3.latlng_to_cell(lat, lon, resolution)
     assert h3.str_to_int(row["h3"]) == row["h3_uint64"]
-    assert row["h3_resolution"] == 8
+    assert row["h3_resolution"] == resolution
 
 
 def test_invalid_coordinate_keeps_trade_record_and_raw_evidence() -> None:
@@ -38,7 +40,7 @@ def test_invalid_coordinate_keeps_trade_record_and_raw_evidence() -> None:
         "Coordinates": "1260N 07730E",
         "Function": "1234567B",
     }
-    row = trade(raw)
+    row = trade(raw, grid=H3())
     assert row["h3"] is None and row["function"] == "1234567B"
     result = decorate(
         row,
@@ -74,18 +76,19 @@ def test_postal_variants_and_closed_airports_are_not_filtered() -> None:
         "77.5786",
         "6",
     ]
-    row = postal(raw, "allCountries.zip")
+    row = postal(raw, "allCountries.zip", grid=H3())
     assert row["accuracy"] == "6" and row["postal_code"] == "560001"
     assert row["admin2_name"] == "Bengaluru"
     with pytest.raises(Reject):
-        postal(raw[:-1], "bad")
+        postal(raw[:-1], "bad", grid=H3())
     result = airport(
         {
             "type": "closed",
             "iso_country": "US",
             "latitude_deg": "1",
             "longitude_deg": "2",
-        }
+        },
+        grid=H3(),
     )
     assert result["type"] == "closed" and result["h3"]
 
@@ -99,13 +102,14 @@ def test_postal_variants_and_closed_airports_are_not_filtered() -> None:
 )
 def test_ranges_preserve_both_address_families(start: str, end: str) -> None:
     row = ip_range(
-        [start, end, "NA", "US", "California", "Mountain View", "37.4", "-122.1"]
+        [start, end, "NA", "US", "California", "Mountain View", "37.4", "-122.1"],
+        grid=H3(),
     )
     assert row["ip_start"] == start and row["ip_end"] == end
     assert len(row["ip_start_packed"]) == 16
     assert row["ip_start_packed"] <= row["ip_end_packed"]
     with pytest.raises(Reject):
-        ip_range([end, start, "NA", "US", "", "", "0", "0"])
+        ip_range([end, start, "NA", "US", "", "", "0", "0"], grid=H3())
 
 
 def test_code_systems_zero_padding_and_shared_phone_codes() -> None:
@@ -126,7 +130,7 @@ def test_code_systems_zero_padding_and_shared_phone_codes() -> None:
         {"1": ["US", "CA"], "91": ["IN"]},
     )
     assert row["country_codes"] == ["US", "CA"] and row["language"] == "en"
-    assert coordinates("+404251-0740023")["h3"] == h3.latlng_to_cell(
+    assert coordinates("+404251-0740023", grid=H3())["h3"] == h3.latlng_to_cell(
         40 + 42 / 60 + 51 / 3600, -(74 + 23 / 3600), 8
     )
 
@@ -135,7 +139,7 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string(
     limits: SourceLimits,
 ) -> None:
     row = decorate(
-        dict(country_code="IN", postal_code="560001", **point(12.97, 77.59)),
+        dict(country_code="IN", postal_code="560001", **point(12.97, 77.59, grid=H3())),
         "postal",
         "id",
         dict(
@@ -149,7 +153,7 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string(
         {},
     )
     table = pa.Table.from_pylist([row], schema=LOOKUP_SCHEMAS["postal_codes"])
-    validate_table(table, "postal_codes", "postal", limits)
+    validate_table(table, "postal_codes", "postal", limits, grid=H3())
     row["h3_uint64"] += 1
     with pytest.raises(ValueError, match="H3"):
         validate_table(
@@ -157,6 +161,7 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string(
             "postal_codes",
             "postal",
             limits,
+            grid=H3(),
         )
     row["h3_uint64"] -= 1
     row["postal_code"] = "\u00a0"
@@ -166,6 +171,7 @@ def test_lookup_schema_rejects_wrong_cell_and_blank_string(
             "postal_codes",
             "postal",
             limits,
+            grid=H3(),
         )
 
 

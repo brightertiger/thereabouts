@@ -9,6 +9,7 @@ import pytest
 import shapely
 from shapely.geometry import Polygon, box
 
+from pipeline.config.schema import H3
 from pipeline.config.sources import SourceLimits
 from pipeline.sources.overture import areas as overture_areas
 from pipeline.sources.overture import rows as overture_rows
@@ -91,6 +92,7 @@ def test_all_roles_names_and_nested_metadata_are_preserved(
             "places",
             "overture",
             limits,
+            grid=H3(),
         )
     aliases = list(overture_rows.names(raw, CONTEXT))
     assert [row["name_kind"] for row in aliases] == ["primary", "common", "historic"]
@@ -102,6 +104,7 @@ def test_all_roles_names_and_nested_metadata_are_preserved(
         "names",
         "overture",
         limits,
+        grid=H3(),
     )
 
 
@@ -136,6 +139,7 @@ def test_repair_split_flags_ids_and_containment(
         "areas",
         "overture",
         limits,
+        grid=H3(),
     )
     geometry = shapely.MultiPolygon([box(0, 0, 1, 1), box(2, 2, 3, 3)])
     parts = list(split_geometry(geometry, 160, max_depth=24))

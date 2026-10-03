@@ -9,7 +9,7 @@ from pipeline.runtime.jsonio import digest
 from pipeline.sources.contract import SourceContext
 
 from .parquet import write_partition
-from .schemas import SCHEMAS, Kind
+from .schemas import Kind, schema_for
 
 
 class PartitionWriter:
@@ -50,7 +50,9 @@ class PartitionWriter:
     def _batch(self) -> None:
         if not self.rows:
             return
-        table = pa.Table.from_pylist(self.rows, schema=SCHEMAS[self.kind])
+        table = pa.Table.from_pylist(
+            self.rows, schema=schema_for(self.kind, self.ctx.runtime.config.h3)
+        )
         if (
             self.tables
             and self.size + table.nbytes > self.ctx.settings.limits.part_bytes
@@ -81,6 +83,7 @@ class PartitionWriter:
                 self.ctx.settings.name,
                 self.ctx.settings.limits,
                 self.tables,
+                grid=self.ctx.runtime.config.h3,
             )
             written = path.stat().st_size
             self.outputs.append(path)

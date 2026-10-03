@@ -6,6 +6,8 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.compute as pc
 
+from pipeline.config.schema import H3
+
 from .lookup_schemas import validate_lookup
 
 
@@ -15,6 +17,8 @@ def validate_lookup_batch(
     sources: tuple[str, ...],
     provenance: Callable[[dict[str, object]], None],
     max_row_bytes: int,
+    *,
+    grid: H3,
 ) -> None:
     for field in batch.schema:
         if pa.types.is_string(field.type):
@@ -43,4 +47,4 @@ def validate_lookup_batch(
             or country != country.upper()
         ):
             raise ValueError("country_code must be uppercase ISO alpha-2 (or XK)")
-        validate_lookup(row, kind)
+        validate_lookup(row, kind, grid=grid)

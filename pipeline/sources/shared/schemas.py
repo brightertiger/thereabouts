@@ -9,6 +9,7 @@ from typing import Literal, cast
 import pyarrow as pa
 import shapely
 
+from pipeline.config.schema import H3
 from pipeline.config.sources import SourceLimits
 
 from .geometry import BBOX_COLUMNS, BOUND_TOLERANCE, check_bounds, validate_polygon
@@ -100,6 +101,20 @@ SCHEMAS: dict[Kind, pa.Schema] = {
 for lookup_kind, lookup_schema in LOOKUP_SCHEMAS.items():
     SCHEMAS[lookup_kind] = lookup_schema
 
+
+def schema_for(kind: Kind, grid: H3) -> pa.Schema:
+    """Keep field contracts fixed and label written lookup files with their grid."""
+    schema = SCHEMAS[kind]
+    if b"h3_reference_resolution" in (schema.metadata or {}):
+        return schema.with_metadata(
+            {
+                **(schema.metadata or {}),
+                b"h3_reference_resolution": str(grid.cell_resolution).encode(),
+            }
+        )
+    return schema
+
+
 SCHEMA_HASHES: dict[Kind, str] = {
     kind: hashlib.sha256(schema.serialize().to_pybytes()).hexdigest()
     for kind, schema in SCHEMAS.items()
@@ -142,7 +157,12 @@ def _area(row: dict[str, object]) -> None:
 
 
 def validate_table(
-    table: pa.Table | pa.RecordBatch, kind: Kind, source: str, limits: SourceLimits
+    table: pa.Table | pa.RecordBatch,
+    kind: Kind,
+    source: str,
+    limits: SourceLimits,
+    *,
+    grid: H3,
 ) -> None:
     """Validate schema, nulls, byte bounds, coordinates, WKB and provenance."""
     schema = SCHEMAS[kind]
@@ -158,7 +178,9 @@ def validate_table(
     )
     for batch in batches:
         if kind in LOOKUP_SCHEMAS:
-            validate_lookup_batch(batch, kind, (source,), _provenance, limits.row_bytes)
+            validate_lookup_batch(
+                batch, kind, (source,), _provenance, limits.row_bytes, grid=grid
+            )
             continue
         for index, row in enumerate(batch.to_pylist()):
             if batch.slice(index, 1).nbytes > limits.row_bytes:

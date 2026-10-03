@@ -12,8 +12,10 @@ lookups → dataset → two fake packs → memory publication through the runner
 including ledger completion, receipt contents and resume. Fix 5 documents IDs,
 logical keys and checksums; the rebuilt subset is **8,810,295 bytes**. All three
 reader examples (including the name join) and checksum verification passed.
-Exported row licence expressions are retained too. Fixes 6–8 follow; current
-render inputs are in the release measurements JSON.
+Exported row licence expressions are retained too. Fix 6 passes the configured
+H3 grid through point parsers, Parquet metadata/validation and internal table
+manifest reads; helpers are tested at resolutions 7 and 8. Fixes 7–8 follow.
+Current render inputs are in the release measurements JSON.
 
 Package 1 supplies configuration, the single ledger/fingerprint rule, resource
 admission, runner and recoverable migration. Package 2 supplies the 13 retained
@@ -51,8 +53,8 @@ are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
-config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 44.80 s**
-(the independent review measured 175 s before fixes). Current suite: **671
+config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 47.24 s**
+(the independent review measured 175 s before fixes). Current suite: **683
 passed, 8 skipped**; Ruff check/format and strict mypy pass. The six Malaysia
 artifacts, including base cells, city index and mapping, match retained SHA256:
 **20.32 s**, **435,535,872 bytes RSS**, **141,524,404 output bytes**.
@@ -77,7 +79,7 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 | dataset / packs / publish (disabled) | 0 | 0 | 0 | 0 | 0 |
 | **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
-Latest final-review plan: **309.17 s**, **1,482,670,080 bytes RSS**.
+Latest final-review plan: **314.76 s**, **1,440,268,288 bytes RSS**.
 Latest handover: package 4, **331.70 s / 1,473,708,032 bytes RSS**; repeated at fix 8.
 Gate reports: [PIPELINE_FINAL_REVIEW_MEASUREMENTS.json](PIPELINE_FINAL_REVIEW_MEASUREMENTS.json).
 Real ledger SHA256 before/after:
@@ -186,7 +188,7 @@ Retain this short status and linked detailed evidence. Update the frozen client'
 `src/thereabouts/manifest.py` missing-data command on the Rust branch; its current
 `python -m build_data` message and client test were intentionally left unchanged here.
 
-Worktree bytes: **970,044,687**; free disk: **49,366,769,664**. The initial scratch cleanup removed
+Worktree bytes: **982,621,443**; free disk: **49,834,655,744**. The initial scratch cleanup removed
 **1,049,266,242 bytes**. This task keeps new outputs below 3 GB and free disk above
 5 GB; all subsequent tests set workspace TMPDIR and pytest has a worktree basetemp.
 One early targeted pytest invocation omitted TMPDIR and wrote small synthetic

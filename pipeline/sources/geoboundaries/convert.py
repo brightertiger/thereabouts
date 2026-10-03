@@ -97,6 +97,7 @@ def _convert(
                     "areas",
                     ctx.settings.name,
                     ctx.settings.limits,
+                    grid=ctx.runtime.config.h3,
                 )
         except (ValueError, shapely.errors.GEOSException) as error:
             report["rejects"].append(

@@ -5,10 +5,12 @@ import tarfile
 from collections.abc import Iterator
 from pathlib import Path
 
+from pipeline.config.schema import H3
+
 from .lookup_rows import Row, point
 
 
-def coordinates(value: str) -> Row:
+def coordinates(value: str, *, grid: H3) -> Row:
     match = re.fullmatch(r"([+-])(\d{4}|\d{6})([+-])(\d{5}|\d{7})", value)
     if match is None:
         raise ValueError(f"Invalid IANA coordinates: {value}")
@@ -24,10 +26,11 @@ def coordinates(value: str) -> Row:
     return point(
         angle(lat, 2) * (-1 if ns == "-" else 1),
         angle(lon, 3) * (-1 if ew == "-" else 1),
+        grid=grid,
     )
 
 
-def zone_rows(path: Path) -> Iterator[Row]:
+def zone_rows(path: Path, *, grid: H3) -> Iterator[Row]:
     with tarfile.open(path) as archive:
         for name in ("zone.tab", "zone1970.tab", "zonenow.tab"):
             member = archive.extractfile(name)
@@ -44,5 +47,5 @@ def zone_rows(path: Path) -> Iterator[Row]:
                     country_codes=parts[0],
                     comments=parts[3] if len(parts) > 3 else None,
                     coordinates_raw=parts[1],
-                    **coordinates(parts[1]),
+                    **coordinates(parts[1], grid=grid),
                 )

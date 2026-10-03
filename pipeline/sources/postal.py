@@ -6,6 +6,7 @@ import zipfile
 from collections.abc import Iterator
 from pathlib import Path
 
+from pipeline.config.schema import H3
 from pipeline.config.source_options import Text as Options
 from pipeline.config.sources import SourceSettings
 from pipeline.pins.models import SourcePin
@@ -31,11 +32,15 @@ POSTAL_FIELDS = [
 ]
 
 
-def postal(raw: list[str], variant: str) -> Row:
+def postal(raw: list[str], variant: str, *, grid: H3) -> Row:
     if len(raw) != 12:
         raise Reject(f"Expected 12 postal columns, got {len(raw)}")
     row = dict(zip(POSTAL_FIELDS, raw, strict=True))
-    return {**row, **point(row["latitude"], row["longitude"]), "variant": variant}
+    return {
+        **row,
+        **point(row["latitude"], row["longitude"], grid=grid),
+        "variant": variant,
+    }
 
 
 def records(ctx: SourceContext) -> Iterator[InputRow]:
@@ -68,7 +73,9 @@ def normalize(ctx: SourceContext) -> list[Path]:
         ctx,
         records(ctx),
         lambda row: postal(
-            row.raw["fields"], str(row.pin.metadata.get("key", row.pin.name))
+            row.raw["fields"],
+            str(row.pin.metadata.get("key", row.pin.name)),
+            grid=ctx.runtime.config.h3,
         ),
     )
 

@@ -10,6 +10,8 @@ import h3
 import pyarrow as pa
 import shapely
 
+from pipeline.config.schema import H3
+
 from .geometry import validate_polygon
 from .plates_schemas import PLATE_KINDS, PLATE_SCHEMAS, PlateKind
 from .plates_validation import validate_plate
@@ -78,7 +80,7 @@ def schema(columns: list[pa.Field[pa.DataType]]) -> pa.Schema:
         metadata={
             "acquire_schema_version": "1",
             "lookup_schema_version": "1",
-            "h3_reference_resolution": "8",
+            "h3_reference_resolution": str(H3().cell_resolution),
         },
     )
 
@@ -162,7 +164,7 @@ for plate_kind, plate_schema in PLATE_SCHEMAS.items():
     LOOKUP_SCHEMAS[plate_kind] = plate_schema
 
 
-def validate_lookup(row: dict[str, Any], kind: str) -> None:
+def validate_lookup(row: dict[str, Any], kind: str, *, grid: H3) -> None:
     """Check stored cells, point agreement, IP ordering and bounded area geometry."""
     if kind in PLATE_KINDS:
         validate_plate(row, kind)
@@ -178,7 +180,7 @@ def validate_lookup(row: dict[str, Any], kind: str) -> None:
             not h3.is_valid_cell(cell)
             or h3.int_to_str(number) != cell
             or h3.get_resolution(cell) != resolution
-            or not 0 <= resolution <= 8
+            or not 0 <= resolution <= grid.cell_resolution
         ):
             raise ValueError("Invalid canonical H3 key or resolution")
         if row.get("latitude") is not None:
@@ -190,8 +192,13 @@ def validate_lookup(row: dict[str, Any], kind: str) -> None:
                 and -180 <= lon <= 180
             ):
                 raise ValueError("Invalid coordinates")
-            if resolution != 8 or h3.latlng_to_cell(lat, lon, 8) != cell:
-                raise ValueError("Point does not match resolution-8 cell")
+            if (
+                resolution != grid.cell_resolution
+                or h3.latlng_to_cell(lat, lon, grid.cell_resolution) != cell
+            ):
+                raise ValueError(
+                    f"Point does not match resolution-{grid.cell_resolution} cell"
+                )
     if kind == "ip_ranges":
         start, end = (
             ipaddress.ip_address(row["ip_start"]),

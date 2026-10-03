@@ -8,9 +8,10 @@ import pyarrow.parquet as pq
 import pytest
 from shapely.geometry import Point, box
 
+from pipeline.config.schema import H3
 from pipeline.config.sources import SourceLimits
 from pipeline.sources.shared.parquet import validate_parquet, write_partition
-from pipeline.sources.shared.schemas import SCHEMAS, Kind, validate_table
+from pipeline.sources.shared.schemas import SCHEMAS, Kind, schema_for, validate_table
 
 
 def example(kind: Kind, **updates: object) -> pa.Table:
@@ -65,7 +66,7 @@ def test_schema_roundtrip_and_partition(
     kind: Kind, tmp_path: Path, limits: SourceLimits
 ) -> None:
     table = example(kind)
-    validate_table(table, kind, "overture", limits)
+    validate_table(table, kind, "overture", limits, grid=H3())
     destination = tmp_path / "part.parquet"
     write_partition(
         destination,
@@ -73,8 +74,9 @@ def test_schema_roundtrip_and_partition(
         "overture",
         limits,
         [table, pa.Table.from_batches(table.to_batches())],
+        grid=H3(),
     )
-    validate_parquet(destination, kind, "overture", limits)
+    validate_parquet(destination, kind, "overture", limits, grid=H3())
     assert pq.read_table(destination).equals(pa.concat_tables([table, table]))
 
 
@@ -84,11 +86,15 @@ def test_rejects_wrong_schema_null_and_missing_provenance(
 ) -> None:
     table = example(kind)
     with pytest.raises(ValueError, match="schema"):
-        validate_table(table.drop(["source_id"]), kind, "overture", limits)
+        validate_table(table.drop(["source_id"]), kind, "overture", limits, grid=H3())
     with pytest.raises(ValueError, match="null"):
-        validate_table(example(kind, source_id=None), kind, "overture", limits)
+        validate_table(
+            example(kind, source_id=None), kind, "overture", limits, grid=H3()
+        )
     with pytest.raises(ValueError, match="provenance"):
-        validate_table(example(kind, provenance="{}"), kind, "overture", limits)
+        validate_table(
+            example(kind, provenance="{}"), kind, "overture", limits, grid=H3()
+        )
 
 
 @pytest.mark.parametrize(
@@ -105,7 +111,9 @@ def test_rejects_wrong_schema_null_and_missing_provenance(
 )
 def test_invalid_point_values(updates: dict[str, object], limits: SourceLimits) -> None:
     with pytest.raises(ValueError):
-        validate_table(example("places", **updates), "places", "overture", limits)
+        validate_table(
+            example("places", **updates), "places", "overture", limits, grid=H3()
+        )
 
 
 @pytest.mark.parametrize(
@@ -123,7 +131,9 @@ def test_invalid_geometry_or_bbox(
     updates: dict[str, object], limits: SourceLimits
 ) -> None:
     with pytest.raises(ValueError):
-        validate_table(example("areas", **updates), "areas", "overture", limits)
+        validate_table(
+            example("areas", **updates), "areas", "overture", limits, grid=H3()
+        )
 
 
 def test_batch_and_row_limits(
@@ -132,11 +142,11 @@ def test_batch_and_row_limits(
     table = example("places")
     limits.row_group_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Batch"):
-        validate_table(table, "places", "overture", limits)
+        validate_table(table, "places", "overture", limits, grid=H3())
     limits.row_group_bytes = table.nbytes + 1
     limits.row_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Row"):
-        validate_table(table, "places", "overture", limits)
+        validate_table(table, "places", "overture", limits, grid=H3())
 
 
 def test_failed_parquet_write_preserves_previous_partition(
@@ -144,7 +154,7 @@ def test_failed_parquet_write_preserves_previous_partition(
 ) -> None:
     destination = tmp_path / "part.parquet"
     valid = example("places")
-    write_partition(destination, "places", "overture", limits, [valid])
+    write_partition(destination, "places", "overture", limits, [valid], grid=H3())
     original = destination.read_bytes()
     with pytest.raises(ValueError):
         write_partition(
@@ -153,6 +163,7 @@ def test_failed_parquet_write_preserves_previous_partition(
             "geonames",
             limits,
             [valid, example("places", latitude=100)],
+            grid=H3(),
         )
     assert destination.read_bytes() == original
     assert not list(tmp_path.glob("*.part"))
@@ -164,14 +175,19 @@ def test_partition_cap_checked_on_write_and_read(
 
     destination = tmp_path / "part.parquet"
     table = example("places")
-    write_partition(destination, "places", "overture", limits, [table])
+    write_partition(destination, "places", "overture", limits, [table], grid=H3())
     limits.parquet_bytes = table.nbytes - 1
     with pytest.raises(ValueError, match="Partition"):
         write_partition(
-            tmp_path / "too-large.parquet", "places", "overture", limits, [table]
+            tmp_path / "too-large.parquet",
+            "places",
+            "overture",
+            limits,
+            [table],
+            grid=H3(),
         )
     with pytest.raises(ValueError, match="partition limit"):
-        validate_parquet(destination, "places", "overture", limits)
+        validate_parquet(destination, "places", "overture", limits, grid=H3())
 
 
 def test_dictionary_expansion_is_rejected_before_decode(
@@ -180,9 +196,19 @@ def test_dictionary_expansion_is_rejected_before_decode(
     destination = tmp_path / "dictionary.parquet"
     pq.write_table(example("places"), destination, use_dictionary=True)
     with pytest.raises(ValueError, match="dictionary"):
-        validate_parquet(destination, "places", "overture", limits)
+        validate_parquet(destination, "places", "overture", limits, grid=H3())
 
 
 @pytest.fixture
 def limits() -> SourceLimits:
     return SourceLimits()
+
+
+def test_grid_metadata_preserves_default_and_nonspatial_schemas() -> None:
+    for kind, schema in SCHEMAS.items():
+        assert schema_for(kind, H3()).serialize() == schema.serialize()
+        metadata = schema_for(kind, H3(cell_resolution=7)).metadata
+        if b"h3_reference_resolution" in (schema.metadata or {}):
+            assert metadata and metadata[b"h3_reference_resolution"] == b"7"
+        else:
+            assert metadata == schema.metadata

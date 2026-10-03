@@ -142,7 +142,9 @@ def normalize(ctx: SourceContext) -> list[Path]:
     if len(iana) != 1:
         raise ValueError("Expected one pinned IANA archive")
     pin = iana[0]
-    for index, row in enumerate(zone_rows(ctx.input(pin.name))):
+    for index, row in enumerate(
+        zone_rows(ctx.input(pin.name), grid=ctx.runtime.config.h3)
+    ):
         writer.add(
             decorate(
                 dict(row),

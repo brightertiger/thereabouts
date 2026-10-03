@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import pyarrow.parquet as pq
 import pytest
 import yaml
 
@@ -92,6 +93,16 @@ def test_shared_phone_calling_code_preserves_all_territories(tmp_path: Path) -> 
     "name,kind,payloads",
     [
         (
+            "airports",
+            "airports",
+            {
+                "airports.csv": (
+                    b"ident,name,latitude_deg,longitude_deg,iso_country\nTEST,Example,50.85,4.35,BE\n",
+                    {},
+                )
+            },
+        ),
+        (
             "postal",
             "postal_codes",
             {
@@ -133,17 +144,26 @@ def test_shared_phone_calling_code_preserves_all_territories(tmp_path: Path) -> 
         ),
     ],
 )
-def test_points_use_resolution_eight_and_preserve_country(
+@pytest.mark.parametrize("resolution", [7, 8])
+def test_points_use_configured_resolution_and_preserve_country(
     tmp_path: Path,
     name: str,
     kind: str,
     payloads: dict[str, tuple[bytes, dict[str, Any]]],
+    resolution: int,
 ) -> None:
     with Ledger(tmp_path, None, readonly=False) as ledger:
         source, stages = source_context(tmp_path, ledger, name, payloads)
+        source.runtime.config.h3.cell_resolution = resolution
         run(source.runtime, stages)
         [row] = rows(source, kind)
-        assert row["country_code"] == "BE" and row["h3_resolution"] == 8
+        assert row["country_code"] == "BE" and row["h3_resolution"] == resolution
+        for path in (source.normalized / kind).rglob("*.parquet"):
+            schema_metadata = pq.read_schema(path).metadata
+            assert schema_metadata
+            assert (
+                schema_metadata[b"h3_reference_resolution"] == str(resolution).encode()
+            )
         if name == "dbip":
             assert row["ip_start_packed"] == b"\0" * 12 + b"\x01\x00\x00\x00"
         assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}

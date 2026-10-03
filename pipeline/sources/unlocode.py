@@ -5,6 +5,7 @@ import re
 from collections.abc import Iterator
 from pathlib import Path
 
+from pipeline.config.schema import H3
 from pipeline.config.source_options import Text as Options
 from pipeline.config.sources import SourceSettings
 from pipeline.pins.models import SourcePin
@@ -15,25 +16,29 @@ from .shared.lookup_rows import Row, point
 from .shared.text import InputRow, publish_rows
 
 
-def locode_coordinates(value: str) -> Row:
+def locode_coordinates(value: str, *, grid: H3) -> Row:
     if not value.strip():
-        return point(None, None)
+        return point(None, None, grid=grid)
     match = re.fullmatch(r"(\d{2})(\d{2})([NS])\s+(\d{3})(\d{2})([EW])", value.strip())
     if match is None:
         return {
-            **point(None, None),
+            **point(None, None, grid=grid),
             "coordinate_error": "invalid UN/LOCODE coordinate syntax",
         }
     latd, latm, ns, lond, lonm, ew = match.groups()
     if int(latm) >= 60 or int(lonm) >= 60:
-        return {**point(None, None), "coordinate_error": "invalid coordinate minutes"}
+        return {
+            **point(None, None, grid=grid),
+            "coordinate_error": "invalid coordinate minutes",
+        }
     return point(
         (int(latd) + int(latm) / 60) * (-1 if ns == "S" else 1),
         (int(lond) + int(lonm) / 60) * (-1 if ew == "W" else 1),
+        grid=grid,
     )
 
 
-def trade(raw: dict[str, str]) -> Row:
+def trade(raw: dict[str, str], *, grid: H3) -> Row:
     names = {
         "country_code": "Country",
         "location": "Location",
@@ -51,7 +56,7 @@ def trade(raw: dict[str, str]) -> Row:
     return {
         **{k: raw.get(v) for k, v in names.items()},
         "locode": raw["Country"] + raw["Location"],
-        **locode_coordinates(raw.get("Coordinates", "")),
+        **locode_coordinates(raw.get("Coordinates", ""), grid=grid),
     }
 
 
@@ -66,7 +71,9 @@ def records(ctx: SourceContext) -> Iterator[InputRow]:
 
 def normalize(ctx: SourceContext) -> list[Path]:
     ctx.named("code-list.csv")
-    return publish_rows(ctx, records(ctx), lambda row: trade(row.raw))
+    return publish_rows(
+        ctx, records(ctx), lambda row: trade(row.raw, grid=ctx.runtime.config.h3)
+    )
 
 
 __all__ = ["Options", "normalize", "propose"]

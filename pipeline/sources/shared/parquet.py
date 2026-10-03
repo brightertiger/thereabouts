@@ -6,13 +6,16 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config.schema import H3
 from pipeline.config.sources import SourceLimits
 from pipeline.runtime.jsonio import atomic_output
 
-from .schemas import SCHEMAS, Kind, validate_table
+from .schemas import SCHEMAS, Kind, schema_for, validate_table
 
 
-def validate_parquet(path: Path, kind: Kind, source: str, limits: SourceLimits) -> None:
+def validate_parquet(
+    path: Path, kind: Kind, source: str, limits: SourceLimits, *, grid: H3
+) -> None:
     if path.stat().st_size > limits.parquet_bytes:
         raise ValueError("Encoded Parquet exceeds the configured partition limit")
     with pq.ParquetFile(path) as file:
@@ -32,7 +35,7 @@ def validate_parquet(path: Path, kind: Kind, source: str, limits: SourceLimits) 
             for batch in file.iter_batches(
                 batch_size=limits.batch_rows, row_groups=[index]
             ):
-                validate_table(batch, kind, source, limits)
+                validate_table(batch, kind, source, limits, grid=grid)
                 decoded += batch.nbytes
                 if decoded > limits.parquet_bytes:
                     raise ValueError("Decoded partition exceeds the configured limit")
@@ -44,16 +47,18 @@ def write_partition(
     source: str,
     limits: SourceLimits,
     batches: Iterable[pa.Table],
+    *,
+    grid: H3,
 ) -> None:
     with atomic_output(path) as temporary:
         with pq.ParquetWriter(
-            temporary, SCHEMAS[kind], compression="zstd", use_dictionary=False
+            temporary, schema_for(kind, grid), compression="zstd", use_dictionary=False
         ) as writer:
             size = 0
             for batch in batches:
-                validate_table(batch, kind, source, limits)
+                validate_table(batch, kind, source, limits, grid=grid)
                 size += batch.nbytes
                 if size > limits.parquet_bytes:
                     raise ValueError("Partition exceeds the configured limit")
                 writer.write_table(batch, row_group_size=limits.batch_rows)
-        validate_parquet(temporary, kind, source, limits)
+        validate_parquet(temporary, kind, source, limits, grid=grid)

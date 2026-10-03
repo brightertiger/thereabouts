@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from pipeline.config.schema import H3
 from thereabouts.format import CITY_CUTOFF_KM
 
 from .errors import DamagedPackError, UnsupportedSchemaError
@@ -11,7 +12,7 @@ from .errors import DamagedPackError, UnsupportedSchemaError
 SCHEMA = "h3-table-v1"
 
 
-def read_manifest(path: Path) -> dict[str, Any]:
+def read_manifest(path: Path, *, grid: H3) -> dict[str, Any]:
     try:
         if (path / "manifest.json").stat().st_size > 2_000_000:
             raise ValueError("manifest too large")
@@ -20,7 +21,7 @@ def read_manifest(path: Path) -> dict[str, Any]:
             raise ValueError("expected an object")
         if value.get("schema_version") != SCHEMA:
             raise UnsupportedSchemaError("Expected an H3 table pack")
-        if value.get("resolution") not in (6, 7, 8):
+        if value.get("resolution") != grid.cell_resolution:
             raise ValueError("unsupported finest resolution")
         if value.get("layout") != "combined":
             raise ValueError("unsupported table layout")

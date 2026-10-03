@@ -6,6 +6,7 @@ import ipaddress
 from collections.abc import Iterator
 from pathlib import Path
 
+from pipeline.config.schema import H3
 from pipeline.config.source_options import Text as Options
 from pipeline.config.sources import SourceSettings
 from pipeline.pins.models import SourcePin
@@ -16,7 +17,7 @@ from .shared.lookup_rows import Reject, Row, point
 from .shared.text import InputRow, publish_rows
 
 
-def ip_range(raw: list[str]) -> Row:
+def ip_range(raw: list[str], *, grid: H3) -> Row:
     if len(raw) != 8:
         raise Reject(f"Expected 8 DB-IP columns, got {len(raw)}")
     try:
@@ -34,7 +35,7 @@ def ip_range(raw: list[str]) -> Row:
         country_code=raw[3],
         region=raw[4],
         city=raw[5],
-        **point(raw[6], raw[7]),
+        **point(raw[6], raw[7], grid=grid),
     )
 
 
@@ -52,7 +53,11 @@ def records(ctx: SourceContext) -> Iterator[InputRow]:
 
 
 def normalize(ctx: SourceContext) -> list[Path]:
-    return publish_rows(ctx, records(ctx), lambda row: ip_range(row.raw["fields"]))
+    return publish_rows(
+        ctx,
+        records(ctx),
+        lambda row: ip_range(row.raw["fields"], grid=ctx.runtime.config.h3),
+    )
 
 
 __all__ = ["Options", "normalize", "propose"]
