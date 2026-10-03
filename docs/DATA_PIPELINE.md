@@ -498,3 +498,8 @@ the locked fsspec version; that optional driver is not installed or locked in th
 checkout. Its dependency resolution and real multipart behavior remain owner
 validation before cloud publication. GCS raw-mirror support is separate and uses
 the existing locked `gcsfs` dependency. No remote backend was contacted here.
+
+The owner-run [release procedure](RELEASE_PROCEDURE.md) covers migration and
+symlink removal, GCP provisioning, the monthly pin/build cycle, staging checks and
+registry submission. The VM scripts and registry PR text are drafts for future
+execution; no VM or cloud publication was performed during this task.

@@ -2,10 +2,10 @@
 
 ## Current state
 
-Packages 1–4 and all eleven package-2/3 review fixes are implemented locally on
+Packages 1–5 and all eleven package-2/3 review fixes are implemented locally on
 `feat/pipeline`. The real workspace remains unmigrated. Use
 [DATA_PIPELINE.md](DATA_PIPELINE.md) for commands and configuration; the current
-schema is [DATASET_README.md](DATASET_README.md). Package 5 is next.
+schema is [DATASET_README.md](DATASET_README.md).
 
 Package 1 supplies configuration, the single ledger/fingerprint rule, resource
 admission, runner and recoverable migration. Package 2 supplies the 13 retained
@@ -27,6 +27,12 @@ then skipped all 23 on repeat; the directory with `_SUCCESS` is **8,740,271 byte
 [PIPELINE_RELEASE_MEASUREMENTS.json](PIPELINE_RELEASE_MEASUREMENTS.json) records
 per-table sizes, identities, reader outputs, timings and source attribution.
 
+Package 5 supplies the owner-run [release procedure](RELEASE_PROCEDURE.md),
+32 GB / 300 GB GCP provisioning scripts, monthly and staging instructions,
+[registry entry](release-registry.yaml) and [PR draft](release-registry-pr.md).
+Scripts passed Bash syntax checks only; no provisioning/startup command ran.
+The procedure includes exact migration recovery and symlink-removal steps.
+
 Review fixes: complete code closure and per-source invalidation (1–2), slim config
 and lock plus repeated acceptance (3–4), adapter-owned pin proposals tested only
 on loopback HTTP (5), full Malaysia pilot proof (6), stage-owned parameters and
@@ -37,7 +43,7 @@ are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
-config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 46.16 s**
+config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 49.04 s**
 (the independent review measured 175 s before fixes). Current suite: **667
 passed, 8 skipped**; Ruff check/format and strict mypy pass. The six Malaysia
 artifacts, including base cells, city index and mapping, match retained SHA256:
@@ -63,9 +69,9 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 | dataset / packs / publish (disabled) | 0 | 0 | 0 | 0 | 0 |
 | **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
-Package-4 plan: **318.58 s**, **1,415,757,824 bytes RSS**; handover:
-**331.70 s**, **1,473,708,032 bytes RSS**. Reports:
-`.cache/pipeline/wp4-plan.json` and `wp4-handover.json`.
+Final package-5 plan: **331.26 s**, **1,443,315,712 bytes RSS**; package-4 handover:
+**331.70 s**, **1,473,708,032 bytes RSS**. Stage code is unchanged for package 5.
+Reports: `.cache/pipeline/wp5-plan.json` and `wp4-handover.json`.
 Real ledger SHA256 before/after:
 `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
 
@@ -106,16 +112,21 @@ PIPELINE_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
   --report .cache/pipeline/migration.json
 .venv/bin/python -c 'import json; print("\n".join(json.load(open(".cache/pipeline/migration.json"))["writable_directories"]))' \
   > .cache/pipeline/writable-directories.txt
+restore_pipeline_permissions() {
+  while IFS= read -r directory; do
+    chmod a-w "$PIPELINE_DATA${directory:+/$directory}"
+  done < .cache/pipeline/writable-directories.txt
+}
+trap restore_pipeline_permissions EXIT
 while IFS= read -r directory; do
-  [ -z "$directory" ] || chmod u+w "$PIPELINE_DATA/$directory"
+  chmod u+w "$PIPELINE_DATA${directory:+/$directory}"
 done < .cache/pipeline/writable-directories.txt
 .venv/bin/python -m pipeline migrate --root "$PIPELINE_DATA" \
   --report .cache/pipeline/migration-applied.json
 .venv/bin/python -m pipeline migrate check --root "$PIPELINE_DATA"
 .venv/bin/python -m pipeline plan --root "$PIPELINE_DATA"
-while IFS= read -r directory; do
-  [ -z "$directory" ] || chmod a-w "$PIPELINE_DATA/$directory"
-done < .cache/pipeline/writable-directories.txt
+restore_pipeline_permissions
+trap - EXIT
 ```
 
 If interrupted, use `pipeline migrate recover --root "$PIPELINE_DATA"` before
@@ -152,18 +163,20 @@ per table. Real packs and their sizes are unverified. The optional `s3fs` driver
 is not installed/locked; resolve it before cloud publication. Only local and
 memory backends were exercised. VM setup execution is outside this task.
 
-The earlier full logical digest read all **14 tables / 98,077,250 rows** and matched
+The final full logical digest read all **14 tables / 98,077,250 rows** and matched
 `0e543e65bc26987a2714b89f2b23395e11c9e48d482d9ee2315d3a890a0e9614`
-in 1,261.885 s at 541,097,984 bytes RSS. Scratch peaked at 2,119,253,760 bytes
-and was removed. That check is distinct from migration's per-file verification.
+in **1,121.60 s** at **586,940,416 bytes RSS**, identical to the baseline JSON.
+Preflight reserved 2,119,253,760 scratch bytes plus 50 MB for concurrent checks
+(total allowance 2,952,221,227 bytes); scratch was removed. This check is distinct
+from migration's per-file verification and does not rebuild any table.
 
 ## Follow-ups and safety record
 
-Finish package 5; retain this short status and linked detailed evidence. Update the frozen client's `src/thereabouts/manifest.py` missing-
-data command on the Rust branch; its current `python -m build_data` message and
-client test were intentionally left unchanged here.
+Retain this short status and linked detailed evidence. Update the frozen client's
+`src/thereabouts/manifest.py` missing-data command on the Rust branch; its current
+`python -m build_data` message and client test were intentionally left unchanged here.
 
-Worktree bytes: **960,286,861**; free disk: **47,038,324,736**. The initial scratch cleanup removed
+Worktree bytes: **826,193,527**; free disk: **50,555,064,320**. The initial scratch cleanup removed
 **1,049,266,242 bytes**. This task keeps new outputs below 3 GB and free disk above
 5 GB; all subsequent tests set workspace TMPDIR and pytest has a worktree basetemp.
 One early targeted pytest invocation omitted TMPDIR and wrote small synthetic

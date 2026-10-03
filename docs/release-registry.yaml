@@ -1,0 +1,22 @@
+Name: Thereabouts offline geocoding dataset
+Description: Canonical places, H3 reverse lookup and source code observations.
+Documentation: 'OWNER DECISION: public documentation URL'
+Contact: 'OWNER DECISION: public maintenance contact'
+ManagedBy: 'OWNER DECISION: public maintenance contact'
+UpdateFrequency: Monthly
+Tags:
+- geospatial
+- mapping
+- parquet
+License: https://opendatacommons.org/licenses/odbl/1-0/
+Citation: 'OWNER DECISION: preferred dataset citation'
+Resources:
+- Description: Versioned Parquet datasets and client packs
+  ARN: arn:aws:s3:::OWNER-DECISION-BUCKET
+  Region: 'OWNER DECISION: release bucket region'
+  Type: S3 Bucket
+DataAtWork:
+  Tutorials:
+  - Title: Read Thereabouts Parquet with DuckDB, PyArrow and pandas
+    URL: 'OWNER DECISION: public documentation URL'
+    AuthorName: 'OWNER DECISION: public maintenance contact'

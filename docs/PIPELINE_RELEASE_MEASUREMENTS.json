@@ -377,5 +377,157 @@
   "local_backend_bytes": 8740271,
   "packs": "Fake writer only; no real pack output or size claim",
   "workspace_bytes": 960286861,
-  "disk_free_bytes": 47038324736
+  "disk_free_bytes": 47038324736,
+  "package5": {
+    "plan": {
+      "wall_seconds": 331.26,
+      "peak_rss_bytes": 1443315712,
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      },
+      "simulated": true
+    },
+    "pytest": {
+      "wall_seconds": 50.0,
+      "peak_rss_bytes": 275415040,
+      "passed": 667,
+      "skipped": 8,
+      "pytest_seconds": 49.04
+    },
+    "ruff_check": "passed",
+    "ruff_format_files": 497,
+    "mypy_files": 483,
+    "mypy": {
+      "wall_seconds": 8.12,
+      "peak_rss_bytes": 407371776
+    },
+    "shell_validation": "bash -n only: both scripts and all 8 documented shell blocks",
+    "vm_executed": false,
+    "cloud_accessed": false,
+    "real_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+    "full_golden_digest": {
+      "wall_seconds": 1121.6,
+      "peak_rss_bytes": 586940416,
+      "matches_baseline": true,
+      "format": "thereabouts-golden-content-1",
+      "sha256": "0e543e65bc26987a2714b89f2b23395e11c9e48d482d9ee2315d3a890a0e9614",
+      "tables": {
+        "airports": {
+          "rows": 86154,
+          "sha256": "025bb9f11bb1b5c6964d1f7a0c2cfa8a1b62753da80da29aa3689637bd9d19c6"
+        },
+        "canonical_cities": {
+          "rows": 68923,
+          "sha256": "54070ab9e8ac9f2b7c86e9b5017cf891ee1d2297526f30e598dbabc2ffc7bc6a"
+        },
+        "cells": {
+          "rows": 66226680,
+          "sha256": "15e32d10f263955afc6c822e402d9475838cffdb34481615e988901138c303a6"
+        },
+        "countries": {
+          "rows": 252,
+          "sha256": "62cb702b96679453ecc665c1fbaedd07585fcdbc4d74ca192b1ad1c8e4f831bc"
+        },
+        "ip_ranges": {
+          "rows": 7786864,
+          "sha256": "8459dd9982e0b1de4d9af9bad97311005a23c1ae2031f4364827d0b1573141f2"
+        },
+        "phone_metadata": {
+          "rows": 254,
+          "sha256": "b8a272a849a8444f3912725735963c8d5eda5888f8ec1c0afdea01f2286d3b6b"
+        },
+        "phone_prefixes": {
+          "rows": 427963,
+          "sha256": "b3b566a38b6cb48e20df1bde0925a75b65c7020dc2460bb75dfed30387d8886f"
+        },
+        "place_to_city": {
+          "rows": 6875329,
+          "sha256": "e5491763620e2da339ca1193ff02f7b269835c88a1aae5e5bd8ca6a5a9c07a92"
+        },
+        "places": {
+          "rows": 6875329,
+          "sha256": "d39d73cc56f7b32f715c727961c69dc6d26b68983d5f71733f223e44d21a3688"
+        },
+        "postal_codes": {
+          "rows": 5036067,
+          "sha256": "158d5d89667f9bc20a1e00c86e9b87d85c0c748db70d4d41ea9cbe11d599ca5f"
+        },
+        "subdivisions": {
+          "rows": 8911,
+          "sha256": "5ec6eb4b69bd9f209386d0b39ebed1b4fc202890330a08487ae3d8b553cdb832"
+        },
+        "timezone_cells": {
+          "rows": 4567490,
+          "sha256": "acd9b769e26b6938df48ffde1b9cd371a0769472e3499e01f8e28a3fc48faea5"
+        },
+        "trade_locations": {
+          "rows": 116213,
+          "sha256": "e302de052698c28832c029323d02eb13ddee1b611a45e3861fdbd58272d0c406"
+        },
+        "zone_tables": {
+          "rows": 821,
+          "sha256": "eb8ca56b0e422acd0d8fc5aac30e0b62135ee3ed968bbf82df14cff2337066a3"
+        }
+      },
+      "comparison": "Complete digest JSON, including column schemas, equals the baseline; table counts and hashes retained here."
+    },
+    "digest_preflight": {
+      "workspace_bytes": 782967467,
+      "maximum_scratch_bytes": 2119253760,
+      "merge_fan_in": 265,
+      "free_bytes": 46895267840,
+      "maximum_total_bytes": 2902221227,
+      "reserved_additional_bytes": 50000000
+    },
+    "scratch_removed": true,
+    "workspace_bytes": 826193527,
+    "disk_free_bytes": 50555064320
+  }
 }
