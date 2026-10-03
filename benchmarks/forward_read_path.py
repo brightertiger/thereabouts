@@ -3,16 +3,14 @@
 import argparse
 import json
 import platform
-import statistics
 import subprocess
-import time
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 from benchmarks.core_read_path import ROOT
+from benchmarks.forward_queries import Query, airport_defaults, misses, queries
 from benchmarks.forward_sizes import estimate
+from benchmarks.forward_workload import run
 from thereabouts import Geocoder
 
 
@@ -20,38 +18,27 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
     pack_name = "core-names" if family == "geocode" else family
     pack = ROOT / f"tests/fixtures/packs/{pack_name}-sample"
     bundle = json.loads((ROOT / f"tests/fixtures/{family}-vectors.json").read_text())
-    cases = [c for c in bundle["cases"] if c["result"]["status"] == "matched"]
-    country = "US"
-    queries = [
-        c["request"]["values"][0]
-        for c in cases
-        if c["request"].get("country") == country
-    ]
-    if not queries:
-        raise ValueError("Benchmark needs matching US vectors")
-    values = [queries[i % len(queries)] for i in range(iterations)]
-    durations, rates = [], []
+    population = queries(family)
     verb = {"airports": "airport", "plates": "plate"}.get(family, family)
-    kwargs: dict[str, Any] = {"country": country}
-    if family in {"phone", "ip"}:
-        kwargs = {}
-    if family == "airports":
-        kwargs["scheme"] = "ident"
+    absent = misses(family)
     with Geocoder(pack) as geo:
         scalar = getattr(geo, verb)
-        batch = getattr(geo, verb + "_columns")
-        for value in queries:
-            scalar(value, **kwargs)
-        for value in values:
-            start = time.perf_counter_ns()
-            scalar(value, **kwargs)
-            durations.append(time.perf_counter_ns() - start)
-        for _ in range(7):
-            start_batch = time.perf_counter()
-            result = batch(values, **kwargs)
-            elapsed = time.perf_counter() - start_batch
-            assert len(result["status"]) == iterations
-            rates.append(iterations / elapsed)
+        assert all(scalar(q.value, **q.kwargs()).status == "not_found" for q in absent)
+        hot = next(
+            q for q in population if scalar(q.value, **q.kwargs()).status == "matched"
+        )
+    workloads = {
+        "hot": run(pack, verb, [hot], iterations),
+        "random": run(pack, verb, population, iterations),
+        "miss": run(pack, verb, absent, iterations),
+    }
+    if family == "airports":
+        workloads["default_scheme"] = run(pack, verb, airport_defaults(), iterations)
+    if family == "geocode":
+        workloads["fuzzy"] = run(
+            pack, verb, [Query("Utrechx", (("country", "NL"),))], 1000
+        )
+    countries = sorted({v for q in population for k, v in q.options if k == "country"})
     manifest = json.loads((pack / "manifest.json").read_text())
     source = json.loads((ROOT / f"tests/fixtures/{family}-source.json").read_text())
     size = sum(p.stat().st_size for p in pack.iterdir())
@@ -67,13 +54,10 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
             else "family pack including supporting catalogue"
         ),
         "vectors": len(bundle["cases"]),
-        "iterations": iterations,
-        "distinct_queries": len(queries),
-        "country": country,
-        "scalar_median_us": statistics.median(durations) / 1000,
-        "scalar_p99_us": float(np.percentile(durations, 99)) / 1000,
-        "batch_points_per_second": statistics.median(rates),
-        "batch_repeats": rates,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": countries,
+        "workloads": workloads,
+        **workloads["hot"],
     }
 
 
@@ -87,15 +71,19 @@ def update_status(data: dict[str, Any]) -> None:
     rows = [
         (
             "| Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) "
-            "| Batch rows/s | Estimated world bytes |"
+            "| Random median / p99 (µs) | Random batch rows/s | Estimated world bytes |"
         ),
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for family, value in data["families"].items():
+        random = value.get("workloads", {}).get("random", value)
         rows.append(
             f"| {family} | {value['pack_bytes']:,} / {value['sample_rows']:,} | "
             f"{value['vectors']} | {value['scalar_median_us']:.3f} / "
-            f"{value['scalar_p99_us']:.3f} | {value['batch_points_per_second']:,.0f} | "
+            f"{value['scalar_p99_us']:.3f} | "
+            f"{random['scalar_median_us']:.3f} / "
+            f"{random['scalar_p99_us']:.3f} | "
+            f"{random['batch_points_per_second']:,.0f} | "
             f"{value['estimated_world_bytes']:,} |"
         )
     text = path.read_text()
@@ -125,6 +113,7 @@ def main() -> None:
     parser.add_argument(
         "--output", type=Path, default=ROOT / "docs/CLIENT_FORWARD_MEASUREMENTS.json"
     )
+    parser.add_argument("--record", choices=["before", "after"], default="after")
     args = parser.parse_args()
     if args.iterations < 100:
         parser.error("at least 100 iterations are required")
@@ -152,7 +141,17 @@ def main() -> None:
         "platform": platform.platform(),
         "python": platform.python_version(),
     }
-    existing["families"][args.family] = measure(args.family, args.iterations)
+    measurement = measure(args.family, args.iterations)
+    existing.setdefault("history", {}).setdefault(args.family, {})[args.record] = (
+        measurement
+    )
+    existing["families"][args.family] = measurement
+    core_path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    core = json.loads(core_path.read_text())
+    core.setdefault("forward_workloads", {}).setdefault(args.family, {})[
+        args.record
+    ] = measurement
+    core_path.write_text(json.dumps(core, indent=2) + "\n")
     packs = {
         pack.name: sum(p.stat().st_size for p in pack.rglob("*") if p.is_file())
         for pack in sorted((ROOT / "tests/fixtures/packs").iterdir())

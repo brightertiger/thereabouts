@@ -111,6 +111,9 @@ pub fn close(a: &str, b: &str) -> bool {
                 .min(row[j] + 1)
                 .min(previous[j] + usize::from(left != right));
         }
+        if row.iter().all(|cost| *cost > threshold) {
+            return false;
+        }
         std::mem::swap(&mut previous, &mut row);
     }
     previous[b.len()] <= threshold

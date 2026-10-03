@@ -7,182 +7,1019 @@
   },
   "families": {
     "postal": {
-      "pack_bytes": 363327,
+      "pack_bytes": 105111,
       "sample_rows": 897,
       "world_source_rows": 5036067,
-      "estimated_world_bytes": 2039842937,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 143127131,
+      "data_artifact_bytes_per_row": 28.40691192865106,
+      "measured_catalogue_metadata_bytes": 68019,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 28,
-      "iterations": 20000,
-      "distinct_queries": 3,
-      "country": "US",
-      "scalar_median_us": 7.459,
-      "scalar_p99_us": 10.375,
-      "batch_points_per_second": 474755.3699906237,
-      "batch_repeats": [
-        474755.3699906237,
-        480246.8466342765,
-        477247.71613196365,
-        461706.7145265064,
-        459023.9740334947,
-        479777.85512943595,
-        474714.532252421
-      ]
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [
+        "BE",
+        "FR",
+        "IN",
+        "LU",
+        "NL",
+        "TR",
+        "US"
+      ],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 8.042,
+          "scalar_p99_us": 8.875,
+          "batch_points_per_second": 436963.07339254726
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 229,
+          "seed": 271828,
+          "status_counts": {
+            "ambiguous": 2643,
+            "matched": 17357
+          },
+          "scalar_median_us": 8.5,
+          "scalar_p99_us": 363.1362499999982,
+          "batch_points_per_second": 146025.9050066554
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 3,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.167,
+          "scalar_p99_us": 3.333,
+          "batch_points_per_second": 2809235.353712875
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 8.042,
+      "scalar_p99_us": 8.875,
+      "batch_points_per_second": 436963.07339254726
     },
     "airports": {
-      "pack_bytes": 375778,
+      "pack_bytes": 75947,
       "sample_rows": 213,
       "world_source_rows": 86154,
-      "estimated_world_bytes": 151994262,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 7219281,
+      "data_artifact_bytes_per_row": 83.25821596244131,
+      "measured_catalogue_metadata_bytes": 46253,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 33,
-      "iterations": 20000,
-      "distinct_queries": 3,
-      "country": "US",
-      "scalar_median_us": 7.417,
-      "scalar_p99_us": 9.334,
-      "batch_points_per_second": 469222.88515268796,
-      "batch_repeats": [
-        469222.88515268796,
-        477380.6087709468,
-        468930.89016150037,
-        471344.2379721704,
-        467494.98048953485,
-        475608.2298418578,
-        461026.4597075132
-      ]
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [
+        "BE",
+        "FR",
+        "IN",
+        "LU",
+        "NL",
+        "TR",
+        "US"
+      ],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.666,
+          "scalar_p99_us": 13.000419999999933,
+          "batch_points_per_second": 433759.1164219122
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 452,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 8.167,
+          "scalar_p99_us": 12.958,
+          "batch_points_per_second": 394942.75795907225
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 2,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.333,
+          "scalar_p99_us": 4.0012499999998,
+          "batch_points_per_second": 1921729.6790556123
+        },
+        "default_scheme": {
+          "queries": 20000,
+          "distinct_queries": 92,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 8.167,
+          "scalar_p99_us": 9.125419999999933,
+          "batch_points_per_second": 381534.3769199703
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 7.666,
+      "scalar_p99_us": 13.000419999999933,
+      "batch_points_per_second": 433759.1164219122
     },
     "locode": {
-      "pack_bytes": 349522,
+      "pack_bytes": 76930,
       "sample_rows": 225,
       "world_source_rows": 116213,
-      "estimated_world_bytes": 180528890,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 8823901,
+      "data_artifact_bytes_per_row": 75.51555555555555,
+      "measured_catalogue_metadata_bytes": 48012,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 31,
-      "iterations": 20000,
-      "distinct_queries": 3,
-      "country": "US",
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.75,
+          "scalar_p99_us": 8.292,
+          "batch_points_per_second": 531082.1399098266
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 225,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.834,
+          "scalar_p99_us": 10.208,
+          "batch_points_per_second": 459627.03892595245
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 2,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.084,
+          "scalar_p99_us": 4.417,
+          "batch_points_per_second": 3333495.5661091073
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
       "scalar_median_us": 7.75,
-      "scalar_p99_us": 15.710239999999802,
-      "batch_points_per_second": 469668.2380530962,
-      "batch_repeats": [
-        469668.2380530962,
-        472682.3963070496,
-        477152.3471071457,
-        467251.968327163,
-        468837.4528351355,
-        468185.7921712485,
-        472077.5900544596
-      ]
+      "scalar_p99_us": 8.292,
+      "batch_points_per_second": 531082.1399098266
     },
     "phone": {
-      "pack_bytes": 187284,
+      "pack_bytes": 70425,
       "sample_rows": 389,
       "world_source_rows": 428217,
-      "estimated_world_bytes": 206165020,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 10075099,
+      "data_artifact_bytes_per_row": 23.524421593830333,
+      "measured_catalogue_metadata_bytes": 1542,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 29,
-      "iterations": 20000,
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 4.542,
+          "scalar_p99_us": 4.833,
+          "batch_points_per_second": 841488.1598273456
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 167,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 5.75,
+          "scalar_p99_us": 6.917,
+          "batch_points_per_second": 411425.6353885843
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.084,
+          "scalar_p99_us": 3.25,
+          "batch_points_per_second": 2656865.6729366956
+        }
+      },
+      "queries": 20000,
       "distinct_queries": 1,
-      "country": "US",
-      "scalar_median_us": 4.333,
-      "scalar_p99_us": 4.583,
-      "batch_points_per_second": 967617.097436548,
-      "batch_repeats": [
-        962361.6503356395,
-        961093.7253793905,
-        960784.0146737332,
-        972307.4683801031,
-        970485.1215547096,
-        967617.097436548,
-        969101.7880079647
-      ]
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 4.542,
+      "scalar_p99_us": 4.833,
+      "batch_points_per_second": 841488.1598273456
     },
     "ip": {
-      "pack_bytes": 234875,
+      "pack_bytes": 45523,
       "sample_rows": 449,
       "world_source_rows": 7786864,
-      "estimated_world_bytes": 4073362321,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 215105432,
+      "data_artifact_bytes_per_row": 27.621380846325167,
+      "measured_catalogue_metadata_bytes": 21496,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 58,
-      "iterations": 20000,
-      "distinct_queries": 6,
-      "country": "US",
-      "scalar_median_us": 7.875,
-      "scalar_p99_us": 12.208419999999933,
-      "batch_points_per_second": 472963.72596766945,
-      "batch_repeats": [
-        464837.46313493606,
-        475880.7798381983,
-        480351.12894782575,
-        470112.59176953963,
-        472963.72596766945,
-        481729.4008556275,
-        471813.563038312
-      ]
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.292,
+          "scalar_p99_us": 9.667,
+          "batch_points_per_second": 608776.283494951
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 898,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.417,
+          "scalar_p99_us": 8.0,
+          "batch_points_per_second": 563711.1083192579
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 2,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 3.042,
+          "scalar_p99_us": 3.25,
+          "batch_points_per_second": 3356831.1546159266
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 7.292,
+      "scalar_p99_us": 9.667,
+      "batch_points_per_second": 608776.283494951
     },
     "plates": {
-      "pack_bytes": 1139827,
+      "pack_bytes": 48499,
       "sample_rows": 521,
       "world_source_rows": 144675,
-      "estimated_world_bytes": 316515300,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 4570923,
+      "data_artifact_bytes_per_row": 31.495201535508638,
+      "measured_catalogue_metadata_bytes": 14355,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+      "estimate_scope": "family pack including supporting catalogue",
       "vectors": 36,
-      "iterations": 20000,
-      "distinct_queries": 3,
-      "country": "US",
-      "scalar_median_us": 28.417,
-      "scalar_p99_us": 35.33440999999993,
-      "batch_points_per_second": 55176.13030356115,
-      "batch_repeats": [
-        54300.96435718071,
-        54905.23989649256,
-        55176.13030356115,
-        53880.64081700032,
-        55250.59651046783,
-        55757.76138668121,
-        55447.58678274413
-      ]
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [
+        "FR",
+        "IN",
+        "NL",
+        "TR",
+        "US"
+      ],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 4.834,
+          "scalar_p99_us": 5.083,
+          "batch_points_per_second": 642180.0004512863
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 155,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 5.167,
+          "scalar_p99_us": 17.833,
+          "batch_points_per_second": 246193.61587714948
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 23.625,
+          "scalar_p99_us": 31.667,
+          "batch_points_per_second": 47326.618024945456
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 4.834,
+      "scalar_p99_us": 5.083,
+      "batch_points_per_second": 642180.0004512863
     },
     "geocode": {
       "pack_bytes": 210397,
       "sample_rows": 101,
       "world_source_rows": 68923,
-      "estimated_world_bytes": 143576163,
-      "estimate_method": "linear sample byte/row ratio including sample fixed overhead; not a world measurement",
+      "estimated_world_bytes": 11846553,
+      "data_artifact_bytes_per_row": 169.22772277227722,
+      "measured_catalogue_metadata_bytes": 182871,
+      "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
       "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
       "vectors": 51,
-      "iterations": 20000,
-      "distinct_queries": 2,
-      "country": "US",
-      "scalar_median_us": 43.25,
-      "scalar_p99_us": 108.583,
-      "batch_points_per_second": 120572.38749826705,
-      "batch_repeats": [
-        119968.71816295206,
-        120572.38749826705,
-        121056.33784715825,
-        120024.54524831926,
-        120973.13767203827,
-        121060.97843239685,
-        114081.53505983503
-      ]
+      "workload_scope": "all source keys; plates use code/country assertions",
+      "countries": [
+        "BE",
+        "FR",
+        "IN",
+        "LU",
+        "NL",
+        "TR",
+        "US"
+      ],
+      "workloads": {
+        "hot": {
+          "queries": 20000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 20000
+          },
+          "scalar_median_us": 7.875,
+          "scalar_p99_us": 13.584409999999934,
+          "batch_points_per_second": 446326.4543861873
+        },
+        "random": {
+          "queries": 20000,
+          "distinct_queries": 88,
+          "seed": 271828,
+          "status_counts": {
+            "ambiguous": 422,
+            "matched": 19578
+          },
+          "scalar_median_us": 8.334,
+          "scalar_p99_us": 42.583,
+          "batch_points_per_second": 367763.952322031
+        },
+        "miss": {
+          "queries": 20000,
+          "distinct_queries": 2,
+          "seed": 271828,
+          "status_counts": {
+            "not_found": 20000
+          },
+          "scalar_median_us": 5.417,
+          "scalar_p99_us": 7.875419999999933,
+          "batch_points_per_second": 381615.6653641571
+        },
+        "fuzzy": {
+          "queries": 1000,
+          "distinct_queries": 1,
+          "seed": 271828,
+          "status_counts": {
+            "matched": 1000
+          },
+          "scalar_median_us": 9.416,
+          "scalar_p99_us": 12.669749999999997,
+          "batch_points_per_second": 268585.5869498053
+        }
+      },
+      "queries": 20000,
+      "distinct_queries": 1,
+      "seed": 271828,
+      "status_counts": {
+        "matched": 20000
+      },
+      "scalar_median_us": 7.875,
+      "scalar_p99_us": 13.584409999999934,
+      "batch_points_per_second": 446326.4543861873
     }
   },
   "fixture_packs": {
     "bytes_by_pack": {
-      "airports-sample": 375778,
-      "airports-synthetic": 4462,
+      "airports-sample": 75947,
+      "airports-synthetic": 6252,
       "core-names-sample": 210397,
       "core-names-synthetic": 5879,
-      "ip-sample": 234875,
-      "locode-sample": 349522,
-      "phone-sample": 187284,
-      "phone-synthetic": 3463,
-      "plates-sample": 1139827,
-      "postal-sample": 363327,
-      "postal-synthetic": 3891
+      "ip-sample": 45523,
+      "locode-sample": 76930,
+      "phone-sample": 70425,
+      "phone-synthetic": 5141,
+      "plates-sample": 48499,
+      "postal-sample": 105111,
+      "postal-synthetic": 5485
     },
-    "total_bytes": 2878705
+    "total_bytes": 655589
+  },
+  "history": {
+    "geocode": {
+      "before": {
+        "pack_bytes": 210397,
+        "sample_rows": 101,
+        "world_source_rows": 68923,
+        "estimated_world_bytes": 11846553,
+        "data_artifact_bytes_per_row": 169.22772277227722,
+        "measured_catalogue_metadata_bytes": 182871,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
+        "vectors": 51,
+        "workload_scope": "all published source keys; plates are code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.375,
+            "scalar_p99_us": 11.333,
+            "batch_points_per_second": 419432.6679162629
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 88,
+            "seed": 271828,
+            "status_counts": {
+              "ambiguous": 422,
+              "matched": 19578
+            },
+            "scalar_median_us": 8.959,
+            "scalar_p99_us": 46.45841999999993,
+            "batch_points_per_second": 333669.0879949147
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 5.542,
+            "scalar_p99_us": 7.875409999999935,
+            "batch_points_per_second": 386128.6525793384
+          },
+          "fuzzy": {
+            "queries": 1000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 1000
+            },
+            "scalar_median_us": 11.125,
+            "scalar_p99_us": 15.50041,
+            "batch_points_per_second": 178365.73470552792
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.375,
+        "scalar_p99_us": 11.333,
+        "batch_points_per_second": 419432.6679162629
+      },
+      "after": {
+        "pack_bytes": 210397,
+        "sample_rows": 101,
+        "world_source_rows": 68923,
+        "estimated_world_bytes": 11846553,
+        "data_artifact_bytes_per_row": 169.22772277227722,
+        "measured_catalogue_metadata_bytes": 182871,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "city-name index and supporting catalogue only; excludes spatial core",
+        "vectors": 51,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.875,
+            "scalar_p99_us": 13.584409999999934,
+            "batch_points_per_second": 446326.4543861873
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 88,
+            "seed": 271828,
+            "status_counts": {
+              "ambiguous": 422,
+              "matched": 19578
+            },
+            "scalar_median_us": 8.334,
+            "scalar_p99_us": 42.583,
+            "batch_points_per_second": 367763.952322031
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 5.417,
+            "scalar_p99_us": 7.875419999999933,
+            "batch_points_per_second": 381615.6653641571
+          },
+          "fuzzy": {
+            "queries": 1000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 1000
+            },
+            "scalar_median_us": 9.416,
+            "scalar_p99_us": 12.669749999999997,
+            "batch_points_per_second": 268585.5869498053
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.875,
+        "scalar_p99_us": 13.584409999999934,
+        "batch_points_per_second": 446326.4543861873
+      }
+    },
+    "postal": {
+      "after": {
+        "pack_bytes": 105111,
+        "sample_rows": 897,
+        "world_source_rows": 5036067,
+        "estimated_world_bytes": 143127131,
+        "data_artifact_bytes_per_row": 28.40691192865106,
+        "measured_catalogue_metadata_bytes": 68019,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 28,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.042,
+            "scalar_p99_us": 8.875,
+            "batch_points_per_second": 436963.07339254726
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 229,
+            "seed": 271828,
+            "status_counts": {
+              "ambiguous": 2643,
+              "matched": 17357
+            },
+            "scalar_median_us": 8.5,
+            "scalar_p99_us": 363.1362499999982,
+            "batch_points_per_second": 146025.9050066554
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 3,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.167,
+            "scalar_p99_us": 3.333,
+            "batch_points_per_second": 2809235.353712875
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 8.042,
+        "scalar_p99_us": 8.875,
+        "batch_points_per_second": 436963.07339254726
+      }
+    },
+    "airports": {
+      "after": {
+        "pack_bytes": 75947,
+        "sample_rows": 213,
+        "world_source_rows": 86154,
+        "estimated_world_bytes": 7219281,
+        "data_artifact_bytes_per_row": 83.25821596244131,
+        "measured_catalogue_metadata_bytes": 46253,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 33,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "BE",
+          "FR",
+          "IN",
+          "LU",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.666,
+            "scalar_p99_us": 13.000419999999933,
+            "batch_points_per_second": 433759.1164219122
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 452,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.167,
+            "scalar_p99_us": 12.958,
+            "batch_points_per_second": 394942.75795907225
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.333,
+            "scalar_p99_us": 4.0012499999998,
+            "batch_points_per_second": 1921729.6790556123
+          },
+          "default_scheme": {
+            "queries": 20000,
+            "distinct_queries": 92,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 8.167,
+            "scalar_p99_us": 9.125419999999933,
+            "batch_points_per_second": 381534.3769199703
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.666,
+        "scalar_p99_us": 13.000419999999933,
+        "batch_points_per_second": 433759.1164219122
+      }
+    },
+    "locode": {
+      "after": {
+        "pack_bytes": 76930,
+        "sample_rows": 225,
+        "world_source_rows": 116213,
+        "estimated_world_bytes": 8823901,
+        "data_artifact_bytes_per_row": 75.51555555555555,
+        "measured_catalogue_metadata_bytes": 48012,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 31,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.75,
+            "scalar_p99_us": 8.292,
+            "batch_points_per_second": 531082.1399098266
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 225,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.834,
+            "scalar_p99_us": 10.208,
+            "batch_points_per_second": 459627.03892595245
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.084,
+            "scalar_p99_us": 4.417,
+            "batch_points_per_second": 3333495.5661091073
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.75,
+        "scalar_p99_us": 8.292,
+        "batch_points_per_second": 531082.1399098266
+      }
+    },
+    "phone": {
+      "after": {
+        "pack_bytes": 70425,
+        "sample_rows": 389,
+        "world_source_rows": 428217,
+        "estimated_world_bytes": 10075099,
+        "data_artifact_bytes_per_row": 23.524421593830333,
+        "measured_catalogue_metadata_bytes": 1542,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 29,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 4.542,
+            "scalar_p99_us": 4.833,
+            "batch_points_per_second": 841488.1598273456
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 167,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 5.75,
+            "scalar_p99_us": 6.917,
+            "batch_points_per_second": 411425.6353885843
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.084,
+            "scalar_p99_us": 3.25,
+            "batch_points_per_second": 2656865.6729366956
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 4.542,
+        "scalar_p99_us": 4.833,
+        "batch_points_per_second": 841488.1598273456
+      }
+    },
+    "ip": {
+      "after": {
+        "pack_bytes": 45523,
+        "sample_rows": 449,
+        "world_source_rows": 7786864,
+        "estimated_world_bytes": 215105432,
+        "data_artifact_bytes_per_row": 27.621380846325167,
+        "measured_catalogue_metadata_bytes": 21496,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 58,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.292,
+            "scalar_p99_us": 9.667,
+            "batch_points_per_second": 608776.283494951
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 898,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 7.417,
+            "scalar_p99_us": 8.0,
+            "batch_points_per_second": 563711.1083192579
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 2,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 3.042,
+            "scalar_p99_us": 3.25,
+            "batch_points_per_second": 3356831.1546159266
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 7.292,
+        "scalar_p99_us": 9.667,
+        "batch_points_per_second": 608776.283494951
+      }
+    },
+    "plates": {
+      "after": {
+        "pack_bytes": 48499,
+        "sample_rows": 521,
+        "world_source_rows": 144675,
+        "estimated_world_bytes": 4570923,
+        "data_artifact_bytes_per_row": 31.495201535508638,
+        "measured_catalogue_metadata_bytes": 14355,
+        "estimate_method": "all data artifacts (compressed query and evidence, FSTs, directories, framing) / source rows * world rows + measured sample catalogue/metadata; world catalogue growth is not modelled",
+        "estimate_scope": "family pack including supporting catalogue",
+        "vectors": 36,
+        "workload_scope": "all source keys; plates use code/country assertions",
+        "countries": [
+          "FR",
+          "IN",
+          "NL",
+          "TR",
+          "US"
+        ],
+        "workloads": {
+          "hot": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 4.834,
+            "scalar_p99_us": 5.083,
+            "batch_points_per_second": 642180.0004512863
+          },
+          "random": {
+            "queries": 20000,
+            "distinct_queries": 155,
+            "seed": 271828,
+            "status_counts": {
+              "matched": 20000
+            },
+            "scalar_median_us": 5.167,
+            "scalar_p99_us": 17.833,
+            "batch_points_per_second": 246193.61587714948
+          },
+          "miss": {
+            "queries": 20000,
+            "distinct_queries": 1,
+            "seed": 271828,
+            "status_counts": {
+              "not_found": 20000
+            },
+            "scalar_median_us": 23.625,
+            "scalar_p99_us": 31.667,
+            "batch_points_per_second": 47326.618024945456
+          }
+        },
+        "queries": 20000,
+        "distinct_queries": 1,
+        "seed": 271828,
+        "status_counts": {
+          "matched": 20000
+        },
+        "scalar_median_us": 4.834,
+        "scalar_p99_us": 5.083,
+        "batch_points_per_second": 642180.0004512863
+      }
+    }
   }
 }

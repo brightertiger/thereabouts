@@ -188,27 +188,25 @@ Those historical samples and code differ; the JSON preserves them.
 Old-reader synthetic figures (a different workload) were 10.291 µs / 531,994
 rows/s with Cython and 12.750 µs / 530,437 rows/s with Python.
 
-The following historical package-2 measurements predate format 2.1. They
-use 20,000 scalar calls over matching US vectors and
-seven native batch repetitions. distinct_queries is recorded per family
-(including the one-query phone case); these are repeated-key measurements,
-not a world-random claim. Size estimates multiply total sample bytes per source
-row by source row counts. Fixed metadata/notices make this crude ratio strongly
-upward-biased. The geocode estimate covers names and supporting catalogue only,
-excluding the spatial core. Those size estimates are obsolete; corrected data-
-artifact estimates and the measured IP/postal exports appear below. Random
-forward and world-scale throughput measurements are still pending review fix 4.
+The following measurements use the public Python API, with a single matched hot
+key and seeded random queries visiting every published sample key. Misses and
+the default airport path are separate workloads in the JSON. Postal and airport
+batch calls are grouped by their required country/scheme options. Plates here
+cover every code/country assertion; format inference is measured separately.
+Size estimates scale data artifacts only and add the measured sample catalogue
+and metadata, so they do not model growth of the catalogue. Earlier repeated-US
+query numbers remain historical records in the measurements JSON.
 
 <!-- forward-measurements:start -->
-| Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Batch rows/s | Estimated world bytes |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| postal | 363,327 / 897 | 28 | 7.459 / 10.375 | 474,755 | 2,039,842,937 |
-| airports | 375,778 / 213 | 33 | 7.417 / 9.334 | 469,223 | 151,994,262 |
-| locode | 349,522 / 225 | 31 | 7.750 / 15.710 | 469,668 | 180,528,890 |
-| phone | 187,284 / 389 | 29 | 4.333 / 4.583 | 967,617 | 206,165,020 |
-| ip | 234,875 / 449 | 58 | 7.875 / 12.208 | 472,964 | 4,073,362,321 |
-| plates | 1,139,827 / 521 | 36 | 28.417 / 35.334 | 55,176 | 316,515,300 |
-| geocode | 210,397 / 101 | 51 | 43.250 / 108.583 | 120,572 | 143,576,163 |
+| Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Random median / p99 (µs) | Random batch rows/s | Estimated world bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| postal | 105,111 / 897 | 28 | 8.042 / 8.875 | 8.500 / 363.136 | 146,026 | 143,127,131 |
+| airports | 75,947 / 213 | 33 | 7.666 / 13.000 | 8.167 / 12.958 | 394,943 | 7,219,281 |
+| locode | 76,930 / 225 | 31 | 7.750 / 8.292 | 7.834 / 10.208 | 459,627 | 8,823,901 |
+| phone | 70,425 / 389 | 29 | 4.542 / 4.833 | 5.750 / 6.917 | 411,426 | 10,075,099 |
+| ip | 45,523 / 449 | 58 | 7.292 / 9.667 | 7.417 / 8.000 | 563,711 | 215,105,432 |
+| plates | 48,499 / 521 | 36 | 4.834 / 5.083 | 5.167 / 17.833 | 246,194 | 4,570,923 |
+| geocode | 210,397 / 101 | 51 | 7.875 / 13.584 | 8.334 / 42.583 | 367,764 | 11,846,553 |
 <!-- forward-measurements:end -->
 
 ## Plates source limitation and remaining work
@@ -293,3 +291,38 @@ alignment. Neither export qualifies a core world pack or the other families.
 | before | 13.291 | 120.875 | 144578.55712150357 |
 | after | 7.25 | 18.667 | 298081.435803999 |
 <!-- catalogue-reads:end -->
+
+## Query performance rework (review fix 4)
+
+Exact name rows are reused, and H3 cells are computed only for returned cities.
+Fuzzy lookup uses bounded per-key counters, cached trigram cardinalities, a
+minimum Dice overlap and prepared bit-parallel edit distance. It never truncates
+potential matches before hard filters and population ranking. Property tests
+compare both the candidate set and edit-distance result against exhaustive
+reference implementations. A symbol-bearing Rust sampling loop is reproducible
+with `python -m benchmarks.geocode_profile`; its native attribution is retained
+in `docs/measurements/geocode-profile.txt`. Projection dominates the mixed exact,
+ambiguous and fuzzy sample workload; Unicode normalization is retained unchanged.
+
+Generate scale fixtures using `cargo run --release -p thereabouts-core --example
+forward_scale -- ../.tmp/forward-scale` from `core`, then run
+`python -m benchmarks.forward_scale`. They contain 7.8M single-address intervals
+with gaps, split evenly between IPv4 and IPv6, and 90k cities/name keys in three
+FST shards. The IP location dictionary is deliberately hot; random addresses
+exercise the bounded decoded-block cache. Common synthetic name trigrams stress
+fuzzy counting, including many legitimate candidates. These fixtures measure
+search scale, not real-world compression or accuracy. Their generated binaries
+remain uncommitted inside this worktree.
+
+## Synthetic search scale
+
+<!-- forward-scale:start -->
+| Synthetic workload | Median / p99 (µs) | Batch rows/s |
+| --- | ---: | ---: |
+| ip | 139.667 / 313.293 | 7,374 |
+| ip_gap | 3.084 / 4.500 | 2,724,780 |
+| names_exact | 7.792 / 15.500 | 379,427 |
+| names_random | 15.875 / 124.293 | 86,983 |
+| names_fuzzy_common_grams | 11553.167 / 22356.124 | 83 |
+| names_miss | 10.584 / 48.218 | 114,410 |
+<!-- forward-scale:end -->

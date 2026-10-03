@@ -3,11 +3,7 @@ use super::{
     container::{FileShard, encode, index, put, uint},
     observation::{self, Strings},
 };
-use crate::{
-    Error, Result,
-    error::ensure,
-    name_normalization::{close, trigrams},
-};
+use crate::{Error, Result, error::ensure, name_normalization::trigrams};
 use fst::{IntoStreamer, Streamer};
 use std::{collections::BTreeMap, path::Path};
 /// One published canonical-city spelling; keys are normalized separately.
@@ -93,6 +89,8 @@ pub(crate) struct Names {
     map: fst::Map<Vec<u8>>,
     grams: fst::Map<Vec<u8>>,
     keys: Vec<String>,
+    gram_counts: Vec<usize>,
+    lengths: Vec<usize>,
     offsets: Vec<usize>,
     gram_offsets: Vec<usize>,
     postings: Vec<usize>,
@@ -176,6 +174,8 @@ impl Names {
             file,
             map,
             grams,
+            gram_counts: keys.iter().map(|key| trigrams(key).len()).collect(),
+            lengths: keys.iter().map(|key| key.chars().count()).collect(),
             keys,
             offsets,
             gram_offsets,
@@ -210,7 +210,15 @@ impl Names {
     }
     pub(crate) fn fuzzy(&self, key: &str) -> Result<Vec<usize>> {
         let query = trigrams(key);
-        let mut counts = BTreeMap::<usize, usize>::new();
+        let distance = crate::name_distance::Distance::new(key);
+        let mut touched = Vec::new();
+        // At most 9 MB per million admitted keys: byte counters and touched IDs.
+        // No tree allocation per posting or scan over unvisited keys.
+        // Counts cannot exceed 128 unique query trigrams. Full counting preserves
+        // hard-filter/population semantics instead of truncating common-gram hits.
+        let mut counts = vec![0_u8; self.keys.len()];
+        let length = key.chars().count();
+        let edits = (length / 4).clamp(1, 3);
         for gram in &query {
             if let Some(id) = self.grams.get(gram) {
                 let id = index(id)?;
@@ -224,18 +232,36 @@ impl Names {
                     .get(*a..*b)
                     .ok_or_else(|| Error::Corrupt("Invalid trigram postings".into()))?
                 {
-                    *counts.entry(*id).or_default() += 1;
+                    if let Some(count) = counts.get_mut(*id) {
+                        if *count == 0 {
+                            touched.push(*id);
+                        }
+                        *count = count.saturating_add(1);
+                    }
                 }
             }
         }
         let mut rows = Vec::new();
-        for (id, common) in counts {
+        // Only visited keys need testing; common postings are already sorted.
+        touched.sort_unstable();
+        for id in touched {
+            let common = usize::from(counts.get(id).copied().unwrap_or(0));
+            let required = ((query.len() + self.gram_counts.get(id).copied().unwrap_or(128)) * 45)
+                .div_ceil(200);
+            if common < required
+                || self
+                    .lengths
+                    .get(id)
+                    .is_none_or(|n| n.abs_diff(length) > edits)
+            {
+                continue;
+            }
             let name = self
                 .keys
                 .get(id)
                 .ok_or_else(|| Error::Corrupt("Missing name key".into()))?;
             // Dice >= 0.45, then at most three edits; integer math avoids unstable score ties.
-            if common * 200 >= (query.len() + trigrams(name).len()) * 45 && close(key, name) {
+            if distance.close(name) {
                 rows.extend(self.rows(id as u64)?);
             }
         }
@@ -317,8 +343,25 @@ impl Names {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::name_normalization::close;
     use proptest::prelude::*;
     proptest! {
+        #[test]
+        fn fuzzy_agrees_with_exhaustive_dice_and_edit_distance(
+            values in proptest::collection::btree_set("[a-z]{3,18}", 1..40), query in "[a-z]{3,18}"
+        ) {
+            let dir=tempfile::tempdir().unwrap(); let path=dir.path().join("names.bin");
+            let entries=values.into_iter().map(|name|(name.clone(),Entry{places:[1,0,2],name,alternate:false})).collect::<Vec<_>>();
+            std::fs::write(&path,encode_entries(&entries).unwrap()).unwrap();
+            let index=Names::open(&path).unwrap();
+            let grams=trigrams(&query);
+            let expected=entries.iter().enumerate().filter_map(|(row,(name,_))| {
+                let other=trigrams(name);
+                (grams.intersection(&other).count()*200 >= (grams.len()+other.len())*45 && close(&query,name)).then_some(row)
+            }).collect::<Vec<_>>();
+            prop_assert_eq!(index.fuzzy(&query).unwrap(),expected);
+        }
+
         #[test]
         fn round_trip_and_corrupt_fst(name in "[a-z]{2,24}") {
             let dir=tempfile::tempdir().unwrap();let path=dir.path().join("names.bin");

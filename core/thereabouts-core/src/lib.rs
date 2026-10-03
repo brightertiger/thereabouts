@@ -25,3 +25,5 @@ mod plates_index;
 pub mod geocode;
 pub mod name_normalization;
 mod name_query;
+
+mod name_distance;

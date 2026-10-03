@@ -57,21 +57,20 @@ impl Pack {
                 "Use a town or city name with at most 128 normalized characters.",
             ));
         }
-        let known = self
+        let exact = self
             .names
             .iter()
             .map(|index| index.exact(&key))
-            .collect::<Result<Vec<_>>>()?
-            .iter()
-            .any(|v| !v.is_empty());
+            .collect::<Result<Vec<_>>>()?;
+        let known = exact.iter().any(|rows| !rows.is_empty());
         if let Some(result) = crate::name_query::classify(value, known) {
             return Ok(result);
         }
         for phase in 0_u8..3 {
             let mut grouped = BTreeMap::<u32, LookupResult>::new();
-            for index in &self.names {
+            for (index, exact_rows) in self.names.iter().zip(&exact) {
                 let rows = match phase {
-                    0 => index.exact(&key)?,
+                    0 => exact_rows.clone(),
                     1 => index.prefix(&key)?,
                     _ => index.fuzzy(&key)?,
                 };
@@ -109,11 +108,6 @@ impl Pack {
                     answer.rank_basis = Some("population".into());
                     answer.timezone = self.place(city, false)?.and_then(|p| p.timezone.clone());
                     answer.point = answer.city.as_ref().and_then(|c| c.point.clone());
-                    answer.cell = answer
-                        .point
-                        .as_ref()
-                        .and_then(|p| h3o::LatLng::new(p.lat, p.lon).ok())
-                        .map(|p| p.to_cell(h3o::Resolution::Eight).to_string());
                     if options.evidence {
                         answer.evidence =
                             Some(self.name_evidence(index, row, [c, s, city], phase)?);
@@ -172,12 +166,22 @@ fn ranked(mut answers: Vec<LookupResult>, options: Options<'_>) -> Result<Lookup
         return answers
             .into_iter()
             .next()
+            .map(with_cell)
             .ok_or_else(|| Error::Corrupt("Missing name result".into()));
     }
     answers.truncate(options.limit);
     let mut result = LookupResult::empty(Status::Ambiguous);
     result.kind = Kind::City;
     result.rank_basis = Some("population".into());
-    result.candidates = answers;
+    result.candidates = answers.into_iter().map(with_cell).collect();
     Ok(result)
+}
+
+fn with_cell(mut answer: LookupResult) -> LookupResult {
+    answer.cell = answer
+        .point
+        .as_ref()
+        .and_then(|p| h3o::LatLng::new(p.lat, p.lon).ok())
+        .map(|p| p.to_cell(h3o::Resolution::Eight).to_string());
+    answer
 }
