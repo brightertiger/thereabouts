@@ -208,6 +208,16 @@ statuses; missing, incompatible, corrupt or closed data raise coded exceptions.
 State fields come from subdivisions by code, with published place fields as
 the fallback only when the table has no row.
 
+## Writer dataset layout support
+
+The writer accepts legacy per-block cell files and manifest-declared coalesced
+resolution-1 groups, one Parquet row group per resolution-3 block. Spatial emission
+selects only that block's row group. Tests cover multiple row groups, empty blocks,
+byte-identical pack artifacts across layouts, malformed routing and input changes
+before publication. Whole-file checksums run before first consumption and before
+publication, without a repeated full hash for every block. No real dataset export
+was performed for this change. PACK_FORMAT.md specifies the input contract.
+
 ## Inputs, samples and admission
 
 The workspace separates thereabouts-core, thereabouts-writer, thereabouts-py
@@ -257,9 +267,9 @@ table below lists real vector counts; synthetic vectors additionally cover
 legacy codes, shared calling codes and alternate names. Pytest requires no real
 data. Node execution awaits its binding package.
 
-The full gate passed: 98 Rust tests; 750
+The full gate passed: 99 Rust tests; 757
 pytest passed and 9 skipped; strict mypy checked
-477 files. Rustfmt, Clippy with all targets/features, Ruff check,
+478 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and the wasm target check passed. Legacy reader and pipeline tests
 remain included. Skipped tests are reported separately from passing checks.
 

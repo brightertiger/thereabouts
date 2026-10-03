@@ -2421,10 +2421,10 @@
       "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832"
     },
     "validation": {
-      "rust_tests": 98,
-      "pytest_passed": 750,
+      "rust_tests": 99,
+      "pytest_passed": 757,
       "pytest_skipped": 9,
-      "mypy_files": 477,
+      "mypy_files": 478,
       "node_tests": 33,
       "gates": [
         "cargo fmt --check",

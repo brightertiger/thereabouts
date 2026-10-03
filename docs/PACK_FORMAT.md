@@ -1017,3 +1017,35 @@ street-address-shaped queries are unsupported_granularity. Known exact city
 names take precedence over airport/LOCODE and street-word heuristics, while IP,
 phone, H3 and purely numeric postal forms remain identifier requests.
 The Python geocode_columns method uses the shared candidate-offset layout.
+
+## Dataset cells input layouts
+
+This is a writer input contract; it does not change format-2.2 pack bytes.
+The completed dataset manifest selects the layout for each `kind: "cells"`
+file. All paths, file sizes, row counts and SHA-256 values remain inventoried.
+
+* Legacy files have `block: "<resolution-3 H3 hex>"` and contain only that
+  block. The writer scans all of that file's row groups.
+* Coalesced files, conventionally `cells/group=<resolution-1 H3 hex>/part.parquet`,
+  have `blocks: [{"block": "<resolution-3 H3 hex>", "row_group": 0, "rows": N}, …]`.
+  They must not also have `block`. Entries are strictly sorted by block and
+  row groups are consecutive from zero, one per block. All blocks share one
+  resolution-1 parent (at most 49 blocks). Entries cover every physical row
+  group, including an empty block's zero-row group. Per-group row counts must
+  match Parquet metadata and sum to the file's declared row count.
+
+Routing uses manifest entries, not filenames or inferred partition columns.
+Blocks cannot repeat across files or layouts. Stored H3 cells must belong to
+that block, agree across text/uint64/resolution columns and obey the existing
+resolution-3 through resolution-8 rules. During spatial emission the Arrow
+reader selects only the indicated row group for each grouped block; other
+row groups do not enter that block's record batches. Catalogue seeding scans
+all inventoried cells once to collect referenced places.
+
+Input checksums are verified before first consumption and again before atomic
+publication. This hashes each consumed file twice, including coalesced files;
+it does not hash the entire file again for every row group. A changed input
+aborts publication and removes staging. Parquet and Arrow admission limits
+apply to the row groups and batches actually decoded. The same logical block
+rows produce identical pack artifacts in either input layout; manifest input
+identity naturally differs when file packaging changes.

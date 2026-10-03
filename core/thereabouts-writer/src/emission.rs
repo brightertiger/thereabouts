@@ -1,11 +1,7 @@
 //! Bound each output unit independently of the dataset size.
 // serde_json read indexing returns Null for absent fields, including non-objects.
 #![allow(clippy::indexing_slicing)]
-use super::{
-    add, catalogue, flags,
-    source::{Dataset, required},
-    timezones,
-};
+use super::{add, catalogue, flags, source::Dataset, timezones};
 use crate::{
     Error, Result,
     error::ensure,
@@ -21,19 +17,11 @@ pub fn cells(
     manifest: &mut Manifest,
     metadata: &mut Metadata,
 ) -> Result<()> {
-    let mut tables = data.tables("cells");
-    tables.sort_by_key(|t| t["block"].as_str());
-    for (i, table) in tables.iter().enumerate() {
-        let root = required(table, "block")?
-            .parse::<CellIndex>()
-            .map_err(|_| Error::Input("Invalid block H3 cell".into()))?;
-        ensure(
-            root.resolution() == Resolution::Three,
-            "Cell table is not a resolution-three block",
-        )?;
+    for (i, input) in crate::cell_layout::blocks(data)?.iter().enumerate() {
+        let root = input.cell;
         let block = address::address(root).0;
         let mut rows = vec![];
-        data.scan(table, |row| {
+        data.scan_block(input, |row| {
             ensure(rows.len() < 16807, "Too many stored rows in a block")?;
             let cell = row
                 .required("h3")?

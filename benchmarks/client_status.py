@@ -345,6 +345,16 @@ statuses; missing, incompatible, corrupt or closed data raise coded exceptions.
 State fields come from subdivisions by code, with published place fields as
 the fallback only when the table has no row.
 
+## Writer dataset layout support
+
+The writer accepts legacy per-block cell files and manifest-declared coalesced
+resolution-1 groups, one Parquet row group per resolution-3 block. Spatial emission
+selects only that block's row group. Tests cover multiple row groups, empty blocks,
+byte-identical pack artifacts across layouts, malformed routing and input changes
+before publication. Whole-file checksums run before first consumption and before
+publication, without a repeated full hash for every block. No real dataset export
+was performed for this change. PACK_FORMAT.md specifies the input contract.
+
 ## Inputs, samples and admission
 
 The workspace separates thereabouts-core, thereabouts-writer, thereabouts-py

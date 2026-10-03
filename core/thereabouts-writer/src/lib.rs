@@ -8,6 +8,7 @@ mod airports;
 mod arrow;
 mod blocks;
 mod catalogue;
+mod cell_layout;
 mod compact;
 mod compact_ip;
 mod compact_metadata;
@@ -169,7 +170,11 @@ pub fn write_pack(
             error.into()
         }
     })?;
-    let result = build(&data, &stage, options, input_digest, identity, family);
+    let result =
+        build(&data, &stage, options, input_digest, identity, family).and_then(|manifest| {
+            data.verify_inputs()?;
+            Ok(manifest)
+        });
     match result {
         Ok(manifest) => {
             fs::rename(&stage, output)?;
