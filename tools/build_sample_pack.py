@@ -22,6 +22,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from thereabouts import _core
+from tools.sample_evidence import extract
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLDEN = Path("/Users/ujjwal/Downloads/solo/thereabouts/data/golden")
@@ -230,6 +231,11 @@ def main() -> None:
         "--output", type=Path, default=ROOT / "tests/fixtures/packs/core-sample"
     )
     parser.add_argument("--dataset-version", default="2026.10")
+    parser.add_argument(
+        "--extract-only",
+        action="store_true",
+        help="Refresh source expectations without writing a pack",
+    )
     args = parser.parse_args()
     output = args.output.resolve()
     if not output.is_relative_to(ROOT):
@@ -239,6 +245,15 @@ def main() -> None:
     with tempfile.TemporaryDirectory(dir=scratch, prefix="sample-") as temporary:
         local = Path(temporary)
         provenance = subset(args.golden, local)
+        extract(
+            local,
+            ROOT / "tests/fixtures/core-sample-vectors.json",
+            ROOT / "tests/fixtures/core-source-extract.json",
+            provenance,
+        )
+        if args.extract_only:
+            print(json.dumps({"extract": "tests/fixtures/core-source-extract.json"}))
+            return
         notices = {
             name: (args.golden / name).read_text()
             for name in ("DATA_LICENSES.md", "DATASET_CARD.md")

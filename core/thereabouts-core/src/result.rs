@@ -40,6 +40,9 @@ pub struct DistanceBand {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Evidence {
     pub stored_cell: Option<String>,
+    pub country_id: Option<String>,
+    pub state_id: Option<String>,
+    pub city_id: Option<String>,
     pub city_method: Option<String>,
     pub land_method: Option<String>,
     pub reason: Option<String>,

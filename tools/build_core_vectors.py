@@ -6,6 +6,7 @@ from typing import Any
 
 import h3
 
+from tests.conformance.core_legacy import assert_case
 from thereabouts import Geocoder, _core
 from thereabouts.packs.address import cell_at
 from tools.synthetic_dataset import golden
@@ -46,22 +47,7 @@ def synthetic() -> None:
             if case["request"]["kind"] not in {"h3", "coordinates"}:
                 continue
             result = resolve(geo, case["request"])
-            # Assert independently retained legacy identities and method meaning.
-            if "result" in case and case["result"]["selected"] is not None:
-                previous = case["result"]["selected"]
-                assert result["status"] == "matched"
-                if previous["city"]:
-                    assert result["city"]["id"] == previous["city"]["id"]
-                if previous["country"]:
-                    assert (
-                        result["country"]["code"] == previous["country"]["country_code"]
-                    )
-                method = previous["methods"]["city"]
-                expected = {
-                    "rural_nearest": "nearest",
-                    "rural_nearest_distant": "nearest_distant",
-                }.get(method, "contained")
-                assert result["match"] == expected
+            assert_case(geo, case)
             cases.append(
                 dict(id=f"legacy-{case['id']}", request=case["request"], result=result)
             )

@@ -78,6 +78,9 @@ impl Pack {
                 let method = label.0[3] & 7;
                 answer.evidence = Some(Evidence {
                     stored_cell: stored.map(|c| c.to_string()),
+                    country_id: self.place(label.0[0])?.map(|p| p.field(0).into()),
+                    state_id: self.place(label.0[1])?.map(|p| p.field(0).into()),
+                    city_id: self.place(label.0[2])?.map(|p| p.field(0).into()),
                     city_method: METHODS
                         .get(method as usize)
                         .filter(|m| !m.is_empty())
@@ -110,6 +113,9 @@ impl Pack {
         } else if evidence {
             answer.evidence = Some(Evidence {
                 stored_cell: None,
+                country_id: None,
+                state_id: None,
+                city_id: None,
                 city_method: None,
                 land_method: None,
                 reason: Some(reason.into()),

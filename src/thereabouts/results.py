@@ -42,6 +42,9 @@ class DistanceBand:
 @dataclass(frozen=True, slots=True)
 class Evidence:
     stored_cell: str | None
+    country_id: str | None
+    state_id: str | None
+    city_id: str | None
     city_method: str | None
     land_method: str | None
     reason: str | None
