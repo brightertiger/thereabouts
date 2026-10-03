@@ -18,8 +18,11 @@ from . import (
     reconcile,
 )
 from .contract import Stage
+from .dataset import DatasetStage
 from .engine_discovery import Discovery
 from .geographic import GeographicStage
+from .packs import PacksStage
+from .publish import PublishStage
 from .sources import SourceStage
 
 
@@ -92,10 +95,12 @@ def registry(config: Config) -> list[Stage]:
             plate_country.parameters,
         ),
     }
+    releases = {"dataset": DatasetStage, "packs": PacksStage, "publish": PublishStage}
     unknown = {stage.name for stage in config.stages} - {
         "download",
         "normalize",
         *implementations,
+        *releases,
     }
     if unknown:
         raise ValueError(f"Unknown stage implementations: {sorted(unknown)}")
@@ -103,6 +108,8 @@ def registry(config: Config) -> list[Stage]:
         [
             SourceStage(settings, pins)
             if settings.name in {"download", "normalize"}
+            else releases[settings.name](settings)
+            if settings.name in releases
             else GeographicStage(settings, discovery, *implementations[settings.name])
             for settings in config.stages
         ]

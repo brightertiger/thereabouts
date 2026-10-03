@@ -3,8 +3,9 @@
 The `pipeline` package builds Thereabouts from frozen sources through verified
 geographic and lookup tables. All stages share configuration, a relative-path
 ledger, resource admission, and one fingerprint rule. The former `build_data`
-package has been removed. Release assembly and publication are the next work
-package; [PIPELINE_STATUS.md](PIPELINE_STATUS.md) records the measured boundary.
+package has been removed. Versioned release assembly and fsspec publication are
+implemented; real pack writing awaits the Rust client merge.
+[PIPELINE_STATUS.md](PIPELINE_STATUS.md) records measured validation.
 
 A **stage** owns one kind of work. A **unit** is a resumable item within a stage,
 such as a source, country or H3 block. The **ledger** records a completed unit's
@@ -53,7 +54,7 @@ working directory. Reports must remain outside the inspected data workspace.
 
 ## Configuration and identity
 
-Structured defaults are merged with `config/sources/*.yaml`, `config/engines.yaml`, then
+Structured defaults are merged with `config/sources/*.yaml`, `config/engines.yaml`, `config/release.yaml`, then
 `config/pipeline.yaml`, an optional `config/profiles/<name>.yaml`, and `key=value`
 overrides. Each source declares an `options_schema` dataclass, loaded without importing
 its normalizer. Unknown adapter options fail during configuration loading:
@@ -227,9 +228,8 @@ inventory, so only synthetic inputs exercise this engine here.
 New outputs use configured `reconciled/`, `cities/`, `cells/` and `work/` paths,
 with immutable input-hash subdirectories. `cells/base/current.json` points to the
 base manifest; `cells/current.json` points to the verified normalized manifest.
-Every artifact record is relative to the workspace root. The table schema remains
-[GOLDEN_DATASET.md](GOLDEN_DATASET.md) until the package-4 dataset README replaces
-it. The release pack stage will call the client-owned
+Every artifact record is relative to the workspace root. The release schema and
+worked reads are in [DATASET_README.md](DATASET_README.md). The pack stage calls the client-owned
 `thereabouts._core.write_pack(dataset_dir, family, output_dir, options)` binding.
 The old pipeline pack format and exporters have been removed; real pack builds
 require the Rust client branch to merge.
@@ -333,10 +333,9 @@ copies no Parquet tree and creates no hard links.
 ## Execution and resource limits
 
 The runtime runner implements `run [--through STAGE | --only STAGE]`. Download
-and normalize execute frozen source pins. Engine declarations still support
-retained-output inspection and refuse rebuilding until package 3. Use source
-execution only on a separate writable workspace, never the protected existing
-workspace used for this redesign.
+and normalize execute frozen source pins, followed by the ported geographic
+engines and release stages. Use execution only on a separate writable workspace,
+never the protected existing workspace used for this redesign.
 
 Before each unit starts, the resource guard requires at least 5,000,000,000 free
 disk bytes, the configured workspace allowance and process RSS headroom. It
@@ -349,8 +348,8 @@ refresh the measured total at their unit boundary, including removed scratch
 files. Free disk and RSS are checked before every admission.
 These admission checks do not impose limits on arbitrary stage code.
 The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
-and a 2 GB RSS allowance. Engine-specific limits and measurements follow with
-their ports.
+and a 2 GB RSS allowance. Engine-specific limits live in `config/engines.yaml`; the completed pilot
+measurements are in the status report.
 
 Run logs and summaries go in `work/runs/<UTC timestamp>/`. Atomic outputs use a
 sibling `.part` file, fsync and replacement; failed publication does not complete
@@ -386,9 +385,9 @@ The [historical acquisition guide](history/source-and-golden-pipeline.md),
 [content-neutral integration proof](history/rename-integration.md) retain the
 original measurements and commands. They are historical evidence rather than
 instructions to rebuild the protected workspace. [SERVING_FORMAT.md](SERVING_FORMAT.md)
-still defines the unchanged pack format. [GOLDEN_DATASET.md](GOLDEN_DATASET.md)
-is the current golden table schema until the release README replaces it. The new release README layout draft is
-[DATASET_README.md](DATASET_README.md); dataset and pack generation are package 4.
+records the pre-Rust pack format. The client owns the current binary format and
+writer. [DATASET_README.md](DATASET_README.md) is the rendered release schema,
+measured inventory and runnable reader guide.
 
 Logical table comparisons are available through `python -m pipeline digest
 DATASET --output REPORT.json --temp-dir SCRATCH [--compare BASELINE.json]`.
@@ -408,3 +407,94 @@ review the proposal's sizes before accepting a larger release. Disabled
 `plate_country` remains at zero until its inputs are chosen. The VM profile sets
 `storage.gcs_raw` to the retained raw-mirror bucket; no bucket access was made
 while validating these changes.
+
+## Versioned releases
+
+`dataset`, `packs` and `publish` are registered stages but discover no units until
+`release.enabled=true` and a version is configured. Versions use `YYYY.MM[.patch]`;
+quote numeric-looking strings in YAML or dot-list arguments, for example
+`'release.version="2026.10"'`. A version's contents cannot be replaced in place.
+Fill the contact, citation, documentation and release bucket region in
+`config/release.yaml` before a public release.
+
+The dataset stage consumes the completed `lookups/manifest/current` unit, whose
+manifest includes normalized cells and country catalogues. It checks each input's
+SHA256, row count and schema before and after reading. Cell files group resolution-3
+blocks by a resolution-1 parent (up to 49 blocks); the world routing has at most
+842 groups. Each group is streamed, with bounded batches and row groups.
+`config/dataset.yaml` declares all fourteen retained table schemas, their keys,
+column meanings, units and physical nullability. Additional optional plate tables
+must be given reviewed schemas there before release; those sources are disabled.
+
+Parquet, documents, per-table logical digests and the manifest are built in an
+owned temporary directory, then published together. The output cap applies before
+each write, including Parquet footers. Resource admission accounts for output
+bytes and reserves digest scratch. Logical digests preserve duplicates and do not
+depend on row order, compression or file boundaries. `CHANGES.md` compares with
+`release.previous_version` when supplied; the prior release is verified first.
+The prior digest is an explicit unit parameter. The current manifest references
+all output files and is the last local publication boundary.
+
+`release prepare` is a standalone use of the same assembler for an existing,
+completed snapshot. It requires a separate output root; it neither migrates nor
+creates a ledger for the input. Its identity uses the same stage fingerprint and
+an explicit input manifest hash. Both entry points verify the lock against the
+normalized input inventories; changing pins without rebuilding cannot silently
+relabel that input evidence. Prepare only from a completed snapshot of the same
+build: this command does not run the source workspace or repair stale stages.
+For the measured read-only subset:
+
+```sh
+.venv/bin/python -m pipeline release prepare \
+  --from /path/to/existing/data/golden --root "$PWD" --version 2026.10 \
+  paths.dataset=data/dataset paths.work=data/pipeline-work/work \
+  'release.countries=[MY,SG]' \
+  'release.blocks=[836505fffffffff,836500fffffffff,836526fffffffff]' \
+  release.dataset.max_output_bytes=412318215 resources.max_workspace=3000000000 \
+  'release.packs.families=[]' --report data/pipeline-work/release-prepare.json
+.venv/bin/python examples/dataset/verify_readme.py data/dataset/2026.10
+```
+
+The example runner needs the reader's optional `pandas`, `pyarrow`, `duckdb` and
+`h3` packages. Pandas is not a pipeline runtime dependency. This task tested it
+using worktree-local copies of already-installed pandas 2.2.2 and NumPy 1.26.4;
+the pipeline environment retains its locked NumPy 2.3.5. No package was fetched.
+The README template is `config/templates/dataset-readme.md`; the rendered copy
+is committed as [DATASET_README.md](DATASET_README.md).
+
+`packs` delegates each configured family to
+`thereabouts._core.write_pack(dataset_dir, family, output_dir, options)`. The
+adapter adds source notices and input provenance and re-verifies returned files.
+Tests inject a fake writer; they do not implement the binary format. Real use
+requires the Rust branch merge **and support in that writer for coalesced cell
+inputs**. At inspection, its `emission::cells` still required one block per table
+and at most 16,807 stored rows. The release contains a grouped file with 22,404
+rows, so the client needs to stream/group that file before real pack validation.
+No real pack-size claim is made here. Writer changes must update the client
+package version or cell format version; client source bytes are not hashed.
+
+Publication reads a verified dataset and the configured pack-family manifests.
+Each object is uploaded through an fsspec transaction, re-hashed from the backend,
+and skipped if already present with the correct size and checksum. Conflicting
+objects are refused before uploading; investigate them instead of overwriting a
+published version. The `<version>/_SUCCESS` inventory is committed last.
+`release upload --dry-run` performs inventory and remote checks without creating
+objects or a success marker. The runner's `publish` stage performs the upload;
+`release upload` is its explicit standalone counterpart.
+
+```sh
+.venv/bin/python -m pipeline release upload --root "$PWD" --version 2026.10 \
+  paths.dataset=data/dataset 'release.packs.families=[]' \
+  "storage.s3_release=file://$PWD/data/pipeline-work/local-release" --dry-run
+# Omit --dry-run only for the explicitly selected destination.
+.venv/bin/python -m pipeline release registry --root "$PWD" --version 2026.10 \
+  storage.s3_release=s3://OWNER-DECISION-BUCKET \
+  --report docs/release-registry.yaml
+```
+
+The same generic upload implementation supports `memory://` and local files in
+tests. Actual S3 use requires an installed fsspec S3 driver (`s3fs`) compatible with
+the locked fsspec version; that optional driver is not installed or locked in this
+checkout. Its dependency resolution and real multipart behavior remain owner
+validation before cloud publication. GCS raw-mirror support is separate and uses
+the existing locked `gcsfs` dependency. No remote backend was contacted here.

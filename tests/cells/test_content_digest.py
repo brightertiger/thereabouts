@@ -8,6 +8,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from pipeline.cli import main
+from pipeline.config.content import DigestLimits
 from pipeline.content.digest import digest_dataset
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.reconcile.common import Row
@@ -55,11 +56,14 @@ def test_metadata_order_partitions_and_root_do_not_change_content(
         ],
         portable=True,
     )
-    before = digest_dataset(first, temp_dir=tmp_path)
-    assert digest_dataset(second, temp_dir=tmp_path) == before
+    before = digest_dataset(first, temp_dir=tmp_path, limits=DigestLimits())
+    assert digest_dataset(second, temp_dir=tmp_path, limits=DigestLimits()) == before
     relocated = tmp_path / "relocated"
     second.parent.rename(relocated)
-    assert digest_dataset(relocated / "golden", temp_dir=tmp_path) == before
+    assert (
+        digest_dataset(relocated / "golden", temp_dir=tmp_path, limits=DigestLimits())
+        == before
+    )
     assert before["tables"]["cells"]["rows"] == 3
 
 
@@ -79,20 +83,27 @@ def test_real_differences_change_digest(tmp_path: Path, change: str) -> None:
         saved = read_json(after / "manifest.json")
         saved["tables"][0]["kind"] = "places"
         write_json(after / "manifest.json", saved)
-    assert digest_dataset(before, temp_dir=tmp_path) != digest_dataset(
-        after, temp_dir=tmp_path
-    )
+    assert digest_dataset(
+        before, temp_dir=tmp_path, limits=DigestLimits()
+    ) != digest_dataset(after, temp_dir=tmp_path, limits=DigestLimits())
 
 
 def test_empty_tables_and_nonfinite_values_are_deterministic(tmp_path: Path) -> None:
     schema = pa.schema([("f", pa.float64())])
     empty = pa.Table.from_pylist([], schema=schema)
     value = dataset(tmp_path / "empty", [empty])
-    assert digest_dataset(value, temp_dir=tmp_path)["tables"]["cells"]["rows"] == 0
+    assert (
+        digest_dataset(value, temp_dir=tmp_path, limits=DigestLimits())["tables"][
+            "cells"
+        ]["rows"]
+        == 0
+    )
     table = pa.table({"f": [float("nan"), float("inf"), float("-inf"), 0.0, -0.0]})
     a = dataset(tmp_path / "a", [table])
     b = dataset(tmp_path / "b", [table.take([4, 2, 3, 0, 1])])
-    assert digest_dataset(a, temp_dir=tmp_path) == digest_dataset(b, temp_dir=tmp_path)
+    assert digest_dataset(
+        a, temp_dir=tmp_path, limits=DigestLimits()
+    ) == digest_dataset(b, temp_dir=tmp_path, limits=DigestLimits())
 
 
 def test_incomplete_duplicate_and_inconsistent_manifests_fail(tmp_path: Path) -> None:
@@ -100,19 +111,19 @@ def test_incomplete_duplicate_and_inconsistent_manifests_fail(tmp_path: Path) ->
     saved = read_json(output / "manifest.json")
     write_json(output / "manifest.json", {**saved, "completed": False})
     with pytest.raises(ValueError, match="completed"):
-        digest_dataset(output, temp_dir=tmp_path)
+        digest_dataset(output, temp_dir=tmp_path, limits=DigestLimits())
     write_json(output / "manifest.json", {**saved, "tables": saved["tables"] * 2})
     with pytest.raises(ValueError, match="Duplicate"):
-        digest_dataset(output, temp_dir=tmp_path)
+        digest_dataset(output, temp_dir=tmp_path, limits=DigestLimits())
     saved["tables"][0]["rows"] += 1
     write_json(output / "manifest.json", saved)
     with pytest.raises(ValueError, match="row count"):
-        digest_dataset(output, temp_dir=tmp_path)
+        digest_dataset(output, temp_dir=tmp_path, limits=DigestLimits())
     other = dataset(
         tmp_path / "other", [pa.table({"id": [1]}), pa.table({"value": [1]})]
     )
     with pytest.raises(ValueError, match="schemas"):
-        digest_dataset(other, temp_dir=tmp_path)
+        digest_dataset(other, temp_dir=tmp_path, limits=DigestLimits())
 
 
 def test_cli_writes_comparable_json_and_returns_failure_for_differences(

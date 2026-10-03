@@ -14,6 +14,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config.content import DigestLimits
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.reconcile.common import Row
 from pipeline.runtime.jsonio import digest as fingerprint
@@ -65,12 +66,12 @@ def columns(schema: pa.Schema) -> list[Row]:
     ]
 
 
-def table_digest(records: list[Row], scratch: Path) -> Row:
+def table_digest(records: list[Row], scratch: Path, limits: DigestLimits) -> Row:
     """Sort a multiset of SHA256 row digests using bounded sequential scratch."""
     schema: list[Row] | None = None
     count = 0
     with tempfile.TemporaryDirectory(prefix=scratch.stem, dir=scratch.parent) as work:
-        sorter = RowHashes(Path(work) / "runs")
+        sorter = RowHashes(Path(work) / "runs", limits)
         for record in records:
             with pq.ParquetFile(record["path"]) as file:
                 actual = columns(file.schema_arrow)
@@ -80,7 +81,9 @@ def table_digest(records: list[Row], scratch: Path) -> Row:
                 names = [f["name"] for f in schema]
                 if file.metadata.num_rows != record["rows"]:
                     raise ValueError(f"Manifest row count differs: {record['path']}")
-                for batch in file.iter_batches(batch_size=1024, columns=names):
+                for batch in file.iter_batches(
+                    batch_size=limits.batch_rows, columns=names
+                ):
                     hashes = []
                     for row in batch.to_pylist():
                         encoded = json.dumps(
@@ -102,7 +105,11 @@ def table_digest(records: list[Row], scratch: Path) -> Row:
 
 
 def digest_dataset(
-    directory: Path, *, temp_dir: Path, manifest_path: Path | None = None
+    directory: Path,
+    *,
+    temp_dir: Path,
+    limits: DigestLimits,
+    manifest_path: Path | None = None,
 ) -> Row:
     """Read listed partitions, preserving duplicates and empty tables."""
     saved = read_json(manifest_path or directory / "manifest.json")
@@ -120,7 +127,7 @@ def digest_dataset(
     with tempfile.TemporaryDirectory(prefix="golden-digest-", dir=temp_dir) as work:
         for number, kind in enumerate(sorted(grouped)):
             scratch = Path(work) / f"{number}"
-            tables[kind] = table_digest(grouped[kind], scratch)
+            tables[kind] = table_digest(grouped[kind], scratch, limits)
             print(f"digested {kind}: {tables[kind]['rows']:,} rows", flush=True)
     result: Row = {"format": "thereabouts-golden-content-1", "tables": tables}
     return {**result, "sha256": fingerprint(result)}

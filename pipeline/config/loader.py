@@ -16,6 +16,7 @@ from thereabouts.format import BLOCK_RESOLUTION
 
 from .engine_validation import validate as validate_engines
 from .engine_validation import validate_sources
+from .release import validate as validate_release
 from .schema import DISK_FLOOR, Config
 from .sources import load_sources, resolve_options, validate_source
 
@@ -30,6 +31,11 @@ def load(
 ) -> Config:
     files = [
         path,
+        *(
+            [path.parent / "release.yaml"]
+            if (path.parent / "release.yaml").exists()
+            else []
+        ),
         *(
             [path.parent / "engines.yaml"]
             if (path.parent / "engines.yaml").exists()
@@ -75,6 +81,9 @@ def _load(
             {"engines": OmegaConf.load(path.parent / "engines.yaml")}
             if (path.parent / "engines.yaml").exists()
             else {},
+            {"release": OmegaConf.load(path.parent / "release.yaml")}
+            if (path.parent / "release.yaml").exists()
+            else {},
             OmegaConf.load(path),
         )
         if profile is not None:
@@ -107,6 +116,8 @@ def validate(config: Config) -> None:
             raise ValueError(f"Source key must match its name: {name}")
         validate_source(source)
         resolve_options(source)
+    config.content.validate()
+    validate_release(config.release, config.h3.block_resolution)
     validate_engines(config.engines, config.h3.block_resolution)
     if any("engines" in stage.config for stage in config.stages):
         validate_sources(config.engines, config.sources)

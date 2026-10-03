@@ -1,0 +1,381 @@
+{
+  "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.8 / SQLite 3.47.1",
+  "plan": {
+    "wall_seconds": 318.58,
+    "peak_rss_bytes": 1415757824,
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    },
+    "simulation": "Mapping and output hashes only; not world engine semantics"
+  },
+  "handover": {
+    "wall_seconds": 331.7,
+    "peak_rss_bytes": 1473708032,
+    "changed_units": 85577,
+    "identities": [
+      {
+        "changed": 13,
+        "new_identity": "3ce19efc1e4967adbbd305a1d70cb507628f5a24ee4b656c701458eee6ed8ead",
+        "old_identity": [
+          "b88e37a1d62382fb30315b7669e6bbfb111f0ebb1c93e509ba200bca46eb74d1"
+        ],
+        "stage": "download",
+        "units": 13
+      },
+      {
+        "changed": 13,
+        "new_identity": "15ad5cae28a548ad17185461663b2454cb52508b78016b856476b8c033853018",
+        "old_identity": [
+          "fb011b4c4068740b911ea431476074b43b06c47840500edca009d0c657477f36"
+        ],
+        "stage": "normalize",
+        "units": 13
+      },
+      {
+        "changed": 1111,
+        "new_identity": "26566f3647632477f18a42b7040af00202bdee464f243ed475c13891bf2bcfd4",
+        "old_identity": [
+          "cc58af67e53b6936e2d3dcbcdc838d716259a333e00e63700b2a0f10892f9314"
+        ],
+        "stage": "reconcile",
+        "units": 1111
+      },
+      {
+        "changed": 41442,
+        "new_identity": "0e6a44be8191020d0a073394a831b06520ad1eaf883fbed83e94107719deba04",
+        "old_identity": [
+          "7880e45496a985dd90110cdc7b95b59f90ef95621372ebeb75a4775777ccfd3b"
+        ],
+        "stage": "cells",
+        "units": 41442
+      },
+      {
+        "changed": 555,
+        "new_identity": "4701745315376f107d8c060ecb3a033ea8bc5d52922e192eb90ef29ec1d44470",
+        "old_identity": [
+          "d7a8c87c1dfac1c2d2fb9847ef10dc0f674cb5e2c877e3e4eb902cfc220becbe"
+        ],
+        "stage": "cities",
+        "units": 555
+      },
+      {
+        "changed": 1,
+        "new_identity": "181d250ca3613ad14c61fa70d8fbf407ad94f9a8a3503557e967c28cc4c7441e",
+        "old_identity": [
+          "52b956828e65d83d6a3fe876bd371d3969b0aa5ad3a42b48439db65dd4bc8f0a"
+        ],
+        "stage": "evaluate",
+        "units": 1
+      },
+      {
+        "changed": 41716,
+        "new_identity": "76593d131a40c29a5d8e7f6be561d13d2c9167e6b31e63e124fda568c2a49d58",
+        "old_identity": [
+          "3bfb3799347bc246e542f3b4da74083fa225ba27e0f52847d5693bd5fcf600cd"
+        ],
+        "stage": "normalize_cells",
+        "units": 41716
+      },
+      {
+        "changed": 0,
+        "new_identity": "f3113d8528999ef404a70fd5f14ec6946a56db2f6ff7186e5082d44645d9ffbc",
+        "old_identity": [],
+        "stage": "plate_country",
+        "units": 0
+      },
+      {
+        "changed": 726,
+        "new_identity": "af0e9578cc27f26c48d8f956e79f05df5ee3b675e84ada1ce50197927c2237f0",
+        "old_identity": [
+          "687403e58322ba792ff354f414260a0af1317aaa55a870765cf50b319ed2cf13"
+        ],
+        "stage": "lookups",
+        "units": 726
+      },
+      {
+        "changed": 0,
+        "new_identity": "2c0597017a276f68b024f3f9ded5d981ac8d994099fed055f07ea62923812f3e",
+        "old_identity": [],
+        "stage": "dataset",
+        "units": 0
+      },
+      {
+        "changed": 0,
+        "new_identity": "5e6c9151ae7120caf005a7fb56b34d4ee9720cb12f50f8e05acfa4cebb199310",
+        "old_identity": [],
+        "stage": "packs",
+        "units": 0
+      },
+      {
+        "changed": 0,
+        "new_identity": "c27e3630074d2a9b33201423a1b39004ee978e238914bd598a30ec602b12cceb",
+        "old_identity": [],
+        "stage": "publish",
+        "units": 0
+      }
+    ],
+    "ledger_sha256": null,
+    "mode": "handover simulation",
+    "scope": "mapping and hashes only; no engine equivalence claim",
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    }
+  },
+  "real_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+  "load_seconds": 0.15791983300005086,
+  "pytest": {
+    "passed": 667,
+    "skipped": 8,
+    "seconds": 46.16
+  },
+  "dataset": {
+    "bytes": 8736970,
+    "files": 23,
+    "version": "2026.10",
+    "wall_seconds": 18.4,
+    "peak_rss_bytes": 312164352,
+    "countries": [
+      "MY",
+      "SG"
+    ],
+    "blocks": [
+      "836505fffffffff",
+      "836500fffffffff",
+      "836526fffffffff"
+    ],
+    "tables": {
+      "airports": {
+        "bytes": 14291,
+        "files": 1,
+        "rows": 25
+      },
+      "canonical_cities": {
+        "bytes": 34789,
+        "files": 2,
+        "rows": 408
+      },
+      "cells": {
+        "bytes": 183373,
+        "files": 1,
+        "rows": 22404
+      },
+      "countries": {
+        "bytes": 18584,
+        "files": 1,
+        "rows": 2
+      },
+      "ip_ranges": {
+        "bytes": 1493691,
+        "files": 1,
+        "rows": 36547
+      },
+      "phone_metadata": {
+        "bytes": 26146,
+        "files": 1,
+        "rows": 2
+      },
+      "phone_prefixes": {
+        "bytes": 2063,
+        "files": 1,
+        "rows": 0
+      },
+      "place_to_city": {
+        "bytes": 417842,
+        "files": 2,
+        "rows": 28063
+      },
+      "places": {
+        "bytes": 3919626,
+        "files": 2,
+        "rows": 28063
+      },
+      "postal_codes": {
+        "bytes": 1161474,
+        "files": 1,
+        "rows": 64317
+      },
+      "subdivisions": {
+        "bytes": 10370,
+        "files": 1,
+        "rows": 37
+      },
+      "timezone_cells": {
+        "bytes": 21689,
+        "files": 1,
+        "rows": 1473
+      },
+      "trade_locations": {
+        "bytes": 24994,
+        "files": 1,
+        "rows": 202
+      },
+      "zone_tables": {
+        "bytes": 7964,
+        "files": 1,
+        "rows": 5
+      }
+    },
+    "rows": 181548,
+    "parquet_bytes": 7336896,
+    "logical_sha256": "7263899d1ac9fefa8fec7e147e69448626de2e811232d819b84ce9578aea40e0",
+    "manifest_sha256": "e7d0b27709c9f7df887234fdc43293f545fe3990c6254474151923a1f44e9a61",
+    "readme_sha256": "74c1309bdfe9cd4409dbd1c9feceecd51954b17e840688f02e540a11dabfbeb0",
+    "sources": [
+      "airports",
+      "codes",
+      "dbip",
+      "geoboundaries",
+      "geonames",
+      "ghsl",
+      "osm_land",
+      "overture",
+      "phone",
+      "postal",
+      "timezones",
+      "unlocode"
+    ],
+    "output_cap": 412318215
+  },
+  "examples": {
+    "all_three_ran": true,
+    "results": [
+      "DuckDB: [('country:MY', 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city:geonames:1735161', 'policy_polygon')]",
+      "PyArrow: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}",
+      "pandas: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}"
+    ],
+    "pandas": "2.2.2",
+    "analysis_numpy": "1.26.4",
+    "pipeline_numpy": "2.3.5",
+    "dependencies": "Copied from existing local installation; no package download"
+  },
+  "references": {
+    "country_id": 0,
+    "state_id": 0,
+    "city_id": 0,
+    "rural_ids_outside_canonical_cities": 2353
+  },
+  "publish": {
+    "publish-dry-run": {
+      "bytes": 8736970,
+      "dry_run": true,
+      "skip": 0,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 23,
+      "version": "2026.10"
+    },
+    "publish-local": {
+      "bytes": 8736970,
+      "dry_run": false,
+      "skip": 0,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 23,
+      "version": "2026.10"
+    },
+    "publish-local-repeat": {
+      "bytes": 0,
+      "dry_run": false,
+      "skip": 23,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 0,
+      "version": "2026.10"
+    }
+  },
+  "local_backend_bytes": 8740271,
+  "packs": "Fake writer only; no real pack output or size claim",
+  "workspace_bytes": 960286861,
+  "disk_free_bytes": 47038324736
+}

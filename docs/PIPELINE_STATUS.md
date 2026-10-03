@@ -2,10 +2,10 @@
 
 ## Current state
 
-Packages 1–3 and all eleven package-2/3 review fixes are implemented locally on
+Packages 1–4 and all eleven package-2/3 review fixes are implemented locally on
 `feat/pipeline`. The real workspace remains unmigrated. Use
 [DATA_PIPELINE.md](DATA_PIPELINE.md) for commands and configuration; the current
-schema is [GOLDEN_DATASET.md](GOLDEN_DATASET.md). Packages 4–5 are next.
+schema is [DATASET_README.md](DATASET_README.md). Package 5 is next.
 
 Package 1 supplies configuration, the single ledger/fingerprint rule, resource
 admission, runner and recoverable migration. Package 2 supplies the 13 retained
@@ -13,6 +13,19 @@ sources plus disabled `plate_country`, frozen pins and verified mirrors. Package
 3 moves engines into pipeline stages, preserves the policy semantics for all 676
 country projections, and removes `build_data`. The only client-source change
 remains `CELL_FORMAT_VERSION`.
+
+Package 4 adds dataset assembly, generated documentation and checksums, a client
+pack adapter, fsspec publication and registry drafts. Releases remain disabled
+until a version is selected. `release prepare --from INPUT --root OUTPUT
+--version YYYY.MM` assembles a separate read-only snapshot; full commands are in
+the pipeline guide. Source pins are checked against built inventories.
+The MY/SG subset has **181,548 rows / 14 tables / 23 files / 8,736,970 bytes**;
+Parquet contributes **7,336,896 bytes**. Three blocks coalesce into one cell file.
+Its final build took **18.40 s** at **312,164,352 bytes RSS**.
+All three README examples ran and agreed. Local publish uploaded 23 objects,
+then skipped all 23 on repeat; the directory with `_SUCCESS` is **8,740,271 bytes**.
+[PIPELINE_RELEASE_MEASUREMENTS.json](PIPELINE_RELEASE_MEASUREMENTS.json) records
+per-table sizes, identities, reader outputs, timings and source attribution.
 
 Review fixes: complete code closure and per-source invalidation (1–2), slim config
 and lock plus repeated acceptance (3–4), adapter-owned pin proposals tested only
@@ -24,8 +37,8 @@ are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
-config `load()` **2.646 s → 0.140 s**; pytest **187.68 s → 40.20 s**
-(the independent review measured 175 s before fixes). Current suite: **647
+config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 46.16 s**
+(the independent review measured 175 s before fixes). Current suite: **667
 passed, 8 skipped**; Ruff check/format and strict mypy pass. The six Malaysia
 artifacts, including base cells, city index and mapping, match retained SHA256:
 **20.32 s**, **435,535,872 bytes RSS**, **141,524,404 output bytes**.
@@ -47,12 +60,12 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 | normalize_cells | 41,716 | 41,716 | 0 | 0 | 0 |
 | plate_country (disabled) | 0 | 0 | 0 | 0 | 0 |
 | lookups | 726 | 726 | 0 | 0 | 0 |
+| dataset / packs / publish (disabled) | 0 | 0 | 0 | 0 | 0 |
 | **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
-Post-fix plan: **334.35 s**, **1,484,046,336 bytes RSS**; handover:
-**318.62 s**, **1,437,302,784 bytes RSS**. Reports:
-`.cache/pipeline/review910-plan.json` and `review910-handover.json`.
-Fix 11 is documentation-only and shares this checked code state.
+Package-4 plan: **318.58 s**, **1,415,757,824 bytes RSS**; handover:
+**331.70 s**, **1,473,708,032 bytes RSS**. Reports:
+`.cache/pipeline/wp4-plan.json` and `wp4-handover.json`.
 Real ledger SHA256 before/after:
 `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
 
@@ -133,8 +146,11 @@ availability has not been tested in this task.
 No stage or migration application ran with the real workspace as its output root;
 no full data rebuild, cloud access, push or public publication occurred. Real pack
 writing awaits `feat/rust-core` and its `thereabouts._core.write_pack` binding.
-The pipeline owns no copy of the binary format. Dataset release and local publish
-measurements are still package 4 work; VM setup execution is outside this task.
+The pipeline owns no copy of the binary format. The Rust writer also needs
+coalesced-cell input support: its inspected implementation expects one r3 block
+per table. Real packs and their sizes are unverified. The optional `s3fs` driver
+is not installed/locked; resolve it before cloud publication. Only local and
+memory backends were exercised. VM setup execution is outside this task.
 
 The earlier full logical digest read all **14 tables / 98,077,250 rows** and matched
 `0e543e65bc26987a2714b89f2b23395e11c9e48d482d9ee2315d3a890a0e9614`
@@ -143,12 +159,11 @@ and was removed. That check is distinct from migration's per-file verification.
 
 ## Follow-ups and safety record
 
-Finish packages 4–5, retaining this short status and moving detailed evidence to
-linked reports. Update the frozen client's `src/thereabouts/manifest.py` missing-
+Finish package 5; retain this short status and linked detailed evidence. Update the frozen client's `src/thereabouts/manifest.py` missing-
 data command on the Rust branch; its current `python -m build_data` message and
 client test were intentionally left unchanged here.
 
-Worktree bytes: **1,759,595,855**; free disk: **48,816,140,288**. The initial scratch cleanup removed
+Worktree bytes: **960,286,861**; free disk: **47,038,324,736**. The initial scratch cleanup removed
 **1,049,266,242 bytes**. This task keeps new outputs below 3 GB and free disk above
 5 GB; all subsequent tests set workspace TMPDIR and pytest has a worktree basetemp.
 One early targeted pytest invocation omitted TMPDIR and wrote small synthetic

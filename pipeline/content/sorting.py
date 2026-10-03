@@ -7,8 +7,8 @@ from itertools import groupby
 from pathlib import Path
 from typing import BinaryIO
 
-CHUNK_ROWS = 250_000
-FAN_IN = 64
+from pipeline.config.content import DigestLimits
+
 WIDTH = 32
 
 
@@ -22,7 +22,8 @@ def read_hashes(stream: BinaryIO) -> Iterator[bytes]:
 class RowHashes:
     """Use small sorted runs and bounded merge fan-in, never random B-tree writes."""
 
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, limits: DigestLimits) -> None:
+        self.limits = limits
         self.root = root
         root.mkdir()
         self.pending: list[bytes] = []
@@ -39,7 +40,7 @@ class RowHashes:
             if len(value) != WIDTH:
                 raise ValueError("Expected a SHA256 row digest")
             self.pending.append(value)
-            if len(self.pending) >= CHUNK_ROWS:
+            if len(self.pending) >= self.limits.chunk_rows:
                 self._flush()
 
     def _flush(self) -> None:
@@ -58,12 +59,14 @@ class RowHashes:
 
     def counts(self) -> Iterator[tuple[bytes, int]]:
         self._flush()
-        while len(self.runs) > FAN_IN:
+        while len(self.runs) > self.limits.merge_fan_in:
             next_runs = []
-            for start in range(0, len(self.runs), FAN_IN):
-                batch = self.runs[start : start + FAN_IN]
+            for start in range(0, len(self.runs), self.limits.merge_fan_in):
+                batch = self.runs[start : start + self.limits.merge_fan_in]
                 path = self._path()
-                with path.open("wb", buffering=1024 * 1024) as stream:
+                with path.open(
+                    "wb", buffering=self.limits.write_buffer_bytes
+                ) as stream:
                     stream.writelines(self._merged(batch))
                 for old in batch:
                     old.unlink()

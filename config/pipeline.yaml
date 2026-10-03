@@ -248,3 +248,28 @@ stages:
                pipeline/config/policies.py, pipeline/sources/plates]
     config: [engines]
     native: [pyarrow, regex]
+
+  - name: dataset
+    needs: [lookups]
+    packages: [pipeline/stages/dataset.py]
+    config: [h3, content]
+    native: [pyarrow, h3]
+    cell_format: true
+  - name: packs
+    needs: [dataset]
+    packages: [pipeline/stages/packs.py]
+    config: []
+    native: [thereabouts]
+    cell_format: true
+  - name: publish
+    needs: [dataset, packs]
+    packages: [pipeline/stages/publish.py]
+    config: []
+    native: [fsspec]
+
+# The full-world proof used 250k-row sorting runs at 541 MB RSS.
+content:
+  batch_rows: 1024
+  chunk_rows: 250000
+  merge_fan_in: 64
+  write_buffer_bytes: 1048576
