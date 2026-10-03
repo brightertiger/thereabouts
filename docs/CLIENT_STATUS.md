@@ -81,6 +81,32 @@ fresh decoded caches, with warm filesystem caches; timings include Python.
 These measurements come from benchmarks.single_shard_read_path; both the synthetic
 and real-sample physical spans are retained in CLIENT_CORE_MEASUREMENTS.json.
 
+Forward tables now share a lazy 512 MiB decoded-block LRU per opened pack.
+IP starts use contiguous 24-byte rows. IO and decompression remain outside the
+cache lock. Fuzzy search derives length/first-trigram buckets and has pack-wide
+budgets of 2,048 keys, 16,384 posting visits and 256 projected rows. Exact and
+prefix are exhaustive; larger fuzzy searches can omit otherwise eligible cities,
+and population ranks the admitted set. Hard geography filters still apply.
+
+| Synthetic workload | Reader | Median µs | p99 µs | Batch rows/s |
+| --- | --- | ---: | ---: | ---: |
+| ip | before | 129.500 | 143.125 | 8,086 |
+| ip | after | 7.667 | 140.459 | 341,162 |
+| names_exact | before | 10.125 | 10.458 | 216,007 |
+| names_exact | after | 10.208 | 10.667 | 212,373 |
+| names_random | before | 13.583 | 18.586 | 196,805 |
+| names_random | after | 14.166 | 24.000 | 187,189 |
+| names_fuzzy_common_grams | before | 111596.833 | 125372.539 | 9 |
+| names_fuzzy_common_grams | after | 1129.542 | 3733.859 | 935 |
+
+The world-scale script uses 7.8M synthetic intervals with gaps and one million
+distinct name keys across 34 shards. It explicitly preloads file bytes, then opens
+fresh decoded caches. Initial block misses are included. It measures search
+scale, not world accuracy or compressibility. Historical unconditioned filesystem
+runs are retained as history in the JSON. Process peak RSS was
+333,905,920 bytes before and
+630,849,536 bytes after.
+
 ## What changed in the package-2 rework
 
 Forward packs use format 2.2: bounded LZ4 column blocks, dictionary IDs, FST
@@ -99,7 +125,8 @@ gate. Before/after sample row counts differ and are retained in the JSON.
 Catalogue misses use one record read, one contiguous offsets read and one text
 read; evidence is fetched only on request. Exact geocode reuses its first FST
 lookup. Fuzzy search uses bounded counters, cached trigram cardinalities and
-bit-parallel edit distance without dropping eligible candidates. Plate matching
+bit-parallel edit distance; the later R4 work bounds its admitted candidate set.
+Plate matching
 prefilters with RegexSet before ordered capture extraction and scoring.
 
 Ambiguity retains all shared flat fields across the complete candidate set,
@@ -179,9 +206,9 @@ included. Golden has no literal 9122 phone row: all six published Mumbai child
 prefixes are retained instead. Kidarakulam/Karakulam supplies a real differing
 English-name vector. The reverse sample retains its original geographic subset.
 
-Forward/name packs total 1,188,122 bytes; compressed source
+Forward/name packs total 1,201,616 bytes; compressed source
 extracts use 1,328,164 bytes. Packs, extracts and shared
-vectors total 2,856,860 bytes, below the fixture
+vectors total 2,870,354 bytes, below the fixture
 budget. Builders are idempotent for the recorded inputs and writer revision.
 
 ## Conformance and validation
@@ -205,7 +232,7 @@ table below lists real vector counts; synthetic vectors additionally cover
 legacy codes, shared calling codes and alternate names. Pytest requires no real
 data. Node execution awaits its binding package.
 
-The full gate passed: 85 Rust tests; 745
+The full gate passed: 88 Rust tests; 745
 pytest passed and 9 skipped; strict mypy checked
 477 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and the wasm target check passed. Legacy reader and pipeline tests
@@ -233,7 +260,7 @@ script output, not hand-entered estimates. Reverse open time is
 | phone | 66,126 / 395 | 30 | 4.875 / 5.292 | 6.459 / 10.292 | 302,444 | 6,111,549 |
 | ip | 115,492 / 7,170 | 60 | 7.834 / 26.584 | 8.792 / 142.709 | 342,898 | 100,098,143 |
 | plates | 43,463 / 521 | 36 | 4.125 / 11.875 | 4.334 / 20.959 | 1,185,311 | 3,095,294 |
-| geocode | 213,326 / 102 | 52 | 8.250 / 35.083 | 8.750 / 49.917 | 333,519 | 11,940,180 |
+| geocode | 225,876 / 102 | 52 | 8.209 / 11.292 | 8.500 / 45.083 | 349,629 | 11,952,713 |
 <!-- forward-measurements:end -->
 
 Random workloads visit all published sample keys, plus seeded repetitions.
@@ -282,7 +309,7 @@ IPv6 low words are preserved; the measured export contains
 | Catalogue read path | Median µs | p99 µs | Batch rows/s |
 | --- | ---: | ---: | ---: |
 | before | 13.291 | 120.875 | 144578.55712150357 |
-| after | 7.416 | 11.25 | 435478.98122715764 |
+| after | 7.25 | 12.583 | 497542.96862847265 |
 <!-- catalogue-reads:end -->
 
 <!-- forward-scale:start -->
@@ -296,11 +323,11 @@ IPv6 low words are preserved; the measured export contains
 | names_miss | 10.500 / 13.833 | 136,518 |
 <!-- forward-scale:end -->
 
-Synthetic scale covers 7,800,000 intervals
-with gaps and 90,000 name keys. It measures
-search scale, not world accuracy or compressibility. Common-trigram fuzzy cases
-retain many legitimate candidates. The native profile is retained in
-docs/measurements/geocode-profile.txt; projection dominates that mixed workload.
+The historical package-2 scale run covered
+7,800,000 intervals
+with gaps and 90,000 name keys. Its uncapped
+fuzzy profile is retained in
+docs/measurements/geocode-profile.txt; it predates the million-key R4 measurements.
 
 <!-- plates-rules:start -->
 | All-rule inference | Median / p99 (µs) | Batch rows/s |

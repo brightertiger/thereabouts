@@ -90,7 +90,7 @@ pub(crate) struct Names {
     grams: fst::Map<Vec<u8>>,
     keys: Vec<String>,
     gram_counts: Vec<usize>,
-    lengths: Vec<usize>,
+    buckets: super::name_search::Buckets,
     offsets: Vec<usize>,
     gram_offsets: Vec<usize>,
     postings: Vec<usize>,
@@ -175,7 +175,7 @@ impl Names {
             map,
             grams,
             gram_counts: keys.iter().map(|key| trigrams(key).len()).collect(),
-            lengths: keys.iter().map(|key| key.chars().count()).collect(),
+            buckets: super::name_search::Buckets::new(&keys),
             keys,
             offsets,
             gram_offsets,
@@ -208,17 +208,13 @@ impl Names {
         }
         Ok(rows)
     }
-    pub(crate) fn fuzzy(&self, key: &str) -> Result<Vec<usize>> {
+    pub(crate) fn fuzzy(&self, key: &str, budget: usize) -> Result<Vec<usize>> {
+        if budget == 0 {
+            return Ok(vec![]);
+        }
         let query = trigrams(key);
         let distance = crate::name_distance::Distance::new(key);
-        let mut touched = Vec::new();
-        // At most 9 MB per million admitted keys: byte counters and touched IDs.
-        // No tree allocation per posting or scan over unvisited keys.
-        // Counts cannot exceed 128 unique query trigrams. Full counting preserves
-        // hard-filter/population semantics instead of truncating common-gram hits.
-        let mut counts = vec![0_u8; self.keys.len()];
-        let length = key.chars().count();
-        let edits = (length / 4).clamp(1, 3);
+        let mut postings = Vec::new();
         for gram in &query {
             if let Some(id) = self.grams.get(gram) {
                 let id = index(id)?;
@@ -227,42 +223,34 @@ impl Names {
                     .get(id)
                     .zip(self.gram_offsets.get(id + 1))
                     .ok_or_else(|| Error::Corrupt("Invalid trigram span".into()))?;
-                for id in self
-                    .postings
-                    .get(*a..*b)
-                    .ok_or_else(|| Error::Corrupt("Invalid trigram postings".into()))?
-                {
-                    if let Some(count) = counts.get_mut(*id) {
-                        if *count == 0 {
-                            touched.push(*id);
-                        }
-                        *count = count.saturating_add(1);
-                    }
-                }
+                postings.push(
+                    self.postings
+                        .get(*a..*b)
+                        .ok_or_else(|| Error::Corrupt("Invalid trigram postings".into()))?,
+                );
             }
         }
         let mut rows = Vec::new();
-        // Only visited keys need testing; common postings are already sorted.
-        touched.sort_unstable();
-        for id in touched {
-            let common = usize::from(counts.get(id).copied().unwrap_or(0));
-            let required = ((query.len() + self.gram_counts.get(id).copied().unwrap_or(128)) * 45)
-                .div_ceil(200);
-            if common < required
-                || self
-                    .lengths
-                    .get(id)
-                    .is_none_or(|n| n.abs_diff(length) > edits)
-            {
-                continue;
-            }
+        for id in self.buckets.candidates(key, postings, budget) {
             let name = self
                 .keys
                 .get(id)
                 .ok_or_else(|| Error::Corrupt("Missing name key".into()))?;
-            // Dice >= 0.45, then at most three edits; integer math avoids unstable score ties.
-            if distance.close(name) {
-                rows.extend(self.rows(id as u64)?);
+            if !distance.close(name) {
+                continue;
+            }
+            let bounded = format!("^{name}$");
+            let common = query
+                .iter()
+                .filter(|g| bounded.contains(g.as_str()))
+                .count();
+            let required = ((query.len() + self.gram_counts.get(id).copied().unwrap_or(128)) * 45)
+                .div_ceil(200);
+            if common >= required {
+                rows.extend(self.rows(id as u64)?.take(budget - rows.len()));
+                if rows.len() == budget {
+                    break;
+                }
             }
         }
         Ok(rows)
@@ -345,6 +333,26 @@ mod tests {
     use super::*;
     use crate::name_normalization::close;
     use proptest::prelude::*;
+    #[test]
+    fn duplicate_spellings_cannot_expand_fuzzy_rows_past_the_budget() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("names.bin");
+        let entry = (
+            "fixture town".into(),
+            Entry {
+                places: [1, 0, 2],
+                name: "Fixture Town".into(),
+                alternate: false,
+            },
+        );
+        std::fs::write(&path, encode_entries(&vec![entry; 10_000]).unwrap()).unwrap();
+        let names = Names::open(&path).unwrap();
+        assert_eq!(
+            names.fuzzy("fixture towq", 8).unwrap(),
+            (0..8).collect::<Vec<_>>()
+        );
+        assert_eq!(names.exact("fixture town").unwrap().len(), 10_000);
+    }
     proptest! {
         #[test]
         fn fuzzy_agrees_with_exhaustive_dice_and_edit_distance(
@@ -359,7 +367,7 @@ mod tests {
                 let other=trigrams(name);
                 (grams.intersection(&other).count()*200 >= (grams.len()+other.len())*45 && close(&query,name)).then_some(row)
             }).collect::<Vec<_>>();
-            prop_assert_eq!(index.fuzzy(&query).unwrap(),expected);
+            prop_assert_eq!(index.fuzzy(&query, super::super::name_search::FUZZY_KEYS).unwrap(),expected);
         }
 
         #[test]

@@ -128,6 +128,15 @@ def main() -> None:
         f"{v['single_shard_spans']['hot_offsets_max_bytes']:,} |"
         for phase, v in spans.items()
     )
+    world = core.get("world_scale", {})
+    world_rows = "\n".join(
+        f"| {verb} | {phase} | {v[verb]['scalar_median_us']:.3f} | "
+        f"{v[verb]['scalar_p99_us']:.3f} | "
+        f"{v[verb]['batch_points_per_second']:,.0f} |"
+        for verb in ("ip", "names_exact", "names_random", "names_fuzzy_common_grams")
+        for phase, v in world.items()
+        if phase in {"before", "after"}
+    )
     text = f"""# Thereabouts client status
 
 The Rust runtime and Python reverse/forward API are implemented. This report
@@ -210,6 +219,25 @@ fresh decoded caches, with warm filesystem caches; timings include Python.
 These measurements come from benchmarks.single_shard_read_path; both the synthetic
 and real-sample physical spans are retained in CLIENT_CORE_MEASUREMENTS.json.
 
+Forward tables now share a lazy 512 MiB decoded-block LRU per opened pack.
+IP starts use contiguous 24-byte rows. IO and decompression remain outside the
+cache lock. Fuzzy search derives length/first-trigram buckets and has pack-wide
+budgets of 2,048 keys, 16,384 posting visits and 256 projected rows. Exact and
+prefix are exhaustive; larger fuzzy searches can omit otherwise eligible cities,
+and population ranks the admitted set. Hard geography filters still apply.
+
+| Synthetic workload | Reader | Median µs | p99 µs | Batch rows/s |
+| --- | --- | ---: | ---: | ---: |
+{world_rows}
+
+The world-scale script uses 7.8M synthetic intervals with gaps and one million
+distinct name keys across 34 shards. It explicitly preloads file bytes, then opens
+fresh decoded caches. Initial block misses are included. It measures search
+scale, not world accuracy or compressibility. Historical unconditioned filesystem
+runs are retained as history in the JSON. Process peak RSS was
+{world.get("before", {}).get("process_peak_rss_bytes", 0):,} bytes before and
+{world.get("after", {}).get("process_peak_rss_bytes", 0):,} bytes after.
+
 ## What changed in the package-2 rework
 
 Forward packs use format 2.2: bounded LZ4 column blocks, dictionary IDs, FST
@@ -228,7 +256,8 @@ gate. Before/after sample row counts differ and are retained in the JSON.
 Catalogue misses use one record read, one contiguous offsets read and one text
 read; evidence is fetched only on request. Exact geocode reuses its first FST
 lookup. Fuzzy search uses bounded counters, cached trigram cardinalities and
-bit-parallel edit distance without dropping eligible candidates. Plate matching
+bit-parallel edit distance; the later R4 work bounds its admitted candidate set.
+Plate matching
 prefilters with RegexSet before ordered capture extraction and scoring.
 
 Ambiguity retains all shared flat fields across the complete candidate set,
@@ -382,11 +411,11 @@ IPv6 low words are preserved; the measured export contains
 
 {section(old, "forward-scale")}
 
-Synthetic scale covers {core["forward_scale"]["after"]["intervals"]:,} intervals
-with gaps and {core["forward_scale"]["after"]["name_keys"]:,} name keys. It measures
-search scale, not world accuracy or compressibility. Common-trigram fuzzy cases
-retain many legitimate candidates. The native profile is retained in
-docs/measurements/geocode-profile.txt; projection dominates that mixed workload.
+The historical package-2 scale run covered
+{core["forward_scale"]["after"]["intervals"]:,} intervals
+with gaps and {core["forward_scale"]["after"]["name_keys"]:,} name keys. Its uncapped
+fuzzy profile is retained in
+docs/measurements/geocode-profile.txt; it predates the million-key R4 measurements.
 
 {section(old, "plates-rules")}
 

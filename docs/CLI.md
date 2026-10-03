@@ -360,3 +360,11 @@ context; city detail and timezone are null. A partial core sample supplies
 only the places it contains. Python explicit paths select enrichment with
 `Geocoder(packs={"core": core_path, "postal": postal_path})`; a lone forward
 `Geocoder(path)` is deliberately standalone. Names lookups continue to use core.
+
+### Bounded fuzzy search
+
+Exact and prefix name lookup remain exhaustive. The fuzzy fallback uses the
+pack-wide key/row budgets documented in PACK_FORMAT.md. On large name indexes,
+otherwise eligible fuzzy cities may be omitted; population ranks the admitted
+candidates. Country and subdivision filters remain hard constraints on every
+returned result.

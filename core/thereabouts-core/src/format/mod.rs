@@ -26,6 +26,7 @@ pub mod plates;
 pub mod columns;
 pub mod compact;
 mod fst;
+pub(crate) mod name_search;
 pub mod names;
 pub mod table;
 

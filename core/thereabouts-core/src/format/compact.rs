@@ -87,6 +87,22 @@ pub(crate) struct Compact {
     tables: BTreeMap<String, Table>,
     keys: Option<fst::Map<Vec<u8>>>,
 }
+fn open_tables(root: &Path, manifest: &Manifest) -> Result<BTreeMap<String, Table>> {
+    let mut tables = BTreeMap::new();
+    let cache = table::block_cache();
+    for (identity, role) in ROLES.iter().enumerate() {
+        let kind = if role.ends_with("strings") {
+            table::STRING_KIND
+        } else {
+            table::INTEGER_KIND
+        };
+        tables.insert(
+            (*role).into(),
+            Table::open(root, manifest, role, kind, Arc::clone(&cache), identity)?,
+        );
+    }
+    Ok(tables)
+}
 impl Compact {
     pub(crate) fn open(root: &Path, manifest: &Manifest) -> Result<Self> {
         let schema = manifest
@@ -119,15 +135,7 @@ impl Compact {
                 .all(|role| manifest.files.iter().any(|f| &f.kind == role)),
             "Missing compressed table inventory",
         )?;
-        let mut tables = BTreeMap::new();
-        for role in ROLES {
-            let kind = if role.ends_with("strings") {
-                table::STRING_KIND
-            } else {
-                table::INTEGER_KIND
-            };
-            tables.insert((*role).into(), Table::open(root, manifest, role, kind)?);
-        }
+        let tables = open_tables(root, manifest)?;
         let keys = if manifest.family == "ip" {
             None
         } else {

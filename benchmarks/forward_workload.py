@@ -17,8 +17,17 @@ from thereabouts import Geocoder
 SEED = 271828
 
 
-def run(pack: Path, verb: str, queries: list[Query], count: int) -> dict[str, Any]:
+def run(
+    pack: Path, verb: str, queries: list[Query], count: int, *, warm_files: bool = False
+) -> dict[str, Any]:
     """Visit every key once, then sample uniformly; batch groups preserve options."""
+    if warm_files:
+        buffer = bytearray(65536)
+        for path in sorted(pack.iterdir()):
+            if path.is_file():
+                with path.open("rb") as stream:
+                    while stream.readinto(buffer):
+                        pass
     rng = random.Random(SEED)
     values = queries.copy()
     rng.shuffle(values)
@@ -46,6 +55,7 @@ def run(pack: Path, verb: str, queries: list[Query], count: int) -> dict[str, An
                 assert len(result["status"]) == len(group)
             rates.append(len(values) / (time.perf_counter() - start_batch))
     return {
+        "filesystem_cache": "preloaded" if warm_files else "uncontrolled",
         "queries": len(values),
         "distinct_queries": len(queries),
         "seed": SEED,

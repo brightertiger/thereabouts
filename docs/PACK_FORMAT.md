@@ -324,11 +324,20 @@ of at most 112 bytes covering its requested offsets, then at most 65,536
 UTF-8 bytes. Record-local string blocks prevent intervening records from entering
 either range. Only referenced strings are decoded/validated.
 The evidence reference is excluded unless evidence was requested. No catalogue miss loads or validates an entire shard. Retained
-caches use constant-time linked-key LRU eviction: 8 MiB for decoded blocks and
+caches use constant-time linked-key LRU eviction: 8 MiB for decoded spatial blocks and
 4 MiB for decoded places, with separate cache identities for query-only and
 evidence-bearing values. IO and decoding occur outside the cache mutex.
 Concurrent misses may decode the same immutable record; insertion reuses an
 existing cached value. Active readers can retain evicted values until finished.
+Forward integer/string tables share one lazy 512 MiB decompressed-block cache
+per opened pack, keyed by table identity and block ordinal. This budget is shared
+by interval, exact-key, prefix and evidence tables, rather than multiplied by the
+number of tables. Validated IP start rows occupy contiguous 24-byte triples;
+other tables retain their decoded rows/strings. IO, decompression and validation
+happen outside the cache mutex. Budget accounting includes owned payload
+capacities and the decoded value; hash-map bookkeeping and in-flight/evicted
+references add small overhead outside that budget. No cache changes wire bytes.
+
 Every shard retains the file handle opened with its validated directory and
 uses positioned reads; replacing its path cannot change the handle's contents.
 In-place mutation of an open shard is unsupported.
@@ -957,9 +966,34 @@ Search exact keys first. If no result survives the filters, search keys with
 the query as a prefix. If still empty, take trigram candidates having Dice
 similarity at least 0.45, then retain those with Levenshtein distance at most
 clamp(floor(query scalar length / 4),1,3). Distances count Unicode scalars.
-Hard country and subdivision filters precede ranking, phase selection and
-candidate truncation. Country is ISO alpha-2; subdivision compares the full
+Hard country and subdivision filters precede projection, ranking, phase selection
+and the returned-candidate limit. Country is ISO alpha-2; subdivision compares the full
 published code case-insensitively. Duplicated spellings yield one city.
+
+Exact and prefix retrieval are exhaustive. Fuzzy retrieval derives resident
+buckets from the existing key strings: Unicode scalar length and the first
+trigram of ^key$. There is no additional wire section. Across the pack, fuzzy
+search examines at most 2,048 keys and 16,384 posting entries, and projects at
+most 256 spelling rows. Split each allowance evenly across name shards in
+manifest order, assigning the remainder one per initial shard.
+
+In each shard, if all keys fit its key allowance, examine all keys within the
+edit-distance length window. Otherwise sort the query's posting lists by
+ascending length, then first key ordinal, and visit at most eight times that
+shard's key allowance. Discard keys outside the length window. Keep at most
+one allowance of distinct keys with the same first-trigram bucket and one
+allowance with a different first trigram. In ascending key order, select up
+to floor(3 × allowance / 4) from the same-prefix set, fill from the other set,
+then fill any remainder from the same-prefix set. This reserves room for errors
+at the beginning of a name without visiting common postings exhaustively.
+
+Apply the Dice/edit checks to admitted keys in ascending order, collecting at
+most the shard's key allowance of spelling rows. Apply hard filters to those
+rows and project at most its share of the 256-row budget. Deduplicate by city,
+then rank and apply the caller's output limit. Fuzzy recall and population
+ranking are therefore over this bounded admitted set, not over every potential
+world match. Large buckets, repeated spellings and very many shards can omit
+otherwise eligible fuzzy cities. Exact and prefix results are unaffected.
 
 Results have kind city, centroid point, centroid's r8 cell, catalogue timezone
 when published, and rank_basis population. Primary exact keys use match exact;

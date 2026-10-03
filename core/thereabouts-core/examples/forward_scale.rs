@@ -14,7 +14,7 @@ use thereabouts_core::{
     },
 };
 const INTERVALS: usize = 7_800_000;
-const NAMES: usize = 90_000;
+const NAMES: usize = 1_000_000;
 fn add(root: &Path, manifest: &mut Manifest, name: &str, kind: &str, bytes: &[u8]) -> Result<()> {
     let path = root.join(name);
     fs::write(&path, bytes)?;
@@ -117,7 +117,7 @@ fn ip(output: &Path) -> Result<()> {
 }
 fn name(mut id: usize) -> String {
     let mut suffix = String::new();
-    for _ in 0..4 {
+    for _ in 0..5 {
         suffix.push(char::from(b'a' + u8::try_from(id % 26).unwrap_or(0)));
         id /= 26;
     }
@@ -165,7 +165,11 @@ fn names(output: &Path) -> Result<()> {
         let mut places = Vec::new();
         for i in first..(first + 4096).min(NAMES) {
             let name = name(i);
-            places.push(place(format!("city:{i}"), name.clone(), "city"));
+            places.push(place(
+                format!("place:synthetic:{i:07}"),
+                name.clone(),
+                "city",
+            ));
             let id = u32::try_from(i + 2).map_err(|e| Error::Input(e.to_string()))?;
             entries.push((
                 name.to_ascii_lowercase(),

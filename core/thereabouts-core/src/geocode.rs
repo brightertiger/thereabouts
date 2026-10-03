@@ -1,7 +1,11 @@
 //! Canonical city-name lookup: filters precede population ranking and truncation.
 use crate::{
     Error, Result,
-    format::{Pack, spatial::Label},
+    format::{
+        Pack,
+        name_search::{FUZZY_KEYS, FUZZY_ROWS, share},
+        spatial::Label,
+    },
     result::{Evidence, Kind, LookupResult, Match, Status},
 };
 use std::collections::BTreeMap;
@@ -66,31 +70,39 @@ impl Pack {
         if let Some(result) = crate::name_query::classify(value, known) {
             return Ok(result);
         }
+        let mut filters = BTreeMap::new();
         for phase in 0_u8..3 {
             let mut grouped = BTreeMap::<u32, LookupResult>::new();
-            for (index, exact_rows) in self.names.iter().zip(&exact) {
+            for (ordinal, (index, exact_rows)) in self.names.iter().zip(&exact).enumerate() {
+                let key_budget = share(FUZZY_KEYS, self.names.len(), ordinal);
+                let row_budget = share(FUZZY_ROWS, self.names.len(), ordinal);
+                let mut admitted = 0;
                 let rows = match phase {
                     0 => exact_rows.clone(),
                     1 => index.prefix(&key)?,
-                    _ => index.fuzzy(&key)?,
+                    _ => index.fuzzy(&key, key_budget)?,
                 };
                 for row in rows {
                     let ([c, s, city], alternate) = index.record(row, self.place_count)?;
+                    if phase == 2 && admitted == row_budget {
+                        break;
+                    }
+                    let allowed = if let Some(allowed) = filters.get(&(c, s)) {
+                        *allowed
+                    } else {
+                        let allowed =
+                            self.name_allowed(c, s, country.as_deref(), options.subdivision)?;
+                        filters.insert((c, s), allowed);
+                        allowed
+                    };
+                    if !allowed {
+                        continue;
+                    }
+                    admitted += 1;
                     let mut answer = self.project(
                         LookupResult::empty(Status::Matched),
                         Label([c, s, city, 0, 0]),
                     )?;
-                    if country.as_ref().is_some_and(|filter| {
-                        answer.country.as_ref().is_none_or(|c| &c.code != filter)
-                    }) || options.subdivision.is_some_and(|filter| {
-                        answer
-                            .state
-                            .as_ref()
-                            .and_then(|s| s.code.as_deref())
-                            .is_none_or(|code| !code.eq_ignore_ascii_case(filter.trim()))
-                    }) {
-                        continue;
-                    }
                     let method = if phase > 0 {
                         Match::Fuzzy
                     } else if alternate {
@@ -122,6 +134,29 @@ impl Pack {
         let mut result = LookupResult::empty(Status::NotFound);
         result.kind = Kind::City;
         Ok(result)
+    }
+    fn name_allowed(
+        &self,
+        country: u32,
+        state: u32,
+        country_filter: Option<&str>,
+        subdivision: Option<&str>,
+    ) -> Result<bool> {
+        if let Some(filter) = country_filter
+            && self
+                .place(country, false)?
+                .is_none_or(|p| p.field(6) != filter)
+        {
+            return Ok(false);
+        }
+        if let Some(filter) = subdivision
+            && self
+                .place(state, false)?
+                .is_none_or(|p| !p.field(7).eq_ignore_ascii_case(filter.trim()))
+        {
+            return Ok(false);
+        }
+        Ok(true)
     }
     fn name_evidence(
         &self,

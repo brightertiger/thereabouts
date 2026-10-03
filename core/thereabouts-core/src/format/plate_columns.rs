@@ -29,7 +29,8 @@ impl PlateColumns {
             "Missing plate columns",
         )?;
         let mut tables = BTreeMap::new();
-        for role in ROLES {
+        let cache = table::block_cache();
+        for (identity, role) in ROLES.iter().enumerate() {
             tables.insert(
                 (*role).into(),
                 Table::open(
@@ -41,6 +42,8 @@ impl PlateColumns {
                     } else {
                         table::INTEGER_KIND
                     },
+                    std::sync::Arc::clone(&cache),
+                    identity,
                 )?,
             );
         }

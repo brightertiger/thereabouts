@@ -20,7 +20,16 @@ pub const STRING_KIND: u32 = 10;
 #[derive(Debug)]
 pub(crate) enum Data {
     Integers(Vec<Vec<u64>>),
+    Starts(Vec<[u64; 3]>),
     Strings(Vec<String>),
+}
+/// One shared budget per forward pack, allocated lazily. The 7.8M-interval
+/// workload has 15.6M starts/gaps: 374.4 MB as 24-byte rows. 512 MiB retains
+/// that working set and its small dictionaries without a budget per table.
+pub(crate) const DECODED_BLOCK_CACHE_BYTES: usize = 512 * 1024 * 1024;
+pub(crate) type BlockCache = Arc<Mutex<Cache<(usize, usize), Data>>>;
+pub(crate) fn block_cache() -> BlockCache {
+    Arc::new(Mutex::new(Cache::new(DECODED_BLOCK_CACHE_BYTES)))
 }
 #[derive(Debug)]
 struct Block {
@@ -39,10 +48,18 @@ pub(crate) struct Table {
     kind: u32,
     keyed: bool,
     pub(crate) rows: usize,
-    cache: Mutex<Cache<usize, Data>>,
+    cache: BlockCache,
+    identity: usize,
 }
 impl Table {
-    pub(crate) fn open(root: &Path, manifest: &Manifest, role: &str, kind: u32) -> Result<Self> {
+    pub(crate) fn open(
+        root: &Path,
+        manifest: &Manifest,
+        role: &str,
+        kind: u32,
+        cache: BlockCache,
+        identity: usize,
+    ) -> Result<Self> {
         let keyed = matches!(role, "starts4" | "starts6");
         let mut blocks = Vec::<Block>::new();
         let mut rows = 0;
@@ -98,7 +115,8 @@ impl Table {
             kind,
             keyed,
             rows,
-            cache: Mutex::new(Cache::new(8 * 1024 * 1024)),
+            cache,
+            identity,
         })
     }
     fn block(&self, number: usize) -> Result<Arc<Data>> {
@@ -106,7 +124,7 @@ impl Table {
             .cache
             .lock()
             .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
-            .get(number)
+            .get((self.identity, number))
         {
             return Ok(data);
         }
@@ -130,24 +148,32 @@ impl Table {
                     "Start directory key disagrees",
                 )?;
             }
-            let size = rows
-                .iter()
-                .map(|r| r.capacity() * 8 + size_of::<Vec<u64>>())
-                .sum();
-            (Data::Integers(rows), size)
+            if self.keyed {
+                let starts = rows
+                    .into_iter()
+                    .map(|r| {
+                        r.try_into()
+                            .map_err(|_| Error::Corrupt("Invalid start width".into()))
+                    })
+                    .collect::<Result<Vec<[u64; 3]>>>()?;
+                let size = starts.capacity() * size_of::<[u64; 3]>();
+                (Data::Starts(starts), size)
+            } else {
+                let size = rows.capacity() * size_of::<Vec<u64>>()
+                    + rows.iter().map(|r| r.capacity() * 8).sum::<usize>();
+                (Data::Integers(rows), size)
+            }
         } else {
             let values = decode_strings(&raw, b.rows)?;
-            let size = values
-                .iter()
-                .map(|s| s.capacity() + size_of::<String>())
-                .sum();
+            let size = values.capacity() * size_of::<String>()
+                + values.iter().map(String::capacity).sum::<usize>();
             (Data::Strings(values), size)
         };
         Ok(self
             .cache
             .lock()
             .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
-            .insert(number, data, size))
+            .insert((self.identity, number), data, size + size_of::<Data>()))
     }
     fn locate(&self, row: usize) -> Result<(Arc<Data>, usize)> {
         ensure(row < self.rows, "Dangling table row")?;
@@ -165,12 +191,12 @@ impl Table {
     }
     pub(crate) fn row(&self, row: usize) -> Result<Vec<u64>> {
         let (data, row) = self.locate(row)?;
-        let Data::Integers(rows) = data.as_ref() else {
-            return Err(Error::Corrupt("Expected numeric table".into()));
-        };
-        rows.get(row)
-            .cloned()
-            .ok_or_else(|| Error::Corrupt("Missing numeric row".into()))
+        match data.as_ref() {
+            Data::Integers(rows) => rows.get(row).cloned(),
+            Data::Starts(rows) => rows.get(row).map(|r| r.to_vec()),
+            Data::Strings(_) => None,
+        }
+        .ok_or_else(|| Error::Corrupt("Missing numeric row".into()))
     }
     pub(crate) fn string(&self, row: usize) -> Result<String> {
         let (data, row) = self.locate(row)?;
@@ -271,4 +297,39 @@ fn integer_key(row: &[u64]) -> Result<u128> {
         .get(1)
         .ok_or_else(|| Error::Corrupt("Missing start".into()))?;
     Ok((u128::from(*high) << 64) | u128::from(*low))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn decoded_blocks_are_shared_without_colliding_between_tables() {
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tests/fixtures/packs/ip-sample");
+        let manifest = manifest::read(&root).unwrap();
+        let cache = block_cache();
+        let starts = Table::open(
+            &root,
+            &manifest,
+            "starts4",
+            INTEGER_KIND,
+            Arc::clone(&cache),
+            0,
+        )
+        .unwrap();
+        let strings = Table::open(&root, &manifest, "strings", STRING_KIND, cache, 1).unwrap();
+        let file = &starts.blocks[0].file;
+        file.reads.lock().unwrap().clear();
+        let first = starts.block(0).unwrap();
+        assert!(matches!(first.as_ref(), Data::Starts(_)));
+        assert_eq!(file.reads.lock().unwrap().len(), 1);
+        assert!(Arc::ptr_eq(&first, &starts.block(0).unwrap()));
+        assert_eq!(file.reads.lock().unwrap().len(), 1);
+        assert!(matches!(
+            strings.block(0).unwrap().as_ref(),
+            Data::Strings(_)
+        ));
+        assert!(Arc::ptr_eq(&first, &starts.block(0).unwrap()));
+        assert_eq!(file.reads.lock().unwrap().len(), 1);
+    }
 }

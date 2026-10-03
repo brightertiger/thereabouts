@@ -18,7 +18,7 @@ impl Compact {
         let Some((block, base)) = table.block_at_key(address)? else {
             return Ok(vec![]);
         };
-        let Data::Integers(rows) = block.as_ref() else {
+        let Data::Starts(rows) = block.as_ref() else {
             return Err(Error::Corrupt("Invalid address table".into()));
         };
         let Some(local) = rows
