@@ -80,6 +80,11 @@ resolutions 3–8, dictionary-coded labels) and adds families.
 | `airports` | IATA/ICAO/GPS/local codes | `airport` | ~5 MB |
 | `locode` | UN/LOCODE | `locode` | ~5 MB |
 | `ip` | sorted IPv4/IPv6 intervals → country, region, city | `ip` | ~120 MB |
+
+Forward packs are columnar: dictionary-coded strings in a pack-level pool,
+fixed-width or bit-packed columns in compressed blocks of a few thousand rows,
+keys in an FST, evidence in separate sections read only on request. Per-row
+budgets are enforced by tests (IP ≤ 16 bytes/row, postal ≤ 14, others ≤ 40).
 | `phone` | calling codes, prefix trie, metadata | `phone` | ~5 MB |
 | `plates` | per-country format rules, state/series tables | `plate` | ~2 MB |
 | `names-full` | all 6.9M place names with alternates, for `geocode(..., scope="places")` | optional | 100–250 MB |
@@ -122,7 +127,8 @@ Result
   point:    {lat, lon} representative point | null        (cell centre or place centroid)
   cell:     H3 resolution-8 id | null
   distance_band: {greater_than_km, at_most_km} for nearest matches | null   (the dataset records bands, not exact distances)
-  candidates: [Result] when ambiguous, ranked, with rank_basis; the flat fields are then null
+  candidates: [Result] when ambiguous, ranked, with rank_basis; flat fields on which
+            all candidates agree (often country, state, timezone) are filled, the rest null
   evidence: optional detail (method chain, source ids) behind an explicit flag
 ```
 
@@ -160,8 +166,8 @@ await geo.close();
 Rules shared by both: `lat`/`lon` keyword or object only, never positional
 pairs; `geocode` rejects code-shaped input (`75001`, `8.8.8.8`, `+44`) with
 `invalid_input` and a hint naming the right method; address-shaped input
-returns `unsupported_granularity`; ambiguity returns `status: ambiguous` with the flat fields null and ranked
-`candidates`, unless the caller opts into `prefer="population"`; errors
+returns `unsupported_granularity`; ambiguity returns `status: ambiguous` with ranked `candidates` and only the
+flat fields the candidates disagree on left null, unless the caller opts into `prefer="population"`; errors
 (`DataNotInstalledError`, `IncompatibleDataError`, `CorruptPackError`,
 `ClosedGeocoderError`) carry a stable `code` and, for missing data, the exact
 `thereabouts data install …` command. JSON serialisation uses `snake_case`
