@@ -1,0 +1,932 @@
+{
+  "throwaway": true,
+  "timestamp": "2026-10-03T19:03:50Z",
+  "machine": {
+    "system": "macOS-27.0-arm64-arm-64bit",
+    "processor": "arm",
+    "logical_cpus": 8,
+    "physical_ram": 8589934592
+  },
+  "python": "3.12.8",
+  "versions": {
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "h3": "4.5.0",
+    "duckdb": "1.5.6",
+    "pyarrow": "23.0.1",
+    "geographiclib": "2.1",
+    "rapidfuzz": "3.14.6",
+    "s2sphere": "0.2.5",
+    "pygeohash": "3.5.1"
+  },
+  "radius_m": 10000.0,
+  "score_weights": [
+    0.65,
+    0.25,
+    0.1
+  ],
+  "threshold": 0.83,
+  "margin": 0.05,
+  "code_sha256": "527a86d664e377f9afd351522ea8d6a9aa8faf4b3c9751f6174aa2ec3a4f4289",
+  "extraction": {
+    "geonames": {
+      "release": "20261001T160939Z",
+      "manifest_files": 119,
+      "selected_rows": 68835,
+      "seconds": 0.8035609159851447
+    },
+    "overture": {
+      "release": "2026-09-23.1",
+      "manifest_files": 409,
+      "selected_rows": 229447,
+      "seconds": 3.40407479199348
+    }
+  },
+  "countries": {
+    "BE": {
+      "review": [
+        {
+          "overture": "08e5e3e0-abc0-46ce-9dd6-faef4fa14c8e",
+          "geonames": "2789047",
+          "names": [
+            "Petit-Rœulx-lez-Nivelles",
+            null,
+            "Petit-Roeulx-lez-Nivelles",
+            null
+          ],
+          "aliases": [
+            [
+              "petitrœulxleznivelles"
+            ],
+            [
+              "petitroeulxleznivelles"
+            ]
+          ],
+          "types": [
+            "locality",
+            "village",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              50.5558268,
+              4.3119183
+            ],
+            [
+              50.55419,
+              4.31351
+            ]
+          ],
+          "distance_m": 214.18619597564881,
+          "overture_qid": "Q2161576",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "spike_plausible: ligature variant; no independent label"
+        },
+        {
+          "overture": "092f4136-52e3-470a-bebf-511d0b87977d",
+          "geonames": "2789570",
+          "names": [
+            "Ottignies-Louvain-la-Neuve",
+            null,
+            "Ottignies",
+            null
+          ],
+          "aliases": [
+            [
+              "ottignieslouvainlaneuve"
+            ],
+            [
+              "ottignies",
+              "ottignieslouvainlaneuveottignies",
+              "ottini",
+              "оттиньи"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              50.6654216,
+              4.5674107
+            ],
+            [
+              50.66535,
+              4.56679
+            ]
+          ],
+          "distance_m": 44.60129835312807,
+          "overture_qid": "Q329642",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "golden_preferred: municipality versus component settlement"
+        },
+        {
+          "overture": "092f4136-52e3-470a-bebf-511d0b87977d",
+          "geonames": "7647765",
+          "names": [
+            "Ottignies-Louvain-la-Neuve",
+            null,
+            "Ottignies-Louvain-la-Neuve",
+            null
+          ],
+          "aliases": [
+            [
+              "ottignieslouvainlaneuve"
+            ],
+            [
+              "aodinixinluwen",
+              "ocgniyelinouloven",
+              "otiniluvenlanev",
+              "otiniluvenlanov",
+              "ottignieslouvainlaneuve",
+              "ottiniacumnovumlovanium",
+              "ottiniluvenlanjov",
+              "отинилувенланьов",
+              "отињилувенланев",
+              "оттиньилувенланев",
+              "اوتینیلوونلنو",
+              "奥蒂尼新鲁汶"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              50.6654216,
+              4.5674107
+            ],
+            [
+              50.66714,
+              4.55023
+            ]
+          ],
+          "distance_m": 1229.6257414512245,
+          "overture_qid": "Q329642",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "golden_preferred: municipality versus component settlement"
+        },
+        {
+          "overture": "5911dd15-7cfa-4461-b286-ae3e6e6f54b0",
+          "geonames": "2799264",
+          "names": [
+            "Doorn",
+            null,
+            "Doren",
+            null
+          ],
+          "aliases": [
+            [
+              "doorn"
+            ],
+            [
+              "dooren",
+              "doren"
+            ]
+          ],
+          "types": [
+            "locality",
+            "hamlet",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              51.1752472,
+              4.2895872
+            ],
+            [
+              51.17544,
+              4.28952
+            ]
+          ],
+          "distance_m": 21.958101688950713,
+          "overture_qid": null,
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "unresolved: nearby spelling variant versus distant exact homonym"
+        },
+        {
+          "overture": "5911dd15-7cfa-4461-b286-ae3e6e6f54b0",
+          "geonames": "2799282",
+          "names": [
+            "Doorn",
+            null,
+            "Doorn",
+            null
+          ],
+          "aliases": [
+            [
+              "doorn"
+            ],
+            [
+              "doorn"
+            ]
+          ],
+          "types": [
+            "locality",
+            "hamlet",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              51.1752472,
+              4.2895872
+            ],
+            [
+              51.1505,
+              4.27765
+            ]
+          ],
+          "distance_m": 2877.0057274973024,
+          "overture_qid": null,
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "unresolved: nearby spelling variant versus distant exact homonym"
+        },
+        {
+          "overture": "bd5f123a-4ed5-4679-b2a8-ff4ef55049d1",
+          "geonames": "2800433",
+          "names": [
+            "Chaumont",
+            null,
+            "Chaumont",
+            null
+          ],
+          "aliases": [
+            [
+              "chaumont"
+            ],
+            [
+              "chaumont"
+            ]
+          ],
+          "types": [
+            "locality",
+            "hamlet",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              49.9199811,
+              5.6711689
+            ],
+            [
+              50.56464,
+              5.36332
+            ]
+          ],
+          "distance_m": 74994.92367643946,
+          "overture_qid": "Q21551205",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "spike_preferred_provisionally: identical names 94m versus 75km; audit Wikidata"
+        },
+        {
+          "overture": "bd5f123a-4ed5-4679-b2a8-ff4ef55049d1",
+          "geonames": "2800436",
+          "names": [
+            "Chaumont",
+            null,
+            "Chaumont",
+            null
+          ],
+          "aliases": [
+            [
+              "chaumont"
+            ],
+            [
+              "chaumont"
+            ]
+          ],
+          "types": [
+            "locality",
+            "hamlet",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              49.9199811,
+              5.6711689
+            ],
+            [
+              49.92053,
+              5.67217
+            ]
+          ],
+          "distance_m": 94.31906132884231,
+          "overture_qid": "Q21551205",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "spike_preferred_provisionally: identical names 94m versus 75km; audit Wikidata"
+        }
+      ],
+      "golden_miss_reasons": {
+        "not_top_candidate": 11,
+        "margin": 24,
+        "score_or_name": 85,
+        "assignment": 44,
+        "outside_radius": 4
+      },
+      "golden_multi_groups": 88,
+      "golden_distinct_geonames": 4733,
+      "geonames_rows": 13337,
+      "overture_rows": 8416,
+      "overture_eligible": 6274,
+      "golden_edges": 4823,
+      "radius_pairs": 861910,
+      "blocking": {
+        "ecef": {
+          "build_s": 0.006784958997741342,
+          "query_materialize_s": 0.1747671659977641,
+          "total_s": 0.18155224999645725,
+          "candidates": 861910,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.9991706406800747
+        },
+        "h3_k2": {
+          "build_s": 0.007691208011237904,
+          "query_materialize_s": 0.31124516698764637,
+          "total_s": 0.31893645800300874,
+          "candidates": 1597132,
+          "radius_misses": 844,
+          "radius_recall": 0.9990207794317272,
+          "golden_recall": 0.999377980510056
+        },
+        "h3_k4": {
+          "build_s": 0.0076611670083366334,
+          "query_materialize_s": 1.0489983749866951,
+          "total_s": 1.0566596249991562,
+          "candidates": 4846038,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.9995853203400373
+        },
+        "s2": {
+          "build_s": 0.07558391700149514,
+          "query_materialize_s": 2.541142125002807,
+          "total_s": 2.616726167005254,
+          "candidates": 1887944,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.999377980510056
+        },
+        "geohash": {
+          "build_s": 0.005528042005607858,
+          "query_materialize_s": 0.36275254099746235,
+          "total_s": 0.368280708004022,
+          "candidates": 1562545,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.999377980510056
+        }
+      },
+      "strict_1to1": {
+        "predicted": 4859,
+        "reference": 4823,
+        "true_positive": 4646,
+        "false_positive": 213,
+        "false_negative": 177,
+        "precision": 0.956163819715991,
+        "recall": 0.9633008500933029
+      },
+      "rule_many": {
+        "predicted": 4869,
+        "reference": 4823,
+        "true_positive": 4655,
+        "false_positive": 214,
+        "false_negative": 168,
+        "precision": 0.9560484699116861,
+        "recall": 0.965166908563135
+      },
+      "labelled_overture_domain": {
+        "predicted": 4659,
+        "reference": 4823,
+        "true_positive": 4655,
+        "false_positive": 4,
+        "false_negative": 168,
+        "precision": 0.9991414466623739,
+        "recall": 0.965166908563135
+      },
+      "predicted_outside_labelled_domain": 210,
+      "one_to_many_groups": 10,
+      "unmatched_overture": 1405,
+      "unmatched_geonames": 8478,
+      "distance_filter_s": 26.79114762498648,
+      "scoring_assignment_artifacts_s": 7.23104520799825,
+      "total_s": 39.06005654099863,
+      "golden_methods": {
+        "names": 4381,
+        "none": 7781,
+        "wikidata": 381,
+        "unlinked": 1451
+      }
+    },
+    "JP": {
+      "review": [
+        {
+          "overture": "01143241-d602-430a-b5d5-348ca1abb26b",
+          "geonames": "1848354",
+          "names": [
+            "横浜市",
+            "Yokohama",
+            "Yokohama",
+            "Yokohama"
+          ],
+          "aliases": [
+            [
+              "yokohama",
+              "横浜市"
+            ],
+            [
+              "hengbang",
+              "hengbangshi",
+              "hengbinshi",
+              "iokogama",
+              "jakagama",
+              "jokohama",
+              "jokohamo",
+              "jokokhama",
+              "yoakoahama",
+              "yok",
+              "yokohama",
+              "yokohamashi",
+              "yokohamasi",
+              "ywkwhama",
+              "ywqwhmh",
+              "иокогама",
+              "иокохама",
+              "якагама",
+              "јокохама",
+              "יוקוהמה",
+              "يوكوهاما",
+              "โยะโกะฮะมะ",
+              "იოკოჰამა",
+              "요코하마시",
+              "よこはま",
+              "よこはまし",
+              "ヨコハマ",
+              "ヨコハマシ",
+              "横浜",
+              "横浜市",
+              "横滨市"
+            ]
+          ],
+          "types": [
+            "locality",
+            "city",
+            "PPLA"
+          ],
+          "coordinates": [
+            [
+              35.4503381,
+              139.6343802
+            ],
+            [
+              35.43333,
+              139.65
+            ]
+          ],
+          "distance_m": 2360.539773230043,
+          "overture_qid": "Q38283",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "golden_preferred: Yokohama exact multilingual aliases; spike distance penalty"
+        },
+        {
+          "overture": "1a66a583-cf4d-4938-8670-353fc9c1e30b",
+          "geonames": "11402804",
+          "names": [
+            "津奈木町",
+            "Tsunagi",
+            "Kotsunagi",
+            null
+          ],
+          "aliases": [
+            [
+              "tsunagi",
+              "津奈木町"
+            ],
+            [
+              "kotsunagi",
+              "xiaojinnaimu",
+              "こつなき",
+              "コツナキ",
+              "小津奈木"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              32.2339118,
+              130.4396169
+            ],
+            [
+              32.22965,
+              130.4394
+            ]
+          ],
+          "distance_m": 473.0367055640157,
+          "overture_qid": "Q1184734",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "golden_preferred: Tsunagi versus distinct Kotsunagi name"
+        },
+        {
+          "overture": "1a66a583-cf4d-4938-8670-353fc9c1e30b",
+          "geonames": "1849633",
+          "names": [
+            "津奈木町",
+            "Tsunagi",
+            "Tsunagi",
+            null
+          ],
+          "aliases": [
+            [
+              "tsunagi",
+              "津奈木町"
+            ],
+            [
+              "jinnaimu",
+              "tsunagi",
+              "tsunaki",
+              "つなき",
+              "ツナキ",
+              "津奈木"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              32.2339118,
+              130.4396169
+            ],
+            [
+              32.23616,
+              130.47617
+            ]
+          ],
+          "distance_m": 3454.18569067089,
+          "overture_qid": "Q1184734",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "golden_preferred: Tsunagi versus distinct Kotsunagi name"
+        },
+        {
+          "overture": "c5ee4c97-0270-424d-86a2-6449feb8591a",
+          "geonames": "11147658",
+          "names": [
+            "益城町",
+            "Mashiki",
+            "Shimada",
+            null
+          ],
+          "aliases": [
+            [
+              "mashiki",
+              "益城町"
+            ],
+            [
+              "daotian",
+              "mashiki",
+              "shimada",
+              "しまた",
+              "シマタ",
+              "島田"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              32.7916295,
+              130.8164207
+            ],
+            [
+              32.75684,
+              130.79043
+            ]
+          ],
+          "distance_m": 4562.357530630705,
+          "overture_qid": "Q1206076",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "golden_preferred: exact Mashiki alias versus Mamizu/pinyin Mashui"
+        },
+        {
+          "overture": "c5ee4c97-0270-424d-86a2-6449feb8591a",
+          "geonames": "11147910",
+          "names": [
+            "益城町",
+            "Mashiki",
+            "Mamizu",
+            null
+          ],
+          "aliases": [
+            [
+              "mashiki",
+              "益城町"
+            ],
+            [
+              "mamizu",
+              "mashui",
+              "まみす",
+              "マミス",
+              "馬水"
+            ]
+          ],
+          "types": [
+            "locality",
+            "town",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              32.7916295,
+              130.8164207
+            ],
+            [
+              32.78711,
+              130.80631
+            ]
+          ],
+          "distance_m": 1071.5625143037137,
+          "overture_qid": "Q1206076",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "golden_preferred: exact Mashiki alias versus Mamizu/pinyin Mashui"
+        },
+        {
+          "overture": "ea82f079-9595-4712-a528-35e027a85875",
+          "geonames": "11611627",
+          "names": [
+            "東広島市",
+            "Higashi Hiroshima",
+            "Higashihiroshima",
+            null
+          ],
+          "aliases": [
+            [
+              "higashihiroshima",
+              "東広島市"
+            ],
+            [
+              "dongguangdao",
+              "higashihiroshima",
+              "khigashikhiroshima",
+              "хигашихирошима",
+              "東広島"
+            ]
+          ],
+          "types": [
+            "locality",
+            "city",
+            "PPLA2"
+          ],
+          "coordinates": [
+            [
+              34.4272126,
+              132.7416231
+            ],
+            [
+              34.40861,
+              132.73682
+            ]
+          ],
+          "distance_m": 2110.2963539824086,
+          "overture_qid": "Q653372",
+          "in_spike": false,
+          "in_golden": true,
+          "assessment": "unresolved: two same-name GeoNames records; golden selects PPLA2"
+        },
+        {
+          "overture": "ea82f079-9595-4712-a528-35e027a85875",
+          "geonames": "6822110",
+          "names": [
+            "東広島市",
+            "Higashi Hiroshima",
+            "Higashi-Hiroshima",
+            null
+          ],
+          "aliases": [
+            [
+              "higashihiroshima",
+              "東広島市"
+            ],
+            [
+              "dongguangdao",
+              "higashihiroshima",
+              "東広島"
+            ]
+          ],
+          "types": [
+            "locality",
+            "city",
+            "PPL"
+          ],
+          "coordinates": [
+            [
+              34.4272126,
+              132.7416231
+            ],
+            [
+              34.43484,
+              132.74062
+            ]
+          ],
+          "distance_m": 851.117689101525,
+          "overture_qid": "Q653372",
+          "in_spike": true,
+          "in_golden": false,
+          "assessment": "unresolved: two same-name GeoNames records; golden selects PPLA2"
+        }
+      ],
+      "golden_miss_reasons": {
+        "assignment": 422,
+        "score_or_name": 1253,
+        "margin": 38,
+        "not_top_candidate": 18,
+        "outside_radius": 20
+      },
+      "golden_multi_groups": 1372,
+      "golden_distinct_geonames": 2304,
+      "geonames_rows": 55498,
+      "overture_rows": 221031,
+      "overture_eligible": 9832,
+      "golden_edges": 3687,
+      "radius_pairs": 936897,
+      "blocking": {
+        "ecef": {
+          "build_s": 0.10983124998165295,
+          "query_materialize_s": 0.18154050002340227,
+          "total_s": 0.29137179200188257,
+          "candidates": 936897,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.994575535665853
+        },
+        "h3_k2": {
+          "build_s": 0.03742987499572337,
+          "query_materialize_s": 0.4083145839977078,
+          "total_s": 0.44574454199755564,
+          "candidates": 1593900,
+          "radius_misses": 553,
+          "radius_recall": 0.9994097536869048,
+          "golden_recall": 0.996202874966097
+        },
+        "h3_k4": {
+          "build_s": 0.032981291005853564,
+          "query_materialize_s": 0.8504526669858024,
+          "total_s": 0.8834339999884833,
+          "candidates": 3739525,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.9978302142663412
+        },
+        "s2": {
+          "build_s": 0.3194565840240102,
+          "query_materialize_s": 4.058535666001262,
+          "total_s": 4.377992334018927,
+          "candidates": 1771075,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.9964740981828044
+        },
+        "geohash": {
+          "build_s": 0.02409562500542961,
+          "query_materialize_s": 0.3775854590057861,
+          "total_s": 0.40168120901216753,
+          "candidates": 1570358,
+          "radius_misses": 0,
+          "radius_recall": 1.0,
+          "golden_recall": 0.9953892053159751
+        }
+      },
+      "strict_1to1": {
+        "predicted": 2029,
+        "reference": 3687,
+        "true_positive": 1920,
+        "false_positive": 109,
+        "false_negative": 1767,
+        "precision": 0.9462789551503203,
+        "recall": 0.5207485760781123
+      },
+      "rule_many": {
+        "predicted": 2045,
+        "reference": 3687,
+        "true_positive": 1936,
+        "false_positive": 109,
+        "false_negative": 1751,
+        "precision": 0.9466992665036675,
+        "recall": 0.5250881475454299
+      },
+      "labelled_overture_domain": {
+        "predicted": 1945,
+        "reference": 3687,
+        "true_positive": 1936,
+        "false_positive": 9,
+        "false_negative": 1751,
+        "precision": 0.9953727506426735,
+        "recall": 0.5250881475454299
+      },
+      "predicted_outside_labelled_domain": 100,
+      "one_to_many_groups": 15,
+      "unmatched_overture": 7787,
+      "unmatched_geonames": 53469,
+      "distance_filter_s": 27.732857666007476,
+      "scoring_assignment_artifacts_s": 8.517017791979015,
+      "total_s": 48.209323166985996,
+      "golden_methods": {
+        "names": 3307,
+        "none": 42922,
+        "wikidata": 333,
+        "unlinked": 6145
+      }
+    }
+  },
+  "inputs": {
+    "/Users/ujjwal/Downloads/solo/thereabouts/data/normalized/geonames/manifest.json": {
+      "sha256": "7605e41e07730e8f6fcff3c1a17b97c2f16586872dbc6ecfbbdec5957a74dda6",
+      "mtime_ns": 1790876250495302076
+    },
+    "/Users/ujjwal/Downloads/solo/thereabouts/data/normalized/overture/manifest.json": {
+      "sha256": "f8def01a5f20cdde940dec3df45529b6d433d10d48e2623f443320b4444cab9e",
+      "mtime_ns": 1790876229612013485
+    },
+    "/Users/ujjwal/Downloads/solo/thereabouts/data/golden/manifest.json": {
+      "sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+      "mtime_ns": 1790969280455068039
+    },
+    "/Users/ujjwal/Downloads/solo/thereabouts/data/golden-thereabouts/places/BE.parquet": {
+      "sha256": "7896dc40377708c09347eb55180753f4af815e2d2b8f5eb1573c095f5aeaa506",
+      "mtime_ns": 1790967646973817785
+    },
+    "/Users/ujjwal/Downloads/solo/thereabouts/data/golden-thereabouts/places/JP.parquet": {
+      "sha256": "e0d89f764374f9f61ecbdcbc9f9fceccda3c750d9aaff36edbb61c1bcde5a40e",
+      "mtime_ns": 1790967673474587584
+    }
+  },
+  "input_manifests_and_golden_unchanged": true,
+  "coordinate_bounds_m": {
+    "100": 1.0380907729579853e-09,
+    "1000": 1.0380907729579852e-06,
+    "10000": 0.0010380907729579854,
+    "100000": 1.0380907729579854
+  },
+  "reconcile_module_lines": {
+    "catalog.py": 23,
+    "build.py": 76,
+    "city_identity.py": 44,
+    "audit.py": 100,
+    "classification.py": 107,
+    "state_codes.py": 78,
+    "evaluation.py": 41,
+    "lookup.py": 170,
+    "areas.py": 151,
+    "__init__.py": 1,
+    "state_votes.py": 54,
+    "coverage.py": 110,
+    "spatial.py": 105,
+    "hierarchy.py": 47,
+    "matching.py": 159,
+    "rollups.py": 48,
+    "inputs.py": 88,
+    "common.py": 67,
+    "area_audit.py": 54,
+    "entities.py": 163,
+    "quality.py": 127,
+    "land.py": 128
+  },
+  "matched_micro": {
+    "predicted": 6914,
+    "reference": 8510,
+    "true_positive": 6591,
+    "false_positive": 323,
+    "false_negative": 1919,
+    "precision": 0.9532831935203934,
+    "recall": 0.7745005875440658
+  },
+  "elapsed_s": 93.73159741598647,
+  "max_rss_bytes": 1534836736,
+  "min_free_disk_bytes": 48483799040,
+  "explore_bytes": 589204852,
+  "venv_bytes": 473199482
+}
