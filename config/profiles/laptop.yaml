@@ -1,0 +1,9 @@
+# The existing builders used one DuckDB thread and at most 1 GB of its memory.
+resources:
+  duckdb_memory: 1GB
+  duckdb_threads: 1
+  workers: 1
+  rss_limit: 2000000000
+release:
+  dataset:
+    max_output_bytes: 3000000000

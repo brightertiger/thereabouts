@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from build_data.reference.oracle import FloatArray, Reference
-from build_data.reference.schema import EARTH_RADIUS_KM
+from pipeline.engines.schema import EARTH_RADIUS_KM
+from tests.support.reference.oracle import FloatArray, Reference
 
 
 def sample(reference: Reference, count: int, seed: int, *, nearby: bool) -> FloatArray:

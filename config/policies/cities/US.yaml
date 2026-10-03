@@ -1,0 +1,23 @@
+footprints:
+- city_id: city:geonames:5128581
+  reference: https://portal.311.nyc.gov/article/?kanumber=KA-02877
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:4784112
+  reference: Acquired Overture division c740bf61-630a-4451-8614-6d63c3a4e690; OSM
+    relation 9260621, separate Salem city locality linked to GeoNames 4784112.
+  reason: Salem independent city is encoded at county rank; its 0.00381 square-degree
+    municipal extent contains both linked anchors, unlike a surrounding county.
+parts:
+  city:geonames:5110302: city:geonames:5128581
+  city:geonames:5110266: city:geonames:5128581
+  city:geonames:5125771: city:geonames:5128581
+  city:geonames:5133273: city:geonames:5128581
+  city:geonames:5139568: city:geonames:5128581
+independent: []
+container_terms:
+- township
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.

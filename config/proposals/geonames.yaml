@@ -1,0 +1,41 @@
+release: ''
+selectors: []
+files:
+- name: allCountries.zip
+  url: https://download.geonames.org/export/dump/allCountries.zip
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: featureCodes_en.txt
+  url: https://download.geonames.org/export/dump/featureCodes_en.txt
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: admin2Codes.txt
+  url: https://download.geonames.org/export/dump/admin2Codes.txt
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: readme.txt
+  url: https://download.geonames.org/export/dump/readme.txt
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: alternateNamesV2.zip
+  url: https://download.geonames.org/export/dump/alternateNamesV2.zip
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: admin1CodesASCII.txt
+  url: https://download.geonames.org/export/dump/admin1CodesASCII.txt
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: countryInfo.txt
+  url: https://download.geonames.org/export/dump/countryInfo.txt
+  metadata:
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+settings:
+  release_file: allCountries.zip
+  date_format: '%Y%m%d'

@@ -1,0 +1,5 @@
+- country_code: IN
+  source: wiki-IN.json
+  table: 7
+  code_column: 0
+  name_column: 1

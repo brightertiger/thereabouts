@@ -6,6 +6,8 @@ from typing import Any, TypeVar
 import numpy as np
 from numpy.typing import NDArray
 
+# Bump only when the cell address/label encoding changes, never for refactoring.
+CELL_FORMAT_VERSION = 1
 BLOCK_RESOLUTION = 3
 H3_BASE_CELLS = 122
 H3_MAX_RESOLUTION = 15

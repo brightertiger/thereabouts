@@ -1,0 +1,51 @@
+footprints:
+- city_id: city:geonames:1796236
+  priority: 5
+  clip_urban: true
+  reference: Retained shared-identity municipality, restricted to connected GHSL core
+    per approved plan
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1792947
+  priority: 5
+  clip_urban: true
+  reference: Retained shared-identity municipality, restricted to connected GHSL core
+    per approved plan
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1816670
+  priority: 5
+  clip_urban: true
+  reference: Retained shared-identity municipality, restricted to connected GHSL core
+    per approved plan
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1814906
+  priority: 5
+  clip_urban: true
+  reference: Retained shared-identity municipality, restricted to connected GHSL core
+    per approved plan
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1786764
+  clip_urban: true
+  reference: Acquired Overture division e19642c4-0a8f-44d8-9406-2b9032418f8d; OSM
+    relation 2983923; connected GHSL centre containing linked GeoNames anchor.
+  reason: Prefecture polygon includes rural land; retain only its connected built-up
+    core under the same rule as the reviewed direct-administered cities.
+- city_id: city:geonames:2037346
+  clip_urban: true
+  reference: Acquired Overture division 157e451d-de93-4df6-b428-4549b4a6bf9c; OSM
+    relation 2769803; connected GHSL centre containing linked GeoNames anchor.
+  reason: Prefecture polygon includes rural land; retain only its connected built-up
+    core under the same rule as the reviewed direct-administered cities.
+parts: {}
+independent: []
+excluded_areas:
+- 6dc14a7a-3709-43e1-b112-cbcb54fce6fa
+excluded_area_evidence: Lanzhou New Area contains the separately retained Qinchuan
+  and Shangchuan town polygons; its 1,789-cell source area is not a single-city footprint.
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.

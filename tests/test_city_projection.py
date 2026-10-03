@@ -6,9 +6,10 @@ import numpy as np
 import pytest
 import shapely
 
-from build_data.cities.projection import project
-from build_data.reconcile.common import connect
-from build_data.reconcile.spatial import create_areas, insert_area
+from pipeline.config.engines import EngineLimits
+from pipeline.engines.cities.projection import project
+from pipeline.engines.reconcile.common import connect
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
 from tests.test_city_normalization import city, make_engine
 
 
@@ -17,7 +18,7 @@ def test_offshore_uses_city_on_projected_land(
     tmp_path: Path, original_boundary: bool
 ) -> None:
     land_path = tmp_path / "land.sqlite"
-    db = connect(land_path)
+    db = connect(land_path, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = (
         shapely.box(0.03, -0.03, 0.06, 0.03)
@@ -64,4 +65,4 @@ def test_offshore_uses_city_on_projected_land(
         )
         assert mixed.tolist() == ["coastal-city", "far-neighbour"]
     with pytest.raises(ValueError, match="land input"):
-        project(None, coordinates, np.array([True]))
+        project(None, coordinates, np.array([True]), EngineLimits())

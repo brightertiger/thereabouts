@@ -1,0 +1,81 @@
+# Retained-stage declarations for the legacy ledger migration only.
+# Ports change pipeline.yaml; this catalogue remains the adoption baseline.
+stages:
+- name: download
+  packages:
+  - pipeline/stages/retained.py
+- name: normalize
+  needs:
+  - download
+  packages:
+  - pipeline/stages/retained.py
+  native:
+  - duckdb
+  - shapely
+  - h3
+- name: reconcile
+  needs:
+  - normalize
+  packages:
+  - pipeline/stages/retained.py
+  native:
+  - duckdb
+  - shapely
+  - h3
+- name: cells
+  needs:
+  - reconcile
+  packages:
+  - pipeline/stages/retained.py
+  config:
+  - h3
+  native:
+  - duckdb
+  - shapely
+  - h3
+  cell_format: true
+- name: cities
+  needs:
+  - reconcile
+  - normalize
+  packages:
+  - pipeline/stages/retained.py
+  native:
+  - duckdb
+  - shapely
+  - h3
+- name: evaluate
+  needs:
+  - cells
+  - cities
+  packages:
+  - pipeline/stages/retained.py
+  config:
+  - h3
+  native:
+  - duckdb
+  - shapely
+  - h3
+- name: normalize_cells
+  needs:
+  - cells
+  - cities
+  - evaluate
+  packages:
+  - pipeline/stages/retained.py
+  config:
+  - h3
+  native:
+  - duckdb
+  - shapely
+  - h3
+  cell_format: true
+- name: lookups
+  needs:
+  - normalize
+  - normalize_cells
+  packages:
+  - pipeline/stages/retained.py
+  native:
+  - duckdb
+  - h3

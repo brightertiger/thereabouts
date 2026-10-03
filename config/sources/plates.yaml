@@ -1,0 +1,26 @@
+name: plates
+adapter: pipeline.sources.plates
+kind: registration_evidence
+enabled: true
+upstream:
+  url: https://raw.githubusercontent.com/datasets/country-codes/2e9d6498a0456f4afc2f6cf367d1e12a9ed4afe1/README.md
+licence:
+  id: per-file
+  url: https://opendatacommons.org/licenses/pddl/1-0/
+  attribution: Per-file source attribution and licence identifiers are retained in
+    pins.lock and every normalized row.
+limits:
+  # Two retained releases of capacity; current pinned bytes: 217,388,877.
+  download_bytes: 434777754
+options:
+  example_limit: 5
+  document_bytes: 64000000
+  pdf_version: pdftotext version 25.11.0
+policies:
+  coverage: config/policies/plates/coverage.yaml
+  formats: config/policies/plates/formats.yaml
+  rules: config/policies/plates/rules.yaml
+  sources: config/policies/plates/sources.yaml
+  survey: config/policies/plates/survey.yaml
+  wikidata: config/policies/plates/wikidata.yaml
+options_schema: pipeline.config.source_options.Plates

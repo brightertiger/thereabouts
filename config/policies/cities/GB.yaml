@@ -1,0 +1,45 @@
+footprints:
+- city_id: city:geonames:2643743
+  members:
+  - 10b4f1b5-9ed8-436f-8157-dd264cd31ade
+  - 19317970-00e5-4f6f-a2a5-46a2be6e770a
+  - 223b2141-d782-41ad-88dd-e7b2d25853bf
+  - 29064d5c-c93d-4770-8d3b-46f19e16eb53
+  - 35097f38-1580-48a2-9e35-3b1b007b1aef
+  - 4a7c8136-de3a-4a6c-a69b-964f09bf27a8
+  - 50fdc785-d1bb-461c-b467-fe1cb550a0d4
+  - 672c33d5-a755-423d-b0eb-d9cfe104fb40
+  - 6955cc6e-5e0c-4b03-8b67-c9b6b7c6aeff
+  - 6dc78aa5-b687-4cac-a4f8-7d446c41eb49
+  - 6f8902d3-c757-4573-94bd-dd930c546471
+  - 754be612-f816-4eae-8661-1a503a0f86d0
+  - 82865424-fadc-41ca-a422-600a14d7c3a9
+  - 837a08ed-255c-47d1-89bf-ce195cb6c294
+  - 8c23aadd-d29c-41fe-8a5b-76db46347a8e
+  - 8c52b2b2-fa19-4d4d-8df7-64502e4860fc
+  - 91fcf399-7510-498c-8112-4b5d9d8d34b1
+  - 98c4a68e-1020-498e-84f5-c629db5c288b
+  - 9912cc5a-2f3b-4437-933b-eb4902729d0a
+  - aa664a5f-5532-484f-8e9a-a30ffa58fb9e
+  - b47d7b84-9b8c-4872-898e-4ea39c9d01b0
+  - b64871c3-3df7-478f-91a9-1b7ead142384
+  - c1db38e0-d021-4188-a66f-92d178c0d354
+  - ca828762-c4b3-40ff-a707-5d6bac5bcc1d
+  - cb8f16da-029e-4f8e-9e37-939160457ec5
+  - cf2fef61-a880-424f-bd56-e54e11753660
+  - d6a66966-ce2f-4ce4-b5b8-3cd5d74f42ff
+  - e47e3740-396b-44c7-a780-980f29849610
+  - e785ce65-348a-460f-9c90-c592c0a1d1ad
+  - f3920768-b2c4-41b6-8fbc-54f78bd95fd0
+  - f6cfaf46-bb61-4719-a4f0-adc851c6d61b
+  - fd629040-d8b1-481d-adad-6db19d068681
+  - fee3fd74-1ed4-4567-b27f-1c0cad0e42c6
+  reference: Existing reviewed reconciliation policy; pinned membership
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+parts: {}
+independent: []
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.

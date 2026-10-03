@@ -1,0 +1,34 @@
+# Publication is explicit: enable and choose a version for each release.
+enabled: false
+version: ''
+title: Thereabouts offline geocoding dataset
+description: Canonical places, H3 reverse lookup and source code observations.
+contact: 'OWNER DECISION: public maintenance contact'
+citation: 'OWNER DECISION: preferred dataset citation'
+documentation: 'OWNER DECISION: public documentation URL'
+update_frequency: Monthly
+region: "OWNER DECISION: release bucket region"
+license: ODbL-1.0
+previous_version: ''
+countries: []
+blocks: []
+example_latitude: 3.139
+example_longitude: 101.6869
+schema: config/dataset.yaml
+readme_template: config/templates/dataset-readme.md
+dataset:
+  # Workspace admission still checks available space before every write.
+  max_output_bytes: ${resources.max_workspace}
+  # MY/SG proof: 8.74 MB output, 360 MB RSS with these batch sizes.
+  # Up to 49 r3 blocks share an r1 group.
+  batch_rows: 1024
+  # Non-cell tables only; cells use exactly one row group per retained r3 block.
+  row_group_rows: 16384
+  compression: zstd
+  cell_group_resolution: 1
+packs:
+  families: [core, postal, airports, locode, phone, ip]
+publish:
+  read_bytes: 1048576
+  # S3's minimum multipart part size, also exercised by the local fake.
+  multipart_bytes: 5242880

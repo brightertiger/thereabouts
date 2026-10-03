@@ -1,0 +1,16 @@
+name: dbip
+adapter: pipeline.sources.dbip
+kind: dbip
+enabled: true
+upstream:
+  proposal: config/proposals/dbip.yaml
+  url: https://download.db-ip.com/free/dbip-city-lite-2026-10.csv.gz
+licence:
+  id: CC-BY-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  attribution: IP Geolocation by DB-IP https://db-ip.com
+limits:
+  # Two retained releases of capacity; current pinned bytes: 85,827,400.
+  download_bytes: 171654800
+options: {}
+options_schema: pipeline.config.source_options.Text

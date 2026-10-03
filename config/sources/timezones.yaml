@@ -1,0 +1,24 @@
+name: timezones
+adapter: pipeline.sources.timezones
+kind: timezones
+enabled: true
+upstream:
+  proposal: config/proposals/timezones.yaml
+  url: https://github.com/evansiroky/timezone-boundary-builder/releases/download/2026d/timezone-names-with-oceans.json
+licence:
+  id: per-file
+  url: https://opendatacommons.org/licenses/odbl/1-0/
+  attribution: Per-file source attribution and licence identifiers are retained in
+    pins.lock and every normalized row.
+limits:
+  # Two retained releases of capacity; current pinned bytes: 89,226,948.
+  download_bytes: 178453896
+options:
+  boundary_file: timezones-with-oceans.shapefile.zip
+  names_file: timezone-names-with-oceans.json
+  iana_suffix: .tar.gz
+  cover_batch_rows: 4096
+  geometry_bytes: 4000000
+  geometry_max_depth: 32
+  semantics: res8-center; with-oceans; overlaps retained
+options_schema: pipeline.config.source_options.Timezones

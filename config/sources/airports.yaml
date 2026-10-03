@@ -1,0 +1,16 @@
+name: airports
+adapter: pipeline.sources.airports
+kind: airports
+enabled: true
+upstream:
+  proposal: config/proposals/airports.yaml
+  url: https://davidmegginson.github.io/ourairports-data/airports.csv
+licence:
+  id: Public-Domain
+  url: https://ourairports.com/data/
+  attribution: OurAirports contributors
+limits:
+  # Two retained releases of capacity; current pinned bytes: 12,734,002.
+  download_bytes: 25468004
+options: {}
+options_schema: pipeline.config.source_options.Text

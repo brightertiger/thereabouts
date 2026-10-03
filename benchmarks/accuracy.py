@@ -7,8 +7,8 @@ from typing import Any
 
 import numpy as np
 
-from build_data.reference.oracle import Reference
-from build_data.sources import sha256
+from pipeline.runtime.jsonio import sha256_file as sha256
+from tests.support.reference.oracle import Reference
 from thereabouts import Geocoder
 
 from .sampling import sample

@@ -8,8 +8,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from build_data.acquire.io import write_json
-from build_data.normalize_cells.score import normalized_name, score
+from pipeline.config import load
+from pipeline.engines.normalize_cells.score import normalized_name
+from pipeline.evaluation.score import score
+from pipeline.runtime.jsonio import write_json
 
 
 def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -> None:
@@ -75,24 +77,65 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
             {
                 "kind": "cells",
                 "block": h3.cell_to_parent(cell, 3),
-                "path": str(cell_path),
+                "path": cell_path.name,
             },
-            {"kind": "places", "path": str(place_path)},
+            {"kind": "places", "path": place_path.name},
         ],
     }
     write_json(tmp_path / "manifest.json", manifest)
     with pytest.raises(ValueError, match="final verified"):
-        score(tmp_path, points, "holdout")
-    assert score(tmp_path, points, "dev")["counts"]["correct"] == 0
+        score(
+            tmp_path,
+            tmp_path / "manifest.json",
+            points,
+            "holdout",
+            tmp_path / "holdout-score.json",
+            config=load(),
+        )
+    assert (
+        score(
+            tmp_path,
+            tmp_path / "manifest.json",
+            points,
+            "dev",
+            tmp_path / "dev-score.json",
+            config=load(),
+        )["counts"]["correct"]
+        == 0
+    )
     manifest["completed"] = True
     write_json(tmp_path / "manifest.json", manifest)
-    result = score(tmp_path, points, "holdout")
+    result = score(
+        tmp_path,
+        tmp_path / "manifest.json",
+        points,
+        "holdout",
+        tmp_path / "holdout-score.json",
+        config=load(),
+    )
     assert result["counts"]["total"] == result["counts"]["correct"] == 1
-    assert score(tmp_path, points, "holdout") == result
+    assert (
+        score(
+            tmp_path,
+            tmp_path / "manifest.json",
+            points,
+            "holdout",
+            tmp_path / "holdout-score.json",
+            config=load(),
+        )
+        == result
+    )
     manifest["revision"] = "retuned"
     write_json(tmp_path / "manifest.json", manifest)
     with pytest.raises(ValueError, match="already scored"):
-        score(tmp_path, points, "holdout")
+        score(
+            tmp_path,
+            tmp_path / "manifest.json",
+            points,
+            "holdout",
+            tmp_path / "holdout-score.json",
+            config=load(),
+        )
 
 
 def test_name_matching_preserves_suffixes_punctuation_and_accents() -> None:

@@ -1,0 +1,1025 @@
+{
+  "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.8 / SQLite 3.47.1",
+  "plan": {
+    "wall_seconds": 318.58,
+    "peak_rss_bytes": 1415757824,
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    },
+    "simulation": "Mapping and output hashes only; not world engine semantics"
+  },
+  "handover": {
+    "wall_seconds": 331.7,
+    "peak_rss_bytes": 1473708032,
+    "changed_units": 85577,
+    "identities": [
+      {
+        "changed": 13,
+        "new_identity": "3ce19efc1e4967adbbd305a1d70cb507628f5a24ee4b656c701458eee6ed8ead",
+        "old_identity": [
+          "b88e37a1d62382fb30315b7669e6bbfb111f0ebb1c93e509ba200bca46eb74d1"
+        ],
+        "stage": "download",
+        "units": 13
+      },
+      {
+        "changed": 13,
+        "new_identity": "15ad5cae28a548ad17185461663b2454cb52508b78016b856476b8c033853018",
+        "old_identity": [
+          "fb011b4c4068740b911ea431476074b43b06c47840500edca009d0c657477f36"
+        ],
+        "stage": "normalize",
+        "units": 13
+      },
+      {
+        "changed": 1111,
+        "new_identity": "26566f3647632477f18a42b7040af00202bdee464f243ed475c13891bf2bcfd4",
+        "old_identity": [
+          "cc58af67e53b6936e2d3dcbcdc838d716259a333e00e63700b2a0f10892f9314"
+        ],
+        "stage": "reconcile",
+        "units": 1111
+      },
+      {
+        "changed": 41442,
+        "new_identity": "0e6a44be8191020d0a073394a831b06520ad1eaf883fbed83e94107719deba04",
+        "old_identity": [
+          "7880e45496a985dd90110cdc7b95b59f90ef95621372ebeb75a4775777ccfd3b"
+        ],
+        "stage": "cells",
+        "units": 41442
+      },
+      {
+        "changed": 555,
+        "new_identity": "4701745315376f107d8c060ecb3a033ea8bc5d52922e192eb90ef29ec1d44470",
+        "old_identity": [
+          "d7a8c87c1dfac1c2d2fb9847ef10dc0f674cb5e2c877e3e4eb902cfc220becbe"
+        ],
+        "stage": "cities",
+        "units": 555
+      },
+      {
+        "changed": 1,
+        "new_identity": "181d250ca3613ad14c61fa70d8fbf407ad94f9a8a3503557e967c28cc4c7441e",
+        "old_identity": [
+          "52b956828e65d83d6a3fe876bd371d3969b0aa5ad3a42b48439db65dd4bc8f0a"
+        ],
+        "stage": "evaluate",
+        "units": 1
+      },
+      {
+        "changed": 41716,
+        "new_identity": "76593d131a40c29a5d8e7f6be561d13d2c9167e6b31e63e124fda568c2a49d58",
+        "old_identity": [
+          "3bfb3799347bc246e542f3b4da74083fa225ba27e0f52847d5693bd5fcf600cd"
+        ],
+        "stage": "normalize_cells",
+        "units": 41716
+      },
+      {
+        "changed": 0,
+        "new_identity": "f3113d8528999ef404a70fd5f14ec6946a56db2f6ff7186e5082d44645d9ffbc",
+        "old_identity": [],
+        "stage": "plate_country",
+        "units": 0
+      },
+      {
+        "changed": 726,
+        "new_identity": "af0e9578cc27f26c48d8f956e79f05df5ee3b675e84ada1ce50197927c2237f0",
+        "old_identity": [
+          "687403e58322ba792ff354f414260a0af1317aaa55a870765cf50b319ed2cf13"
+        ],
+        "stage": "lookups",
+        "units": 726
+      },
+      {
+        "changed": 0,
+        "new_identity": "2c0597017a276f68b024f3f9ded5d981ac8d994099fed055f07ea62923812f3e",
+        "old_identity": [],
+        "stage": "dataset",
+        "units": 0
+      },
+      {
+        "changed": 0,
+        "new_identity": "5e6c9151ae7120caf005a7fb56b34d4ee9720cb12f50f8e05acfa4cebb199310",
+        "old_identity": [],
+        "stage": "packs",
+        "units": 0
+      },
+      {
+        "changed": 0,
+        "new_identity": "c27e3630074d2a9b33201423a1b39004ee978e238914bd598a30ec602b12cceb",
+        "old_identity": [],
+        "stage": "publish",
+        "units": 0
+      }
+    ],
+    "ledger_sha256": null,
+    "mode": "handover simulation",
+    "scope": "mapping and hashes only; no engine equivalence claim",
+    "stages": {
+      "cells": {
+        "current": 41442,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "cities": {
+        "current": 555,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "download": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 4,
+        "stale": 0
+      },
+      "evaluate": {
+        "current": 1,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "lookups": {
+        "current": 726,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "normalize": {
+        "current": 13,
+        "new": 0,
+        "outputs_absent": 2,
+        "stale": 0
+      },
+      "normalize_cells": {
+        "current": 41716,
+        "new": 0,
+        "outputs_absent": 0,
+        "stale": 0
+      },
+      "reconcile": {
+        "current": 1111,
+        "new": 0,
+        "outputs_absent": 1111,
+        "stale": 0
+      }
+    }
+  },
+  "real_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+  "load_seconds": 0.15791983300005086,
+  "pytest": {
+    "passed": 667,
+    "skipped": 8,
+    "seconds": 46.16
+  },
+  "dataset": {
+    "bytes": 8736970,
+    "files": 23,
+    "version": "2026.10",
+    "wall_seconds": 18.4,
+    "peak_rss_bytes": 312164352,
+    "countries": [
+      "MY",
+      "SG"
+    ],
+    "blocks": [
+      "836505fffffffff",
+      "836500fffffffff",
+      "836526fffffffff"
+    ],
+    "tables": {
+      "airports": {
+        "bytes": 14291,
+        "files": 1,
+        "rows": 25
+      },
+      "canonical_cities": {
+        "bytes": 34789,
+        "files": 2,
+        "rows": 408
+      },
+      "cells": {
+        "bytes": 183373,
+        "files": 1,
+        "rows": 22404
+      },
+      "countries": {
+        "bytes": 18584,
+        "files": 1,
+        "rows": 2
+      },
+      "ip_ranges": {
+        "bytes": 1493691,
+        "files": 1,
+        "rows": 36547
+      },
+      "phone_metadata": {
+        "bytes": 26146,
+        "files": 1,
+        "rows": 2
+      },
+      "phone_prefixes": {
+        "bytes": 2063,
+        "files": 1,
+        "rows": 0
+      },
+      "place_to_city": {
+        "bytes": 417842,
+        "files": 2,
+        "rows": 28063
+      },
+      "places": {
+        "bytes": 3919626,
+        "files": 2,
+        "rows": 28063
+      },
+      "postal_codes": {
+        "bytes": 1161474,
+        "files": 1,
+        "rows": 64317
+      },
+      "subdivisions": {
+        "bytes": 10370,
+        "files": 1,
+        "rows": 37
+      },
+      "timezone_cells": {
+        "bytes": 21689,
+        "files": 1,
+        "rows": 1473
+      },
+      "trade_locations": {
+        "bytes": 24994,
+        "files": 1,
+        "rows": 202
+      },
+      "zone_tables": {
+        "bytes": 7964,
+        "files": 1,
+        "rows": 5
+      }
+    },
+    "rows": 181548,
+    "parquet_bytes": 7336896,
+    "logical_sha256": "7263899d1ac9fefa8fec7e147e69448626de2e811232d819b84ce9578aea40e0",
+    "manifest_sha256": "e7d0b27709c9f7df887234fdc43293f545fe3990c6254474151923a1f44e9a61",
+    "readme_sha256": "74c1309bdfe9cd4409dbd1c9feceecd51954b17e840688f02e540a11dabfbeb0",
+    "sources": [
+      "airports",
+      "codes",
+      "dbip",
+      "geoboundaries",
+      "geonames",
+      "ghsl",
+      "osm_land",
+      "overture",
+      "phone",
+      "postal",
+      "timezones",
+      "unlocode"
+    ],
+    "output_cap": 412318215
+  },
+  "examples": {
+    "all_three_ran": true,
+    "results": [
+      "DuckDB: [('country:MY', 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city:geonames:1735161', 'policy_polygon')]",
+      "PyArrow: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}",
+      "pandas: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}"
+    ],
+    "pandas": "2.2.2",
+    "analysis_numpy": "1.26.4",
+    "pipeline_numpy": "2.3.5",
+    "dependencies": "Copied from existing local installation; no package download"
+  },
+  "references": {
+    "country_id": 0,
+    "state_id": 0,
+    "city_id": 0,
+    "rural_ids_outside_canonical_cities": 2353
+  },
+  "publish": {
+    "publish-dry-run": {
+      "bytes": 8736970,
+      "dry_run": true,
+      "skip": 0,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 23,
+      "version": "2026.10"
+    },
+    "publish-local": {
+      "bytes": 8736970,
+      "dry_run": false,
+      "skip": 0,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 23,
+      "version": "2026.10"
+    },
+    "publish-local-repeat": {
+      "bytes": 0,
+      "dry_run": false,
+      "skip": 23,
+      "success_path": "2026.10/_SUCCESS",
+      "upload": 0,
+      "version": "2026.10"
+    }
+  },
+  "local_backend_bytes": 8740271,
+  "packs": "Fake writer only; no real pack output or size claim",
+  "workspace_bytes": 960286861,
+  "disk_free_bytes": 47038324736,
+  "package5": {
+    "plan": {
+      "wall_seconds": 331.26,
+      "peak_rss_bytes": 1443315712,
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      },
+      "simulated": true
+    },
+    "pytest": {
+      "wall_seconds": 50.0,
+      "peak_rss_bytes": 275415040,
+      "passed": 667,
+      "skipped": 8,
+      "pytest_seconds": 49.04
+    },
+    "ruff_check": "passed",
+    "ruff_format_files": 497,
+    "mypy_files": 483,
+    "mypy": {
+      "wall_seconds": 8.12,
+      "peak_rss_bytes": 407371776
+    },
+    "shell_validation": "bash -n only: both scripts and all 8 documented shell blocks",
+    "vm_executed": false,
+    "cloud_accessed": false,
+    "real_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+    "full_golden_digest": {
+      "wall_seconds": 1121.6,
+      "peak_rss_bytes": 586940416,
+      "matches_baseline": true,
+      "format": "thereabouts-golden-content-1",
+      "sha256": "0e543e65bc26987a2714b89f2b23395e11c9e48d482d9ee2315d3a890a0e9614",
+      "tables": {
+        "airports": {
+          "rows": 86154,
+          "sha256": "025bb9f11bb1b5c6964d1f7a0c2cfa8a1b62753da80da29aa3689637bd9d19c6"
+        },
+        "canonical_cities": {
+          "rows": 68923,
+          "sha256": "54070ab9e8ac9f2b7c86e9b5017cf891ee1d2297526f30e598dbabc2ffc7bc6a"
+        },
+        "cells": {
+          "rows": 66226680,
+          "sha256": "15e32d10f263955afc6c822e402d9475838cffdb34481615e988901138c303a6"
+        },
+        "countries": {
+          "rows": 252,
+          "sha256": "62cb702b96679453ecc665c1fbaedd07585fcdbc4d74ca192b1ad1c8e4f831bc"
+        },
+        "ip_ranges": {
+          "rows": 7786864,
+          "sha256": "8459dd9982e0b1de4d9af9bad97311005a23c1ae2031f4364827d0b1573141f2"
+        },
+        "phone_metadata": {
+          "rows": 254,
+          "sha256": "b8a272a849a8444f3912725735963c8d5eda5888f8ec1c0afdea01f2286d3b6b"
+        },
+        "phone_prefixes": {
+          "rows": 427963,
+          "sha256": "b3b566a38b6cb48e20df1bde0925a75b65c7020dc2460bb75dfed30387d8886f"
+        },
+        "place_to_city": {
+          "rows": 6875329,
+          "sha256": "e5491763620e2da339ca1193ff02f7b269835c88a1aae5e5bd8ca6a5a9c07a92"
+        },
+        "places": {
+          "rows": 6875329,
+          "sha256": "d39d73cc56f7b32f715c727961c69dc6d26b68983d5f71733f223e44d21a3688"
+        },
+        "postal_codes": {
+          "rows": 5036067,
+          "sha256": "158d5d89667f9bc20a1e00c86e9b87d85c0c748db70d4d41ea9cbe11d599ca5f"
+        },
+        "subdivisions": {
+          "rows": 8911,
+          "sha256": "5ec6eb4b69bd9f209386d0b39ebed1b4fc202890330a08487ae3d8b553cdb832"
+        },
+        "timezone_cells": {
+          "rows": 4567490,
+          "sha256": "acd9b769e26b6938df48ffde1b9cd371a0769472e3499e01f8e28a3fc48faea5"
+        },
+        "trade_locations": {
+          "rows": 116213,
+          "sha256": "e302de052698c28832c029323d02eb13ddee1b611a45e3861fdbd58272d0c406"
+        },
+        "zone_tables": {
+          "rows": 821,
+          "sha256": "eb8ca56b0e422acd0d8fc5aac30e0b62135ee3ed968bbf82df14cff2337066a3"
+        }
+      },
+      "comparison": "Complete digest JSON, including column schemas, equals the baseline; table counts and hashes retained here."
+    },
+    "digest_preflight": {
+      "workspace_bytes": 782967467,
+      "maximum_scratch_bytes": 2119253760,
+      "merge_fan_in": 265,
+      "free_bytes": 46895267840,
+      "maximum_total_bytes": 2902221227,
+      "reserved_additional_bytes": 50000000
+    },
+    "scratch_removed": true,
+    "workspace_bytes": 826193527,
+    "disk_free_bytes": 50555064320
+  },
+  "readme_render": {
+    "profile": "laptop",
+    "overrides": [
+      "release.version='2026.10'",
+      "release.countries=[MY,SG]",
+      "release.blocks=[836505fffffffff,836500fffffffff,836526fffffffff]"
+    ],
+    "statistics": {
+      "airports": {
+        "bytes": 14291,
+        "files": 1,
+        "rows": 25
+      },
+      "canonical_cities": {
+        "bytes": 34789,
+        "files": 2,
+        "rows": 408
+      },
+      "cells": {
+        "bytes": 173850,
+        "files": 1,
+        "rows": 22404
+      },
+      "countries": {
+        "bytes": 18584,
+        "files": 1,
+        "rows": 2
+      },
+      "ip_ranges": {
+        "bytes": 1493691,
+        "files": 1,
+        "rows": 36547
+      },
+      "phone_metadata": {
+        "bytes": 26146,
+        "files": 1,
+        "rows": 2
+      },
+      "phone_prefixes": {
+        "bytes": 2063,
+        "files": 1,
+        "rows": 0
+      },
+      "place_to_city": {
+        "bytes": 417842,
+        "files": 2,
+        "rows": 28063
+      },
+      "places": {
+        "bytes": 3919626,
+        "files": 2,
+        "rows": 28063
+      },
+      "postal_codes": {
+        "bytes": 1161474,
+        "files": 1,
+        "rows": 64317
+      },
+      "subdivisions": {
+        "bytes": 10370,
+        "files": 1,
+        "rows": 37
+      },
+      "timezone_cells": {
+        "bytes": 21689,
+        "files": 1,
+        "rows": 1473
+      },
+      "trade_locations": {
+        "bytes": 24994,
+        "files": 1,
+        "rows": 202
+      },
+      "zone_tables": {
+        "bytes": 7964,
+        "files": 1,
+        "rows": 5
+      }
+    },
+    "policy": {
+      "anchor_urban_edge_m": 1000,
+      "boundary_anchor_edge_m": 250,
+      "boundary_evidence": {
+        "reason": "Territorial locality polygons own their settlement interiors regardless local city/town/village/hamlet title. Point-only weak village seats do not qualify. Either linked source anchor may validate a footprint. The alternate anchor is used only when the primary anchor is within 250 m of the boundary, preventing distant namesake links from assigning a city a tiny village footprint. Overlaps retain the source municipal precedence among accepted boundaries.",
+        "reference": "Acquired Overture division_area is_territorial, subtype, linked division class and coordinates; GeoNames settlement coordinates."
+      },
+      "core_m": 1000,
+      "countries": {
+        "CN": {
+          "excluded_area_evidence": "Lanzhou New Area contains the separately retained Qinchuan and Shangchuan town polygons; its 1,789-cell source area is not a single-city footprint.",
+          "excluded_areas": [
+            "6dc14a7a-3709-43e1-b112-cbcb54fce6fa"
+          ],
+          "footprints": [
+            {
+              "city_id": "city:geonames:1796236",
+              "clip_urban": true,
+              "priority": 5,
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained shared-identity municipality, restricted to connected GHSL core per approved plan"
+            },
+            {
+              "city_id": "city:geonames:1792947",
+              "clip_urban": true,
+              "priority": 5,
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained shared-identity municipality, restricted to connected GHSL core per approved plan"
+            },
+            {
+              "city_id": "city:geonames:1816670",
+              "clip_urban": true,
+              "priority": 5,
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained shared-identity municipality, restricted to connected GHSL core per approved plan"
+            },
+            {
+              "city_id": "city:geonames:1814906",
+              "clip_urban": true,
+              "priority": 5,
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained shared-identity municipality, restricted to connected GHSL core per approved plan"
+            },
+            {
+              "city_id": "city:geonames:1786764",
+              "clip_urban": true,
+              "reason": "Prefecture polygon includes rural land; retain only its connected built-up core under the same rule as the reviewed direct-administered cities.",
+              "reference": "Acquired Overture division e19642c4-0a8f-44d8-9406-2b9032418f8d; OSM relation 2983923; connected GHSL centre containing linked GeoNames anchor."
+            },
+            {
+              "city_id": "city:geonames:2037346",
+              "clip_urban": true,
+              "reason": "Prefecture polygon includes rural land; retain only its connected built-up core under the same rule as the reviewed direct-administered cities.",
+              "reference": "Acquired Overture division 157e451d-de93-4df6-b428-4549b4a6bf9c; OSM relation 2769803; connected GHSL centre containing linked GeoNames anchor."
+            }
+          ],
+          "independent": [],
+          "parts": {},
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "GB": {
+          "footprints": [
+            {
+              "city_id": "city:geonames:2643743",
+              "members": [
+                "10b4f1b5-9ed8-436f-8157-dd264cd31ade",
+                "19317970-00e5-4f6f-a2a5-46a2be6e770a",
+                "223b2141-d782-41ad-88dd-e7b2d25853bf",
+                "29064d5c-c93d-4770-8d3b-46f19e16eb53",
+                "35097f38-1580-48a2-9e35-3b1b007b1aef",
+                "4a7c8136-de3a-4a6c-a69b-964f09bf27a8",
+                "50fdc785-d1bb-461c-b467-fe1cb550a0d4",
+                "672c33d5-a755-423d-b0eb-d9cfe104fb40",
+                "6955cc6e-5e0c-4b03-8b67-c9b6b7c6aeff",
+                "6dc78aa5-b687-4cac-a4f8-7d446c41eb49",
+                "6f8902d3-c757-4573-94bd-dd930c546471",
+                "754be612-f816-4eae-8661-1a503a0f86d0",
+                "82865424-fadc-41ca-a422-600a14d7c3a9",
+                "837a08ed-255c-47d1-89bf-ce195cb6c294",
+                "8c23aadd-d29c-41fe-8a5b-76db46347a8e",
+                "8c52b2b2-fa19-4d4d-8df7-64502e4860fc",
+                "91fcf399-7510-498c-8112-4b5d9d8d34b1",
+                "98c4a68e-1020-498e-84f5-c629db5c288b",
+                "9912cc5a-2f3b-4437-933b-eb4902729d0a",
+                "aa664a5f-5532-484f-8e9a-a30ffa58fb9e",
+                "b47d7b84-9b8c-4872-898e-4ea39c9d01b0",
+                "b64871c3-3df7-478f-91a9-1b7ead142384",
+                "c1db38e0-d021-4188-a66f-92d178c0d354",
+                "ca828762-c4b3-40ff-a707-5d6bac5bcc1d",
+                "cb8f16da-029e-4f8e-9e37-939160457ec5",
+                "cf2fef61-a880-424f-bd56-e54e11753660",
+                "d6a66966-ce2f-4ce4-b5b8-3cd5d74f42ff",
+                "e47e3740-396b-44c7-a780-980f29849610",
+                "e785ce65-348a-460f-9c90-c592c0a1d1ad",
+                "f3920768-b2c4-41b6-8fbc-54f78bd95fd0",
+                "f6cfaf46-bb61-4719-a4f0-adc851c6d61b",
+                "fd629040-d8b1-481d-adad-6db19d068681",
+                "fee3fd74-1ed4-4567-b27f-1c0cad0e42c6"
+              ],
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Existing reviewed reconciliation policy; pinned membership"
+            }
+          ],
+          "independent": [],
+          "parts": {},
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "ID": {
+          "footprints": [
+            {
+              "city_id": "city:geonames:1642911",
+              "members": [
+                "e02c6844-49e9-4bf8-b8b3-1937132af240",
+                "3624dc58-f6c9-46c2-a43d-0a2458576e1d",
+                "322a853d-4e24-4563-87e2-f68b5c4a5b81",
+                "bc8971f2-157d-4a35-8298-bac2a23d336f",
+                "81ddbb89-8a1d-47bf-9c93-fe11f66f8cb9"
+              ],
+              "reason": "Union the five administrative cities, following the same parts convention as London and Tokyo. Exclude the separately administered Thousand Islands regency, retaining rural village answers there. Do not use the broad province polygon including the sea.",
+              "reference": "https://jakarta.go.id/index.php/tentang-jakarta; https://barat.jakarta.go.id/index.php/profil/sejarah; acquired Overture county divisions Jakarta Barat, Selatan, Pusat, Utara and Timur."
+            }
+          ],
+          "independent": [],
+          "parts": {},
+          "reason": "Jakarta is one province-level city administered through five mainland cities. Its urban villages and administrative city parts report Jakarta; municipalities outside those limits remain independent.",
+          "reference": "https://jakarta.go.id/index.php/tentang-jakarta; acquired Overture children of region 89dd6d40-79a8-4c79-82f9-ef041b2958c7."
+        },
+        "IN": {
+          "footprints": [
+            {
+              "city_id": "city:geonames:1275339",
+              "members": [
+                "0b41dd58-5ea3-403a-803e-515ff51369a8",
+                "0d972a9b-b360-457f-a271-0afb4d577029",
+                "2134fdb1-41bb-4671-b798-ac4e1dcf9d14",
+                "2276de1e-0663-4f12-ba1d-df31fb388543",
+                "3164dee2-4c77-4834-b231-3d10c54466af",
+                "3bb44834-7f89-494e-95a8-e09839774a88",
+                "3ef5c52d-a3b8-4964-9892-4dd0cbca0545",
+                "42e9e006-6714-43a7-9317-5f9a1a9307b8",
+                "48a121c2-267a-48d8-a114-c97e58c54e0d",
+                "48b4f9f0-5db4-4324-b5f9-c571a7c0ea30",
+                "51f7c8af-6ce8-483f-b3db-c6cb68b3dd89",
+                "6207dde9-4dbb-4355-971e-c36a483f7b00",
+                "7506dd7b-bdfb-418d-ab20-bb951088ff78",
+                "7a6723e2-6087-4c6d-9632-ababaf983e7a",
+                "85d4bfd3-c6c3-4aa7-bd1e-48b6b1b1ffd2",
+                "8c03a12a-4d80-43f7-900f-bc4cc1aa1cf3",
+                "a1fce24f-d164-4d3f-89c1-78358e2f10e3",
+                "b0559ff7-bf4c-41a3-bc66-12997068ccdf",
+                "b7f1bd48-58a0-4006-bea0-ca42319f66c3",
+                "b8fa70f8-af16-4e25-b17f-53411c7baec4",
+                "be696577-dad0-4278-ba39-bd698e027322",
+                "dd11fe55-0227-4f98-979d-7ad8852a7e63",
+                "e2764833-2ca7-44be-8436-0aab3d828663",
+                "fb793b7f-f4d6-4eb3-b88f-d035a745daad"
+              ],
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "https://portal.mcgm.gov.in/irj/portal/anonymous/BMC-on-Map-Wards-Offices?guest_user=english"
+            },
+            {
+              "area_entities": [
+                "city:geonames:1273294",
+                "city:geonames:1261481"
+              ],
+              "city_id": "city:geonames:1273294",
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained Delhi and New Delhi municipal polygons; explicit owner New Delhi to Delhi roll-up."
+            },
+            {
+              "city_id": "city:geonames:1275004",
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Retained municipal boundary; owner city convention"
+            }
+          ],
+          "independent": [
+            "city:geonames:7279746",
+            "city:geonames:1254661",
+            "city:geonames:6619347",
+            "city:geonames:1270396"
+          ],
+          "part_evidence": {
+            "Nokha": {
+              "reason": "Guru Jasnathpura and Jat Colony are small city-labelled neighbourhood polygons wholly inside the linked Nokha town boundary. The owner convention gives the town answer.",
+              "reference": "Acquired OSM ways 1391274843 and 1382084636 within Nokha way 257934042; Overture division IDs in parts."
+            }
+          },
+          "parts": {
+            "city:geonames:1261481": "city:geonames:1273294",
+            "city:overture:e043e0b7-d5dc-4982-929a-f4e1fd7082d3": "city:geonames:1261227",
+            "city:overture:f5387dd2-a84c-4a89-acbf-ff25294745b4": "city:geonames:1261227"
+          },
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "JP": {
+          "footprints": [
+            {
+              "city_id": "city:geonames:1850147",
+              "members": [
+                "004124e6-0784-4454-9865-f794c04e280c",
+                "00449a5e-cc3b-4414-9b55-6bdf4d22db2a",
+                "0609bb5d-6236-47e0-96da-357322e1831b",
+                "18bd315d-ba3b-4e83-86b9-c2f6364915b0",
+                "21766799-1aab-4aea-8385-f5d6b96f79ba",
+                "36b9fa80-d93a-43d1-a730-9c780ebbc1ed",
+                "3a88f029-33f0-4835-97f1-dcb40092fe7e",
+                "66a4c369-d03e-4c33-a315-4659f7101e11",
+                "66fc8f97-2ef6-4e0c-b4c3-2cab7b531eee",
+                "6eb763aa-dc82-4510-a45d-d3ccee8543b3",
+                "7759e38b-4310-4cb5-82b2-cfd84a6f6429",
+                "7c58f3da-ef55-4551-ae2c-c1b83e97c951",
+                "7dc4ea76-24a1-4144-8edd-5f154ac5da94",
+                "81129248-9fa5-48e9-b0b9-f6ab457e9505",
+                "85142460-67be-43f8-8995-e58f86165046",
+                "9917dccb-777f-4c6a-91f9-20cbfc716c9a",
+                "a0045d82-d9e4-465f-8eaf-1a8b7d265a42",
+                "b78bc637-a2bb-4904-8ca0-f38563453206",
+                "bb6d5f39-9e3d-4dfb-a644-2da7faccc2cd",
+                "c0280993-77bb-4fdd-815c-2955dcf61473",
+                "cb1dbb5a-56d2-4cd1-a1dc-1e10646a23e7",
+                "d45a7707-836b-4c46-8982-475f9f935a7d",
+                "dcdaacf0-0765-474c-9849-17da30e797b0"
+              ],
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "Existing reviewed reconciliation policy; pinned membership"
+            }
+          ],
+          "independent": [
+            "city:geonames:1848354"
+          ],
+          "parts": {},
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "MY": {
+          "footprints": [
+            {
+              "city_id": "city:geonames:1735161",
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "https://ppkl.dbkl.gov.my/en/pskl2020/"
+            }
+          ],
+          "independent": [
+            "city:geonames:1735158"
+          ],
+          "parts": {},
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "TR": {
+          "alias_evidence": "Typed municipal localities Sivas Belediyesi, K\u0131r\u0131kkale Belediyesi and Isparta Belediyesi: exact city name plus municipality suffix, anchors within 500 m, retained source polygons. Government labels name the city for this product.",
+          "footprints": [
+            {
+              "area_entity": "state:overture:6d1a95a9-4af5-498e-8df2-77cc995080b2",
+              "city_id": "city:geonames:745044",
+              "clip_urban": true,
+              "priority": 1,
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "https://ibb.istanbul/ibb/belediye-hakkinda/yetki-alani/",
+              "role": "state"
+            }
+          ],
+          "identity_aliases": {
+            "city:overture:983d250c-12f4-4266-9fab-cfa17f1bbf6e": "city:geonames:300619",
+            "city:overture:dcb9182a-ad15-4d8c-bfbc-7978d0ee73a8": "city:geonames:311073",
+            "city:overture:ef99d33a-ccc6-4c82-944b-7b64a88602b0": "city:geonames:307654"
+          },
+          "independent": [],
+          "parts": {},
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        },
+        "US": {
+          "container_terms": [
+            "township"
+          ],
+          "footprints": [
+            {
+              "city_id": "city:geonames:5128581",
+              "reason": "Owner-approved single-city extent from retained municipal boundary or pinned administrative parts; urban clipping where specified excludes broad rural administration.",
+              "reference": "https://portal.311.nyc.gov/article/?kanumber=KA-02877"
+            },
+            {
+              "city_id": "city:geonames:4784112",
+              "reason": "Salem independent city is encoded at county rank; its 0.00381 square-degree municipal extent contains both linked anchors, unlike a surrounding county.",
+              "reference": "Acquired Overture division c740bf61-630a-4451-8614-6d63c3a4e690; OSM relation 9260621, separate Salem city locality linked to GeoNames 4784112."
+            }
+          ],
+          "independent": [],
+          "parts": {
+            "city:geonames:5110266": "city:geonames:5128581",
+            "city:geonames:5110302": "city:geonames:5128581",
+            "city:geonames:5125771": "city:geonames:5128581",
+            "city:geonames:5133273": "city:geonames:5128581",
+            "city:geonames:5139568": "city:geonames:5128581"
+          },
+          "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
+        }
+      },
+      "distant_m": 25000,
+      "eligibility": {
+        "excluded_codes": [
+          "PPLX",
+          "PPLH",
+          "PPLQ",
+          "PPLW"
+        ],
+        "major_seats": [
+          "PPLC",
+          "PPLA"
+        ],
+        "minimum_population": 15000,
+        "seat_codes": [
+          "PPLC",
+          "PPLA",
+          "PPLA2",
+          "PPLA3",
+          "PPLA4",
+          "PPLA5"
+        ],
+        "typed_minimum": 5000
+      },
+      "nearest_m": 50000,
+      "pilot": [
+        "IN",
+        "BD",
+        "TR",
+        "CN",
+        "US",
+        "JP",
+        "GB",
+        "MY",
+        "ID"
+      ],
+      "population_floor": 15000,
+      "projected_edge_tolerance_degrees": 1e-09,
+      "town_radius": {
+        "density_per_km2": 3000,
+        "enabled": false,
+        "maximum_km": 3,
+        "maximum_population": 50000,
+        "minimum_km": 0.5,
+        "minimum_population": 5000
+      },
+      "version": "city-normalization-1"
+    },
+    "sources": [
+      "airports",
+      "codes",
+      "dbip",
+      "geoboundaries",
+      "geonames",
+      "ghsl",
+      "osm_land",
+      "overture",
+      "phone",
+      "postal",
+      "timezones",
+      "unlocode"
+    ],
+    "manifest_sha256": "c43983107777db804a92f3065ddb3c31f079fb2b3493ee387f2c9d3544a099cc",
+    "readme_sha256": "80cd3f7dce5c132a2c136002e053109411404f013c554d8dd4d9d42c8c69033d",
+    "dataset_directory": "data/dataset-review/2026.10",
+    "dataset_bytes": 8802046,
+    "examples": [
+      "DuckDB: [('country:MY', 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city:geonames:1735161', 'Kuala Lumpur', 'policy_polygon')]",
+      "PyArrow: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}",
+      "pandas: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}"
+    ],
+    "checksum_example_verified_files": 22,
+    "observed_row_licences": [
+      "Apache-2.0",
+      "CC-BY-4.0",
+      "LGPL-2.1-or-later",
+      "ODbL-1.0",
+      "PDDL-1.0",
+      "PDDL-1.0 AND CC-BY-4.0",
+      "Public-Domain"
+    ],
+    "all_row_licences_in_notices": true,
+    "wall_seconds": 17.05,
+    "rss_bytes": 442040320,
+    "cell_files": [
+      {
+        "blocks": [
+          {
+            "block": "836500fffffffff",
+            "row_group": 0,
+            "rows": 11107
+          },
+          {
+            "block": "836505fffffffff",
+            "row_group": 1,
+            "rows": 8019
+          },
+          {
+            "block": "836526fffffffff",
+            "row_group": 2,
+            "rows": 3278
+          }
+        ],
+        "kind": "cells",
+        "path": "cells/group=81653ffffffffff/part.parquet",
+        "rows": 22404,
+        "sha256": "dadb3586c398660fc4633bb634d343d330949411fafbac7d339ba95c43cb364e",
+        "size": 173850
+      }
+    ]
+  }
+}

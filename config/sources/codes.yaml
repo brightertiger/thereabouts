@@ -1,0 +1,17 @@
+name: codes
+adapter: pipeline.sources.codes
+kind: codes
+enabled: true
+upstream:
+  proposal: config/proposals/codes.yaml
+  url: https://raw.githubusercontent.com/datasets/country-codes/2e9d6498a0456f4afc2f6cf367d1e12a9ed4afe1/README.md
+licence:
+  id: per-file
+  url: https://opendatacommons.org/licenses/pddl/1-0/
+  attribution: Per-file source attribution and licence identifiers are retained in
+    pins.lock and every normalized row.
+limits:
+  # Two retained releases of capacity; current pinned bytes: 843,631.
+  download_bytes: 1687262
+options: {}
+options_schema: pipeline.config.source_options.Text

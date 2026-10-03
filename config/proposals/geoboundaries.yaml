@@ -1,0 +1,15 @@
+settings:
+  api: https://www.geoboundaries.org/api/current/gbOpen
+  layers:
+  - ALL/ADM0
+  - ALL/ADM1
+  - PHL/ADM2
+  country_reference: https://download.geonames.org/export/dump/countryInfo.txt
+  extra_countries:
+    XKX:
+      alpha2: XK
+      population: 0
+      name: Kosovo
+  repository_api: https://api.github.com/repos/wmgeolab/geoBoundaries
+  raw_prefix: https://github.com/wmgeolab/geoBoundaries/raw/
+  media: https://media.githubusercontent.com/media/wmgeolab/geoBoundaries

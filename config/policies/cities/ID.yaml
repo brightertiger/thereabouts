@@ -1,0 +1,21 @@
+reason: Jakarta is one province-level city administered through five mainland cities.
+  Its urban villages and administrative city parts report Jakarta; municipalities
+  outside those limits remain independent.
+reference: https://jakarta.go.id/index.php/tentang-jakarta; acquired Overture children
+  of region 89dd6d40-79a8-4c79-82f9-ef041b2958c7.
+footprints:
+- city_id: city:geonames:1642911
+  members:
+  - e02c6844-49e9-4bf8-b8b3-1937132af240
+  - 3624dc58-f6c9-46c2-a43d-0a2458576e1d
+  - 322a853d-4e24-4563-87e2-f68b5c4a5b81
+  - bc8971f2-157d-4a35-8298-bac2a23d336f
+  - 81ddbb89-8a1d-47bf-9c93-fe11f66f8cb9
+  reason: Union the five administrative cities, following the same parts convention
+    as London and Tokyo. Exclude the separately administered Thousand Islands regency,
+    retaining rural village answers there. Do not use the broad province polygon including
+    the sea.
+  reference: https://jakarta.go.id/index.php/tentang-jakarta; https://barat.jakarta.go.id/index.php/profil/sejarah;
+    acquired Overture county divisions Jakarta Barat, Selatan, Pusat, Utara and Timur.
+parts: {}
+independent: []

@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from h3.api import basic_int as h3
 
-from build_data.hierarchy import descendants, label_block
-from build_data.reference.oracle import Reference
+from pipeline.engines.hierarchy import descendants, label_block
+from tests.support.reference.oracle import Reference
 from thereabouts import Geocoder
 from thereabouts.table import Table
 

@@ -1,0 +1,62 @@
+footprints:
+- city_id: city:geonames:1275339
+  members:
+  - 0b41dd58-5ea3-403a-803e-515ff51369a8
+  - 0d972a9b-b360-457f-a271-0afb4d577029
+  - 2134fdb1-41bb-4671-b798-ac4e1dcf9d14
+  - 2276de1e-0663-4f12-ba1d-df31fb388543
+  - 3164dee2-4c77-4834-b231-3d10c54466af
+  - 3bb44834-7f89-494e-95a8-e09839774a88
+  - 3ef5c52d-a3b8-4964-9892-4dd0cbca0545
+  - 42e9e006-6714-43a7-9317-5f9a1a9307b8
+  - 48a121c2-267a-48d8-a114-c97e58c54e0d
+  - 48b4f9f0-5db4-4324-b5f9-c571a7c0ea30
+  - 51f7c8af-6ce8-483f-b3db-c6cb68b3dd89
+  - 6207dde9-4dbb-4355-971e-c36a483f7b00
+  - 7506dd7b-bdfb-418d-ab20-bb951088ff78
+  - 7a6723e2-6087-4c6d-9632-ababaf983e7a
+  - 85d4bfd3-c6c3-4aa7-bd1e-48b6b1b1ffd2
+  - 8c03a12a-4d80-43f7-900f-bc4cc1aa1cf3
+  - a1fce24f-d164-4d3f-89c1-78358e2f10e3
+  - b0559ff7-bf4c-41a3-bc66-12997068ccdf
+  - b7f1bd48-58a0-4006-bea0-ca42319f66c3
+  - b8fa70f8-af16-4e25-b17f-53411c7baec4
+  - be696577-dad0-4278-ba39-bd698e027322
+  - dd11fe55-0227-4f98-979d-7ad8852a7e63
+  - e2764833-2ca7-44be-8436-0aab3d828663
+  - fb793b7f-f4d6-4eb3-b88f-d035a745daad
+  reference: https://portal.mcgm.gov.in/irj/portal/anonymous/BMC-on-Map-Wards-Offices?guest_user=english
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1273294
+  reference: Retained Delhi and New Delhi municipal polygons; explicit owner New Delhi
+    to Delhi roll-up.
+  area_entities:
+  - city:geonames:1273294
+  - city:geonames:1261481
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+- city_id: city:geonames:1275004
+  reference: Retained municipal boundary; owner city convention
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+parts:
+  city:geonames:1261481: city:geonames:1273294
+  city:overture:e043e0b7-d5dc-4982-929a-f4e1fd7082d3: city:geonames:1261227
+  city:overture:f5387dd2-a84c-4a89-acbf-ff25294745b4: city:geonames:1261227
+independent:
+- city:geonames:7279746
+- city:geonames:1254661
+- city:geonames:6619347
+- city:geonames:1270396
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.
+part_evidence:
+  Nokha:
+    reason: Guru Jasnathpura and Jat Colony are small city-labelled neighbourhood
+      polygons wholly inside the linked Nokha town boundary. The owner convention
+      gives the town answer.
+    reference: Acquired OSM ways 1391274843 and 1382084636 within Nokha way 257934042;
+      Overture division IDs in parts.

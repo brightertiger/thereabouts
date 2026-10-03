@@ -1,0 +1,52 @@
+version: city-normalization-1
+pilot:
+- IN
+- BD
+- TR
+- CN
+- US
+- JP
+- GB
+- MY
+- ID
+eligibility:
+  minimum_population: 15000
+  typed_minimum: 5000
+  major_seats:
+  - PPLC
+  - PPLA
+  seat_codes:
+  - PPLC
+  - PPLA
+  - PPLA2
+  - PPLA3
+  - PPLA4
+  - PPLA5
+  excluded_codes:
+  - PPLX
+  - PPLH
+  - PPLQ
+  - PPLW
+core_m: 1000
+population_floor: 15000
+nearest_m: 50000
+distant_m: 25000
+town_radius:
+  enabled: false
+  minimum_population: 5000
+  maximum_population: 50000
+  density_per_km2: 3000
+  minimum_km: 0.5
+  maximum_km: 3
+anchor_urban_edge_m: 1000
+projected_edge_tolerance_degrees: 1.0e-09
+boundary_evidence:
+  reason: Territorial locality polygons own their settlement interiors regardless
+    local city/town/village/hamlet title. Point-only weak village seats do not qualify.
+    Either linked source anchor may validate a footprint. The alternate anchor is
+    used only when the primary anchor is within 250 m of the boundary, preventing
+    distant namesake links from assigning a city a tiny village footprint. Overlaps
+    retain the source municipal precedence among accepted boundaries.
+  reference: Acquired Overture division_area is_territorial, subtype, linked division
+    class and coordinates; GeoNames settlement coordinates.
+boundary_anchor_edge_m: 250

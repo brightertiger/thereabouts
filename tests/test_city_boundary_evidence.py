@@ -7,9 +7,9 @@ import numpy as np
 import pytest
 import shapely
 
-from build_data.cities.boundaries import BoundaryIndex
-from build_data.cities.footprints import screen
-from build_data.reconcile.common import pack
+from pipeline.engines.cities.boundaries import BoundaryIndex
+from pipeline.engines.cities.footprints import screen
+from pipeline.engines.reconcile.common import pack
 from tests.test_city_normalization import city
 
 
@@ -90,7 +90,7 @@ def test_distant_namesake_anchor_does_not_validate_a_city_boundary(
 
 
 def test_linked_municipality_precedes_smaller_unlinked_overlap() -> None:
-    from build_data.cities.footprints import resolve_overlaps
+    from pipeline.engines.cities.footprints import resolve_overlaps
 
     municipal = {
         "city_id": "town",
@@ -114,7 +114,7 @@ def test_linked_municipality_precedes_smaller_unlinked_overlap() -> None:
 
 
 def test_city_rollup_preserves_accepted_part_boundary() -> None:
-    from build_data.cities.footprints import resolve_overlaps, roll_up
+    from pipeline.engines.cities.footprints import resolve_overlaps, roll_up
 
     core = {
         "city_id": "city",
