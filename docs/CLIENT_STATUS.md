@@ -27,7 +27,8 @@ separately and do not fetch pipeline data.
 Batch rows preserve input columns and prefix result fields with thereabouts_.
 Bad rows continue and exit 5. JSON output streams one results object; CSV from
 NDJSON spools rows to disk to determine its input header with bounded schema
-memory and the free-space floor. NO_COLOR is honored by plain tables.
+memory. Disk exhaustion is exit 2; no product free-space floor applies.
+NO_COLOR is honored by plain tables.
 
 The optional MCP server returns the same JSON for all nine verbs. The original
 CLI and MCP implementations remain under commandline/application.py and
@@ -46,12 +47,35 @@ interruption/resume, ignored ranges, bad checksums, activation failure,
 concurrent locking and the absence of implicit network access.
 
 CLI process start to first flushed reverse result on the sample pack:
-**63.177 ms median,
-71.239 ms p99** across 30 fresh process
+**62.808 ms median,
+85.139 ms p99** across 30 fresh process
 launches after 3 warmups. File caches are warm; Python
 imports and pack opening are included. The initial launch took
-68.922 ms. These numbers come from
+120.163 ms. These numbers come from
 python -m benchmarks.cli_startup. The full per-launch series is in the JSON.
+
+## CLI review fixes after package 3
+
+A1-A4 separate the agent disk rule from product admission (twice archive bytes
+plus 64 MiB), replace the global HTTP timer with connection/header deadlines
+and per-read stall limits, render bounded aligned place rows, and preserve CSV
+input order followed by public or selected result order. Candidates are indented;
+evidence remains structured output. Unicode display width determines padding.
+
+A5-A9 refuse version changes that omit an active family, provide path-specific
+repair commands and missing-file errors, stop locally at the unpublished release
+placeholder, explain help forms, delegate Python directory selection to Rust,
+use standard-library file locks, honor environment proxies and HTTPS-only
+redirects, diagnose non-CSV/non-JSON input, expose MCP LOCODE country, and give
+invalid coordinates a range hint. Five synthetic reverse results gain that hint;
+legacy expectations and real reverse vectors are unchanged. Loopback TLS tests
+verify a trusted redirect and reject a downgrade; no public endpoint is contacted.
+
+A10 moves batch parsing, rendering, field selection and exit mapping into the
+wasm-clean thereabouts-cli-core crate. Hosts own streams and temporary storage.
+Its wasm target is checked alongside the reader. A11 refreshes this report and
+CLI startup from scripts. The retained Node reader passes 33
+Node 22 tests and npm type checks pending replacement in package 4.
 
 ## Format follow-ups after package 3
 
@@ -233,7 +257,7 @@ table below lists real vector counts; synthetic vectors additionally cover
 legacy codes, shared calling codes and alternate names. Pytest requires no real
 data. Node execution awaits its binding package.
 
-The full gate passed: 88 Rust tests; 745
+The full gate passed: 98 Rust tests; 750
 pytest passed and 9 skipped; strict mypy checked
 477 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and the wasm target check passed. Legacy reader and pipeline tests
@@ -368,9 +392,10 @@ needs pipeline prefix-to-place links: current real rows link only to countries;
 Mumbai description evidence does not manufacture a city identity.
 
 The final codec has not been world-exported. Other family world sizes are
-estimates. Linux, Windows, other Python versions and Node execution were not run.
+estimates. Linux, Windows, other Python versions and the new Node binding were not run.
 Node/WASM host integration is package 4; legacy Python cleanup is package 5.
-Neither has started. The default release URL is a placeholder; no public
+The shared CLI policy is ready; the Node host and cleanup are still pending.
+The default release URL is a placeholder; no public
 release service or real-network data download was exercised. HTTPS uses rustls
 certificate verification but live public-endpoint behavior was not tested.
 Linux/Windows runtime behavior was not run. Legacy modules remain importable.

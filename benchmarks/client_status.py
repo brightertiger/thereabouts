@@ -36,7 +36,8 @@ def validation(path: Path) -> dict[str, Any]:
     text = path.read_text()
     python = re.search(r"(\d+) passed, (\d+) skipped in", text)
     types = re.search(r"Success: no issues found in (\d+) source files", text)
-    if python is None or types is None:
+    node = re.search(r"# tests (\d+)", text)
+    if python is None or types is None or node is None:
         raise ValueError("A completed full-gate log is required")
     return {
         "rust_tests": sum(
@@ -45,15 +46,19 @@ def validation(path: Path) -> dict[str, Any]:
         "pytest_passed": int(python[1]),
         "pytest_skipped": int(python[2]),
         "mypy_files": int(types[1]),
+        "node_tests": int(node[1]),
         "gates": [
             "cargo fmt --check",
             "cargo clippy --all-targets --all-features -- -D warnings",
             "cargo test",
             "cargo check -p thereabouts-core --target wasm32-unknown-unknown",
+            "cargo check -p thereabouts-cli-core --target wasm32-unknown-unknown",
             "uv run pytest",
             "uv run ruff check",
             "uv run ruff format --check",
             "uv run mypy",
+            "node --test (with offline guard)",
+            "npm run check",
         ],
     }
 
@@ -167,7 +172,8 @@ separately and do not fetch pipeline data.
 Batch rows preserve input columns and prefix result fields with thereabouts_.
 Bad rows continue and exit 5. JSON output streams one results object; CSV from
 NDJSON spools rows to disk to determine its input header with bounded schema
-memory and the free-space floor. NO_COLOR is honored by plain tables.
+memory. Disk exhaustion is exit 2; no product free-space floor applies.
+NO_COLOR is honored by plain tables.
 
 The optional MCP server returns the same JSON for all nine verbs. The original
 CLI and MCP implementations remain under commandline/application.py and
@@ -192,6 +198,29 @@ launches after {cli["warmup_launches"]} warmups. File caches are warm; Python
 imports and pack opening are included. The initial launch took
 {cli["first_launch_ms"]:.3f} ms. These numbers come from
 python -m benchmarks.cli_startup. The full per-launch series is in the JSON.
+
+## CLI review fixes after package 3
+
+A1-A4 separate the agent disk rule from product admission (twice archive bytes
+plus 64 MiB), replace the global HTTP timer with connection/header deadlines
+and per-read stall limits, render bounded aligned place rows, and preserve CSV
+input order followed by public or selected result order. Candidates are indented;
+evidence remains structured output. Unicode display width determines padding.
+
+A5-A9 refuse version changes that omit an active family, provide path-specific
+repair commands and missing-file errors, stop locally at the unpublished release
+placeholder, explain help forms, delegate Python directory selection to Rust,
+use standard-library file locks, honor environment proxies and HTTPS-only
+redirects, diagnose non-CSV/non-JSON input, expose MCP LOCODE country, and give
+invalid coordinates a range hint. Five synthetic reverse results gain that hint;
+legacy expectations and real reverse vectors are unchanged. Loopback TLS tests
+verify a trusted redirect and reject a downgrade; no public endpoint is contacted.
+
+A10 moves batch parsing, rendering, field selection and exit mapping into the
+wasm-clean thereabouts-cli-core crate. Hosts own streams and temporary storage.
+Its wasm target is checked alongside the reader. A11 refreshes this report and
+CLI startup from scripts. The retained Node reader passes {gates["node_tests"]}
+Node 22 tests and npm type checks pending replacement in package 4.
 
 ## Format follow-ups after package 3
 
@@ -451,9 +480,10 @@ needs pipeline prefix-to-place links: current real rows link only to countries;
 Mumbai description evidence does not manufacture a city identity.
 
 The final codec has not been world-exported. Other family world sizes are
-estimates. Linux, Windows, other Python versions and Node execution were not run.
+estimates. Linux, Windows, other Python versions and the new Node binding were not run.
 Node/WASM host integration is package 4; legacy Python cleanup is package 5.
-Neither has started. The default release URL is a placeholder; no public
+The shared CLI policy is ready; the Node host and cleanup are still pending.
+The default release URL is a placeholder; no public
 release service or real-network data download was exercised. HTTPS uses rustls
 certificate verification but live public-endpoint behavior was not tested.
 Linux/Windows runtime behavior was not run. Legacy modules remain importable.
