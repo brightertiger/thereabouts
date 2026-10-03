@@ -6,7 +6,7 @@ use super::{
     table::{self, Table},
 };
 use crate::{Error, Result, error::ensure};
-use std::{collections::BTreeMap, path::Path};
+use std::collections::BTreeMap;
 pub(crate) const ROLES: &[&str] = &[
     "plate_formats",
     "plate_codes",
@@ -21,7 +21,7 @@ pub(crate) struct PlateColumns {
     tables: BTreeMap<String, Table>,
 }
 impl PlateColumns {
-    pub(crate) fn open(root: &Path, manifest: &Manifest) -> Result<Self> {
+    pub(crate) fn open(root: &super::reader::Reader<'_>, manifest: &Manifest) -> Result<Self> {
         ensure(
             ROLES
                 .iter()

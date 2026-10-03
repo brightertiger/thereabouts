@@ -1499,6 +1499,7 @@ dependencies = [
  "csv",
  "serde",
  "serde_json",
+ "sha2",
  "thereabouts-core",
  "thiserror",
  "unicode-width",
@@ -1532,6 +1533,18 @@ dependencies = [
  "thereabouts-cli",
  "thereabouts-core",
  "thereabouts-writer",
+]
+
+[[package]]
+name = "thereabouts-wasm"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "serde",
+ "serde_json",
+ "thereabouts-cli-core",
+ "thereabouts-core",
+ "wasm-bindgen",
 ]
 
 [[package]]

@@ -1,34 +1,40 @@
 {
   "name": "thereabouts",
   "version": "0.1.0",
-  "private": true,
-  "description": "Offline readers for Thereabouts serving packs",
+  "description": "Offline geographic context from the shared Thereabouts Rust/WASM core",
   "type": "module",
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": "./src/index.js"
+      "import": "./runtime/index.js"
     }
   },
   "files": [
-    "src",
+    "runtime",
+    "pkg",
+    "bin",
     "index.d.ts",
-    "README.md",
-    "FORMAT.md"
+    "README.md"
   ],
   "engines": {
     "node": "^22.0.0 || ^24.0.0"
   },
   "scripts": {
+    "build": "node scripts/build-wasm.mjs",
+    "prepack": "npm run build",
     "test": "node --import ./test/offline.js --test test/*.test.js",
     "check": "tsc --strict --noEmit --target es2022 --module nodenext test/types.ts",
-    "format": "prettier --check src test index.d.ts package.json"
+    "format": "prettier --check runtime bin scripts test index.d.ts package.json"
   },
   "dependencies": {
-    "h3-js": "4.5.0"
+    "undici": "^7.16.0"
   },
   "devDependencies": {
     "prettier": "3.6.2",
     "typescript": "~5.9.3"
-  }
+  },
+  "bin": {
+    "thereabouts": "./bin/thereabouts.js"
+  },
+  "license": "UNLICENSED"
 }

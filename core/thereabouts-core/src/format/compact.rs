@@ -8,7 +8,7 @@ use super::{
 use crate::{Error, Result, error::ensure};
 use fst::{IntoStreamer, Streamer};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, path::Path, sync::Arc};
+use std::{collections::BTreeMap, sync::Arc};
 mod ip;
 mod record;
 mod verify;
@@ -87,7 +87,10 @@ pub(crate) struct Compact {
     tables: BTreeMap<String, Table>,
     keys: Option<fst::Map<Vec<u8>>>,
 }
-fn open_tables(root: &Path, manifest: &Manifest) -> Result<BTreeMap<String, Table>> {
+fn open_tables(
+    root: &super::reader::Reader<'_>,
+    manifest: &Manifest,
+) -> Result<BTreeMap<String, Table>> {
     let mut tables = BTreeMap::new();
     let cache = table::block_cache();
     for (identity, role) in ROLES.iter().enumerate() {
@@ -104,7 +107,7 @@ fn open_tables(root: &Path, manifest: &Manifest) -> Result<BTreeMap<String, Tabl
     Ok(tables)
 }
 impl Compact {
-    pub(crate) fn open(root: &Path, manifest: &Manifest) -> Result<Self> {
+    pub(crate) fn open(root: &super::reader::Reader<'_>, manifest: &Manifest) -> Result<Self> {
         let schema = manifest
             .forward_columns
             .clone()
@@ -149,7 +152,7 @@ impl Compact {
                 .first()
                 .ok_or_else(|| Error::Corrupt("Missing key FST".into()))?;
             let c = Container::decode(
-                std::fs::read(manifest::artifact_path(root, &file.path)?)?,
+                root.read(&manifest::artifact_path(root, &file.path)?)?,
                 11,
                 &[1],
             )?;

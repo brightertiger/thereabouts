@@ -231,3 +231,6 @@ node_modules/
 
 .tmp/
 .cargo-cache/
+
+# Reproducible Node WASM build, produced before npm packaging.
+/clients/node/pkg/

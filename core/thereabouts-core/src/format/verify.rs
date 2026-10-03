@@ -7,12 +7,19 @@ use super::{
     spatial,
 };
 use crate::{Error, Result, error::ensure};
-use std::{collections::BTreeSet, fs, path::Path};
+use std::{collections::BTreeSet, path::Path};
 
 /// Hash and structurally validate a pack without loading the world's cell index.
 pub fn verify(root: &Path) -> Result<Manifest> {
-    let manifest = manifest::read(root)?;
-    manifest::verify(root, &manifest)?;
+    if !root.exists() {
+        return Err(Error::PackNotFound(root.to_owned()));
+    }
+    verify_with(&super::reader::Reader::native(root))
+}
+/// Validate byte identity and all structure through a supplied host file source.
+pub fn verify_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
+    let manifest = manifest::read_with(root)?;
+    manifest::verify_with(root, &manifest)?;
     ensure(
         manifest.family == "core"
             || manifest.forward_columns.is_some()
@@ -35,11 +42,11 @@ pub fn verify(root: &Path) -> Result<Manifest> {
         match file.kind.as_str() {
             "metadata" => {
                 ensure(metadata.is_none(), "Repeated metadata table")?;
-                let c = Container::decode(fs::read(path)?, 3, &[1])?;
+                let c = Container::decode(root.read(&path)?, 3, &[1])?;
                 metadata = Some(serde_json::from_slice::<Metadata>(c.section(0))?);
             }
             "catalogue" => {
-                let container = Container::decode(fs::read(path)?, 2, &[80, 8, 1])?;
+                let container = Container::decode(root.read(&path)?, 2, &[80, 8, 1])?;
                 total = total
                     .checked_add(container.section(0).len() / 80)
                     .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
@@ -64,7 +71,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
         let path = manifest::artifact_path(root, &file.path)?;
         match file.kind.as_str() {
             "catalogue" => {
-                for place in catalogue::decode(fs::read(path)?)? {
+                for place in catalogue::decode(root.read(&path)?)? {
                     place.validate(total)?;
                     ensure(
                         manifest.family != "core" || !place.field(11).is_empty(),
@@ -81,16 +88,16 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             }
             "cells" => {
                 for (id, _) in
-                    spatial::decode(fs::read(path)?, total, metadata.timezone_sets.len())?
+                    spatial::decode(root.read(&path)?, total, metadata.timezone_sets.len())?
                 {
                     ensure(blocks.insert(id), "Repeated spatial block")?;
                 }
             }
-            "exact" => super::exact::Exact::open(&path)?.verify(total)?,
-            "trie" => super::trie::Trie::open(&path)?.verify(total)?,
-            "names" => super::names::Names::open(&path)?.verify(total)?,
+            "exact" => super::exact::Exact::open(&path, root)?.verify(total)?,
+            "trie" => super::trie::Trie::open(&path, root)?.verify(total)?,
+            "names" => super::names::Names::open(&path, root)?.verify(total)?,
             "intervals" => {
-                let shard = super::intervals::Intervals::open(&path)?;
+                let shard = super::intervals::Intervals::open(&path, root)?;
                 shard.verify(total)?;
                 if let Some((first, last)) = shard.span {
                     super::intervals::follows(previous_range, first)?;
@@ -103,7 +110,12 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     verify_forward(root, &manifest, total, metadata.countries.len())?;
     Ok(manifest)
 }
-fn verify_forward(root: &Path, manifest: &Manifest, total: usize, countries: usize) -> Result<()> {
+fn verify_forward(
+    root: &super::reader::Reader<'_>,
+    manifest: &Manifest,
+    total: usize,
+    countries: usize,
+) -> Result<()> {
     if manifest.forward_columns.is_some() {
         let count = manifest
             .core_catalogue

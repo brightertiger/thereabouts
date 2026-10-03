@@ -42,8 +42,8 @@ pub(crate) struct Exact {
     offsets: Vec<usize>,
 }
 impl Exact {
-    pub(crate) fn open(path: &Path) -> Result<Self> {
-        let file = FileShard::open(path, 4, &[8, 1, 44, 8, 1])?;
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+        let file = FileShard::from_file(reader.open(path)?, 4, &[8, 1, 44, 8, 1])?;
         let bytes = file.section(0)?;
         let keys = file.section(1)?;
         ensure(
@@ -151,7 +151,8 @@ mod tests {
             ("AA\\0".to_owned() + "00100", record),
         ];
         std::fs::write(&path, encode_entries(&entries).unwrap()).unwrap();
-        let shard = Exact::open(&path).unwrap();
+        let shard =
+            Exact::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
         assert_eq!(shard.lookup("AA\\000100").unwrap(), vec![0, 1]);
         assert_eq!(shard.lookup("AA\\0100").unwrap(), Vec::<usize>::new());
         let decoded = shard.record(1, 0).unwrap();

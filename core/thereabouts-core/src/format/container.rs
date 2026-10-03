@@ -112,18 +112,28 @@ fn directory(
 /// A file-backed shard whose header and directory are checked before range reads.
 #[derive(Debug)]
 pub(crate) struct FileShard {
-    file: std::fs::File,
+    file: std::sync::Arc<dyn super::reader::ReadAt>,
     #[cfg(test)]
     pub(crate) reads: std::sync::Mutex<Vec<usize>>,
     spans: Vec<(usize, usize)>,
 }
 impl FileShard {
+    #[cfg(test)]
     pub(crate) fn open(path: &std::path::Path, kind: u32, widths: &[usize]) -> Result<Self> {
-        use std::io::Read;
-        let mut file = std::fs::File::open(path)?;
-        let length = index(file.metadata()?.len())?;
+        Self::from_file(
+            super::reader::Reader::native(std::path::Path::new("")).open(path)?,
+            kind,
+            widths,
+        )
+    }
+    pub(crate) fn from_file(
+        file: std::sync::Arc<dyn super::reader::ReadAt>,
+        kind: u32,
+        widths: &[usize],
+    ) -> Result<Self> {
+        let length = index(file.size())?;
         let mut header = vec![0; 32 + widths.len() * 32];
-        file.read_exact(&mut header)?;
+        file.read_at(0, &mut header)?;
         let spans = directory(&header, length, kind, widths)?;
         let shard = Self {
             file,
@@ -170,7 +180,7 @@ impl FileShard {
             .map_err(|_| Error::Corrupt("Test read log poisoned".into()))?
             .push(length);
         let mut bytes = vec![0; length];
-        super::positioned::read(&self.file, &mut bytes, start as u64)?;
+        self.file.read_at(start as u64, &mut bytes)?;
         Ok(bytes)
     }
 }

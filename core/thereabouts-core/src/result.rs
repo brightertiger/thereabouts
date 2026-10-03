@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub enum Status {
     /// Published geography or one resolved place.
     Matched,
-    /// Several ranked places; flat fields remain null.
+    /// Several ranked places; flat fields retain only candidate consensus.
     Ambiguous,
     /// No stored answer for the query.
     NotFound,

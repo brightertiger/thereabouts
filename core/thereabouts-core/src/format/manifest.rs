@@ -5,8 +5,6 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
-    fs,
-    io::Read,
     path::{Path, PathBuf},
 };
 
@@ -96,19 +94,8 @@ fn zero(value: &u16) -> bool {
     *value == 0
 }
 /// Hash a file in bounded chunks; never load Parquet just to fingerprint it.
-#[allow(clippy::indexing_slicing)] // Read returns at most the buffer length.
 pub fn digest(path: &Path) -> Result<String> {
-    let mut file = fs::File::open(path)?;
-    let mut hash = Sha256::new();
-    let mut buffer = vec![0; 65536];
-    loop {
-        let n = file.read(&mut buffer)?;
-        if n == 0 {
-            break;
-        }
-        hash.update(&buffer[..n]);
-    }
-    Ok(format!("{:x}", hash.finalize()))
+    super::reader::Reader::native(Path::new("")).digest(path)
 }
 /// Reject path traversal and symlinks, including symlinked parent directories.
 pub fn artifact_path(root: &Path, name: &str) -> Result<PathBuf> {
@@ -120,7 +107,8 @@ pub fn artifact_path(root: &Path, name: &str) -> Result<PathBuf> {
     for part in name.split('/') {
         ensure(!matches!(part, "" | "." | ".."), "Unsafe artifact path")?;
         path.push(part);
-        if let Ok(metadata) = fs::symlink_metadata(&path) {
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Ok(metadata) = std::fs::symlink_metadata(&path) {
             ensure(!metadata.file_type().is_symlink(), "Symlink artifact")?;
         }
     }
@@ -131,12 +119,16 @@ pub fn read(root: &Path) -> Result<Manifest> {
     if !root.exists() {
         return Err(Error::PackNotFound(root.to_owned()));
     }
+    read_with(&super::reader::Reader::native(root))
+}
+/// Admit manifest and artifact sizes through a host-provided stable file source.
+pub fn read_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
     let path = artifact_path(root, "manifest.json")?;
     ensure(
-        fs::metadata(&path)?.len() <= 16 * 1024 * 1024,
+        root.open(&path)?.size() <= 16 * 1024 * 1024,
         "Oversized manifest",
     )?;
-    let value: serde_json::Value = serde_json::from_slice(&fs::read(path)?)?;
+    let value: serde_json::Value = serde_json::from_slice(&root.read(&path)?)?;
     if value
         .get("format_version")
         .and_then(serde_json::Value::as_u64)
@@ -213,18 +205,19 @@ pub fn read(root: &Path) -> Result<Manifest> {
             "Invalid checksum",
         )?;
         let path = artifact_path(root, &f.path)?;
-        ensure(
-            fs::metadata(path)?.len() == f.size,
-            "Artifact size mismatch",
-        )?;
+        ensure(root.open(&path)?.size() == f.size, "Artifact size mismatch")?;
     }
     Ok(m)
 }
 /// Verify every checksum, including notices and metadata tables.
 pub fn verify(root: &Path, m: &Manifest) -> Result<()> {
+    verify_with(&super::reader::Reader::native(root), m)
+}
+/// Verify digests through the same handles used by admission and later reads.
+pub fn verify_with(root: &super::reader::Reader<'_>, m: &Manifest) -> Result<()> {
     for f in &m.files {
         ensure(
-            digest(&artifact_path(root, &f.path)?)? == f.sha256,
+            root.digest(&artifact_path(root, &f.path)?)? == f.sha256,
             "Shard checksum mismatch",
         )?;
     }

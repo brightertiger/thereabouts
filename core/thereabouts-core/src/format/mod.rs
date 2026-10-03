@@ -12,7 +12,9 @@ pub mod verify;
 mod cache;
 mod metadata_index;
 
+#[cfg(not(target_arch = "wasm32"))]
 mod positioned;
+pub mod reader;
 
 pub mod exact;
 pub mod observation;

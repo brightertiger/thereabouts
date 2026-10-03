@@ -1,0 +1,20 @@
+[package]
+name = "thereabouts-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Host-read WASM bindings for the shared Thereabouts core"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+thereabouts-core = { path = "../thereabouts-core" }
+thereabouts-cli-core = { path = "../thereabouts-cli-core" }
+wasm-bindgen = "=0.2.129"
+js-sys = "=0.3.106"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[lints]
+workspace = true

@@ -112,8 +112,8 @@ pub(crate) struct Intervals {
     pub(crate) span: Option<(Bounds, Bounds)>,
 }
 impl Intervals {
-    pub(crate) fn open(path: &Path) -> Result<Self> {
-        let file = FileShard::open(path, 6, &[36, 44, 8, 1])?;
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+        let file = FileShard::from_file(reader.open(path)?, 6, &[36, 44, 8, 1])?;
         let count = file.len(0)? / 36;
         ensure(
             file.len(1)? / 44 == count,
@@ -193,7 +193,7 @@ mod tests {
             let range=Bounds{version:4,first:u128::from(start),last:u128::from(start+width)};
             let record=Observation{fallback:[None,None,None,None],identity:None,places:[0;3],latitude:i32::MIN,longitude:i32::MIN,text:[Some("s".into()),Some("id".into()),None,None,None,None]};
             std::fs::write(&path,encode_entries(&[(range.key(),record)]).unwrap()).unwrap();
-            let index=Intervals::open(&path).unwrap();
+            let index=Intervals::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
             prop_assert_eq!(index.lookup((4,range.first)).unwrap(),Some(0));
             prop_assert_eq!(index.lookup((4,range.last)).unwrap(),Some(0));
             prop_assert_eq!(index.lookup((4,range.last+1)).unwrap(),None);

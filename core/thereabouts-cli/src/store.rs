@@ -214,8 +214,13 @@ pub fn inventory(root: &Path) -> Result<Vec<(PathBuf, Manifest)>> {
     }
     Ok(result)
 }
-/// Hold an OS advisory lock; process exit releases it, so stale files are harmless.
-pub fn lock(root: &Path) -> Result<File> {
+/// Both guards are owned for the whole transaction and released by the OS on exit.
+pub struct InstallLock {
+    _file: File,
+    _coordination: std::net::TcpListener,
+}
+/// Serialize native and JS hosts without a Node native addon or stale leases.
+pub fn lock(root: &Path) -> Result<InstallLock> {
     fs::create_dir_all(root)?;
     let path = manifest::artifact_path(root, ".install.lock")?;
     let file = OpenOptions::new()
@@ -226,7 +231,19 @@ pub fn lock(root: &Path) -> Result<File> {
         .open(path)?;
     file.try_lock()
         .map_err(|_| Error::Integrity("Another data operation holds the install lock".into()))?;
-    Ok(file)
+    let canonical = fs::canonicalize(root)?;
+    let canonical = canonical
+        .to_str()
+        .ok_or_else(|| Error::Usage("Store path must be UTF-8".into()))?;
+    let port = thereabouts_cli_core::lock_port(canonical);
+    let coordination = std::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port))
+        .map_err(|_| Error::Integrity(format!(
+            "Install lock coordination port 127.0.0.1:{port} is busy; another data operation or local process holds it"
+        )))?;
+    Ok(InstallLock {
+        _file: file,
+        _coordination: coordination,
+    })
 }
 /// Replace the pin only after every requested installation has verified.
 pub fn activate(root: &Path, pin: &Active) -> Result<()> {

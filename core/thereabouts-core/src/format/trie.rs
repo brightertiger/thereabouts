@@ -97,8 +97,8 @@ pub(crate) struct Trie {
     nodes: Vec<Node>,
 }
 impl Trie {
-    pub(crate) fn open(path: &Path) -> Result<Self> {
-        let file = FileShard::open(path, 5, &[48, 44, 8, 1])?;
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+        let file = FileShard::from_file(reader.open(path)?, 5, &[48, 44, 8, 1])?;
         let bytes = file.section(0)?;
         ensure(!bytes.is_empty(), "Missing trie root")?;
         let mut nodes = Vec::new();
@@ -225,7 +225,7 @@ mod tests {
         ];
         let bytes = encode_entries(&entries).unwrap();
         std::fs::write(&path, &bytes).unwrap();
-        let trie = Trie::open(&path).unwrap();
+        let trie = Trie::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
         assert_eq!(trie.lookup("12025551234").unwrap(), (4, 1..3));
         assert_eq!(trie.lookup("199").unwrap(), (1, 0..1));
         assert_eq!(trie.lookup("44").unwrap(), (0, 0..0));
@@ -245,6 +245,6 @@ mod tests {
         )
         .unwrap();
         std::fs::write(&path, corrupt).unwrap();
-        assert!(Trie::open(&path).is_err());
+        assert!(Trie::open(&path, &super::super::reader::Reader::native(Path::new(""))).is_err());
     }
 }

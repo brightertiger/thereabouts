@@ -113,14 +113,16 @@ fn decode_offsets(bytes: &[u8], count: usize, end: usize) -> Result<Vec<usize>> 
     Ok(values)
 }
 impl Names {
-    pub(crate) fn open(path: &Path) -> Result<Self> {
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
         // The fst crate documents panic on malformed serialized nodes. Validate
         // the full DAG at admission and convert that boundary to a coded error.
-        std::panic::catch_unwind(|| Self::read(path))
+        // Reader borrows finish before FST traversal; unwinding drops the whole
+        // admission result, so no partially initialized state can escape.
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| Self::read(path, reader)))
             .map_err(|_| Error::Corrupt("Malformed serialized name FST".into()))?
     }
-    fn read(path: &Path) -> Result<Self> {
-        let file = FileShard::open(path, 8, &[1, 8, 20, 8, 1, 1, 8, 4])?;
+    fn read(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+        let file = FileShard::from_file(reader.open(path)?, 8, &[1, 8, 20, 8, 1, 1, 8, 4])?;
         let map = super::fst::read(file.section(0)?, true)?;
         let grams = super::fst::read(file.section(5)?, true)?;
         ensure(
@@ -346,7 +348,8 @@ mod tests {
             },
         );
         std::fs::write(&path, encode_entries(&vec![entry; 10_000]).unwrap()).unwrap();
-        let names = Names::open(&path).unwrap();
+        let names =
+            Names::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
         assert_eq!(
             names.fuzzy("fixture towq", 8).unwrap(),
             (0..8).collect::<Vec<_>>()
@@ -361,7 +364,7 @@ mod tests {
             let dir=tempfile::tempdir().unwrap(); let path=dir.path().join("names.bin");
             let entries=values.into_iter().map(|name|(name.clone(),Entry{places:[1,0,2],name,alternate:false})).collect::<Vec<_>>();
             std::fs::write(&path,encode_entries(&entries).unwrap()).unwrap();
-            let index=Names::open(&path).unwrap();
+            let index=Names::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
             let grams=trigrams(&query);
             let expected=entries.iter().enumerate().filter_map(|(row,(name,_))| {
                 let other=trigrams(name);
@@ -376,7 +379,7 @@ mod tests {
             let entries=vec![(name.clone(),Entry{places:[1,0,2],name:name.clone(),alternate:false})];
             let bytes=encode_entries(&entries).unwrap();
             std::fs::write(&path,&bytes).unwrap();
-            let index=Names::open(&path).unwrap();
+            let index=Names::open(&path, &super::super::reader::Reader::native(Path::new(""))).unwrap();
             prop_assert_eq!(index.exact(&name).unwrap(),vec![0]);
             prop_assert_eq!(index.record(0,2).unwrap(),([1,0,2],false));
             prop_assert_eq!(index.spelling(0).unwrap(),name);
@@ -387,7 +390,7 @@ mod tests {
             fst[16]^=1;
             let corrupt=encode(8,&[(&fst,1),(c.section(1),8),(c.section(2),20),(c.section(3),8),(c.section(4),1),(c.section(5),1),(c.section(6),8),(c.section(7),4)]).unwrap();
             std::fs::write(&path,corrupt).unwrap();
-            prop_assert!(Names::open(&path).is_err());
+            prop_assert!(Names::open(&path, &super::super::reader::Reader::native(Path::new(""))).is_err());
         }
     }
 }

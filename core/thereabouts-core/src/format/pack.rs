@@ -11,7 +11,6 @@ use super::{
 use crate::{Error, Result, error::ensure};
 use std::{
     collections::BTreeMap,
-    fs,
     path::Path,
     sync::{Arc, Mutex},
 };
@@ -82,10 +81,17 @@ impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
     #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
     pub fn open(root: &Path, verify: bool) -> Result<Self> {
+        if !root.exists() {
+            return Err(Error::PackNotFound(root.to_owned()));
+        }
+        Self::open_with(&super::reader::Reader::native(root), verify)
+    }
+    /// Open through host reads; all shards retain their original handles after admission.
+    pub fn open_with(root: &super::reader::Reader<'_>, verify: bool) -> Result<Self> {
         let manifest = if verify {
-            super::verify::verify(root)?
+            super::verify::verify_with(root)?
         } else {
-            manifest::read(root)?
+            manifest::read_with(root)?
         };
         let mut metadata = None;
         let mut exacts = Vec::new();
@@ -99,40 +105,20 @@ impl Pack {
             let path = manifest::artifact_path(root, &file.path)?;
             match file.kind.as_str() {
                 "catalogue" => {
-                    let source = catalogue_source(&path, place_count)?;
+                    let source = catalogue_source(&path, place_count, root)?;
                     place_count = source.end;
                     catalogues.push(source);
                 }
                 "metadata" => {
                     ensure(metadata.is_none(), "Repeated metadata table")?;
-                    let c = Container::decode(fs::read(path)?, 3, &[1])?;
+                    let c = Container::decode(root.read(&path)?, 3, &[1])?;
                     metadata = Some(serde_json::from_slice::<Metadata>(c.section(0))?);
                 }
-                "cells" => {
-                    let shard = Arc::new(FileShard::open(&path, 1, &[40, 2, 1, 20])?);
-                    let entries = spatial::directory(
-                        &shard.section(0)?,
-                        [shard.len(1)?, shard.len(2)?, shard.len(3)?],
-                    )?;
-                    for entry in entries {
-                        ensure(
-                            blocks
-                                .insert(
-                                    entry.block,
-                                    BlockSource {
-                                        shard: Arc::clone(&shard),
-                                        entry,
-                                    },
-                                )
-                                .is_none(),
-                            "Repeated spatial block",
-                        )?;
-                    }
-                }
-                "exact" => exacts.push(super::exact::Exact::open(&path)?),
-                "trie" => tries.push(super::trie::Trie::open(&path)?),
-                "intervals" => intervals.push(super::intervals::Intervals::open(&path)?),
-                "names" => names.push(super::names::Names::open(&path)?),
+                "cells" => load_blocks(root, &path, &mut blocks)?,
+                "exact" => exacts.push(super::exact::Exact::open(&path, root)?),
+                "trie" => tries.push(super::trie::Trie::open(&path, root)?),
+                "intervals" => intervals.push(super::intervals::Intervals::open(&path, root)?),
+                "names" => names.push(super::names::Names::open(&path, root)?),
                 "notice" | "keys" => {}
                 role if super::compact::ROLES.contains(&role)
                     || super::plate_columns::ROLES.contains(&role) => {}
@@ -391,8 +377,12 @@ impl Pack {
     }
 }
 
-fn catalogue_source(path: &Path, first: usize) -> Result<CatalogueSource> {
-    let shard = FileShard::open(path, 2, &[80, 8, 1])?;
+fn catalogue_source(
+    path: &Path,
+    first: usize,
+    reader: &super::reader::Reader<'_>,
+) -> Result<CatalogueSource> {
+    let shard = FileShard::from_file(reader.open(path)?, 2, &[80, 8, 1])?;
     catalogue::validate_header(&shard)?;
     let end = first
         .checked_add(shard.len(0)? / 80)
@@ -402,4 +392,35 @@ fn catalogue_source(path: &Path, first: usize) -> Result<CatalogueSource> {
         "Catalogue exceeds u32 references",
     )?;
     Ok(CatalogueSource { first, end, shard })
+}
+
+fn load_blocks(
+    reader: &super::reader::Reader<'_>,
+    path: &Path,
+    blocks: &mut BTreeMap<u32, BlockSource>,
+) -> Result<()> {
+    let shard = Arc::new(FileShard::from_file(
+        reader.open(path)?,
+        1,
+        &[40, 2, 1, 20],
+    )?);
+    let entries = spatial::directory(
+        &shard.section(0)?,
+        [shard.len(1)?, shard.len(2)?, shard.len(3)?],
+    )?;
+    for entry in entries {
+        ensure(
+            blocks
+                .insert(
+                    entry.block,
+                    BlockSource {
+                        shard: Arc::clone(&shard),
+                        entry,
+                    },
+                )
+                .is_none(),
+            "Repeated spatial block",
+        )?;
+    }
+    Ok(())
 }

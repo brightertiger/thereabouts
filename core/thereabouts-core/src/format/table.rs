@@ -6,10 +6,7 @@ use super::{
     manifest::{self, Manifest},
 };
 use crate::{Error, Result, error::ensure};
-use std::{
-    path::Path,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 /// Each directory row contains row range, compressed span and first search key.
 pub const DIRECTORY_WIDTH: usize = 48;
 /// Integer and UTF-8 tables have distinct container kinds.
@@ -53,7 +50,7 @@ pub(crate) struct Table {
 }
 impl Table {
     pub(crate) fn open(
-        root: &Path,
+        root: &super::reader::Reader<'_>,
         manifest: &Manifest,
         role: &str,
         kind: u32,
@@ -64,8 +61,8 @@ impl Table {
         let mut blocks = Vec::<Block>::new();
         let mut rows = 0;
         for artifact in manifest.files.iter().filter(|f| f.kind == role) {
-            let file = Arc::new(FileShard::open(
-                &manifest::artifact_path(root, &artifact.path)?,
+            let file = Arc::new(FileShard::from_file(
+                root.open(&manifest::artifact_path(root, &artifact.path)?)?,
                 kind,
                 &[DIRECTORY_WIDTH, 1],
             )?);
@@ -309,7 +306,7 @@ mod tests {
         let manifest = manifest::read(&root).unwrap();
         let cache = block_cache();
         let starts = Table::open(
-            &root,
+            &super::super::reader::Reader::native(&root),
             &manifest,
             "starts4",
             INTEGER_KIND,
@@ -317,7 +314,15 @@ mod tests {
             0,
         )
         .unwrap();
-        let strings = Table::open(&root, &manifest, "strings", STRING_KIND, cache, 1).unwrap();
+        let strings = Table::open(
+            &super::super::reader::Reader::native(&root),
+            &manifest,
+            "strings",
+            STRING_KIND,
+            cache,
+            1,
+        )
+        .unwrap();
         let file = &starts.blocks[0].file;
         file.reads.lock().unwrap().clear();
         let first = starts.block(0).unwrap();

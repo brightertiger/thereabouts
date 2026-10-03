@@ -1,65 +1,81 @@
-import { execFileSync } from "node:child_process";
-import { test } from "node:test";
+import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { Geocoder, requireOne, AmbiguousResultError } from "../src/index.js";
-
-export const fixtures = fileURLToPath(
-  new URL("../../../tests/fixtures/", import.meta.url),
-);
-const bundle = JSON.parse(
-  await readFile(`${fixtures}/conformance.json`, "utf8"),
-);
-assert.equal(bundle.schema, "thereabouts-conformance-1");
-export async function resolve(reader, request) {
-  const { kind, values, country, scheme } = request;
-  if (kind === "coordinates") return reader.reverse(...values);
-  if (kind === "h3") return reader.fromH3(values[0]);
-  return reader[kind](values[0], { country, scheme });
-}
-for (const fixture of [...new Set(bundle.cases.map((c) => c.pack))]) {
-  test(`Python conformance: ${fixture}`, async () => {
-    const reader = await Geocoder.open({
-      pack: `${fixtures}/${fixture}`,
-      verify: true,
-    });
-    try {
-      for (const item of bundle.cases.filter((c) => c.pack === fixture)) {
-        if (item.error)
-          await assert.rejects(resolve(reader, item.request), item.error);
-        else {
-          const result = await resolve(reader, item.request);
-          assert.deepEqual(result, item.result, `case ${item.id}`);
-          assert.deepEqual(reader.explain(result), {
-            result,
-            raw_evidence_installed: false,
-          });
-          if (result.status === "ambiguous")
-            assert.throws(() => requireOne(result), AmbiguousResultError);
-          else assert.equal(requireOne(result), result.selected);
-        }
+import fs from "node:fs";
+import path from "node:path";
+import { Geocoder } from "../runtime/index.js";
+import { run } from "../runtime/cli.js";
+import {
+  json,
+  FIXTURES,
+  temporary,
+  selection,
+  fixtureStore,
+  lookup,
+  argumentsFor,
+  console,
+  USAGE,
+  assertResult,
+} from "./helpers.js";
+const bundles = fs
+  .readdirSync(FIXTURES)
+  .filter((name) => name.endsWith("-vectors.json"))
+  .sort();
+for (const name of bundles) {
+  const bundle = json(path.join(FIXTURES, name));
+  test(`library vectors: ${name} (${bundle.cases.length})`, async (t) => {
+    const geo = await Geocoder.open({ packs: selection(bundle.pack) });
+    t.after(() => geo.close());
+    for (const c of bundle.cases)
+      assertResult(assert, await lookup(geo, c.request), c.result, c.id);
+  });
+  test(`bin vectors: ${name} (${bundle.cases.length})`, async (t) => {
+    const root = temporary(t);
+    fixtureStore(root, selection(bundle.pack));
+    for (const c of bundle.cases) {
+      const args = argumentsFor(c.request);
+      if (
+        c.request.kind !== "coordinates" &&
+        typeof c.request.values[0] !== "string"
+      )
+        continue;
+      // Synthetic reverse vectors retain typed invalid coordinate cases. OS argv
+      // can only preserve strings; these remain asserted through the library.
+      if (
+        c.request.kind === "coordinates" &&
+        c.request.values.some((v) => typeof v !== "number")
+      )
+        continue;
+      let output;
+      if (args.some((v) => v.includes("\0"))) {
+        let stdout = "",
+          stderr = "";
+        const status = await run(["--data-dir", root, ...args], {
+          stdout: (s) => (stdout += s),
+          stderr: (s) => (stderr += s),
+          env: process.env,
+          stdinTTY: false,
+          stdoutTTY: false,
+        });
+        output = { status, stdout, stderr };
+      } else output = console(root, args);
+      if (
+        USAGE.has(c.id) ||
+        (c.request.kind === "postal" && !c.request.country) ||
+        (c.request.limit !== undefined &&
+          (c.request.limit < 1 || c.request.limit > 100))
+      ) {
+        assert.equal(c.result.status, "invalid_input");
+        assert.equal(output.status, 2, c.id);
+        assert.equal(output.stdout, "");
+        continue;
       }
-    } finally {
-      await reader.close();
+      const code = ["invalid_input", "unsupported_granularity"].includes(
+        c.result.status,
+      )
+        ? 2
+        : 0;
+      assert.equal(output.status, code, `${c.id}: ${output.stderr}`);
+      assertResult(assert, JSON.parse(output.stdout), c.result, c.id);
     }
   });
 }
-
-test("legacy packaged specification matches its recorded historical contract", async () => {
-  const packaged = await readFile(new URL("../FORMAT.md", import.meta.url));
-  const source = execFileSync("git", ["show", "3ade5da:docs/SERVING_FORMAT.md"], {
-    cwd: new URL("../../../", import.meta.url),
-  });
-  const standalone = source
-    .toString()
-    .replaceAll(
-      "[CLIENT_STATUS.md](CLIENT_STATUS.md)",
-      "CLIENT_STATUS.md in the repository docs directory",
-    )
-    .replaceAll(
-      "[CODE_PACKS.md](CODE_PACKS.md)",
-      "CODE_PACKS.md in the repository docs directory",
-    );
-  assert.equal(packaged.toString(), standalone);
-});

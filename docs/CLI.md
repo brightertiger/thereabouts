@@ -1,8 +1,11 @@
 # Thereabouts command and store contract
 
-This is the normative grammar for the Rust CLI and the later Node command
+This is the normative grammar for the Rust CLI and the Node command
 tree. The console entry and python -m thereabouts invoke the same Rust
-run(argv, io) function. argv includes its program name; Io owns standard
+run(argv, io) function. Node mirrors the argument grammar and calls
+thereabouts-cli-core through WASM for batch parsing, rendering, field projection
+and lookup exit policy; Node owns filesystem and HTTP operations. Native argv
+includes its program name; Io owns standard
 streams, environment and TTY detection. Python supplies the optional MCP host.
 See [CLIENT_STATUS.md](CLIENT_STATUS.md) for qualification and measurements.
 
@@ -246,10 +249,19 @@ the first pin carries over other compatible old pointers of the same dataset
 version. Format-1 reverse pointers produce IncompatibleDataError; they are not
 read as format 2.
 
-An OS advisory lock on .install.lock serializes install/remove operations.
-The lock is released by closing its file handle, including on process exit;
-a leftover lock filename does not block future operations. A concurrent
-operation fails explicitly instead of proceeding without a lock.
+Install/remove operations take a shared loopback OS socket lock. The native
+host also takes its advisory lock on .install.lock; Node opens that same marker
+but needs no native addon. Both hosts hash the UTF-8 canonical store path
+(normalized separators, Windows drive paths lowercased and extended prefix
+removed) with SHA-256. The coordination port is
+49152 + (the first two digest bytes as big-endian u16 & 16383), on 127.0.0.1.
+Binding is exclusive and lasts through activation/removal. No data is sent.
+Closing the host or process releases the socket; the marker filename does
+not block a later operation. A busy port, including a rare unrelated collision,
+fails closed with its address in the diagnostic (exit 4). Close the competing
+operation/process or use another store directory. Lookups do not bind sockets.
+This shared guard is required because Node 22/24 exposes no advisory file-lock
+API and the distribution contract forbids native addons.
 
 ## Release index and install transaction
 
@@ -301,8 +313,9 @@ reserved installer .archive.json receipt.
 Before download the installer reserves twice the requested archive byte sum
 plus a 64 MiB bookkeeping margin. Insufficient space is an environment error
 (exit 2); there is no fixed free-space floor in the product. Partial
-downloads remain in .downloads and resume at their exact byte offset. HTTP
-uses ureq with rustls and its certificate verification enabled. Initial
+downloads remain in .downloads and resume at their exact byte offset. The native HTTP
+host uses ureq with rustls and certificate verification enabled. Node uses
+fetch with undici environment-proxy support and normal TLS verification. Initial
 transfers require HTTP 200; resumes send Range: bytes=N- and require HTTP 206
 with Content-Range: bytes N-(total-1)/total. If supplied, Content-Length must
 equal the remaining advertised length. Ignored/mismatched ranges fail and
@@ -310,7 +323,9 @@ retain the partial file for retry. No bytes are appended before these checks.
 Requests use Accept-Encoding: identity; encoded responses are rejected.
 HTTPS requests follow at most five HTTPS-only redirects; downgrade to HTTP is
 rejected. HTTP sources (including loopback tests) do not follow redirects.
-HTTPS_PROXY/HTTP_PROXY/ALL_PROXY and NO_PROXY use ureq environment semantics. Connections and headers
+HTTPS_PROXY/HTTP_PROXY/ALL_PROXY and NO_PROXY use native ureq environment semantics.
+Node honors HTTPS_PROXY/HTTP_PROXY and NO_PROXY through undici; ALL_PROXY is
+used as a fallback when HTTP_PROXY/HTTPS_PROXY are absent. Connections and headers
 have 30-second deadlines; each transport read has a fresh 60-second stall limit.
 There is no total download timeout. Failures retain verified-offset partial bytes
 for the next explicit install to resume. Tests use only loopback HTTP and local directories.
@@ -404,3 +419,29 @@ Hosts supply input/output streams and seekable temporary storage; table width
 is measured in terminal cells (including wide Unicode text). The native crate
 owns clap, files, temporary-file lifetimes, process environment and downloads.
 The Node binding uses this same portable policy through WASM.
+
+
+## Node implementation
+
+The ESM package supports Node 22 and 24. Scalar library methods are async and
+return the same snake_case result objects. reverseMany is an async iterable.
+The host supplies stable file descriptors, sizes and exact positioned reads;
+the WASM module owns every pack decoder and lookup. There is no native addon.
+
+Build the ignored pkg/ artifact with npm run build (Rust 1.99,
+wasm32-unknown-unknown and wasm-bindgen-cli 0.2.129). npm prepack invokes this
+reproducible build and includes the result; no generated WASM is committed.
+The package contains no data and makes no implicit downloads.
+
+Node mcp delegates stdio to python3 -m thereabouts.mcp_service.server;
+THEREABOUTS_PYTHON can select the Python executable. The optional Python
+MCP installation remains required. JS command help describes the same flags;
+text wrapping need not match clap. Node scalar invalid values and CLI batch
+errors use the shared Rust result and exit mapping.
+
+Node library conformance asserts all current and synthetic vectors and all
+54 original legacy mappings. The actual bin asserts every representable query;
+NUL values use the same JS runner and typed non-string values remain library
+assertions. Numeric comparison uses the Rust runner's 1e-10 absolute tolerance
+for target-specific transcendental arithmetic in H3 cell centres. No expected
+geography, statuses or candidate ordering is changed for Node.
