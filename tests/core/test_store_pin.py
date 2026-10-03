@@ -60,3 +60,41 @@ def test_legacy_reverse_diagnosis_survives_native_discovery(tmp_path: Path) -> N
     pointer.write_text("{}")
     with pytest.raises(IncompatibleDataError, match="Legacy reverse"):
         Geocoder(data_dir=tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("platform", "module", "class_name", "name"),
+    [
+        ("macos", "macos", "MacOS", "Thereabouts"),
+        ("linux", "unix", "Unix", "thereabouts"),
+        ("windows", "windows", "Windows", "Thereabouts"),
+    ],
+)
+def test_each_platform_matches_platformdirs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    platform: str,
+    module: str,
+    class_name: str,
+    name: str,
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "Local"))
+    monkeypatch.delenv("XDG_DATA_HOME", raising=False)
+    policy = import_module(f"setuptools._vendor.platformdirs.{module}")
+    expected = getattr(policy, class_name)(name, appauthor=False).user_data_dir
+    assert Path(_core.platform_directory(platform)) == Path(expected)
+
+
+def test_missing_directory_environment_has_coded_discovery_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from thereabouts import DataNotInstalledError
+
+    for key in ("HOME", "LOCALAPPDATA", "XDG_DATA_HOME", "THEREABOUTS_DATA"):
+        monkeypatch.delenv(key, raising=False)
+    with pytest.raises(
+        DataNotInstalledError, match="thereabouts data install core"
+    ) as exc:
+        data_directory()
+    assert exc.value.code == "data_not_installed"

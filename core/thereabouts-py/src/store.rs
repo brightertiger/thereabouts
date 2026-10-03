@@ -24,8 +24,15 @@ fn installed_pack(py: Python<'_>, root: &str, family: &str) -> PyResult<String> 
         .map(|p| p.to_string_lossy().into_owned())
         .map_err(|e| error(py, &e))
 }
+#[pyfunction]
+fn platform_directory(platform: &str) -> PyResult<String> {
+    store::platform_directory(platform, &SystemIo)
+        .map(|p| p.to_string_lossy().into_owned())
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))
+}
 pub(super) fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(data_directory, m)?)?;
+    m.add_function(wrap_pyfunction!(platform_directory, m)?)?;
     m.add_function(wrap_pyfunction!(installed_pack, m)?)?;
     Ok(())
 }

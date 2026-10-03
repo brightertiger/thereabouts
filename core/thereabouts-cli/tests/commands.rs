@@ -239,3 +239,26 @@ fn verify_checks_sizes_by_default_and_content_with_full() {
     fs::write(path, bytes).unwrap();
     assert_eq!(host.run(&["data", "verify"]), 4);
 }
+
+#[test]
+fn help_explains_globals_and_reverse_alternatives() {
+    let temp = tempfile::tempdir().unwrap();
+    let mut host = Host::new(temp.path());
+    assert_eq!(host.run(&[]), 2);
+    assert_eq!(host.out, "");
+    assert!(host.err.contains("Usage:"));
+    assert_eq!(host.run(&["reverse", "--help"]), 0);
+    assert!(host.out.contains("reverse --lat LAT --lon LON"));
+    assert!(host.out.contains("reverse FILE|-"));
+    for explanation in [
+        "installed data store",
+        "pretty JSON",
+        "input columns",
+        "source and method",
+        "progress",
+        "interactive confirmation",
+        "no match",
+    ] {
+        assert!(host.out.contains(explanation), "{explanation}");
+    }
+}

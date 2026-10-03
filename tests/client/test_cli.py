@@ -135,11 +135,11 @@ def test_store_selection_is_explicit_then_environment(
     with pytest.raises(InvalidInputError):
         Geocoder(PACK, data_dir=tmp_path)
     monkeypatch.delenv("THEREABOUTS_DATA")
-    monkeypatch.setattr(sys, "platform", "darwin")
-    assert data_directory() == Path.home() / "Library/Application Support/Thereabouts"
-    monkeypatch.setattr(sys, "platform", "linux")
+    from thereabouts import _core
+
+    assert data_directory() == Path(_core.data_directory())
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
-    assert data_directory() == tmp_path / "xdg/thereabouts"
+    assert Path(_core.platform_directory("linux")) == tmp_path / "xdg/thereabouts"
 
 
 def test_duplicate_csv_headers_are_invalid(

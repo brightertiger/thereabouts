@@ -13,23 +13,31 @@ pub(crate) enum Format {
 #[derive(Debug, Args)]
 #[allow(clippy::struct_excessive_bools)] // Independent user-facing switches, validated by clap.
 pub(crate) struct Global {
+    /// Select the installed data store (overrides `THEREABOUTS_DATA`).
     #[arg(long, global = true)]
     pub data_dir: Option<PathBuf>,
+    /// Choose table, JSON, NDJSON or CSV output; defaults to table on a TTY.
     #[arg(long, global=true, value_enum, conflicts_with_all=["json","csv"])]
     pub format: Option<Format>,
+    /// Print one pretty JSON object (a results array for batches).
     #[arg(long, global = true, conflicts_with = "csv")]
     pub json: bool,
+    /// Print CSV with input columns followed by result columns.
     #[arg(long, global = true)]
     pub csv: bool,
     /// Select comma-separated result paths; omit the value to list paths.
     #[arg(long, global=true, num_args=0..=1, default_missing_value="")]
     pub fields: Option<String>,
+    /// Include source and method details in JSON or CSV; tables omit evidence.
     #[arg(long, global = true)]
     pub evidence: bool,
+    /// Suppress optional progress messages; keep results and errors.
     #[arg(long, global = true)]
     pub quiet: bool,
+    /// Disable interactive confirmation; destructive operations need --yes.
     #[arg(long, global = true)]
     pub no_input: bool,
+    /// Exit 1 when a lookup has no match (batch row errors still exit 5).
     #[arg(long, global = true)]
     pub strict: bool,
 }
@@ -45,6 +53,9 @@ pub(crate) struct Cli {
 #[derive(Debug, Subcommand)]
 pub(crate) enum Command {
     /// Find geographic context or read CSV/NDJSON points.
+    #[command(
+        override_usage = "thereabouts reverse --lat LAT --lon LON [OPTIONS]\n       thereabouts reverse FILE|- [OPTIONS]"
+    )]
     Reverse {
         #[arg(conflicts_with_all=["lat","lon"])]
         file: Option<String>,

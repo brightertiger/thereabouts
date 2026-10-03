@@ -237,8 +237,7 @@ active.json contains:
 The active pointer is authoritative when present: omitted families are
 uninstalled for discovery even if another version remains on disk. The
 manifest hash is checked before reading each selected identity. All entries
-share one dataset version. Installing another version selects only its
-requested families; installing more families at the active version retains
+share one dataset version. Installing another version requires all active families in the request; installing more families at the active version retains
 the existing pin entries.
 
 Without active.json, discovery accepts the existing
@@ -391,3 +390,8 @@ thereabouts data verify --full, and remove/reinstall commands (exit 4).
 Missing data exits 3 with a short sentence on stderr followed by the exact
 install command alone on the last line. Library exception messages remain the
 exact command.
+
+Bare invocation writes help to stderr and exits 2. Explicit --help writes to
+stdout and exits 0. Reverse help shows coordinate and FILE|- forms separately.
+Python discovery delegates directory selection to the same native store policy;
+macOS, Linux and Windows rules are compared with platformdirs in tests.

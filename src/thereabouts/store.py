@@ -1,7 +1,5 @@
 """Persistent pack locations and read-only selection of an active installation."""
 
-import os
-import sys
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
@@ -12,20 +10,15 @@ from .store_files import parse, relative_file, sha256, string
 
 
 def data_directory(explicit: str | Path | None = None) -> Path:
-    if explicit is not None:
-        return Path(explicit).expanduser()
-    environment = os.environ.get("THEREABOUTS_DATA")
-    if environment:
-        return Path(environment).expanduser()
-    if sys.platform == "darwin":
-        return Path.home() / "Library/Application Support/Thereabouts"
-    if os.name == "nt":
-        base = os.environ.get("LOCALAPPDATA")
-        if not base:
-            raise DataNotInstalledError("Set THEREABOUTS_DATA or LOCALAPPDATA")
-        return Path(base) / "Thereabouts"
-    base = os.environ.get("XDG_DATA_HOME")
-    return (Path(base) if base else Path.home() / ".local/share") / "thereabouts"
+    """Use the native store's precedence and platform policy for every caller."""
+    from . import _core
+
+    try:
+        return Path(
+            _core.data_directory(str(explicit) if explicit is not None else None)
+        )
+    except ValueError as exc:
+        raise DataNotInstalledError("thereabouts data install core") from exc
 
 
 def installation_path(

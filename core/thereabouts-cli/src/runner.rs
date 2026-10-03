@@ -43,7 +43,7 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
         return Ok(0);
     }
     let Some(command) = &cli.command else {
-        io.stdout(&Cli::command().render_help().to_string())?;
+        io.stderr(&Cli::command().render_help().to_string())?;
         return Ok(2);
     };
     let fields = render::fields(cli.global.fields.as_deref())?;
