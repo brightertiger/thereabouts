@@ -1,7 +1,6 @@
 """Verify retained outputs, then simulate new identities in an in-memory ledger."""
 
 import hashlib
-from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -17,6 +16,7 @@ from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.verification import Verifier
 from pipeline.stages.contract import Context, Stage, make_unit
 
+from .absence import absent_counts, absent_prefix
 from .backup import original_hash
 from .candidates import Candidate, collect, parameters
 from .dependencies import dependencies
@@ -24,8 +24,6 @@ from .evidence import add_evidence
 from .inventory import Inventory
 from .repair_report import file_class, in_spec, summarize
 from .rewrites import Rewrites, prepare
-
-ABSENT_RECONCILE_PREFIXES = ("reconciled/", "work/reconcile/")
 
 
 @dataclass
@@ -42,16 +40,7 @@ def _verify(candidate: Candidate, verifier: Verifier) -> None:
         if problem is None:
             continue
         missing = problem.startswith("output missing:")
-        if (
-            missing
-            and candidate.stage == "reconcile"
-            and output.path.startswith(ABSENT_RECONCILE_PREFIXES)
-        ) or (
-            missing
-            and candidate.stage == "download"
-            and candidate.custody
-            and output.path.startswith(f"raw/{candidate.unit_id}/")
-        ):
+        if missing and absent_prefix(candidate, output.path) is not None:
             candidate.absent.append(output.path)
         else:
             raise ValueError(f"Cannot adopt {candidate.key}: {problem}")
@@ -183,18 +172,7 @@ def simulate(
         "outputs_absent_files": sum(len(c.absent) for c in candidates.values()),
         "absent_paths_by_prefix": {
             prefix: count
-            for prefix, count in Counter(
-                next(
-                    (
-                        prefix
-                        for prefix in ABSENT_RECONCILE_PREFIXES
-                        if path.startswith(prefix)
-                    ),
-                    f"raw/{candidate.unit_id}/",
-                )
-                for candidate in candidates.values()
-                for path in candidate.absent
-            ).items()
+            for prefix, count in absent_counts(candidates.values()).items()
         },
         "offloaded_sources": [name for name in sorted(inventory.offloaded)],
         "remote_verified": False,

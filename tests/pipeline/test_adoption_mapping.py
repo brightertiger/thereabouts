@@ -96,3 +96,23 @@ def test_extraction_and_index_payloads_remain_owned_by_normalize(
     inventory = Inventory(tmp_path, sources={source: {}})
     mapping = destination(inventory, stage, "auxiliary", [])
     assert (mapping.stage, mapping.unit_id) == ("normalize", source)
+
+
+@pytest.mark.parametrize(
+    ("source", "prefix"),
+    [
+        ("geonames", "work/overture/"),
+        ("overture", "work/geonames/"),
+        ("geonames", "work/geonames-other/"),
+        ("geonames", "normalized/geonames/"),
+        ("overture", "raw/overture/"),
+        ("ghsl", "work/geonames/"),
+    ],
+)
+def test_auxiliary_absence_cannot_escape_approved_source_and_prefix(
+    tmp_path: Path, source: str, prefix: str
+) -> None:
+    output = Output(prefix + "missing", 10, digest("recorded bytes"))
+    candidate = Candidate("normalize", source, outputs={output.path: output})
+    with pytest.raises(ValueError, match="Cannot adopt"):
+        _verify(candidate, Verifier(tmp_path))

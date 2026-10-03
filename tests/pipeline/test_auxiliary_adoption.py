@@ -17,7 +17,7 @@ from .helpers import legacy_workspace, record
 @pytest.mark.parametrize(
     "stage", ["geonames.extract", "geonames.index", "overture.index"]
 )
-def test_auxiliary_is_retained_and_missing_or_corrupt_bytes_refuse_adoption(
+def test_auxiliary_retains_missing_hashes_but_refuses_corrupt_bytes(
     tmp_path: Path, stage: str
 ) -> None:
     source = stage.partition(".")[0]
@@ -55,5 +55,15 @@ def test_auxiliary_is_retained_and_missing_or_corrupt_bytes_refuse_adoption(
         with pytest.raises(ValueError, match="Cannot adopt"):
             simulate(root, ledger, config, registry(config))
         auxiliary.unlink()
-        with pytest.raises(ValueError, match="output missing"):
-            simulate(root, ledger, config, registry(config))
+        migration = simulate(root, ledger, config, registry(config))
+        try:
+            completion = migration.context.ledger.get("normalize", source)
+            assert completion is not None
+            assert completion.metadata["outputs_absent"] is True
+            assert completion.metadata["absent_paths"] == [
+                auxiliary.relative_to(root).as_posix()
+            ]
+            assert migration.report["absent_paths_by_prefix"] == {f"work/{source}/": 1}
+            assert all(unit.state == "current" for unit in migration.decisions)
+        finally:
+            migration.context.ledger.close()

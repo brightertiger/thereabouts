@@ -103,8 +103,9 @@ original table identity and content hash. They cannot be verified through an
 active `golden` symlink that now points at normalized cells. Superseded pilot,
 normalization and lookup receipts are dropped; the old ledger remains backed up.
 GeoNames extraction/index and Overture index outputs remain owned by normalize.
-Their bytes must re-verify; already-missing auxiliary payloads currently block
-the real workspace adoption (see [status](PIPELINE_STATUS.md)). Reconciliation
+Present bytes must re-verify. Deliberately deleted caches are adopted as absent
+only under `work/geonames/` and `work/overture/`, tied to the matching normalize
+source. A future normalize rebuild must regenerate those caches first. Reconciliation
 absence is allowed only under `reconciled/` and `work/reconcile/`; those units
 retain recorded hashes and `outputs_absent`.
 Missing raw payloads require an offload receipt bound to the exact source

@@ -1,11 +1,10 @@
 # Pipeline redesign status
 
-The package-1 runtime and review fixes are implemented on `feat/pipeline`, with
-local commits only. **Real-workspace adoption is currently blocked**: retaining
-the auxiliary normalization outputs exposed four already-missing payloads.
-The owner decision below is required before the acceptance checks can pass and
-packages 2–3 can proceed. The real workspace has only been read; its migration
-has not been applied. Packages 4–5 remain outside the current request.
+Package 1 and its review fixes are complete on `feat/pipeline`, with local
+commits only. The owner approved the four deliberately deleted GeoNames/Overture
+caches as explicitly absent on 2026-10-03. Read-only plan and handover dry-run
+again report **85,577 current / 0 stale / 0 new**. Packages 2–3 follow; packages
+4–5 remain outside the current request. The real workspace has only been read.
 
 ## Review fixes 1–3
 
@@ -58,10 +57,11 @@ done < .cache/pipeline/writable-directories.txt
 Keep the directory list until application/recovery has completed and protections
 are restored. It is generated before chmod and is not replaced by the application
 report. No chmod command above was executed against the real workspace.
-Do not apply the migration while the missing-auxiliary decision below is open.
 The shell sequence stops on a failed dry run, so it cannot use a stale report.
+Real application remains a reviewer action; none of these chmod/apply commands
+was executed against the protected workspace.
 
-## Review fixes 4–9 and the auxiliary-data decision
+## Review fixes 4–9 and the approved auxiliary absence
 
 Fix 4 preserves JSON token layout and reports every repair class; the complete
 extra-file list follows below. Fix 5 restricts reconcile absence to two explicit
@@ -83,12 +83,14 @@ are **3,260,159,017 bytes**; their hashes are evidence, not verified local bytes
 | `work/geonames/62937f7ffe0bec0f8385fc69ce1d9a75be318abeac8b52bf1e52622e0f7ba83b/lookup.sqlite3` | 271,413,248 | `a6d6f870e357eb45918d7f483c850f7c4da578cb062bef95b851f4f606982d5e` |
 | `work/overture/entities.sqlite3` | 414,531,584 | `375cda6f79cd4a557161c508185d4a18b65a559d017f1e804bf2b24555556ad7` |
 
-**Pending owner decision:** allow exactly these four recorded payloads to be
-retained as explicitly absent normalize outputs, or locate existing copies.
-The current spec only excuses reconciliation and manifest-bound raw offload;
-it does not excuse missing normalization auxiliaries. The implementation does
-not silently extend that exception, drop the receipts, or regenerate the files.
-A question requesting this decision is pending. No stage ports have been started.
+**Owner decision, 2026-10-03:** these four payloads were deliberately deleted
+in an earlier disk cleanup and are regenerable caches of raw inputs mirrored in
+GCS. Adoption retains their recorded hashes and marks `outputs_absent`, only
+under `work/geonames/` and `work/overture/`, tied to the corresponding normalize
+source. **A future rebuild of normalize for these sources must regenerate these
+caches first.** Present corrupt payloads and missing outputs anywhere else still
+refuse adoption. Remote mirror custody is owner-provided evidence, not verified
+by these read-only checks.
 
 Fix 7 restores `docs/GOLDEN_DATASET.md` as the current schema, leaves links at
 `GOLDEN_V2.md` and `CITY_NORMALIZATION_PLAN.md`, and clarifies scratch locations.
@@ -101,36 +103,40 @@ production asserts, requires configured writable-ledger timeouts, rejects
 non-Python identity files, validates the codec block resolution, and names the
 fixed historical migration paths separately from configurable future paths.
 
-| Latest read-only command | Result | Current / stale / new |
-| --- | --- | --- |
-| `plan` | Exit 2: missing GeoNames auxiliary payload | Not classified |
-| `migrate handover --dry-run` | Exit 2: same missing payload | Not classified |
+| Latest read-only command | Current | Stale | New | Absent units |
+| --- | ---: | ---: | ---: | ---: |
+| `plan` | 85,577 | 0 | 0 | 1,117 |
+| `migrate handover --dry-run` | 85,577 | 0 | 0 | 1,117 |
 
-Both commands map **85,577 candidate units** before verification refuses; that
-is not a claim that those units are current. No stage has been ported, so there
-are no actual-stage handovers to report. The last successful stage table below
-belongs to fixes 1–3, before the auxiliary retention correction, and must not be
-used as current migration acceptance.
+Both checks succeeded after the owner-approved extension. No stage has been
+ported yet, so there are zero actual-stage identity handovers at this checkpoint.
+Simulation checks mapping and hashes only; it does not prove engine equivalence.
 
-Measured on the same M2 / 8 GiB machine: plan stopped in 28.29 s at 465,076,224
-bytes peak RSS; handover stopped in 27.05 s at 410,632,192 bytes. Logs are
-`data/pipeline-work/review/plan-fixes49.log` and `handover-fixes49.log` in this
-checkout. `.cache/pipeline/auxiliary-inventory.json` records all eight auxiliary
-outputs; `absence-inventory.json` records the two reconciliation prefix counts.
-The real ledger SHA256 remains `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
+| Approved absent prefix | Files |
+| --- | ---: |
+| `reconciled/` | 834 |
+| `work/reconcile/` | 1,662 |
+| `work/geonames/` | 3 |
+| `work/overture/` | 1 |
+| `raw/geoboundaries/` | 63 |
+| `raw/geonames/` | 2 |
+| `raw/osm_land/` | 4 |
+| `raw/overture/` | 9 |
+| **Total** | **2,578** |
 
-Final whole-worktree checks for fixes 4–9: **702 tests passed, 8 skipped** in
-54.68 s; Ruff and formatting passed (476 files); strict mypy passed (460 source
-files). These include rejection of missing/corrupt auxiliary data. The configured
-whole-worktree mypy file set was used; an initial `mypy .` also descended into
-the ignored uv dependency cache and reported duplicate third-party modules.
-That invocation was corrected without excluding any project source. Final disk
-measurement: 47 GiB free; the entire worktree occupies 1,439,244,288 bytes by
-`du -sk` (including the virtual environment and scratch), below the 3 GB cap.
-The real copied-ledger application proof cannot be rerun until adoption passes;
-its earlier measurements below are historical, not validation of these fixes.
-Do not apply the real migration yet. Packages 2–3, `pins.lock`, independent ported
-stage discovery and pilot-block comparisons remain unimplemented at this point.
+Read-only evidence is in `.cache/pipeline/approved-absence-plan.json` and
+`approved-absence-handover.json`; logs are under this checkout's
+`data/pipeline-work/review/approved-absence-*.log`. The real ledger SHA256 remains
+`d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
+The plan took 186.70 s with 960,806,912 bytes maximum RSS on the M2 / 8 GiB laptop.
+The dry run verified 17,677,116,404 local bytes. Full synthetic checks: **708
+passed, 8 skipped**; Ruff and formatting passed (477 files); strict mypy passed
+(461 source files). The absence regression tests cover both approved sources,
+present corruption, wrong directories and cross-source paths.
+
+Packages 2–3, `pins.lock`, independently discovered source/engine units and
+pilot-block comparisons remain to be implemented. No source or engine was run
+against the real workspace.
 
 ## metadata repairs needing owner approval
 
@@ -814,33 +820,30 @@ applies migration to a copied ledger and JSON inside this worktree, then checks
 saved identities against original payloads read-only with copied JSON overlaid.
 It copies no Parquet or other data tree.
 
-## Previous successful plan (fixes 1–3, before auxiliary retention)
+## Current real-workspace plan and handover dry run
 
-At `bb47b23`, read-only `plan` and handover dry-run reported these counts, which
-matched the original copied-ledger application proof. The latest commands now
-refuse the missing auxiliary payloads; this table is retained as a baseline:
+Both commands report the following table after the approved absence extension:
 
 | Stage | Current | Stale | New | Units with absent outputs |
 | --- | ---: | ---: | ---: | ---: |
 | download | 13 | 0 | 0 | 4 |
-| normalize | 13 | 0 | 0 | 0 |
+| normalize | 13 | 0 | 0 | 2 |
 | reconcile | 1,111 | 0 | 0 | 1,111 |
 | cells | 41,442 | 0 | 0 | 0 |
 | cities | 555 | 0 | 0 | 0 |
 | evaluate | 1 | 0 | 0 | 0 |
 | normalize_cells | 41,716 | 0 | 0 | 0 |
 | lookups | 726 | 0 | 0 | 0 |
-| **Total** | **85,577** | **0** | **0** | **1,115** |
+| **Total** | **85,577** | **0** | **0** | **1,117** |
 
 ## Migration changes and evidence
 
 The corrected mapping processes 134,312 old ledger rows and retains the five
 auxiliary rows previously dropped. It proposes retiring 42,334 superseded rows
-and produces 85,577 candidate units, subject to the blocked verification above. Source-unit aggregation explains the
+and produces 85,577 verified adopted units (including explicitly absent records). Source-unit aggregation explains the
 remaining difference in row counts. It rewrites 588 existing JSON files and
-imports six verified JSON evidence files. There are 2,574 intentionally absent
-output records across 1,115 units under the existing exception rules; the four
-missing auxiliary outputs are currently errors, not added to those counts.
+imports six verified JSON evidence files. There are 2,578 intentionally absent
+output records across 1,117 units, including the approved four auxiliary payloads.
 
 - The active `golden` symlink points to normalized output. Former base records
   are matched to `base_cells/current.json` by table, block/country and recorded
@@ -865,8 +868,8 @@ old ledger, journals JSON originals, and publishes the prepared ledger last.
 Synthetic tests exercise rollback/retry, separate `paths`/`adopt` steps, a move
 to a new root, and idempotence.
 
-**Reviewer command, only after the open auxiliary decision is resolved and
-a fresh dry run succeeds (not run against the real workspace):**
+**Reviewer command, after a fresh dry run succeeds (not run against the real
+workspace):**
 
 ```sh
 .venv/bin/python -m pipeline migrate \
@@ -913,17 +916,15 @@ workspace and no cloud data operation was performed.
 
 ## Next packages and owner follow-ups
 
-1. Resolve the four missing auxiliary payloads and rerun read-only plan, handover
-   dry-run and the copied-ledger world application proof.
-2. Package 2: source adapters, fourteen source configs including `plate_country`,
+1. Package 2: source adapters, fourteen source configs including `plate_country`,
    actual pins, mirror/storage operations and source discovery. Replace retained
    declarations and extend adoption without rebuilding preserved outputs.
-3. Package 3: engine moves, policy JSON-to-YAML equivalence, fingerprint-bound
+2. Package 3: engine moves, policy JSON-to-YAML equivalence, fingerprint-bound
    reviews, evaluation and plate-country stages, fixture/pilot digest comparisons;
    then delete `build_data` and its temporary repository-evidence reader in migration.
-4. Package 4: measured release subset, coalesced cells, complete generated README,
+3. Package 4: measured release subset, coalesced cells, complete generated README,
    manifests/licences/card/changes, packs, local publish and registry output.
-5. Package 5: VM and monthly release procedure documentation/scripts, unexecuted.
+4. Package 5: VM and monthly release procedure documentation/scripts, unexecuted.
 
 No geographic-policy decision was made. The owner still needs to review metadata
 migration, verify remote custody needed for a future rebuild, and choose release
