@@ -1259,6 +1259,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "thereabouts-cli"
+version = "0.1.0"
+dependencies = [
+ "fs2",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thereabouts-core",
+ "thiserror",
+]
+
+[[package]]
 name = "thereabouts-core"
 version = "0.1.0"
 dependencies = [
@@ -1283,6 +1295,7 @@ dependencies = [
  "numpy",
  "pyo3",
  "serde_json",
+ "thereabouts-cli",
  "thereabouts-core",
  "thereabouts-writer",
 ]

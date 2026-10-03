@@ -9,9 +9,9 @@ from mcp.types import TextContent
 
 from tests.conformance.generate import FIXTURES, OUTPUT
 from thereabouts.client import Geocoder
+from thereabouts.mcp_service.catalogue_server import create_server
 from thereabouts.mcp_service.models import MAX_BATCH_POINTS, PAGE_SIZE
 from thereabouts.mcp_service.responses import page
-from thereabouts.mcp_service.server import create_server
 
 CASES = json.loads(OUTPUT.read_bytes())["cases"]
 

@@ -2304,10 +2304,10 @@
       "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832"
     },
     "validation": {
-      "rust_tests": 64,
-      "pytest_passed": 718,
+      "rust_tests": 74,
+      "pytest_passed": 723,
       "pytest_skipped": 9,
-      "mypy_files": 461,
+      "mypy_files": 464,
       "gates": [
         "cargo fmt --check",
         "cargo clippy --all-targets --all-features -- -D warnings",

@@ -1,0 +1,62 @@
+"""Current store pins and native platform paths preserve Python discovery."""
+
+import json
+import shutil
+from importlib import import_module
+from pathlib import Path
+
+import pytest
+
+from thereabouts import Geocoder, IncompatibleDataError, _core
+from thereabouts.store import active_pack, data_directory
+from thereabouts.store_files import sha256
+
+PACKS = Path(__file__).parents[1] / "fixtures/packs"
+
+
+def test_native_default_matches_platformdirs(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("THEREABOUTS_DATA", raising=False)
+    import sys
+
+    name = "Thereabouts" if sys.platform in ("darwin", "win32") else "thereabouts"
+    # setuptools is already a dev dependency and vendors unmodified platformdirs.
+    # This comparison adds no package download to the offline qualification.
+    platformdirs = import_module("setuptools._vendor.platformdirs")
+    expected = Path(platformdirs.user_data_dir(name, appauthor=False))
+    assert data_directory() == expected
+    assert Path(_core.data_directory()) == expected
+
+
+def test_one_pin_controls_all_families(tmp_path: Path) -> None:
+    pin: dict[str, object] = {"data_version": "2026.10", "packs": {}}
+    pointers = {}
+    for family in ("core", "postal"):
+        source = PACKS / f"{family}-sample"
+        info = _core.pack_info(str(source))
+        pin["data_version"] = info["data_version"]
+        path = tmp_path / "packs" / family / info["data_version"]
+        shutil.copytree(source, path)
+        pointers[family] = {
+            "path": path.relative_to(tmp_path).as_posix(),
+            "manifest_sha256": sha256(path / "manifest.json"),
+        }
+    pin["packs"] = pointers
+    (tmp_path / "active.json").write_text(json.dumps(pin))
+    with Geocoder(data_dir=tmp_path) as geo:
+        assert geo.reverse(lat=48.8566, lon=2.3522).status == "matched"
+        assert geo.postal("75001", country="FR").status == "matched"
+    assert active_pack(tmp_path) == tmp_path / pointers["core"]["path"]
+    pin["data_version"] = "different"
+    (tmp_path / "active.json").write_text(json.dumps(pin))
+    from thereabouts import CorruptPackError
+
+    with pytest.raises(CorruptPackError, match="identity mismatch"):
+        Geocoder(data_dir=tmp_path)
+
+
+def test_legacy_reverse_diagnosis_survives_native_discovery(tmp_path: Path) -> None:
+    pointer = tmp_path / "packs/reverse/current.json"
+    pointer.parent.mkdir(parents=True)
+    pointer.write_text("{}")
+    with pytest.raises(IncompatibleDataError, match="Legacy reverse"):
+        Geocoder(data_dir=tmp_path)

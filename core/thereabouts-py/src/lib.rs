@@ -1,6 +1,7 @@
 //! Thin `CPython` boundary. Dataset policy and lookup semantics live in the core.
 mod columns;
 mod result;
+mod store;
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
@@ -377,6 +378,7 @@ fn pack_info(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
 }
 #[pymodule]
 fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    store::register(m)?;
     m.add_class::<Geocoder>()?;
     m.add_function(wrap_pyfunction!(open, m)?)?;
     #[cfg(feature = "writer")]

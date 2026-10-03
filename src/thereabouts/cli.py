@@ -89,7 +89,7 @@ def _run(args: argparse.Namespace) -> int:
         return _data(args)
     if args.command == "mcp":
         try:
-            from .mcp_service.server import run
+            from .mcp_service.catalogue_server import run
         except ModuleNotFoundError as exc:
             if exc.name != "mcp":
                 raise
