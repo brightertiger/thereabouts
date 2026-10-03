@@ -22,7 +22,7 @@ from .artifacts import read_json
 from .geonames_download import now
 from .io import publish, sha256_file, write_json
 
-CLIENT = "Thereabouts-plates/1.0 (+https://github.com/brightertiger/PyOfflineGeocoder)"
+CLIENT = "Thereabouts-plates/1.0 (+https://github.com/brightertiger/thereabouts)"
 MAX_DOCUMENT_BYTES = 64_000_000
 
 

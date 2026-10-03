@@ -67,7 +67,7 @@ corroborating unsimplified SHP/GeoJSON identities. Coverage gaps are reported.
 Run only these adapters when sharing the data directory with reconciliation:
 
 ```sh
-LOOKUP_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+LOOKUP_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
 for source in postal codes airports unlocode timezones phone dbip; do
   uv run --no-sync python -m build_data.acquire "$source" --data-dir "$LOOKUP_DATA"
 done
@@ -459,7 +459,7 @@ Raw custody is explicit and independent of normalized completion. The acquisitio
 CLI supports a non-destructive transfer and an already-verified-transfer record:
 
 ```sh
-PIPELINE_DATA=/Users/ujjwal/Downloads/solo/PyOfflineGeocoder/data
+PIPELINE_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
 uv run --no-sync python -m build_data.acquire offload \
   --sources osm_land overture geonames geoboundaries \
   --remote gs://pyofflinegeocoder-summer-sector-488705-m8/raw \
