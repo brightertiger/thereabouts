@@ -5,7 +5,6 @@ use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 pub(crate) const SUMMARY: &[&str] = &[
     "status", "country", "state", "city", "timezone", "point", "match",
 ];
-const MAX_WIDTH: usize = 28;
 
 pub(crate) fn columns(value: &Value, batch: bool) -> Vec<String> {
     SUMMARY
@@ -75,62 +74,82 @@ fn cell(value: &str, width: usize) -> String {
 fn heading(key: &str) -> &str {
     key.strip_prefix("thereabouts_").unwrap_or(key)
 }
-/// One stream layout, chosen from its first row/candidates and the terminal budget.
+/// Measure every row before allocating the terminal budget.
 pub(crate) struct Layout {
     widths: Vec<usize>,
+    minimum: Vec<usize>,
+    indent: bool,
     separator: &'static str,
 }
 impl Layout {
-    pub fn new(columns: &[String], value: &Value, terminal: usize) -> Result<Self> {
+    pub fn new(columns: &[String]) -> Self {
+        let minimum: Vec<_> = columns.iter().map(|k| heading(k).width().max(1)).collect();
+        Self {
+            widths: minimum.clone(),
+            minimum,
+            indent: false,
+            separator: " | ",
+        }
+    }
+    pub fn observe(&mut self, columns: &[String], value: &Value) {
         let candidates = value
             .get("candidates")
             .or_else(|| value.get("thereabouts_candidates"))
             .and_then(Value::as_array);
-        let reserve = usize::from(candidates.is_some_and(|rows| !rows.is_empty())) * 2;
-        let budget = terminal.saturating_sub(reserve);
-        let minimum: Vec<_> = columns
-            .iter()
-            .map(|k| heading(k).width().clamp(1, MAX_WIDTH))
-            .collect();
-        let mut widths: Vec<_> = columns
-            .iter()
-            .zip(&minimum)
-            .map(|(key, min)| {
-                let current = summary(key, value.get(key).unwrap_or(&Value::Null)).width();
-                let candidate = candidates
-                    .into_iter()
-                    .flatten()
-                    .map(|row| summary(key, row.get(heading(key)).unwrap_or(&Value::Null)).width())
-                    .max()
-                    .unwrap_or(0);
-                current.max(candidate).max(*min).min(MAX_WIDTH)
-            })
-            .collect();
-        let gaps = columns.len().saturating_sub(1);
-        let separator = if minimum.iter().sum::<usize>() + 3 * gaps > budget {
+        self.indent |= candidates.is_some_and(|rows| !rows.is_empty());
+        for (key, width) in columns.iter().zip(&mut self.widths) {
+            let current = summary(key, value.get(key).unwrap_or(&Value::Null)).width();
+            let candidate = candidates
+                .into_iter()
+                .flatten()
+                .map(|row| summary(key, row.get(heading(key)).unwrap_or(&Value::Null)).width())
+                .max()
+                .unwrap_or(0);
+            *width = (*width).max(current).max(candidate);
+        }
+    }
+    pub fn fit(&mut self, terminal: usize) -> Result<()> {
+        let budget = terminal.saturating_sub(usize::from(self.indent) * 2);
+        let gaps = self.widths.len().saturating_sub(1);
+        self.separator = if self.minimum.iter().sum::<usize>() + 3 * gaps > budget {
             "  "
         } else {
             " | "
         };
-        let available = budget.saturating_sub(separator.len() * gaps);
-        if minimum.iter().sum::<usize>() > available {
+        let available = budget.saturating_sub(self.separator.len() * gaps);
+        if self.minimum.iter().sum::<usize>() > available {
             return Err(Error::Usage(
                 "Table columns do not fit the terminal; use --fields or --json".into(),
             ));
         }
-        while widths.iter().sum::<usize>() > available {
-            let widest = widths
-                .iter_mut()
-                .zip(&minimum)
-                .filter(|(width, min)| **width > **min)
-                .max_by_key(|(width, _)| **width);
-            if let Some((width, _)) = widest {
-                *width -= 1;
+        // Water-fill from natural widths without work proportional to a huge cell.
+        let (mut low, mut high) = (0, self.widths.iter().copied().max().unwrap_or(0));
+        while low < high {
+            let middle = low + (high - low).div_ceil(2);
+            let used: usize = self
+                .widths
+                .iter()
+                .zip(&self.minimum)
+                .map(|(width, min)| (*width).min(middle).max(*min))
+                .sum();
+            if used <= available {
+                low = middle;
             } else {
-                break;
+                high = middle - 1;
             }
         }
-        Ok(Self { widths, separator })
+        let natural = self.widths.clone();
+        for (width, min) in self.widths.iter_mut().zip(&self.minimum) {
+            *width = (*width).min(low).max(*min);
+        }
+        let mut slack = available.saturating_sub(self.widths.iter().sum::<usize>());
+        for (width, natural) in self.widths.iter_mut().zip(natural) {
+            if slack > 0 && *width < natural {
+                *width += 1;
+                slack -= 1;
+            }
+        }
+        Ok(())
     }
     pub fn header(&self, columns: &[String]) -> String {
         format!(
@@ -175,6 +194,20 @@ mod tests {
         assert_eq!(cell("東京大阪", 5), "東京…");
     }
     #[test]
+    fn later_rows_receive_their_natural_width_on_a_wide_terminal() {
+        let columns = vec!["lat".into(), "state".into()];
+        let first = serde_json::json!({"lat":"0", "state":{"name":"X"}});
+        let later = serde_json::json!({"lat":"1.3521", "state":{"name":"Wilayah Persekutuan Kuala Lumpur"}});
+        let mut layout = Layout::new(&columns);
+        layout.observe(&columns, &first);
+        layout.observe(&columns, &later);
+        layout.fit(200).unwrap();
+        let row = layout.row(&columns, &later, false);
+        assert!(row.contains("1.3521"));
+        assert!(row.contains("Wilayah Persekutuan Kuala Lumpur"));
+        assert!(!row.contains('…'));
+    }
+    #[test]
     fn terminal_budget_preserves_headers_and_bounds_unicode_candidates() {
         let columns = SUMMARY.iter().map(|s| (*s).into()).collect::<Vec<_>>();
         let candidate = serde_json::json!({"status":"matched", "country":{"code":"JP"},
@@ -183,7 +216,9 @@ mod tests {
         let mut value = candidate.clone();
         value["candidates"] = serde_json::json!([candidate]);
         for budget in [80, 100, 160] {
-            let layout = Layout::new(&columns, &value, budget).unwrap();
+            let mut layout = Layout::new(&columns);
+            layout.observe(&columns, &value);
+            layout.fit(budget).unwrap();
             for line in [
                 layout.header(&columns),
                 layout.row(&columns, &value, false),
@@ -193,9 +228,13 @@ mod tests {
             }
             assert!(layout.header(&columns).contains("timezone"));
         }
-        let small = Layout::new(&columns, &value, 80).unwrap();
-        let wide = Layout::new(&columns, &value, 160).unwrap();
+        let mut small = Layout::new(&columns);
+        small.observe(&columns, &value);
+        let mut wide = Layout::new(&columns);
+        wide.observe(&columns, &value);
+        small.fit(80).unwrap();
+        wide.fit(160).unwrap();
         assert!(small.widths.iter().sum::<usize>() < wide.widths.iter().sum::<usize>());
-        assert!(Layout::new(&columns, &value, 20).is_err());
+        assert!(Layout::new(&columns).fit(20).is_err());
     }
 }

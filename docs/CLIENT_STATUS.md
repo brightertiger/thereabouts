@@ -51,6 +51,18 @@ and pytest scratch overlapped. Those artifacts were removed immediately and
 the remaining gates prune debug outputs before Python tests. Free disk stayed
 above 5 GB; no real data or files outside the worktree were written.
 
+## Pre-merge corrections
+
+The editable cache now tracks all linked crates recursively, including CLI-core
+resources; a dependency-graph regression test checks coverage. Install-lock docs
+cover PID reuse and safe manual recovery. Tables measure all rows before output,
+use the available terminal width without a fixed character cap and display
+invalid-row hints. Temporary spooling keeps memory bounded and one header.
+The release benchmark tolerates retired staging files, supports script/module
+execution and writes tracked measurements only with --write. Retired build and
+performance docs are labelled historical; code-pack examples use the public API.
+Node reports the version from its package metadata.
+
 ## Use
 
 Install an artifact built from this checkout. Python: Geocoder(data_dir="./store")
@@ -126,10 +138,10 @@ Current and synthetic vectors total 478;
 Node library and bin coverage includes typed/NUL boundary exceptions documented
 in CLI.md. Python and Rust assert the same files and legacy mappings.
 
-Latest completed gate: 103 Rust tests; 505 pytest
-passed, 2 skipped; mypy 463 files;
-61 Node tests on 22.
-Node 24: 61 tests.
+Latest completed gate: 104 Rust tests; 510 pytest
+passed, 2 skipped; mypy 465 files;
+63 Node tests on 22.
+Node 24: 63 tests.
 Rust fmt, clippy all targets/all features with warnings denied, core/CLI-core/WASM
 target checks, ruff, ruff format, mypy, npm build and TypeScript check passed.
 Fresh installed-package import/version and artifact checks are documented in
@@ -149,17 +161,17 @@ fuzzy timings and historical comparisons remain in CLIENT_CORE_MEASUREMENTS.json
 
 | Node verb | Median / p99 µs | Batch results/s |
 | --- | ---: | ---: |
-| reverse | 6.333 / 8.708 | 150,352 |
-| postal | 8.708 / 10.875 | 92,781 |
-| airport | 8.667 / 9.875 | 109,190 |
-| locode | 8.542 / 9.042 | 117,370 |
-| phone | 10.500 / 11.125 | 136,962 |
-| ip | 8.000 / 8.625 | 124,510 |
-| plate | 4.875 / 6.500 | 158,358 |
-| geocode | 8.250 / 9.583 | 102,481 |
+| reverse | 6.292 / 8.792 | 148,988 |
+| postal | 8.750 / 10.959 | 92,101 |
+| airport | 8.625 / 10.000 | 109,619 |
+| locode | 8.542 / 9.125 | 117,447 |
+| phone | 10.458 / 11.083 | 138,728 |
+| ip | 8.042 / 8.708 | 124,270 |
+| plate | 4.792 / 5.917 | 157,747 |
+| geocode | 8.208 / 10.167 | 104,352 |
 
 Forward batch measurements are ordered scalar loops; reverse uses reverseMany.
-The reproducibly built WASM is 2,530,341 bytes, not committed.
+The reproducibly built WASM is 2,539,196 bytes, not committed.
 Process-start measurements, including npx overhead, remain in the same JSON.
 
 Core sample bytes, including the forward catalogue closure:

@@ -95,9 +95,12 @@ nulls are the exact snake_case public result contract in the design and
 [PACK_FORMAT.md](PACK_FORMAT.md). NO_COLOR disables terminal colour; plain
 tables need no colour to convey status. The implementation emits no ANSI
 colour sequences in any mode, including with NO_COLOR. Table cells replace
-control characters with spaces and truncate wide values with … (at most 28
-characters per cell). Each place occupies one line; candidates appear as indented
-lines beneath the query. The header appears once. Default scalar columns are
+control characters with spaces and truncate values with … only when the
+terminal budget requires it. Each place occupies one line; candidates appear as indented
+lines beneath the query. The header appears once. A table page spans the invocation: all rows and
+candidates are measured using a temporary row spool before output. Natural
+column widths have no fixed cap; the widest columns shrink first to fit the
+terminal. Invalid-row hints follow their row and wrap to the terminal width. Default scalar columns are
 status, country, state, city, timezone, point, match, omitting fields absent from
 the result and its candidates. Batches keep all seven summary fields to support
 rows with differing coverage. --fields uses exactly the requested column order.
@@ -144,7 +147,8 @@ input produces a usage error explaining CSV headers and NDJSON objects. Empty in
 NDJSON-to-CSV/table needs the union of input keys, in first-seen order, before
 writing a header.
 It spools input to an automatically removed temporary file, retaining at most
-4,096 keys and 1 MiB of key names. Disk exhaustion during spooling reports “not enough disk” (exit 2). JSON/NDJSON output and CSV input stream directly. Missing input fields
+4,096 keys and 1 MiB of key names. Disk exhaustion during spooling reports “not enough disk” (exit 2). JSON/NDJSON and CSV output stream directly; table output also spools the result
+page to measure every row. Missing input fields
 become null tabular cells. Batch hint is always present (nullable), and evidence
 is nullable when requested, so failed rows cannot change the CSV result schema.
 
@@ -275,6 +279,11 @@ nested recoveries; exhausted contention exits 2. Normal release removes only
 its own token. Completed recovery leases are removed on scope exit.
 
 ## Release index and install transaction
+
+A reused PID can make a dead installer's lease appear live. This deliberately
+fails closed: inspect `<data-dir>/.lock` and the named process, confirm that no
+install is running and that the process is unrelated, then remove that `.lock`
+file and retry. Do not remove a lease while its installer is running.
 
 The source is a directory containing index.json and archives, or a configured
 base URL. The placeholder default is https://thereabouts-releases.invalid;
@@ -476,12 +485,15 @@ before appending. Checksum and protocol identity failures still exit 4.
 
 Tables use COLUMNS when it is a positive integer (at most 10,000), otherwise
 the stdout terminal's width (ioctl on native hosts), otherwise 80 columns.
-Column widths reflect the first query row and its candidates, capped at 28.
+Column widths reflect every row and candidate in the rendered page, with no
+fixed character cap. The page is spooled to host-owned temporary storage so
+width measurement uses bounded memory.
 The widest columns shrink first until the table fits; headers remain readable.
 Batch table result headers omit the thereabouts_ prefix; JSON/NDJSON/CSV keep
 it. Separators compact to two spaces when needed. Very wide input schemas
 that cannot retain readable headers require --fields or --json. A stream keeps
-one header and fixed column widths; later wide values use …, including Unicode.
+one header and fixed column widths; values exceeding their allocated width
+use …, including Unicode.
 
 Results are semantically equal across native and WASM hosts. H3-derived cell
 centres can differ in the last floating-point digits because target math

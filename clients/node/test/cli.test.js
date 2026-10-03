@@ -218,3 +218,12 @@ test("tables respect terminal columns and keep batch result headers readable", a
     assert.ok(!h.out().includes("thereabou"));
   }
 });
+
+test("version output follows the packaged metadata", async () => {
+  const metadata = JSON.parse(
+    fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+  );
+  const h = host();
+  assert.equal(await run(["--version"], h.io), 0);
+  assert.equal(h.out(), `thereabouts ${metadata.version}\n`);
+});

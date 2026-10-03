@@ -167,6 +167,18 @@ and pytest scratch overlapped. Those artifacts were removed immediately and
 the remaining gates prune debug outputs before Python tests. Free disk stayed
 above 5 GB; no real data or files outside the worktree were written.
 
+## Pre-merge corrections
+
+The editable cache now tracks all linked crates recursively, including CLI-core
+resources; a dependency-graph regression test checks coverage. Install-lock docs
+cover PID reuse and safe manual recovery. Tables measure all rows before output,
+use the available terminal width without a fixed character cap and display
+invalid-row hints. Temporary spooling keeps memory bounded and one header.
+The release benchmark tolerates retired staging files, supports script/module
+execution and writes tracked measurements only with --write. Retired build and
+performance docs are labelled historical; code-pack examples use the public API.
+Node reports the version from its package metadata.
+
 ## Use
 
 Install an artifact built from this checkout. Python: Geocoder(data_dir="./store")

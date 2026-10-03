@@ -66,3 +66,18 @@ remain separate inventories. The MY/SG proof includes core plus five forward
 packs because the real plate tables are unavailable.
 
 No world build, upstream download or data publication is part of qualification.
+
+
+## Editable build cache
+
+uv cache keys cover each local crate linked by thereabouts-py, recursive Rust
+sources and cli-core resources including grammar.json. The offline regression
+check is `uv run pytest tests/test_build_cache.py`; it walks the local dependency
+graph and requires every source/resource file and crate manifest to be covered.
+Rust-only edits therefore invalidate the editable extension on the next uv run.
+
+The MY/SG proof script supports both `python benchmarks/release_path.py` and
+`python -m benchmarks.release_path`. With --from and a new worktree-local --output,
+it writes measurements.json inside that output. Updating the tracked
+CLIENT_RELEASE_MEASUREMENTS.json additionally requires --write. Ordinary
+measurement runs leave historical tracked figures unchanged.

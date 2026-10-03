@@ -73,8 +73,8 @@ npx thereabouts --data-dir ./store data verify --full
 The command grammar is specified in repository docs/CLI.md; the wire format
 is specified in docs/PACK_FORMAT.md. There is no separate JavaScript decoder.
 Table/JSON/NDJSON/CSV rendering, field projection, streaming batch parsing and
-lookup exit status come from the shared Rust CLI module. The JS command tree
-owns flags and process IO. mcp delegates to the optional installed Python
+lookup exit status come from the shared Rust CLI module. JavaScript hosts the
+shared command grammar and owns process IO. mcp delegates to the optional installed Python
 MCP host (THEREABOUTS_PYTHON overrides the default python3 executable).
 
 The store is shared with Python/native: packs/<family>/<dataset-version>
@@ -87,12 +87,14 @@ on the next explicit install. HTTPS redirects cannot downgrade. The only
 runtime npm dependency is undici for environment proxy support; there are no
 native add-ons or platform packages.
 
-Native and Node installs coordinate through a loopback OS socket derived from
-the canonical store path. It carries no data and is released on process exit.
-Native additionally holds its advisory file lock. A busy coordination port
-fails closed with a diagnostic; a rare unrelated port collision can be resolved
-by closing that process or using a different store path. Lookups never bind
-a socket.
+Native and Node installs share an exclusively created `.lock` file in the store.
+The lease records PID, creation time and a unique token. Live contention exits
+2 with “another install is running”; dead owners are recovered automatically,
+with a short grace period for incomplete records. A live PID never expires by
+age. If the OS reuses a dead installer's PID, its stale lease can therefore
+block installation: inspect `.lock`, confirm the named process is unrelated and
+that no install is running, then remove `<data-dir>/.lock` and retry. Never
+remove a live installer's lease. No coordination socket is used.
 
 ## Build and validation
 

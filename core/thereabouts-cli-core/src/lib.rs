@@ -10,6 +10,7 @@ pub mod lease;
 mod object;
 pub mod render;
 mod table;
+mod table_page;
 use serde::{Deserialize, Serialize};
 use thereabouts_core::result::Status;
 

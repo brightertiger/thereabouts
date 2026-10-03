@@ -1,3 +1,0 @@
-
-# Preserve the exact pinned Cython output, including generated whitespace.
-src/thereabouts/reading/_reader_cy.c -whitespace linguist-generated=true

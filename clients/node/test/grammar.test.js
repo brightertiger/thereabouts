@@ -160,3 +160,33 @@ test("info inventories keep the same family order in native and Node", (t) => {
     ["core", "postal", "airports"],
   );
 });
+
+test("table pages measure later rows, use wide terminals and show invalid hints", (t) => {
+  const root = temporary(t);
+  fixtureStore(root, selection("packs/core-sample"));
+  const previous = process.env.COLUMNS;
+  t.after(() => {
+    if (previous === undefined) delete process.env.COLUMNS;
+    else process.env.COLUMNS = previous;
+  });
+  const region = "Wilayah Persekutuan Kuala Lumpur";
+  const input = `id,lat,lon,region\n1,0,0,x\n2,1.3521,103.8198,${region}\n3,91,0,bad\n`;
+  for (const width of [80, 220]) {
+    process.env.COLUMNS = String(width);
+    const result = parity(root, ["reverse", "-", "--format=table"], input);
+    assert.equal(result.status, 5, result.stderr);
+    assert.ok(
+      result.stdout
+        .trimEnd()
+        .split("\n")
+        .every((line) => [...line].length <= width),
+    );
+    assert.equal(result.stdout.match(/status/g).length, 1);
+    assert.match(result.stdout, /hint:.*\[-90, 90\]/);
+    if (width === 220) {
+      assert.ok(result.stdout.includes("1.3521"));
+      assert.ok(result.stdout.includes(region));
+      assert.ok(!result.stdout.includes("…"));
+    }
+  }
+});

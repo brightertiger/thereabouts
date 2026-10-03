@@ -1,5 +1,9 @@
 # Python read-path performance
 
+> Historical: this document describes the retired Python/Cython client. Its
+> commands and API are no longer supported. See [CLIENT_RELEASE.md](CLIENT_RELEASE.md)
+> for current builds and [CLIENT_STATUS.md](CLIENT_STATUS.md) for current measurements.
+
 The public reader now meets the requested warm targets on a populated synthetic
 pack: **9.375 µs scalar median with Cython**, **11.917 µs in forced Python mode**,
 and about **527,000 coordinate lookups/s returning columns** in both modes for

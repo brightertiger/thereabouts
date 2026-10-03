@@ -1,3 +1,4 @@
+import { VERSION } from "./version.js";
 import { inventory, active } from "./store.js";
 import { source, index, select, compareVersions } from "./transport.js";
 import { install, remove } from "./install.js";
@@ -31,7 +32,7 @@ export async function manage(command, values, options, root, io) {
       const entries = await inventory(root);
       if (!entries.length) throw new DataNotInstalledError();
       return {
-        client_version: "0.1.0",
+        client_version: VERSION,
         packs: entries.map((entry) => entry.info),
       };
     }

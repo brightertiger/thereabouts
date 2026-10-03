@@ -9,6 +9,10 @@ import time
 from pathlib import Path
 from typing import Any
 
+# Direct execution puts benchmarks/, rather than the repository, on sys.path.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import psutil
 
 from pipeline.runtime.jsonio import sha256_file
@@ -21,6 +25,15 @@ DISK_FLOOR = 5_000_000_000
 WORKSPACE_LIMIT = 4_000_000_000
 RSS_LIMIT = 2_000_000_000
 OUTPUT_LIMIT = 1_000_000_000
+
+
+def record(measurements: dict[str, Any], output: Path, *, write: bool) -> None:
+    """Retain a local report; update tracked history only on explicit request."""
+    text = json.dumps(measurements, indent=2) + "\n"
+    (output / "measurements.json").write_text(text)
+    if write:
+        (ROOT / "docs/CLIENT_RELEASE_MEASUREMENTS.json").write_text(text)
+    print(text, end="")
 
 
 def measure(
@@ -65,6 +78,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--from", dest="source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="Also update docs/CLIENT_RELEASE_MEASUREMENTS.json",
+    )
     args = parser.parse_args()
     output = args.output.resolve()
     if not output.is_relative_to(ROOT) or output.exists():
@@ -176,9 +194,7 @@ def main() -> None:
         "Unavailable: golden has no plate tables; normalized/plates_country is absent."
     )
     measurements["output_bytes"] = workspace_bytes(output)
-    path = ROOT / "docs/CLIENT_RELEASE_MEASUREMENTS.json"
-    path.write_text(json.dumps(measurements, indent=2) + "\n")
-    print(json.dumps(measurements, indent=2))
+    record(measurements, output, write=args.write)
 
 
 if __name__ == "__main__":

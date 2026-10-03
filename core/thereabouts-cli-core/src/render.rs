@@ -1,4 +1,4 @@
-//! Output never changes result semantics, and batch rendering retains one row.
+//! Structured formats stream; table pages spool rows while measuring their widths.
 use crate::{
     Format,
     error::{Error, Result},
@@ -95,13 +95,13 @@ fn csv_line(values: &[String]) -> Result<String> {
         .map_err(|e| Error::Integrity(e.to_string()))?;
     String::from_utf8(bytes).map_err(|e| Error::Integrity(e.to_string()))
 }
-/// Incremental output with one header and no retained batch rows.
+/// Output with one header; tables retain only widths and a temporary row spool.
 pub struct Renderer {
     format: Format,
     columns: Option<Vec<String>>,
     rows: usize,
     batch: bool,
-    layout: Option<crate::table::Layout>,
+    page: Option<crate::table_page::Page>,
 }
 impl Renderer {
     /// Start an output stream in the chosen encoding.
@@ -112,7 +112,7 @@ impl Renderer {
             columns: None,
             rows: 0,
             batch,
-            layout: None,
+            page: None,
         }
     }
     /// Emit one detached public result or pass-through row.
@@ -153,77 +153,38 @@ impl Renderer {
                 ordered(value)
             }
         });
-        if self.format == Format::Table
-            && columns
-                .iter()
-                .any(|k| k.strip_prefix("thereabouts_").unwrap_or(k) == "evidence")
-        {
-            return Err(Error::Usage(
-                "Evidence requires --json --evidence, not a table".into(),
-            ));
-        }
-        if self.format == Format::Table && self.layout.is_none() {
-            self.layout = Some(crate::table::Layout::new(
-                columns,
-                value,
-                io.terminal_columns(),
-            )?);
+        if self.format == Format::Table {
+            if self.page.is_none() {
+                self.page = Some(crate::table_page::Page::new(columns.clone(), io)?);
+            }
+            return self
+                .page
+                .as_mut()
+                .ok_or_else(|| Error::Integrity("Missing table page".into()))?
+                .push(value);
         }
         if self.rows == 0 {
-            io.stdout(&if self.format == Format::Csv {
-                csv_line(columns)?
-            } else {
-                self.layout
-                    .as_ref()
-                    .ok_or_else(|| Error::Integrity("Missing table layout".into()))?
-                    .header(columns)
-            })?;
+            io.stdout(&csv_line(columns)?)?;
         }
-        if self.format == Format::Csv {
-            if object.keys().any(|key| !columns.contains(key)) {
-                return Err(Error::Usage(
-                    "CSV output requires consistent input columns; use NDJSON for varying objects"
-                        .into(),
-                ));
-            }
-            io.stdout(&csv_line(
-                &columns
-                    .iter()
-                    .map(|key| text(object.get(key).unwrap_or(&Value::Null)))
-                    .collect::<Vec<_>>(),
-            )?)?;
-        } else {
-            let layout = self
-                .layout
-                .as_ref()
-                .ok_or_else(|| Error::Integrity("Missing table layout".into()))?;
-            io.stdout(&layout.row(columns, value, false))?;
-            if let Some(candidates) = value
-                .get("candidates")
-                .or_else(|| value.get("thereabouts_candidates"))
-                .and_then(Value::as_array)
-            {
-                for candidate in candidates {
-                    let candidate = if object.contains_key("thereabouts_status") {
-                        Value::Object(
-                            candidate
-                                .as_object()
-                                .into_iter()
-                                .flatten()
-                                .map(|(k, v)| (format!("thereabouts_{k}"), v.clone()))
-                                .collect(),
-                        )
-                    } else {
-                        candidate.clone()
-                    };
-                    io.stdout(&layout.row(columns, &candidate, true))?;
-                }
-            }
+        if object.keys().any(|key| !columns.contains(key)) {
+            return Err(Error::Usage(
+                "CSV output requires consistent input columns; use NDJSON for varying objects"
+                    .into(),
+            ));
         }
+        io.stdout(&csv_line(
+            &columns
+                .iter()
+                .map(|key| text(object.get(key).unwrap_or(&Value::Null)))
+                .collect::<Vec<_>>(),
+        )?)?;
         Ok(())
     }
-    /// Close a streamed JSON batch, including an empty one.
-    pub fn finish(&self, io: &mut dyn Io) -> Result<()> {
+    /// Render the measured table page or close a streamed JSON batch.
+    pub fn finish(&mut self, io: &mut dyn Io) -> Result<()> {
+        if let Some(page) = self.page.take() {
+            page.finish(io)?;
+        }
         if self.format == Format::Json && self.batch {
             io.stdout(if self.rows == 0 {
                 "{\"results\": []}\n"

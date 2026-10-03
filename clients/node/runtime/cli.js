@@ -1,3 +1,4 @@
+import { VERSION } from "./version.js";
 import fs from "node:fs";
 import { lineReader } from "./input.js";
 import { writeAll } from "./output.js";
@@ -55,7 +56,7 @@ async function execute(parsed, io) {
     return 0;
   }
   if (parsed.version) {
-    io.stdout("thereabouts 0.1.0\n");
+    io.stdout(`thereabouts ${VERSION}\n`);
     return 0;
   }
   const module = await wasm();
@@ -100,7 +101,7 @@ async function execute(parsed, io) {
               family: p.family,
               data_version: p.data_version,
               format_minor: p.format_minor,
-              client_version: "0.1.0",
+              client_version: VERSION,
               attribution: p.attribution,
             }))
           : value.packs;
