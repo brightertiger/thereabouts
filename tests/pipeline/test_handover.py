@@ -14,15 +14,14 @@ from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.stages.contract import Stage
-from pipeline.stages.registry import registry
 
-from .helpers import SyntheticStage, context, legacy_workspace
+from .helpers import SyntheticStage, context, legacy_workspace, retained_stages
 
 
 def adopted(root: Path) -> Path:
     path = legacy_workspace(root)
     with Ledger(root, path) as source:
-        proposal = simulate(root, source, load(), registry(load()))
+        proposal = simulate(root, source, load(), retained_stages())
         try:
             apply(proposal, source, path)
         finally:
@@ -34,7 +33,7 @@ def ported() -> tuple[SyntheticStage, list[Stage]]:
     stage = SyntheticStage(
         "download", [Recipe("download", "ghsl", {"release": "fixture"})]
     )
-    return stage, [stage, *registry(load())[1:]]
+    return stage, [stage, *retained_stages()[1:]]
 
 
 def test_handover_changes_only_identity_parameters_and_input_hash(

@@ -1,12 +1,12 @@
 # Thereabouts pipeline
 
-The `pipeline` package supplies the runtime and migration for the redesigned
-Thereabouts data build. It can inspect and adopt existing outputs without
-regenerating them. Source adapters and geographic engines are still in
-`build_data`; their moves belong to the next two work packages. Production
-rebuilds through the new stage declarations are explicitly unavailable until
-those moves are complete. [PIPELINE_STATUS.md](PIPELINE_STATUS.md) records the
-implemented boundary, measurements and remaining work.
+The `pipeline` package supplies configuration, resumable source acquisition,
+normalization, and verified migration for the Thereabouts data build. Download
+and normalize discover units from source YAML and `pins.lock`; geographic
+engines remain retained stages until package 3. The old `build_data` entry points
+remain usable only on their original unmigrated workspaces.
+[PIPELINE_STATUS.md](PIPELINE_STATUS.md) records the implemented boundary,
+measurements, and remaining work.
 
 A **stage** owns one kind of work. A **unit** is a resumable item within a stage,
 such as a source, country or H3 block. The **ledger** records a completed unit's
@@ -55,8 +55,10 @@ working directory. Reports must remain outside the inspected data workspace.
 
 ## Configuration and identity
 
-`config/pipeline.yaml` is merged over structured dataclass defaults, followed by
-an optional `config/profiles/<name>.yaml`, followed by `key=value` overrides:
+Structured defaults are merged with `config/sources/*.yaml`, then
+`config/pipeline.yaml`, an optional `config/profiles/<name>.yaml`, and `key=value`
+overrides. Source adapters declare a typed `Options` dataclass; unknown adapter
+options fail during configuration loading:
 
 ```sh
 .venv/bin/python -m pipeline plan --profile laptop \
@@ -82,6 +84,57 @@ upstream outputs it reads. A code change may make a consumer provisionally stale
 in a plan; if rebuilding the upstream unit produces identical bytes, execution
 can still skip that consumer. Migration retains original input digests as
 adoption evidence while source/engine-specific discovery is being ported.
+
+## Sources and frozen versions
+
+Each `config/sources/<name>.yaml` declares a name, adapter module, schema family,
+upstream, attribution, byte limits, and typed normalization options. Adding a
+source does not require editing a source-name list. The thirteen retained sources
+are enabled. `plate_country` is declared but disabled because the retained
+workspace has no build or payload inventory for it; enabling it requires an
+explicit reviewed pin proposal.
+
+`pins.lock` records exact input names, sizes, SHA256, upstream metadata, and the
+inventory used by the retained source manifest. An inventory found later under
+the same raw directory is not assumed to describe the built output. In particular,
+the committed geoBoundaries lock uses the manifest's resolved inventory.
+
+```sh
+# Read-only: compare the lock with an already-built workspace's exact manifests.
+.venv/bin/python -m pipeline pins check --from-workspace /path/to/existing/data
+# Import explicitly reviewed versions/checksums; this command writes only the lock.
+.venv/bin/python -m pipeline pins update ghsl --from-file reviewed-pins.yaml
+# Bootstrap exact versions from built manifests, without downloading or running stages.
+.venv/bin/python -m pipeline pins update --from-workspace /path/to/existing/data
+```
+
+`pins update` requires `--from-file` or `--from-workspace`; neither it nor a stage
+silently selects latest. A proposal uses the same typed format as `pins.lock`.
+`pins check` without `--from-workspace` checks the lock structure and hashes only;
+it does not claim that upstream or remote mirror payloads were verified.
+
+On a separate writable workspace, `run --through normalize` downloads every
+enabled source and publishes its normalized manifest. Configure
+`storage.gcs_raw=gs://BUCKET/raw` for future production execution; local tests use
+`storage.gcs_raw=file:///absolute/path/to/a/mirror` or `memory://mirror`.
+The fsspec GCS driver is pinned in `uv.lock`. No cloud operation was used to test
+this implementation.
+
+Downloads reuse verified local files, then try the mirror, then the frozen
+upstream URL. Each payload is copied to `sha256/<checksum>` in the mirror and
+rehashed before the download unit can complete. Historical offload prefixes are
+retained as fallback restore locations, with their original custody evidence;
+restored bytes must match the recorded size and SHA256. Adoption itself does
+not contact these locations. Interrupted downloads resume at file boundaries,
+not by appending an unverified HTTP response to a partial file.
+
+Normalize streams bounded partitions and retains source identities, licences,
+and rejection evidence. GeoNames extraction/index and Overture parent-index
+caches are regenerated before row conversion and remain tracked normalize
+outputs. Plate parsing rules now live in YAML. PDF evidence requires the
+configured Poppler `pdftotext` version (25.11.0 was measured on this laptop);
+this is a prerequisite for future PDF normalization, not evidence of the version
+used by every historical build.
 
 ## Migration and its boundary
 
@@ -165,12 +218,11 @@ copies no Parquet tree and creates no hard links.
 
 ## Execution and resource limits
 
-The runtime runner implements `run [--through STAGE | --only STAGE]`. Source and
-engine declarations currently support retained-output inspection; their `run`
-methods refuse rebuilding until packages 2 and 3 supply the implementations.
-The runner itself is tested with synthetic executable stages, including dynamic
-unit discovery after upstream publication, parallel workers, interruption,
-resumption and restoration of deliberately absent inputs.
+The runtime runner implements `run [--through STAGE | --only STAGE]`. Download
+and normalize execute frozen source pins. Engine declarations still support
+retained-output inspection and refuse rebuilding until package 3. Use source
+execution only on a separate writable workspace, never the protected existing
+workspace used for this redesign.
 
 Before each unit starts, the resource guard requires at least 5,000,000,000 free
 disk bytes, the configured workspace allowance and process RSS headroom. It
@@ -178,7 +230,9 @@ pauses and logs its reason instead of failing on resource pressure. Concurrent
 workers share declared disk reservations. Workspace size is measured at most
 once per `resources.workspace_scan_seconds` (60 seconds by default), outside the
 admission lock; completed output bytes and active reservations are accounted for
-between scans. Free disk and RSS are checked before every admission.
+between scans. Streaming source normalizers account for each allocation and
+refresh the measured total at their unit boundary, including removed scratch
+files. Free disk and RSS are checked before every admission.
 These admission checks do not impose limits on arbitrary stage code.
 The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
 and a 2 GB RSS allowance. Engine-specific limits and measurements follow with

@@ -7,7 +7,7 @@ import pytest
 from pipeline.cli import main
 from pipeline.migration.preflight import check_writable
 
-from .helpers import legacy_workspace
+from .helpers import legacy_workspace, source_options
 
 
 def files(root: Path) -> dict[Path, bytes]:
@@ -23,7 +23,7 @@ def test_apply_permission_preflight_precedes_lock_backup_and_journal(
     before = files(root)
     target.chmod(0o555)
     try:
-        assert main(["migrate", "--root", str(root)]) == 2
+        assert main(["migrate", *source_options(root), "--root", str(root)]) == 2
         message = capsys.readouterr().out
         assert f"chmod u+w {target}" in message
         assert f"chmod a-w {target}" in message
@@ -51,14 +51,20 @@ def test_existing_unrelated_backup_is_not_silently_kept(tmp_path: Path) -> None:
     legacy_workspace(root)
     (root / "work/ledger.pre-migration.sqlite3").write_bytes(b"unrelated backup")
     before = files(root)
-    assert main(["migrate", "--root", str(root)]) == 2
+    assert main(["migrate", *source_options(root), "--root", str(root)]) == 2
     assert files(root) == before
 
 
 def test_paths_step_cannot_recreate_a_lost_original_backup(tmp_path: Path) -> None:
     root = tmp_path / "data"
     legacy_workspace(root)
-    options = ["--root", str(root), "--report", str(tmp_path / "report.json")]
+    options = [
+        *source_options(root),
+        "--root",
+        str(root),
+        "--report",
+        str(tmp_path / "report.json"),
+    ]
     assert main(["migrate", "paths", *options]) == 0
     (root / "work/ledger.pre-migration.sqlite3").unlink()
     before = files(root)

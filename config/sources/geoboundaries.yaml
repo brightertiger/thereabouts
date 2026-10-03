@@ -1,0 +1,25 @@
+name: geoboundaries
+adapter: pipeline.sources.geoboundaries
+kind: administrative_areas
+enabled: true
+upstream:
+  url: https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/41af8f1e141eb6826ab9877e306df6f848b9ff0b/releaseData/gbOpen/CAN/ADM1/geoBoundaries-CAN-ADM1-all.zip
+licence:
+  id: per-layer
+  url: https://www.geoboundaries.org/
+  attribution: geoBoundaries and each layer publisher; see pinned boundaryLicense
+    and licenseSource
+limits:
+  download_bytes: 2506890152
+  batch_rows: 2048
+  batch_bytes: 16000000
+  part_bytes: 60000000
+  row_overhead: 2048
+options:
+  shape_bytes: 120000000
+  geometry_bytes: 6000000
+  geometry_max_depth: 32
+  kinds:
+    ADM0: country
+    ADM1: state
+    ADM2: county

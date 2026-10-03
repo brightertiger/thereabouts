@@ -13,9 +13,8 @@ from pipeline.migration.adoption import simulate
 from pipeline.migration.apply import apply, recover
 from pipeline.runtime.jsonio import atomic_output
 from pipeline.runtime.ledger import Ledger
-from pipeline.stages.registry import registry
 
-from .helpers import legacy_workspace
+from .helpers import legacy_workspace, retained_stages, source_options
 
 
 def test_interrupt_between_json_and_ledger_is_recoverable(
@@ -35,7 +34,7 @@ def test_interrupt_between_json_and_ledger_is_recoverable(
             yield temporary
 
     with Ledger(root, path) as source:
-        migration = simulate(root, source, load(), registry(load()))
+        migration = simulate(root, source, load(), retained_stages())
         try:
             with monkeypatch.context() as patch:
                 patch.setattr(module, "atomic_output", interrupted)
@@ -58,7 +57,14 @@ def test_interrupt_between_json_and_ledger_is_recoverable(
     assert all(p.read_bytes() == data for p, data in before.items())
     assert (
         main(
-            ["migrate", "--root", str(root), "--report", str(tmp_path / "report.json")]
+            [
+                "migrate",
+                *source_options(root),
+                "--root",
+                str(root),
+                "--report",
+                str(tmp_path / "report.json"),
+            ]
         )
         == 0
     )
@@ -68,7 +74,13 @@ def test_separate_paths_and_adopt_steps_and_idempotence(tmp_path: Path) -> None:
     root = tmp_path / "data"
     path = legacy_workspace(root)
     original = path.read_bytes()
-    common = ["--root", str(root), "--report", str(tmp_path / "report.json")]
+    common = [
+        *source_options(root),
+        "--root",
+        str(root),
+        "--report",
+        str(tmp_path / "report.json"),
+    ]
     assert main(["migrate", "paths", *common]) == 0
     with Ledger(root, path) as ledger:
         assert not ledger.migrated

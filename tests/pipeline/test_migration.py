@@ -13,9 +13,8 @@ from pipeline.migration.apply import apply
 from pipeline.runtime.jsonio import digest, read_object, write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.planning import plan
-from pipeline.stages.registry import registry
 
-from .helpers import context, legacy_workspace
+from .helpers import context, legacy_workspace, retained_stages
 
 
 def test_adoption_is_readonly_until_applied_and_portable(tmp_path: Path) -> None:
@@ -25,7 +24,7 @@ def test_adoption_is_readonly_until_applied_and_portable(tmp_path: Path) -> None
         p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()
     }
     config = load()
-    stages = registry(config)
+    stages = retained_stages()
     with Ledger(root, path) as old:
         migration = simulate(root, old, config, stages)
         try:
@@ -51,7 +50,9 @@ def test_adoption_is_readonly_until_applied_and_portable(tmp_path: Path) -> None
     moved = tmp_path / "moved"
     shutil.move(str(root), moved)
     with Ledger(moved, moved / "work/ledger.sqlite3") as ledger:
-        assert all(d.state == "current" for d in plan(context(moved, ledger), stages))
+        ctx = context(moved, ledger)
+        ctx.config = config
+        assert all(d.state == "current" for d in plan(ctx, stages))
         assert all(
             not o.path.startswith("/") for r in ledger.records() for o in r.outputs
         )
@@ -74,7 +75,7 @@ def test_adoption_cannot_bless_missing_or_corrupt_payload(
         Ledger(path.parents[1], path) as ledger,
         pytest.raises(ValueError, match="Cannot adopt"),
     ):
-        simulate(path.parents[1], ledger, load(), registry(load()))
+        simulate(path.parents[1], ledger, load(), retained_stages())
 
 
 def test_offloaded_missing_raw_keeps_evidence_but_claims_no_remote_verification(
@@ -95,7 +96,7 @@ def test_offloaded_missing_raw_keeps_evidence_but_claims_no_remote_verification(
     )
     (root / "raw/ghsl/input.zip").unlink()
     with Ledger(root, path) as ledger:
-        migration = simulate(root, ledger, load(), registry(load()))
+        migration = simulate(root, ledger, load(), retained_stages())
         try:
             assert migration.report["offloaded_sources"] == ["ghsl"]
             assert migration.report["remote_verified"] is False
@@ -117,4 +118,4 @@ def test_changed_offload_binding_does_not_authorize_absence(tmp_path: Path) -> N
         },
     )
     with Ledger(root, path) as ledger, pytest.raises(ValueError, match="does not bind"):
-        simulate(root, ledger, load(), registry(load()))
+        simulate(root, ledger, load(), retained_stages())

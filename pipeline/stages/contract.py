@@ -30,6 +30,7 @@ class Unit:
     inputs_hash: str
     dependency_hash: str
     required_bytes: int = 0
+    accounts_disk: bool = False
 
     @property
     def key(self) -> tuple[str, str]:

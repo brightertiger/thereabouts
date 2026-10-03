@@ -1,0 +1,13 @@
+name: airports
+adapter: pipeline.sources.airports
+kind: airports
+enabled: true
+upstream:
+  url: https://davidmegginson.github.io/ourairports-data/airports.csv
+licence:
+  id: Public-Domain
+  url: https://ourairports.com/data/
+  attribution: OurAirports contributors
+limits:
+  download_bytes: 12734002
+options: {}

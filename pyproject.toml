@@ -42,6 +42,7 @@ acquire = [
     "shapely>=2.1,<3",
     "pyshp>=2.3,<3",
     "regex>=2024.11,<2027",
+    "gcsfs>=2026.10.0",
 ]
 
 [tool.setuptools.packages.find]
@@ -87,4 +88,9 @@ files = ["src", "build_data", "pipeline", "benchmarks", "tests", "setup.py"]
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]
 module = ["scipy.spatial", "shapefile", "h3.*"]
+ignore_missing_imports = true
+
+# fsspec backends are narrowed to the storage Protocol at their boundary.
+[[tool.mypy.overrides]]
+module = ["fsspec.*"]
 ignore_missing_imports = true

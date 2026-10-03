@@ -1,10 +1,98 @@
 # Pipeline redesign status
 
-Package 1 and its review fixes are complete on `feat/pipeline`, with local
-commits only. The owner approved the four deliberately deleted GeoNames/Overture
-caches as explicitly absent on 2026-10-03. Read-only plan and handover dry-run
-again report **85,577 current / 0 stale / 0 new**. Packages 2–3 follow; packages
-4–5 remain outside the current request. The real workspace has only been read.
+Packages 1 and 2 and the package-1 review fixes are complete on `feat/pipeline`,
+with local commits only. The owner-approved auxiliary absence is committed as
+`316f5c6`. Download and normalize now independently discover thirteen units each
+from source YAML and the frozen lock. The real workspace has only been read.
+Package 3 is next; packages 4–5 remain outside the current request.
+
+## Package 2: sources
+
+Download and normalize are executable stages with fourteen typed source
+configurations, thirteen enabled sources, bounded source adapters, and a
+reviewed `pins.lock`. The source registry has no hard-coded source-name list.
+Simple adapters are single modules; complex geometry/name/plate parsers retain
+small modules by responsibility. `plate_country` has a declared evidence adapter
+and disabled configuration because no built payload or inventory exists in the
+retained workspace. Its inference engine belongs to package 3; enabling the
+source requires an explicit reviewed pin.
+
+[DATA_PIPELINE.md](DATA_PIPELINE.md#sources-and-frozen-versions) gives the source,
+lock and restore commands. `pins update` accepts an explicit candidate lock or
+an existing workspace's exact manifest inputs. It never selects latest during
+execution. The download stage verifies frozen sizes/checksums, reuses local or
+mirrored bytes, and verifies a content-addressed mirror copy before completion.
+Historical GCS prefixes remain fallback restore locations with bound custody
+receipts. Tests use fsspec memory and local directory backends. No real mirror
+or upstream data request was made. The GCS driver is installed and locked;
+package dependencies were downloaded without uploading project data.
+
+Normalizers stream source rows, retain attribution/rejection evidence, publish
+root-relative manifests and track caches. Missing GeoNames and Overture caches
+are regenerated before normalization. Plate rules moved mechanically to YAML;
+PDF parsing checks the configured Poppler version, measured locally as 25.11.0.
+This does not establish Poppler's version for historical builds. HTTP recovery
+resumes at file boundaries. Existing engines and the old `build_data` package
+are still unchanged at this checkpoint.
+
+The lock has **1,098 payload records for thirteen built sources**, plus the
+explicit unavailable `plate_country` record. `pins check --from-workspace`
+passes against the protected workspace. Versions include:
+
+| Source | Retained version or evidence |
+| --- | --- |
+| Overture | `2026-09-23.1`, nine objects |
+| GeoNames | dump `20261001`, inventory `20261001T160939Z` |
+| geoBoundaries | manifest-selected `gbOpen-a5b064cdf7dc8c3cb70b`, 430 pinned layers/commits |
+| GHSL | `R2024A-V1.2`; SHA256 `bc879d82320504f89df2041b7936221c8239cd808abe93980493aed062b4f3d6` |
+| OSM land | `2026-10-01T03:37:19Z`; ETag `"374dfb18-65cbf220083e3"` |
+| DB-IP | `2026-10`; 7,786,864 publisher rows |
+| Time zones | boundary `2026d`, IANA `2026e` |
+| Phone | commit `0ae309f1940227efe688f5eb1815ef45a6fbee8d` |
+| Codes | country-list `2e9d6498a0456f4afc2f6cf367d1e12a9ed4afe1`, pycountry `4c6a69927a25326a69bf753671fb571bb437cd7d` |
+| UN/LOCODE | commit `b1309b37edea63334a819a78c22b8967f61c37ad` |
+| Plates | inventory `5cfeab8a47dec58b3725c42a41a097ad74d138ac88d02d252ca3eda7ba987606` |
+| Airports / postal | exact retained inventory timestamps and per-file SHA256 in `pins.lock` |
+
+geoBoundaries' newer unused raw inventory is deliberately not substituted for
+the manifest-selected build inputs. Pins record the actual per-file licences,
+not a single guessed licence for mixed-source tables.
+
+The stage table below remains **85,577 current / 0 stale / 0 new**. Source
+handover verifies exact key equality, all present output bytes, and the approved
+absent-output evidence, then proposes thirteen download and thirteen normalize
+identity/parameter/input-hash updates. The simulated zero-stale result checks
+mapping and hashes only; it does not prove source-output equivalence on world
+inputs. Synthetic source tests cover every adapter, malformed configuration,
+mirror restore/corruption/failure, resumption, portable paths after a move,
+licence/provenance and name/geometry decisions.
+
+The explicit world test applied adoption to a copied ledger and JSON only,
+then applied all 26 handovers to that copy. Reopening it reports zero stale;
+output records are unchanged and a repeated migration is idempotent. It also
+checks the protected ledger hash/mtime and all original JSON bytes unchanged.
+Measured on the M2 / 8 GiB laptop: **493.645 s**, **850,755,584 bytes peak RSS**,
+**152,739,840 ledger bytes** and **30,689,281 overlaid JSON bytes**. Evidence:
+`data/pipeline-work/sources-world-proof/test_world_copy_application0/measurements.json`.
+The preceding approved-absence copy proof passed in 332.095 s, peak RSS
+1,195,245,568 bytes, copied ledger 151,154,688 bytes and the same JSON bytes.
+
+Final handover dry-run: **26 changes**, **261.52 s**, **1,065,615,360 bytes
+maximum RSS**. Its report's identities equal the final source identities:
+
+| Ported stage | Discovered / adopted | Changed | Old → new identity |
+| --- | ---: | ---: | --- |
+| download | 13 | 13 | `24cfed679d15e584897e265554f0849727ad85bceb0f218404e0d590fc639600` → `bdb2d51cb502a516e06818254265809d12a9918752cc4fcf1d512ddc4e2d8175` |
+| normalize | 13 | 13 | `bf86e23ded2aa3f26c943b4f0cad9181f6652871829db2efb6a7e42ca6b7b36f` → `d9bcdad2f63bd1f6773779393c8924647206a8be8b7a5ae6c89ea659bd318f20` |
+
+Reports: `.cache/pipeline/sources-handover.json` and
+`.cache/pipeline/sources-plan.json`; logs under `data/pipeline-work/sources-*`.
+Full checks: **737 passed, 8 skipped** in 134.37 s; Ruff and formatting passed
+(552 files); strict mypy passed (536 source files). The opt-in world proof is an
+additional passing test. Final read-only plan: **254.88 s**, **1,255,784,448 bytes maximum RSS**,
+85,577 current / 0 stale / 0 new. Worktree allocation was 2,524,268 KiB
+and free disk 46 GiB before commit, within the 3 GB / 5 GB limits.
+
 
 ## Review fixes 1–3
 
@@ -20,8 +108,8 @@ stage table below: 85,577 current, zero stale/new.
 ported-stage keys with the saved keys, verifies outputs, and proposes only new
 identity, parameters and input hash. Outputs, completion times, custody and absent
 markers stay intact. It refuses changed dependencies and a second identity change
-after handover. The handover audit lives separately in SQLite. No stage is ported
-yet, so the real-workspace dry run has zero eligible ported stages at this commit;
+after handover. The handover audit lives separately in SQLite. At the review-fix checkpoint no stage was ported, so its real-workspace dry run
+had zero eligible ported stages;
 the transition is exercised on synthetic applied ledgers.
 
 The protected workspace still has its legacy ledger. A handover dry run there
@@ -108,8 +196,8 @@ fixed historical migration paths separately from configurable future paths.
 | `plan` | 85,577 | 0 | 0 | 1,117 |
 | `migrate handover --dry-run` | 85,577 | 0 | 0 | 1,117 |
 
-Both checks succeeded after the owner-approved extension. No stage has been
-ported yet, so there are zero actual-stage identity handovers at this checkpoint.
+Both checks succeeded after the owner-approved extension. At the approved-absence checkpoint no stage had been ported, so that report
+had zero actual-stage identity handovers. Package 2 now hands over 26 units.
 Simulation checks mapping and hashes only; it does not prove engine equivalence.
 
 | Approved absent prefix | Files |
@@ -134,8 +222,9 @@ passed, 8 skipped**; Ruff and formatting passed (477 files); strict mypy passed
 (461 source files). The absence regression tests cover both approved sources,
 present corruption, wrong directories and cross-source paths.
 
-Packages 2–3, `pins.lock`, independently discovered source/engine units and
-pilot-block comparisons remain to be implemented. No source or engine was run
+At that checkpoint, source and engine ports were still outstanding. Package 2
+now supplies source discovery and the lock; engine ports and pilot-block
+comparisons remain for package 3. No source or engine was run
 against the real workspace.
 
 ## metadata repairs needing owner approval
@@ -791,8 +880,9 @@ invalidation and recoverable migration. Low disk or resident-memory headroom
 pauses admission. These checks do not impose an operating-system memory limit
 on arbitrary stage code. SQLite writer waiting is configurable too.
 
-Source and engine declarations inspect retained outputs. Their rebuild methods
-fail explicitly until packages 2 and 3 port the implementations. Synthetic stages
+Source stages now execute frozen pins and discover units independently. Engine
+declarations still inspect retained outputs and explicitly refuse rebuilding
+until package 3 ports the implementations. Synthetic stages
 prove dependencies within a stage, lazy discovery, unchanged-byte propagation,
 absent-input restoration and retry after interrupted manifest publication.
 
@@ -879,7 +969,7 @@ workspace):**
 
 Stop old builders before application; they must not run against the adopted
 ledger. Follow with `migrate check` and `plan` using the same `--root`. Production
-rebuilding still requires packages 2 and 3. The old checkout-name symlink is
+geographic rebuilding still requires package 3. The old checkout-name symlink is
 left for the reviewer because removing it would write outside this worktree.
 
 ## Original package-1 measurements (before review fixes)
@@ -916,9 +1006,7 @@ workspace and no cloud data operation was performed.
 
 ## Next packages and owner follow-ups
 
-1. Package 2: source adapters, fourteen source configs including `plate_country`,
-   actual pins, mirror/storage operations and source discovery. Replace retained
-   declarations and extend adoption without rebuilding preserved outputs.
+1. Package 2: completed above; world source normalization has not been rerun.
 2. Package 3: engine moves, policy JSON-to-YAML equivalence, fingerprint-bound
    reviews, evaluation and plate-country stages, fixture/pilot digest comparisons;
    then delete `build_data` and its temporary repository-evidence reader in migration.

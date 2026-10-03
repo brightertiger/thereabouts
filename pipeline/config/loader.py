@@ -1,9 +1,11 @@
 """Merge structured defaults, YAML, a profile and dot-list overrides."""
 
+import copy
 import math
 import re
 from collections.abc import Sequence
-from dataclasses import fields
+from dataclasses import asdict, fields
+from functools import lru_cache
 from pathlib import Path
 from typing import cast
 
@@ -13,6 +15,7 @@ from omegaconf.errors import OmegaConfBaseException
 from thereabouts.format import BLOCK_RESOLUTION
 
 from .schema import DISK_FLOOR, Config
+from .sources import load_sources, resolve_options, validate_source
 
 CONFIG_DIR = Path(__file__).parents[2] / "config"
 
@@ -23,8 +26,44 @@ def load(
     profile: str | None = None,
     overrides: Sequence[str] = (),
 ) -> Config:
+    files = [path, *sorted((path.parent / "sources").glob("*.yaml"))]
+    if profile is not None:
+        if not re.fullmatch(r"[a-z][a-z0-9_-]*", profile):
+            raise ValueError("Profile must name a file in config/profiles")
+        files.append(path.parent / "profiles" / f"{profile}.yaml")
+    stamp = tuple(
+        (str(file), file.stat().st_mtime_ns, file.stat().st_size) for file in files
+    )
+    return copy.deepcopy(_cached(path, profile, tuple(overrides), stamp))
+
+
+@lru_cache(maxsize=8)
+def _cached(
+    path: Path,
+    profile: str | None,
+    overrides: tuple[str, ...],
+    stamp: tuple[tuple[str, int, int], ...],
+) -> Config:
+    return _load(path, profile=profile, overrides=overrides)
+
+
+def _load(
+    path: Path = CONFIG_DIR / "pipeline.yaml",
+    *,
+    profile: str | None = None,
+    overrides: Sequence[str] = (),
+) -> Config:
     try:
-        tree = OmegaConf.merge(OmegaConf.structured(Config), OmegaConf.load(path))
+        tree = OmegaConf.merge(
+            OmegaConf.structured(Config),
+            {
+                "sources": {
+                    name: asdict(source)
+                    for name, source in load_sources(path.parent / "sources").items()
+                }
+            },
+            OmegaConf.load(path),
+        )
         if profile is not None:
             if not re.fullmatch(r"[a-z][a-z0-9_-]*", profile):
                 raise ValueError("Profile must name a file in config/profiles")
@@ -50,6 +89,11 @@ def validate(config: Config) -> None:
             path = Path(value)
             if path.is_absolute() or ".." in path.parts or path == Path("."):
                 raise ValueError(f"paths.{item.name} must be relative to paths.root")
+    for name, source in config.sources.items():
+        if name != source.name:
+            raise ValueError(f"Source key must match its name: {name}")
+        validate_source(source)
+        resolve_options(source)
     resources = config.resources
     if resources.disk_floor < DISK_FLOOR:
         raise ValueError(f"resources.disk_floor must be at least {DISK_FLOOR}")

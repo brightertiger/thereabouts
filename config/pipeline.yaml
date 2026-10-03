@@ -1,4 +1,4 @@
-# Byte budgets are decimal. Stage-specific source and engine settings follow later.
+# Byte budgets are decimal. Source settings are merged from config/sources/*.yaml.
 paths:
   root: data
 storage:
@@ -16,15 +16,18 @@ resources:
 h3:
   block_resolution: 3
   cell_resolution: 8
-# Runtime-core inventory stages. Source and engine implementations replace these
-# declarations in the following work packages; rebuilding is explicitly refused.
+# Sources execute frozen pins. Engine stages retain adoption recipes until ported.
 stages:
   - name: download
-    packages: [pipeline/stages/retained.py]
+    packages: [pipeline/stages/sources.py, pipeline/sources/download.py, pipeline/storage,
+               pipeline/pins/models.py, pipeline/sources/contract.py,
+               pipeline/sources/shared/manifest.py]
+    config: [sources]
   - name: normalize
     needs: [download]
-    packages: [pipeline/stages/retained.py]
-    native: [duckdb, shapely, h3]
+    packages: [pipeline/stages/sources.py, pipeline/sources]
+    config: [sources, h3]
+    native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex]
   - name: reconcile
     needs: [normalize]
     packages: [pipeline/stages/retained.py]

@@ -1,0 +1,13 @@
+name: unlocode
+adapter: pipeline.sources.unlocode
+kind: unlocode
+enabled: true
+upstream:
+  url: https://raw.githubusercontent.com/datasets/un-locode/b1309b37edea63334a819a78c22b8967f61c37ad/README.md
+licence:
+  id: PDDL-1.0
+  url: https://opendatacommons.org/licenses/pddl/1-0/
+  attribution: UNECE; DataHub maintainers
+limits:
+  download_bytes: 7297966
+options: {}

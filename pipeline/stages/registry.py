@@ -4,11 +4,13 @@ from collections.abc import Sequence
 from dataclasses import fields
 
 from pipeline.config import Config
+from pipeline.pins.lock import read_lock
 from pipeline.runtime.fingerprints import REPOSITORY, native_versions
 from pipeline.runtime.paths import validate_relative
 
 from .contract import Stage
 from .retained import RetainedStage
+from .sources import SourceStage
 
 
 def ordered(stages: Sequence[Stage]) -> list[Stage]:
@@ -55,4 +57,15 @@ def registry(config: Config) -> list[Stage]:
         native_versions(stage.native, REPOSITORY / "uv.lock")
         if not stage.packages:
             raise ValueError(f"Stage {stage.name} needs an identity package")
-    return ordered([RetainedStage(settings) for settings in config.stages])
+    pins = read_lock(REPOSITORY / "pins.lock")
+    for name, source in config.sources.items():
+        if source.enabled and (name not in pins or not pins[name].available):
+            raise ValueError(f"Enabled source has no reviewed pin: {name}")
+    return ordered(
+        [
+            SourceStage(settings, pins)
+            if settings.name in {"download", "normalize"}
+            else RetainedStage(settings)
+            for settings in config.stages
+        ]
+    )

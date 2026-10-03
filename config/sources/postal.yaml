@@ -1,0 +1,13 @@
+name: postal
+adapter: pipeline.sources.postal
+kind: postal
+enabled: true
+upstream:
+  url: https://download.geonames.org/export/zip/CA_full.csv.zip
+licence:
+  id: CC-BY-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+limits:
+  download_bytes: 44700758
+options: {}

@@ -1,0 +1,13 @@
+name: dbip
+adapter: pipeline.sources.dbip
+kind: dbip
+enabled: true
+upstream:
+  url: https://download.db-ip.com/free/dbip-city-lite-2026-10.csv.gz
+licence:
+  id: CC-BY-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  attribution: IP Geolocation by DB-IP https://db-ip.com
+limits:
+  download_bytes: 85827400
+options: {}

@@ -1,0 +1,22 @@
+name: geonames
+adapter: pipeline.sources.geonames
+kind: places_and_names
+enabled: true
+upstream:
+  url: https://download.geonames.org/export/dump/allCountries.zip
+licence:
+  id: CC-BY-4.0
+  url: https://creativecommons.org/licenses/by/4.0/
+  attribution: geonames
+limits:
+  download_bytes: 629433471
+  batch_rows: 4096
+  chunk_bytes: 67108864
+  scalar_bytes: 8
+options:
+  kept_classes:
+  - P
+  - A
+  line_bytes: 1000000
+  index_bytes: 1000000000
+  sqlite_cache_kib: 32768

@@ -9,9 +9,8 @@ import pytest
 from pipeline.config import load
 from pipeline.migration.adoption import simulate
 from pipeline.runtime.ledger import Ledger
-from pipeline.stages.registry import registry
 
-from .helpers import legacy_workspace, record
+from .helpers import legacy_workspace, record, retained_stages
 
 
 @pytest.mark.parametrize(
@@ -40,7 +39,7 @@ def test_auxiliary_retains_missing_hashes_but_refuses_corrupt_bytes(
         )
     config = load()
     with Ledger(root, path) as ledger:
-        migration = simulate(root, ledger, config, registry(config))
+        migration = simulate(root, ledger, config, retained_stages())
         try:
             completion = migration.context.ledger.get("normalize", source)
             assert completion is not None
@@ -53,9 +52,9 @@ def test_auxiliary_retains_missing_hashes_but_refuses_corrupt_bytes(
             migration.context.ledger.close()
         auxiliary.write_bytes(b"bad")
         with pytest.raises(ValueError, match="Cannot adopt"):
-            simulate(root, ledger, config, registry(config))
+            simulate(root, ledger, config, retained_stages())
         auxiliary.unlink()
-        migration = simulate(root, ledger, config, registry(config))
+        migration = simulate(root, ledger, config, retained_stages())
         try:
             completion = migration.context.ledger.get("normalize", source)
             assert completion is not None

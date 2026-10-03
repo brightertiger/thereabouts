@@ -12,6 +12,8 @@ from pipeline.config import load
 from pipeline.migration.adoption import simulate
 from pipeline.migration.apply import apply
 from pipeline.migration.command import migrate
+from pipeline.migration.handover import prepare
+from pipeline.migration.handover_apply import apply_handover
 from pipeline.runtime.context import context
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.runtime.ledger import Ledger
@@ -20,7 +22,7 @@ from pipeline.runtime.resources import ResourceGuard, workspace_bytes
 from pipeline.runtime.verification import Verifier
 from pipeline.stages.registry import registry
 
-from .helpers import peak_rss
+from .helpers import peak_rss, retained_stages
 
 
 @pytest.mark.world
@@ -38,7 +40,7 @@ def test_world_copy_application(tmp_path: Path) -> None:
     stages = registry(config)
     started = time.monotonic()
     with Ledger(root, original_ledger) as source:
-        migration = simulate(root, source, config, stages)
+        migration = simulate(root, source, config, retained_stages())
     try:
         assert all(d.state == "current" for d in migration.decisions)
         copied = tmp_path / "copied-metadata"
@@ -79,6 +81,23 @@ def test_world_copy_application(tmp_path: Path) -> None:
             ctx = replace(
                 context(config, root, adopted), verifier=Verifier(root, overlay)
             )
+            handover = prepare(ctx, stages)
+            try:
+                assert all(d.state == "current" for d in handover.decisions)
+                assert len(handover.changes) == 26
+                before_outputs = {
+                    record.key: record.outputs for record in adopted.records()
+                }
+                apply_handover(handover, adopted)
+            finally:
+                handover.context.ledger.close()
+        with Ledger(root, copied_ledger) as adopted:
+            ctx = replace(
+                context(config, root, adopted), verifier=Verifier(root, overlay)
+            )
+            assert {
+                record.key: record.outputs for record in adopted.records()
+            } == before_outputs
             decisions = plan(ctx, stages)
             assert all(d.state == "current" for d in decisions)
             before = sha256_file(copied_ledger)

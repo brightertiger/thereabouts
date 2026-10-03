@@ -85,6 +85,12 @@ class ResourceGuard:
                 self.measured_at = self.clock()
                 return self.measured
 
+    def refresh_usage(self) -> None:
+        """Reconcile streamed allocations and scratch removal at a unit boundary."""
+        with self.lock:
+            self.measured = None
+        self.usage()
+
     def admit(self, required_bytes: int = 0) -> None:
         if required_bytes < 0:
             raise ValueError("A unit's disk reservation cannot be negative")

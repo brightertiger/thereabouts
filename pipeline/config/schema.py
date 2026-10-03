@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass, field
 
+from .sources import SourceSettings
+
 DISK_FLOOR = 5_000_000_000
 
 
@@ -54,4 +56,5 @@ class Config:
     resources: Resources = field(default_factory=Resources)
     h3: H3 = field(default_factory=H3)
     storage: dict[str, str] = field(default_factory=lambda: {"local": "file://"})
+    sources: dict[str, SourceSettings] = field(default_factory=dict)
     stages: list[StageSettings] = field(default_factory=list)

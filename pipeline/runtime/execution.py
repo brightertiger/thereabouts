@@ -44,6 +44,7 @@ class Executor:
         return replace(
             make_unit(self.ctx, unit.recipe, stage.identity(self.ctx)),
             required_bytes=unit.required_bytes,
+            accounts_disk=unit.accounts_disk,
         )
 
     def missing(self, unit: Unit) -> bool:
@@ -189,4 +190,9 @@ class Executor:
                 if outputs is not None:
                     written = sum(path.stat().st_size for path in outputs)
             finally:
-                self.ctx.guard.release(unit.required_bytes, written_bytes=written)
+                self.ctx.guard.release(
+                    unit.required_bytes,
+                    written_bytes=0 if unit.accounts_disk else written,
+                )
+                if unit.accounts_disk:
+                    self.ctx.guard.refresh_usage()

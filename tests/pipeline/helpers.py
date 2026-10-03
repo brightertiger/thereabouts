@@ -4,10 +4,14 @@ import json
 import resource
 import sqlite3
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-from pipeline.config import load
+import yaml
+
+from pipeline.config import Config, load
+from pipeline.config.loader import CONFIG_DIR
+from pipeline.config.schema import Resources
 from pipeline.runtime.jsonio import (
     Object,
     atomic_output,
@@ -19,7 +23,8 @@ from pipeline.runtime.ledger import UNITS_SQL, Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.verification import Verifier
-from pipeline.stages.contract import Context, Unit, make_unit
+from pipeline.stages.contract import Context, Stage, Unit, make_unit
+from pipeline.stages.retained import RetainedStage
 
 
 def peak_rss() -> int:
@@ -28,7 +33,7 @@ def peak_rss() -> int:
 
 
 def context(root: Path, ledger: Ledger) -> Context:
-    config = load(overrides=["resources.workers=2"])
+    config = Config(resources=Resources(workers=2))
     guard = ResourceGuard(
         root,
         config.resources,
@@ -127,3 +132,20 @@ def legacy_workspace(root: Path, *, source: str = "ghsl") -> Path:
                 ),
             )
     return path
+
+
+def retained_stages() -> list[Stage]:
+    """The frozen stand-ins used by the initial legacy migration."""
+    return [
+        RetainedStage(settings)
+        for settings in load(CONFIG_DIR / "adoption.yaml").stages
+    ]
+
+
+def source_options(root: Path) -> list[str]:
+    """A one-source configuration for independent CLI discovery over tiny evidence."""
+    config = load()
+    config.sources = {"ghsl": config.sources["ghsl"]}
+    path = root.parent / "pipeline.yaml"
+    path.write_text(yaml.safe_dump(asdict(config), sort_keys=False))
+    return ["--config", str(path)]

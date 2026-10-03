@@ -1,18 +1,23 @@
 """Command-line entry for read-only planning, migration and resumable execution."""
 
 import sqlite3
+import sys
 from collections.abc import Sequence
 
 from pipeline.arguments import parse
 from pipeline.commands import execute_run, inspect_plan, inspect_status, invalidate
 from pipeline.migration.command import migrate
+from pipeline.pins.cli import main as pins_main
 from pipeline.runtime.context import context
 from pipeline.runtime.ledger import Ledger
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     try:
-        options = parse(argv)
+        arguments = list(sys.argv[1:] if argv is None else argv)
+        if arguments[:1] == ["pins"]:
+            return pins_main(arguments[1:])
+        options = parse(arguments)
         with Ledger(options.root, options.ledger, readonly=True) as ledger:
             ctx = context(options.config, options.root, ledger)
             if options.command == "migrate":

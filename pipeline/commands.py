@@ -70,8 +70,6 @@ def invalidate(ctx: Context, options: Options) -> int:
 def execute_run(ctx: Context, options: Options) -> int:
     if not ctx.ledger.migrated:
         raise ValueError("Migrate the legacy ledger before running")
-    if not ctx.ledger.recipes():
-        raise NotImplementedError("Source discovery arrives in package 2; use plan")
     with Ledger(
         ctx.root,
         options.ledger,
