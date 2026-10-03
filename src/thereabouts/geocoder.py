@@ -1,10 +1,10 @@
 """Synchronous offline lookups with explicit coordinates and no downloads."""
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Mapping
 from pathlib import Path
 from threading import Lock
 from types import TracebackType
-from typing import Any
+from typing import Any, Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,6 +13,16 @@ from . import _core
 from .errors import ClosedGeocoderError
 from .results import Result
 from .store import core_pack
+
+
+class Coordinates(Protocol):
+    """Named coordinate attributes accepted by reverse_many."""
+
+    @property
+    def lat(self) -> float: ...
+
+    @property
+    def lon(self) -> float: ...
 
 
 class Geocoder:
@@ -57,11 +67,24 @@ class Geocoder:
         )
 
     def reverse_many(
-        self, points: Iterable[tuple[float, float]], *, evidence: bool = False
+        self,
+        points: Iterable[Mapping[str, float] | Coordinates],
+        *,
+        evidence: bool = False,
     ) -> Iterator[Result]:
-        """Yield results in input order without retaining the input iterable."""
+        """Yield named mappings or coordinate objects in order; reject bare tuples."""
         self._ensure_open()
-        for lat, lon in points:
+        for point in points:
+            self._ensure_open()
+            try:
+                if isinstance(point, Mapping):
+                    lat, lon = point["lat"], point["lon"]
+                else:
+                    lat, lon = point.lat, point.lon
+            except (KeyError, AttributeError) as exc:
+                raise TypeError(
+                    "Each point must have named lat and lon fields"
+                ) from exc
             yield self.reverse(lat=lat, lon=lon, evidence=evidence)
 
     def reverse_columns(

@@ -99,6 +99,8 @@ pub fn join(
         .enumerate()
         .map(|(i, v)| (v, i))
         .collect();
+    // Carry the source key through compaction: equal labels from distinct stored
+    // cells must not create an ancestor that the dataset never published.
     let mut cells = BTreeMap::new();
     for (key, label) in rows {
         for child in address::cell_at(block, key)?.children(Resolution::Eight) {
@@ -114,7 +116,7 @@ pub fn join(
             label.0[4] =
                 u32::try_from(n).map_err(|_| Error::Input("Too many timezone sets".into()))?;
             ensure(
-                cells.insert(child, label).is_none(),
+                cells.insert(child, (label, key)).is_none(),
                 "Overlapping dataset cells",
             )?;
         }
@@ -144,7 +146,7 @@ pub fn join(
     }
     let mut rows: Vec<_> = cells
         .into_iter()
-        .map(|(c, l)| (address::address(c).1, l))
+        .map(|(c, (label, _origin))| (address::address(c).1, label))
         .collect();
     rows.sort_unstable();
     Ok(rows)
@@ -185,6 +187,30 @@ pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
 mod tests {
     use super::*;
     use crate::catalogue;
+    #[test]
+    fn equal_labels_from_distinct_source_cells_never_merge_above_their_resolution() {
+        let db = Connection::open_in_memory().unwrap();
+        catalogue::initialize(&db).unwrap();
+        let root = h3o::LatLng::new(52.0, 4.0)
+            .unwrap()
+            .to_cell(Resolution::Three);
+        let block = address::address(root).0;
+        db.execute(
+            "INSERT INTO zones VALUES (?,?,?)",
+            params![block, 0, "Area/One"],
+        )
+        .unwrap();
+        let rows: Vec<_> = root
+            .children(Resolution::Four)
+            .map(|cell| (address::address(cell).1, Label([0; 5])))
+            .collect();
+        let original: Vec<_> = rows.iter().map(|(key, _)| *key).collect();
+        let output = join(&db, block, rows, &mut vec![vec![]]).unwrap();
+        assert_eq!(
+            output.iter().map(|(key, _)| *key).collect::<Vec<_>>(),
+            original
+        );
+    }
     #[test]
     fn overlapping_zones_split_labels_and_never_choose_one() {
         let db = Connection::open_in_memory().unwrap();

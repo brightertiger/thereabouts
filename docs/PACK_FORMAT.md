@@ -153,7 +153,7 @@ H3 queries accept canonical 15-character hexadecimal cells at resolutions 0..8.
 A query at 3..8 searches only itself and stored ancestors, never an arbitrary
 child. Resolutions 0..2 have no stored ancestor in this layout and return
 `not_found`. Their representative point is the query cell centre; the public
-`cell` field is its resolution-8 centre child. Resolution >8 is `invalid_input`.
+`cell` field is the canonical query cell itself, retaining its resolution. Resolution >8 is `invalid_input`.
 
 Absence of a block, absence of an ancestor, and stored unassigned land all
 project to the new public `not_found` status. Opt-in evidence distinguishes
@@ -170,7 +170,8 @@ or from an inferred city centroid.
 
 The writer joins all `timezone_cells` that contain each represented r8 centre.
 It can split a spatial ancestor at timezone boundaries, then compact identical
-five-field labels without crossing a block. Missing coverage produces set 0.
+five-field labels within each original stored source cell. Compaction must
+not combine distinct source cells into a new coarse ancestor. Missing coverage produces set 0.
 Overlapping zones form a sorted unique set, without choosing a source winner.
 Timezone overlap never changes geographic status, including an all-zero
 (unassigned) label. When a country is assigned, retain only zone names whose
@@ -309,6 +310,18 @@ format/family raises `incompatible_data`, damage raises `corrupt_pack`, and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query
 values are result statuses, not pack exceptions.
 
+
+## Sample reproducibility
+
+The sample builder requires an explicit `--golden` directory and writes only
+inside its worktree. The manifest records the original golden manifest and
+consumed file digests, subset definition, dataset label, Parquet writer settings
+and PyArrow version. Byte-identical regeneration requires that recorded
+PyArrow version; changed writer settings or versions produce a different input
+identity instead of silently claiming identical bytes. Settings are Parquet 2.6,
+Zstandard level 3, data pages 1.0, 65,536-row groups, dictionary encoding,
+statistics and stored Arrow schema. The committed source extract is produced
+from the same copied golden rows without calling the reverse engine.
 
 ## Columnar binding representation
 

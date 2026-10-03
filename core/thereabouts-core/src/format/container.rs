@@ -32,6 +32,7 @@ pub fn index(value: u64) -> Result<usize> {
 /// A validated owned shard. Slices cannot outlive their bytes.
 #[derive(Debug)]
 pub struct Container {
+    /// Owned wire bytes retained so validated section spans remain valid.
     pub bytes: Vec<u8>,
     spans: Vec<(usize, usize)>,
 }

@@ -50,8 +50,8 @@ impl Pack {
             lat: centre.lat(),
             lon: centre.lng(),
         });
-        // The public cell is always r8. Coarse queries do not choose a descendant label.
-        answer.cell = cell.center_child(Resolution::Eight).map(|c| c.to_string());
+        // Preserve the query cell; a coarse query never invents a resolution-eight descendant.
+        answer.cell = Some(cell.to_string());
         let mut reason = "outside_coverage";
         let found = if cell.resolution() < Resolution::Three {
             reason = "no_stored_ancestor";

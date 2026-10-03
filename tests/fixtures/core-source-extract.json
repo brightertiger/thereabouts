@@ -1879,7 +1879,18 @@
       "golden-thereabouts/places/US.parquet": "14cb39127a22321af2bbd0d282bc6e719124fb45638b4b4d27bc91343b7a5e44"
     },
     "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
-    "stored_blocks": 29
+    "stored_blocks": 29,
+    "subset_writer": {
+      "compression": "zstd",
+      "compression_level": 3,
+      "data_page_version": "1.0",
+      "parquet_version": "2.6",
+      "pyarrow": "23.0.1",
+      "row_group_size": 65536,
+      "store_schema": true,
+      "use_dictionary": true,
+      "write_statistics": true
+    }
   },
   "subdivisions": [
     {

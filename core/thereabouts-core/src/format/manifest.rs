@@ -13,27 +13,45 @@ use std::{
 /// Artifact identity; ranges are validated from the binary directories.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Artifact {
+    /// Portable relative artifact path; traversal and symlinks are rejected.
     pub path: String,
+    /// Artifact role: cells, catalogue, metadata or notice.
     pub kind: String,
+    /// Exact byte length checked before any payload allocation.
     pub size: u64,
+    /// Lowercase SHA-256 checked by explicit full verification.
     pub sha256: String,
 }
 /// Required pack identity and source attribution, independent of build paths.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
+    /// Required schema identifier, thereabouts-pack-2.
     pub schema: String,
+    /// Wire format integer; this reader accepts 2.
     pub format_version: u32,
+    /// Lookup family; this package reads core only.
     pub family: String,
+    /// Explicit dataset release identity, independent of library version.
     pub data_version: String,
+    /// Unknown required bits cause incompatibility; currently zero.
     pub required_features: u32,
+    /// Coordinate indexing resolution; currently eight.
     pub reference_resolution: u8,
+    /// Spatial directory resolution; currently three.
     pub block_resolution: u8,
+    /// Digest of the deterministic writer input identity.
     pub input_digest: String,
+    /// Source manifest, encoding revision and export options used for identity.
     pub inputs: serde_json::Value,
+    /// Published source descriptions retained without inference.
     pub sources: serde_json::Value,
+    /// Human-readable attribution accompanying the license artifacts.
     pub attribution: String,
+    /// Ordered artifact inventory; order defines global catalogue references.
     pub files: Vec<Artifact>,
+    /// Exclusive lower bound for distant-nearest, in metres.
     pub distant_over_m: u32,
+    /// Inclusive upper bound for distant-nearest, in metres.
     pub cutoff_m: u32,
 }
 /// Hash a file in bounded chunks; never load Parquet just to fingerprint it.

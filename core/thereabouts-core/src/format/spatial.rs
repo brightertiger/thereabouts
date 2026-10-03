@@ -48,7 +48,9 @@ impl Label {
 /// A validated per-block index into an owned shard.
 #[derive(Debug)]
 pub struct Block {
+    /// Sorted sparse logical keys, disjoint from their stored ancestors.
     pub keys: Vec<u16>,
+    /// One validated label per key, in identical order.
     pub labels: Vec<Label>,
 }
 impl Block {

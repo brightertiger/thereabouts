@@ -6,9 +6,13 @@ use serde_json::Value;
 /// Metadata tables preserve source rows and timezone overlaps without precedence.
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Metadata {
+    /// Golden country rows, preserving original nullable source fields.
     pub countries: Vec<Value>,
+    /// Golden subdivision rows, indexed by their published code.
     pub subdivisions: Vec<Value>,
+    /// IANA rows used to narrow overlap by comma-separated country codes.
     pub zone_tables: Vec<Value>,
+    /// Sorted unique zone-name sets; entry zero is the empty set.
     pub timezone_sets: Vec<Vec<String>>,
 }
 impl Metadata {

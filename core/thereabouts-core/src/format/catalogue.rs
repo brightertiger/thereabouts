@@ -29,11 +29,17 @@ pub const REF_FIELDS: [&str; 4] = [
 /// Decoded record; the same definition feeds reader and writer.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Place {
+    /// Nullable string fields in `TEXT_FIELDS` order; required fields are checked on decode.
     pub text: [Option<String>; 12],
+    /// Pack-global relationships in `REF_FIELDS` order; zero is null.
     pub refs: [u32; 4],
+    /// Latitude in microdegrees, or `i32::MIN` when the anchor is unknown.
     pub latitude: i32,
+    /// Longitude in microdegrees, sharing latitude's unknown sentinel.
     pub longitude: i32,
+    /// Published population; zero represents unknown.
     pub population: u32,
+    /// Single published zone at the catalogue anchor, when available.
     pub timezone: Option<String>,
 }
 impl Place {

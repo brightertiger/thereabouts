@@ -8,10 +8,7 @@ from typing import Any
 from urllib.parse import quote
 
 from .errors import DataNotInstalledError
-from .packs.errors import CorruptPackError
-from .packs.jsonio import parse, relative_file, sha256, string
-from .packs.keys import FAMILIES
-from .packs.metadata import read_manifest
+from .store_files import parse, relative_file, sha256, string
 
 
 def data_directory(explicit: str | Path | None = None) -> Path:
@@ -34,6 +31,8 @@ def data_directory(explicit: str | Path | None = None) -> Path:
 def installation_path(
     root: Path, version: str, digest: str, family: str = "reverse"
 ) -> Path:
+    from .packs.keys import FAMILIES
+
     if family not in FAMILIES:
         raise ValueError("Unsupported pack family")
     # A prefix avoids reserved device names on Windows, including CON and NUL.
@@ -44,8 +43,13 @@ def installation_path(
 def installed_pack(
     data_dir: str | Path | None = None, *, family: str = "reverse"
 ) -> Path:
+    from .packs.keys import FAMILIES
+
     if family not in FAMILIES:
         raise ValueError("Unsupported pack family")
+    from .packs.errors import CorruptPackError
+    from .packs.metadata import read_manifest
+
     root = data_directory(data_dir)
     try:
         pointer = relative_file(root, f"packs/{family}/current.json")
@@ -69,6 +73,9 @@ def installed_pack(
 
 
 def list_packs(data_dir: str | Path | None = None) -> list[dict[str, Any]]:
+    from .packs.keys import FAMILIES
+    from .packs.metadata import read_manifest
+
     root = data_directory(data_dir)
     if not root.exists():
         return []
@@ -100,15 +107,16 @@ def core_pack(data_dir: str | Path | None = None) -> Path:
         root = data_directory(data_dir)
     except DataNotInstalledError as exc:
         raise DataNotInstalledError("thereabouts data install core") from exc
-    pointer = relative_file(root, "packs/core/current.json")
-    if not pointer.exists():
-        # Old installers used the reverse family. Discover that pointer too;
-        # the native opener then reports the incompatible format explicitly.
-        legacy = relative_file(root, "packs/reverse/current.json")
-        if legacy.exists():
-            return installed_pack(root)
-        raise DataNotInstalledError("thereabouts data install core")
     try:
+        pointer = relative_file(root, "packs/core/current.json")
+        if not pointer.exists():
+            # The old pointer is sufficient to diagnose incompatibility; do not load v1.
+            legacy = relative_file(root, "packs/reverse/current.json")
+            if legacy.exists():
+                raise errors.IncompatibleDataError(
+                    "Legacy reverse data requires a format-2 core pack"
+                )
+            raise DataNotInstalledError("thereabouts data install core")
         value = parse(pointer.read_bytes())
         path = relative_file(root, string(value["path"]))
         digest = sha256(path / "manifest.json")

@@ -10,41 +10,41 @@
     "iterations": 20000,
     "coordinate_vectors": 65,
     "seed": 20261003,
-    "pack_bytes": 4498416
+    "pack_bytes": 4498635
   },
-  "open_seconds": 0.0031077500025276095,
-  "open_rss_delta_bytes": 1097728,
+  "open_seconds": 0.0029504999984055758,
+  "open_rss_delta_bytes": 1048576,
   "cache_hot": {
     "points": 20000,
-    "scalar_median_us": 7.417,
-    "scalar_p99_us": 8.041,
-    "reverse_columns_points_per_second": 754773.9454316051,
+    "scalar_median_us": 7.584,
+    "scalar_p99_us": 8.25,
+    "reverse_columns_points_per_second": 763474.1448462022,
     "reverse_columns_repeats": [
-      750844.690986482,
-      754773.9454316051,
-      752223.7426432954,
-      756746.8613382104,
-      757063.1620909007,
-      757977.7159384436,
-      753460.039246313
+      757984.8976888969,
+      762459.0768415825,
+      768087.2648201325,
+      766226.0430779664,
+      765633.264417793,
+      763474.1448462022,
+      762287.1255367569
     ]
   },
   "random": {
     "points": 100000,
     "scalar_median_us": 4.417,
-    "scalar_p99_us": 37.541,
-    "reverse_columns_points_per_second": 417682.95716796536,
+    "scalar_p99_us": 36.333,
+    "reverse_columns_points_per_second": 426340.7540523758,
     "reverse_columns_repeats": [
-      412797.62118614535,
-      414451.3654011148,
-      417682.95716796536,
-      414359.84768939286,
-      422599.196987938,
-      422455.33272415976,
-      422734.9689983277
+      415574.6283381637,
+      408821.3424861365,
+      398229.4051761884,
+      428623.16889998957,
+      427218.29093327693,
+      426340.7540523758,
+      427607.78328170447
     ]
   },
-  "peak_rss_bytes": 124911616,
+  "peak_rss_bytes": 140132352,
   "historical_reader": {
     "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",

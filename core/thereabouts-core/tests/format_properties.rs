@@ -60,3 +60,60 @@ proptest! {
         prop_assert!(verify::verify(temp.path()).is_err());
     }
 }
+
+proptest! {
+    #[test]
+    fn structural_corruption_is_rejected_even_with_matching_checksums(
+        mutation in 0_usize..6, invalid_key in 19608_u16..=u16::MAX
+    ) {
+        use thereabouts_core::format::{Pack, container::uint};
+        let source=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/packs/core-synthetic");
+        let temp=tempfile::tempdir().unwrap();
+        for entry in std::fs::read_dir(&source).unwrap() {
+            let entry=entry.unwrap();
+            std::fs::copy(entry.path(),temp.path().join(entry.file_name())).unwrap();
+        }
+        let mut manifest=manifest::read(temp.path()).unwrap();
+        let kind=if mutation<4 { "cells" } else { "catalogue" };
+        let file=manifest.files.iter_mut().filter(|f| f.kind==kind).max_by_key(|f| f.size).unwrap();
+        let path=temp.path().join(&file.path);
+        let mut bytes=std::fs::read(&path).unwrap();
+        let query=if kind=="cells" {
+            let directory=usize::try_from(uint(&bytes,40,8).unwrap()).unwrap();
+            let block=u32::try_from(uint(&bytes,directory,4).unwrap()).unwrap();
+            address::cell_at(block,0).unwrap().to_string()
+        } else { "8860140001fffff".into() };
+        match mutation {
+            0 => bytes[0]^=1,
+            1 => bytes[40..48].copy_from_slice(&u64::MAX.to_le_bytes()),
+            2 => {
+                let keys=usize::try_from(uint(&bytes,72,8).unwrap()).unwrap();
+                bytes[keys..keys+2].copy_from_slice(&invalid_key.to_le_bytes());
+            },
+            3 => {
+                let dictionary=usize::try_from(uint(&bytes,136,8).unwrap()).unwrap();
+                bytes[dictionary+12..dictionary+16].copy_from_slice(&64_u32.to_le_bytes());
+            },
+            4 => {
+                let offsets=usize::try_from(uint(&bytes,72,8).unwrap()).unwrap();
+                bytes[offsets..offsets+8].copy_from_slice(&1_u64.to_le_bytes());
+            },
+            _ => {
+                let strings=usize::try_from(uint(&bytes,104,8).unwrap()).unwrap();
+                bytes[strings]=255;
+            }
+        }
+        std::fs::write(&path,&bytes).unwrap();
+        file.sha256=manifest::digest(&path).unwrap();
+        std::fs::write(temp.path().join("manifest.json"),serde_json::to_vec(&manifest).unwrap()).unwrap();
+        let checked=std::panic::catch_unwind(|| Pack::open(temp.path(),true));
+        prop_assert!(checked.is_ok());
+        prop_assert!(checked.unwrap().is_err());
+        let verified=std::panic::catch_unwind(|| verify::verify(temp.path()));
+        prop_assert!(verified.is_ok());
+        prop_assert!(verified.unwrap().is_err());
+        let lazy=std::panic::catch_unwind(|| Pack::open(temp.path(),false).and_then(|pack| pack.from_h3(&query,true)));
+        prop_assert!(lazy.is_ok());
+        prop_assert!(lazy.unwrap().is_err());
+    }
+}

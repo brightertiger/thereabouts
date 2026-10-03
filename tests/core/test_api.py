@@ -84,7 +84,9 @@ def test_public_exports_and_keyword_coordinates() -> None:
 
 def test_closed_and_batch_lifecycle() -> None:
     geo = Geocoder(SAMPLE)
-    results = geo.reverse_many([(50.85, 4.35), (52.36, 4.9)])
+    results = geo.reverse_many(
+        [{"lat": 50.85, "lon": 4.35}, {"lat": 52.36, "lon": 4.9}]
+    )
     next(results)
     geo.close()
     geo.close()
@@ -121,7 +123,11 @@ def test_columns_strides_null_masks_and_order() -> None:
     lon = np.array([4.3517, 0, 4.9041, 0, 6.1319, 0, 0, 0])[::2]
     with Geocoder(SAMPLE) as geo:
         columns = geo.reverse_columns(lat, lon)
-        results = list(geo.reverse_many(zip(lat, lon, strict=True)))
+        results = list(
+            geo.reverse_many(
+                {"lat": a, "lon": b} for a, b in zip(lat, lon, strict=True)
+            )
+        )
         assert text_column(columns, "status") == [r.status for r in results]
         assert text_column(columns, "country_code") == [
             r.country.code if r.country else None for r in results

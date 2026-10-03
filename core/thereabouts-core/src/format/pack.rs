@@ -39,7 +39,9 @@ struct CatalogueSource {
 /// Concurrent pack handle. Open checks inventories; lookups validate accessed payloads.
 #[derive(Debug)]
 pub struct Pack {
+    /// Validated release identity and policy used when projecting results.
     pub manifest: Manifest,
+    /// Published side-table rows; runtime indexes refer to these rows.
     pub metadata: Metadata,
     pub(crate) metadata_index: MetadataIndex,
     blocks: BTreeMap<u32, BlockSource>,
@@ -59,14 +61,20 @@ impl Pack {
         };
         let mut metadata = None;
         let mut catalogues = Vec::new();
-        let mut place_count = 0;
+        let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
         for file in &manifest.files {
             let path = manifest::artifact_path(root, &file.path)?;
             match file.kind.as_str() {
                 "catalogue" => {
                     let shard = FileShard::open(&path, 2, &[80, 8, 1])?;
-                    let end = place_count + shard.len(0)? / 80;
+                    let end = place_count
+                        .checked_add(shard.len(0)? / 80)
+                        .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
+                    ensure(
+                        u32::try_from(end).is_ok(),
+                        "Catalogue exceeds u32 references",
+                    )?;
                     catalogues.push(CatalogueSource {
                         first: place_count,
                         end,

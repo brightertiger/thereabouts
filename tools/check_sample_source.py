@@ -43,6 +43,10 @@ def check() -> dict[str, Any]:
                 )
                 checked += 1
                 continue
+            stored = result.evidence.stored_cell
+            assert stored is not None
+            assert h3.get_resolution(stored) >= h3.get_resolution(row["h3"])
+            assert h3.cell_to_parent(stored, h3.get_resolution(row["h3"])) == row["h3"]
             assert result.evidence.country_id == row["country_id"], case["id"]
             assert result.evidence.state_id == row["state_id"], case["id"]
             assert result.evidence.city_id == row["city_id"], case["id"]

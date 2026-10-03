@@ -1,6 +1,6 @@
 """Reproducibly subset read-only golden data and export a core sample.
 
-Run from the repository root: uv run python tools/build_sample_pack.py.
+Run: uv run python -m tools.build_sample_pack --golden /path/to/data/golden.
 Benelux rows are taken from all r3 blocks intersecting a conservatively buffered
 continental bounding box. Six additional complete r3 blocks cover Paris,
 Istanbul, Mumbai, Delhi, Springfield (Illinois) and a distant-nearest Montana
@@ -25,7 +25,6 @@ from thereabouts import _core
 from tools.sample_evidence import extract
 
 ROOT = Path(__file__).resolve().parents[1]
-GOLDEN = Path("/Users/ujjwal/Downloads/solo/thereabouts/data/golden")
 CENTRES = {
     "Paris": (48.8566, 2.3522),
     "Istanbul": (41.0082, 28.9784),
@@ -70,7 +69,16 @@ def subset(source: Path, output: Path) -> dict[str, Any]:
         path = output / name
         path.parent.mkdir(parents=True, exist_ok=True)
         pq.write_table(
-            pa.Table.from_pylist(rows, schema=schema), path, compression="zstd"
+            pa.Table.from_pylist(rows, schema=schema),
+            path,
+            compression="zstd",
+            compression_level=3,
+            version="2.6",
+            data_page_version="1.0",
+            row_group_size=65536,
+            use_dictionary=True,
+            write_statistics=True,
+            store_schema=True,
         )
         tables.append(
             dict(
@@ -210,6 +218,17 @@ def subset(source: Path, output: Path) -> dict[str, Any]:
         + "\n"
     )
     return {
+        "subset_writer": {
+            "pyarrow": pa.__version__,
+            "parquet_version": "2.6",
+            "compression": "zstd",
+            "compression_level": 3,
+            "data_page_version": "1.0",
+            "row_group_size": 65536,
+            "use_dictionary": True,
+            "write_statistics": True,
+            "store_schema": True,
+        },
         "golden_manifest_sha256": sha(source / "manifest.json"),
         "files": inputs,
         "benelux_bounds": [48.8, 1.7, 54.1, 8],
@@ -226,7 +245,7 @@ def subset(source: Path, output: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--golden", type=Path, default=GOLDEN)
+    parser.add_argument("--golden", type=Path, required=True)
     parser.add_argument(
         "--output", type=Path, default=ROOT / "tests/fixtures/packs/core-sample"
     )

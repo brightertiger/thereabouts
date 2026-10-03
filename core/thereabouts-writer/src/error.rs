@@ -5,18 +5,25 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("{0}")]
+    /// Dataset fields, policy, options or staging state are invalid.
     Input(String),
     #[error(transparent)]
+    /// A shared encoder or verifier rejected the generated or existing pack.
     Core(#[from] thereabouts_core::Error),
     #[error(transparent)]
+    /// Source, staging or output filesystem access failed.
     Io(#[from] std::io::Error),
     #[error(transparent)]
+    /// Dataset or options JSON is invalid.
     Json(#[from] serde_json::Error),
     #[error(transparent)]
+    /// A required input table could not be decoded.
     Parquet(#[from] parquet::errors::ParquetError),
     #[error(transparent)]
+    /// A typed dataset column could not be interpreted.
     Arrow(#[from] arrow_schema::ArrowError),
     #[error(transparent)]
+    /// The bounded staging index could not complete an operation.
     Sql(#[from] rusqlite::Error),
 }
 impl Error {

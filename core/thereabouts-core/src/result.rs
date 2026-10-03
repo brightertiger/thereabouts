@@ -85,67 +85,104 @@ impl Match {
 /// Geographic degrees, rounded only when stored as a catalogue microdegree point.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Point {
+    /// Latitude in geographic degrees.
     pub lat: f64,
+    /// Longitude in geographic degrees.
     pub lon: f64,
 }
 /// Country metadata from the dataset, with nullable alpha-3.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Country {
+    /// Published two-letter country code.
     pub code: String,
+    /// Published alpha-3 code, or null when unavailable.
     pub code3: Option<String>,
+    /// Country display name from the place catalogue.
     pub name: String,
 }
 /// Published subdivision code and name.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct State {
+    /// Published subdivision code, falling back to the place code only if no row exists.
     pub code: Option<String>,
+    /// Subdivision table name, falling back only when the row is absent.
     pub name: String,
 }
 /// Final canonical city or rural settlement; zero population becomes null.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct City {
+    /// Stable canonical city or final rural-settlement identity.
     pub id: String,
+    /// Published canonical display name; never reconstructed by the client.
     pub name: String,
+    /// English name when the dataset supplies one.
     pub name_en: Option<String>,
+    /// Published settlement class such as city, town or village.
     pub kind: String,
+    /// Published population, with unknown zero represented as null.
     pub population: Option<u32>,
+    /// Published catalogue anchor, independent of the query cell centre.
     pub point: Option<Point>,
 }
 /// Published nearest-distance interval; no exact distance is inferred.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DistanceBand {
+    /// Exclusive lower policy bound in kilometres.
     pub greater_than_km: f64,
+    /// Inclusive upper policy bound in kilometres.
     pub at_most_km: f64,
 }
 /// Audit details are omitted unless explicitly requested.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Evidence {
+    /// Stored pack ancestor, possibly split by a timezone boundary.
     pub stored_cell: Option<String>,
+    /// Country catalogue identity behind the spatial label.
     pub country_id: Option<String>,
+    /// Subdivision catalogue identity behind the spatial label.
     pub state_id: Option<String>,
+    /// Final city or settlement identity behind the spatial label.
     pub city_id: Option<String>,
+    /// Original golden assignment method, when a city is assigned.
     pub city_method: Option<String>,
+    /// Published land or offshore eligibility marker.
     pub land_method: Option<String>,
+    /// Detailed matched or not-found reason without changing public status.
     pub reason: Option<String>,
+    /// Unresolved zone survivors after country narrowing; empty for a unique zone.
     pub timezones: Vec<String>,
+    /// Source identifiers published in the city catalogue evidence.
     pub source_ids: Option<serde_json::Value>,
 }
 /// One detached lookup answer, serialized identically by every binding.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct LookupResult {
+    /// Typed outcome; misses and invalid query values are ordinary results.
     pub status: Status,
+    /// Domain of the answer; reverse uses cell.
     pub kind: Kind,
+    /// Published spatial method, absent for misses and invalid inputs.
     pub r#match: Option<Match>,
+    /// Flat country context for an unambiguous match.
     pub country: Option<Country>,
+    /// Flat subdivision context, using indexed metadata.
     pub state: Option<State>,
+    /// Final published canonical city or rural settlement.
     pub city: Option<City>,
+    /// Single country-valid zone; unresolved overlap stays in evidence.
     pub timezone: Option<String>,
+    /// Representative query-cell centre for reverse lookups.
     pub point: Option<Point>,
+    /// Canonical query H3 cell; coarse inputs retain their own resolution.
     pub cell: Option<String>,
+    /// Published nearest-policy interval, absent for contained results.
     pub distance_band: Option<DistanceBand>,
+    /// Ranked forward candidates; reverse always leaves this empty.
     pub candidates: Vec<Self>,
+    /// Forward ranking rule, absent for reverse lookups.
     pub rank_basis: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
+    /// Opt-in audit fields, omitted from JSON when not requested.
     pub evidence: Option<Evidence>,
 }
 impl LookupResult {

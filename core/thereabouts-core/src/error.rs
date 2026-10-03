@@ -5,20 +5,28 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("thereabouts data install core")]
+    /// No pack was discovered in the store; bindings present the install command.
     Missing,
     #[error("Pack not found: {0}")]
+    /// The explicitly selected directory does not exist.
     PackNotFound(std::path::PathBuf),
     #[error("{0}")]
+    /// The pack requires another format, family or required feature.
     Incompatible(String),
     #[error("{0}")]
+    /// Wire structure, reference or checksum validation failed.
     Corrupt(String),
     #[error("Geocoder is closed")]
+    /// A binding handle has been explicitly closed.
     Closed,
     #[error("{0}")]
+    /// An internal codec caller supplied an invalid encoding value.
     Input(String),
     #[error(transparent)]
+    /// An inventoried pack file could not be read.
     Io(#[from] std::io::Error),
     #[error(transparent)]
+    /// Pack JSON could not be parsed without losing its structure.
     Json(#[from] serde_json::Error),
 }
 impl Error {

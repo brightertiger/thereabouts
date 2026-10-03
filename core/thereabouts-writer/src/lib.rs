@@ -21,7 +21,7 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.1.1";
+const WRITER_REVISION: &str = "0.1.2";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -32,6 +32,7 @@ use thereabouts_core::format::{
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Options {
+    /// Explicit release label; the writer never guesses a dataset version.
     pub data_version: String,
     /// Parent for both the exclusive stage and SQLite file; omitted from pack identity.
     #[serde(default, skip_serializing)]
@@ -40,12 +41,16 @@ pub struct Options {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub allow_missing_tables: Vec<String>,
     #[serde(default)]
+    /// Source descriptions retained verbatim in the pack manifest.
     pub sources: Value,
     #[serde(default)]
+    /// Human-readable credit for the included sources.
     pub attribution: String,
     #[serde(default)]
+    /// Named license or dataset notices emitted as inventoried artifacts.
     pub notices: BTreeMap<String, String>,
     #[serde(default)]
+    /// Original input digests and subset policy when exporting a derived sample.
     pub input_provenance: Value,
 }
 /// Export a core pack atomically. Repeated identical requests verify and return.
