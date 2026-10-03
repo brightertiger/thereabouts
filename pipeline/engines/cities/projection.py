@@ -11,26 +11,26 @@ from pipeline.config.engines import EngineLimits
 from pipeline.engines.cells.offshore import Offshore
 from pipeline.engines.cells.windows import areas, envelopes, expanded
 from pipeline.engines.reconcile.land import Land
+from thereabouts.format import BLOCK_RESOLUTION
 
 
 def project(
     source: tuple[Path, float] | None,
     coordinates: NDArray[np.float64],
     offshore: NDArray[np.bool_],
-    limits: EngineLimits | None = None,
+    limits: EngineLimits,
 ) -> NDArray[np.float64]:
-    limits = limits or EngineLimits()
     result = coordinates.copy()
     groups: dict[str, list[int]] = {}
     for i in np.flatnonzero(offshore):
         y, x = coordinates[i]
-        groups.setdefault(h3.latlng_to_cell(y, x, 3), []).append(int(i))
+        groups.setdefault(h3.latlng_to_cell(y, x, BLOCK_RESOLUTION), []).append(int(i))
     if not groups:
         return result
     if source is None:
         raise ValueError("Offshore city normalization requires verified land input")
     path, cutoff = source
-    land = Land(path)
+    land = Land(path, limits)
     try:
         for indices in groups.values():
             points = coordinates[indices]

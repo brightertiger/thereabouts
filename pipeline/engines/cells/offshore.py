@@ -10,7 +10,6 @@ from numpy.typing import NDArray
 from scipy.spatial import cKDTree
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.config.engines import EngineLimits
 from pipeline.engines.reconcile.spatial import EARTH_M
 
 from .geometry import Floats, Ints
@@ -21,7 +20,7 @@ class Offshore:
         self,
         shapes: list[BaseGeometry],
         owner_bounds: Floats,
-        batch_rows: int = EngineLimits.offshore_batch_rows,
+        batch_rows: int,
     ) -> None:
         self.batch_rows = batch_rows
         left, right, owners = [], [], []

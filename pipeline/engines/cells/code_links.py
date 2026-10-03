@@ -42,7 +42,7 @@ class CodeIndex:
         self.names: dict[tuple[str, str], set[str]] = {}
         self.geonames: dict[str, set[str]] = {}
         for cc, path in inputs.paths.items():
-            db = connect(path, readonly=True)
+            db = connect(path, readonly=True, cache_kib=inputs.limits.sqlite_cache_kib)
             try:
                 for identity, role, data in db.execute(
                     "SELECT id,role,data FROM entities "
@@ -141,7 +141,7 @@ def linked_rows(
     index: CodeIndex | None = None,
     phone: PhoneCountries | None = None,
 ) -> Iterator[Row]:
-    for row in rows(path):
+    for row in rows(path, inputs.limits.source_batch_rows):
         cc = row.get("country_code", row.get("territory"))
         country_id = f"country:{cc}" if cc in countries else None
         options: list[str] = []

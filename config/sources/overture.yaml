@@ -8,9 +8,10 @@ upstream:
 licence:
   id: ODbL-1.0
   url: https://opendatacommons.org/licenses/odbl/1-0/
-  attribution: overture
+  attribution: © OpenStreetMap contributors, Overture Maps Foundation
 limits:
-  download_bytes: 5113075498
+  # Two retained releases of capacity; current pinned bytes: 5,113,075,498.
+  download_bytes: 10226150996
 options:
   index_bytes: 1000000000
   sqlite_cache_kib: 32768

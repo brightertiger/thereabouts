@@ -20,14 +20,20 @@ def boundary_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Row
     """
     result = []
     aliases = engine.policy["countries"].get(cc, {}).get("identity_aliases", {})
-    db = connect(engine.index_path, readonly=True)
+    db = connect(
+        engine.index_path, readonly=True, cache_kib=engine.limits.sqlite_cache_kib
+    )
     try:
         for blob, metadata in db.execute(
             "SELECT geometry,data FROM boundaries ORDER BY id"
         ):
             boundary = unpack(metadata)
             shape = shapely.from_wkb(blob)
-            cells = sorted(h3.geo_to_cells(shape.__geo_interface__, 8))
+            cells = sorted(
+                h3.geo_to_cells(
+                    shape.__geo_interface__, comparison.before.grid.cell_resolution
+                )
+            )
             before, after = comparison.query(cells)
             selected = [
                 i

@@ -5,6 +5,9 @@ from pathlib import Path
 import h3
 import shapely
 
+from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cells.schemas import CELLS
 from pipeline.engines.cities.evaluate import Comparison
@@ -12,7 +15,6 @@ from pipeline.engines.cities.gates import failures
 from pipeline.engines.cities.quality import neighbour_checks
 from pipeline.engines.reconcile.common import Row, connect
 from pipeline.engines.reconcile.spatial import create_areas, insert_area
-from pipeline.engines.storage import parquet
 from tests.test_city_normalization import city, make_engine
 
 
@@ -22,7 +24,7 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
     engine = make_engine(
         tmp_path, [city("town", 0, 20000), city("large", 0.08, 1000000)], []
     )
-    db = connect(engine.source)
+    db = connect(engine.source, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = shapely.box(-0.02, -0.02, 0.06, 0.02)
     insert_area(db, "town", "city", 0, shape.wkb, shape.bounds, "test")
@@ -47,7 +49,9 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
         1024,
     )
     table.update(kind="cells", block=root, path=str(tmp_path / table["path"]))
-    comparison = Comparison(Cells([table]), {"ZZ": engine}, False)
+    comparison = Comparison(
+        Cells([table], grid=H3(), limits=EngineLimits()), {"ZZ": engine}, False
+    )
     report = neighbour_checks(comparison, "ZZ", engine, {"ZZ": {"town": "Town"}})[0]
     assert not report["accepted_city_footprint"]
     assert report["source_area_ids"]
@@ -62,7 +66,7 @@ def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> Non
 
     engine = make_engine(tmp_path, [city("town", 0, 20000)], [])
     shape = shapely.box(-0.01, -0.01, 0.01, 0.01)
-    db = connect(engine.index_path)
+    db = connect(engine.index_path, cache_kib=EngineLimits().sqlite_cache_kib)
     db.execute("CREATE TABLE boundaries(id INT,geometry BLOB,data BLOB)")
     db.execute(
         "INSERT INTO boundaries VALUES(1,?,?)",
@@ -97,12 +101,16 @@ def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> Non
             ]
             return before, after
 
-    report = boundary_checks(ChangedComparison(Cells([]), {}, False), "ZZ", engine)[0]
+    report = boundary_checks(
+        ChangedComparison(Cells([], grid=H3(), limits=EngineLimits()), {}, False),
+        "ZZ",
+        engine,
+    )[0]
     assert report["after"]["expected"] > report["before"]["expected"]
     assert report["lost_cells"] == 1
     assert report["lost_to"] == {"other": 1}
     # A reviewed identity alias must not hide the old owner's lost cells.
-    db = connect(engine.index_path)
+    db = connect(engine.index_path, cache_kib=EngineLimits().sqlite_cache_kib)
     db.execute(
         "UPDATE boundaries SET data=?",
         (
@@ -119,7 +127,11 @@ def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> Non
     db.commit()
     db.close()
     engine.policy["countries"]["ZZ"] = {"identity_aliases": {"town": "canonical"}}
-    aliased = boundary_checks(ChangedComparison(Cells([]), {}, False), "ZZ", engine)[0]
+    aliased = boundary_checks(
+        ChangedComparison(Cells([], grid=H3(), limits=EngineLimits()), {}, False),
+        "ZZ",
+        engine,
+    )[0]
     assert aliased["before"]["expected"] == 1
     assert aliased["lost_cells"] == 1
     assert aliased["before_owner_ids"] == ["canonical", "town"]

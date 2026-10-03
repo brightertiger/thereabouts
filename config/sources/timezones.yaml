@@ -11,7 +11,8 @@ licence:
   attribution: Per-file source attribution and licence identifiers are retained in
     pins.lock and every normalized row.
 limits:
-  download_bytes: 89226948
+  # Two retained releases of capacity; current pinned bytes: 89,226,948.
+  download_bytes: 178453896
 options:
   boundary_file: timezones-with-oceans.shapefile.zip
   names_file: timezone-names-with-oceans.json

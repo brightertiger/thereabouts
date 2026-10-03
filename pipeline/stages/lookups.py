@@ -8,13 +8,13 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from pipeline.engines import query
+from pipeline.engines.artifact_io import file_record, parquet
 from pipeline.engines.cells import joins
 from pipeline.engines.cells.code_links import CodeIndex, linked_rows
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.phone import PhoneCountries
 from pipeline.engines.cells.schemas import strings
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import file_record, parquet
 from pipeline.runtime.jsonio import Object, atomic_output, write_json
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Recipe
@@ -55,6 +55,8 @@ def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
         {},
         {},
         set(codes),
+        grid=ctx.config.h3,
+        limits=ctx.config.engines.limits,
     )
     index = CodeIndex(inputs)
     phone = None
@@ -64,7 +66,8 @@ def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
                 located(ctx.root, p["path"])
                 for p in manifest["partitions"]
                 if p["kind"] == "phone_metadata"
-            ]
+            ],
+            ctx.config.engines.limits.source_batch_rows,
         )
     schema = pq.read_schema(original)
     for field in [
@@ -120,7 +123,7 @@ def spatial(ctx: Context, unit: Unit, root: Path, kind: str) -> list[Path]:
         db.read_parquet([str(located(ctx.root, p["path"])) for p in parts]).create_view(
             "source"
         )
-        joins.assignments(db, groups)
+        joins.assignments(db, groups, ctx.config.h3)
         sql = """SELECT s.*, a.country_id,a.state_id,a.city_id,
           a.cell_country_code, coalesce(a.cell_status,'unlocated') AS cell_status,
           CASE WHEN s.country_code IS NOT NULL AND a.country_id IS NOT NULL

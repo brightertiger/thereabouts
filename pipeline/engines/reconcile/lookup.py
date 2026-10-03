@@ -84,20 +84,20 @@ class Locator:
         countries: dict[str, Path],
         land: Path,
         policy: Row,
-        limits: EngineLimits | None = None,
+        limits: EngineLimits,
     ) -> None:
-        self.limits = limits or EngineLimits()
+        self.limits = limits
         self.countries = {
-            cc: connect(path, readonly=True) for cc, path in countries.items()
+            cc: connect(path, readonly=True, cache_kib=limits.locator_cache_kib)
+            for cc, path in countries.items()
         }
         self.bounds = {}
         for cc, db in self.countries.items():
-            db.execute(f"PRAGMA cache_size=-{self.limits.locator_cache_kib}")
             self.bounds[cc] = db.execute(
                 "SELECT xmin,xmax,ymin,ymax FROM area_bounds r "
                 "JOIN areas a ON a.id=r.id WHERE a.role='country'"
             ).fetchall()
-        self.land = Land(land)
+        self.land = Land(land, limits)
         self.policy = policy
 
     def close(self) -> None:

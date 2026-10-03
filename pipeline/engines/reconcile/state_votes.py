@@ -8,8 +8,6 @@ from collections import Counter
 import numpy as np
 import shapely
 
-from pipeline.config.engines import EngineLimits
-
 from .common import Row
 from .spatial import decode
 
@@ -18,7 +16,7 @@ def votes(
     db: sqlite3.Connection,
     identity: str,
     policy: Row,
-    batch_rows: int = EngineLimits.state_vote_batch_rows,
+    batch_rows: int,
 ) -> Row:
     counts: Counter[str] = Counter()
     seen: set[str] = set()

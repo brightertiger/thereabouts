@@ -10,7 +10,7 @@ from .engine import Engine
 
 
 def rows(engine: Engine, batch_rows: int) -> Iterator[Row]:
-    db = connect(engine.source, readonly=True)
+    db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     canonical = set(engine.ids)
     try:
         # A bounded temporary aggregate avoids a point query per catalogue entity.

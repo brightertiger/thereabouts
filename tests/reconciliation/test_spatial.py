@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import shapely
 
+from pipeline.config.engines import EngineLimits
 from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.land import Land
 from pipeline.engines.reconcile.spatial import (
@@ -18,7 +19,7 @@ from pipeline.engines.reconcile.spatial import (
 
 def test_offshore_cutoff_overlap_holes_and_dateline(tmp_path: Path) -> None:
     path = tmp_path / "land.sqlite"
-    db = connect(path)
+    db = connect(path, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     for i, geometry in enumerate(
         [
@@ -34,7 +35,7 @@ def test_offshore_cutoff_overlap_holes_and_dateline(tmp_path: Path) -> None:
         insert_area(db, str(i), "land", 0, geometry.wkb, geometry.bounds, "test")
     db.commit()
     db.close()
-    land = Land(path)
+    land = Land(path, limits=EngineLimits())
     try:
         degree = math.degrees(1 / EARTH_M)
         assert land.project(-0.05, 0, 1000) == (-0.05, 0, "land", 0.0)
@@ -53,13 +54,13 @@ def test_spherical_distance_is_not_a_fixed_degree_buffer(
     tmp_path: Path, latitude: float
 ) -> None:
     path = tmp_path / "land.sqlite"
-    db = connect(path)
+    db = connect(path, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = shapely.box(-1, latitude - 0.1, 0, latitude + 0.1)
     insert_area(db, "l", "land", 0, shape.wkb, shape.bounds, "test")
     db.commit()
     db.close()
-    land = Land(path)
+    land = Land(path, limits=EngineLimits())
     try:
         x = math.degrees(900 / EARTH_M) / math.cos(math.radians(latitude))
         value = land.project(x, latitude, 1000)

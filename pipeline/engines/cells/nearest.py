@@ -17,8 +17,8 @@ from .geometry import Floats, Ints
 
 
 class Nearest:
-    def __init__(self, path: Path) -> None:
-        db = connect(path, readonly=True)
+    def __init__(self, path: Path, limits: EngineLimits) -> None:
+        db = connect(path, readonly=True, cache_kib=limits.sqlite_cache_kib)
         try:
             records = db.execute(
                 "SELECT DISTINCT entity,x,y FROM points ORDER BY entity,x,y"
@@ -77,11 +77,10 @@ class Nearest:
 _cache: Cache[tuple[Path, int, int], Nearest] = Cache()
 
 
-def nearest(path: Path, limits: EngineLimits | None = None) -> Nearest:
-    limits = limits or EngineLimits()
+def nearest(path: Path, limits: EngineLimits) -> Nearest:
     stamp = path.stat()
     return _cache.get(
         (path, stamp.st_size, stamp.st_mtime_ns),
-        lambda: Nearest(path),
+        lambda: Nearest(path, limits),
         limits.nearest_cache_entries,
     )

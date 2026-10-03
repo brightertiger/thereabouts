@@ -24,12 +24,14 @@ def score(
     if not selected:
         raise ValueError("Development evaluation has no points")
     cells = [
-        h3.latlng_to_cell(float(r["latitude"]), float(r["longitude"]), 8)
+        h3.latlng_to_cell(
+            float(r["latitude"]), float(r["longitude"]), ctx.config.h3.cell_resolution
+        )
         for r in selected
     ]
     engines = Engines(ctx, codes, policy, cities.urban(ctx))
     before, after = Comparison(
-        Cells(base, ctx.config.engines.limits),
+        Cells(base, ctx.config.engines.limits, grid=ctx.config.h3),
         engines,
         policy["town_radius"]["enabled"],
     ).query(cells)
@@ -42,7 +44,9 @@ def score(
         }
         if not ids:
             continue
-        db = connect(path, readonly=True)
+        db = connect(
+            path, readonly=True, cache_kib=ctx.config.engines.limits.sqlite_cache_kib
+        )
         try:
             for identity in ids:
                 row = db.execute(

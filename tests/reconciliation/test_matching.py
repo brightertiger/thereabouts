@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
 from pipeline.engines.reconcile.classification import trusted_city
 from pipeline.engines.reconcile.common import connect
@@ -26,9 +27,9 @@ def test_ambiguous_name_does_not_merge_and_shared_id_wins(tmp_path: Path) -> Non
         divisions=[],
         areas=[],
     )
-    db = connect(tmp_path / "catalog.sqlite")
+    db = connect(tmp_path / "catalog.sqlite", cache_kib=EngineLimits().sqlite_cache_kib)
     try:
-        prepare_catalog(db, root)
+        prepare_catalog(db, root, EngineLimits().source_batch_rows)
         row = place("ov", "Springfield", 0.0005, 0, source="overture")
         linked, method, _, issue = link(db, row, policy())
         assert linked is None and method == "unlinked" and issue

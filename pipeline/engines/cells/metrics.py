@@ -8,7 +8,7 @@ import duckdb
 from h3.api import basic_int as h3
 
 from pipeline.config.engines import EngineLimits
-from pipeline.config.schema import Resources
+from pipeline.config.schema import H3, Resources
 from pipeline.engines.reconcile.common import Row
 
 
@@ -25,6 +25,8 @@ def measure(
     cells: list[Row],
     resources: Resources,
     limits: EngineLimits,
+    *,
+    grid: H3,
 ) -> Row:
     if not places or not cells:
         return {"status": "no places or cells yet"}
@@ -39,12 +41,16 @@ def measure(
         ).create_view("places")
         db.read_parquet([p["path"] for p in cells]).create_view("cells")
         pentagons = ",".join(
-            str(c) for level in range(3, 9) for c in h3.get_pentagons(level)
+            str(c)
+            for level in range(grid.block_resolution, grid.cell_resolution + 1)
+            for c in h3.get_pentagons(level)
         )
         db.execute(f"""CREATE VIEW weighted AS SELECT *,
             CASE WHEN h3_uint64 IN ({pentagons})
-            THEN (5 * (7::BIGINT ** (8-h3_resolution)::INTEGER) + 1) / 6
-            ELSE 7::BIGINT ** (8-h3_resolution)::INTEGER END::BIGINT AS fine
+            THEN (5 * (7::BIGINT **
+              ({grid.cell_resolution}-h3_resolution)::INTEGER) + 1) / 6
+            ELSE 7::BIGINT ** ({grid.cell_resolution}-h3_resolution)::INTEGER
+            END::BIGINT AS fine
             FROM cells""")
         filters = {
             "eligible": "true",

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
 from pipeline.engines.reconcile.common import connect, unpack
-from tests.reconcile.conftest import reconciled
+from tests.reconciliation.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
@@ -28,7 +29,7 @@ def test_division_english_name_survives_blank_area_name(tmp_path: Path) -> None:
         areas=[area("country", "Country", "country", (0, 0, 1, 1)), state],
     )
     path = reconciled(tmp_path, root, "ZZ", policy())
-    db = connect(path, readonly=True)
+    db = connect(path, readonly=True, cache_kib=EngineLimits().sqlite_cache_kib)
     try:
         entity = unpack(
             db.execute("SELECT data FROM entities WHERE role='state'").fetchone()[0]
@@ -78,7 +79,7 @@ def test_gb_whole_layer_and_ph_province_equivalent_city(tmp_path: Path) -> None:
         selected = policy()
         selected["rollups"] = []
         path = reconciled(tmp_path, root, cc, selected)
-        db = connect(path, readonly=True)
+        db = connect(path, readonly=True, cache_kib=EngineLimits().sqlite_cache_kib)
         try:
             states = {
                 unpack(r[0])["name"]

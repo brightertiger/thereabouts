@@ -5,12 +5,14 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
+from pipeline.config.schema import H3
 from pipeline.engines.cells.code_links import CodeIndex, linked_rows
 from pipeline.engines.cells.inputs import Inputs
-from tests.reconcile.conftest import reconciled
+from tests.reconciliation.conftest import reconciled
 
-from ..reconcile.conftest import area, write_inputs
+from ..reconciliation.conftest import area, write_inputs
 
 
 def test_retained_district_aliases_join_without_guessing_ambiguous_names(
@@ -29,7 +31,9 @@ def test_retained_district_aliases_join_without_guessing_ambiguous_names(
         ],
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
-    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"})
+    inputs = Inputs(
+        {"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"}, grid=H3(), limits=EngineLimits()
+    )
     index = CodeIndex(inputs)
     path = tmp_path / "codes.parquet"
     pq.write_table(
@@ -79,7 +83,7 @@ def test_subdivision_can_identify_a_separately_represented_territory(
         root = write_inputs(tmp_path / cc, geonames=[], divisions=[], areas=[shape])
         output = reconciled(tmp_path, root, cc, configured)
         paths[cc] = {"path": str(output)}
-    index = CodeIndex(Inputs(paths, {}, {}))
+    index = CodeIndex(Inputs(paths, {}, {}, grid=H3(), limits=EngineLimits()))
     matched, _ = index.subdivision(
         {"country_code": "ZZ", "code_system": "ISO-3166-2", "code": "ZZ-YY"}
     )
@@ -108,7 +112,9 @@ def test_source_qualified_aliases_preserve_type_scope_and_ambiguity(
         ],
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
-    inputs = Inputs({"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"})
+    inputs = Inputs(
+        {"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"}, grid=H3(), limits=EngineLimits()
+    )
     index = CodeIndex(inputs)
     path = tmp_path / "codes.parquet"
     cases = [

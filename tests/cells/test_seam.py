@@ -7,6 +7,7 @@ import pytest
 import shapely
 from h3.api import basic_int as h3
 
+from pipeline.config.engines import EngineLimits
 from pipeline.engines.cells.planning import Dependencies
 from pipeline.engines.cells.seam import oracle
 from pipeline.engines.cells.windows import envelopes
@@ -23,7 +24,7 @@ def test_seam_and_poles_match_every_scalar_centre(
     original, paths = synthetic
     land_path = paths["ZZ"].with_name("land.sqlite")
     for path, role in ((paths["ZZ"], "country"), (land_path, "land")):
-        db = connect(path)
+        db = connect(path, cache_kib=EngineLimits().sqlite_cache_kib)
         try:
             db.execute("DELETE FROM area_bounds")
             db.execute("DELETE FROM areas")
@@ -49,7 +50,7 @@ def test_seam_and_poles_match_every_scalar_centre(
         finally:
             db.close()
     cells, coordinates = descendants(h3.latlng_to_cell(latitude, 179.99, 3), 8)
-    with Locator(paths, land_path, original.policy) as scalar:
+    with Locator(paths, land_path, original.policy, limits=EngineLimits()) as scalar:
         reference = oracle(scalar, paths, coordinates)
         labels = label_block(reference, cells, coordinates, 8)
         assert np.array_equal(labels, reference.labels(coordinates))

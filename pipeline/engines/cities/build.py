@@ -5,8 +5,8 @@ from pathlib import Path
 import shapely
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.artifact_io import file_record, parquet
 from pipeline.engines.reconcile.common import Row, check_database, connect, encode, pack
-from pipeline.engines.storage import file_record, parquet
 from pipeline.runtime.jsonio import atomic_output, write_json
 
 from .candidates import candidates, divisions
@@ -146,7 +146,7 @@ def build_country(
             out.commit()
         finally:
             out.close()
-        check_database(temporary)
+        check_database(temporary, limits.sqlite_cache_kib)
     rows = []
     for identity, c in sorted(cities.items()):
         refs = [

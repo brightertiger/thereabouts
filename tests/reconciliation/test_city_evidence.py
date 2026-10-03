@@ -5,11 +5,12 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
 from pipeline.engines.reconcile.common import connect, unpack
 from pipeline.engines.reconcile.lookup import Locator
 from pipeline.engines.reconcile.spatial import create_areas, insert_area
-from tests.reconcile.conftest import reconciled
+from tests.reconciliation.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
@@ -50,13 +51,13 @@ def test_ward_container_and_independent_suburb(
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
-    db = connect(land)
+    db = connect(land, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = area("land", "Land", "land", (0, 0, 2, 2))
     insert_area(db, "land", "land", 0, shape["geometry"], (0, 0, 2, 2), "test")
     db.commit()
     db.close()
-    with Locator({"ZZ": output}, land, policy()) as locator:
+    with Locator({"ZZ": output}, land, policy(), limits=EngineLimits()) as locator:
         assert locator.locate(0.50001, 0.50001)["city"]["geonames_id"] == "1"
         assert locator.locate(0.7, 0.7)["city"]["geonames_id"] == "2"
         db = locator.countries["ZZ"]
@@ -78,7 +79,7 @@ def test_country_catalogue_without_claiming_a_polygon(tmp_path: Path) -> None:
         areas=[],
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
-    db = connect(output, readonly=True)
+    db = connect(output, readonly=True, cache_kib=EngineLimits().sqlite_cache_kib)
     try:
         value = unpack(
             db.execute("SELECT data FROM entities WHERE id='country:ZZ'").fetchone()[0]
@@ -139,7 +140,7 @@ def test_region_requires_exact_city_identity(
         ],
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
-    db = connect(output, readonly=True)
+    db = connect(output, readonly=True, cache_kib=EngineLimits().sqlite_cache_kib)
     try:
         from pipeline.engines.reconcile.lookup import choose_city, covering
 
@@ -193,12 +194,12 @@ def test_shared_city_footprint_beats_unlinked_town_and_keeps_linked_town(
     )
     output = reconciled(tmp_path, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
-    db = connect(land)
+    db = connect(land, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = area("land", "Land", "land", (0, 0, 1, 1))
     insert_area(db, "land", "land", 0, shape["geometry"], (0, 0, 1, 1), "test")
     db.commit()
     db.close()
-    with Locator({"ZZ": output}, land, policy()) as locator:
+    with Locator({"ZZ": output}, land, policy(), limits=EngineLimits()) as locator:
         assert locator.locate(0.2, 0.2)["city"]["geonames_id"] == "1"
         assert locator.locate(0.7, 0.7)["city"]["geonames_id"] == "2"

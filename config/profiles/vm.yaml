@@ -6,3 +6,6 @@ resources:
   duckdb_threads: 1
   workers: 1
   rss_limit: 2000000000
+
+storage:
+  gcs_raw: gs://pyofflinegeocoder-summer-sector-488705-m8/raw

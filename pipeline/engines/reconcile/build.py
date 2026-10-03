@@ -53,7 +53,7 @@ def build_country(
     policy: Row,
     limits: EngineLimits,
 ) -> Path:
-    state = state_policy(root, country, policy)
+    state = state_policy(root, country, policy, limits.source_batch_rows)
     with atomic_output(output) as temp:
         shutil.copyfile(source, temp)
         db = connect(temp, cache_kib=limits.sqlite_cache_kib)
@@ -62,7 +62,7 @@ def build_country(
             create_areas(db)
             fallback_points(db, country, policy)
             overture_points(db, country, policy)
-            assign_areas(db, root, country, policy, state)
+            assign_areas(db, root, country, policy, state, limits.source_batch_rows)
             ensure_country(db, country, policy)
             attach_parents(db, policy, limits.state_vote_batch_rows)
             db.execute(
@@ -72,5 +72,5 @@ def build_country(
             db.commit()
         finally:
             db.close()
-        check_database(temp)
+        check_database(temp, limits.sqlite_cache_kib)
     return output

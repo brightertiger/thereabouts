@@ -5,6 +5,8 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from pipeline.engines.cells.code_links import linked_rows
 from pipeline.engines.cells.inputs import Inputs
 
@@ -22,7 +24,7 @@ def test_shared_phone_code_does_not_claim_unique_place_before_all_countries_read
         ),
         path,
     )
-    inputs = Inputs({"US": {}}, {}, {}, {"US", "CA"})
+    inputs = Inputs({"US": {}}, {}, {}, {"US", "CA"}, grid=H3(), limits=EngineLimits())
     first = list(linked_rows(path, "phone_prefixes", inputs, {"US"}, {}))
     assert first[0]["link_status"] == "pending"
     assert first[0]["place_id"] is None
@@ -49,7 +51,7 @@ def test_subdivision_namespaces_and_non_geographic_phone_service(
         ),
         path,
     )
-    inputs = Inputs({"ZZ": {}}, {}, {}, {"ZZ"})
+    inputs = Inputs({"ZZ": {}}, {}, {}, {"ZZ"}, grid=H3(), limits=EngineLimits())
     values = list(
         linked_rows(
             path,

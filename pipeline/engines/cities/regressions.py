@@ -12,7 +12,7 @@ from .evaluate import Comparison
 def audit(comparison: Comparison, country: str, engine: Engine) -> list[Row]:
     reference = read_json(EVALUATION / "cities/regressions.json")
     result = []
-    db = connect(engine.source, readonly=True)
+    db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     try:
         for probe in reference["points"]:
             if probe["country"] != country:
@@ -25,7 +25,9 @@ def audit(comparison: Comparison, country: str, engine: Engine) -> list[Row]:
                     {"probe": probe, "error": "missing acquired GeoNames point"}
                 )
                 continue
-            cell = h3.latlng_to_cell(point[1], point[0], 8)
+            cell = h3.latlng_to_cell(
+                point[1], point[0], comparison.before.grid.cell_resolution
+            )
             before, after = comparison.query([cell])
             identity = "city:geonames:" + probe["id"]
             target = engine.parts.get(identity, identity)

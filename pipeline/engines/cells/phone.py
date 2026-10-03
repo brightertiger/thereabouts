@@ -11,12 +11,12 @@ from pipeline.engines.reconcile.common import Row, rows
 
 
 class PhoneCountries:
-    def __init__(self, paths: list[Path]) -> None:
+    def __init__(self, paths: list[Path], batch_rows: int) -> None:
         self.patterns: dict[
             str, tuple[str, regex.Pattern[str], regex.Pattern[str] | None]
         ] = {}
         for path in paths:
-            for row in rows(path):
+            for row in rows(path, batch_rows):
                 tree = ET.fromstring(row["metadata_xml"])
                 # Geographic descriptions describe fixed-line areas, not shared
                 # mobile/service allocations in generalDesc.

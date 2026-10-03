@@ -3,11 +3,11 @@
 from pathlib import Path
 from typing import cast
 
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cities import build, mapping, schemas
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.urban import Urban
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import parquet
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
@@ -15,6 +15,7 @@ from . import engine_io as io
 from . import parameters as unit_parameters
 from .contract import Context, Unit
 from .engine_data import Geography, countries, source_manifest
+from .reconcile import country_policy
 
 
 def urban(ctx: Context) -> Urban:
@@ -31,13 +32,15 @@ def engine(
     source = io.artifact(ctx, "reconcile", "country/" + cc, suffix=".sqlite")
     physical = None
     if land:
-        from .reconcile import country_policy
-
         physical = (
             io.artifact(ctx, "reconcile", "land/world", suffix=".sqlite"),
-            country_policy(source)["offshore_m"],
+            country_policy(source, ctx.config.engines.limits.sqlite_cache_kib)[
+                "offshore_m"
+            ],
         )
-    return Engine(index, source, centres, policy, physical, ctx.config.engines.limits)
+    return Engine(
+        index, source, centres, policy, physical, limits=ctx.config.engines.limits
+    )
 
 
 def run(ctx: Context, unit: Unit) -> list[Path]:

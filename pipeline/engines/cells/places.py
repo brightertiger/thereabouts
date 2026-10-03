@@ -9,8 +9,8 @@ from pathlib import Path
 from pipeline.engines.reconcile.common import Row, connect, encode, unpack
 
 
-def entities(path: Path, policy: Row) -> Iterator[Row]:
-    db = connect(path, readonly=True)
+def entities(path: Path, policy: Row, cache_kib: int) -> Iterator[Row]:
+    db = connect(path, readonly=True, cache_kib=cache_kib)
     try:
         country_row = db.execute(
             "SELECT data FROM entities WHERE role='country' ORDER BY id LIMIT 1"

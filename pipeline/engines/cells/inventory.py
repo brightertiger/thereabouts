@@ -23,6 +23,7 @@ def inventory(
     policy: Row,
     resources: Resources,
     limits: EngineLimits,
+    kinds: dict[str, str],
 ) -> Row:
     records: list[tuple[str, float, float, float, float]] = []
     expected: set[str] = set()
@@ -40,11 +41,11 @@ def inventory(
                     "WHERE country_code IS NOT NULL"
                 ).fetchall()
             )
-            if source == "geonames":
+            if kinds[source] == "places_and_names":
                 continue
             condition = (
                 "subtype IN ('country','dependency')"
-                if source == "overture"
+                if kinds[source] == "divisions"
                 else "admin_level='ADM0'"
             )
             reader = db.execute(
@@ -53,10 +54,10 @@ def inventory(
             ).to_arrow_reader(limits.source_batch_rows)
             for batch in reader:
                 for row in batch.to_pylist():
-                    if source == "overture" and not default_perspective(row):
+                    if kinds[source] == "divisions" and not default_perspective(row):
                         continue
                     if (
-                        source == "geoboundaries"
+                        kinds[source] == "administrative_areas"
                         and row["license"] not in policy["compatible_gb_licenses"]
                     ):
                         continue
@@ -69,7 +70,12 @@ def inventory(
 
 
 def index(
-    path: Path, value: Row, policy: Row, resolution: H3, selected: list[str]
+    path: Path,
+    value: Row,
+    policy: Row,
+    resolution: H3,
+    selected: list[str],
+    limits: EngineLimits,
 ) -> None:
     dependencies = Dependencies(value, policy["offshore_m"])
     roots = (
@@ -100,4 +106,4 @@ def index(
                 json.loads(countries)
         finally:
             db.close()
-        check_database(temporary)
+        check_database(temporary, limits.sqlite_cache_kib)

@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from pipeline.config import Config
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cells import build as cells
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.schemas import CELLS
@@ -12,7 +13,6 @@ from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.schemas import MAPPING
 from pipeline.engines.cities.urban import Urban
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import parquet
 from pipeline.runtime.jsonio import sha256_file
 
 
@@ -30,7 +30,8 @@ def base_cells(
         {"path": str(physical)},
         policy,
         {"MY"},
-        config.engines.limits,
+        limits=config.engines.limits,
+        grid=config.h3,
     )
     rows, counts = cells.build(int(block, 16), inputs, ["MY"], exhaustive=True)
     path = output / "base.parquet"

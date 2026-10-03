@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import shapely
 
+from pipeline.config.engines import EngineLimits
 from pipeline.engines.reconcile.common import Row, connect, pack
 from pipeline.engines.reconcile.entities import add_point, create_entities, save_entity
 from pipeline.engines.reconcile.lookup import Locator
@@ -15,7 +16,10 @@ from pipeline.engines.reconcile.spatial import create_areas, insert_area
 @pytest.fixture
 def synthetic(tmp_path: Path) -> Iterator[tuple[Locator, dict[str, Path]]]:
     path, land_path = tmp_path / "ZZ.sqlite", tmp_path / "land.sqlite"
-    db, land = connect(path), connect(land_path)
+    db, land = (
+        connect(path, cache_kib=EngineLimits().sqlite_cache_kib),
+        connect(land_path, cache_kib=EngineLimits().sqlite_cache_kib),
+    )
     create_areas(db)
     create_areas(land)
     create_entities(db)
@@ -76,5 +80,10 @@ def synthetic(tmp_path: Path) -> Iterator[tuple[Locator, dict[str, Path]]]:
     db.close()
     land.close()
     paths = {"ZZ": path}
-    with Locator(paths, land_path, {"offshore_m": 1000, "nearest_m": 50000}) as locator:
+    with Locator(
+        paths,
+        land_path,
+        {"offshore_m": 1000, "nearest_m": 50000},
+        limits=EngineLimits(),
+    ) as locator:
         yield locator, paths

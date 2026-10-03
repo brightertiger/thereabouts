@@ -201,7 +201,7 @@ class Oracle:
             )
             if not len(selected):
                 continue
-            _, first, second = nearest(path).query(
+            _, first, second = nearest(path, self.locator.limits).query(
                 points[selected], self.locator.policy["nearest_m"]
             )
             r, cutoff = radius[selected], self.locator.policy["nearest_m"]

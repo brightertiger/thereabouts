@@ -4,12 +4,13 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
 from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.lookup import Locator
 from pipeline.engines.reconcile.spatial import create_areas, insert_area
 from pipeline.runtime.jsonio import sha256_file
-from tests.reconcile.conftest import reconciled
+from tests.reconciliation.conftest import reconciled
 
 from .conftest import area, place, write_inputs
 
@@ -37,13 +38,13 @@ def test_nested_population_separate_state_and_resumption(tmp_path: Path) -> None
     )
     output = reconciled(workspace, root, "ZZ", policy())
     land = tmp_path / "land.sqlite"
-    db = connect(land)
+    db = connect(land, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = area("land", "land", "land", (0, 0, 2, 2))
     insert_area(db, "land", "land", 0, shape["geometry"], (0, 0, 2, 2), "test")
     db.commit()
     db.close()
-    with Locator({"ZZ": output}, land, policy()) as oracle:
+    with Locator({"ZZ": output}, land, policy(), limits=EngineLimits()) as oracle:
         result = oracle.locate(0.51, 0.51)
         assert result["city"]["name"] == "City"
         assert result["state"]["name"] == "State"

@@ -46,7 +46,7 @@ def build_land(
                     print(f"land {index + 1}/{len(paths)}", flush=True)
         finally:
             db.close()
-        check_database(temp)
+        check_database(temp, limits.sqlite_cache_kib)
     return output
 
 
@@ -107,8 +107,8 @@ def nearest_spherical(wkb: bytes, x: float, y: float) -> tuple[float, float, flo
 
 
 class Land:
-    def __init__(self, path: Path) -> None:
-        self.db = connect(path, readonly=True)
+    def __init__(self, path: Path, limits: EngineLimits) -> None:
+        self.db = connect(path, readonly=True, cache_kib=limits.sqlite_cache_kib)
 
     def close(self) -> None:
         self.db.close()

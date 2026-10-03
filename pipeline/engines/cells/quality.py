@@ -20,7 +20,9 @@ def display_names(inputs: Inputs, answer: Row) -> Row:
     cc = (answer.get("country_id") or "").removeprefix("country:")
     if cc not in inputs.paths:
         return {}
-    db = connect(inputs.paths[cc], readonly=True)
+    db = connect(
+        inputs.paths[cc], readonly=True, cache_kib=inputs.limits.sqlite_cache_kib
+    )
     try:
         return {
             role: entity(db, answer[role + "_id"])["name"]
@@ -36,7 +38,7 @@ def named(reader: Reader, inputs: Inputs) -> list[Row]:
     fixtures = json.loads((EVALUATION / "reconcile/fixtures.json").read_text())
     output = []
     for label, lat, lon, cc, city, state in fixtures:
-        cell = h3.latlng_to_cell(lat, lon, 8)
+        cell = h3.latlng_to_cell(lat, lon, inputs.grid.cell_resolution)
         answer = reader.lookup(cell)
         names = display_names(inputs, answer)
         code = (answer.get("country_id") or "").removeprefix("country:")
@@ -60,7 +62,9 @@ def named(reader: Reader, inputs: Inputs) -> list[Row]:
 
 
 def settlements(reader: Reader, inputs: Inputs, country: str) -> Row:
-    db = connect(inputs.paths[country], readonly=True)
+    db = connect(
+        inputs.paths[country], readonly=True, cache_kib=inputs.limits.sqlite_cache_kib
+    )
     counts: Counter[str] = Counter()
     failures = []
     try:
@@ -74,7 +78,9 @@ def settlements(reader: Reader, inputs: Inputs, country: str) -> Row:
             (inputs.policy["minimum_population"],),
         ):
             place = unpack(data)
-            cell = h3.latlng_to_cell(place["latitude"], place["longitude"], 8)
+            cell = h3.latlng_to_cell(
+                place["latitude"], place["longitude"], inputs.grid.cell_resolution
+            )
             answer = reader.lookup(cell)
             counts["total"] += 1
             if answer["cell_status"] == "pending":
@@ -121,7 +127,7 @@ def probes(reader: Reader, inputs: Inputs) -> list[Row]:
     points = json.loads((EVALUATION / "cells/probes.json").read_text())
     output = []
     for label, lat, lon in points:
-        cell = h3.latlng_to_cell(lat, lon, 8)
+        cell = h3.latlng_to_cell(lat, lon, inputs.grid.cell_resolution)
         answer = reader.lookup(cell)
         names = display_names(inputs, answer)
         output.append(
@@ -137,7 +143,7 @@ def probes(reader: Reader, inputs: Inputs) -> list[Row]:
 
 
 def evaluate(cells: list[Row], inputs: Inputs) -> Row:
-    reader = Cells(cells)
+    reader = Cells(cells, inputs.limits, grid=inputs.grid)
     countries = {}
     totals: Counter[str] = Counter()
     for cc in sorted(inputs.countries):

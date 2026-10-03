@@ -8,6 +8,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
+from pipeline.config import load
 from pipeline.engines.normalize_cells.score import normalized_name
 from pipeline.evaluation.score import score
 from pipeline.runtime.jsonio import write_json
@@ -89,6 +90,7 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
             points,
             "holdout",
             tmp_path / "holdout-score.json",
+            config=load(),
         )
     assert (
         score(
@@ -97,6 +99,7 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
             points,
             "dev",
             tmp_path / "dev-score.json",
+            config=load(),
         )["counts"]["correct"]
         == 0
     )
@@ -108,6 +111,7 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
         points,
         "holdout",
         tmp_path / "holdout-score.json",
+        config=load(),
     )
     assert result["counts"]["total"] == result["counts"]["correct"] == 1
     assert (
@@ -117,6 +121,7 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
             points,
             "holdout",
             tmp_path / "holdout-score.json",
+            config=load(),
         )
         == result
     )
@@ -129,6 +134,7 @@ def test_holdout_requires_final_snapshot_and_cannot_be_retuned(tmp_path: Path) -
             points,
             "holdout",
             tmp_path / "holdout-score.json",
+            config=load(),
         )
 
 

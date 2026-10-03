@@ -11,6 +11,7 @@ from pipeline.engines.cells.quality import display_names
 from pipeline.engines.reconcile.common import Row, connect
 
 from .boundary_checks import boundary_checks
+from .diagnostic import checks
 from .engine import Engine
 from .evaluate import Comparison, measure
 from .regressions import audit
@@ -23,7 +24,11 @@ def footprint_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Ro
     for fp in engine.footprints:
         if fp["city_id"] not in large:
             continue
-        cells = sorted(h3.geo_to_cells(fp["geometry"].__geo_interface__, 8))
+        cells = sorted(
+            h3.geo_to_cells(
+                fp["geometry"].__geo_interface__, comparison.before.grid.cell_resolution
+            )
+        )
         before, after = comparison.query(cells)
         # Border/coastal membership is tested only for eligible same-country cells.
         chosen = [
@@ -43,7 +48,7 @@ def footprint_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Ro
 def urban_checks(
     comparison: Comparison, cc: str, engine: Engine, urban: Urban
 ) -> list[Row]:
-    db = connect(engine.source, readonly=True)
+    db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     try:
         borders = [
             shapely.from_wkb(b)
@@ -57,7 +62,12 @@ def urban_checks(
         db.close()
     result = []
     for index in sorted(indices):
-        cells = sorted(h3.geo_to_cells(urban.shapes[index].__geo_interface__, 8))
+        cells = sorted(
+            h3.geo_to_cells(
+                urban.shapes[index].__geo_interface__,
+                comparison.before.grid.cell_resolution,
+            )
+        )
         before, after = comparison.query(cells)
         chosen = [
             i for i, r in enumerate(before) if r.get("country_id") == f"country:{cc}"
@@ -85,14 +95,18 @@ def neighbour_checks(
                 {"city_id": identity, "name": name, "error": "missing canonical city"}
             )
             continue
-        cell = h3.latlng_to_cell(city["latitude"], city["longitude"], 8)
+        cell = h3.latlng_to_cell(
+            city["latitude"], city["longitude"], comparison.before.grid.cell_resolution
+        )
         before, after = comparison.query([cell])
         patch = sorted(h3.grid_disk(cell, 4))
         pb, pa = comparison.query(patch)
         # Inspect original source polygons even if normalization rejected them.
         # Otherwise rejecting a town's footprint could hide the very regression
         # this independent neighbour check is meant to expose.
-        db = connect(engine.source, readonly=True)
+        db = connect(
+            engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib
+        )
         try:
             source_areas = db.execute(
                 "SELECT id,geometry FROM areas WHERE entity=? AND role='city'",
@@ -104,7 +118,10 @@ def neighbour_checks(
             {
                 c
                 for _, blob in source_areas
-                for c in h3.geo_to_cells(shapely.from_wkb(blob).__geo_interface__, 8)
+                for c in h3.geo_to_cells(
+                    shapely.from_wkb(blob).__geo_interface__,
+                    comparison.before.grid.cell_resolution,
+                )
             }
         )
         ob, oa = comparison.query(owned)
@@ -142,7 +159,9 @@ def named_checks(comparison: Comparison, inputs: Inputs) -> list[Row]:
     fixtures = json.loads((EVALUATION / "reconcile/fixtures.json").read_text())
     result = []
     for label, lat, lon, cc, target, *_ in [*probes, *fixtures]:
-        before, after = comparison.query([h3.latlng_to_cell(lat, lon, 8)])
+        before, after = comparison.query(
+            [h3.latlng_to_cell(lat, lon, comparison.before.grid.cell_resolution)]
+        )
         names = display_names(inputs, after[0])
         passed = (
             after[0].get("city_id") == target
@@ -167,8 +186,6 @@ def named_checks(comparison: Comparison, inputs: Inputs) -> list[Row]:
 def country_report(
     comparison: Comparison, cc: str, engine: Engine, urban: Urban, probes: Row
 ) -> Row:
-    from .diagnostic import checks
-
     return {
         "diagnostic": checks(comparison, engine),
         "plan_regressions": audit(comparison, cc, engine),

@@ -10,6 +10,7 @@ licence:
   url: https://creativecommons.org/licenses/by/4.0/
   attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
 limits:
-  download_bytes: 44700758
+  # Two retained releases of capacity; current pinned bytes: 44,700,758.
+  download_bytes: 89401516
 options: {}
 options_schema: pipeline.config.source_options.Text

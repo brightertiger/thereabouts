@@ -8,6 +8,7 @@ import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 from numpy.typing import NDArray
 
+from pipeline.config.schema import H3
 from pipeline.engines.cells.compaction import compact
 from pipeline.engines.cells.reader import interval
 from pipeline.engines.cities.engine import Engine
@@ -17,12 +18,14 @@ from pipeline.engines.reconcile.common import Row
 FIELDS = ("country_id", "state_id", "city_id", "city_method", "land_method")
 
 
-def expand(record: Row) -> tuple[NDArray[np.uint64], NDArray[np.float64], list[Row]]:
-    fine, coordinates = descendants(int(record["block"], 16), 8)
+def expand(
+    record: Row, grid: H3
+) -> tuple[NDArray[np.uint64], NDArray[np.float64], list[Row]]:
+    fine, coordinates = descendants(int(record["block"], 16), grid.cell_resolution)
     labels = np.full(len(fine), -1, dtype=np.int64)
     rows = pq.read_table(record["path"]).to_pylist()
     for i, row in enumerate(rows):
-        lo, hi = interval(row["h3_uint64"], row["h3_resolution"])
+        lo, hi = interval(row["h3_uint64"], row["h3_resolution"], grid.cell_resolution)
         a, b = np.searchsorted(fine, [lo, hi], side="left")
         b = int(np.searchsorted(fine, hi, side="right"))
         if (labels[a:b] >= 0).any():
@@ -32,12 +35,12 @@ def expand(record: Row) -> tuple[NDArray[np.uint64], NDArray[np.float64], list[R
 
 
 def transform(
-    record: Row, engines: Mapping[str, Engine], radius: bool
+    record: Row, engines: Mapping[str, Engine], radius: bool, *, grid: H3
 ) -> tuple[list[Row], Row]:
     """Change eligible base cells only; empty ocean blocks need no enumeration."""
     if pq.read_metadata(record["path"]).num_rows == 0:
         return [], {}
-    fine, coordinates, before = expand(record)
+    fine, coordinates, before = expand(record, grid)
     answers = [tuple(row.get(k) for k in FIELDS) for row in before]
     after = list(answers)
     counts: dict[str, Row] = {}
@@ -77,7 +80,7 @@ def transform(
         for i, answer in enumerate(sorted(set(after) - {(None,) * 5}, key=str))
     }
     values = np.array([catalogue.get(a, 0) for a in after], dtype=np.uint64)
-    stored, labels = compact(fine, values)
+    stored, labels = compact(fine, values, grid=grid)
     by_code = {v: k for k, v in catalogue.items()}
     rows = []
     for cell, label in zip(stored, labels, strict=True):
@@ -96,8 +99,8 @@ def transform(
                 "land_method": land,
             }
         )
-    if sum(h3.cell_to_children_size(r["h3_uint64"], 8) for r in rows) != sum(
-        bool(r) for r in before
-    ):
+    if sum(
+        h3.cell_to_children_size(r["h3_uint64"], grid.cell_resolution) for r in rows
+    ) != sum(bool(r) for r in before):
         raise ValueError("Normalization changed land eligibility")
     return rows, counts

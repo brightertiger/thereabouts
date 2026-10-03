@@ -10,7 +10,8 @@ licence:
   attribution: Per-file source attribution and licence identifiers are retained in
     pins.lock and every normalized row.
 limits:
-  download_bytes: 217388877
+  # Two retained releases of capacity; current pinned bytes: 217,388,877.
+  download_bytes: 434777754
 options:
   example_limit: 5
   document_bytes: 64000000

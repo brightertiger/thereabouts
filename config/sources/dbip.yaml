@@ -10,6 +10,7 @@ licence:
   url: https://creativecommons.org/licenses/by/4.0/
   attribution: IP Geolocation by DB-IP https://db-ip.com
 limits:
-  download_bytes: 85827400
+  # Two retained releases of capacity; current pinned bytes: 85,827,400.
+  download_bytes: 171654800
 options: {}
 options_schema: pipeline.config.source_options.Text

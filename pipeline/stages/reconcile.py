@@ -6,10 +6,10 @@ from collections import Counter
 from pathlib import Path
 from typing import cast
 
+from pipeline.engines.artifact_io import file_record
 from pipeline.engines.reconcile import build, catalog, inputs, land, quality
 from pipeline.engines.reconcile.common import Row, connect
 from pipeline.engines.reconcile.lookup import Locator
-from pipeline.engines.storage import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
@@ -26,8 +26,8 @@ def country_paths(ctx: Context, codes: list[str]) -> dict[str, Path]:
     }
 
 
-def country_policy(path: Path) -> Row:
-    db = connect(path, readonly=True)
+def country_policy(path: Path, cache_kib: int) -> Row:
+    db = connect(path, readonly=True, cache_kib=cache_kib)
     try:
         value = db.execute("SELECT data FROM metadata WHERE key='policy'").fetchone()
         if value is None:
@@ -108,7 +108,9 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
     paths = country_paths(ctx, codes)
     physical = io.artifact(ctx, "reconcile", "land/world", suffix=".sqlite")
     if paths:
-        policy = country_policy(next(iter(paths.values())))
+        policy = country_policy(
+            next(iter(paths.values())), ctx.config.engines.limits.sqlite_cache_kib
+        )
     if action == "quality":
         with Locator(paths, physical, policy, ctx.config.engines.limits) as oracle:
             report = quality.country_report(oracle, key, policy)

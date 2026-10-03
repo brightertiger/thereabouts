@@ -66,7 +66,7 @@ def land(
     windows = expanded(bounds, policy["offshore_m"])
     parts = manifest(root, "normalized/osm_land/manifest.json")["partitions"]
     path = output / "land.sqlite"
-    destination = connect(path)
+    destination = connect(path, cache_kib=config.engines.limits.sqlite_cache_kib)
     count = 0
     try:
         create_areas(destination)

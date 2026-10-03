@@ -10,6 +10,7 @@ licence:
   url: https://opendatacommons.org/licenses/pddl/1-0/
   attribution: UNECE; DataHub maintainers
 limits:
-  download_bytes: 7297966
+  # Two retained releases of capacity; current pinned bytes: 7,297,966.
+  download_bytes: 14595932
 options: {}
 options_schema: pipeline.config.source_options.Text

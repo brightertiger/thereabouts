@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 import shapely
 
+from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from tests.test_city_normalization import city, make_engine
 
 
@@ -13,10 +15,10 @@ def test_compact_parent_splits_at_new_boundary(
 ) -> None:
     import h3
 
+    from pipeline.engines.artifact_io import parquet
     from pipeline.engines.cells.reader import Cells
     from pipeline.engines.cells.schemas import CELLS
     from pipeline.engines.normalize_cells.blocks import transform
-    from pipeline.engines.storage import parquet
 
     shape = shapely.box(-0.1, -2, 0.1, 2)
     engine = make_engine(
@@ -54,11 +56,11 @@ def test_compact_parent_splits_at_new_boundary(
     )
     base.update(kind="cells", block=root)
     base["path"] = str(tmp_path / base["path"])
-    rows, _ = transform(base, {"ZZ": engine}, False)
+    rows, _ = transform(base, {"ZZ": engine}, False, grid=H3())
     table = parquet(tmp_path, tmp_path / "normalized.parquet", rows, CELLS, 1024)
     table.update(kind="cells", block=root, path=str(tmp_path / table["path"]))
     assert table["rows"] > 1
-    reader = Cells([table])
+    reader = Cells([table], grid=H3(), limits=EngineLimits())
     for cell in h3.cell_to_children(root, 8):
         y, x = h3.cell_to_latlng(cell)
         expected = "town" if shape.covers(shapely.Point(x, y)) else "village"
@@ -68,9 +70,9 @@ def test_compact_parent_splits_at_new_boundary(
 def test_empty_ocean_block_does_not_enumerate_centres(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    from pipeline.engines.artifact_io import parquet
     from pipeline.engines.cells.schemas import CELLS
     from pipeline.engines.normalize_cells.blocks import transform
-    from pipeline.engines.storage import parquet
 
     def unexpected_enumeration(*args: object) -> None:
         raise AssertionError("An empty base block has no eligible centres")
@@ -80,4 +82,4 @@ def test_empty_ocean_block_does_not_enumerate_centres(
     monkeypatch.setattr(
         "pipeline.engines.normalize_cells.blocks.descendants", unexpected_enumeration
     )
-    assert transform(record, {}, False) == ([], {})
+    assert transform(record, {}, False, grid=H3()) == ([], {})

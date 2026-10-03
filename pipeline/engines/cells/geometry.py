@@ -29,8 +29,7 @@ def _large_geometry(wkb: bytes) -> BaseGeometry:
 _geometries: Cache[bytes, BaseGeometry] = Cache()
 
 
-def geometry(wkb: bytes, limits: EngineLimits | None = None) -> BaseGeometry:
-    limits = limits or EngineLimits()
+def geometry(wkb: bytes, limits: EngineLimits) -> BaseGeometry:
     if len(wkb) >= limits.large_geometry_bytes:
         return _geometries.get(
             wkb, lambda: _large_geometry(wkb), limits.geometry_cache_entries
@@ -60,9 +59,8 @@ _edges: Cache[tuple[bytes, int], STRtree] = Cache()
 def boundaries(
     sources: list[bytes],
     bounds: tuple[float, float, float, float],
-    limits: EngineLimits | None = None,
+    limits: EngineLimits,
 ) -> STRtree:
-    limits = limits or EngineLimits()
     lines = []
     region = shapely.box(*bounds)
     for wkb in sources:

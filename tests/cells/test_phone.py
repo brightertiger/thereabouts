@@ -5,6 +5,8 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from pipeline.engines.cells.code_links import linked_rows
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.phone import PhoneCountries
@@ -29,7 +31,7 @@ def test_numbering_prefixes_keep_overlap_and_missing_evidence(tmp_path: Path) ->
         ),
         metadata,
     )
-    phone = PhoneCountries([metadata])
+    phone = PhoneCountries([metadata], batch_rows=EngineLimits().source_batch_rows)
     path = tmp_path / "prefixes.parquet"
     pq.write_table(
         pa.Table.from_pylist(
@@ -40,7 +42,9 @@ def test_numbering_prefixes_keep_overlap_and_missing_evidence(tmp_path: Path) ->
         ),
         path,
     )
-    inputs = Inputs({"US": {}, "CA": {}}, {}, {}, {"US", "CA"})
+    inputs = Inputs(
+        {"US": {}, "CA": {}}, {}, {}, {"US", "CA"}, grid=H3(), limits=EngineLimits()
+    )
     result = list(
         linked_rows(path, "phone_prefixes", inputs, {"US", "CA"}, {}, phone=phone)
     )

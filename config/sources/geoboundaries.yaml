@@ -11,7 +11,8 @@ licence:
   attribution: geoBoundaries and each layer publisher; see pinned boundaryLicense
     and licenseSource
 limits:
-  download_bytes: 2506890152
+  # Two retained releases of capacity; current pinned bytes: 2,506,890,152.
+  download_bytes: 5013780304
   batch_rows: 2048
   batch_bytes: 16000000
   part_bytes: 60000000

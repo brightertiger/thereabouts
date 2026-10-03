@@ -4,15 +4,17 @@ import duckdb
 import pyarrow as pa
 from h3.api import basic_int as h3
 
+from pipeline.config.schema import H3
 from pipeline.engines.reconcile.common import Row
 
+JOIN_GROUP_RESOLUTION = 1
 PARENT_MASK = ((1 << 64) - 1) ^ (15 << 52)
 
 
 def prepare(db: duckdb.DuckDBPyConnection, cells: list[Row]) -> dict[int, list[str]]:
     groups: dict[int, list[str]] = {}
     for record in cells:
-        parent = h3.cell_to_parent(int(record["block"], 16), 1)
+        parent = h3.cell_to_parent(int(record["block"], 16), JOIN_GROUP_RESOLUTION)
         groups.setdefault(parent, []).append(record["path"])
     ready = pa.table(
         {"root": pa.array([int(r["block"], 16) for r in cells], type=pa.uint64())}
@@ -21,17 +23,22 @@ def prepare(db: duckdb.DuckDBPyConnection, cells: list[Row]) -> dict[int, list[s
     return groups
 
 
-def intervals(db: duckdb.DuckDBPyConnection, paths: list[str]) -> None:
+def intervals(db: duckdb.DuckDBPyConnection, paths: list[str], grid: H3) -> None:
+    trailing_bits = 3 * (15 - grid.cell_resolution)
     db.read_parquet(paths).create_view("cells")
     db.execute(f"""CREATE OR REPLACE TEMP VIEW intervals AS
       SELECT ((h3_uint64 & {PARENT_MASK}::UBIGINT &
         ~((1::UBIGINT << (3 * (15 - h3_resolution::INTEGER))) - 1)) |
-        (8::UBIGINT << 52) | ((1::UBIGINT << 21) - 1)) AS lo,
-      ((h3_uint64 & {PARENT_MASK}::UBIGINT) | (8::UBIGINT << 52)) AS hi,
+        ({grid.cell_resolution}::UBIGINT << 52) |
+        ((1::UBIGINT << {trailing_bits}) - 1)) AS lo,
+      ((h3_uint64 & {PARENT_MASK}::UBIGINT) |
+        ({grid.cell_resolution}::UBIGINT << 52)) AS hi,
       country_id,state_id,city_id FROM cells""")
 
 
-def assignments(db: duckdb.DuckDBPyConnection, groups: dict[int, list[str]]) -> None:
+def assignments(
+    db: duckdb.DuckDBPyConnection, groups: dict[int, list[str]], grid: H3
+) -> None:
     """Sort narrow unique keys once per source, not its full provenance rows.
 
     ASOF selects the greatest lower endpoint; the upper check rejects gaps.
@@ -40,11 +47,12 @@ def assignments(db: duckdb.DuckDBPyConnection, groups: dict[int, list[str]]) -> 
     """
     root = (
         f"((s.h3_uint64 & {PARENT_MASK}::UBIGINT) | "
-        "(3::UBIGINT << 52) | ((1::UBIGINT << 36) - 1))"
+        f"({grid.block_resolution}::UBIGINT << 52) | "
+        f"((1::UBIGINT << {3 * (15 - grid.block_resolution)}) - 1))"
     )
     db.execute(f"""CREATE OR REPLACE TEMP TABLE keys AS SELECT DISTINCT h3_uint64,
-      ((h3_uint64 & {PARENT_MASK}::UBIGINT) | (1::UBIGINT << 52) |
-       ((1::UBIGINT << 42)-1)) AS parent FROM source
+      ((h3_uint64 & {PARENT_MASK}::UBIGINT) | ({JOIN_GROUP_RESOLUTION}::UBIGINT << 52) |
+       ((1::UBIGINT << {3 * (15 - JOIN_GROUP_RESOLUTION)})-1)) AS parent FROM source
        WHERE h3_uint64 IS NOT NULL""")
     db.execute(
         "CREATE OR REPLACE TEMP TABLE assignments(h3_uint64 UBIGINT,"
@@ -62,7 +70,7 @@ def assignments(db: duckdb.DuckDBPyConnection, groups: dict[int, list[str]]) -> 
                 [parent],
             )
             continue
-        intervals(db, paths)
+        intervals(db, paths, grid)
         db.execute(
             f"""INSERT INTO assignments
           SELECT s.h3_uint64,

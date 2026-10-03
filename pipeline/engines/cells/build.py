@@ -29,17 +29,17 @@ def build(
     if not set(countries) <= inputs.countries.keys():
         raise ValueError("A block touching an unfinished country must wait")
     started = time.monotonic()
-    fine, coordinates = descendants(root, 8)
+    fine, coordinates = descendants(root, inputs.grid.cell_resolution)
     paths = {cc: inputs.paths[cc] for cc in countries}
     with Locator(
         paths, Path(inputs.land["path"]), inputs.policy, inputs.limits
     ) as locator:
         oracle = make_oracle(locator, paths, coordinates)
         prepared = time.monotonic()
-        labels = label_block(oracle, fine, coordinates, 8)
+        labels = label_block(oracle, fine, coordinates, inputs.grid.cell_resolution)
         labelled_at = time.monotonic()
         labelled = oracle.labelled_points
-        stored, values = compact(fine, labels)
+        stored, values = compact(fine, labels, grid=inputs.grid)
         production_seconds = time.monotonic() - started
         checks: Row = {}
         if exhaustive:
@@ -56,7 +56,9 @@ def build(
             for cell, expected in zip(fine, direct, strict=True):
                 matches = [
                     ancestor_table[p]
-                    for level in range(3, 9)
+                    for level in range(
+                        inputs.grid.block_resolution, inputs.grid.cell_resolution + 1
+                    )
                     if (p := h3.cell_to_parent(int(cell), level)) in ancestor_table
                 ]
                 if matches != ([int(expected)] if expected else []):

@@ -3,10 +3,10 @@
 from pathlib import Path
 from typing import cast
 
+from pipeline.engines.artifact_io import file_record, parquet
 from pipeline.engines.cells import build, inventory, places, schemas
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import file_record, parquet
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
@@ -21,13 +21,16 @@ def inputs(ctx: Context, codes: list[str], policy: Row) -> Inputs:
     paths = reconcile.country_paths(ctx, codes)
     physical = io.artifact(ctx, "reconcile", "land/world", suffix=".sqlite")
     if paths:
-        policy = reconcile.country_policy(next(iter(paths.values())))
+        policy = reconcile.country_policy(
+            next(iter(paths.values())), ctx.config.engines.limits.sqlite_cache_kib
+        )
     return Inputs(
         {cc: {"path": str(path)} for cc, path in paths.items()},
         {"path": str(physical)},
         policy,
         set(codes),
-        ctx.config.engines.limits,
+        limits=ctx.config.engines.limits,
+        grid=ctx.config.h3,
     )
 
 
@@ -55,11 +58,17 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
                 if row["kind"] == kind
             ]
         value = inventory.inventory(
-            sources, policy, ctx.config.resources, settings.limits
+            sources,
+            policy,
+            ctx.config.resources,
+            settings.limits,
+            {name: ctx.config.sources[name].kind for name in sources},
         )
         destination = located(ctx.root, settings.country_inventory)
         blocks = located(ctx.root, settings.block_index)
-        inventory.index(blocks, value, policy, ctx.config.h3, settings.blocks)
+        inventory.index(
+            blocks, value, policy, ctx.config.h3, settings.blocks, settings.limits
+        )
         write_json(destination, value)
         return [destination, blocks]
     if action == "block":
@@ -82,7 +91,13 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         parquet(
             ctx.root,
             path,
-            places.entities(country_source, reconcile.country_policy(country_source)),
+            places.entities(
+                country_source,
+                reconcile.country_policy(
+                    country_source, settings.limits.sqlite_cache_kib
+                ),
+                settings.limits.sqlite_cache_kib,
+            ),
             schemas.PLACES,
             settings.limits.parquet_batch_rows,
         )

@@ -22,6 +22,7 @@ def test_changed_country_dependencies_and_ocean_blocks(tmp_path: Path) -> None:
             reconcile(),
             load().h3,
             [root, ocean],
+            load().engines.limits,
         )
         db = sqlite3.connect(path)
         try:

@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.engines.artifact_io import file_record
 from pipeline.engines.plate_country.policy import Row, code_key, normalize, policy
 from pipeline.engines.plate_country.resolver import Resolver
 from pipeline.engines.plate_country.syntax import relaxed_pattern, specificity
-from pipeline.engines.storage import file_record
 from pipeline.runtime.jsonio import write_json
 
 

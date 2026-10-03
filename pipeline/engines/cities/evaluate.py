@@ -20,25 +20,34 @@ from pipeline.engines.reconcile.common import Row
 from .engine import Engine
 
 
-def column_block(path: Path) -> tuple[pa.Table, NDArray[np.uint64], NDArray[np.uint64]]:
+def column_block(
+    path: Path, resolution: int
+) -> tuple[pa.Table, NDArray[np.uint64], NDArray[np.uint64]]:
     table = pq.read_table(path)
     keys = table["h3_uint64"].to_numpy().astype(np.uint64)
-    resolution = table["h3_resolution"].to_numpy().astype(np.uint64)
-    mask = (np.uint64(1) << (3 * (15 - resolution))) - np.uint64(1)
-    base = (keys & np.uint64(((1 << 64) - 1) ^ (15 << 52))) | np.uint64(8 << 52)
-    low, high = (base & ~mask) | np.uint64((1 << 21) - 1), base | mask
+    stored_resolution = table["h3_resolution"].to_numpy().astype(np.uint64)
+    mask = (np.uint64(1) << (3 * (15 - stored_resolution))) - np.uint64(1)
+    base = (keys & np.uint64(((1 << 64) - 1) ^ (15 << 52))) | np.uint64(
+        resolution << 52
+    )
+    low, high = (
+        (base & ~mask) | np.uint64((1 << (3 * (15 - resolution))) - 1),
+        base | mask,
+    )
     order = np.argsort(low)
     return table.take(pa.array(order, type=pa.int64())), low[order], high[order]
 
 
 ColumnBlock = tuple[pa.Table, NDArray[np.uint64], NDArray[np.uint64]]
-_columns: Cache[tuple[Path, int, int], ColumnBlock] = Cache()
+_columns: Cache[tuple[Path, int, int, int], ColumnBlock] = Cache()
 
 
 def lookup(reader: Cells, cells: list[str]) -> list[Row]:
     groups: dict[str, list[int]] = {}
     for i, cell in enumerate(cells):
-        groups.setdefault(h3.cell_to_parent(cell, 3), []).append(i)
+        groups.setdefault(
+            h3.cell_to_parent(cell, reader.grid.block_resolution), []
+        ).append(i)
     result: list[Row] = [{} for _ in cells]
     for root, indices in groups.items():
         if root not in reader.blocks:
@@ -48,8 +57,8 @@ def lookup(reader: Cells, cells: list[str]) -> list[Row]:
         path = reader.blocks[root]
         stamp = path.stat()
         table, low, high = _columns.get(
-            (path, stamp.st_size, stamp.st_mtime_ns),
-            partial(column_block, path),
+            (path, stamp.st_size, stamp.st_mtime_ns, reader.grid.cell_resolution),
+            partial(column_block, path, reader.grid.cell_resolution),
             reader.limits.column_cache_entries,
         )
         keys = np.array([int(cells[i], 16) for i in indices], dtype=np.uint64)

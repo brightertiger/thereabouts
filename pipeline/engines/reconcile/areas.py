@@ -20,7 +20,7 @@ from .rollups import selected, targets
 from .spatial import insert_area
 
 
-def state_policy(root: Path, country: str, policy: Row) -> Row:
+def state_policy(root: Path, country: str, policy: Row, batch_rows: int) -> Row:
     if country in policy["no_state"]:
         return {
             "source": None,
@@ -29,7 +29,8 @@ def state_policy(root: Path, country: str, policy: Row) -> Row:
         }
     selected = dict(policy["states"].get(country, policy["default_state"]))
     if selected["source"] == "overture" and not any(
-        r["subtype"] == selected["level"] for r in rows(root / "overture_areas.parquet")
+        r["subtype"] == selected["level"]
+        for r in rows(root / "overture_areas.parquet", batch_rows)
     ):
         return {
             "source": "geoboundaries",
@@ -55,13 +56,18 @@ def _area(
 
 
 def assign_areas(
-    db: sqlite3.Connection, root: Path, country: str, policy: Row, state: Row
+    db: sqlite3.Connection,
+    root: Path,
+    country: str,
+    policy: Row,
+    state: Row,
+    batch_rows: int,
 ) -> None:
     rollups = targets(db, country, policy)
     dominated = dominated_localities(db, policy)
     city_regions = footprints(db, country, policy)
     rolled: dict[str, set[str]] = {}
-    for row in rows(root / "overture_areas.parquet"):
+    for row in rows(root / "overture_areas.parquet", batch_rows):
         if not default_perspective(row):
             continue
         kind = row["subtype"]
@@ -128,7 +134,7 @@ def assign_areas(
                     else "insufficient settlement evidence"
                 )
                 _area(db, row, district, "district")
-    for row in rows(root / "geoboundaries_areas.parquet"):
+    for row in rows(root / "geoboundaries_areas.parquet", batch_rows):
         role = "country" if row["admin_level"] == "ADM0" else None
         if state["source"] == "geoboundaries" and row["admin_level"] == state["level"]:
             role = "state"

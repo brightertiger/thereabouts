@@ -8,6 +8,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import shapely
 
+from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import cities as policy
 from pipeline.engines.cities.candidates import eligible
 from pipeline.engines.cities.engine import Engine
@@ -69,7 +70,13 @@ def make_engine(
         ),
         urban_path,
     )
-    return Engine(path, source, Urban([{"path": str(urban_path)}]), policy())
+    return Engine(
+        path,
+        source,
+        Urban([{"path": str(urban_path)}]),
+        policy(),
+        limits=EngineLimits(),
+    )
 
 
 def city(identity: str, x: float, population: int) -> Row:

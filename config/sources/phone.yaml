@@ -10,6 +10,7 @@ licence:
   url: https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE
   attribution: The Libphonenumber Authors; Google
 limits:
-  download_bytes: 12194851
+  # Two retained releases of capacity; current pinned bytes: 12,194,851.
+  download_bytes: 24389702
 options: {}
 options_schema: pipeline.config.source_options.Text

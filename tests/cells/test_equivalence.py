@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from h3.api import basic_int as h3
 
+from pipeline.config.schema import H3
 from pipeline.engines.cells.compaction import compact
 from pipeline.engines.cells.oracle import Oracle
 from pipeline.engines.cells.reader import interval
@@ -28,7 +29,7 @@ def test_every_finest_centre_equals_independent_scalar_and_compacted_ancestors(
     labels = label_block(oracle, cells, coordinates, 8)
     direct = oracle.labels(coordinates)
     assert np.array_equal(labels, direct)
-    stored, values = compact(cells, labels)
+    stored, values = compact(cells, labels, grid=H3())
     table = dict(zip(stored, values, strict=True))
     for cell, point, value in zip(cells, coordinates, labels, strict=True):
         answer = locator.locate(*point)
@@ -56,17 +57,17 @@ def test_every_finest_centre_equals_independent_scalar_and_compacted_ancestors(
 def test_pentagons_and_integer_ranges_cover_only_actual_descendants(root: int) -> None:
     cells, _ = descendants(root, 8)
     labels = np.ones(len(cells), dtype=np.uint64)
-    stored, values = compact(cells, labels)
+    stored, values = compact(cells, labels, grid=H3())
     assert stored.tolist() == [root]
     assert values.tolist() == [1]
-    lo, hi = interval(root, 3)
+    lo, hi = interval(root, 3, H3().cell_resolution)
     assert all(lo <= int(c) <= hi for c in cells)
     assert len(cells) == h3.cell_to_children_size(root, 8)
     for r in range(3, 9):
         children = h3.cell_to_children(root, r)
         previous = -1
         for child in children:
-            low, high = interval(child, r)
+            low, high = interval(child, r, H3().cell_resolution)
             assert low > previous
             previous = high
 

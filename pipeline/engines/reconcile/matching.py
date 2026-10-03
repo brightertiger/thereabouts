@@ -10,7 +10,7 @@ from .common import Row, encode, key, pack, rows, unpack
 from .spatial import distance
 
 
-def prepare_catalog(db: sqlite3.Connection, root: Path) -> None:
+def prepare_catalog(db: sqlite3.Connection, root: Path, batch_rows: int) -> None:
     db.executescript("""
         CREATE TABLE geonames (id TEXT PRIMARY KEY, class TEXT, code TEXT,
           admin1 TEXT, population INTEGER, x REAL, y REAL, data TEXT);
@@ -20,7 +20,7 @@ def prepare_catalog(db: sqlite3.Connection, root: Path) -> None:
           method TEXT, distance_m REAL, data TEXT, issue TEXT);
         CREATE INDEX gn_xy ON geonames(x,y);
     """)
-    for row in rows(root / "geonames_places.parquet"):
+    for row in rows(root / "geonames_places.parquet", batch_rows):
         db.execute(
             "INSERT INTO geonames VALUES(?,?,?,?,?,?,?,?)",
             (
@@ -45,7 +45,7 @@ def prepare_catalog(db: sqlite3.Connection, root: Path) -> None:
                 if name
             ),
         )
-    for row in rows(root / "geonames_names.parquet"):
+    for row in rows(root / "geonames_names.parquet", batch_rows):
         if not row["is_historic"] and not row["valid_to"]:
             qid = row["name"].rsplit("/", 1)[-1]
             if qid.startswith("Q") and qid[1:].isdigit():
@@ -119,8 +119,10 @@ def default_perspective(row: Row) -> bool:
     return not value or not value.get("includes")
 
 
-def link_divisions(db: sqlite3.Connection, root: Path, policy: Row) -> None:
-    for row in rows(root / "overture_places.parquet"):
+def link_divisions(
+    db: sqlite3.Connection, root: Path, policy: Row, batch_rows: int
+) -> None:
+    for row in rows(root / "overture_places.parquet", batch_rows):
         if not default_perspective(row):
             continue
         linked, method, metres, issue = link(db, row, policy)

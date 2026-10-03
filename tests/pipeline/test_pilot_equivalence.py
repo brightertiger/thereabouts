@@ -9,11 +9,11 @@ import pyarrow.parquet as pq
 import pytest
 
 from pipeline.config import load, policies
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cells.schemas import CELLS
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.urban import Urban
 from pipeline.engines.normalize_cells.blocks import transform
-from pipeline.engines.storage import parquet
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.runtime.resources import workspace_bytes
 
@@ -77,12 +77,12 @@ def test_retained_pilot_bytes(tmp_path: Path) -> None:
         urban,
         city_policy,
         (physical, policy["offshore_m"]),
-        config.engines.limits,
+        limits=config.engines.limits,
     )
     pilot = manifest(root, "work/v2-pilot-blocks/report.json")
     results = []
     for variant, radius in [("off", False), ("on", True)]:
-        rows, counts = transform(record, {COUNTRY: selector}, radius)
+        rows, counts = transform(record, {COUNTRY: selector}, radius, grid=config.h3)
         output = tmp_path / f"{variant}.parquet"
         made = parquet(
             tmp_path, output, rows, CELLS, config.engines.limits.parquet_batch_rows

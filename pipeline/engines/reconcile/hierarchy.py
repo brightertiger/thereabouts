@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import sqlite3
 
-from pipeline.config.engines import EngineLimits
-
 from .common import Row, pack, unpack
 from .spatial import containing
 from .state_codes import state_crosswalk
@@ -14,7 +12,7 @@ from .state_codes import state_crosswalk
 def attach_parents(
     db: sqlite3.Connection,
     policy: Row,
-    batch_rows: int = EngineLimits.state_vote_batch_rows,
+    batch_rows: int,
 ) -> None:
     crosswalk = state_crosswalk(db, policy, batch_rows)
     by_code: dict[str, list[str]] = {}

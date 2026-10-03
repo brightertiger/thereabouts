@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 import sqlite3
 
-from pipeline.config.engines import EngineLimits
-
 from .common import Row, key, unpack
 from .state_votes import votes
 
@@ -14,7 +12,7 @@ from .state_votes import votes
 def state_crosswalk(
     db: sqlite3.Connection,
     policy: Row,
-    batch_rows: int = EngineLimits.state_vote_batch_rows,
+    batch_rows: int,
 ) -> dict[str, Row]:
     # Independent identity-name match against GeoNames ADM1, never infer ISO
     # codes from a numeric GeoNames code. PH province parents use ADM1 region.

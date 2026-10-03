@@ -12,7 +12,7 @@ from .evaluate import Comparison
 
 
 def checks(comparison: Comparison, engine: Engine) -> Row:
-    db = connect(engine.source, readonly=True)
+    db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     try:
         places = [
             unpack(b)
@@ -23,7 +23,12 @@ def checks(comparison: Comparison, engine: Engine) -> Row:
         ]
     finally:
         db.close()
-    cells = [h3.latlng_to_cell(p["latitude"], p["longitude"], 8) for p in places]
+    cells = [
+        h3.latlng_to_cell(
+            p["latitude"], p["longitude"], comparison.before.grid.cell_resolution
+        )
+        for p in places
+    ]
     before, after = comparison.query(cells)
     overrides = read_json(EVALUATION / "cities/diagnostic_expectations.json")[
         "overrides"
@@ -44,7 +49,11 @@ def checks(comparison: Comparison, engine: Engine) -> Row:
                     "name": p["name"],
                     "feature_code": p["feature_code"],
                     "population": p["population"],
-                    "h3": h3.latlng_to_cell(p["latitude"], p["longitude"], 8),
+                    "h3": h3.latlng_to_cell(
+                        p["latitude"],
+                        p["longitude"],
+                        comparison.before.grid.cell_resolution,
+                    ),
                     "expected": expected,
                     "before": b,
                     "after": a,

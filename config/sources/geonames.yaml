@@ -8,9 +8,10 @@ upstream:
 licence:
   id: CC-BY-4.0
   url: https://creativecommons.org/licenses/by/4.0/
-  attribution: geonames
+  attribution: GeoNames
 limits:
-  download_bytes: 629433471
+  # Two retained releases of capacity; current pinned bytes: 629,433,471.
+  download_bytes: 1258866942
   batch_rows: 4096
   chunk_bytes: 67108864
   scalar_bytes: 8

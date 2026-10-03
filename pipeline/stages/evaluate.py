@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import cast
 
 from pipeline.config import policies, reviews
+from pipeline.engines.artifact_io import file_record
 from pipeline.engines.artifacts import EVALUATION, read_json
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.cities.gates import failures, unreviewed
 from pipeline.engines.cities.quality import country_report, named_checks
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import file_record
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
@@ -36,7 +36,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         )
     root = located(ctx.root, ctx.config.paths.work) / "evaluation" / unit.inputs_hash
     tables = io.local(ctx, base["tables"])
-    reader = Cells(tables, ctx.config.engines.limits)
+    reader = Cells(tables, ctx.config.engines.limits, grid=ctx.config.h3)
     centres = cities.urban(ctx)
     engines = Engines(ctx, codes, policy, centres)
     inputs = cells.inputs(ctx, codes, policy)

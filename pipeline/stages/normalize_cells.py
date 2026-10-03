@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 from pipeline.engines import query
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.artifacts import EVALUATION, read_json
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.reader import Cells
@@ -13,7 +14,6 @@ from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.cities.quality import country_report, named_checks
 from pipeline.engines.normalize_cells import blocks, tables
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.storage import parquet
 from pipeline.runtime.jsonio import atomic_output, write_json
 from pipeline.runtime.paths import located
 
@@ -37,7 +37,10 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             ctx, cast(list[str], unit.recipe.parameters["countries"]), policy, centres
         )
         rows, counts = blocks.transform(
-            io.local(ctx, base), engines, policy["town_radius"]["enabled"]
+            io.local(ctx, base),
+            engines,
+            policy["town_radius"]["enabled"],
+            grid=ctx.config.h3,
         )
         path = root / "cells" / f"{key}.parquet"
         record = parquet(ctx.root, path, rows, CELLS, limits.parquet_batch_rows)
@@ -86,10 +89,10 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
                 )
             )
         comparison = Comparison(
-            Cells(views["cells"], limits),
+            Cells(views["cells"], limits, grid=ctx.config.h3),
             {},
             policy["town_radius"]["enabled"],
-            Cells(views["normalize_cells"], limits),
+            Cells(views["normalize_cells"], limits, grid=ctx.config.h3),
         )
         centres = cities.urban(ctx)
         report = country_report(
@@ -100,7 +103,13 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             read_json(EVALUATION / "cities/probes.json"),
         )
         source = io.artifact(ctx, "reconcile", "country/" + key, suffix=".sqlite")
-        inputs = Inputs({key: {"path": str(source)}}, {}, {})
+        inputs = Inputs(
+            {key: {"path": str(source)}},
+            {},
+            {},
+            grid=ctx.config.h3,
+            limits=ctx.config.engines.limits,
+        )
         report["named"] = [
             row for row in named_checks(comparison, inputs) if row["country"] == key
         ]

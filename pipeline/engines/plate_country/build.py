@@ -6,7 +6,8 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.engines.storage import parquet
+from pipeline.engines.artifact_io import file_record, parquet
+from pipeline.engines.reconcile.common import encode
 from pipeline.runtime.jsonio import write_json
 
 from . import formats, priors
@@ -68,8 +69,6 @@ def build(
             pa.field("evidence_json", pa.string(), nullable=False),
         ]
     )
-    from pipeline.engines.reconcile.common import encode
-
     for kind, rows in {
         "formats": grammar,
         "vehicle_priors": stock,
@@ -98,8 +97,6 @@ def build(
         },
     )
     manifest = output / "manifest.json"
-    from pipeline.engines.storage import file_record
-
     write_json(
         manifest,
         {

@@ -15,7 +15,7 @@ runtime, rather than retaining aliases for deleted APIs.
 | Watch loop/disk pause | `tests/pipeline/test_resources.py`, `test_runner.py`; pause/retry, bounded scans and propagation of ordinary failures |
 | Old v0 acquisition/settlement ingestion | Removed production behavior. Frozen fixture builders and scalar reference remain only under `tests/support`; client equivalence fixtures are unchanged. |
 
-The source decision tests under `tests/acquire` retain name/alias classification,
+The source decision tests under `tests/sources` retain name/alias classification,
 lossless geometry splitting, holes, repairs, SHX and publisher counts, ZIP CRC,
 plate parsing, syntax and ambiguity. The shared downloader intentionally resumes
 at verified file boundaries; old HTTP Range/ETag append tests describe a removed

@@ -75,7 +75,7 @@ The manifest records schema version, reference/block resolution, source policy,
 reconciliation and golden builders, country/land hashes and each table's path,
 kind, row count, bytes and SHA256. New golden manifests store artifact paths
 relative to the data root; `data_root` locates that root relative to the manifest's
-directory. `build_data.golden.paths.manifest(path)` resolves them for readers.
+directory. `pipeline.runtime.paths.located(root, path)` resolves workspace-relative records for readers.
 Historical absolute records remain readable. Cell records also name their resolution-3 block.
 The manifest and its companion reports are committed as `golden.manifest/current`.
 Only use its listed files, never glob for a supposedly complete snapshot. Running
@@ -168,7 +168,7 @@ The extra 1e-4 degree margin covers SQLite float32 R-tree rounding. At the date 
 and eastern envelopes; expanded windows wrap at ±180°. Certificates that cross
 the seam or approach a pole refine to the finest centres.
 
-`build_data.golden.reader.Cells` performs ancestor lookup. Never calculate a fresh
+`pipeline.engines.cells.reader.Cells` performs ancestor lookup. Never calculate a fresh
 coarse cell from a coordinate: logical ancestry from the original r8 key is the
 contract. Batched source joins use nonoverlapping integer descendant intervals,
 which include harmless invalid-digit gaps but exactly the valid H3 descendants.

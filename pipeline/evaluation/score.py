@@ -6,7 +6,7 @@ from pathlib import Path
 import duckdb
 import h3
 
-from pipeline.config.loader import load
+from pipeline.config import Config
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cities.evaluate import lookup
@@ -17,7 +17,12 @@ from pipeline.runtime.paths import located
 
 
 def score(
-    root: Path, manifest_path: Path, points: Path, split: str, receipt: Path
+    root: Path,
+    manifest_path: Path,
+    points: Path,
+    split: str,
+    receipt: Path,
+    config: Config,
 ) -> Row:
     if split not in {"dev", "holdout"}:
         raise ValueError("Evaluation split must be dev or holdout")
@@ -45,13 +50,16 @@ def score(
     with points.open(newline="", encoding="utf-8") as stream:
         selected = [r for r in csv.DictReader(stream) if r["split"] == split]
     cells = [
-        h3.latlng_to_cell(float(r["latitude"]), float(r["longitude"]), 8)
+        h3.latlng_to_cell(
+            float(r["latitude"]), float(r["longitude"]), config.h3.cell_resolution
+        )
         for r in selected
     ]
-    answers = lookup(Cells(tables), cells)
+    answers = lookup(Cells(tables, config.engines.limits, grid=config.h3), cells)
     ids = sorted({r["city_id"] for r in answers if r.get("city_id")})
     db = duckdb.connect()
-    db.execute("SET memory_limit=?", [load().resources.duckdb_memory])
+    db.execute("SET memory_limit=?", [config.resources.duckdb_memory])
+    db.execute("SET threads=?", [config.resources.duckdb_threads])
     try:
         db.read_parquet(
             [r["path"] for r in tables if r["kind"] == "places"]

@@ -10,6 +10,7 @@ import h3
 import pyarrow.parquet as pq
 
 from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from pipeline.engines.reconcile.common import Row
 
 
@@ -18,8 +19,9 @@ class Reader(Protocol):
 
 
 class Cells:
-    def __init__(self, tables: list[Row], limits: EngineLimits | None = None) -> None:
-        self.limits = limits or EngineLimits()
+    def __init__(self, tables: list[Row], limits: EngineLimits, *, grid: H3) -> None:
+        self.grid = grid
+        self.limits = limits
         self.blocks = {
             r["block"]: Path(r["path"]) for r in tables if r["kind"] == "cells"
         }
@@ -39,13 +41,20 @@ class Cells:
     def lookup(self, cell: str | None) -> Row:
         if cell is None:
             return {"cell_status": "unlocated"}
-        if not h3.is_valid_cell(cell) or h3.get_resolution(cell) != 8:
-            raise ValueError("Golden lookup requires a resolution-8 H3 cell")
-        root = h3.cell_to_parent(cell, 3)
+        if (
+            not h3.is_valid_cell(cell)
+            or h3.get_resolution(cell) != self.grid.cell_resolution
+        ):
+            raise ValueError(
+                f"Lookup requires H3 resolution {self.grid.cell_resolution}"
+            )
+        root = h3.cell_to_parent(cell, self.grid.block_resolution)
         if root not in self.blocks:
             return {"cell_status": "pending"}
         block = self.block(root)
-        for resolution in range(8, 2, -1):
+        for resolution in range(
+            self.grid.cell_resolution, self.grid.block_resolution - 1, -1
+        ):
             parent = h3.cell_to_parent(cell, resolution)
             if parent in block:
                 row = block[parent]
@@ -56,7 +65,7 @@ class Cells:
         return {"cell_status": "ineligible"}
 
 
-def interval(cell: int, resolution: int) -> tuple[int, int]:
+def interval(cell: int, resolution: int, target_resolution: int) -> tuple[int, int]:
     """Inclusive integer range containing exactly the valid r8 descendants.
 
     Invalid H3 digit strings in the gaps are harmless: all lookup keys are valid.
@@ -64,5 +73,5 @@ def interval(cell: int, resolution: int) -> tuple[int, int]:
     create gaps, never valid descendants of another parent.
     """
     mask = (1 << (3 * (15 - resolution))) - 1
-    base = (cell & ~(15 << 52) & ~mask) | (8 << 52)
-    return base | ((1 << 21) - 1), base | mask
+    base = (cell & ~(15 << 52) & ~mask) | (target_resolution << 52)
+    return base | ((1 << (3 * (15 - target_resolution))) - 1), base | mask

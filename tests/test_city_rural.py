@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import shapely
 
+from pipeline.config.engines import EngineLimits
 from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.spatial import create_areas, insert_area
 from tests.test_city_normalization import city, make_engine
@@ -14,7 +15,7 @@ def test_rejected_area_cannot_survive_as_rural_fallback(tmp_path: Path) -> None:
     engine = make_engine(
         tmp_path, [city("village", 0, 50)], [], shapely.box(10, 10, 11, 11)
     )
-    db = connect(engine.source)
+    db = connect(engine.source, cache_kib=EngineLimits().sqlite_cache_kib)
     create_areas(db)
     shape = shapely.box(-2, -2, 2, 2)
     insert_area(db, "region", "city", 0, shape.wkb, shape.bounds, "test")

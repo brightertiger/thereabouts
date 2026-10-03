@@ -7,13 +7,13 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from pipeline.config import load
-from pipeline.engines.storage import file_record
+from pipeline.engines.artifact_io import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.sources.shared.schemas import SCHEMAS
 from pipeline.stages.contract import Context, make_unit
-from tests.reconcile.conftest import area, place, write_inputs
+from tests.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
 

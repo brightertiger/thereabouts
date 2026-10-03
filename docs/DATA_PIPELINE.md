@@ -395,3 +395,16 @@ DATASET --output REPORT.json --temp-dir SCRATCH [--compare BASELINE.json]`.
 The command reads the dataset and writes only to the explicitly separate report
 and scratch directories. Row order, partitioning and Parquet metadata do not
 change its digest.
+
+Engine grid sizes, batch counts, SQLite caches and DuckDB budgets are supplied
+from configuration. Engines no longer construct fallback limits. The table
+contract still requires H3 resolution 8 and the shared block codec requires 3;
+configuration validation rejects incompatible changes before execution.
+
+Each enabled source's `download_bytes` allows twice the bytes in its retained
+pin. The source YAML records that measured baseline. This is a capacity allowance
+for one release up to twice the retained size, not a prediction of upstream growth;
+review the proposal's sizes before accepting a larger release. Disabled
+`plate_country` remains at zero until its inputs are chosen. The VM profile sets
+`storage.gcs_raw` to the retained raw-mirror bucket; no bucket access was made
+while validating these changes.

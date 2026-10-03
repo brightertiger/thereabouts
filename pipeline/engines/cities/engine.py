@@ -37,14 +37,15 @@ class Engine:
         urban: Urban,
         policy: Row,
         land: tuple[Path, float] | None = None,
-        limits: EngineLimits | None = None,
+        *,
+        limits: EngineLimits,
     ) -> None:
         """Load a committed country index and build its two spatial selectors."""
-        self.limits = limits or EngineLimits()
+        self.limits = limits
         self.index_path = path
         self.land = land
         self.source, self.urban, self.policy = source, urban, policy
-        db = connect(path, readonly=True)
+        db = connect(path, readonly=True, cache_kib=self.limits.sqlite_cache_kib)
         try:
             self.cities = [
                 unpack(b) for (b,) in db.execute("SELECT data FROM cities ORDER BY id")
@@ -136,7 +137,9 @@ class Engine:
             & np.isin(before, list(self.repair_ids))
         )
         if repair.any():
-            db = connect(self.source, readonly=True)
+            db = connect(
+                self.source, readonly=True, cache_kib=self.limits.sqlite_cache_kib
+            )
             try:
                 ids[repair], methods[repair] = rural(
                     self, db, coordinates[repair], projected[repair]

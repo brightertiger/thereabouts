@@ -13,7 +13,8 @@ licence:
     assessment of Earth Observation and population survey data, International Journal
     of Digital Earth 17(1). https://doi.org/10.1080/17538947.2024.2390454
 limits:
-  download_bytes: 6902089
+  # Two retained releases of capacity; current pinned bytes: 6,902,089.
+  download_bytes: 13804178
 options:
   expected_rows: 11422
 options_schema: pipeline.config.source_options.UrbanCentres

@@ -38,7 +38,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/reconcile.py
@@ -63,7 +63,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/cells.py
@@ -97,7 +97,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/cities.py
@@ -130,7 +130,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/evaluate.py
@@ -171,7 +171,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/normalize_cells.py
@@ -211,7 +211,7 @@ stages:
     - pipeline/stages/engine_discovery.py
     - pipeline/stages/engine_recipes.py
     - pipeline/stages/engine_io.py
-    - pipeline/engines/storage.py
+    - pipeline/engines/artifact_io.py
     - pipeline/engines/cache.py
     - pipeline/config/policies.py
     - pipeline/stages/lookups.py
@@ -244,7 +244,7 @@ stages:
     packages: [pipeline/stages/plate_country.py, pipeline/stages/geographic.py,
                pipeline/stages/engine_discovery.py, pipeline/stages/engine_recipes.py,
                pipeline/stages/engine_data.py, pipeline/stages/engine_io.py,
-               pipeline/engines/plate_country, pipeline/engines/storage.py,
+               pipeline/engines/plate_country, pipeline/engines/artifact_io.py,
                pipeline/config/policies.py, pipeline/sources/plates]
     config: [engines]
     native: [pyarrow, regex]

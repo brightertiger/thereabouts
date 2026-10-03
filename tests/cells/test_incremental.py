@@ -9,6 +9,8 @@ import pyarrow.parquet as pq
 import pytest
 
 from pipeline.config import load
+from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from pipeline.engines.cells import joins
 from pipeline.engines.cells.metrics import measure
 from pipeline.engines.cells.reader import Cells
@@ -59,7 +61,7 @@ def test_partial_join_preserves_cardinality_country_and_fills_new_coverage(
     )
     with duckdb.connect() as db:
         db.register("source", source)
-        joins.assignments(db, joins.prepare(db, cells))
+        joins.assignments(db, joins.prepare(db, cells), H3())
         rows = db.sql(
             "SELECT s.country_code,a.cell_country_code,"
             "coalesce(a.cell_status,'unlocated') AS status "
@@ -74,14 +76,14 @@ def test_partial_join_preserves_cardinality_country_and_fills_new_coverage(
         ]
         assert sum(a != b for a, b, _ in rows if a and b) == 1
         cells.append(table(tmp_path, h3.cell_to_parent(pending, 3), []))
-        joins.assignments(db, joins.prepare(db, cells))
+        joins.assignments(db, joins.prepare(db, cells), H3())
         assert db.sql(
             "SELECT count(*) FROM assignments WHERE cell_status='pending'"
         ).fetchone() == (0,)
-    reader = Cells(cells)
+    reader = Cells(cells, grid=H3(), limits=EngineLimits())
     assert reader.lookup(cell)["city_id"] == "city:Z"
     assert reader.lookup(ocean)["cell_status"] == "ineligible"
-    with pytest.raises(ValueError, match="resolution-8"):
+    with pytest.raises(ValueError, match="resolution 8"):
         reader.lookup(root)
     places = tmp_path / "places.parquet"
     pq.write_table(
@@ -101,6 +103,7 @@ def test_partial_join_preserves_cardinality_country_and_fills_new_coverage(
         cells,
         config.resources,
         config.engines.limits,
+        grid=config.h3,
     )
     assert metrics["represented_r8_centres"]["eligible"] == 7**5
     assert metrics["represented_r8_centres"]["city"] == 7**5

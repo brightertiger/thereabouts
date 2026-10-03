@@ -5,7 +5,6 @@ from typing import cast
 import numpy as np
 from numpy.typing import NDArray
 
-from pipeline.config.engines import EngineLimits
 from pipeline.engines.reconcile.common import Row
 from pipeline.engines.reconcile.spatial import EARTH_M
 from pipeline.engines.sphere import unit_vectors
@@ -31,7 +30,7 @@ class Allocation:
         footprints: list[Row],
         urban: Urban,
         policy: Row,
-        batch_rows: int = EngineLimits.allocation_batch_rows,
+        batch_rows: int,
     ) -> None:
         self.urban, self.policy, self.batch_rows = urban, policy, batch_rows
         self.ids = np.array([r["city_id"] for r in cities], dtype=object)

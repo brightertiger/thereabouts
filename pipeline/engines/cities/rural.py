@@ -39,7 +39,7 @@ def rural(
         ["rural_polygon" if i >= 0 else None for i in found], dtype=object
     )
     missing = np.flatnonzero(found < 0)
-    index = nearest(engine.source)
+    index = nearest(engine.source, engine.limits)
     chosen, distances, _ = index.query(coordinates[missing], engine.policy["nearest_m"])
     for row, choice, distance in zip(missing, chosen, distances, strict=True):
         if choice >= 0:

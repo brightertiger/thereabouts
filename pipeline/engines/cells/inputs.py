@@ -4,16 +4,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from pipeline.config.engines import EngineLimits
+from pipeline.config.schema import H3
 from pipeline.engines.reconcile.common import Row
 
 
 @dataclass
 class Inputs:
+    grid: H3 = field(kw_only=True)
     countries: dict[str, Row]
     land: Row
     policy: Row
     expected: set[str] | None = None
-    limits: EngineLimits = field(default_factory=EngineLimits)
+    limits: EngineLimits = field(kw_only=True)
 
     @property
     def paths(self) -> dict[str, Path]:
