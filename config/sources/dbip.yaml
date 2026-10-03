@@ -3,6 +3,7 @@ adapter: pipeline.sources.dbip
 kind: dbip
 enabled: true
 upstream:
+  proposal: config/proposals/dbip.yaml
   url: https://download.db-ip.com/free/dbip-city-lite-2026-10.csv.gz
 licence:
   id: CC-BY-4.0

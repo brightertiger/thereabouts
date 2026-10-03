@@ -28,7 +28,7 @@ stages:
     packages: [pipeline/stages/sources.py, pipeline/sources/contract.py,
                pipeline/sources/shared, pipeline/sources/download.py, pipeline/storage]
     config: [h3]
-    native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex]
+    native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex, sqlite3]
   - name: reconcile
     needs:
     - normalize
@@ -44,6 +44,7 @@ stages:
     - pipeline/stages/reconcile.py
     - pipeline/engines/reconcile
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3
@@ -78,6 +79,7 @@ stages:
     - engines
     - h3
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3
@@ -108,6 +110,7 @@ stages:
     - pipeline/engines/schema.py
     - pipeline/geometry
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3
@@ -150,6 +153,7 @@ stages:
     - engines
     - h3
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3
@@ -188,6 +192,7 @@ stages:
     - engines
     - h3
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3
@@ -224,6 +229,7 @@ stages:
     - pipeline/engines/schema.py
     - pipeline/geometry
     native:
+    - sqlite3
     - duckdb
     - shapely
     - h3

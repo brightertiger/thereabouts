@@ -63,6 +63,41 @@ pytest directory (`pytest-233`), outside the worktree. No real-workspace data wa
 touched. Pytest now defaults to `--basetemp=.cache/pytest` in this checkout as an
 additional safeguard. The external fixtures have not been modified or removed.
 
+## Package 2–3 review checkpoint: fixes 5–6
+
+Every adapter now exposes `propose(settings)`. `pins update [source...]` writes a
+candidate plus a file-level JSON diff; only `--accept` replaces the lock. A saved
+proposal can be accepted without contacting upstream. Catalogs select exact
+files and GitHub trees, resolve complete Git commits, timezone and IANA releases,
+GeoNames/OSM publisher dates, geoBoundaries layer commits and paginated Overture
+releases. GHSL's reviewed release remains configured and its SHA256 is measured.
+Plate proposals use the reviewed policy URLs, including frozen Wikipedia
+revisions. Tests use loopback HTTP only; real upstream availability is untested.
+The disabled plate-country catalog requires owner-selected evidence URLs.
+
+The expanded Malaysia proof now reconstructs the base block, MY city index,
+canonical-city table and place-to-city mapping before using those products for
+both pilot variants. All six output SHA256 values match the retained records.
+It checks every one of the block's 16,807 finest cell centres. Measurements:
+**20.55 wall seconds**, **538,935,296 peak RSS bytes**, **141,524,404 output bytes**.
+
+The first extended proof exposed native-runtime drift: this worktree's existing
+venv used Python 3.12.2 / SQLite 3.46.0, while the retained city index records
+SQLite 3.47.1. Logical tables and the city Parquet were identical, but eight
+SQLite pages differed. Reusing the locally installed Python 3.12.8 interpreter
+with this worktree's existing dependencies reproduced the full index bytes.
+`.python-version` now selects that interpreter, and affected stages hash the
+actual SQLite library version. No dependency or interpreter was downloaded.
+The fixes-1–4 measurements have been corrected to name their actual Python
+3.12.2 runtime; their reported timings and hashes are unchanged.
+
+On Python 3.12.8, configuration loads in **0.139 s**; the full suite is **663
+passed, 8 skipped in 44.79 s**. Final plan: **85,577 current / 0 stale / 0 new under simulation**, **320.71 s**,
+**1,298,595,840 bytes peak RSS**. Handover passed for **85,577 units**,
+**312.99 s**, **1,365,983,232 bytes peak RSS**; all eight stage counts match the
+fixes-1–4 table above, with zero stale/new after simulated handover. The ledger remains unmigrated and all engine proof writes stay
+inside this checkout. No upstream or cloud source requests were made.
+
 ## Package 3: engines and independent handover
 
 The executable registry now covers reconcile, cells, cities, evaluate,

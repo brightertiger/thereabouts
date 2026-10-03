@@ -1,6 +1,7 @@
 """The single identity rule: declared code, settings, pins and native versions."""
 
 import importlib.metadata
+import sqlite3
 import tomllib
 from collections.abc import Mapping, Sequence
 from functools import lru_cache
@@ -31,6 +32,10 @@ def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
     pinned = locked_versions(lock.read_bytes())
     result = {}
     for name in names:
+        if name == "sqlite3":
+            # SQLite ships with the interpreter, not a uv.lock distribution.
+            result[name] = sqlite3.sqlite_version
+            continue
         if name not in pinned:
             raise ValueError(f"No uv.lock pin for native dependency {name}")
         installed = installed_version(name)

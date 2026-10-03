@@ -3,6 +3,7 @@ adapter: pipeline.sources.plate_country
 kind: registration_country_evidence
 enabled: false
 upstream:
+  proposal: config/proposals/plate_country.yaml
   url: https://www.worldlicenseplates.com/
 licence:
   id: per-source

@@ -10,9 +10,12 @@ import shapely
 from numpy.typing import NDArray
 
 from pipeline.config.source_options import UrbanCentres as Options
+from pipeline.config.sources import SourceSettings
+from pipeline.pins.models import SourcePin
 from pipeline.runtime.jsonio import encode
 
 from .contract import SourceContext
+from .proposals.resolve import propose as propose_pin
 from .shared.archives import extract
 from .shared.geometry import bounds_columns, repair_geometry
 from .shared.lookup_rows import Row
@@ -100,4 +103,9 @@ def normalize(ctx: SourceContext) -> list[Path]:
     return finish(ctx, writer.finish(), paths)
 
 
-__all__ = ["Options", "normalize"]
+__all__ = ["Options", "normalize", "propose"]
+
+
+def propose(settings: SourceSettings) -> SourcePin:
+    """Resolve upstream only for an explicit pin proposal."""
+    return propose_pin(settings)

@@ -3,6 +3,7 @@ adapter: pipeline.sources.airports
 kind: airports
 enabled: true
 upstream:
+  proposal: config/proposals/airports.yaml
   url: https://davidmegginson.github.io/ourairports-data/airports.csv
 licence:
   id: Public-Domain

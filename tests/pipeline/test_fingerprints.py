@@ -1,9 +1,11 @@
 """Output identity follows only explicitly declared production inputs."""
 
+import sqlite3
 from pathlib import Path
 
 import pytest
 
+from pipeline.runtime import fingerprints
 from pipeline.runtime.code import code_hashes
 from pipeline.runtime.fingerprints import identity
 
@@ -126,3 +128,13 @@ def test_entry_module_hashes_parent_initializers_without_imports(
     assert len(before) == 3
     initializer.write_text("rule = 2\n")
     assert code_hashes([entry], tmp_path) != before
+
+
+def test_sqlite_runtime_version_is_an_explicit_native_identity_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    lock = tmp_path / "uv.lock"
+    lock.write_text("package = []\n")
+    before = fingerprints.native_versions(["sqlite3"], lock)
+    monkeypatch.setattr(sqlite3, "sqlite_version", "different-native")
+    assert fingerprints.native_versions(["sqlite3"], lock) != before

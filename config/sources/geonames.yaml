@@ -3,6 +3,7 @@ adapter: pipeline.sources.geonames
 kind: places_and_names
 enabled: true
 upstream:
+  proposal: config/proposals/geonames.yaml
   url: https://download.geonames.org/export/dump/allCountries.zip
 licence:
   id: CC-BY-4.0

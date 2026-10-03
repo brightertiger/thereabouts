@@ -77,7 +77,10 @@ implementation, the stage contract and the configuration schema are excluded.
 The source stages share only their controller identity; each source unit adds
 its own adapter import closure, settings, pin and policy-file hashes. A pin or
 adapter edit therefore invalidates that source and consumers of its outputs. Native versions must match `uv.lock`; Shapely's GEOS version is also
-included. Tests, fixtures, documentation and client source files are excluded.
+included. Stages that use SQLite also hash its actual runtime library version,
+because SQLite ships with Python rather than as a lockfile distribution. The
+committed `.python-version` selects Python 3.12.8, used by the retained SQLite
+artifacts; reproduction was measured with SQLite 3.47.1. Tests, fixtures, documentation and client source files are excluded.
 The explicit `thereabouts.format.CELL_FORMAT_VERSION` participates where the cell
 codec matters. Adding that constant does not change the encoding.
 
@@ -108,16 +111,42 @@ the committed geoBoundaries lock uses the manifest's resolved inventory.
 ```sh
 # Read-only: compare the lock with an already-built workspace's exact manifests.
 .venv/bin/python -m pipeline pins check --from-workspace /path/to/existing/data
-# Import explicitly reviewed versions/checksums; this command writes only the lock.
-.venv/bin/python -m pipeline pins update ghsl --from-file reviewed-pins.yaml
-# Bootstrap exact versions from built manifests, without downloading or running stages.
-.venv/bin/python -m pipeline pins update --from-workspace /path/to/existing/data
+# Resolve upstream and write a candidate lock plus a file-level diff.
+.venv/bin/python -m pipeline pins update ghsl
+# Review .cache/pipeline/pins-proposal.yaml and pins-proposal.diff.json.
+# Accept those exact bytes without contacting upstream again.
+.venv/bin/python -m pipeline pins update ghsl \
+  --from-file .cache/pipeline/pins-proposal.yaml --accept
+# Bootstrap from a built workspace's manifests, without upstream access.
+.venv/bin/python -m pipeline pins update \
+  --from-workspace /path/to/existing/data --accept
 ```
 
-`pins update` requires `--from-file` or `--from-workspace`; neither it nor a stage
-silently selects latest. A proposal uses the same typed format as `pins.lock`.
-`pins check` without `--from-workspace` checks the lock structure and hashes only;
-it does not claim that upstream or remote mirror payloads were verified.
+Only `pins update` resolves upstream versions. Without `--accept`, it writes a
+proposal and a JSON diff while leaving `pins.lock` unchanged. `--proposal PATH`
+selects the candidate output; its companion diff uses `.diff.json`. Inspect the
+candidate before accepting it with `--from-file ... --accept`; running a fresh
+upstream proposal with `--accept` accepts freshly resolved bytes instead.
+An unchanged inspection preserves the previous pin, including its timestamp.
+
+Adapters expose `propose(settings)`. Catalogs in `config/proposals/` declare file
+selections, GitHub commit/release selectors, IANA versions and Overture listing
+prefixes. geoBoundaries resolves every selected layer to a complete commit and
+repairs contradictory ALL records through the country's API. GeoNames and OSM
+release dates come from publisher Last-Modified evidence. GHSL's reviewed
+release URL is explicit in its catalog; its checksum is recomputed. Plate URLs
+remain the reviewed evidence set in the plate policy, including frozen Wikipedia
+revisions; changing that set requires policy review. The disabled plate-country
+catalog is empty until the owner selects evidence URLs.
+
+Proposals HEAD each payload, then stream it to SHA256 under the configured byte
+and retry limits, without saving payloads. This can read the full upstream source
+size where the publisher has no SHA256; the later download stage still verifies
+and mirrors the accepted pin. Conditional requests and size/ETag checks reject
+an upstream object changing during inspection. Tests use only loopback HTTP.
+No real upstream proposal has been exercised in this implementation session.
+`pins check` without `--from-workspace` checks lock structure and hashes only;
+it does not verify upstream availability or remote mirror custody.
 
 On a separate writable workspace, `run --through normalize` downloads every
 enabled source and publishes its normalized manifest. Configure

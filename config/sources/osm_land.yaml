@@ -3,6 +3,7 @@ adapter: pipeline.sources.osm_land
 kind: land
 enabled: true
 upstream:
+  proposal: config/proposals/osm_land.yaml
   url: https://osmdata.openstreetmap.de/download/land-polygons-split-4326.zip
 licence:
   id: ODbL-1.0

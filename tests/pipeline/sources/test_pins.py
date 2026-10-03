@@ -19,8 +19,6 @@ def test_lock_requires_explicit_update_and_rejects_unknown_fields(
     tmp_path: Path,
 ) -> None:
     path = tmp_path / "pins.lock"
-    assert main(["pins", "update", "--lock", str(path)]) == 2
-    assert not path.exists()
     original = SourcePin(
         "release",
         "2026-10-03",
@@ -29,7 +27,20 @@ def test_lock_requires_explicit_update_and_rejects_unknown_fields(
     proposal = tmp_path / "proposal.yaml"
     write_lock(proposal, {"example": original})
     assert (
-        main(["pins", "update", "--lock", str(path), "--from-file", str(proposal)]) == 0
+        main(
+            [
+                "pins",
+                "update",
+                "--lock",
+                str(path),
+                "--from-file",
+                str(proposal),
+                "--proposal",
+                str(tmp_path / "review.yaml"),
+                "--accept",
+            ]
+        )
+        == 0
     )
     assert read_lock(path) == {"example": original}
     assert main(["pins", "check", "--lock", str(path)]) == 0
@@ -37,7 +48,20 @@ def test_lock_requires_explicit_update_and_rejects_unknown_fields(
     proposal.write_text(yaml.safe_dump(bad))
     before = path.read_bytes()
     assert (
-        main(["pins", "update", "--lock", str(path), "--from-file", str(proposal)]) == 2
+        main(
+            [
+                "pins",
+                "update",
+                "--lock",
+                str(path),
+                "--from-file",
+                str(proposal),
+                "--proposal",
+                str(tmp_path / "review.yaml"),
+                "--accept",
+            ]
+        )
+        == 2
     )
     assert path.read_bytes() == before
 
@@ -133,3 +157,30 @@ def test_overrides_and_cached_config_are_independent() -> None:
         .limits.batch_rows
         == 2
     )
+
+
+def test_proposal_diff_cannot_overwrite_the_lock_without_accept(tmp_path: Path) -> None:
+    proposal = tmp_path / "candidate.yaml"
+    lock = proposal.with_suffix(".diff.json")
+    original = SourcePin(
+        "release", "2026-10-03", files=[PinFile("input", "memory://input", 1, "a" * 64)]
+    )
+    write_lock(lock, {"example": original})
+    write_lock(proposal, {"example": original})
+    before = lock.read_bytes()
+    assert (
+        main(
+            [
+                "pins",
+                "update",
+                "--lock",
+                str(lock),
+                "--proposal",
+                str(proposal),
+                "--from-file",
+                str(proposal),
+            ]
+        )
+        == 2
+    )
+    assert lock.read_bytes() == before

@@ -1,5 +1,5 @@
 {
-  "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.8",
+  "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.2 (SQLite 3.46.0)",
   "review_fixes": [
     1,
     2,
@@ -324,5 +324,314 @@
     "skipped": 8
   },
   "worktree_bytes": 1317830620,
-  "free_bytes": 49341775872
+  "free_bytes": 49341775872,
+  "review_5_6": {
+    "machine": "Apple M2 / 8 GiB / macOS / CPython 3.12.8 / SQLite 3.47.1",
+    "load_seconds": 0.13863016699906439,
+    "pytest_seconds": 44.79,
+    "pytest": {
+      "passed": 663,
+      "skipped": 8
+    },
+    "pilot": {
+      "land_features": 97,
+      "output_bytes": 141524404,
+      "peak_rss_bytes": 538935296,
+      "real_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+      "results": [
+        {
+          "counts": {
+            "checks": {
+              "exhaustive_centres": 16807
+            },
+            "countries": [
+              "MY"
+            ],
+            "eligible": 11499,
+            "enumerated": 16807,
+            "label_seconds": 0.2705277499917429,
+            "labelled": 14085,
+            "prepare_seconds": 0.10710037499666214,
+            "production_seconds": 0.38028524999390356,
+            "resolutions": {
+              "6": 22,
+              "7": 430,
+              "8": 7411
+            },
+            "seconds": 0.6149638339993544
+          },
+          "kind": "base_cells",
+          "path": "base.parquet",
+          "rows": 7863,
+          "sha256": "a5ee4ca23c81d357394df15f8914cb7e44dfc2dd0a9b9a353a3e59708f05396f",
+          "size": 77762
+        },
+        {
+          "kind": "city_index",
+          "path": "cities/MY/index.sqlite",
+          "sha256": "0fec25e848d7eb7ae7d7d17aa3d565325270983000e1ae5e9578a0d2697c4a8d",
+          "size": 610304
+        },
+        {
+          "country": "MY",
+          "kind": "canonical_cities",
+          "path": "cities/MY/canonical_cities.parquet",
+          "rows": 407,
+          "sha256": "9fc16f63e541f03af28c2e318fe4ee0594795289ed0acb60069902ce39faf6d5",
+          "size": 30071
+        },
+        {
+          "kind": "place_to_city",
+          "path": "cities/MY/place_to_city.parquet",
+          "rows": 27839,
+          "sha256": "da845b12b2ab91f677b4775775efc4686d82cb75935dbd1900f573a3d926f894",
+          "size": 415476
+        },
+        {
+          "block": "836505fffffffff",
+          "counts": {
+            "MY": {
+              "changed_city": 1151,
+              "eligible": 11499,
+              "method_transitions": {
+                "area -> city_polygon": 2943,
+                "area -> policy_polygon": 288,
+                "area -> rural_nearest": 607,
+                "area -> rural_polygon": 50,
+                "area -> urban_allocation": 7,
+                "nearest -> rural_nearest": 7197,
+                "nearest -> urban_allocation": 407
+              }
+            }
+          },
+          "path": "off.parquet",
+          "rows": 8019,
+          "sha256": "f83e156e9b966c3b442cbaf2e08e08f35c40fb331e2d3f81cd484ff75d42cfd4",
+          "size": 79690,
+          "variant": "off"
+        },
+        {
+          "block": "836505fffffffff",
+          "counts": {
+            "MY": {
+              "changed_city": 1233,
+              "eligible": 11499,
+              "method_transitions": {
+                "area -> city_polygon": 2943,
+                "area -> policy_polygon": 288,
+                "area -> rural_nearest": 601,
+                "area -> rural_polygon": 47,
+                "area -> town_radius": 9,
+                "area -> urban_allocation": 7,
+                "nearest -> rural_nearest": 7055,
+                "nearest -> town_radius": 142,
+                "nearest -> urban_allocation": 407
+              }
+            }
+          },
+          "path": "on.parquet",
+          "rows": 8007,
+          "sha256": "02f3b7bee9e6204f22928af12fdbbac3283b730189678be3c356eaa092fc4fb3",
+          "size": 79733,
+          "variant": "on"
+        }
+      ],
+      "seconds": 18.550488040986238
+    },
+    "pilot_wall_seconds": 20.55,
+    "plan": {
+      "wall_seconds": 320.71,
+      "peak_rss_bytes": 1298595840,
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      },
+      "simulated": true
+    },
+    "handover": {
+      "wall_seconds": 312.99,
+      "peak_rss_bytes": 1365983232,
+      "changed_units": 85577,
+      "identities": [
+        {
+          "changed": 13,
+          "new_identity": "4c95d4f802e0e081e054978ad152cfc8687832b0a3dba21dfdabeb6a7fea3ff7",
+          "old_identity": [
+            "04d74a464b8d58125c30784d5798c97e71264847ead6460c2cc53bf967ba3f10"
+          ],
+          "stage": "download",
+          "units": 13
+        },
+        {
+          "changed": 13,
+          "new_identity": "1c6044a6be7ba7d3466ac1f4409cf7d1bb46287d13170b4a59329c667dc7e728",
+          "old_identity": [
+            "fa308e43751b05915b5e9d3f62671682f340d933f53e69248424c113cf86d9a5"
+          ],
+          "stage": "normalize",
+          "units": 13
+        },
+        {
+          "changed": 1111,
+          "new_identity": "dfd46642e9b88a18a49c4eed65da6d95ca9e03513fca4913995863536efae77b",
+          "old_identity": [
+            "ab0237ebc3179f9a730153bb5482ae14f8698ab946442ea7094764a691673a29"
+          ],
+          "stage": "reconcile",
+          "units": 1111
+        },
+        {
+          "changed": 41442,
+          "new_identity": "378e63937dc1f9e1b6e40d16e50292a804089d7e4f1beaadfd9a6e367a42d77a",
+          "old_identity": [
+            "08c08287fb300dcacea41d2460719459d633ec348a7a93431044957fa2d9a3b0"
+          ],
+          "stage": "cells",
+          "units": 41442
+        },
+        {
+          "changed": 555,
+          "new_identity": "92fefec3501ee0bc4f1659e08d18402b81cdcd74807fdf2b1a6f8f28c846e9ab",
+          "old_identity": [
+            "8a8e2e3561a40ebe6494d55a4b97784b1f4d6fd7eb32d7a581c40c469e38eec0"
+          ],
+          "stage": "cities",
+          "units": 555
+        },
+        {
+          "changed": 1,
+          "new_identity": "c75b41810c4d336c82d5f8185eb293533ed30aec083a35a8a354739a243be9cb",
+          "old_identity": [
+            "4ca69c6c836ff304acb744dc07a16de2efa261cafd446a209929d8f1d0b6b052"
+          ],
+          "stage": "evaluate",
+          "units": 1
+        },
+        {
+          "changed": 41716,
+          "new_identity": "c377b3a22f35a1de51903a5795cffefe8a256c520c2f0cb4f8628f12d013a179",
+          "old_identity": [
+            "dea29912c47061e5a5eeeebc81e7e01ffe5a96f6bf987cafbc81d4de7fee248f"
+          ],
+          "stage": "normalize_cells",
+          "units": 41716
+        },
+        {
+          "changed": 0,
+          "new_identity": "c05b71973def77c4ef0d3cb708b7f97bccaffed7cbfe26665497a3eba3fd4643",
+          "old_identity": [],
+          "stage": "plate_country",
+          "units": 0
+        },
+        {
+          "changed": 726,
+          "new_identity": "cb3d3bcd3e9a2bf3130846b5b081a4d8cdbb175cf03526d1df6f568c86dc7bda",
+          "old_identity": [
+            "25ce5cbc64db2231699901981e59b9ba0397298d0ebe7d435ea3dc9fa265e020"
+          ],
+          "stage": "lookups",
+          "units": 726
+        }
+      ],
+      "ledger_sha256": null,
+      "mode": "handover simulation",
+      "scope": "mapping and hashes only; no engine equivalence claim",
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      }
+    }
+  }
 }

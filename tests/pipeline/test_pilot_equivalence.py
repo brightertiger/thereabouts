@@ -1,4 +1,4 @@
-"""Opt-in proof: exact bytes for one retained Malaysian pilot, radius off and on."""
+"""Opt-in proof: Malaysian base cells, city products and both pilot variants."""
 
 import os
 import shutil
@@ -19,6 +19,7 @@ from pipeline.runtime.resources import workspace_bytes
 
 from .helpers import peak_rss
 from .pilot_inputs import artifact, country, land, manifest
+from .pilot_outputs import base_cells, city_products
 
 # This deliberately selects the already measured input sample, not a world build.
 BLOCK = "836505fffffffff"
@@ -57,7 +58,8 @@ def test_retained_pilot_bytes(tmp_path: Path) -> None:
         for row in base["tables"]
         if row["kind"] == "cells" and row["block"] == BLOCK
     )
-    record = {**record, "path": str(artifact(root, record["path"]))}
+    base_result = base_cells(tmp_path, BLOCK, source, physical, policy, record, config)
+    record = {**record, "path": str(tmp_path / base_result["path"])}
     city = manifest(root, "city_normalized/manifest.json")["countries"][COUNTRY]
     urban = Urban(
         [
@@ -65,11 +67,15 @@ def test_retained_pilot_bytes(tmp_path: Path) -> None:
             for part in manifest(root, "normalized/ghsl/manifest.json")["partitions"]
         ]
     )
+    city_policy = policies.cities()
+    city_index, city_results = city_products(
+        tmp_path, source, urban, city_policy, city, config
+    )
     selector = Engine(
-        artifact(root, city["index"]["path"]),
+        city_index,
         source,
         urban,
-        policies.cities(),
+        city_policy,
         (physical, policy["offshore_m"]),
         config.engines.limits,
     )
@@ -97,7 +103,7 @@ def test_retained_pilot_bytes(tmp_path: Path) -> None:
             "peak_rss_bytes": peak_rss(),
             "output_bytes": workspace_bytes(tmp_path),
             "land_features": feature_count,
-            "results": results,
+            "results": [base_result, *city_results, *results],
             "real_ledger_sha256": before,
         },
     )

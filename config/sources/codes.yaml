@@ -3,6 +3,7 @@ adapter: pipeline.sources.codes
 kind: codes
 enabled: true
 upstream:
+  proposal: config/proposals/codes.yaml
   url: https://raw.githubusercontent.com/datasets/country-codes/2e9d6498a0456f4afc2f6cf367d1e12a9ed4afe1/README.md
 licence:
   id: per-file

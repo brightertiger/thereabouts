@@ -1,0 +1,9 @@
+release: '{month}'
+selectors: []
+files:
+- name: dbip-city-lite-{month}.csv.gz
+  url: https://download.db-ip.com/free/dbip-city-lite-{month}.csv.gz
+  metadata:
+    attribution: IP Geolocation by DB-IP https://db-ip.com
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/

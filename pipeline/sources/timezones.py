@@ -11,10 +11,12 @@ from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
 from pipeline.config.source_options import Timezones as Options
-from pipeline.pins.models import PinFile
+from pipeline.config.sources import SourceSettings
+from pipeline.pins.models import PinFile, SourcePin
 from pipeline.runtime.jsonio import write_json
 
 from .contract import SourceContext
+from .proposals.resolve import propose as propose_pin
 from .shared.archives import extract
 from .shared.geometry import repair_geometry, split_geometry
 from .shared.h3_cover import cover
@@ -159,4 +161,9 @@ def normalize(ctx: SourceContext) -> list[Path]:
     return finish(ctx, outputs, [*shapes, report_path])
 
 
-__all__ = ["Options", "normalize"]
+__all__ = ["Options", "normalize", "propose"]
+
+
+def propose(settings: SourceSettings) -> SourcePin:
+    """Resolve upstream only for an explicit pin proposal."""
+    return propose_pin(settings)

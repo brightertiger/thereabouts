@@ -1,0 +1,18 @@
+release: '{commit}'
+selectors:
+- name: commit
+  kind: github_commit
+  url: https://api.github.com/repos/google/libphonenumber/commits/HEAD
+files: []
+trees:
+- url: https://api.github.com/repos/google/libphonenumber/git/trees/{commit}?recursive=1
+  raw: https://raw.githubusercontent.com/google/libphonenumber/{commit}/
+  prefixes:
+  - resources/geocoding/
+  names:
+  - resources/PhoneNumberMetadata.xml
+  - LICENSE
+  metadata:
+    license: Apache-2.0
+    license_url: https://raw.githubusercontent.com/google/libphonenumber/{commit}/LICENSE
+    attribution: The Libphonenumber Authors; Google

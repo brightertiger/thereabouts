@@ -3,6 +3,7 @@ adapter: pipeline.sources.ghsl
 kind: urban_centres
 enabled: true
 upstream:
+  proposal: config/proposals/ghsl.yaml
   url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_UCDB_GLOBE_R2024A/GHS_UCDB_THEME_GLOBE_R2024A/GHS_UCDB_THEME_GENERAL_CHARACTERISTICS_GLOBE_R2024A/V1-2/GHS_UCDB_THEME_GENERAL_CHARACTERISTICS_GLOBE_R2024A_V1_2.zip
 licence:
   id: CC-BY-4.0
