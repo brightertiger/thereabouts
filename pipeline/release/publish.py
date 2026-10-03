@@ -59,6 +59,39 @@ def inventory(dataset: Path, packs: dict[str, Path], version: str) -> list[Uploa
             entries.append(
                 Upload(path, f"{prefix}/{output.path}", output.size, output.sha256)
             )
+    if packs:
+        roots = {path.parent for path in packs.values()}
+        if len(roots) != 1:
+            raise ValueError("Client packs must share one release directory")
+        root = next(iter(roots))
+        index = read_json(root / "index.json")
+        records = index["datasets"][version]["packs"]
+        if set(records) != set(packs):
+            raise ValueError("Release index differs from requested families")
+        for record in records.values():
+            path = located(root, record["url"])
+            if (
+                path.stat().st_size != record["bytes"]
+                or sha256_file(path) != record["sha256"]
+            ):
+                raise ValueError("Client archive checksum mismatch")
+            entries.append(
+                Upload(
+                    path,
+                    f"packs/{version}/{path.name}",
+                    record["bytes"],
+                    record["sha256"],
+                )
+            )
+        path = root / "index.json"
+        entries.append(
+            Upload(
+                path,
+                f"packs/{version}/index.json",
+                path.stat().st_size,
+                sha256_file(path),
+            )
+        )
     return entries
 
 

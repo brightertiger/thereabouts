@@ -257,7 +257,8 @@ stages:
     cell_format: true
   - name: packs
     needs: [dataset]
-    packages: [pipeline/stages/packs.py]
+    packages: [pipeline/stages/packs.py, pipeline/release/client.py,
+      pipeline/release/bundle.py, pipeline/release/prepared.py]
     config: []
     native: [thereabouts]
     cell_format: true

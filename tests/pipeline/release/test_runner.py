@@ -96,7 +96,7 @@ def test_release_through_publish_commits_and_resumes(
         destination.mkdir(parents=True)
         payload = destination / "client-owned.bin"
         payload.write_text(f"synthetic client pack {family}")
-        result = {"files": [file_record(destination, payload)]}
+        result = {"format_minor": 2, "files": [file_record(destination, payload)]}
         write_json(destination / "manifest.json", result)
         return result
 
@@ -117,7 +117,7 @@ def test_release_through_publish_commits_and_resumes(
     ) as ledger:
         ctx = context(config, root, ledger)
         ctx.readonly = False
-        assert run(ctx, stages, through="publish") == {"completed": 5, "skipped": 0}
+        assert run(ctx, stages, through="publish") == {"completed": 6, "skipped": 0}
         receipt = json.loads(fs.cat(marker))
         assert receipt["version"] == "2026.10"
         paths = {entry["path"] for entry in receipt["files"]}
@@ -129,8 +129,8 @@ def test_release_through_publish_commits_and_resumes(
         local = json.loads((root / "work/releases/2026.10/publish.json").read_text())
         assert local["files"] == receipt["files"]
         assert all(decision.state == "current" for decision in plan(ctx, stages))
-        assert run(ctx, stages, through="publish") == {"completed": 0, "skipped": 5}
+        assert run(ctx, stages, through="publish") == {"completed": 0, "skipped": 6}
         assert sorted(calls) == ["core", "postal"]
         assert lookups.calls == ["manifest/current"]
-        assert len(ledger.recipes()) == 5
+        assert len(ledger.recipes()) == 6
     fs.rm(base, recursive=True)

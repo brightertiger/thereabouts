@@ -475,13 +475,35 @@ is committed as [DATASET_README.md](DATASET_README.md).
 `packs` delegates each configured family to
 `thereabouts._core.write_pack(dataset_dir, family, output_dir, options)`. The
 adapter adds source notices and input provenance and re-verifies returned files.
-Tests inject a fake writer; they do not implement the binary format. Real use
-requires the Rust branch merge **and support in that writer for the manifest's
-block/row-group index**. The refreshed subset contains one grouped file with
-22,404 rows across three indexed blocks; the client must read the specified row
-group for each block before real pack validation.
-No real pack-size claim is made here. Writer changes must update the client
-package version or cell format version; client source bytes are not hashed.
+The writer is now exercised through the runner with grouped synthetic Parquet,
+including core-before-forward dependencies, full verification, local console
+installation, idempotence and corrupt archive rejection. The real MY/SG proof
+is recorded in [CLIENT_RELEASE_MEASUREMENTS.json](CLIENT_RELEASE_MEASUREMENTS.json).
+
+For an already prepared dataset, run only its local release stages:
+
+```sh
+python -m pipeline release packs --root /path/to/release-workspace --version 2026.10 \
+  paths.dataset=dataset paths.packs=packs paths.work=work \
+  'release.packs.families=[core,postal,airports,locode,phone,ip]'
+thereabouts --data-dir /path/to/store data install core postal airports locode phone ip \
+  --from /path/to/release-workspace/packs/2026.10 --yes
+```
+
+This command registers the verified prepared dataset in a local ledger and runs
+the packs stage; it never schedules acquisition or geographic stages. Core is
+an explicit prerequisite for every forward family. Its path is supplied as the
+writer's core_pack option, so forward manifests pin its exact catalogue.
+A final index unit depends on every requested family and produces index.json.
+Each family also produces a deterministic POSIX ustar archive. Their hashes and
+sizes are the client release-index records; --from accepts this local directory.
+Publication inventories include the index and archives at packs/<version>/.
+
+The real snapshot has no plate tables, and normalized/plates_country is absent.
+Plates remains unavailable in this release proof; no empty or invented
+plate pack is substituted. Core includes the city-name index. The default
+six-pack selection is core plus five forward packs. Writer/schema changes must
+update the release identity; client source bytes are not hashed as native versions.
 
 Publication reads a verified dataset and the configured pack-family manifests.
 Each object is uploaded through an fsspec transaction, re-hashed from the backend,

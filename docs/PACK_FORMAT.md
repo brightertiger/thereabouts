@@ -1063,3 +1063,16 @@ Dropping the last shard reference closes its handle. Node supplies synchronous
 fs reads through wasm-bindgen imports; WASM has no filesystem or network calls.
 Metadata and index admission bounds, cache budgets and lazy evidence rules
 are identical across hosts. This binding change does not change pack bytes.
+
+## Pipeline release integration
+
+The pipeline supplies a completed golden-2 manifest whose data_root is "."
+for a prepared dataset. Both legacy per-block inputs and the grouped row-group
+layout above are admitted. Required family tables remain mandatory, including
+explicitly inventoried zero-row tables. Missing plate tables are an input error.
+The release runner builds core first and passes its path as core_pack for each
+forward export. A release index is emitted only after every requested family
+and its archive verify. Archives are deterministic POSIX ustar, with inventoried
+artifacts and manifest.json at the archive root; transport and activation are
+specified in [CLI.md](CLI.md). Dataset Parquet, pack payloads and transport archives
+have separate inventories and digests; one does not substitute for another.

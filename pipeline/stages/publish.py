@@ -21,8 +21,9 @@ class PublishStage(ReleaseStage):
         dependencies = (
             Dependency("dataset", version),
             *(
-                Dependency("packs", f"{version}/{family}")
-                for family in ctx.config.release.packs.families
+                (Dependency("packs", f"{version}/index"),)
+                if ctx.config.release.packs.families
+                else ()
             ),
         )
         return [
