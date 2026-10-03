@@ -5,8 +5,8 @@ from pathlib import Path
 import numpy as np
 from h3.api import basic_int as h3
 
-from build_data.hierarchy import blocks, compact, descendants, label_block
-from build_data.reference.oracle import Reference
+from pipeline.engines.hierarchy import blocks, compact, descendants, label_block
+from tests.support.reference.oracle import Reference
 from thereabouts.table import Table
 
 from .conftest import FIXTURE
@@ -75,8 +75,8 @@ def test_certificates_include_tiny_interior_islands(synthetic_pack: Path) -> Non
 
 
 def test_fixture_build_is_reproducible_and_atomic(tmp_path: Path) -> None:
-    from build_data.sources import sha256
-    from build_data.table import build_table
+    from pipeline.runtime.jsonio import sha256_file as sha256
+    from tests.support.table import build_table
 
     output = tmp_path / "copy"
     build_table(REFERENCE, output)

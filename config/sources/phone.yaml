@@ -1,0 +1,16 @@
+name: phone
+adapter: pipeline.sources.phone
+kind: phone
+enabled: true
+upstream:
+  proposal: config/proposals/phone.yaml
+  url: https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE
+licence:
+  id: Apache-2.0
+  url: https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE
+  attribution: The Libphonenumber Authors; Google
+limits:
+  # Two retained releases of capacity; current pinned bytes: 12,194,851.
+  download_bytes: 24389702
+options: {}
+options_schema: pipeline.config.source_options.Text

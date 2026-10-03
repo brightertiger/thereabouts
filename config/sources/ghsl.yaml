@@ -1,0 +1,20 @@
+name: ghsl
+adapter: pipeline.sources.ghsl
+kind: urban_centres
+enabled: true
+upstream:
+  proposal: config/proposals/ghsl.yaml
+  url: https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_UCDB_GLOBE_R2024A/GHS_UCDB_THEME_GLOBE_R2024A/GHS_UCDB_THEME_GENERAL_CHARACTERISTICS_GLOBE_R2024A/V1-2/GHS_UCDB_THEME_GENERAL_CHARACTERISTICS_GLOBE_R2024A_V1_2.zip
+licence:
+  id: CC-BY-4.0
+  url: https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php
+  attribution: European Commission, Joint Research Centre (JRC), GHS-UCDB R2024A;
+    Pesaresi et al. (2024), Advances on the Global Human Settlement Layer by joint
+    assessment of Earth Observation and population survey data, International Journal
+    of Digital Earth 17(1). https://doi.org/10.1080/17538947.2024.2390454
+limits:
+  # Two retained releases of capacity; current pinned bytes: 6,902,089.
+  download_bytes: 13804178
+options:
+  expected_rows: 11422
+options_schema: pipeline.config.source_options.UrbanCentres

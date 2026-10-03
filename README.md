@@ -120,17 +120,12 @@ uv run ruff format --check
 uv run mypy
 ```
 
-The build-size benchmark constructs and verifies the table, and writes its one
-result file. For a plain build use
-`uv run python -m build_data --reference data/reference --output data/h3-world`.
-The reference source pack is **data/reference**; the exported table is
-**data/h3-world**, which is committed to this repository so a clone can run
-lookups without building. Existing outputs are not overwritten: use fresh paths or remove
-previous generated outputs before rebuilding. The reference pack is created if
-absent. Retain pinned source archives in `data/cache`: GeoNames' daily URL may no
-longer serve the frozen **2026-10-01** snapshot. A hash mismatch is an error.
-Accuracy saves reproducible runtime input under `data/benchmarks/points.npy`.
-Explicit full verification is `uv run python -m build_data.verify data/h3-world`.
+The build-size benchmark requires an existing reference fixture and measures the
+synthetic table builder retained under `tests/support`. The former production
+`build_data` package has been retired. Use [the pipeline guide](docs/DATA_PIPELINE.md)
+for frozen sources, plans, migration and geographic builds. The committed
+`data/h3-world` client fixture remains available for offline tests. Accuracy saves
+reproducible runtime input under `data/benchmarks/points.npy`.
 
 The offline fixtures occupy **2.18 MB** and retain the original Benelux region.
 Tests brute-force **all 554,631 resolution-8 centres**, comparing the reference,

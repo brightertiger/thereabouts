@@ -14,10 +14,9 @@ import pyarrow.parquet as pq
 from benchmarks.core_read_path import ROOT
 from benchmarks.forward_queries import Query
 from benchmarks.forward_workload import run
-from build_data.acquire.plates_config import policy as base_policy
-from build_data.plate_country.formats import _decorate
-from build_data.plate_country.policy import policy
-from build_data.plate_country.syntax import template_pattern
+from pipeline.engines.plate_country.formats import _decorate
+from pipeline.engines.plate_country.policy import base_policy, policy
+from pipeline.engines.plate_country.syntax import template_pattern
 from thereabouts import Geocoder, _core
 from tools.build_sample_pack import sha
 from tools.forward_sample import Subset
@@ -79,10 +78,10 @@ def build() -> tuple[Path, int]:
     provenance["rule_files"] = {
         str(p.relative_to(ROOT)): sha(p)
         for folder in (
-            "build_data/plate_country/data",
-            "build_data/acquire/plates_data",
+            "config/policies/plate_country",
+            "config/policies/plates",
         )
-        for p in (ROOT / folder).glob("*.json")
+        for p in (ROOT / folder).glob("*.yaml")
     }
     _core.write_pack(
         str(dataset),

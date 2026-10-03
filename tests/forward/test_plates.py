@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from build_data.plate_country.resolver import Resolver
+from pipeline.engines.plate_country.resolver import Resolver
 from tests.conformance.pack_selection import selection
 from thereabouts import Geocoder
 from tools.source_fixture import read_source

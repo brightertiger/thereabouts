@@ -1,5 +1,9 @@
 # Postal and airport packs
 
+> The format descriptions remain current. Historical `build_data` commands in
+> this document refer to the retired implementation. Current build instructions
+> are in [DATA_PIPELINE.md](DATA_PIPELINE.md); release stages arrive in package 4.
+
 Postal and airport packs provide offline exact-code lookups with original source
 observations and canonical geographic context. Each includes its own minimal
 place catalogue and attribution. Install either without a reverse pack:
@@ -55,15 +59,11 @@ byte/semantic contract in [SERVING_FORMAT.md](SERVING_FORMAT.md).
 
 ## Export, install and query
 
-Use a completed verified golden-2 snapshot and the same release JSON as reverse:
+Package 4 will expose pack export through the pipeline release stages. The
+ported export helpers are exercised on synthetic fixtures. For already-built
+local packs, install and query with:
 
 ```sh
-.venv/bin/python -m build_data.serve export --family postal \
-  --manifest /path/to/golden/manifest.json --release /path/to/release.json \
-  --output /path/to/new-postal-pack
-.venv/bin/python -m build_data.serve export --family airports \
-  --manifest /path/to/golden/manifest.json --release /path/to/release.json \
-  --output /path/to/new-airport-pack
 .venv/bin/python -m thereabouts --data-dir /path/to/store data install \
   --from /path/to/new-postal-pack --sha256 TRUSTED_MANIFEST_SHA256 --offline
 .venv/bin/python -m thereabouts --data-dir /path/to/store postal 00100 --country AA

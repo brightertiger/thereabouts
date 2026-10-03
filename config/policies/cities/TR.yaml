@@ -1,0 +1,22 @@
+footprints:
+- city_id: city:geonames:745044
+  area_entity: state:overture:6d1a95a9-4af5-498e-8df2-77cc995080b2
+  role: state
+  priority: 1
+  clip_urban: true
+  reference: https://ibb.istanbul/ibb/belediye-hakkinda/yetki-alani/
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+parts: {}
+independent: []
+identity_aliases:
+  city:overture:983d250c-12f4-4266-9fab-cfa17f1bbf6e: city:geonames:300619
+  city:overture:ef99d33a-ccc6-4c82-944b-7b64a88602b0: city:geonames:307654
+  city:overture:dcb9182a-ad15-4d8c-bfbc-7978d0ee73a8: city:geonames:311073
+alias_evidence: 'Typed municipal localities Sivas Belediyesi, Kırıkkale Belediyesi
+  and Isparta Belediyesi: exact city name plus municipality suffix, anchors within
+  500 m, retained source polygons. Government labels name the city for this product.'
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.

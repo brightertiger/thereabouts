@@ -1,0 +1,12 @@
+release: ''
+selectors: []
+files:
+- name: land-polygons-split-4326.zip
+  url: https://osmdata.openstreetmap.de/download/land-polygons-split-4326.zip
+  metadata:
+    attribution: © OpenStreetMap contributors; coastline service osmdata.openstreetmap.de
+    license: ODbL-1.0
+    license_url: https://opendatacommons.org/licenses/odbl/1-0/
+settings:
+  release_file: land-polygons-split-4326.zip
+  date_format: '%Y-%m-%dT%H:%M:%S%z'

@@ -1,0 +1,30 @@
+release: '{commit}'
+selectors:
+- name: commit
+  kind: github_commit
+  url: https://api.github.com/repos/datasets/un-locode/commits/HEAD
+files:
+- name: README.md
+  url: https://raw.githubusercontent.com/datasets/un-locode/{commit}/README.md
+  metadata:
+    attribution: UNECE; DataHub maintainers
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/
+- name: code-list.csv
+  url: https://raw.githubusercontent.com/datasets/un-locode/{commit}/data/code-list.csv
+  metadata:
+    attribution: UNECE; DataHub maintainers
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/
+- name: datapackage.json
+  url: https://raw.githubusercontent.com/datasets/un-locode/{commit}/datapackage.json
+  metadata:
+    attribution: UNECE; DataHub maintainers
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/
+- name: function-classifiers.csv
+  url: https://raw.githubusercontent.com/datasets/un-locode/{commit}/data/function-classifiers.csv
+  metadata:
+    attribution: UNECE; DataHub maintainers
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/

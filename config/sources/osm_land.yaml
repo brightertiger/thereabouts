@@ -1,0 +1,23 @@
+name: osm_land
+adapter: pipeline.sources.osm_land
+kind: land
+enabled: true
+upstream:
+  proposal: config/proposals/osm_land.yaml
+  url: https://osmdata.openstreetmap.de/download/land-polygons-split-4326.zip
+licence:
+  id: ODbL-1.0
+  url: https://opendatacommons.org/licenses/odbl/1-0/
+  attribution: © OpenStreetMap contributors; coastline service osmdata.openstreetmap.de
+limits:
+  # Two retained releases of capacity; current pinned bytes: 927,857,432.
+  download_bytes: 1855714864
+  batch_bytes: 32000000
+  batch_rows: 1000
+options:
+  grid_degrees: 10
+  unit_records: 1000
+  unit_bytes: 8000000
+  shape_bytes: 6000000
+  index_bytes: 200000000
+options_schema: pipeline.config.source_options.Land

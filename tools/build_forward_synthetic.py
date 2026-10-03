@@ -1,12 +1,8 @@
 """Rebuild the original code fixture without changing legacy expectations."""
 
-import json
-import shutil
 from pathlib import Path
 
-from tests.codes.fixtures import snapshot
 from thereabouts import _core
-from tools.build_sample_pack import sha
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests/fixtures"
@@ -14,23 +10,8 @@ FIXTURES = ROOT / "tests/fixtures"
 
 def build(family: str) -> None:
     root = FIXTURES / "datasets/forward-synthetic"
-    manifest_path, _ = snapshot(root)
-    manifest = json.loads(manifest_path.read_text())
-    side = FIXTURES / "datasets/core-synthetic/golden"
-    original = json.loads((side / "manifest.json").read_text())
-    for table in original["tables"]:
-        if table["kind"] not in {"countries", "subdivisions"}:
-            continue
-        path = side / original["data_root"] / table["path"]
-        destination = root / table["path"]
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, destination)
-        manifest["tables"].append(
-            table | {"sha256": sha(destination), "size": destination.stat().st_size}
-        )
-    manifest_path.write_text(json.dumps(manifest, sort_keys=True) + "\n")
     _core.write_pack(
-        str(manifest_path.parent),
+        str(root / "golden"),
         family,
         str(FIXTURES / f"packs/{family}-synthetic"),
         {

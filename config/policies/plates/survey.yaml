@@ -1,0 +1,2863 @@
+AF:
+  source: wiki-AF.json
+  classification: usable_now
+  unit_kind: province
+  code_position: province abbreviation beside serial
+  series: ordinary; exceptions described in notes
+  evidence_pattern: the\ province\ in\ either\ Persian\ or\ Pashto\ ,\ with\ a\ corresponding\
+    Latin\ 3\-letter\ code,\ a\ numerical\ code\ which\ ranges\ from\ 1\ digit\ to\
+    5\ digits,\ and\ the\ class\ of\ the\ vehicle,\ identified\ by\ a\ Persian\ letter\
+    ,\ and\ a\ corresponding\ Latin\ let
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+AL:
+  source: wiki-AL.json
+  classification: historic_only
+  unit_kind: district
+  code_position: leading letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \.\ Current\ series\ \[\ edit\ \]\ Private\ Vehicles\ \[\ edit\
+    \]\ The\ new\ format\ is\ no\ longer\ based\ on\ regional\ district\ abbreviations,\
+    while\ old\ plates\ are\ still\ valid\ A\ new\ format\ similar\ to\ the\ post\-1994\
+    Italian\ and\ post\-2009\ French\ plate\ designs\ has\ been\ in
+  coverage_status: partial
+  notes: National series since 2011; older plates remain valid.
+  valid_to: '2011'
+DZ:
+  source: wiki-DZ.json
+  classification: usable_now
+  unit_kind: province
+  code_position: last two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: r\ registrations\ for\ vehicles\ manufactured\ in\ 2022\.\ Wilayas\
+    \[\ edit\ \]\ A\ two\-digit\ suffix\ on\ the\ plate\ identifies\ the\ wilaya\
+    \(\ Arabic\ :\ ولاية\ \)\ or\ province\ in\ which\ the\ vehicle\ was\ first\ registered\.\
+    Initially\ there\ were\ 48\ such\ wilayas\ \.\ I
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+AO:
+  source: wiki-AO.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first three letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ies\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ ABC\-01\-23\-DE\ \(ABC\ being\ the\ regional\ code\)\ Colour\ \(front\)\
+    Black\ on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Angola\ requires\ its\ residents\
+    to\ register\ their\ motor\ vehicles\ and\ display\ vehicle\ r
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+AM:
+  source: wiki-AM.json
+  classification: unverified
+  unit_kind: province
+  code_position: two-digit group
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: he\ remaining\ numbers\ on\ the\ second\.\ The\ two\-number\ group\
+    is\ supposedly\ the\ regional\ code\.\ Production\ of\ license\ plates\ in\ the\
+    mid\-2000s\ was\ interrupted\ due\ to\ equipment\ failure\.\ \[\ citation\ needed\
+    \]\ A\ two\-row\ va
+  notes: The source qualifies the geographic claim as supposed; no current-validity
+    guarantee.
+AT:
+  source: wiki-AT.json
+  classification: usable_now
+  unit_kind: district
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ter\(s\)"\ or\ "XX\ ∇=provincial\ emblem\ personalised\ letters\+number";\
+    XX\ \-\ one\ or\ two\ letters\ which\ indicate\ the\ local\ registration\ office\
+    \(\ district\ where\ the\ registered\ possessor\ resides\)\.\ As\ a\ general\
+    rule,\ State\ capitals\ have\ one\ letter;\ other\ districts\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+AZ:
+  source: wiki-AZ.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: of\ the\ former\ French\ license\ plate\ system\),\ in\ Azerbaijani\
+    plates\ the\ first\ two\ digits\ of\ the\ license\ plate\ represent\ the\ department,\
+    followed\ by\ a\ progressive\ 2\-letter\ and\ 3\-number\ system\ \(progression\
+    starting\ with\ 90\-AA\-001\ and\ ending\ with\ 90\-ZZ\-999\)\.\ Below\ is\ a\
+    ta
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BD:
+  source: wiki-BD.json
+  classification: usable_now
+  unit_kind: district_or_city
+  code_position: Bengali name on first line
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\[\ edit\ \]\ License\ plates\ of\ Bangladesh\ are\ divided\
+    into\ two\ lines,\ the\ first\ of\ which\ displays\ the\ city\ or\ district\ in\
+    which\ the\ vehicle\ was\ registered\ in,\ followed\ by\ the\ vehicle''s\ class\
+    represented\ by\ a\ Bengali\ letter\.\ Part\ 2:\ Registration\ Series\ and\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BB:
+  source: wiki-BB.json
+  classification: usable_now
+  unit_kind: parish
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: icence\ plates\ to\ all\ new\ motor\ vehicle\ owners\.\ Each\
+    licence\ plate\ has\ one\ or\ two\ letters\ which\ represents\ the\ part\ of\
+    the\ island\ which\ the\ vehicle's\ owner\ resides\ or\ previously\ resided\ at\
+    the\ time\ the\ vehicle\ was\ registered\.\ The\ first\ part\ consists\ of\ one
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BY:
+  source: wiki-BY.json
+  classification: usable_now
+  unit_kind: region
+  code_position: last digit
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ifier,\ two\ letters\ –\ the\ number\ plate\ series,\ and\ the\
+    region\ code\ –\ a\ final\ digit\ indicating\ the\ region\ of\ Belarus\ in\ which\
+    the\ vehicle\ was\ registered\.\ The\ placement\ of\ the\ series\ letters\ varies\
+    for\ the\ weight\ class\ or\ type\ of\ the\ vehicle:\ 1234\ AB\-5\ \-\ f
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BE:
+  source: wiki-BE.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: de\ of\ red\ \(ruby\ red\ \-\ RAL\ 3003\)\ is\ used\.\ The\ combination\
+    on\ the\ plate\ does\ not\ give\ any\ information\ about\ the\ geographical\ location\.\
+    Sometimes\ the\ first\ letter\ \(or\ first\ and\ second\ letter\)\ has\ a\ special\
+    meaning:\ CD:\ Diplomats\ \(CD\ stands\ for\ 'Corps\ Diplomatique'\)\ G:\ Agricu
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BZ:
+  source: wiki-BZ.json
+  classification: usable_now
+  unit_kind: district_or_city
+  code_position: letter abbreviation
+  series: ordinary; exceptions described in notes
+  evidence_pattern: United\ Kingdom\.\ Location\ codes\ \[\ edit\ \]\ The\ following\
+    table\ shows\ the\ abbreviations\ used\ on\ license\ plates\ for\ each\ of\ the\
+    six\ administrative\ districts\ in\ Belize\.\ District\ codes\ District\ Capital\
+    Abbreviation\ Belize\ Belize\ City\ BZ\ Cayo\ San\ Ignacio\ CY\ Coroza
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BJ:
+  source: wiki-BJ.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: or\ motorcycles\ format\ is\ 1A\ /\ 2345,\ where\ 1A\ \-\ Series,\
+    2345\ \-\ number\.\ Regional\ coding\ is\ missing\.\ Other\ formats\ \[\ edit\
+    \]\ Commercial\ vehicles\ \[\ edit\ \]\ Commercial\ license\ Plate\ Commercial\
+    vehicles\ have\ license\ plates\ with\ red\ symbols\ on\ an\ orange\ b
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BT:
+  source: wiki-BT.json
+  classification: usable_now
+  unit_kind: registration_region
+  code_position: digit after vehicle-class prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'e\ first\ two\ letters\ for\ private\ vehicles\ are\ BP\ This\
+    is\ followed\ by\ a\ digit\ signifying\ the\ region\ in\ which\ the\ vehicle\
+    is\ registered\.\ Then\ a\ letter\ from\ A\-Z\ is\ followed\ by\ four\ digits\
+    running\ in\ sequence\ like\ 1234\.\ So\ for\ example\ a\ car\ registered\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BO:
+  source: wiki-BO.json
+  classification: historic_only
+  unit_kind: department
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: se\ plate\ with\ a\ configuration\ of\ three\ numbers\ and\ three\
+    letters\.\ The\ first\ letter\ indicated\ the\ department\ and\ the\ second\ letter\
+    indicated\ the\ type\ of\ vehicle\ \(A\-Car,\ C\-Truck,\ T\-Public\ car,\ etc\.\)\.\
+    The\ color\ of\ the\ license\ plate\ indicated\ the\ type\ of\ vehicl
+  coverage_status: partial
+  notes: Historic serial encoded department; current plate shows department letter
+    in a separate small box (not part of serial). Historic-only here refers to encoding
+    in the serial.
+BA:
+  source: wiki-BA.json
+  classification: historic_only
+  unit_kind: city
+  code_position: leading city letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ory\ controlled\ by\ Army\ of\ the\ Republic\ of\ Bosnia\ and\
+    Herzegovina\ from\ 1992\ were\ used\ new\ license\ plates\.\ They\ wore\ a\ blue\
+    strip\ on\ the\ left\ side\ with\ the\ "BIH"\ script\ and\ the\ coat\ of\ arms\
+    above\ the\ script\ \(1992\ is\ no\ blue\ strip\)\.\ On\ the\ white\ background
+  coverage_status: partial
+  notes: Ordinary plates standardized without district letters in 1998. Historical
+    regional series retained.
+  valid_to: '1998'
+BN:
+  source: wiki-BN.json
+  classification: historic_only
+  unit_kind: registration_office
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: stered\ with\ the\ Kuala\ Belait\ Land\ Transport\ Department\
+    prior\ to\ 2006\.\ After\ 2006,\ the\ letter\ 'K'\ can\ be\ assigned\ to\ any\
+    vehicle\ irrespective\ of\ the\ location\ in\ which\ the\ car\ are\ registered\.\
+    \[\ citation\ needed\ \]\ The\ table\ below\ shows\ special\ ca
+  coverage_status: partial
+  notes: B/K no longer reliable geography after 2006.
+  valid_to: '2006'
+BG:
+  source: wiki-BG.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ :\ BG\.\ The\ characters\ displayed\ in\ the\ main\ field\ of\
+    the\ plate\ are:\ a\ one\-\ or\ two\-letter\ province\ code\ four\ numerals\ a\
+    final\ two\-letter\ code,\ known\ as\ the\ "series"\.\ The\ format\ is\ thus\
+    XX\ NNNN\ YY\ ,\ where\ XX\ \(or\ X\)\ is\ the\ province\ code,\ NNNN\ is\ the\
+    seria
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+BR:
+  source: wiki-BR.json
+  classification: usable_now
+  unit_kind: state
+  code_position: first three-letter allocation block
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'UAR\ Amapá\ \(AP\)\ NEI\ to\ NFB\ QLN\ to\ QLT\ SAK\ to\ SAM\
+    TGO\ to\ TGQ\ UKO\ to\ UKQ\ Vertical\ distribution\ of\ sequences\ in\ alphabetical\
+    order\ \[\ edit\ \]\ Below\ is\ an\ alphabetically\ organized\ list\ of\ Letter\
+    Sequences\ and\ corresponding\ States\.\ This\ list\ is\ up\ to\ date\ as\ of\ '
+  coverage_status: partial
+  notes: Allocation blocks identify original issuing state; ownership and moves do
+    not guarantee current location. Partial serial subranges are gaps.
+CV:
+  source: wiki-CV.json
+  classification: usable_now
+  unit_kind: island
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ \-\ São\ Nicolau\ ST\ \-\ Santiago\ SV\ \-\ São\ Vicente\ The\
+    format\ is\ AB\-12\-CD,\ where\ AB\ is\ the\ regional\ code\.\ Vehicles\ of\ the\
+    Armed\ Forces\ bear\ registration\ plates\ of\ the\ type\ "FA\-12\-34"\.\ Diplomatic\
+    plates\ are\ white\ with\ red\ letters\ and\ usually\ have\ the\ form
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+KH:
+  source: wiki-KH.json
+  classification: printed_not_encoded
+  unit_kind: province
+  code_position: province name above/below serial
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ letters\ of\ Latin\ alphabet\ ,\ four\ numbers\ \(from\ 0001\
+    to\ 9999\)\ and\ the\ name\ of\ the\ province\ in\ Khmer\ in\ which\ the\ car\
+    was\ registered\ at\ the\ top\ and\ at\ the\ bottom\ in\ English\ \.\ \(Ex\.\
+    រតនគិរី\ 2D\-0008\ RATANAKIRI;\ ព្រះសីហនុ\ 2D\-0088\ PREAH\ SIHANOUK;\ ភ្នំពេញ\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+CM:
+  source: wiki-CM.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ense\ plates\ was\ introduced\ in\ 1985\.\ It\ has\ AB1234V\ formats\
+    or\ AB123VH\ where\ AB\ is\ the\ code\ region,\ 1234\ is\ the\ number,\ and\ SH\
+    is\ the\ series\.\ The\ regular\ plate\ has\ an\ orange\ background\ with\ black\
+    marks\.\ Since\ 2005,\ to\ reflect\ the\ German\ FE\ font\ use
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+CA:
+  source: wiki-CA.json
+  classification: printed_not_encoded
+  unit_kind: province_or_territory
+  code_position: printed jurisdiction
+  series: ordinary; exceptions described in notes
+  evidence_pattern: l\ formats\ In\ all\ provinces\ and\ the\ territory\ of\ Yukon\
+    ,\ licence\ plate\ serials\ are\ alphanumeric\ and\ usually\ assigned\ in\ ascending\
+    order\.\ The\ letters\ I,\ O,\ Q\ and\ U\ are\ generally\ not\ used\ to\ avoid\
+    confusion\ with\ 1,\ 0\ and\ V;\ additionally,\ British\ Columbia\ does\ not\
+    use\ the\ letters\ Y\ and\ Z
+  coverage_status: partial
+  notes: Jurisdiction-specific serial patterns overlap; printed province is needed.
+    Historic exceptional allocations unreviewed.
+AU:
+  source: wiki-AU-WA.json
+  classification: usable_now
+  unit_kind: local_government_area
+  code_position: WA locality letter prefix
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ state's\ local\ government\ areas\ \(LGAs\)\.\ LGA\ specific\
+    plates\ can\ only\ be\ requested\ by\ vehicle\ owners\ who\ are\ resident\ within\
+    these\ LGAs\.\ Western\ Australia\ also\ has\ a\ plate\ series\ for\ vehicles\
+    designated\ for\ off\-road\ use\ on
+  notes: Most Australian plates require the printed state. Geographic coding here
+    is limited to optional Western Australian LGA plates; other state schemes and
+    historic allocations are gaps.
+CF:
+  source: wiki-CF.json
+  classification: usable_now
+  unit_kind: prefecture
+  code_position: last two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ VZ,\ followed\ by\ a\ group\ of\ three\ digits\ ranging\ from\
+    001\ to\ 999\.\ The\ last\ two\ letters\ denote\ the\ prefecture\ of\ registration\
+    On\ the\ left\ is\ the\ emblem\ of\ the\ Central\ African\ Economic\ and\ Monetary\
+    Community\ \(CEMAC\)\ and\ the\ RCA\ code\.\ Registration\ codes\ \[\ edit\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+TD:
+  source: wiki-TD.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'to\ spot\ from\ Chad,\ is\ the\ code\ 18,\ which\ identifies\
+    the\ capital\ city\.\ Two\ first\ numbers\ in\ the\ plates\ from\ Chad,\ identifies\
+    the\ region\.\ 01\ —\ Batha\ 02\ —\ Borkou\ 03\ —\ Chari\-Baguirmi\ 04\ —\ Guéra\
+    05\ —\ Hadjer\-Lamis\ 06\ —\ Kanem\ 07\ —\ Lac\ 08\ —\ Logone\ Occidental\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+CL:
+  source: wiki-CL.json
+  classification: historic_only
+  unit_kind: region
+  code_position: initial letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 81\ GRAL\.\ LAKES\ 82\ /\ AAA\ 452\ TJE\ 813\ /\ TALCA\ 83\ GVC\
+    629\ /\ RENCA\ 84\ The\ initial\ letters\ between\ 1981\ and\ 1984\ were\ distributed\
+    as\ follows:\ Arica\ and\ Parinacota,\ and\ Tarapacá\ Regions:\ A\.\ Antofagasta\
+    Region:\ B\.\ Atacama\ and\ Coquimbo\ Regions:\ C\.\ Valparaiso\ Region
+  coverage_status: partial
+  notes: National serial numbering since 1985.
+  valid_to: '1984'
+CN:
+  source: wiki-CN.json
+  classification: usable_now
+  unit_kind: province_and_registration_area
+  code_position: Chinese character plus Latin letter at start
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ow\ found\ on\ 2019\-standard\ registration\ plates\ for\ firetrucks\
+    as\ well\.\ List\ of\ prefixes\ \[\ edit\ \]\ The\ following\ lists\ all\ licence\
+    plate\ prefixes\ in\ use\ in\ the\ People's\ Republic\ of\ China\ ,\ divided\
+    into\ four\ sections:\ municipalities\ ,\ provi
+  coverage_status: partial
+  notes: Municipal prefixes may encode vehicle categories rather than districts; source
+    has current and former prefixes; temporal adjudication incomplete.
+CO:
+  source: wiki-CO.json
+  classification: usable_now
+  unit_kind: registration_region
+  code_position: initial prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 's\ use\ ABC\-123\ format,\ with\ the\ issuing\ city\ or\ department\
+    beneath\.The\ initial\ prefix\ indicates\ the\ original\ region\ of\ registration\.\
+    Current\ plate\ types\ \[\ edit\ \]\ Category\ Image\ Type\ Colors\ Serial\ format\
+    Legends\ English\ Spanish\ Passenger\ Private\ Particular\ black\ on\ '
+  coverage_status: partial
+  notes: Prefix allocation plus printed municipality. Complete allocation ranges not
+    collected.
+HR:
+  source: wiki-HR.json
+  classification: usable_now
+  unit_kind: city
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ \(KA\ =\ Karlovac\ \)\ The\ standard\ licence\ plates\ in\ Croatia\
+    consist\ of\ a\ two\-letter\ city\ code\ which\ is\ separated\ by\ the\ coat\
+    of\ arms\ of\ Croatia\ from\ three\ or\ four\ numbers\ and\ one\ or\ two\ letters\.\
+    Regular\ plates\ \[\ edit\ \]\ The\ standard\ regular\ pla
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+CU:
+  source: wiki-CU.json
+  classification: historic_only
+  unit_kind: province
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ identify\ the\ sector\ to\ which\ the\ medium\ belongs\.\ In\
+    this\ system,\ the\ province\ to\ which\ the\ vehicle\ belongs\ is\ not\ reflected,\
+    as\ was\ the\ case\ previously,\ but\ only\ certain\ sectors\ are\ identified,\
+    which\ allows\ for\ an\ increase\ in\ alphanumeric\ combinations,\ facilitating\
+    continu
+  coverage_status: partial
+  notes: Province letter removed in 2013.
+  valid_to: '2013'
+CY:
+  source: wiki-CY.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'rus\ are\ composed\ of\ three\ letters\ and\ three\ digits\ \(e\.g\.\
+    ABC\ 123\ \)\.\ A\ simple\ incremental\ numbering\ system\ is\ used;\ numbers\
+    run\ from\ 001\ to\ 999\ per\ letter\ sequence\ \(alphabetic\),\ so\ that,\ for\
+    example,\ the\ plate\ to\ be\ issued\ after\ MAA\ 999\ would\ be\ MAB\ 001\ \.\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+CZ:
+  source: wiki-CZ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first letter, usually second character
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ was\ introduced\ between\ 29\ June\ and\ 17\ July\ 2001\.\ In\
+    this\ system,\ the\ first\ letter\ from\ the\ left\ represents\ the\ region\ \(\
+    kraj\ \)\ ,\ and\ this\ is\ combined\ with\ numbers\ issued\ in\ series\ from\
+    1\ x\ 0\ 0001,\ where\ x\ is\ the\ letter\ representing\ the\ region\.\ By\ 2009,\
+    Prague\ \(A\)\ has
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+DK:
+  source: wiki-DK.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: n\ centers\ \(Skat\ Motor\ center\)\.\ The\ combination\ is\ simply\
+    a\ serial\ and\ has\ no\ connection\ with\ a\ geographic\ location,\ but\ the\
+    digits\ have\ number\ series\ based\ on\ vehicle\ type\.\ The\ country's\ official\
+    international\ road\ code\ is\ DK\ ,\ excluding\ the\ Faroe\ Islands\ \.\ Danish
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+DO:
+  source: wiki-DO.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: merican\ standard\ 6\ ×\ 12\ inches\ \(152\ ×\ 300\ mm\)\.\ The\
+    background\ and\ the\ first\ letter\ of\ the\ plate\ varies\ depending\ on\ the\
+    type\ of\ the\ plate\.\ Passenger\ baseplates\ \[\ edit\ \]\ The\ Dominican\ Republic\
+    issued\ a\ single\ plate\ to\ each\ vehicle\ twice\ a\ year\.\ The\ 1st\ \(1º\)\
+    period\ of\ each\ ye
+  coverage_status: partial
+  notes: Ordinary scheme described by vehicle type; full historical coverage not established.
+EC:
+  source: wiki-EC.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: libri\ typeface\ for\ ECUADOR\ text\ since\ 2022\.\ Letter\ codes\
+    \[\ edit\ \]\ The\ first\ letter\ in\ the\ letter\-number\ combination\ indicates\
+    the\ province\ of\ issue\.\ The\ second\ letter,\ also\ called\ the\ "key\ letter",\
+    identifies\ the\ type\ of\ license\ plate\ \(described\ below\)\.\ Some\ plates
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+EG:
+  source: wiki-EG.json
+  classification: usable_now
+  unit_kind: governorate
+  code_position: letter component; Cairo/Giza also digit count
+  series: ordinary; exceptions described in notes
+  evidence_pattern: e\ plates,\ three\ letters\ for\ all\ other\ governorates\ \(including\
+    Cairo\ \)\ Plate\ code\ Governorate\ Vehicle\ Registration\ Image\ 0000\-\.\.\
+    Giza\ Governorate\ 000\-\.\.\.\ Cairo\ Governorate\ 0000\-\.\.أ\ 0000\-\.\.س\
+    Alexandria\ Governorate\ 0000\-\.\.ق\ Qalyubia\ Governorate\ 0000\-\.\.ر\ Sharqia\
+    Gove
+  coverage_status: partial
+  notes: Arabic letter codes and variable formats require script-aware handling.
+GQ:
+  source: wiki-GQ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: re\ built\ on\ the\ Spanish\ principle\ and\ have\ the\ format\
+    "AB\-123\-C"\.\ The\ prefix\ "AB"\ means\ the\ region,\ "123"\ \-\ the\ number,\
+    the\ suffix\ "С"\ \-\ the\ series\.\ The\ license\ plates\ have\ European\ shapes\
+    and\ sizes\.\ Regular\ plates\ have\ a\ white\ background\ with\ blac
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+EE:
+  source: wiki-EE.json
+  classification: historic_only
+  unit_kind: registration_office
+  code_position: first of three letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: are\ the\ same\ size\ and\ length\ as\ other\ European\ plates\
+    \(520\ ×\ 113\ mm\)\.\ Previously\ the\ first\ of\ the\ three\ letters\ indicated\
+    the\ region\ of\ Estonia\ in\ which\ the\ car\ was\ registered;\ however,\ as\
+    of\ 2013,\ this\ is\ no\ longer\ the\ case\.\ The\ third\ digit\ from\ the\ numbers\
+    indicated\ st
+  coverage_status: partial
+  notes: 'Source contradicts itself: introduction says ended 2013; history says random
+    since August 2019.'
+  valid_to: '2019'
+SZ:
+  source: wiki-SZ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: final letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ace,\ three\ numbers,\ another\ space,\ and\ then\ one\ random\
+    letter\ and\ the\ first\ letter\ of\ the\ region\ the\ car\ is\ registered\ to\.\
+    \(e\.g\.\ JSD\ 136\ AM\)\.\ This\ allows\ for\ 26\ x\ 10\ x\ 10\ x\ 10\ x\ 26\
+    x\ 26\ =\ 17,576,000\ vehicle\ registration\ numbers\.\ The\ 2010\ design\ consists\
+    of\ black\ lette
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+FI:
+  source: wiki-FI.json
+  classification: historic_only
+  unit_kind: province
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ABC\-123\),\ though\ vanity\ plates\ may\ carry\ 2\-3\ letters\
+    and\ 1\-3\ numbers\.\ Since\ 1989\ the\ code\ has\ no\ connection\ with\ the\
+    geographic\ location,\ except\ that\ Åland\ has\ its\ own\ type\ of\ plate\.\
+    Between\ 1972/1973\ and\ 1989\ the\ first\ letter\ indicated\ where\ the\ vehicle\
+    wa
+  coverage_status: partial
+  notes: Åland has a separate territorial series.
+  valid_to: '1989'
+GA:
+  source: wiki-GA.json
+  classification: historic_only
+  unit_kind: region
+  code_position: digit after G in old series
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ flag\ colors\ under\ which\ the\ code\ has\ RG\.\ Regional\
+    coding\ is\ missing\.\ Regular\ license\ plates\ until\ 2013\ \[\ edit\ \]\ Regular\
+    license\ plate\ until\ 2013\ By\ 2013,\ issued\ license\ plates\ 1234G5A\ format,\
+    which\ 1234\ \-\ number,\ G\ \-\ pointer\ Gabon,\ 5\ \-\ a\ region\ code\ A\ '
+  coverage_status: partial
+  notes: Current provincial coding not established from fetched evidence.
+  valid_to: '2013'
+DE:
+  source: wiki-DE.json
+  classification: usable_now
+  unit_kind: district_or_city
+  code_position: first one to three letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'e\.\ A\ significant\ feature\ of\ German\ vehicle\ registration\
+    plates\ is\ the\ area\ code,\ which\ can\ be\ used\ to\ tell\ the\ district\ of\
+    registration\.\ It\ has\ developed\ into\ a\ widespread\ habit\ in\ Germany,\
+    even\ a\ children''s\ game\ when\ travelling,\ to\ guess\ "where\ that\ vehicle\
+    is\ from"\.\ '
+  coverage_status: partial
+  notes: Vehicles may retain plate after moves; multiple districts share restored
+    codes.
+GH:
+  source: wiki-GH.json
+  classification: usable_now
+  unit_kind: region
+  code_position: letter prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ates\ of\ Ghana\ are\ issued\ by\ the\ Driver\ Vehicle\ License\
+    Authority\.\ The\ plates\ indicate\ the\ region\ where\ the\ vehicles\ were\ registered\.\
+    Regulations\ \[\ edit\ \]\ Ghana\ has\ no\ national\ restrictions\ on\ number\
+    plates\.\ For\ example,\ a\ vehicle\ registered\ in\ the\ Asha
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+GR:
+  source: wiki-GR.json
+  classification: usable_now
+  unit_kind: prefecture
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'loniki\ ,\ which\ are\ represented\ by\ just\ the\ first\ letter\
+    of\ the\ three,\ all\ other\ districts\ are\ represented\ by\ the\ first\ 2\ letters\.\
+    The\ final\ one\ or\ two\ letters\ in\ the\ sequence\ changes\ in\ Greek\ alphabetical\
+    order\ after\ 8,999\ issued\ plates\.\ For\ example,\ Patras\ plates\ are\ ΑΧΑ–1000\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+GL:
+  source: wiki-GL.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: n\ centers\ \(Skat\ Motor\ center\)\.\ The\ combination\ is\ simply\
+    a\ serial\ and\ has\ no\ connection\ with\ a\ geographic\ location,\ but\ the\
+    digits\ have\ number\ series\ based\ on\ vehicle\ type\.\ The\ country's\ official\
+    international\ road\ code\ is\ DK\ ,\ excluding\ the\ Faroe\ Islands\ \.\ Danish
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+GU:
+  source: wiki-GU.json
+  classification: usable_now
+  unit_kind: municipality
+  code_position: two-letter prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: e\ 12\ in\ ×\ 6\ in\ 30\ cm\ ×\ 15\ cm\ Material\ Aluminum\ Serial\
+    format\ AB\ 1234\ \(coded\ by\ municipality\)\ Introduced\ February\ 27,\ 2009\
+    \(\ 2009\-02\-27\ \)\ History\ First\ issued\ 1916\ \(\ 1916\ \)\ The\ U\.S\.\
+    unincorporated\ territory\ of\ Guam\ first\ required\ its\ resident
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+GT:
+  source: wiki-GT.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \[\ edit\ \]\ Guatemala\ uses\ the\ same\ format\ for\ all\ types,\
+    123ABC,\ with\ a\ prefix\ at\ the\ start\ to\ show\ the\ vehicle\ class\.\ P\
+    is\ for\ passenger\ vehicles\ and\ is\ the\ most\ common\ type\.\ C\ is\ for\
+    commercial\ vehicles\.\ Image\ First\ issued\ Design\ Slogan\ Serial\ format\
+    Serials\ issued
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+GN:
+  source: wiki-GN.json
+  classification: usable_now
+  unit_kind: region
+  code_position: last two digits since 2021; prefix letters in older series
+  series: ordinary; exceptions described in notes
+  evidence_pattern: lack\ colored\ circle\ and\ country\-code\ RG\ \.\ XX\ \-123\-AB\
+    XX\ indicates\ the\ two\-letter\ regional\ code\.\ RC\ indicates\ Conakry\ Region\
+    for\ example\.\ 30\ cm\ x\ 15\ cm\ White\ on\ red\ On\ the\ top\ right\ corner,\
+    flag\-map\ Guinea\ in\ a\ black\ colored\ circle\ and\ country\-c
+  coverage_status: partial
+  notes: Numeric regional suffix since 2021; cited table has eight numeric regions
+    but only one historical letter mapping.
+HT:
+  source: wiki-HT.json
+  classification: printed_not_encoded
+  unit_kind: region
+  code_position: region printed at bottom
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ere\ issued\ for\ each\ geographical\ region\ of\ the\ country\.\
+    The\ following\ region\ names\ were\ shown\ at\ the\ bottom\ of\ the\ plate:\
+    Nord\-Ouest,\ Nord,\ Nord\-Est,\ Artibonite,\ Centre,\ Ouest,\ Sud\-Est,\ Sud,\
+    and\ Grand\ Anse\.\ Only\ a\ single\ plate\ was\ issued\.\ The\ front\ plate\
+    wa
+  coverage_status: partial
+  notes: Evidence is historical; current geography cannot be inferred from the number.
+HU:
+  source: wiki-HU.json
+  classification: historic_only
+  unit_kind: district
+  code_position: historic leading district code
+  series: ordinary; exceptions described in notes
+  evidence_pattern: plates\ also\ included\ the\ year\ of\ issue\ next\ to\ the\ regional\
+    code\.\ The\ same\ regional\ system\ was\ maintained\ until\ 1933,\ even\ though\
+    the\ territory\ of\ Hungary\ was\ significantly\ reduced\ after\ the\ Treaty\
+    of\ Trianon\ \.\ In\ 1933\ the\ regional\ system\ was\ changed\ to\ a\ two\ letter
+  coverage_status: partial
+  notes: Proposed regional scheme was not adopted in 2022.
+  valid_to: '1933'
+IS:
+  source: wiki-IS.json
+  classification: historic_only
+  unit_kind: district
+  code_position: historic letter prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: cle\ plates\ are\ 240\ mm\ ×\ 130\ mm\ \(9\.4\ in\ ×\ 5\.1\ in\)\.\
+    History\ \[\ edit\ \]\ An\ older\ decentralized\ district\ plate\ system\ was\
+    used\ 1938\ until\ 31\ December\ 1988\ \(see\ below\)\.\ The\ current\ registration\
+    system\ was\ introduced\ on\ 1\ January\ 1989\.\ Antique\ cars\ were\ allowed\
+    to\ keep
+  coverage_status: partial
+  notes: Current ordinary serials have no geographic coding.
+  valid_to: '1988-12-31'
+IN:
+  source: wiki-IN.json
+  classification: usable_now
+  unit_kind: state_and_registration_office
+  code_position: first two letters plus one/two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ Territory\ in\ which\ the\ vehicle\ is\ registered\.\ Part\
+    2:\ RTO\ number\ ;\ a\ two\-digit\ number\ allocated\ to\ a\ district\ RTO\ within\
+    the\ respective\ state\ or\ Union\ Territory\.\ Due\ to\ heavy\ volume\ of\ vehicle\
+    registration,\ unique\ numbers\ may\ be\ allocated\ to\ multiple\ RTOs\ within\ '
+  coverage_status: partial
+  notes: BH nationwide, diplomatic and military series are excluded; some state codes
+    are statewide and Delhi/suboffice formats vary.
+ID:
+  source: wiki-ID.json
+  classification: usable_now
+  unit_kind: registration_area
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'nsurance\ operator\ Jasa\ Raharja\ \.\ Registration\ area\ codes\
+    \[\ edit\ \]\ The\ lettering\ convention\ denoting\ the\ area\ of\ registration\
+    is\ a\ legacy\ of\ the\ Dutch\ colonial\ era\ and\ does\ not\ reflect\ the\ current\
+    regional\ divisions\ of\ the\ country\ into\ provinces\.\ They\ follow\ '
+  coverage_status: partial
+  notes: Region boundaries reflect older divisions; suffix letters can refine locality
+    and are not fully collected.
+IR:
+  source: wiki-IR.json
+  classification: usable_now
+  unit_kind: province
+  code_position: two digits at right; letter may refine county
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ard\ dimensions\ since\ 2005\.\ Each\ province\ in\ Iran\ has\
+    multiple\ unique,\ two\-digit\ codes\ that\ are\ included\ at\ the\ right\ end\
+    of\ the\ license\ plates\ in\ a\ distinguished\ square\ outline,\ above\ which\
+    the\ word\ ایران\ or\ "Iran"\ has\ been\ written\.\ A\ province''s\ license\ plates\
+    will\ not\ '
+  coverage_status: partial
+  notes: Persian digit strings retained; province coverage collected, county/letter
+    intersections incomplete.
+IQ:
+  source: wiki-IQ.json
+  classification: usable_now
+  unit_kind: governorate
+  code_position: numeric governorate group
+  series: ordinary; exceptions described in notes
+  evidence_pattern: late\ size\ restrictions\.\ Below\ are\ the\ codes\ for\ governorates\
+    of\ Iraq\.\ Code\ Governorate\ 11\ Baghdad\ Governorate\ 12\ Nineveh\ Governorate\
+    13\ Maysan\ Governorate\ 14\ Basra\ Governorate\ 15\ Al\ Anbar\ Governorate\ 16\
+    Al\-Qādisiyyah\ Governorate\ 17\ Muthanna\ Govern
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+IE:
+  source: wiki-IE.json
+  classification: usable_now
+  unit_kind: county
+  code_position: middle letter group after year
+  series: ordinary; exceptions described in notes
+  evidence_pattern: vehicle's\ number\ plate\ is\ determined\ when\ it\ is\ first\
+    registered,\ the\ county/city\ code\ is\ taken\ from\ the\ first\ owner's\ postal\
+    address\.\ Registration\ remains\ fixed\ on\ one\ vehicle\ until\ it\ is\ de\-registered\
+    \(exported,\ destroyed,\ etc\.\),\ and\ cannot\ be\ tran
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+IT:
+  source: wiki-IT.json
+  classification: historic_only
+  unit_kind: province
+  code_position: historic province prefix/suffix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ a\ defined\ format\ \(2\ letters,\ 3\ numbers,\ and\ then\
+    2\ letters\)\ which\ is\ issued\ nationwide,\ regardless\ of\ the\ local\ registration\
+    office\.\ Starting\ from\ 7\ February\ 1999,\ this\ format\ was\ slightly\ redesigned,\
+    adding\ a\ blue\ strip\ on\ the\ left\ containing\ the\ EU\ flag\ above\ the\
+    country\ code\ I\ '
+  coverage_status: partial
+  notes: Since 1994 serial is national; optional province band is not encoded in current
+    number. Some province abbreviations postdate 1994; see code-row caveat.
+  valid_to: '1994'
+FR:
+  source: wiki-FR.json
+  classification: historic_only
+  unit_kind: department
+  code_position: historic final department digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: h\ was\ responsible\ for\ issuing\ the\ plates\ in\ the\ early\
+    20th\ century\.\ A\ pre\-2009\ car\ plate\ with\ the\ two\-digit\ code\ for\ Paris\
+    \(75\)\.\ Since\ 1901,\ various\ systems\ have\ been\ successively\ introduced,\
+    the\ most\ recent\ dating\ from\ 2009\.\ The\ registration\ plates\ issued\ since
+  coverage_status: partial
+  notes: Current SIV number is national; freely chosen printed territorial identifier
+    is not proof of registration location.
+  valid_to: '2009'
+JP:
+  source: wiki-JP.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: Japanese marking before class number
+  series: ordinary; exceptions described in notes
+  evidence_pattern: an\ 660cc\ 9\ 99\ 900\ Tractor\ or\ forklift\ 0\ 00\ 000\ Construction\
+    equipment\ Transportation\ offices\ and\ markings\ \[\ edit\ \]\ Japanese\ registration\
+    plates\ indicate\ the\ transportation\ office\ that\ issued\ the\ plate,\ known\
+    in\ Japanese\ as\ Gotōchi\ \(\ ご当地\ ;\ local\ place\)\ \.\ U
+  coverage_status: partial
+  notes: Includes named regional marks; full plate examples are source specimens,
+    not confirmed live vehicles.
+KZ:
+  source: wiki-KZ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: two digits at right
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ackground\ with\ a\ Kazakh\ flag\ and\ the\ country\ code\ KZ\
+    on\ the\ left\.\ The\ two\ digit\ area\ code\ is\ located\ on\ the\ square\ located\
+    on\ the\ right\ and\ the\ rest\ of\ the\ plate\ follows\ the\ format\ 111AAA\.\
+    This\ format\ was\ introduced\ in\ 2011\ and\ was\ implemented\ from\ A
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+KE:
+  source: wiki-KE.json
+  classification: historic_only
+  unit_kind: registration_district
+  code_position: historic letter after K
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'u\ \(KS\),\ Mombasa\ \(KT\)\ and\ Kisumu\ \(KU\)\ were\ issued,\
+    KW\ \(1984\)\ being\ the\ first\ number\ that\ was\ never\ used\ regionally\.\
+    1989\-2007\ \[\ edit\ \]\ After\ the\ registration\ of\ vehicle\ KZZ\ 999,\ the\
+    second\ generation\ was\ started\ in\ 1989\.\ The\ series\ follow\ KAA\ 001A\
+    to\ KAZ\ 999Z\ The\ '
+  coverage_status: partial
+  notes: Current regular plates are national sequences.
+  valid_to: '1984'
+KP:
+  source: wiki-KP.json
+  classification: usable_now
+  unit_kind: province_or_city
+  code_position: Korean name at start
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ar\ type\ or\ class\ of\ vehicle\.\ \[\ citation\ needed\ \]\
+    Plate\ types\ \[\ edit\ \]\ Abbreviation\ \(as\ it\ appears\ on\ the\ plate\)\
+    Romanization\ of\ abbreviation\ Full\ name\ Hanja\ Romanization\ of\ full\ name\
+    Translation\ 평양\ P’yŏngyang\ 평양시\ 平壤直轄市\ P’yŏngyang\ Chikhalsi\ Pyongyang\ City\
+    라선\ Ras
+  coverage_status: partial
+  notes: Source reliability and current administrative changes unverified.
+KR:
+  source: wiki-KR.json
+  classification: historic_only
+  unit_kind: province_or_city
+  code_position: old name on upper line
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '3\ to\ 2003\ series,\ with\ some\ changes\ to\ the\ information\
+    presented\.\ The\ province\ name\ is\ omitted\.\ The\ prefix\ on\ the\ bottom\
+    line\ is\ moved\ to\ the\ top\ line\ \-\ right\ of\ the\ class\ number\ for\ regular\
+    series,\ and\ left\ of\ the\ class\ number\ for\ the\ circled\ '
+  coverage_status: partial
+  notes: Ordinary private plates lost province names in 2004; commercial exceptions
+    not fully reviewed.
+  valid_to: '2004'
+KG:
+  source: wiki-KG.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\]\ Starting\ from\ July\ 2015,\ a\ new\ system\ has\ entered\
+    into\ circulation\.\ Each\ province\ now\ has\ a\ two\ digit\ code\.\ The\ new\
+    license\ plates\ have\ the\ font\ FE\-Schrift\ \.\ The\ numbers\ usually\ have\
+    a\ font\ size\ slightly\ larger\ than\ the\ letters,\ similar\ to\ Russian\ vehicle\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+LA:
+  source: wiki-LA.json
+  classification: printed_not_encoded
+  unit_kind: province
+  code_position: name above serial
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'it\ \]\ Electric\ cars\ will\ have\ an\ EV\ banner\ at\ the\
+    top\ left\ corner\.\ The\ top\ of\ the\ plate\ displays\ the\ name\ of\ the\ province\
+    where\ the\ car\ is\ registered\.\ The\ plates\ display\ a\ two\-letter\ prefix\.\
+    The\ first\ letter\ ກ,\ ຂ,\ ຄ,\ ນ,\ ມ,\ ຣ,\ ລ,\ ວ,\ ຫ,\ ອ\ or\ ຮ\ is\ for\ passenger\
+    cars;\ ຈ,\ ຍ,\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+LB:
+  source: wiki-LB.json
+  classification: usable_now
+  unit_kind: registration_area
+  code_position: Latin letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 's\ classification\ all\ in\ white\.\ The\ rest\ of\ the\ plate\
+    is\ white,\ with\ a\ Latin\ letter\ representing\ the\ vehicle''s\ registration\
+    area\ and\ Arabic\ numbers\ next\ to\ the\ letter\ in\ bold\.\ Different\ colors\
+    represent\ different\ usages\ \(e\.g\.,\ red\ ones\ are\ used\ by\ taxis\ and\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+LY:
+  source: wiki-LY.json
+  classification: usable_now
+  unit_kind: municipality
+  code_position: first one or two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ 999999\]\.\ The\ First\ number\ \(\ \#\ \),\ a\ 1\ or\ 2\ digit\
+    number\ consists\ of\ a\ code\ corresponding\ to\ Municipality\ in\ Libya\.\ This\
+    number\ is\ separated\ by\ a\ dash\ from\ the\ registration\ code,\ which\ can\
+    be\ 1\ to\ 6\ digits\.\ In\ the\ city\ of\ Tripoli\ ,\ due\ to\ its\ larger\ popul
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+LT:
+  source: wiki-LT.json
+  classification: historic_only
+  unit_kind: county
+  code_position: second letter of three
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ EU\ stripe\ for\ two\-line\ or\ narrow\ plates\)\.\ Area\ designations\
+    \[\ edit\ \]\ Until\ 2004\ the\ second\ of\ the\ three\ letters\ in\ each\ registration\
+    mark\ indicated\ the\ geographical\ administrative\ area\ in\ which\ the\ vehicle\
+    had\ originally\ been\ registered,\ as\ follows:\ A\ K\ L\ M\ P\ S
+  coverage_status: partial
+  notes: Current serial has no regional code.
+  valid_to: '2004'
+LU:
+  source: wiki-LU.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ued\ as\ a\ custom\ plate\.\ The\ numbers\ are\ issued\ at\ a\
+    national\ level\ and\ give\ no\ indication\ of\ regional\ origin\.\ Plates\ have\
+    black\ characters\ on\ a\ yellow\ background,\ with\ the\ standard\ blue\ EU\
+    stripe\ on\ the\ left\.\ The\ current\ usage\ and\ format\ of\ plates\ was\ enacte
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+MG:
+  source: wiki-MG.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first letter after numeric serial
+  series: ordinary; exceptions described in notes
+  evidence_pattern: rs\ with\ the\ current\ format\ \(1234\ XAB\)\ with\ 4\ random\
+    numbers,\ with\ the\ first\ letter\ as\ a\ province\ code,\ and\ the\ last\ 2\
+    random\ letters\.\ History\ \[\ edit\ \]\ License\ plate\ of\ Toamasina\.\ White\
+    license\ plate\ with\ black\ lettering\ were\ resolved\ until\ 2014\.\ The\ l
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+MY:
+  source: wiki-MY.json
+  classification: usable_now
+  unit_kind: state_or_division
+  code_position: leading one/two letters; Sarawak and Sabah vary
+  series: ordinary; exceptions described in notes
+  evidence_pattern: t\ and\ the\ first\ alphabetical\ sequence\ progressed;\ resuming\
+    at\ PBA\ 1\ \.\ Registration\ plates\ of\ Peninsular\ Malaysia\ Prefix\ \(\ x\
+    \)\ State\ Current\ Plate\ Current\ Bidding\ Plate\ A\ Perak\ APL\ APP\ B\ Selangor\
+    BSU\ BSY\ C\ Pahang\ CFH\ CFJ\ D\ Kelantan\ DFS\ DFS\ F\ Putrajaya\ FH\ FH\ J\
+    Joh
+  coverage_status: partial
+  notes: Special, commemorative and tendered series may be nationwide; K/V/W and East
+    Malaysian generations need series-specific rules.
+MD:
+  source: wiki-MD.json
+  classification: historic_only
+  unit_kind: region
+  code_position: first one/two letters before 2015
+  series: ordinary; exceptions described in notes
+  evidence_pattern: gh,\ made\ of\ metal\ with\ embossed\ characters\ using\ the\
+    FE\-Schrift\ font\.\ Pre\-2015\ plates\ have\ seven\ characters:\ two\ letters\
+    for\ the\ region\ \(except\ for\ Chișinău\ ,\ which\ only\ has\ the\ letters\
+    C\ and\ K\),\ two\ letters\ for\ the\ series\ and\ three\ digits,\ all\ written\
+    usin
+  coverage_status: partial
+  notes: Transnistrian series differs and remains a separate coverage gap.
+  valid_to: '2015'
+MN:
+  source: wiki-MN.json
+  classification: usable_now
+  unit_kind: province_or_district
+  code_position: first two letters of suffix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: icence\ plates\ have\ used\ the\ Roboto\ typeface\ in\ lieu\ of\
+    DIN\ 1451\ \.\ The\ first\ two\ letters\ of\ the\ three\-letter\ suffix\ indicate\
+    the\ province\ \(or\ aimag\ in\ Mongolian\)\ where\ the\ vehicle\ was\ registered:\
+    Suffix\ Aimag\ АР\ Arkhangai\ aimag\ БH\ Bayankhongor\ aimag\ БP\ Baganuur\ \(\
+    U
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+ME:
+  source: wiki-ME.json
+  classification: usable_now
+  unit_kind: municipality
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ernational\ automobile\ code\ \(MNE\);\ continuing\ in\ white\
+    background,\ the\ two\-letter\ code\ of\ the\ municipality\ where\ the\ vehicle\
+    was\ registered\ in,\ then\ the\ coat\-of\-arms\ of\ Montenegro\ following\ by\
+    the\ registration\ code,\ which\ generally\ consists\ of\ two\ letters\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+MZ:
+  source: wiki-MZ.json
+  classification: usable_now
+  unit_kind: province
+  code_position: last two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: s\ are\ in\ the\ format\ ABC\ 123\ followed\ by\ the\ Mozambique\
+    crest\ and\ then\ two\ more\ letters\ that\ represent\ the\ province\ where\ the\
+    car\ is\ registered\.\ Two\ row\ plates\ are\ in\ the\ format\ ABC\ at\ the\ top\
+    left\ followed\ by\ the\ Mozambique\ crest\ offset\ at\ the\ top\ right\ on\ the\
+    fir
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+MM:
+  source: wiki-MM.json
+  classification: usable_now
+  unit_kind: region_and_township
+  code_position: regional code and township numeral above serial
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ the\ plates\ was\ introduced\ in\ July\ 2021\.\ The\ current\
+    plates\ contain\ a\ three\ letter\ regional\ code\ followed\ by\ a\ numeral\ representing\
+    the\ township\ \(such\ as\ YGN\-38\ for\ Yangon\ Region,\ Dagon\ Township\)\ above\
+    a\ six\ character\ alphanumeric\ serial\ number,\ and\ the\ make\ and\ model
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+NA:
+  source: wiki-NA.json
+  classification: usable_now
+  unit_kind: town_or_region
+  code_position: last one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 3\-456\ A\ N\ 123\-456\ AB\ The\ first\ letter\ is\ always\ "N"\
+    for\ Namibia\ \.\ The\ last\ one\ or\ two\ letters\ indicate\ the\ town\ or\ region\
+    the\ car\ originates\ from\.\ In\ between,\ numbers\ are\ issued\ sequentially\
+    within\ each\ region,\ starting\ with\ single\-digit\ numbers,\ and\ increasing
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+NP:
+  source: wiki-NP.json
+  classification: usable_now
+  unit_kind: province
+  code_position: province name/number at start
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ember\ 2019,\ and\ starting\ from\ July\ 2020,\ this\ format\
+    has\ been\ issued\.\ These\ new\ plates\ replace\ Zones\ that\ were\ dissolved\
+    on\ 2015,\ with\ Provinces\ \.\ These\ license\ plates\ are\ embossed,\ and\ have\
+    a\ uniform\ black\ on\ white\ background\ color\ scheme\.\ They\ are\ '
+  coverage_status: partial
+  notes: Historic zone scripts and transition to embossed province plates are not
+    exhaustively covered.
+NL:
+  source: wiki-NL.json
+  classification: historic_only
+  unit_kind: province
+  code_position: old leading letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'the\ present\ system\.\ From\ 1906,\ a\ new\ system\ used\ the\
+    format\ xx\-ddddd,\ where\ xx\ was\ a\ province\ code\ and\ ddddd\ a\ serial\
+    number\.\ This\ system\ lasted\ until\ 1951\ when\ the\ current\ system\ was\
+    introduced\.\ Province\ codes\ \[\ edit\ \]\ A:\ Groningen\ B:\ Friesland\ D:'
+  coverage_status: partial
+  notes: Modern national serials have no place code; historical provincial system
+    ended in 1951.
+  valid_to: '1951'
+NZ:
+  source: wiki-NZ.json
+  classification: historic_only
+  unit_kind: region
+  code_position: historic allocation blocks
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ion\ to\ this\ rule\ occurred\ when\ Ln\ plates\ first\ appeared\
+    in\ 1964:\ most\ plates\ went\ to\ the\ regions\ in\ batches,\ starting\ with\
+    the\ AA\ series\ in\ Southland\ and\ moving\ progressively\ north\.\ For\ some\
+    time\ one\ could\ reasonably\ infer\ that\ an\ AF\ plate\ hailed\ from\ Duned
+  coverage_status: partial
+  notes: Historic batch correlations are not current geographic guarantees; incomplete
+    historical table.
+NI:
+  source: wiki-NI.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ ×\ 300\ mm\)\.\ The\ background\ of\ the\ plate\ presents\ a\
+    map\ of\ Nicaragua\ \.\ One\ or\ two\ letters\ identifies\ the\ region\ followed\
+    by\ a\ serial\ number\.\ Past\ plates\ \[\ edit\ \]\ Image\ First\ issued\ Design\
+    Slogan\ Serial\ format\ Serials\ issued\ Notes\ \[\ when\?\ \]\ White\ on\ black\
+    Nicara
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+NE:
+  source: wiki-NE.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first digit
+  series: ordinary; exceptions described in notes
+  evidence_pattern: le\ license\ plates,\ introduced\ in\ 2005,\ uses\ the\ 1A\ 2345\
+    format,\ where\ 1\ represents\ the\ area\ code,\ A\ represents\ the\ series,\
+    and\ 2345\ represents\ random\ digits\.\ Regular\ plates\ have\ a\ white\ background\
+    with\ black\ characters\.\ At\ the\ right\ side\ of\ the\ p
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+NG:
+  source: wiki-NG.json
+  classification: usable_now
+  unit_kind: local_government_area
+  code_position: first three letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \]\ The\ unique\ plate\ combination\ itself\ is\ in\ the\ format\
+    ABC\-123DE\.\ The\ first\ three\ letters\ indicate\ the\ Local\ Government\ Area\
+    in\ which\ the\ vehicle\ was\ registered,\ which\ are\ followed\ by\ three\ digits\
+    and\ two\ letters\.\ The\ background\ consists\ of\ an\ outline\ of\ a\ map\ of\
+    Nigeria\.\ B
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+MK:
+  source: wiki-MK.json
+  classification: usable_now
+  unit_kind: municipality
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: isting\ codes,\ one\ new\ code\ was\ introduced:\ PE\.\ Current\
+    codes\ \[\ edit\ \]\ Vehicle\ registration\ plate\ codes\ by\ municipalities\
+    in\ English\ alphabetical\ order:\ Code\ Region\ Municipalities\ covered\ by\
+    the\ code\ Appearance\ BE\ Berovo\ Berovo\ BT\ Bitola\ Bitola\ ,\ Mogila\ ,\ Novaci\
+    DB\ Debar
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+'NO':
+  source: wiki-NO.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: vehicles\ HY:\ Hydrogen\ powered\ vehicles\ Ordinary\ vehicle\
+    plates\ have\ a\ prefix\ based\ on\ the\ geographic\ location\ for\ the\ first\
+    registration,\ and\ will\ be\ unchanged\ later\.\ Area\ County\ Registration\
+    series\ Halden\ Østfold\ AA\ AB\ AC\ Hafslund\ Østfold\ AD\ AR\ AS\ AT\ AU\ AV\
+    A
+  coverage_status: partial
+  notes: Nationwide EV, hydrogen, gas and diplomatic prefixes must be excluded.
+OM:
+  source: wiki-OM.json
+  classification: historic_only
+  unit_kind: district
+  code_position: historic trailing letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: aning\ Private\ yellow\ =\ private\ vehicle\ Taxi\ red\ =\ non\-private\
+    vehicle\ Main\ district\ codes\ \(for\ old\ plates\ \)\ \[\ edit\ \]\ The\ style\
+    is\ 99999\ X\(X\(X\)\)\ with\ Arabic\ numbers\ followed\ with\ letters\.\ X\ is\
+    district\ registered\ to:\ Old\ Registration\ plate\ from\ Oman\ Letter
+  coverage_status: partial
+  notes: Current ordinary region inference not established.
+PK:
+  source: wiki-PK.json
+  classification: printed_not_encoded
+  unit_kind: province_or_territory
+  code_position: printed province and design
+  series: ordinary; exceptions described in notes
+  evidence_pattern: s\ are\ blue\ with\ white\ letters\ and\ numbers\.\ Provincial\
+    plates\ \[\ edit\ \]\ Each\ province\ and\ territory\ has\ its\ own\ vehicle\
+    registration\ plate\ design\.\ Azad\ Jammu\ \&\ Kashmir\ \[\ edit\ \]\ Azad\ Jammu\
+    \&\ Kashmir\ vehicle\ registration\ plates\ Vehicle\ Type\ Image\ Example\ Descript
+  coverage_status: partial
+  notes: Current district-prefix validity not established; Punjab has changed allocation
+    systems. Treat WD codes as undated evidence.
+PW:
+  source: wiki-PW.json
+  classification: printed_not_encoded
+  unit_kind: state
+  code_position: printed state name
+  series: ordinary; exceptions described in notes
+  evidence_pattern: i\ Japanese\ manufacture\ 1980\ Two\ bai\ \(men's\ meeting\ houses\)\
+    Koror\ 1988\ State\ seal\ Ngarchelong\ plexiglass\ 1990s\ Offshore\ natural\ arch\
+    Spelled\ "NG\ A\ REMLENGUI"\ Ngeremlengui\ 1990s\ State\ seal\ Ngatpang\ plexiglass\
+    1992\ Two\ bai\ \(men's\ meeting\ houses\)
+  coverage_status: partial
+  notes: Printed-state evidence from plate designs; current serial encoding not established.
+PG:
+  source: wiki-PG.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'erman\ FE\ style\.\ Since\ the\ mid\-1990s,\ plates\ have\ been\
+    issued\ with\ the\ first\ letter\ identifying\ the\ province\ of\ issue\.\ As\
+    of\ 2025,\ most\ private\ and\ commercial\ motor\ vehicles\ use\ standard\ white\
+    plates\ with\ black\ lettering\.\ Special\ number\ plates\ are\ issued\ to\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+PE:
+  source: wiki-PE.json
+  classification: usable_now
+  unit_kind: registration_zone
+  code_position: leading letter in current series
+  series: ordinary; exceptions described in notes
+  evidence_pattern: an\ Serial\ format\ Serials\ issued\ Notes\ 2008\ Passenger\ car\
+    None\ AB\-1234\ 2010\ Series\ \[\ edit\ \]\ 2010\ license\ plate\ dimensions\
+    The\ redesign\ of\ the\ Peruvian\ plates\ included\ many\ changes\.\ The\ national\
+    flag\ of\ Peru\ is\ displayed\ in\ co
+  coverage_status: partial
+  notes: Source mixes historic regional codes and newer allocation; current extraction
+    requires further review.
+PH:
+  source: wiki-PH.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first letter (position varies for motorcycles)
+  series: ordinary; exceptions described in notes
+  evidence_pattern: pectedly\ rapid\ depletion\ of\ available\ combinations\.\ In\
+    all\ cases,\ the\ first\ letter,\ regardless\ of\ its\ position,\ indicates\ the\
+    region\ where\ the\ motorcycle\ was\ registered\.\ The\ LTO\ has\ not\ stated\
+    that\ the\ current\ set\ of\ formats\ is\ final,\ and\ additional\ combinatio
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+PT:
+  source: wiki-PT.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: trailer prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ blue\ Euroband,\ joined\ by\ the\ EU\ flag\ on\ top\.\ District\
+    codes\ \[\ edit\ \]\ Trailers\ and\ vehicles\ for\ export\ have\ the\ following\
+    district\ code\ letters\ in\ their\ licence\ plates:\ A\ –\ Ponta\ Delgada\ \(\
+    Azores\ \)\ AN\ –\ Angra\ do\ Heroismo\ AV\ –\ Aveiro\ BE\ –\ Beja\ BG\ –\ Bragança\ '
+  coverage_status: partial
+  notes: Ordinary cars have national sequences; geography applies to trailers/export
+    series only.
+RO:
+  source: wiki-RO.json
+  classification: usable_now
+  unit_kind: county
+  code_position: first one or two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'k\ letters\ on\ white\ background\ in\ the\ format\ CC\ 12\ ABC\
+    ,\ where\ CC\ is\ a\ two\ letter\ county\ code\ ,\ 12\ is\ a\ two\ digit\ group,\
+    and\ ABC\ is\ a\ three\ letter\ group\.\ For\ Bucharest,\ the\ format\ is\ B\
+    12\ ABC\ or\ B\ 123\ ABC\ ,\ where\ B\ is\ code\ for\ Bucharest\ city,\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+RU:
+  source: wiki-RU.json
+  classification: usable_now
+  unit_kind: federal_subject
+  code_position: right-hand two or three digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'Х\),\ additionally\ D\ was\ issued\ on\ some\ very\ early\ plates\.\
+    Finally,\ the\ region\ number\ \(77,\ 97,\ 99,\ 177,\ 197,\ 199,\ 777,\ 797\ and\
+    799\ for\ Moscow\ ;\ 78,\ 98,\ 178,\ and\ 198\ for\ Saint\ Petersburg\ ,\ etc\.\)\
+    and\ the\ international\ code\ RUS\ with\ the\ 1991\ '
+  coverage_status: partial
+  notes: Preserve disputed/occupied-territory claims as source assignments, not sovereignty
+    assertions; obsolete reused codes need dates.
+RS:
+  source: wiki-RS.json
+  classification: usable_now
+  unit_kind: registration_area
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ansitional\ period\ until\ the\ end\ of\ 2011\.\ Standard\ plates\
+    \[\ edit\ \]\ The\ two\-letter\ regional\ code\ is\ followed\ by\ three\ or\ four\-digit\
+    numeric\ code\ separated\ by\ the\ Serbian\ cross\ shield\ and\ a\ Cyrillic\ letter\
+    combination\ for\ the\ region\ below,\ and\ then\ followed\ b
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+SK:
+  source: wiki-SK.json
+  classification: historic_only
+  unit_kind: district
+  code_position: first two letters before 2023
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ number\ and\ LL\ were\ two\ additional\ letters\ \(assigned\
+    alphabetically\)\.\ From\ January\ 2023,\ a\ new\ state\-wide\ numbering\ scheme\
+    was\ introduced,\ preserving\ the\ same\ layout,\ but\ replacing\ the\ initial\
+    two\-letter\ district\ code\ with\ arbitrary\ letters\ of\ the\ alphabet\ \(assigne
+  coverage_status: partial
+  notes: Same visual format now uses arbitrary letters; date is needed to interpret
+    old district codes.
+  valid_to: '2022'
+SI:
+  source: wiki-SI.json
+  classification: usable_now
+  unit_kind: registration_region
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ and\ regional\ divisions\ \[\ edit\ \]\ On\ regular\ issue\
+    license\ plates,\ the\ first\ 2\ letters\ before\ the\ shield\ sticker\ denote\
+    the\ region\ where\ the\ car\ was\ initially\ registered\.\ Further\ division\
+    is\ made\ by\ the\ coat\ of\ arms\ of\ the\ corresponding\ city,\ placed\ afte
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+ZA:
+  source: wiki-ZA.json
+  classification: usable_now
+  unit_kind: province_or_registration_area
+  code_position: province suffix or Western Cape prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ the\ plates\ display\ combinations\ like\ CB\ 12\ CD\ GP\ or\
+    CA\ 123–456,\ with\ distinct\ variations\ in\ layout\ and\ formatting\ across\
+    different\ regions\ of\ the\ country\.\ History\ \[\ edit\ \]\ A\ 1963\ plate\
+    from\ Cape\ Province\ Until\ 1914,\ each\ municipality\ or\ local\ manag
+  coverage_status: partial
+  notes: KwaZulu-Natal switched to province-wide numbering; older local prefixes retained
+    as historic.
+ES:
+  source: wiki-ES.json
+  classification: historic_only
+  unit_kind: province
+  code_position: leading province letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: te\ from\ Orense\ \.\ The\ first\ system,\ introduced\ in\ 1900,\
+    consisted\ of\ a\ letter\ code\ denoting\ the\ province\ the\ vehicle\ was\ registered\
+    in\ \(see\ below\ for\ the\ full\ list\ of\ codes\),\ followed\ by\ a\ sequence\
+    number\ of\ up\ to\ six\ digits\ \(\ XXX\-NNNNNN\ \)\.\ The\ codes\ wer
+  coverage_status: partial
+  notes: National series since September 2000.
+  valid_to: 2000-09
+LK:
+  source: wiki-LK.json
+  classification: unverified
+  unit_kind: province
+  code_position: former province letters
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ the\ form\ of\ the\ country\ emblem\ and\ the\ two\-letter\
+    region\ identifier\ below\ the\ emblem\ on\ the\ left\ side\ of\ the\ plate,\
+    two\ letters,\ four\ digits\ \(serial\ format\ AB\ AB\ 1234\)\.\ It\ was\ developed\
+    by\ the\ German\ Utsch\ A
+  notes: Fetched Wikipedia may lag the reported 2023 removal of provincial letters;
+    current validity unresolved.
+SD:
+  source: wiki-SD.json
+  classification: usable_now
+  unit_kind: state
+  code_position: letter group
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ed\ Notes\ 2009\ 32\ cm\ x16\ cm\ Bilingual\ Arabic\ and\ English\
+    1\ L\ \-2345\ The\ Letter\ L\ indicates\ the\ State\ The\ letter\ خ/KH\ indicates\
+    Khartoum\ State\ for\ example\ References\ \[\ edit\ \]\ \^\ "License\ Plates\
+    of\ Sudan"\ \.\ v\ t\ e\ Vehicle\ registration\ plates\ of\ Africa\ So
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+SE:
+  source: wiki-SE.json
+  classification: historic_only
+  unit_kind: county
+  code_position: historic letter prefix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ty\ codes\ from\ 2007,\ after\ the\ merger\ of\ some\ counties\.\
+    Codes\ \[\ edit\ \]\ A,\ AA,\ AB\ –\ City\ of\ Stockholm\ \(today\ part\ of\ Stockholms\
+    län\ \)\ B,\ BA,\ BB\ –\ Stockholms\ län\ C\ –\ Uppsala\ län\ D\ –\ Södermanlands\
+    län\ E,\ EA\ –\ Östergötlands\ län\ F,\ FA\ '
+  coverage_status: partial
+  notes: Current national combination has no geographic connection; pre-1973 county
+    system retained.
+  valid_to: '1973'
+CH:
+  source: wiki-CH.json
+  classification: usable_now
+  unit_kind: canton
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: te,\ Thurgau\ Vehicle\ license\ plates\ of\ Switzerland\ ,\ are\
+    composed\ of\ a\ two\-letter\ code\ for\ the\ canton\ and\ a\ number\ with\ up\
+    to\ 6\ digits\.\ The\ rear\ plates\ also\ display\ the\ coats\ of\ arms\ of\ Switzerland\
+    and\ the\ respective\ canton\.\ In\ 1987,\ the\ optional\ long
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+TW:
+  source: wiki-TW.json
+  classification: unverified
+  unit_kind: jurisdiction
+  code_position: allocated letter combinations
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: ms\ in\ Taiwan\ also\ ignore\ it\.\ There\ is\ a\ rule\ for\ numbering\
+    of\ different\ jurisdictions,\ such\ as\ "XY\-\*\*\*\*"\ can\ only\ be\ issued\
+    by\ Kaohsiung\ City,\ "WZ\-\*\*\*\*"\ can\ only\ be\ issued\ by\ Lienchiang\ County\.\
+    Plates\ issued\ prior\ to\ 1\ Januar
+  notes: Source allocation table does not establish applicability to current issues;
+    printed jurisdiction removed in 2007.
+TJ:
+  source: wiki-TJ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: two-digit suffix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ries\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ 1234AB56\ \(56\ being\ the\ regional\ code\)\ Colour\ \(front\)\ Black\
+    on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Tajik\ vehicle\ registration\ plates\
+    are\ registration\ plates\ for\ vehicles\ registered\ in\ the\ '
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+TZ:
+  source: wiki-TZ.json
+  classification: historic_only
+  unit_kind: city
+  code_position: historic leading letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ormats\.\ 1933\ \[\ edit\ \]\ In\ 1933,\ Tanganyika\ used\ white\-on\-black\
+    plates\.\ Letters\ denoted\ the\ city\ \(DS\ for\ Dar\ es\ Salaam\ \)\ and\ was\
+    followed\ by\ four\ numbers\.\ XX\ 9999\ XX\ 9999\ 1980s\ \[\ edit\ \]\ British\
+    standard\ plates\ were\ still\ being\ used\ in\ the\ 1980s\.\ '
+  coverage_status: partial
+  notes: Current mainland and Zanzibar schemes differ; subnational place-code coverage
+    incomplete.
+TH:
+  source: wiki-TH-local.json
+  classification: usable_now
+  unit_kind: province
+  code_position: numeric group above truck/bus serial
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: on\ einer\ zwei\-\ oder\ dreistelligen\ Zahl,\ welche\ die\ Provinz\
+    verschlüsselt\.\ Wie\ auf\ den\ anderen\ Schildern\ wird\ der\ vollständige\ Provinzname\
+    an\ der\ Unterseite\ dargestellt\.\ Das\ bedeutet,\ dass\ die\ Nummer\ nicht\
+    eindeut
+  notes: Ordinary car serials do not encode province; province name is printed below.
+    Numeric province code applies to trucks/buses and international plates, not ordinary
+    car serials. Complete code list remains a gap.
+TM:
+  source: wiki-TM.json
+  classification: usable_now
+  unit_kind: province
+  code_position: two-letter suffix
+  series: ordinary; exceptions described in notes
+  evidence_pattern: tin\ serial/counter\ letter;\ \#\ is\ a\ digit\ in\ the\ range\
+    0\-9;\ and\ XX\ is\ a\ two\-letter\ province\ identifier\)\.\ The\ format\ was\
+    updated\ to\ XX\ \#\#\ \#\#\ XX\ in\ 2010\.\ Trailers\ \[\ edit\ \]\ Province\
+    identifiers\ \[\ edit\ \]\ Suffix\ Province\ AG\ Ashgabat\ AH\ Ahal\ AK\ Arkadag\
+    BN\ Ba
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+UA:
+  source: wiki-UA.json
+  classification: usable_now
+  unit_kind: oblast
+  code_position: first two letters
+  series: ordinary; exceptions described in notes
+  evidence_pattern: eries\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ AB\ 1234\ BC\ \(AB\ being\ the\ regional\ code\)\ Colour\ \(front\)\ Black\
+    on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Ukrainian\ implementation\ of\
+    a\ format\ similar\ to\ the\ EU\ format\.\ Both\ the\ EU\ format\ and\ the
+  coverage_status: partial
+  notes: Newer online/electronic registration prefixes can be nationwide; retain historical
+    numeric and Cyrillic suffix series separately.
+AE:
+  source: wiki-AE.json
+  classification: printed_not_encoded
+  unit_kind: emirate
+  code_position: printed emirate name/design
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ \[\ edit\ \]\ Each\ emirate\ has\ its\ own\ vehicle\ registration\
+    plate\ design\.\ United\ Arab\ Emirates\ vehicle\ registration\ plates\ Emirate\
+    Image\ \(550x110mm\)\ Image\ \(335x155mm\)\ Description\ and\ range\ \(applies\
+    to\ current\ version\)\ Abu\ Dhabi\ \(1\(2\)\ 12345\)\ The\ code\ \(usually\ the\
+    number\ in
+  coverage_status: partial
+  notes: Serial formats overlap across emirates; no unique countrywide numeric region
+    code.
+GB:
+  source: wiki-GB.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: first two letters for Great Britain since 2001
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ office\.\ By\ December\ 2013,\ all\ local\ offices\ had\ been\
+    closed,\ but\ the\ letters\ still\ represent\ a\ region\.\ The\ letters\ I\ ,\
+    Q\ and\ Z\ are\ not\ used\ as\ local\ office\ identifiers,\ though\ O\ is\ used\
+    for\ Oxford;\ Z\ can\ be\ used\ only\ as\ a\ random\ letter\.\ The\ first\ of\
+    t
+  coverage_status: partial
+  notes: Northern Ireland and pre-2001 systems differ; private transfers break geographic
+    attribution.
+US:
+  source: wiki-US.json
+  classification: usable_now
+  unit_kind: county_in_some_states
+  code_position: state-specific county prefix; state printed separately
+  series: ordinary; exceptions described in notes
+  evidence_pattern: anumeric\ combinations\.\ Other\ formats\ include\ those\ that\
+    incorporate\ a\ county\ coding\ system\ \(e\.g\.\ Idaho\ \)\ or\ a\ month\ of\
+    expiration\ into\ the\ plate\ number\ \(e\.g\.\ Massachusetts\ \)\.\ Non\-passenger\
+    vehicle\ plates\ \(such\ as\ commercial\ and\ government\-o
+  coverage_status: partial
+  notes: Most plates require printed state. Some states encode counties (e.g. Idaho,
+    Hawaii); no nationwide state code, state-specific extraction is a gap.
+UZ:
+  source: wiki-UZ.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: se\-plate\ format\ has\ two\ variations\.\ The\ standard\ format\
+    consists\ of\ a\ two\-digit\ location\ code,\ followed\ by\ a\ one\-letter\ series,\
+    three\ digits,\ and\ two\ Latin\ letters\.\ The\ alternative\ format\ consists\
+    of\ a\ two\-digit\ location\ code,\ three\ digits,\ an
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+VE:
+  source: wiki-VE.json
+  classification: usable_now
+  unit_kind: state
+  code_position: last letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: hicle\ was\ registered\.\ It\ means\ that\ in\ the\ example\ plate\
+    AA000AB,\ the\ last\ letter\ "B"\ would\ identify\ the\ region\.\ In\ previous\
+    resolutions,\ this\ was\ located\ in\ the\ first\ letter\.\ Code\ State\ A\ Caracas\
+    /\ Capital\ District\ B\ Anzoátegui\ C\ Apure\ D\ Aragua\ E\ Barinas\ F\ Bol
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+VN:
+  source: wiki-VN.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: as\ going\ to\ switch\ to\ AAA\ 111\ format,\ but\ the\ plan\
+    was\ cancelled\.\ The\ leading\ two\ symbols\ are\ two\ digits,\ representing\
+    the\ province/municipality\.\ The\ exact\ date\ of\ format\ changing\ is\ unknown\.\
+    In\ 2012,\ a\ blue\ strip\ with\ a\ "VN"\ will\ be\ added\ on\ the\ left\-ha
+  coverage_status: partial
+  notes: 2025 provincial mergers retain former codes, so old/new province associations
+    need dates.
+VI:
+  source: wiki-VI.json
+  classification: usable_now
+  unit_kind: island
+  code_position: initial letter
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ 12\ in\ ×\ 6\ in\ 30\ cm\ ×\ 15\ cm\ Material\ Aluminum\ Serial\
+    format\ A\ BC\ 123\ \(coded\ by\ island\ of\ issuance\)\ Introduced\ March\ 1,\
+    2023\ \(\ 2023\-03\-01\ \)\ History\ First\ issued\ 1917\ \(\ 1917\ \)\ The\ U\.S\.\
+    unincorporated\ territory\ of\ the\ United\ States\ Virgin\ Islands\ fir
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+YE:
+  source: wiki-YE.json
+  classification: usable_now
+  unit_kind: governorate
+  code_position: numeric governorate group
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ for\ transport\ of\ goods,\ Pick\-up\ trucks,\ trucks,\ tractor\
+    trailers\ نقل\ Governorate\ codes\ \[\ edit\ \]\ Vehicle\ types\ Governorate\
+    Code\ Governorate\ Code\ Sanaa\ \(City\)\ 1\ Lahij\ 12\ Sanaa\ \(Governorate\)\
+    2\ Al\ Bayda\ 13\ Aden\ 3\ Al\ Mahwit\ 14\ Taiz\ 4\ Shabwah
+  coverage_status: partial
+  notes: Multiple parallel de facto systems; geographic and temporal scope must be
+    retained.
+XK:
+  source: wiki-XK.json
+  classification: usable_now
+  unit_kind: district
+  code_position: first two digits
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ed\ containing\ the\ letters\ RKS\ \(Republic\ of\ Kosovo\)\ on\
+    a\ blue\ field,\ a\ two\ digit\ number\ corresponding\ to\ the\ districts\ of\
+    Kosovo\ ,\ the\ coat\ of\ arms\ of\ Kosovo\ ,\ a\ three\-digit\ number\ and\ finally\
+    two\ serial\ letters\.\ The\ three\-digit\ number\ starts\ at\ 101\ and\ the\
+    serial\ let
+  coverage_status: partial
+  notes: Classification describes the cited series; special and personalised series
+    need separate handling.
+  name: Kosovo
+AD:
+  source: wiki-AD.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 0s\ plate\ Temporary\ plate\ In\ Andorra\ ,\ vehicle\ registration\
+    plates\ are\ composed\ of\ one\ letter\ and\ four\ digits\ \(e\.g\.\ A1234\),\
+    and\ have\ the\ coat\ of\ arms\ of\ Andorra\ and\ country\ code\ \(AND\)\ to\
+    the\ left\ of\ the\ serial\ and\ Principat\ d'Andorra\ in\ blue\ below\ the\ serial\.
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+AI:
+  source: wiki-AI.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ers\ and\ are\ North\ American\ standard\ 6\ by\ 12\ inches\ \(152\
+    mm\ ×\ 300\ mm\)\.\ Vehicle\ plates\ have\ an\ 'A'\ followed\ by\ four\ digits\.\
+    The\ letter\ denoting\ the\ type\ of\ vehicle\ has\ been\ moved\ to\ the\ front\
+    and\ 'P'\ is\ now\ designated\ for\ personal\ vehicles\.\ Image\ First\ issu
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+BH:
+  source: wiki-BH.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'ation\ plate\ from\ 2010\ Country\ Bahrain\ Country\ code\ BRN\
+    Current\ series\ Serial\ format\ 123456\ Introduced\ 2010\ Vehicle\ registration\
+    plates\ of\ Bahrain\ have\ the\ Flag\ of\ Bahrain\ and\ the\ country''s\ name\
+    in\ Arabic\ and\ Latin\ script\.\ Special\ vehicles,\ '
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+BM:
+  source: wiki-BM.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 75\ Bermudian\ licence\ plates\ issued\ to\ general\ passenger\
+    vehicles\ have\ five\ black\ digits\ on\ a\ plain\ white\ background\ \(both\
+    front\ and\ rear\)\.\ Non\-private\ vehicles\ have\ plates\ with\ one\ or\ two\
+    preceding\ letters\ followed\ by\ three\ or\ four\ numbers\.\ Personalised\ plates\
+    allo
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+CW:
+  source: wiki-CW.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \)\.\ Prefixes\ \[\ edit\ \]\ A,\ B,\ D,\ F,\ G,\ H,\ J,\ K,\
+    L,\ M,\ N,\ R,\ S,\ T,\ W,\ Y\ ,\ Private\ Car\ in\ format\ A\ nn\-nn,\ numbers\
+    without\ leading\ zeros\ BUS\ ,\ Bus\ in\ format\ BUS\ nnn\ BR\ ,\ Sales\ Agency\
+    BF\ ,\ Moped\ in\ format\ BF\ nn\-nn,\ numbers\ without\ leading\ zeros\ C\ ,
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+DM:
+  source: wiki-DM.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ear\)\ or\ black\ on\ white\ \(front\)\ and\ black\ on\ yellow\
+    \(rear\)\ plates\.\ The\ first\ letter\ of\ the\ license\ plate\ identifies\ the\
+    type\ of\ vehicle\ it\ is\.\ P\ denotes\ a\ private\ vehicle\.\ Image\ First\
+    issued\ Design\ Serial\ format\ Serials\ issued\ Notes\ \[\ when\?\ \]\ White\
+    on\ black\ 123\ References\ \[
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+GY:
+  source: wiki-GY.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: tes\ of\ Guyana\ consist\ of\ simple\ white\ lettering\ on\ a\
+    black\ plate\.\ The\ format\ is\ 2\ or\ 3\ letters\ followed\ by\ 4\ numbers\.\
+    The\ 4\ numbers\ are\ between\ 1\ and\ 9999\ with\ no\ leading\ zero\.\ Letter\
+    arrangement\ \[\ edit\ \]\ The\ first\ letter\ is\ the\ vehicle\ type\ and\ are\
+    as\ follows:\ P\-\ P
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+JM:
+  source: wiki-JM.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ The\ license\ plates\ for\ private\ cars\ \(introduced\ in\
+    1987\)\ follows\ the\ format\ 1234\ AB\.\ Coding\ is\ not\ provided\.\ The\ plates\
+    use\ blue\ lettering\ on\ a\ white\ background\.\ For\ motorcycles,\ the\ 1234\
+    A\ series\ is\ valid,\ also\ without\ coding\ and\ in
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+NR:
+  source: wiki-NR.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ed\ Notes\ 1970–1975\ White\ on\ black\ 1\-234\ 1975\-2015\ Black\
+    on\ white\ 1234\ 2015–present\ Black\ on\ white\ ABC\ 123\ References\ \[\ edit\
+    \]\ v\ t\ e\ Vehicle\ registration\ plates\ of\ Oceania\ Sovereign\ states\ Australia\
+    Federated\ States\ of\ Micronesia\ Fij
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+NC:
+  source: wiki-NC.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: '\ F\ Current\ series\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\
+    4\.3\ in\ Serial\ format\ 123456\ NC\ Colour\ \(front\)\ White\ on\ black\ Colour\
+    \(rear\)\ White\ on\ black\ New\ Caledonia\ requires\ its\ residents\ to\ register\
+    their\ motor\ vehicles\ and\ display\ vehicle\ '
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+NU:
+  source: wiki-NU.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: None\ Current\ series\ Slogan\ None\ Size\ 372\ mm\ ×\ 134\ mm\
+    14\.6\ in\ ×\ 5\.3\ in\ Serial\ format\ 1234\ Niue\ requires\ its\ residents\
+    to\ register\ their\ motor\ vehicles\ and\ display\ vehicle\ registration\ plates\
+    \.\ Current\ plates\ are\ New\ Zealand\ standard\ 360\ mm
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+NF:
+  source: wiki-NF.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ted\ to\ use\ Australian\ standard\ dies\ plates\ in\ black\ on\
+    yellow\ and\ the\ format\ are\ all\ numeric\ for\ vehicles\ and\ motorbikes\ in\
+    C\-123\ format\.\ Administrative\ vehicles\ are\ issued\ in\ Red\ A\ and\ black\
+    on\ white\ base\ in\ numerics\ shown\ as\ A\-123\ and\ motor
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+SM:
+  source: wiki-SM.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: es\ with\ distinctive\ licence\ plates\ which\ are\ white\ with\
+    blue\ figures,\ usually\ a\ letter\ followed\ by\ up\ to\ four\ numbers\.\ To\
+    the\ left\ of\ these\ figures\ is\ displayed\ the\ national\ coat\ of\ arms\ of\
+    San\ Marino\ \.\ Custom\ licence\ plates\ were\ offered\ starting\ in\ 2004\.\
+    In\ 2023,\ th
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+TG:
+  source: wiki-TG.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: ntroduced\ in\ 2007\.\ It\ has\ a\ format\ 1234\-AB,\ where\ 1234\
+    is\ the\ number,\ AB\ is\ the\ series\.\ Regular\ plates\ have\ a\ white\ background\
+    with\ dark\ blue\ or\ black\ signs\.\ On\ the\ left\ side\ of\ the\ plate\ is\
+    an\ image\ of\ the\ flag\ of\ the\ country\ under\ whi
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+TO:
+  source: wiki-TO.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: e\ plate\ made\.\ Current\ plate\ format\ \[\ edit\ \]\ The\ current\
+    format\ uses\ a\ letter\ followed\ by\ 1\-5\ digits\.\ The\ letter\ used\ denotes\
+    the\ type\ of\ vehicle\.\ This\ table\ is\ incomplete\ ;\ you\ can\ help\ by\
+    adding\ missing\ items\ \.\ Image\ First\ issued\ Design\ Serial\ form
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+VA:
+  source: wiki-VA.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'n\ plates\ of\ official\ road\ vehicles\ registered\ in\ Vatican\
+    City\ use\ the\ prefix\ SCV\ \(\ Latin\ :\ Status\ Civitatis\ Vaticanae\ ,\ lit\.\
+    ''\ Vatican\ City\ State\ ''\ \)\ followed\ by\ a\ series\ of\ digits\ while\
+    vehicle\ registration\ plates\ of\ residential\ '
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+CX:
+  source: wiki-CX.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: 'eries\ Slogan\ None\ Size\ 372\ mm\ ×\ 134\ mm\ 14\.6\ in\ ×\
+    5\.3\ in\ Serial\ format\ CI•1234\ Introduced\ 2003\ ;\ 23\ years\ ago\ \(\ 2003\
+    \)\ History\ First\ issued\ 1972\ ;\ 54\ years\ ago\ \(\ 1972\ \)\ Vehicle\ registration\
+    plates\ of\ Christmas\ Island\ started\ to\ '
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+JE:
+  source: wiki-JE.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; exceptions described in notes
+  evidence_pattern: \ but\ it\ is\ not\ blue\ and\ is\ not\ valid\ under\ the\ Vienna\
+    Convention\.\ The\ standard\ format\ for\ registration\ marks\ in\ the\ island\
+    has\ been\ in\ use\ since\ 1915\.\ Standard\ issue\ plates\ in\ Jersey\ must\
+    be\ flat\ and\ unbroken\ and\ in\ the\ prescribed\ font\ according\ to\ British\
+    s
+  coverage_status: partial
+  notes: No subnational component in the described ordinary series; historical/special
+    formats not exhaustively reviewed.
+PL:
+  source: wiki-PL.json
+  classification: usable_now
+  unit_kind: district_or_city
+  code_position: first two or three letters
+  series: ordinary
+  evidence_pattern: Vehicle\ registration\ plates\ of\ Poland\ indicate\ the\ region\
+    of\ registration\ of\ the\ vehicle\ given\ the\ number\ plate
+  coverage_status: partial
+  notes: Special series require separate handling; current completeness must be established
+    against a dated registry.
+TR:
+  source: wiki-TR-fixed.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first two digits
+  series: ordinary
+  evidence_pattern: First\ two\ digits\ indicating\ the\ province\ code:\ Code\ Province\
+    Code\ Province\ Code\ Province\ 01\ Adana\ 28\ Giresun\ 55\ Samsun\ 02\ Adıyaman\
+    29\ Gümüşhane\ 56\ Siirt\ 03\ Afyonkarahisar\ 30\ Hakkari\ 57\ Sinop\ 04\ Ağrı\
+    31\ Hatay\ 58\ Sivas\ 05\ Amasya\ 32\ Isparta\ 59\ Tekirdağ\ 06\ Ankara\ 33\ Mersin\
+    60\ Tokat\ 07\ Antalya\ 34\ İstanbul\ 61\ Trabzon\ 08\ Artvin\ 35\ İzmir\ 62\
+    Tunceli\ 09\ Aydın\ 36\ Kars\ 63\ Şanlıurfa\ 10\ Balıkesir\ 37\ Kastamonu\ 64\
+    Uşak\ 11\ Bilecik\ 38\ Kayseri\ 65\ Van\ 12\ Bingöl\ 39\ Kırklareli\ 66\ Yozgat\
+    13\ Bitlis\ 40\ Kırşehir\ 67\ Zonguldak\ 14\ Bolu\ 41\ Kocaeli\ 68\ Aksaray\ 15\
+    Burdur\ 42\ Konya\ 69\ Bayburt\ 16\ Bursa\ 43\ Kütahya\ 70\ Karaman\ 17\ Çanakkale\
+    44\ Malatya\ 71\ Kırıkkale\ 18\ Çankırı\ 45\ Manisa\ 72\ Batman\ 19\ Çorum\ 46\
+    Kahramanmaraş\ 73\ Şırnak\ 20\ Denizli\ 47\ Mardin\ 74\ Bartın\ 21\ Diyarbakır\
+    48\ Muğla\ 75\ Ardahan\ 22\ Edirne\ 49\ Muş\ 76\ Iğdır\ 23\ Elazığ\ 50\ Nevşehir\
+    77\ Yalova\ 24\ Erzincan\ 51\ Niğde\ 78\ Karabük\ 25\ Erzurum\ 52\ Ordu\ 79\ Kilis\
+    26\ Eskişehir\ 53\ Rize\ 80\ Osmaniye\ 27\ Gaziantep\ 54\ Sakarya\ 81\ Düzce\
+    Province\ names\ until\ code\ 67\ go\ alphabetically,\ with\ the\ exception\ of\
+    Mersin,\ Kahramanmaraş\ and\ Şanlıurfa\ provinces\ for\ their\ previous\ names\
+    taken\ in\ account\ were\ İçel,\ Maraş\ and\ Urfa,\ respectively
+  coverage_status: partial
+  notes: Special series require separate handling; current completeness must be established
+    against a dated registry.
+UY:
+  source: wiki-UY.json
+  classification: usable_now
+  unit_kind: department
+  code_position: first letter
+  series: ordinary
+  evidence_pattern: Departmental\ coding\ \[\ edit\ \]\ Plates\ issued\ in\ each\
+    department\ begin\ with\ a\ one\-letter\ code\.\ These\ codes,\ used\ on\ the\
+    unique\ local\ issues\ of\ the\ past,\ have\ carried\ over\ to\ the\ current\
+    national\ series\ as\ part\ of\ the\ standard\ nationwide\ format\.\ Department\
+    or\ lia\ Code\ Arti
+  coverage_status: partial
+  notes: Special series require separate handling; current completeness must be established
+    against a dated registry.
+MR:
+  source: wiki-MR.json
+  classification: usable_now
+  unit_kind: region
+  code_position: final two-digit group
+  series: ordinary
+  evidence_pattern: Regional\ coding\ \[\ edit\ \]\ 00\ \-\ Nouakchott\ 01\ \-\ Hodh\
+    Ech\ Chargui\ 02\ \-\ Hodh\ El\ Gharbi\ 03\ \-\ Assaba\ 04\ \-\ Gorgol\ 05\ \-\
+    Brakna\ 06\ \-\ Trarza\ 07\ \-\ Adrar\ 08\ \-\ Dakhlet\ Nouadhibou\ 09\ \-\ Tagant\
+    10\ \-\ Guidimaga\ 11\ \-\ Tiris\ Zemmour\ 12\ \-\ Inchiri\ License\ plates\ of\
+    Mauretania\ Older\ type\.
+  coverage_status: partial
+  notes: Special series require separate handling; current completeness must be established
+    against a dated registry.
+AR:
+  source: wiki-AR.json
+  classification: historic_only
+  unit_kind: province
+  code_position: leading letter before 1995
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: thousands\ and\ thousands\ of\ other\ cases\.\ 1972\-1994:\ Identifying\
+    the\ provinces\ \[\ edit\ \]\ Typical\ Argentine\ registration\ plate,\ 1972\-1994\
+    format\ In\ 1972\ the\ national\ government\ standardized\ the\ plates,\ the\
+    format\ being\ o
+  notes: Current national Mercosur series has no province encoding; legacy province
+    codes are retained.
+BQ:
+  source: wiki-BQ-resolved.json
+  classification: usable_now
+  unit_kind: island
+  code_position: initial letter
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'ssenger\ plates\ \[\ edit\ \]\ Plates\ with\ the\ large\ letter\
+    "B"\ indicate\ a\ plate\ from\ Bonaire,\ while\ the\ large\ letter\ "E"\ indicates\
+    a\ plate\ from\ St\.\ Eustatius,\ and\ a\ large\ letter\ "S"\ indicates\ a\ plate\
+    from\ Saba\.\ '
+  notes: Bonaire, Saba and Sint Eustatius use different prefixes. Vehicle-class prefixes
+    are exceptions.
+CG:
+  source: wiki-CG.json
+  classification: usable_now
+  unit_kind: region
+  code_position: last one or two digits
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'mic\ and\ Monetary\ Community\ \(CEMAC\)\.\ The\ current\ allocation\
+    combinations\ for\ regional\ coding\ was\ introduced\ in\ 1982\.\ 1\ \-\ Nkayi\
+    2\ \-\ Lekoumou\ 3\ \-\ Ouesso\ 4\ \-\ Capital\ District\ \(Brazzaville\)\ 5\
+    \-\ Kouilou\ 6\ \-\ Pointe\-Noire\ 7\ \-\ Likouala\ 8\ \-\ '
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+CD:
+  source: wiki-CD.json
+  classification: usable_now
+  unit_kind: province
+  code_position: separate numeric province group
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: oduction\ of\ the\ current\ system\ in\ 2009\.\ Province\ codes\
+    \[\ edit\ \]\ Current\ Codes\ \[\ edit\ \]\ Province\ Code\ Previous\ province\
+    Kinshasa\ 01\ Kinshasa\ Bas\-Uele\ 02\ Orientale\ Équateur\ 03\ Équateur\ Haut\-Lomami\
+    04\ Katanga\ Haut\-Katang
+  notes: Article gives 26 current numeric province codes but does not explain their
+    exact placement in the main text; position needs verification.
+CR:
+  source: wiki-CR.json
+  classification: historic_only
+  unit_kind: city
+  code_position: old initial letters
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: h\ at\ least\ 1954\.\ For\ a\ time\ the\ plate's\ first\ two\
+    characters\ indicated\ what\ city\ where\ the\ vehicle\ was\ registered\.\ Multi\-year\
+    plates\ began\ to\ appear\ in\ 1955,\ but\ their\ use\ was\ not\ consistent\ until\
+    the\ mid\-1960s\.\ Early\ pl
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+GM:
+  source: wiki-GM-resolved.json
+  classification: usable_now
+  unit_kind: region
+  code_position: initial two or three letters
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: uing\ of\ the\ license\ plates\.\ Some\ of\ the\ regional\ codes\
+    have\ also\ changed\ since\ the\ previous\ version\.\ The\ size\ of\ motorcycle\
+    plates\ have\ also\ changed\ from\ 19\ cm\ x\ 11\ cm\ to\ 24\ cm\ x\ 13\ cm\ \.\
+    Vehicle\ Type\ Image\ Design
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+GE:
+  source: wiki-GE-country.json
+  classification: historic_only
+  unit_kind: region
+  code_position: first letter in former series
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: hanged\ from\ GEO\ to\ GE\ \.\ Originally,\ the\ first\ letter\
+    of\ the\ old\ registration\ plate\ was\ assigned\ according\ to\ the\ territory\
+    where\ the\ vehicle\ was\ registered:\ A\ \-\ Tbilisi\ B\ \-\ Adjara\ C\ \-\ Abkhazia\
+    D\ \-\ Kutaisi\ E\ \-\ Rustavi\ F\ \-\ Z
+  notes: Geographic allocation removed in 2004 per cited revision; 2014 series national.
+    Abkhazia and South Ossetia have parallel schemes, not collected.
+GG:
+  source: wiki-GG.json
+  classification: usable_now
+  unit_kind: island
+  code_position: AY prefix for Alderney
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ Black\ on\ yellow\ Registration\ plates\ of\ Alderney\ are\
+    issued\ with\ the\ prefix\ 'AY'\ followed\ by\ a\ space\ and\ then\ one,\ two,\
+    three\ or\ four\ digits\ \(as\ seen\ in\ the\ photo\ on\ the\ side\)\.\ Residents\
+    or\ owners\ of\ property\ can\ registe
+  notes: Ordinary Guernsey numeric serials give no parish; AY identifies Alderney
+    within the bailiwick.
+CI:
+  source: wiki-CI.json
+  classification: historic_only
+  unit_kind: region
+  code_position: old final two digits
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'd\ then\ 2\ letters\ \(e\.g\.\ AB\-123\-BC\)\.\ This\ format\
+    is\ monitored\ nationwide\ and\ registration\ plates\ are\ permanently\ attached\
+    to\ a\ vehicle\ from\ its\ first\ registration\ to\ its\ disposal\.\ Registration\
+    plates\ are\ made\ of\ '
+  notes: 2023 national format replaced regional suffix; old codes need historical
+    interpretation.
+LS:
+  source: wiki-LS-pl.json
+  classification: usable_now
+  unit_kind: district
+  code_position: first letter
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Obecny\ format\ tablic\ to\ L\ 0000,\ gdzie\ L\ to\ litera\ oznaczająca\
+    dany\ dystrykt\ ,\ a\ 0\ to\ cyfra
+  notes: Polish list explicitly describes current district letters; English page only
+    gives older two-letter codes. Both generations retained.
+MA:
+  source: wiki-MA.json
+  classification: usable_now
+  unit_kind: registration_area
+  code_position: rightmost one or two digits
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: ish\ between\ series\.\ Finally,\ there\ is\ a\ one\-\ or\ two\-digit\
+    regional\ code\ for\ the\ origin\ of\ the\ vehicle\.\ The\ plates\ are\ to\ be\
+    black\ on\ white\.\ Otherwise,\ there\ aren't\ any\ regulation\ on\ font\ shape\
+    or\ font\ size\ used\.
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+MX:
+  source: wiki-MX.json
+  classification: unverified
+  unit_kind: state
+  code_position: allocated letter blocks
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 69–1998\ Serial\ format\ number\ since\ 1998\ Assigned\ 1992\
+    for\ Passengers\ Assigned\ 1992\ for\ Trucks\ Aguascalientes\ AGS\ 01\ AAA–AFZ\
+    AA–AF\ Baja\ California\ BC\ 02\ AGA–CYZ\ AG–CD\ Baja\ California\ Sur\ BCS\ 03\
+    CZA–DEZ\ CE–CL\ C
+  notes: Source gives 1992 state allocation ranges; their applicability to current
+    ordinary plates is unverified. Do not equate numbering-scheme IDs with serial
+    characters.
+PY:
+  source: wiki-PY.json
+  classification: historic_only
+  unit_kind: department
+  code_position: letter in 1982–2000 series
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 1982\ and\ 2000\)\ was\ A\ 123456\ ,\ where\ the\ letter\ represented\
+    the\ department\ \(with\ the\ exception\ of\ those\ patented\ in\ Asunción,\ which\
+    consisted\ only\ of\ numbers\)\.\ The\ design\ varied\ according\ to\ the\ area,\
+    although\ they
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+PS:
+  source: wiki-PS.json
+  classification: usable_now
+  unit_kind: governorate
+  code_position: last letter in West Bank; old initial digit
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: digits\ running\ in\ a\ serial\ fashion\.\ The\ last\ letter\
+    in\ the\ number\ will\ be\ determined\ according\ to\ the\ governorate\ in\ which\
+    the\ vehicle\ was\ registered,\ and\ may\ be:\ The\ letter\ A\ –\ Jenin\ The\
+    letter\ B\ –\ Tulkarm\ The\ letter\ C\ –\ Tu
+  notes: Separate West Bank and Gaza systems; source includes reserved unimplemented
+    Gaza letters which are excluded.
+SY:
+  source: wiki-SY.json
+  classification: usable_now
+  unit_kind: region_or_district
+  code_position: three-letter Kurdish code in AANES plates
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: eption\ of\ Jazira\ Region\ \(Qamishli\)\ \)\ in\ Arabic\ and\
+    a\ 3\-letter\ Latin\ code\ derived\ from\ Kurdish\ \.\ As\ for\ the\ Jazira\ Region\
+    ,\ license\ plates\ are\ issued\ for\ each\ of\ the\ Districts\ under\ its\ jurisdiction,\
+    bearing\ in\ mi
+  notes: Parallel de facto series; current transitional-government numbering is a
+    gap. Assignments do not imply sovereignty.
+SN:
+  source: wiki-SN.json
+  classification: usable_now
+  unit_kind: region
+  code_position: separate regional group since 2019; prefix previously
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'ry\ strip\ as\ well\ XX\ \-1234\-A\ XX\ \-1234\-AB\ XX\ indicates\
+    the\ two\-letter\ regional\ code\.\ DK\ indicates\ Dakar\ Region\ for\ example\.\
+    2019\-Present\ Passenger\ Vehicles,\ Front\ of\ Trucks,\ and\ Front\ of\ Buses\
+    52\ cm\ x\ 11\ cm\ Text\ height\ 7\.5\ '
+  notes: Current regional identifier is separate from the seven-character national
+    serial; department suffix codes not collected.
+SL:
+  source: wiki-SL-local.json
+  classification: usable_now
+  unit_kind: registration_office
+  code_position: two-letter right-hand group
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: n\ drei\ Buchstaben\ und\ drei\ Ziffern\.\ Die\ Registrierungsstelle\
+    von\ Fahrzeugen\ ist\ durch\ Angabe\ eines\ zweistelligen\ Buchstabencodes,\ über\
+    der\ Angabe\ PR\ \(Privatfahrzeuge\)\ oder\ COM\ \(kommerzielle\ Fahrzeuge\),\
+    am\ Ende\ des\ K
+  notes: Source describes office code above PR/COM at right; code list not acquired.
+GW:
+  source: wiki-GW-local.json
+  classification: usable_now
+  unit_kind: region
+  code_position: first two letters
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: sche\ Kennzeichen\ bestehen\ seit\ 1989\ aus\ zwei\ Buchstaben\
+    für\ die\ Region\ und\ seit\ 1974\ aus\ einer\ bis\ zu\ vierstelligen\ Zahl\.\
+    Links\ oben\ ist\ die\ Flagge\ Guinea\-Bissaus\ ,\ darunter\ das\ Nationalitätszeichen\
+    RGB\ \.\ Webli
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+BS:
+  source: wiki-BS-resolved.json
+  classification: printed_not_encoded
+  unit_kind: island
+  code_position: printed text
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: e\ plate\ is\ the\ flag\ of\ the\ Bahamas\.\ The\ text\ of\ the\
+    plates\ varies\ by\ island\ ,\ with\ each\ island\ or\ group\ issuing\ their\
+    own\ plates\.\ Image\ First\ issued\ Design\ Slogan\ Serial\ format\ Serials\
+    issued\ Notes\ 1977\ Black\ on\ cya
+  notes: Inference applies to the described ordinary series; complete historical coverage
+    is not established.
+MH:
+  source: wiki-MH-resolved.json
+  classification: printed_not_encoded
+  unit_kind: atoll
+  code_position: printed MAJURO ATOLL
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: slands\ Country\ code\ None\ Current\ series\ Slogan\ MAJURO\
+    ATOLL\ Size\ 152\ mm\ ×\ 305\ mm\ 6\.0\ in\ ×\ 12\.0\ in\ Material\ Silver\ or\
+    wood\ Serial\ format\ 1234\ History\ First\ issued\ 1972\ ;\ 54\ years\ ago\ \(\
+    1972\ \)\ The\ Mars
+  notes: Fetched examples show atoll name outside numeric serial; other islands need
+    review.
+FM:
+  source: wiki-FM.json
+  classification: printed_not_encoded
+  unit_kind: state
+  code_position: printed state name
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: Country\ code\ None\ Current\ series\ Slogan\ ISLAND\ OF\ STONE\
+    MONEY\ Size\ 152\ mm\ ×\ 305\ mm\ 6\.0\ in\ ×\ 12\.0\ in\ Serial\ format\ 1234\
+    Introduced\ 2000\ ;\ 26\ years\ ago\ \(\ 2000\ \)\ The\ Federated\ States\ of\
+    Micronesia\ require
+  notes: Plate table shows state names/designs; no serial-based state coding established.
+AG:
+  source: wiki-AG-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: the\ type\ of\ vehicle\ it\ is\.\ For\ example,\ "A"\ identifies\
+    private\ vehicles\.\ Image\ First\ issued\ Design\ Slogan\ Serial\ format\ Serials\
+    issued\ Notes\ Black\ on\ white\ LAND\ OF\ SEA\ AND\ SUN\ A\ 1234\ Black\ on\
+    gold\ A\ 123\ White\ on
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+AX:
+  source: wiki-AX-local.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: al\ dreistelligen\ Buchstabenkombination,\ die\ mit\ ÅL\ beginnt,\
+    und\ einer\ bis\ zu\ fünfstelligen\ \(bei\ drei\ Buchstaben:\ vierstelligen\)\
+    Zahl\ in\ blauer\ Schrift\ auf\ weißem\ Grund\.\ Im\ oberen\ Teil\ des\ Kennzeiche
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+AS:
+  source: wiki-AS.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: '\ ×\ 6\ in\ 30\ cm\ ×\ 15\ cm\ Material\ Aluminum\ Serial\ format\
+    1234\ Introduced\ 2011\ \(\ 2011\ \)\ History\ First\ issued\ 1924\ \(\ 1924\
+    \)\ This\ article\ needs\ more\ citations\ \.\ Please\ help\ improve\ this\ article\
+    by\ adding\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+AW:
+  source: wiki-AW.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: d\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ A\ 1234\ Aruba\ requires\ its\ residents\ to\ register\ their\ motor\
+    vehicles\ and\ display\ vehicle\ registration\ plates\ \.\ The\ island\ is\ one\
+    of\ the\ last\ juris
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+BW:
+  source: wiki-BW.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ digits,\ followed\ by\ three\ letters\.\ The\ digits\ and\ letters\
+    are\ assigned\ by\ a\ registrar\ \.\ The\ three\ letters\ will\ never\ include\
+    the\ letter\ Q\ so\ as\ to\ avoid\ confusion\ with\ the\ letter\ O\.\ The\ front\
+    number\ plates\ have\ black\ letterin
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+VG:
+  source: wiki-VG.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'in\ Islands\ Private\ vehicles\ have\ plates\ sequenced\ ''PV''\
+    followed\ by\ five\ digits\.\ Country\ British\ Virgin\ Islands\ Country\ code\
+    BVI\ Current\ series\ Slogan\ Nature''s\ Little\ Secrets\ Size\ 300\ mm\ ×\ 152\
+    mm\ 11\.8\ in\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+KY:
+  source: wiki-KY-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 're\ cars\ 123\ 456\ Black\ on\ yellow\ 123\ 456\ Private\ cars\
+    Crown\ emblem\ on\ black\ —\ N/a\ The\ governor''s\ car\ has\ a\ crown\ on\ a\
+    black\ plate\ on\ the\ front\ only\.\ Black\ on\ yellow\ 12345\ Private\ cars\
+    See\ also\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+HK:
+  source: wiki-HK.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: rivate\ vehicles,\ Public\ transport\ :\ The\ standard\ format\
+    for\ these\ vehicles\ is\ "XX\ \(\#\)\#\#\#",\ where\ 'XX'\ are\ two\ letters\
+    from\ the\ Latin\ alphabet\ ,\ and\ '\(\#\)\#\#\#'\ is\ a\ sequence\ of\ between\
+    three\ and\ four\ digits\.\ The\ plate
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+MO:
+  source: wiki-MO.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: m\ underwent\ another\ change\ to\ include\ a\ sequential\ serial\
+    letter\ after\ the\ 'M'\ prefix\ –\ the\ first\ registration\ issued\ in\ this\
+    format\ was\ MA\-00\-01\ \.\ Registrations\ in\ the\ range\ MA\-00\-01\ to\ MA\-09\-99\
+    are\ rese
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+CK:
+  source: wiki-CK-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: a\ Size\ 372\ mm\ ×\ 134\ mm\ 14\.6\ in\ ×\ 5\.3\ in\ Serial\
+    format\ 1234\ Cook\ Islands\ motorcycle\ license\ plates\ The\ Cook\ Islands\
+    requires\ its\ residents\ to\ register\ their\ motor\ vehicles\ and\ display\
+    vehicle\ registr
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+FK:
+  source: wiki-FK-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: owed\ by\ up\ to\ three\ digits\ and\ a\ letter\ registered\ in\
+    a\ strict\ sequence\.\ Plates\ should\ be\ black\-on\-yellow\ for\ the\ rear\
+    of\ the\ vehicle\ and\ black\-on\-white\ for\ the\ front\ of\ the\ vehicle\ although\
+    black\-on\-yellow\ is\ n
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+FJ:
+  source: wiki-FJ.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'nd\ notes\ 1976\ Black\ on\ reflective\ white\ AA\-001\ to\ CC\-999,\
+    CE\-001\ to\ CO\-999;\ Steel\ base,\ CP\-001\ to\ CZ\-999;\ Steel\ base\ with\
+    slightly\ smaller\ letters\ and\ numbers,\ DA\-001\ to\ KZ\-999,\ MA\-001\ to\
+    MZ\-999,\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+GI:
+  source: wiki-GI.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: om\ 1000\ to\ 9999\ and\ another\ letter\.\ The\ last\ letter\
+    represents\ the\ series\.\ For\ example,\ series\ A\ consists\ of\ all\ registration\
+    plates\ from\ G\ 1000\ A\ to\ G\ 9999\ A\ \.\ The\ next\ series\ is\ B,\ and\
+    so\ on\.\ Currently,\ as\ of\ Ju
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+HN:
+  source: wiki-HN.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: ters\.\ Type\ of\ plate\ Serial\ Format\ Color\ Personal\ P\ AB\
+    1234\ Green\ Commercial\ A\ AB\ 1234\ Yellow\ Diplomatic\ corps\ CD\ 1234\ Consular\
+    corps\ CC\ 1234\ International\ missions\ \(aid\ agencies,\ etc\.\)\ MI\ 1234\
+    Red\-p
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+IM:
+  source: wiki-IM.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: e\ issued\ each\ year\.\ Format\ \[\ edit\ \]\ The\ letters\ I,\
+    Q,\ S\ and\ Z\ are\ not\ used\ on\ Manx\ number\ plates\.\ Additionally\ the\
+    letter\ A\ is\ also\ not\ used\ as\ the\ initial\ letter\ and\ the\ letter\ O\
+    is\ not\ used\ as\ the\ final\ letter\.\ T
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+IL:
+  source: wiki-IL.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ \]\ Current\ format—eight\ digits\ \[\ edit\ \]\ Current\ civil\
+    registration\ numbers\ \(since\ July\ 2017\)\ consist\ of\ eight\ digits,\ separated\
+    by\ dashes\ between\ the\ third\ and\ fourth\ digits\ and\ between\ the\ fifth\
+    and\ sixth\ digits\ \(
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+LV:
+  source: wiki-LV.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: a\ Vehicle\ registration\ plates\ of\ Latvia\ consist\ of\ two\
+    letters\ \(trailers\ plates\ have\ one\ letter\),\ a\ hyphen\ and\ one\ to\ four\
+    numbers\ \(depending\ on\ the\ age\ of\ registration\)\ ,\ e\.g\.,\ AB\-1234,\
+    Colour\ and\ dime
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+LI:
+  source: wiki-LI.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: '\ registration\ marks\ are\ composed\ of\ the\ letters\ FL\ ,\
+    standing\ for\ Fürstentum\ Liechtenstein\ ,\ followed\ by\ the\ small\ version\
+    of\ the\ coat\ of\ arms\ of\ Liechtenstein\ and\ up\ to\ five\ digits\.\ Due\
+    to\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+MT:
+  source: wiki-MT.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ Plate\ All\ privately\ owned\ vehicles\ are\ allocated\ randomly\
+    chosen\ marks,\ except\ that\ the\ first\ letter\ shows\ in\ which\ month\ the\
+    vehicle's\ annual\ tax\ disc\ is\ due\ for\ renewal\.\ The\ following\ is\ a\
+    table\ of\ letters\ by
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+MC:
+  source: wiki-MC.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: in\ ×\ 3\.5\ in\ \(front\ plate\)\ Serial\ format\ One\ letter\
+    and\ three\ digits\ or\ four\ digits\ or\ three\ digits\ and\ one\ letter\ Colour\
+    \(front\)\ Light\ blue\ on\ white\ Colour\ \(rear\)\ Light\ blue\ on\ white\ Number\
+    plates\ of\ Monaco\ are\ used\ to\ ide
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+PA:
+  source: wiki-PA.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: Plate\ with\ a\ 123456\ format\ In\ 2013,\ the\ AB1234\ format\
+    began\ being\ issued\ instead\ of\ the\ previous\ 123456\ format\.\ Plates\ that\
+    follow\ this\ format\ use\ the\ letter\ "M"\ for\ motorcycles,\ "T"\ for\ taxis,\
+    "B"\ f
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+PR:
+  source: wiki-PR.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ ×\ 6\ in\ 30\ cm\ ×\ 15\ cm\ Material\ Aluminum\ Serial\ format\
+    ABC\ 123\ Introduced\ March\ 2023\ \(\ 2023\-03\ \)\ Availability\ Issued\ by\
+    Driver\ Services\ Directorate\ History\ First\ issued\ 1906\ ;\ 120\ years\ ago\
+    \(\ 1906\ \)\ The
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+QA:
+  source: wiki-QA.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 's\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ 123\(45\)\ \-\ Single\ digits\ are\ used\ by\ the\ Royal\ family\ Colour\
+    \(front\)\ Black\ on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Plate\ design\
+    from\ 1997–2011\.\ A\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+LC:
+  source: wiki-LC-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: \ letters\ followed\ by\ up\ to\ four\ digits\.\ Starting\ in\
+    the\ 0000\ format\ and\ then\ P\ 0000,\ and\ then\ PA\ 0000\.\ Used\ by\ most\
+    privately\ owned\ vehicles\.\ White\ text\ on\ a\ blue\ background\.\ Sometimes\
+    indicates\ the\ licensed
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+WS:
+  source: wiki-WS.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: a\ Size\ 372\ mm\ ×\ 134\ mm\ 14\.6\ in\ ×\ 5\.3\ in\ Serial\
+    format\ 1234\ Introduced\ 2000\ ;\ 26\ years\ ago\ \(\ 2000\ \)\ History\ First\
+    issued\ 1950\ ;\ 76\ years\ ago\ \(\ 1950\ \)\ Samoa\ requires\ its\ residents\
+    to\ register\ their\ mo
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+SG:
+  source: wiki-SG.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: s\ for\ a\ private\ vehicle\ since\ 1984\)\ _\ –\ Alphabetical\
+    series\ \("I"\ and\ "O"\ are\ not\ used\ to\ avoid\ confusion\ with\ "1"\ and\
+    "0"\)\ \#\#\#\#\ –\ Numerical\ series\ \(from\ 1\ to\ 9999,\ without\ leading\
+    zeroes\)\ _\ –\ Checksu
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+SX:
+  source: wiki-SX.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: d\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ A\ 1234\ Colour\ \(front\)\ Black\ on\ white\ Colour\ \(rear\)\ Black\
+    on\ white\ Sint\ Maarten\ requires\ its\ residents\ to\ register\ their\ motor\
+    vehicles\ and\ display
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+SR:
+  source: wiki-SR.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: n\ is\ two\ letters\ and\ four\ numbers\ where\ first\ letter\
+    is\ always\ letter\ P\.\ Image\ First\ issued\ Design\ Slogan\ Serial\ format\
+    Serials\ issued\ Notes\ 1960s\ References\ \[\ edit\ \]\ \^\ "License\ Plates\
+    of\ Suriname"\ \.\ \^\ "Suriname
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+TN:
+  source: wiki-TN.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: ing\ is\ white\ on\ a\ black\ background\.\ The\ first\ three\
+    digits\ designate\ the\ series\ and\ the\ last\ four\ digits\ denote\ the\ number\
+    of\ vehicle\ registrations\ in\ the\ series\.\ The\ passage\ from\ one\ series\
+    to\ the\ next\ occurs\ when\ a\ se
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+TL:
+  source: wiki-TL.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: ame\ of\ the\ country\ in\ Portuguese\ \)\.\ The\ current\ format\
+    started\ in\ 2002\.\ Vehicle\ types\ \[\ edit\ \]\ Vehicle\ types\ Type\ Example\
+    Meaning\ Private\ Government\ 05\-204G\ TLS\ Government\ vehicles,\ Palácio\ do\
+    Governo,\ Dili\ Gov
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+TC:
+  source: wiki-TC-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see exceptions
+  coverage_status: partial
+  evidence_pattern: 'ial\ on\ white\ plate\ none\ TC\ 1234\ TC12345\ Red\ serials\
+    denote\ private\ vehicles\ 2000\ Embossed\ red\ serial\ on\ white\ plate;\ Coat\
+    of\ arms\ symbols\ in\ each\ corner;\ slogan\ embossed\ at\ top;\ "TURKS\ \&\
+    CAICOS\ ISLANDS"\ embossed\ at\ '
+  notes: No subnational component in the described ordinary serial. This is a series-level
+    inference; earlier and special systems may differ.
+BF:
+  source: wiki-world.json
+  classification: usable_now
+  unit_kind: province
+  code_position: first digits
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Burkina\ Faso\ passenger\ plate\ Vehicles\ are\ fitted\ with\
+    registration\ plates\ in\ the\ front\ and\ rear\ of\ the\ vehicle\.\ Motorcycles\
+    \(50cc\ or\ more\)\ must\ be\ licensed\ and\ only\ bear\ rear\ plates\.\ Registration\
+    is\ performed\ at\ the\ local\ police\ or\ Gendarmerie\ station\.\ The\ first\
+    digits\ of\ the\ plate\ indicate\ the\ province\ in\ which\ the\ vehicle\ is\
+    registered
+  notes: Applies to the source-described ordinary series; complete historical and
+    special coverage remains unverified.
+ML:
+  source: wiki-ML-fr.json
+  classification: usable_now
+  unit_kind: region_and_circle
+  code_position: separate region abbreviation and circle/arrondissement number
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: sigle\ de\ la\ région\ suivi\ du\ numéro\ de\ l’arrondissement\
+    pour\ le\ district\ de\ Bamako\ et\ du\ Cercle\ pour\ les\ autres\ régions\ Le\
+    drapeau\ national\ du\ Mali\ accompagné\ de\ la\ mention\ ML
+  notes: 2023/2024 series. Region abbreviations collected; circle-number mapping remains
+    a gap.
+ET:
+  source: wiki-ET-fr.json
+  classification: unverified
+  unit_kind: region
+  code_position: letter group
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Le\ deux\ dernières\ lettres\ signifie\ la\ région
+  notes: French source describes regional plates; Ethiopian 2026 national redesign
+    is not reconciled. Codes retained with unknown validity, not asserted current.
+SH:
+  source: wiki-SH-resolved.json
+  classification: usable_now
+  unit_kind: island
+  code_position: A for Ascension; TDC for Tristan
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Ascension\ Island\ plates\ are\ similar\ to\ those\ of\ Saint\
+    Helena\ but\ start\ with\ an\ 'A'
+  notes: Saint Helena itself uses a numeric ordinary serial; prefixes distinguish
+    other islands in the territory.
+ZW:
+  source: wiki-ZW.json
+  classification: historic_only
+  unit_kind: city
+  code_position: historic letter prefix
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: '"S"\ prefixed\ serial\ number\ denotes\ this\ plate\ issued\
+    in\ Salisbury,\ Southern\ Rhodesia,\ between\ 1931\ and\ 1958\ '
+  notes: Modern three-letter/four-digit series has no reviewed geographic allocation;
+    historical Rhodesian schemes incomplete.
+FO:
+  source: wiki-FO-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Cars\ registered\ after\ 1996\ have\ white\ background,\ blue\
+    text\ in\ their\ own\ style,\ two\ letters\ and\ three\ digits
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+GD:
+  source: wiki-GD.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Serial\ format\ ABC123
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+KW:
+  source: wiki-KW.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Private\ 33\.5\ x\ 15\.5\ cm
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+MV:
+  source: wiki-MV-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Background\ colour,\ in\ combination\ with\ the\ first\ letter\
+    on\ the\ left\ denotes\ the\ type\ of\ vehicle
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+PF:
+  source: wiki-PF.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: 1993\ Black\ on\ yellow\ 123456\ P
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+BL:
+  source: wiki-BL-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Serial\ format\ 12\(3\)\ A\(B\)
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+WF:
+  source: wiki-WF-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Serial\ format\ 1234\ WF
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+SA:
+  source: wiki-SA.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: plates\ consist\ of\ three\ letters\ and\ up\ to\ four\ numbers
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+VU:
+  source: wiki-VU.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Republic\ of\ Vanuatu\ 12345
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+VC:
+  source: wiki-VC-resolved.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Serial\ format\ A1234
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+TV:
+  source: wiki-TV.json
+  classification: none
+  unit_kind: null
+  code_position: null
+  series: ordinary; see notes
+  coverage_status: partial
+  evidence_pattern: Serial\ format\ AB1234
+  notes: No subnational component in the described ordinary series. This is a series-level
+    inference; historical and special exceptions have not been exhausted.
+TT:
+  source: wiki-TT-resolved.json
+  classification: none
+  unit_kind: none
+  code_position: none; leading letter denotes vehicle class
+  series: ordinary serial
+  coverage_status: reviewed
+  evidence_pattern: Each\ registration\ number\ begins\ with\ a\ letter\ designating\
+    the\ class\ of\ vehicle
+  notes: Ordinary prefixes identify vehicle class; remaining letters advance as serials.
+    Historic exceptions not exhaustively surveyed.
+SB:
+  source: wiki-SB.json
+  classification: none
+  unit_kind: none
+  code_position: none; sequential series
+  series: ordinary 2014 series
+  valid_from: '2014'
+  coverage_status: reviewed
+  evidence_pattern: MA\-0000\ to\ MA\-9999,\ then\ MB\-0000\ onwards
+  notes: Inference from the described sequential ordinary series. No assertion about
+    every former series.
+ST:
+  source: wiki-ST-resolved.json
+  classification: none
+  unit_kind: none
+  code_position: none; STP is the national prefix
+  series: ordinary serial
+  coverage_status: reviewed
+  evidence_pattern: The\ current\ standard\ has\ the\ form\ «STP\-12\-34AA»
+  notes: Source describes a common national prefix and serial; no subnational geography
+    evidenced. Historic exceptions not exhaustively surveyed.
+JO:
+  source: wiki-JO.json
+  classification: usable_now
+  unit_kind: free_trade_zone
+  code_position: AQ prefix in special zone series; ordinary numeric prefixes denote
+    class
+  series: 2025 special Aqaba series
+  valid_from: 2025-08
+  coverage_status: partial
+  evidence_pattern: Aqaba\ Free\ Trade\ Zone\ Red,\ White\ Text\ سلطة\ العقبة\ AQ
+  notes: Special Aqaba Free Trade Zone plates encode a place. Ordinary numeric series
+    identify vehicle category, not district; nationwide series must not be geocoded.
+GP:
+  source: wiki-FR-fr.json
+  classification: printed_not_encoded
+  unit_kind: department_or_territory
+  code_position: optional identity band; no place in SIV serial
+  series: current SIV; historic territorial series incompletely surveyed
+  coverage_status: partial
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  notes: Current SIV has no encoded registration area; the chosen department band
+    does not establish residence. Historic FNI or local territorial numbering needs
+    separate interpretation and is not fully collected here.
+RE:
+  source: wiki-FR-fr.json
+  classification: printed_not_encoded
+  unit_kind: department_or_territory
+  code_position: optional identity band; no place in SIV serial
+  series: current SIV; historic territorial series incompletely surveyed
+  coverage_status: partial
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  notes: Current SIV has no encoded registration area; the chosen department band
+    does not establish residence. Historic FNI or local territorial numbering needs
+    separate interpretation and is not fully collected here.
+GF:
+  source: wiki-FR-fr.json
+  classification: printed_not_encoded
+  unit_kind: department_or_territory
+  code_position: optional identity band; no place in SIV serial
+  series: current SIV; historic territorial series incompletely surveyed
+  coverage_status: partial
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  notes: Current SIV has no encoded registration area; the chosen department band
+    does not establish residence. Historic FNI or local territorial numbering needs
+    separate interpretation and is not fully collected here.
+MQ:
+  source: wiki-FR-fr.json
+  classification: printed_not_encoded
+  unit_kind: department_or_territory
+  code_position: optional identity band; no place in SIV serial
+  series: current SIV; historic territorial series incompletely surveyed
+  coverage_status: partial
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  notes: Current SIV has no encoded registration area; the chosen department band
+    does not establish residence. Historic FNI or local territorial numbering needs
+    separate interpretation and is not fully collected here.
+YT:
+  source: wiki-FR-fr.json
+  classification: printed_not_encoded
+  unit_kind: department_or_territory
+  code_position: optional identity band; no place in SIV serial
+  series: current SIV; historic territorial series incompletely surveyed
+  coverage_status: partial
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  notes: Current SIV has no encoded registration area; the chosen department band
+    does not establish residence. Historic FNI or local territorial numbering needs
+    separate interpretation and is not fully collected here.
+MF:
+  source: wiki-MF-resolved.json
+  classification: historic_only
+  unit_kind: former_department
+  code_position: historic departmental suffix; current serial nationwide within territory
+  series: pre-2009 Guadeloupe-linked; modern local serial
+  valid_to: '2009'
+  coverage_status: partial
+  evidence_pattern: 97\-1\ signifies\ Guadeloupe\ and\ nearby\ French\ islands
+  notes: Old 97-1 refers to the former Guadeloupe grouping, not a unique locality
+    in present Saint Martin. Current local serial has no reviewed internal geographic
+    split.
+PM:
+  source: wiki-PM-resolved.json
+  classification: none
+  unit_kind: none
+  code_position: none; SPM denotes the territory as a whole
+  series: ordinary since 2000
+  valid_from: '2000'
+  coverage_status: reviewed
+  evidence_pattern: Since\ 2000,\ all\ numbers\ have\ begun\ with\ the\ letters\ SPM\
+    followed\ by\ a\ serial\ number\ and\ serial\ letter
+  notes: The national/territorial prefix does not distinguish the islands. Earlier
+    SPM suffix also denotes the territory as a whole.

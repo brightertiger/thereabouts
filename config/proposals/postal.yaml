@@ -1,0 +1,33 @@
+release: ''
+selectors: []
+files:
+- name: CA_full.csv.zip
+  url: https://download.geonames.org/export/zip/CA_full.csv.zip
+  metadata:
+    attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: GB_full.csv.zip
+  url: https://download.geonames.org/export/zip/GB_full.csv.zip
+  metadata:
+    attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: NL_full.csv.zip
+  url: https://download.geonames.org/export/zip/NL_full.csv.zip
+  metadata:
+    attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: allCountries.zip
+  url: https://download.geonames.org/export/zip/allCountries.zip
+  metadata:
+    attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: readme.txt
+  url: https://download.geonames.org/export/zip/readme.txt
+  metadata:
+    attribution: GeoNames; GB contains Royal Mail copyright and database right 2022
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/

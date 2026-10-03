@@ -7,12 +7,11 @@ from typing import Any
 
 import pyarrow.parquet as pq
 
-from build_data.acquire.plates_config import policy as base_policy
-from build_data.acquire.plates_html import clean_text
-from build_data.acquire.plates_reader import document
-from build_data.plate_country.formats import _decorate
-from build_data.plate_country.policy import code_key, policy
-from build_data.plate_country.syntax import template_pattern
+from pipeline.engines.plate_country.formats import _decorate
+from pipeline.engines.plate_country.policy import base_policy, code_key, policy
+from pipeline.engines.plate_country.syntax import template_pattern
+from pipeline.sources.plates.html import clean_text
+from pipeline.sources.plates.reader import document
 from tools.build_sample_pack import sha
 from tools.forward_sample import COUNTRIES
 
@@ -94,7 +93,7 @@ def load(
         n for n in range(0x110000) if unicodedata.decimal(chr(n), None) == 0
     ]
     bundle["policy"]["decimal_unicode_version"] = unicodedata.unidata_version
-    for path in Path("build_data/plate_country/data").glob("*.json"):
+    for path in Path("config/policies/plate_country").glob("*.yaml"):
         inputs[str(path)] = sha(path)
     return bundle, inputs, total, mode
 

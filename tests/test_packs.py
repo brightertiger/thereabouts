@@ -60,7 +60,7 @@ for name in sys.modules:
 
 
 def test_full_verification_and_checksum_damage(copy_pack: Path) -> None:
-    from build_data.verify import verify
+    from tests.support.verify import verify
 
     verify(copy_pack)
     file = copy_pack / "combined-values.bin"

@@ -1,0 +1,2288 @@
+wiki-IN-rto.json:
+- parser: table
+  tables:
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 33
+  - 34
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2}[- ]\d{1,2}(?:[A-Z]{1,2})?\b
+  unit_kind: registration_office
+  series_status: current
+  historic_pattern: Not in use|Discontinued|Defunct|not issued|abolished
+  exclude: Government vehicles|Police vehicles|Governor|Reserved|Defunct|Rented cars
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 0
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-Z]{2}-\d{2}\b
+  unit_kind: district
+  series_status: current
+  notes: 'Statewide code: retain every listed district; does not uniquely identify
+    the office'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  - 36
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2}[- ]\d{2}\b
+  unit_kind: district
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 32
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2}-\d{2}\b
+  unit_kind: registration_office
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 32
+  pairs:
+  - - 3
+    - 1
+  code_pattern: \b[A-Z]{3}\b
+  unit_kind: registration_office
+  series_status: historic
+  valid_to: '1989'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CN.json:
+- parser: list
+  section_pattern: List of prefixes
+  item_pattern: (?P<codes>[\u3400-\u9fff][A-Z][^—–-]*?)\s*[—–-]\s*(?P<name>.+)
+  code_pattern: '[\u3400-\u9fff][A-Z]{1,2}'
+  unit_kind: registration_area
+  series_status: unknown
+  exclude: Police|Military|Central Guard|Ministry|foreigner|foreign company|Taxi|Taxis|buses|Buses
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: '[\u3400-\u9fff]{2,3}'
+  unit_kind: province
+  series_status: historic
+  valid_from: '1986'
+  valid_to: '1992'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-DE.json:
+- parser: table
+  tables:
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 27
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜ]{1,3}\b
+  unit_kind: district_or_city
+  series_status: current
+  skip_rows: 2
+  header_contains: City / rural district
+  name_exclude: Police|Government|government|Bundes|Landtag
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 35
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜ]{1,3}\b
+  unit_kind: district
+  series_status: historic
+  series_id: DDR
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ID.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 1
+    - 2
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: registration_area
+  series_status: current
+  exclude: Army|Military|Police Head|Diplomatic|Trishaw|Rickshaw|Horse carriage
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-TR-fixed.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b\d{2}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-RU.json:
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[0-9]{2,3}\b
+  unit_kind: federal_subject
+  series_status: current
+  numeric_ranges: false
+  exclude: Not used|unused|not assigned|Military|diplomatic
+  historic_pattern: until|formerly
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-IT.json:
+- parser: table
+  tables:
+  - 101
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  - - 6
+    - 7
+  - - 8
+    - 9
+  code_pattern: \b[A-Z]{2}\b|Roma
+  unit_kind: province
+  series_status: unknown
+  series_id: province-symbols-including-current-optional-band
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 102
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  - - 6
+    - 7
+  code_pattern: \b\d{1,2}\b
+  unit_kind: province
+  series_status: historic
+  valid_from: '1905'
+  valid_to: '1927'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 103
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2}\b
+  unit_kind: province
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-PL.json:
+- parser: cell_lines
+  section_pattern: District indicators
+  item_pattern: (?P<codes>[A-Z][A-Z, ]+)\s*[–—-]\s*(?P<name>.+)
+  code_pattern: \b[A-Z]{2,3}\b
+  unit_kind: district_or_city
+  series_status: current
+  tables:
+  - 4
+  historic_pattern: former
+  valid_to_pattern: divided.* in (?P<date>\d{4})
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GB.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-Z]\b
+  unit_kind: registration_office
+  series_status: current
+  skip_rows: 1
+  code_suffix_column: 3
+  suffix_pattern: \b[A-Z]\b
+  exclude: Reserved|reserved|Personal|personal|Not used|not used|Only issued with
+    approval
+  valid_from: '2001-09-01'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 9
+  pairs:
+  - - 1
+    - 2
+  - - 3
+    - 4
+  - - 5
+    - 6
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: registration_office
+  series_status: historic
+  valid_to: '2001'
+  exclude: Not issued|not issued|Unallocated|unallocated
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-JP.json:
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 2
+    - 3
+  code_pattern: '[\u3040-\u30ff\u3400-\u9fff]+'
+  unit_kind: registration_office
+  series_status: current
+  skip_rows: 2
+  name_language: en
+  local_column: 2
+  local_language: ja
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 5
+    - 3
+  code_pattern: '[\u3040-\u30ff\u3400-\u9fff]+'
+  unit_kind: registration_office
+  series_status: historic
+  skip_rows: 2
+  name_language: en
+  local_column: 5
+  local_language: ja
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-VN.json:
+- parser: table
+  tables:
+  - 15
+  - 16
+  - 17
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b\d{2}\b
+  unit_kind: province
+  series_status: current
+  numeric_ranges: true
+  exclude: National Authorities|Government
+  valid_from: '2025-07-01'
+  name_language: vi
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MY.json:
+- parser: table
+  tables:
+  - 4
+  - 15
+  - 26
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: state_or_division
+  series_status: current
+  skip_rows: 2
+  exclude: Military|Government|Trailer
+  historic_pattern: Exhausted in (?:2004|2016|2018|2023|2026)|replaced
+  unknown_pattern: Exhausted in 2027
+  name_split: ' and '
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 12
+  - 13
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: state
+  series_status: historic
+  skip_rows: 2
+  valid_to: '1948'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 16
+  - 18
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b(?:[1-9]D|[A-Z])\b
+  unit_kind: division
+  series_status: historic
+  skip_rows: 2
+  valid_to: '1991'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-IR.json:
+- parser: table
+  tables:
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  pairs:
+  - - 0
+    - 2
+  code_pattern: '[۰-۹]{2}'
+  unit_kind: province
+  series_status: current
+  exclude: not allocated|No code|Not used
+  skip_rows: 1
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-UA.json:
+- parser: table
+  tables:
+  - 4
+  pairs:
+  - - 0
+    - 3
+  - - 1
+    - 3
+  - - 2
+    - 3
+  code_pattern: \b[A-ZА-ЯІ]{2}\b
+  unit_kind: oblast
+  series_status: current
+  exclude: Online|online|nationwide|Nationwide|Statewide|issued online|All regions
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZА-ЯІЇ]{2}\b
+  unit_kind: oblast
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 6
+  pairs:
+  - - 0
+    - 2
+  - - 1
+    - 2
+  code_pattern: \b(?:\d{2}|[A-ZА-ЯІЇ]{2})\b
+  unit_kind: oblast
+  series_status: historic
+  valid_to: '2004'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CH.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-Z]{2}\b
+  unit_kind: canton
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AT.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: district
+  series_status: current
+  exclude: official|diplomat|consul|police|Federal|Government|government|Army|military
+  historic_pattern: until|former|dissolved
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CZ.json:
+- parser: table
+  tables:
+  - 6
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]\b
+  unit_kind: region
+  series_status: current
+  local_column: 2
+  local_language: cs
+  exclude: electric
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 7
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: district
+  series_status: historic
+  valid_from: '1954'
+  valid_to: '2001'
+  exclude: government|military|electric
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ES.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜ]{1,3}\b
+  unit_kind: province
+  series_status: historic
+  valid_to: '2000'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-FR.json:
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b[A-ZÄÖÜ]{1,3}\b
+  unit_kind: registration_area
+  series_status: historic
+  skip_rows: 2
+  valid_from: '1901'
+  valid_to: '1919'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 6
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b[A-ZÄÖÜ]{1,3}\b
+  unit_kind: registration_area
+  series_status: historic
+  skip_rows: 2
+  valid_from: '1919'
+  valid_to: '1928'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 11
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  - - 6
+    - 7
+  - - 8
+    - 9
+  code_pattern: \b[A-Z]{2}\b
+  unit_kind: department
+  series_status: historic
+  skip_rows: 2
+  valid_from: '1928'
+  valid_to: '1950'
+  alpha_ranges: true
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-IE.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: county
+  series_status: current
+  local_column: 2
+  local_language: ga
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: county
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 1
+    - 2
+  - - 3
+    - 4
+  - - 5
+    - 6
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: county
+  series_status: historic
+  valid_to: '1987'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-NO.json:
+- parser: table
+  tables:
+  - 19
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b[A-Z]{2}\b
+  unit_kind: registration_office
+  series_status: current
+  exclude: Electric|electric|diplomat|Armed|Hydrogen|hydrogen|Gas powered
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AR.json:
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]\b
+  unit_kind: province
+  series_status: historic
+  valid_from: '1972'
+  valid_to: '1994'
+  name_language: es
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]\b
+  unit_kind: province
+  series_status: historic
+  valid_from: '1972'
+  valid_to: '1994'
+  series_id: province-1972
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BR.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{3}\b
+  unit_kind: state
+  series_status: current
+  alpha_ranges: true
+  exclude: not allocated|Not allocated|[0-9][A-Z][0-9]
+  name_language: pt
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MX.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 6
+    - 0
+  code_pattern: \b[A-Z]{3}\b
+  unit_kind: state
+  series_status: unknown
+  alpha_ranges: true
+  series_id: 1992-allocation
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ZA.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2,3}\b
+  unit_kind: registration_area
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2,4}\b
+  unit_kind: registration_area
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-DZ.json:
+- parser: table
+  tables:
+  - 6
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b\d{2}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AF.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 2
+    - 0
+  - - 5
+    - 3
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AL.json:
+- parser: table
+  tables:
+  - 31
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: district
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AM.json:
+- parser: table
+  tables:
+  - 6
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b\d{1,2}\b
+  unit_kind: province
+  series_status: unknown
+  numeric_ranges: true
+  exclude: Individual plates
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AZ.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b\d{2}\b
+  unit_kind: registration_office
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BB.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: parish
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BZ.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: district
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 2
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: city
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BA.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  - - 4
+    - 5
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: city
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  - 4
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: city
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  code_pattern: \b[А-ЯЂЈЉЊЋЏ]{2,3}\b
+  unit_kind: city
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BG.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZА-Я]{1,2}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 2
+    - 1
+  code_pattern: \b[A-ZА-Я]{1,2}\b
+  unit_kind: province
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CF.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: prefecture
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-HR.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_area
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_area
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CU.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: province
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-EC.json:
+- parser: table
+  tables:
+  - 0
+  pairs:
+  - - 1
+    - 0
+  - - 3
+    - 2
+  - - 5
+    - 4
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GR.json:
+- parser: table
+  tables:
+  - 4
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZΑ-Ω]{1,3}\b
+  unit_kind: prefecture
+  series_status: unknown
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GU.json:
+- parser: table
+  tables:
+  - 3
+  - 5
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: municipality
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GN.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b\d{2}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-Z]{1,3}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-IQ.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b\d{1,2}\b
+  unit_kind: governorate
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-KZ.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b\d{1,2}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 1
+    - 2
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 4
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[А-Я]{2}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-KG.json:
+- parser: table
+  tables:
+  - 44
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b\d{1,2}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 45
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 46
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[А-Я]{2}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LY.json:
+- parser: table
+  tables:
+  - 12
+  pairs:
+  - - 0
+    - 1
+  - - 4
+    - 5
+  - - 8
+    - 9
+  code_pattern: \b\d{1,2}\b
+  unit_kind: municipality
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LT.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: county
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MD.json:
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: district
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ME.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: municipality
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MM.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MK.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_area
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_area
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-PE.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  - - 2
+    - 3
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: historic
+  exclude: Not used|Unused|Not assigned
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_zone
+  series_status: current
+  exclude: Not used|Unused|Not assigned
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-PH.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 13
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-RO.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: county
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 4
+  - 5
+  - 6
+  - 7
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: county_or_region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-RS.json:
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_area
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SK.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: district
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SI.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: registration_region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-TJ.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b\d{1,2}\b
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[А-Я]{2}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-TM.json:
+- parser: table
+  tables:
+  - 10
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 5
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[А-Я]{2}\b
+  unit_kind: province
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-UZ.json:
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b\d{1,2}\b
+  unit_kind: region
+  series_status: current
+  numeric_ranges: true
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 3
+  pairs:
+  - - 1
+    - 2
+  code_pattern: \b\d{1,2}\b
+  unit_kind: region
+  series_status: historic
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-UY.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: department
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-VE.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: state
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-YE.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  - - 3
+    - 2
+  code_pattern: \b\d{1,2}\b
+  unit_kind: governorate
+  series_status: unknown
+  skip_rows: 2
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-XK.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b\d{1,2}\b
+  unit_kind: district
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-DE-local.json:
+- parser: table
+  tables:
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  pairs:
+  - - 0
+    - 3
+  code_pattern: \b[A-ZÄÖÜČĆŠĐŽ]{1,3}\b
+  unit_kind: district_or_city
+  series_status: unknown
+  name_language: de
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-NE.json:
+- parser: list
+  section_pattern: Regional Codes
+  item_pattern: (?P<codes>\d+)\s*-\s*(?P<name>.+)
+  code_pattern: \d+
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MG.json:
+- parser: list
+  section_pattern: Province codes
+  item_pattern: (?P<codes>[A-Z]) for (?P<name>.+)
+  code_pattern: '[A-Z]'
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MZ.json:
+- parser: list
+  section_pattern: Province Codes
+  item_pattern: (?P<codes>[A-Z]{2}) = (?P<name>.+)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SE.json:
+- parser: list
+  section_pattern: History / 1906–1973 series / Codes
+  item_pattern: (?P<codes>[A-Z, ]+) [–—-] (?P<name>.+)
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: county
+  series_status: historic
+  valid_from: '1906'
+  valid_to: '1973'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-NL.json:
+- parser: list
+  section_pattern: Earlier schemes / Province codes
+  item_pattern: '(?P<codes>[A-Z, ]+): (?P<name>.+)'
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: province
+  series_status: historic
+  valid_from: '1906'
+  valid_to: '1951'
+  exclude: overseas
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BT.json:
+- parser: list
+  section_pattern: ^$
+  item_pattern: (?P<codes>\d)\. (?P<name>.+)
+  code_pattern: \d
+  unit_kind: district
+  series_status: current
+  name_split: ',\s*'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-TD.json:
+- parser: list
+  section_pattern: Regional coding
+  item_pattern: (?P<codes>\d{2}) [–—-] (?P<name>.+)
+  code_pattern: \d{2}
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MR.json:
+- parser: list
+  section_pattern: Regional coding
+  item_pattern: (?P<codes>\d{2}) [–—-] (?P<name>.+)
+  code_pattern: \d{2}
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LK.json:
+- parser: list
+  section_pattern: Regional Identifier Codes
+  item_pattern: '(?P<name>.+): (?P<codes>[A-Z]{2})'
+  code_pattern: '[A-Z]{2}'
+  unit_kind: province
+  series_status: unknown
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MN.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-ZА-ЯӨҮ]{2}\b
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LB.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 0
+    - 2
+  code_pattern: \b[A-Z]\b
+  unit_kind: registration_area
+  series_status: current
+  skip_rows: 2
+  exclude: Code A added
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+gb-inf104.pdf:
+- parser: fixed_text
+  start: Letter                  Postal area
+  stop: We will not use
+  name_slice:
+  - 24
+  - 43
+  code_start: 43
+  code_line_pattern: (?:[A-Z]{2}[ ]*)+(?:– [A-Z]{2})?
+  code_pattern: \b[A-Z]{2}\b
+  alpha_ranges: true
+  excluded_letters: IQZ
+  exceptions:
+  - \((?P<code>HW) will be used exclusively for (?P<name>Isle of\s+Wight) residents\)
+  exclude_codes:
+  - MN
+  unit_kind: registration_office
+  series_status: current
+  series_id: GB-2001-DVLA-2022
+  valid_from: '2001-09-01'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CD.json:
+- parser: table
+  tables:
+  - 0
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[0-9]{2}\b
+  unit_kind: province
+  series_status: current
+  series_id: numeric-province
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 1
+    - 0
+  - - 2
+    - 0
+  - - 3
+    - 0
+  code_pattern: \b[A-Z]{1,2}\b
+  unit_kind: province
+  series_status: historic
+  valid_to: '2009'
+  series_id: province-letters
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GM-resolved.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b[A-Z]{2,3}\b
+  unit_kind: region
+  series_status: current
+  valid_from: '2019'
+  series_id: '2019'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[A-Z]{2,3}\b
+  unit_kind: region
+  series_status: historic
+  valid_from: '1994'
+  valid_to: '2019'
+  series_id: '1994'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SN.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{2}\b
+  unit_kind: region
+  series_status: current
+  series_id: regional-group
+  name_language: fr
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AU-WA.json:
+- parser: table
+  tables:
+  - 0
+  pairs:
+  - - 0
+    - 1
+  code_pattern: \b[A-Z]{1,3}\b
+  unit_kind: local_government_area
+  series_status: current
+  series_id: WA-optional-LGA
+  subdivision_scope: AU-WA
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-US-ID.json:
+- parser: table
+  tables:
+  - 4
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b[0-9]?[A-Z]\b
+  unit_kind: county
+  series_status: current
+  series_id: Idaho-county-1945
+  valid_from: '1945'
+  subdivision_scope: US-ID
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 4
+  pairs:
+  - - 1
+    - 0
+  code_pattern: \b[0-9]?[A-Z]\b
+  unit_kind: county
+  series_status: historic
+  series_id: Idaho-county-1934
+  valid_from: '1934'
+  valid_to: '1944'
+  subdivision_scope: US-ID
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SY.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 3
+    - 1
+  code_pattern: \b[A-ZŞ]{3}\b
+  unit_kind: region_or_district
+  series_status: current
+  series_id: AANES
+  local_column: 2
+  local_language: ar
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 19
+  pairs:
+  - - 2
+    - 0
+  code_pattern: \b[A-Z]{3}\b
+  unit_kind: district
+  series_status: historic
+  series_id: SIG
+  local_column: 1
+  local_language: ar
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CG.json:
+- parser: list
+  section_pattern: ^Regular
+  item_pattern: (?P<codes>\d{1,2})\s*-\s*(?P<name>.+)
+  code_pattern: \d{1,2}
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GE-country.json:
+- parser: list
+  section_pattern: 1993 to 2014
+  item_pattern: (?P<codes>[A-Z]) - (?P<name>.+)
+  code_pattern: '[A-Z]'
+  unit_kind: region
+  series_status: historic
+  valid_from: '1993'
+  valid_to: '2004'
+  series_id: geographic-1993
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LS.json:
+- parser: list
+  section_pattern: ^Kingdom of Lesotho$
+  item_pattern: (?P<codes>L[A-J]) – (?P<name>.+)
+  code_pattern: L[A-J]
+  unit_kind: district
+  series_status: historic
+  valid_to: '1979'
+  series_id: kingdom-old
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: list
+  section_pattern: ^Colony of Basutoland$
+  item_pattern: (?P<codes>B[A-J]) – (?P<name>.+)
+  code_pattern: B[A-J]
+  unit_kind: district
+  series_status: historic
+  series_id: Basutoland
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-PS.json:
+- parser: list
+  section_pattern: Private vehicles since July 2018
+  item_pattern: The letter (?P<codes>[A-N]) – (?P<name>.+)
+  code_pattern: '[A-N]'
+  unit_kind: governorate
+  series_status: current
+  valid_from: 2018-07
+  series_id: West-Bank-2018
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: list
+  section_pattern: Private vehicles between 1994
+  item_pattern: (?P<codes>[1-9])\s*:\s*(?P<name>.+)
+  code_pattern: '[1-9]'
+  unit_kind: region
+  series_status: historic
+  valid_from: '1994'
+  valid_to: 2018-07
+  series_id: numeric-1994
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ID-local.json:
+- parser: cell_lines
+  tables:
+  - 5
+  section_pattern: Kewilayahan
+  item_pattern: (?P<name>[^():]+)\s*:?\s*\((?P<codes>[A-Z]{1,2})\s+(?:xxxx|[0-9])
+  code_pattern: '[A-Z]{1,2}'
+  unit_kind: regency_or_city
+  series_status: current
+  series_id: area-motorcycle
+  name_language: id
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: cell_lines
+  tables:
+  - 6
+  section_pattern: Kewilayahan
+  item_pattern: (?P<name>[^():]+)\s*:?\s*\((?P<codes>[A-Z]{1,2})\s+(?:xxxx|[0-9])
+  code_pattern: '[A-Z]{1,2}'
+  unit_kind: regency_or_city
+  series_status: current
+  series_id: area-car
+  name_language: id
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CN-civil.json:
+- parser: list
+  section_pattern: ^各地车辆号牌发牌机关代号 / .+（.）$
+  item_pattern: (?P<codes>[A-Z](?:(?:/|、)[A-Z])*)\s+(?P<name>.+)
+  code_pattern: '[A-Z]'
+  unit_kind: registration_area
+  series_status: current
+  series_id: civil-1992
+  name_language: zh
+  code_prefix_section: （(?P<prefix>.)）$
+  unknown_pattern: \[註|地区|摩托|普通汽|市街|郊区
+  historic_pattern: 已撤|已取消|停发|不再|已停|撤销
+  exclude: 从未启用|警用|公安|中央|国家机关|专用|出租|临时|外资|部队
+  name_remove: \[註\s*\d+\]|（[^）]*）
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-JP-regions.json:
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 3
+    - 7
+  code_pattern: ^[一-鿿ぁ-ゖァ-ヺ]{1,6}
+  unit_kind: registration_office_seat
+  series_status: current
+  series_id: local-marking
+  name_language: ja
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: table
+  tables:
+  - 2
+  pairs:
+  - - 8
+    - 7
+  code_pattern: '[一-鿿ぁ-ゖァ-ヺ]{1,6}'
+  unit_kind: registration_office_seat
+  series_status: historic
+  series_id: former-local-marking
+  name_language: ja
+  code_exclude: 地名なし
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-IR-local.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 1
+    - 0
+  - - 3
+    - 2
+  code_pattern: '[۰-۹]{2}'
+  unit_kind: province
+  series_status: current
+  series_id: province-private
+  name_language: fa
+  name_remove: \s*\([۰-۹]+\)
+  name_exclude: ^[۰-۹،\s]+$
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GG.json:
+- parser: text
+  item_pattern: Registration plates of (?P<name>Alderney) are issued with the prefix
+    .(?P<codes>AY).
+  code_pattern: AY
+  unit_kind: island
+  series_status: current
+  series_id: Alderney
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BQ-fixed.json:
+- parser: text
+  item_pattern: large letter "(?P<codes>[BE])" indicates? a plate from (?P<name>[^,.]+)
+  code_pattern: '[BE]'
+  unit_kind: island
+  series_status: current
+  series_id: island
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+th-gazette.pdf:
+- parser: text
+  start: ตารางการใช้รหัสจังหวัด
+  stop: หมายเหตุ
+  item_pattern: (?P<name>[ก-๛]+)\s+(?P<codes>[0-9]{2,3})(?![0-9])
+  code_pattern: '[0-9]{2,3}'
+  unit_kind: province_or_registration_district
+  series_status: current
+  valid_from: '2023-06-27'
+  series_id: international-special-2023
+  name_language: th
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+jp-codes.pdf:
+- parser: fixed
+  start: ナンバープレート表示
+  code_slice:
+  - 7
+  - 20
+  name_slice:
+  - 7
+  - 20
+  code_line_pattern: '[一-鿿ぁ-ヺ]{1,6}'
+  code_pattern: '[一-鿿ぁ-ヺ]{1,6}'
+  unit_kind: registration_area
+  series_status: current
+  series_id: MLIT-regional-marking
+  name_language: ja
+  exclude_lines: 発出元|作成日|ナンバープレート
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ML-fr.json:
+- parser: list
+  section_pattern: Sigles des régions
+  item_pattern: '(?P<codes>[A-Z]{3}) : (?P<name>.+)'
+  code_pattern: '[A-Z]{3}'
+  name_language: fr
+  unit_kind: region
+  series_status: current
+  series_id: source-described
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-MA-fr.json:
+- parser: ordered_list
+  section_pattern: Liste des numéros
+  item_pattern: (?P<codes>[0-9]{1,2}) (?P<name>.+)
+  code_pattern: '[0-9]{1,2}'
+  name_language: fr
+  unit_kind: prefecture
+  series_status: current
+  series_id: source-described
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-LS-pl.json:
+- parser: list
+  section_pattern: Kody literowe
+  item_pattern: (?P<codes>[A-K]) – (?P<name>.+)
+  code_pattern: '[A-K]'
+  name_language: pl
+  unit_kind: district
+  series_status: current
+  series_id: source-described
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-ET-fr.json:
+- parser: list
+  section_pattern: Système
+  item_pattern: '(?P<codes>[A-Z]{2}) : (?P<name>.+)'
+  code_pattern: '[A-Z]{2}'
+  name_language: fr
+  unit_kind: region
+  series_status: unknown
+  series_id: source-described
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-world.json:
+- parser: text
+  country_code: PK
+  item_pattern: (?P<codes>[A-Z]{2})[A-Z]?\s+(?:[0-9]{2} )?[0-9]{4}, is a vehicle registered
+    in (?P<name>[^,]+), Punjab
+  code_pattern: '[A-Z]{2}'
+  unit_kind: registration_city
+  series_status: historic
+  series_id: Punjab-district
+  valid_to: '2020'
+  subdivision_scope: PK-PB
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SH-resolved.json:
+- parser: text
+  item_pattern: (?P<name>Ascension Island) plates are similar to those of Saint Helena
+    but start with an '(?P<codes>A)'
+  code_pattern: A
+  unit_kind: island
+  series_status: current
+  series_id: island
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-JO.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 3
+    - 0
+  code_pattern: ^AQ$
+  unit_kind: free_trade_zone
+  series_status: current
+  series_id: aqaba-special
+  valid_from: 2025-08
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-AO.json:
+- parser: text
+  item_pattern: (?P<codes>LD) = (?P<name>Luanda)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: province
+  series_status: historic
+  valid_from: '1996'
+  valid_to: '2024'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CV.json:
+- parser: text
+  start: 'The codes are:'
+  stop: The format is
+  item_pattern: (?P<codes>[A-Z]{2}) - (?P<name>.*?)(?= [A-Z]{2} - |$)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: island
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-CM.json:
+- parser: list
+  section_pattern: Regional coding
+  item_pattern: (?P<codes>[A-Z]{2}) [–—-] (?P<name>.+)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GQ.json:
+- parser: list
+  section_pattern: Provinces
+  item_pattern: (?P<codes>[A-Z]{2}) [–—-] (?P<name>.+)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: province
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-GH.json:
+- parser: text
+  start: Below are the codes
+  stop: 'NB: Regions'
+  item_pattern: (?P<codes>[A-Z]{2}(?:, [A-Z]{2})*) = (?P<name>[\w -]+ Region)
+  code_pattern: '[A-Z]{2}'
+  unit_kind: region
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-KP.json:
+- parser: table
+  tables:
+  - 1
+  pairs:
+  - - 0
+    - 5
+  code_pattern: '[가-힣]+'
+  local_column: 2
+  local_language: ko
+  unit_kind: province_or_city
+  series_status: current
+  header_contains: Abbreviation
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-NA.json:
+- parser: list
+  section_pattern: ^Town codes$
+  item_pattern: (?P<codes>[A-Z]{1,2})\s*[–—-]\s*(?P<name>.+)
+  code_pattern: '[A-Z]{1,2}'
+  unit_kind: town_or_region
+  series_status: current
+  name_remove: \s*\(since \d{4}\)| Capital of Namibia\.
+  valid_from_pattern: since (?P<date>\d{4})
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: list
+  section_pattern: ^South West Africa$
+  item_pattern: (?P<codes>[A-Z]{1,3})\s*[–—-]\s*(?P<name>.+)
+  code_pattern: '[A-Z]{1,3}'
+  unit_kind: town_or_region
+  series_status: historic
+  valid_from: '1968'
+  valid_to: '1990'
+  name_remove: (?i)\s+now .*|\. The Zambezi Region.*
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-PG.json:
+- parser: cell_lines
+  tables:
+  - 1
+  section_pattern: History
+  item_pattern: (?P<codes>[A-Z]{1,3})=(?P<name>.+)
+  code_pattern: '[A-Z]{1,3}'
+  unit_kind: province
+  series_status: current
+  exclude: Reserved|Not issued|^Z
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-SD.json:
+- parser: text
+  item_pattern: The letter (?P<codes>خ/KH) indicates (?P<name>Khartoum State)
+  code_pattern: خ|KH
+  unit_kind: state
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-BD.json:
+- parser: text
+  item_pattern: (?=(?P<name>ঢাকা মেট্রো))(?P<codes>ঢাকা মেট্রো)-গ
+  code_pattern: ঢাকা মেট্রো
+  unit_kind: registration_region
+  name_language: bn
+  series_status: current
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+wiki-VI.json:
+- parser: text
+  item_pattern: '''(?P<codes>C)'' was used on (?P<name>St\. Croix)'
+  code_pattern: '[A-Z]'
+  unit_kind: island
+  series_status: historic
+  valid_from: '1939'
+  valid_to: '1975'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: '''(?P<codes>T)'' on (?P<name>St\. Thomas and St\. John)'
+  code_pattern: '[A-Z]'
+  unit_kind: island
+  series_status: historic
+  valid_from: '1939'
+  valid_to: '1975'
+  name_split: ' and '
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: '''(?P<codes>J)'' code introduced for (?P<name>St\. John)'
+  code_pattern: '[A-Z]'
+  unit_kind: island
+  series_status: current
+  valid_from: '1975'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+pl-law2024.pdf:
+- parser: text
+  start: Załącznik nr 13
+  item_pattern: (?m)^[ \t]+(?P<name>[^\W\d_][\w .-]*?)[ \t]{2,}(?P<prefixes>[A-Z](?:,
+    [A-Z])?) ?(?P<codes>[A-Z]{1,2}(?:,[ \t\n]+[A-Z]{1,2})*)[ \t]*$
+  code_prefix_group: prefixes
+  prefix_pattern: '[A-Z]'
+  code_pattern: '[A-Z]{1,2}'
+  unit_kind: county_or_city
+  name_language: pl
+  series_status: current
+  series_id: 2024-statutory-allocations
+  text_substitutions:
+  - pattern: (?m)^([ \t]*)([\w-]+)-([ \t]{2,})([A-Z ,]+)\n[ \t]*-([\w-]+)
+    replacement: \1\2-\5\3\4
+  stop: Załącznik nr 14
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+pl-law2025.pdf:
+- parser: text
+  item_pattern: powiatu (?P<name>wrocławskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>wrocławski)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2025-07-30
+  valid_from: '2025-07-30'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: powiatu (?P<name>lubelskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>lubelski)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2025-07-30
+  valid_from: '2025-07-30'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: powiatu (?P<name>nyskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>nyski)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2025-07-30
+  valid_from: '2025-07-30'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+pl-law2026-isap.pdf:
+- parser: text
+  item_pattern: powiatu (?P<name>chełmińskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>chełmiński)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2026-08-04
+  valid_from: '2026-08-04'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: powiatu (?P<name>tarnogórskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>tarnogórski)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2026-08-04
+  valid_from: '2026-08-04'
+  max_alpha_range: 20000
+  max_numeric_range: 1000
+- parser: text
+  item_pattern: powiatu (?P<name>olsztyńskiego) po literach „[A-Z]+” dodaje się przecinek
+    i litery „(?P<codes>[A-Z, ]+)”
+  code_pattern: '[A-Z]{1,2}'
+  prefix_source:
+    source: pl-law2024.pdf
+    pattern: (?m)^[ \t]+(?P<name>olsztyński)[ \t]+(?P<prefixes>[A-Z](?:, [A-Z])?)\b
+    code_pattern: '[A-Z]'
+    max_alpha_range: 20000
+    max_numeric_range: 1000
+  unit_kind: county
+  name_language: pl
+  series_status: current
+  series_id: amendment-2026-08-04
+  valid_from: '2026-08-04'
+  max_alpha_range: 20000
+  max_numeric_range: 1000

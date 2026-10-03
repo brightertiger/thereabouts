@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from build_data.table import encode_keys
+from tests.support.table import encode_keys
 from thereabouts.errors import DamagedPackError
 from thereabouts.format import BITMAP_FLAG, level_offset, pack_label, unpack_label
 from thereabouts.index import position, positions

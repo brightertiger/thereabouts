@@ -1,0 +1,1362 @@
+# Public schemas measured from the retained normalized dataset.
+# Nullability is physical Arrow nullability.
+airports:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: true
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: true
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: ident
+    type: string
+    nullable: true
+    meaning: OurAirports airport identifier
+    units: none
+  - name: iata_code
+    type: string
+    nullable: true
+    meaning: IATA airport code, where available
+    units: none
+  - name: icao_code
+    type: string
+    nullable: true
+    meaning: ICAO airport code, where available
+    units: none
+  - name: gps_code
+    type: string
+    nullable: true
+    meaning: Source GPS airport code
+    units: none
+  - name: local_code
+    type: string
+    nullable: true
+    meaning: Local airport code
+    units: none
+  - name: type
+    type: string
+    nullable: true
+    meaning: Source-specific entity classification
+    units: none
+  - name: name
+    type: string
+    nullable: true
+    meaning: Preferred display name
+    units: none
+  - name: municipality
+    type: string
+    nullable: true
+    meaning: Source municipality text
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: region_code
+    type: string
+    nullable: true
+    meaning: Source region or subdivision code
+    units: none
+  - name: latitude
+    type: double
+    nullable: true
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: true
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: h3
+    type: string
+    nullable: true
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: true
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: true
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: true
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: true
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: true
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: state_id
+    type: string
+    nullable: true
+    meaning: Reconciled first-level subdivision place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: cell_country_code
+    type: string
+    nullable: true
+    meaning: Country code assigned by the geographic cell join
+    units: none
+  - name: cell_status
+    type: string
+    nullable: true
+    meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
+    units: none
+  - name: country_disagrees
+    type: bool
+    nullable: true
+    meaning: Whether source and cell country codes disagree; null if not comparable
+    units: none
+canonical_cities:
+  primary_key:
+  - city_id
+  columns:
+  - name: city_id
+    type: string
+    nullable: false
+    meaning: Canonical city/town anchor ID
+    units: none
+  - name: place_id
+    type: string
+    nullable: false
+    meaning: Reconciled place identifier
+    units: none
+  - name: country_code
+    type: string
+    nullable: false
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: kind
+    type: string
+    nullable: false
+    meaning: Canonical settlement kind
+    units: none
+  - name: name
+    type: string
+    nullable: false
+    meaning: Preferred display name
+    units: none
+  - name: eligibility
+    type: string
+    nullable: false
+    meaning: Evidence qualifying this place as a canonical city
+    units: none
+  - name: name_en
+    type: string
+    nullable: true
+    meaning: Preferred name only when its provenance explicitly identifies English
+    units: none
+  - name: latitude
+    type: double
+    nullable: false
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: false
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: population
+    type: int64
+    nullable: true
+    meaning: Source population estimate, not a current census assertion
+    units: people
+  - name: source_ids
+    type: string
+    nullable: false
+    meaning: JSON list of contributing source identifiers
+    units: none
+  - name: footprint_references
+    type: string
+    nullable: false
+    meaning: JSON references to source settlement footprints
+    units: none
+  - name: allocation_rule
+    type: string
+    nullable: false
+    meaning: Rule used to allocate this canonical settlement
+    units: none
+cells:
+  primary_key:
+  - h3_uint64
+  columns:
+  - name: h3
+    type: string
+    nullable: false
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: false
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: false
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: state_id
+    type: string
+    nullable: true
+    meaning: Reconciled first-level subdivision place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: country_method
+    type: string
+    nullable: true
+    meaning: 'Country assignment evidence: area, or null when absent'
+    units: none
+  - name: state_method
+    type: string
+    nullable: true
+    meaning: 'Subdivision assignment evidence: area, or null when absent'
+    units: none
+  - name: city_method
+    type: string
+    nullable: true
+    meaning: Canonical city allocation rule, including distant-nearest classification
+    units: none
+  - name: land_method
+    type: string
+    nullable: true
+    meaning: 'Land eligibility evidence: land or offshore'
+    units: none
+countries:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: alpha3
+    type: string
+    nullable: true
+    meaning: ISO alpha-3 country code
+    units: none
+  - name: numeric
+    type: string
+    nullable: true
+    meaning: ISO numeric country code represented as text
+    units: none
+  - name: name
+    type: string
+    nullable: true
+    meaning: Preferred display name
+    units: none
+  - name: calling_code
+    type: string
+    nullable: true
+    meaning: International telephone calling code, represented as text
+    units: none
+  - name: currency
+    type: string
+    nullable: true
+    meaning: Source currency code
+    units: none
+  - name: languages
+    type: string
+    nullable: true
+    meaning: Source language codes
+    units: none
+  - name: tld
+    type: string
+    nullable: true
+    meaning: Country internet top-level domain
+    units: none
+  - name: continent
+    type: string
+    nullable: true
+    meaning: Source continent identifier
+    units: none
+  - name: m49
+    type: string
+    nullable: true
+    meaning: UN M49 area code
+    units: none
+  - name: region_code
+    type: string
+    nullable: true
+    meaning: Source region or subdivision code
+    units: none
+  - name: region_name
+    type: string
+    nullable: true
+    meaning: UN region name
+    units: none
+  - name: subregion_code
+    type: string
+    nullable: true
+    meaning: UN subregion code
+    units: none
+  - name: subregion_name
+    type: string
+    nullable: true
+    meaning: UN subregion name
+    units: none
+  - name: intermediate_region_code
+    type: string
+    nullable: true
+    meaning: UN intermediate region code
+    units: none
+  - name: intermediate_region_name
+    type: string
+    nullable: true
+    meaning: UN intermediate region name
+    units: none
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: place_id
+    type: string
+    nullable: true
+    meaning: Uniquely matched reconciled place; null for ambiguous or unmatched observations
+    units: none
+  - name: link_status
+    type: string
+    nullable: true
+    meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
+    units: none
+  - name: link_method
+    type: string
+    nullable: true
+    meaning: Rule used for the identifier link
+    units: none
+  - name: place_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: All candidate place identifiers; ambiguity is preserved
+    units: none
+ip_ranges:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: true
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: true
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: ip_start
+    type: string
+    nullable: true
+    meaning: Inclusive first IP address as text
+    units: none
+  - name: ip_end
+    type: string
+    nullable: true
+    meaning: Inclusive last IP address as text
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: region
+    type: string
+    nullable: true
+    meaning: Source region name
+    units: none
+  - name: city
+    type: string
+    nullable: true
+    meaning: Source city name; retained independently of the canonical city
+    units: none
+  - name: ip_version
+    type: uint8
+    nullable: true
+    meaning: IP address family, 4 or 6
+    units: address family
+  - name: ip_start_packed
+    type: binary
+    nullable: true
+    meaning: Inclusive first address, 16-byte big-endian binary; IPv4 is left zero-padded
+    units: none
+  - name: ip_end_packed
+    type: binary
+    nullable: true
+    meaning: Inclusive last address, 16-byte big-endian binary; IPv4 is left zero-padded
+    units: none
+  - name: latitude
+    type: double
+    nullable: true
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: true
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: h3
+    type: string
+    nullable: true
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: true
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: true
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: true
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: true
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: true
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: state_id
+    type: string
+    nullable: true
+    meaning: Reconciled first-level subdivision place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: cell_country_code
+    type: string
+    nullable: true
+    meaning: Country code assigned by the geographic cell join
+    units: none
+  - name: cell_status
+    type: string
+    nullable: true
+    meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
+    units: none
+  - name: country_disagrees
+    type: bool
+    nullable: true
+    meaning: Whether source and cell country codes disagree; null if not comparable
+    units: none
+phone_metadata:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: territory
+    type: string
+    nullable: true
+    meaning: Libphonenumber territory code
+    units: none
+  - name: calling_code
+    type: string
+    nullable: true
+    meaning: International telephone calling code, represented as text
+    units: none
+  - name: leading_digits
+    type: string
+    nullable: true
+    meaning: Libphonenumber leading-digit pattern
+    units: none
+  - name: national_prefix
+    type: string
+    nullable: true
+    meaning: National telephone prefix
+    units: none
+  - name: international_prefix
+    type: string
+    nullable: true
+    meaning: International dialling prefix pattern
+    units: none
+  - name: metadata_xml
+    type: string
+    nullable: true
+    meaning: Original territory metadata XML
+    units: none
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: place_id
+    type: string
+    nullable: true
+    meaning: Uniquely matched reconciled place; null for ambiguous or unmatched observations
+    units: none
+  - name: link_status
+    type: string
+    nullable: true
+    meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
+    units: none
+  - name: link_method
+    type: string
+    nullable: true
+    meaning: Rule used for the identifier link
+    units: none
+  - name: place_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: All candidate place identifiers; ambiguity is preserved
+    units: none
+phone_prefixes:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: prefix
+    type: string
+    nullable: true
+    meaning: Telephone prefix as text; preserve leading zeros
+    units: none
+  - name: calling_code
+    type: string
+    nullable: true
+    meaning: International telephone calling code, represented as text
+    units: none
+  - name: language
+    type: string
+    nullable: true
+    meaning: Language of the prefix description
+    units: none
+  - name: description
+    type: string
+    nullable: true
+    meaning: Source geographic prefix description
+    units: none
+  - name: country_codes
+    type: 'list<element: string>'
+    nullable: false
+    meaning: Associated country codes; list of text codes
+    units: none
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: place_id
+    type: string
+    nullable: true
+    meaning: Uniquely matched reconciled place; null for ambiguous or unmatched observations
+    units: none
+  - name: link_status
+    type: string
+    nullable: true
+    meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
+    units: none
+  - name: link_method
+    type: string
+    nullable: true
+    meaning: Rule used for the identifier link
+    units: none
+  - name: place_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: All candidate place identifiers; ambiguity is preserved
+    units: none
+place_to_city:
+  primary_key:
+  - place_id
+  columns:
+  - name: place_id
+    type: string
+    nullable: false
+    meaning: Reconciled place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: method
+    type: string
+    nullable: false
+    meaning: 'Mapping rule: self, spatial_absorption, policy_part, identity_alias
+      or non_settlement'
+    units: none
+  - name: evidence
+    type: string
+    nullable: true
+    meaning: JSON evidence supporting the allocation
+    units: none
+places:
+  primary_key:
+  - place_id
+  columns:
+  - name: place_id
+    type: string
+    nullable: true
+    meaning: Reconciled place identifier
+    units: none
+  - name: name_en
+    type: string
+    nullable: true
+    meaning: Preferred name only when its provenance explicitly identifies English
+    units: none
+  - name: local_name
+    type: string
+    nullable: true
+    meaning: Source local/default name, without an inferred translation
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: code
+    type: string
+    nullable: true
+    meaning: Published entity code
+    units: none
+  - name: code_status
+    type: string
+    nullable: true
+    meaning: Recorded source/code status, including user-assigned for XK; codes are
+      not invented
+    units: none
+  - name: parent_id
+    type: string
+    nullable: true
+    meaning: Reconciled parent place identifier
+    units: none
+  - name: parent_method
+    type: string
+    nullable: true
+    meaning: Evidence used to select the parent
+    units: none
+  - name: sovereign_id
+    type: string
+    nullable: true
+    meaning: Sovereign country place identifier
+    units: none
+  - name: sovereign_code
+    type: string
+    nullable: true
+    meaning: Sovereign country code
+    units: none
+  - name: sovereign_name
+    type: string
+    nullable: true
+    meaning: Sovereign country display name
+    units: none
+  - name: population
+    type: int64
+    nullable: true
+    meaning: Source population estimate, not a current census assertion
+    units: people
+  - name: geonames_id
+    type: string
+    nullable: true
+    meaning: GeoNames identifier represented as text
+    units: none
+  - name: geonames_admin1
+    type: string
+    nullable: true
+    meaning: GeoNames first-level administrative code
+    units: none
+  - name: feature_code
+    type: string
+    nullable: true
+    meaning: GeoNames feature code
+    units: none
+  - name: source_subtype
+    type: string
+    nullable: true
+    meaning: Original source feature subtype
+    units: none
+  - name: settlement_class
+    type: string
+    nullable: true
+    meaning: Reconciled settlement classification
+    units: none
+  - name: city_exclusion
+    type: string
+    nullable: true
+    meaning: Reason this place is excluded from canonical city eligibility
+    units: none
+  - name: overture_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: Contributing Overture entity identifiers
+    units: none
+  - name: wikidata_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: Contributing Wikidata entity identifiers
+    units: none
+  - name: source_ids
+    type: string
+    nullable: true
+    meaning: JSON list of contributing source identifiers
+    units: none
+  - name: provenance
+    type: string
+    nullable: true
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: name_provenance
+    type: string
+    nullable: true
+    meaning: JSON evidence for the selected names
+    units: none
+  - name: link
+    type: string
+    nullable: true
+    meaning: JSON identity-link method and evidence, or JSON null
+    units: none
+  - name: name
+    type: string
+    nullable: true
+    meaning: Preferred display name
+    units: none
+  - name: role
+    type: string
+    nullable: true
+    meaning: Reconciled place role
+    units: none
+  - name: normalized_city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID; standalone rural settlements can map to
+      themselves
+    units: none
+  - name: normalization_method
+    type: string
+    nullable: true
+    meaning: Rule used to select the normalized settlement identity
+    units: none
+  - name: settlement_kind
+    type: string
+    nullable: true
+    meaning: Canonical settlement classification
+    units: none
+postal_codes:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: true
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: true
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: postal_code
+    type: string
+    nullable: true
+    meaning: Postal code as text; preserve spaces and leading zeros
+    units: none
+  - name: place_name
+    type: string
+    nullable: true
+    meaning: Source postal place name
+    units: none
+  - name: admin1_name
+    type: string
+    nullable: true
+    meaning: Original level-1 administrative name
+    units: none
+  - name: admin1_code
+    type: string
+    nullable: true
+    meaning: Original level-1 administrative code
+    units: none
+  - name: admin2_name
+    type: string
+    nullable: true
+    meaning: Original level-2 administrative name
+    units: none
+  - name: admin2_code
+    type: string
+    nullable: true
+    meaning: Original level-2 administrative code
+    units: none
+  - name: admin3_name
+    type: string
+    nullable: true
+    meaning: Original level-3 administrative name
+    units: none
+  - name: admin3_code
+    type: string
+    nullable: true
+    meaning: Original level-3 administrative code
+    units: none
+  - name: accuracy
+    type: string
+    nullable: true
+    meaning: Original source positional-accuracy category, not metres
+    units: none
+  - name: variant
+    type: string
+    nullable: true
+    meaning: Original postal observation variant
+    units: none
+  - name: latitude
+    type: double
+    nullable: true
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: true
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: h3
+    type: string
+    nullable: true
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: true
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: true
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: true
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: true
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: true
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: state_id
+    type: string
+    nullable: true
+    meaning: Reconciled first-level subdivision place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: cell_country_code
+    type: string
+    nullable: true
+    meaning: Country code assigned by the geographic cell join
+    units: none
+  - name: cell_status
+    type: string
+    nullable: true
+    meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
+    units: none
+  - name: country_disagrees
+    type: bool
+    nullable: true
+    meaning: Whether source and cell country codes disagree; null if not comparable
+    units: none
+subdivisions:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: code
+    type: string
+    nullable: true
+    meaning: Published entity code
+    units: none
+  - name: code_system
+    type: string
+    nullable: true
+    meaning: Namespace of the published administrative code
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: name
+    type: string
+    nullable: true
+    meaning: Preferred display name
+    units: none
+  - name: type
+    type: string
+    nullable: true
+    meaning: Source-specific entity classification
+    units: none
+  - name: parent_code
+    type: string
+    nullable: true
+    meaning: Original source parent administrative code
+    units: none
+  - name: geoname_id
+    type: string
+    nullable: true
+    meaning: GeoNames identifier represented as text
+    units: none
+  - name: name_ascii
+    type: string
+    nullable: true
+    meaning: Source ASCII name
+    units: none
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: place_id
+    type: string
+    nullable: true
+    meaning: Uniquely matched reconciled place; null for ambiguous or unmatched observations
+    units: none
+  - name: link_status
+    type: string
+    nullable: true
+    meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
+    units: none
+  - name: link_method
+    type: string
+    nullable: true
+    meaning: Rule used for the identifier link
+    units: none
+  - name: place_ids
+    type: 'list<element: string>'
+    nullable: true
+    meaning: All candidate place identifiers; ambiguity is preserved
+    units: none
+timezone_cells:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: tzid
+    type: string
+    nullable: false
+    meaning: IANA timezone identifier
+    units: none
+  - name: h3
+    type: string
+    nullable: false
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: false
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: false
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none
+trade_locations:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: true
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: true
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: locode
+    type: string
+    nullable: true
+    meaning: UN/LOCODE identifier
+    units: none
+  - name: country_code
+    type: string
+    nullable: true
+    meaning: Source or reconciled ISO-like two-letter country code
+    units: none
+  - name: location
+    type: string
+    nullable: true
+    meaning: UN/LOCODE location component
+    units: none
+  - name: name
+    type: string
+    nullable: true
+    meaning: Preferred display name
+    units: none
+  - name: name_ascii
+    type: string
+    nullable: true
+    meaning: Source ASCII name
+    units: none
+  - name: subdivision_code
+    type: string
+    nullable: true
+    meaning: Source subdivision component
+    units: none
+  - name: function
+    type: string
+    nullable: true
+    meaning: UN/LOCODE function flags
+    units: none
+  - name: status
+    type: string
+    nullable: true
+    meaning: UN/LOCODE record status
+    units: none
+  - name: iata_code
+    type: string
+    nullable: true
+    meaning: IATA airport code, where available
+    units: none
+  - name: date
+    type: string
+    nullable: true
+    meaning: Original source record date string
+    units: none
+  - name: change
+    type: string
+    nullable: true
+    meaning: UN/LOCODE change marker
+    units: none
+  - name: remarks
+    type: string
+    nullable: true
+    meaning: Original source remarks
+    units: none
+  - name: coordinates_raw
+    type: string
+    nullable: true
+    meaning: Original source coordinate text
+    units: none
+  - name: latitude
+    type: double
+    nullable: true
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: true
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: h3
+    type: string
+    nullable: true
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: true
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: true
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: true
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: true
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: true
+    meaning: JSON source evidence and transformation provenance
+    units: none
+  - name: country_id
+    type: string
+    nullable: true
+    meaning: Reconciled country place identifier
+    units: none
+  - name: state_id
+    type: string
+    nullable: true
+    meaning: Reconciled first-level subdivision place identifier
+    units: none
+  - name: city_id
+    type: string
+    nullable: true
+    meaning: Selected settlement place ID, including standalone rural settlements;
+      null if unassigned
+    units: none
+  - name: cell_country_code
+    type: string
+    nullable: true
+    meaning: Country code assigned by the geographic cell join
+    units: none
+  - name: cell_status
+    type: string
+    nullable: true
+    meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
+    units: none
+  - name: country_disagrees
+    type: bool
+    nullable: true
+    meaning: Whether source and cell country codes disagree; null if not comparable
+    units: none
+zone_tables:
+  primary_key: []
+  columns:
+  - name: source
+    type: string
+    nullable: false
+    meaning: Configured upstream source name
+    units: none
+  - name: source_id
+    type: string
+    nullable: false
+    meaning: Identifier of the original observation within its source
+    units: none
+  - name: table
+    type: string
+    nullable: true
+    meaning: Original timezone table name
+    units: none
+  - name: tzid
+    type: string
+    nullable: true
+    meaning: IANA timezone identifier
+    units: none
+  - name: country_codes
+    type: string
+    nullable: true
+    meaning: Associated country codes; comma-separated text
+    units: none
+  - name: comments
+    type: string
+    nullable: true
+    meaning: Original timezone comments
+    units: none
+  - name: coordinates_raw
+    type: string
+    nullable: true
+    meaning: Original source coordinate text
+    units: none
+  - name: latitude
+    type: double
+    nullable: true
+    meaning: WGS84 latitude; positive north
+    units: degrees north
+  - name: longitude
+    type: double
+    nullable: true
+    meaning: WGS84 longitude; positive east
+    units: degrees east
+  - name: h3
+    type: string
+    nullable: true
+    meaning: Lowercase hexadecimal H3 cell index, without 0x
+    units: none
+  - name: h3_uint64
+    type: uint64
+    nullable: true
+    meaning: Same H3 index as an unsigned 64-bit integer
+    units: none
+  - name: h3_resolution
+    type: uint8
+    nullable: true
+    meaning: Resolution of this stored H3 index
+    units: H3 level
+  - name: source_release
+    type: string
+    nullable: false
+    meaning: Pinned upstream release or inventory identifier
+    units: none
+  - name: license
+    type: string
+    nullable: false
+    meaning: Upstream licence identifier
+    units: none
+  - name: provenance
+    type: string
+    nullable: false
+    meaning: JSON source evidence and transformation provenance
+    units: none

@@ -1,0 +1,15 @@
+name: plate_country
+adapter: pipeline.sources.plate_country
+kind: registration_country_evidence
+enabled: false
+upstream:
+  proposal: config/proposals/plate_country.yaml
+  url: https://www.worldlicenseplates.com/
+licence:
+  id: per-source
+  url: https://www.worldlicenseplates.com/
+  attribution: See each reviewed plate-country source
+limits:
+  download_bytes: 0
+options: {}
+options_schema: pipeline.config.source_options.Text

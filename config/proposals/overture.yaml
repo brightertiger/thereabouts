@@ -1,0 +1,7 @@
+settings:
+  endpoint: https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com
+  release_prefix: release/
+  theme: divisions
+  types:
+  - division
+  - division_area

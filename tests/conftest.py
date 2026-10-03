@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 from shapely.geometry import Polygon, box
 
-from build_data.pack import write_pack
-from build_data.records import AdminRecord, Settlement
-from build_data.reference.oracle import Reference
+from tests.support.pack import write_pack
+from tests.support.records import AdminRecord, Settlement
+from tests.support.reference.oracle import Reference
 from thereabouts.api import Geocoder
 
 FIXTURE = Path(__file__).parent / "fixtures" / "benelux"

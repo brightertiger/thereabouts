@@ -1,0 +1,45 @@
+release: '{countries}+{iso}'
+selectors:
+- name: countries
+  kind: github_commit
+  url: https://api.github.com/repos/datasets/country-codes/commits/HEAD
+- name: iso
+  kind: github_commit
+  url: https://api.github.com/repos/pycountry/pycountry/commits/HEAD
+files:
+- name: README.md
+  url: https://raw.githubusercontent.com/datasets/country-codes/{countries}/README.md
+  metadata:
+    attribution: DataHub maintainers
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/
+- name: admin1CodesASCII.txt
+  url: https://download.geonames.org/export/dump/admin1CodesASCII.txt
+  metadata:
+    attribution: GeoNames
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: country-codes.csv
+  url: https://raw.githubusercontent.com/datasets/country-codes/{countries}/data/country-codes.csv
+  metadata:
+    attribution: DataHub; UN Statistics Division; GeoNames; CLDR
+    license: PDDL-1.0
+    license_url: https://opendatacommons.org/licenses/pddl/1-0/
+- name: countryInfo.txt
+  url: https://download.geonames.org/export/dump/countryInfo.txt
+  metadata:
+    attribution: GeoNames
+    license: CC-BY-4.0
+    license_url: https://creativecommons.org/licenses/by/4.0/
+- name: iso-LICENSE.txt
+  url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt
+  metadata:
+    attribution: Debian iso-codes; pycountry
+    license: LGPL-2.1-or-later
+    license_url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt
+- name: iso3166-2.json
+  url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/src/pycountry/databases/iso3166-2.json
+  metadata:
+    attribution: Debian iso-codes; pycountry
+    license: LGPL-2.1-or-later
+    license_url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt

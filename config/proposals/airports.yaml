@@ -1,0 +1,9 @@
+release: ''
+selectors: []
+files:
+- name: airports.csv
+  url: https://davidmegginson.github.io/ourairports-data/airports.csv
+  metadata:
+    attribution: OurAirports contributors
+    license: Public-Domain
+    license_url: https://ourairports.com/data/

@@ -1,0 +1,27 @@
+release: '{boundary}+{iana}'
+selectors:
+- name: boundary
+  kind: github_release
+  url: https://api.github.com/repos/evansiroky/timezone-boundary-builder/releases/latest
+- name: iana
+  kind: text
+  url: https://data.iana.org/time-zones/tzdb/version
+files:
+- name: timezone-names-with-oceans.json
+  url: https://github.com/evansiroky/timezone-boundary-builder/releases/download/{boundary}/timezone-names-with-oceans.json
+  metadata:
+    attribution: timezone-boundary-builder; OpenStreetMap contributors
+    license: ODbL-1.0
+    license_url: https://opendatacommons.org/licenses/odbl/1-0/
+- name: timezones-with-oceans.shapefile.zip
+  url: https://github.com/evansiroky/timezone-boundary-builder/releases/download/{boundary}/timezones-with-oceans.shapefile.zip
+  metadata:
+    attribution: timezone-boundary-builder; OpenStreetMap contributors
+    license: ODbL-1.0
+    license_url: https://opendatacommons.org/licenses/odbl/1-0/
+- name: tzdata{iana}.tar.gz
+  url: https://data.iana.org/time-zones/releases/tzdata{iana}.tar.gz
+  metadata:
+    attribution: IANA Time Zone Database contributors
+    license: Public-Domain
+    license_url: https://data.iana.org/time-zones/tz-link.html

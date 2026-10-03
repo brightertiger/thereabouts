@@ -1,0 +1,2441 @@
+IN:
+- source: wiki-IN.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}[- ]?[0-9]{1,2})[- ]?[A-Z]{0,3}[- ]?[0-9]{4}
+  code_group: code
+  code_position: first two letters plus one/two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\ Territory\ in\ which\ the\ vehicle\ is\ registered\.\ Part\
+    2:\ RTO\ number\ ;\ a\ two\-digit\ number\ allocated\ to\ a\ district\ RTO\ within\
+    the\ respective\ state\ or\ Union\ Territory\.\ Due\ to\ heavy\ volume\ of\ vehicle\
+    registration,\ unique\ numbers\ may\ be\ allocated\ to\ multiple\ RTOs\ within\ '
+  examples_pattern: TN\ 60\ AG\ 3333|TN\ 58\ N\ 4006|BR\ 01\ PC\ 2433|GA\ 03\ X\ 0109
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CN:
+- source: wiki-CN.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[\u3400-\u9fff][A-Z])[· •-]?[A-HJ-NP-Z0-9]{5}
+  code_group: code
+  code_position: Chinese character plus Latin letter at start
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ow\ found\ on\ 2019\-standard\ registration\ plates\ for\ firetrucks\
+    as\ well\.\ List\ of\ prefixes\ \[\ edit\ \]\ The\ following\ lists\ all\ licence\
+    plate\ prefixes\ in\ use\ in\ the\ People's\ Republic\ of\ China\ ,\ divided\
+    into\ four\ sections:\ municipalities\ ,\ provi
+  examples_pattern: (?<![A-Z0-9])(?P<code>[\u3400-\u9fff][A-Z])[· •-]?[A-HJ-NP-Z0-9]{5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+- source: wiki-CN.json
+  series_id: new-energy
+  series_status: current
+  pattern: (?P<code>[\u3400-\u9fff][A-Z])[· •-]?[A-HJ-NP-Z0-9]{6}
+  code_group: code
+  code_position: Chinese character plus Latin letter at start
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ow\ found\ on\ 2019\-standard\ registration\ plates\ for\ firetrucks\
+    as\ well\.\ List\ of\ prefixes\ \[\ edit\ \]\ The\ following\ lists\ all\ licence\
+    plate\ prefixes\ in\ use\ in\ the\ People's\ Republic\ of\ China\ ,\ divided\
+    into\ four\ sections:\ municipalities\ ,\ provi
+  examples_pattern: (?<![A-Z0-9])(?P<code>[\u3400-\u9fff][A-Z])[· •-]?[A-HJ-NP-Z0-9]{6}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+DE:
+- source: wiki-DE.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-ZÄÖÜ]{1,3})[ -][A-Z]{1,2}[ -]?[1-9][0-9]{0,3}[EH]?
+  code_group: code
+  code_position: first one to three letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'e\.\ A\ significant\ feature\ of\ German\ vehicle\ registration\
+    plates\ is\ the\ area\ code,\ which\ can\ be\ used\ to\ tell\ the\ district\ of\
+    registration\.\ It\ has\ developed\ into\ a\ widespread\ habit\ in\ Germany,\
+    even\ a\ children''s\ game\ when\ travelling,\ to\ guess\ "where\ that\ vehicle\
+    is\ from"\.\ '
+  examples_pattern: F\-ST\ 683|E\-UM\ 2565|OL\-AF\ 2412|PIR\-AT\ 77|HH\-J\ 8007
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+ID:
+- source: wiki-ID.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{1,2})[ -]?[1-9][0-9]{0,3}[ -]?[A-Z]{0,3}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'nsurance\ operator\ Jasa\ Raharja\ \.\ Registration\ area\ codes\
+    \[\ edit\ \]\ The\ lettering\ convention\ denoting\ the\ area\ of\ registration\
+    is\ a\ legacy\ of\ the\ Dutch\ colonial\ era\ and\ does\ not\ reflect\ the\ current\
+    regional\ divisions\ of\ the\ country\ into\ provinces\.\ They\ follow\ '
+  examples_pattern: B\ 1945\ PKL|B\ 2814\ SSP|B\ 2309\ LKV
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+RU:
+- source: wiki-RU.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[АВЕКМНОРСТУХABEKMHOPCTYX][ -]?[0-9]{3}[ -]?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}[
+    -]?(?P<code>[0-9]{2,3})'
+  code_group: code
+  code_position: right-hand two or three digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'Х\),\ additionally\ D\ was\ issued\ on\ some\ very\ early\ plates\.\
+    Finally,\ the\ region\ number\ \(77,\ 97,\ 99,\ 177,\ 197,\ 199,\ 777,\ 797\ and\
+    799\ for\ Moscow\ ;\ 78,\ 98,\ 178,\ and\ 198\ for\ Saint\ Petersburg\ ,\ etc\.\)\
+    and\ the\ international\ code\ RUS\ with\ the\ 1991\ '
+  examples_pattern: (?<![A-Z0-9])[АВЕКМНОРСТУХABEKMHOPCTYX][ -]?[0-9]{3}[ -]?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}[
+    -]?(?P<code>[0-9]{2,3})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GB:
+- source: wiki-GB.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-HJ-PR-Y][A-HJ-PR-Y])[0-9]{2} ?[A-HJ-PR-Z]{3}
+  code_group: code
+  code_position: first two letters for Great Britain since 2001
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ office\.\ By\ December\ 2013,\ all\ local\ offices\ had\ been\
+    closed,\ but\ the\ letters\ still\ represent\ a\ region\.\ The\ letters\ I\ ,\
+    Q\ and\ Z\ are\ not\ used\ as\ local\ office\ identifiers,\ though\ O\ is\ used\
+    for\ Oxford;\ Z\ can\ be\ used\ only\ as\ a\ random\ letter\.\ The\ first\ of\
+    t
+  examples_pattern: AA11\ AAA
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+JP:
+- source: wiki-JP.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[\u3040-\u30ff\u3400-\u9fff]+) ?[0-9A-Z]{2,3} ?[\u3040-\u309fA-Z]
+    ?[0-9・· -]{1,5}
+  code_group: code
+  code_position: Japanese marking before class number
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: an\ 660cc\ 9\ 99\ 900\ Tractor\ or\ forklift\ 0\ 00\ 000\ Construction\
+    equipment\ Transportation\ offices\ and\ markings\ \[\ edit\ \]\ Japanese\ registration\
+    plates\ indicate\ the\ transportation\ office\ that\ issued\ the\ plate,\ known\
+    in\ Japanese\ as\ Gotōchi\ \(\ ご当地\ ;\ local\ place\)\ \.\ U
+  examples_pattern: (?<![A-Z0-9])(?P<code>[\u3040-\u30ff\u3400-\u9fff]+) ?[0-9A-Z]{2,3}
+    ?[\u3040-\u309fA-Z] ?[0-9・· -]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+VN:
+- source: wiki-VN.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2})[- ]?[A-Z][0-9A-Z]?[- ]?[0-9]{3}[.]?[0-9]{2}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: as\ going\ to\ switch\ to\ AAA\ 111\ format,\ but\ the\ plan\
+    was\ cancelled\.\ The\ leading\ two\ symbols\ are\ two\ digits,\ representing\
+    the\ province/municipality\.\ The\ exact\ date\ of\ format\ changing\ is\ unknown\.\
+    In\ 2012,\ a\ blue\ strip\ with\ a\ "VN"\ will\ be\ added\ on\ the\ left\-ha
+  examples_pattern: 12A\-345\.67
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MY:
+- source: wiki-MY.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>KV|[A-Z])[A-Z]{0,2} ?[1-9][0-9]{0,3}
+  code_group: code
+  code_position: first state letter, or KV for Langkawi
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: t\ and\ the\ first\ alphabetical\ sequence\ progressed;\ resuming\
+    at\ PBA\ 1\ \.\ Registration\ plates\ of\ Peninsular\ Malaysia\ Prefix\ \(\ x\
+    \)\ State\ Current\ Plate\ Current\ Bidding\ Plate\ A\ Perak\ APL\ APP\ B\ Selangor\
+    BSU\ BSY\ C\ Pahang\ CFH\ CFJ\ D\ Kelantan\ DFS\ DFS\ F\ Putrajaya\ FH\ FH\ J\
+    Joh
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[A-Z]{0,2} ?[1-9][0-9]{0,3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+- source: wiki-MY.json
+  series_id: east-malaysia
+  series_status: current
+  pattern: (?P<code>Q[A-Z]|S[A-Z])[A-Z]? ?[1-9][0-9]{0,3} ?[A-Z]?
+  code_group: code
+  code_position: first two letters in Sabah/Sarawak division series
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: t\ and\ the\ first\ alphabetical\ sequence\ progressed;\ resuming\
+    at\ PBA\ 1\ \.\ Registration\ plates\ of\ Peninsular\ Malaysia\ Prefix\ \(\ x\
+    \)\ State\ Current\ Plate\ Current\ Bidding\ Plate\ A\ Perak\ APL\ APP\ B\ Selangor\
+    BSU\ BSY\ C\ Pahang\ CFH\ CFJ\ D\ Kelantan\ DFS\ DFS\ F\ Putrajaya\ FH\ FH\ J\
+    Joh
+  examples_pattern: '(?<![A-Z0-9])(?P<code>Q[A-Z]|S[A-Z])[A-Z]? ?[1-9][0-9]{0,3}(?:
+    [A-Z])?(?![A-Z0-9])'
+  notes: Sarawak/Sabah prefix scope; historic positional variants are incomplete.
+  valid_to: null
+IR:
+- source: wiki-IR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[۰-۹]{2} ?[\u0621-\u064a] ?[۰-۹]{3}[ -]?(?P<code>[۰-۹]{2})'
+  code_group: code
+  code_position: two digits at right; letter may refine county
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ard\ dimensions\ since\ 2005\.\ Each\ province\ in\ Iran\ has\
+    multiple\ unique,\ two\-digit\ codes\ that\ are\ included\ at\ the\ right\ end\
+    of\ the\ license\ plates\ in\ a\ distinguished\ square\ outline,\ above\ which\
+    the\ word\ ایران\ or\ "Iran"\ has\ been\ written\.\ A\ province''s\ license\ plates\
+    will\ not\ '
+  examples_pattern: (?<![A-Z0-9])[۰-۹]{2} ?[\u0621-\u064a] ?[۰-۹]{3}[ -]?(?P<code>[۰-۹]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+UA:
+- source: wiki-UA.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[ABCEHIKMOPTАВCEНІКМОРТХ]{2}) ?[0-9]{4} ?[ABCEHIKMOPTXАВCEНІКМОРТХ]{2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: eries\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ AB\ 1234\ BC\ \(AB\ being\ the\ regional\ code\)\ Colour\ \(front\)\ Black\
+    on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Ukrainian\ implementation\ of\
+    a\ format\ similar\ to\ the\ EU\ format\.\ Both\ the\ EU\ format\ and\ the
+  examples_pattern: (?<![A-Z0-9])(?P<code>[ABCEHIKMOPTАВCEНІКМОРТХ]{2}) ?[0-9]{4}
+    ?[ABCEHIKMOPTXАВCEНІКМОРТХ]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AT:
+- source: wiki-AT.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{1,2})[ -][0-9]{1,5}[ -]?[A-Z]{1,3}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ter\(s\)"\ or\ "XX\ ∇=provincial\ emblem\ personalised\ letters\+number";\
+    XX\ \-\ one\ or\ two\ letters\ which\ indicate\ the\ local\ registration\ office\
+    \(\ district\ where\ the\ registered\ possessor\ resides\)\.\ As\ a\ general\
+    rule,\ State\ capitals\ have\ one\ letter;\ other\ districts\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,2})[ -][0-9]{1,5}[ -]?[A-Z]{1,3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CH:
+- source: wiki-CH.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2})[ ·-]?[1-9][0-9]{0,5}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: te,\ Thurgau\ Vehicle\ license\ plates\ of\ Switzerland\ ,\ are\
+    composed\ of\ a\ two\-letter\ code\ for\ the\ canton\ and\ a\ number\ with\ up\
+    to\ 6\ digits\.\ The\ rear\ plates\ also\ display\ the\ coats\ of\ arms\ of\ Switzerland\
+    and\ the\ respective\ canton\.\ In\ 1987,\ the\ optional\ long
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CZ:
+- source: wiki-CZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9](?P<code>[A-Z])[A-Z0-9] ?[0-9]{4}'
+  code_group: code
+  code_position: first letter, usually second character
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ was\ introduced\ between\ 29\ June\ and\ 17\ July\ 2001\.\ In\
+    this\ system,\ the\ first\ letter\ from\ the\ left\ represents\ the\ region\ \(\
+    kraj\ \)\ ,\ and\ this\ is\ combined\ with\ numbers\ issued\ in\ series\ from\
+    1\ x\ 0\ 0001,\ where\ x\ is\ the\ letter\ representing\ the\ region\.\ By\ 2009,\
+    Prague\ \(A\)\ has
+  examples_pattern: (?<![A-Z0-9])[0-9](?P<code>[A-Z])[A-Z0-9] ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+IE:
+- source: wiki-IE.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{2,3}[- ](?P<code>[A-Z]{1,2})[- ][1-9][0-9]{0,5}'
+  code_group: code
+  code_position: middle letter group after year
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: vehicle's\ number\ plate\ is\ determined\ when\ it\ is\ first\
+    registered,\ the\ county/city\ code\ is\ taken\ from\ the\ first\ owner's\ postal\
+    address\.\ Registration\ remains\ fixed\ on\ one\ vehicle\ until\ it\ is\ de\-registered\
+    \(exported,\ destroyed,\ etc\.\),\ and\ cannot\ be\ tran
+  examples_pattern: (?<![A-Z0-9])[0-9]{2,3}[- ](?P<code>[A-Z]{1,2})[- ][1-9][0-9]{0,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+'NO':
+- source: wiki-NO.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{4,5}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: vehicles\ HY:\ Hydrogen\ powered\ vehicles\ Ordinary\ vehicle\
+    plates\ have\ a\ prefix\ based\ on\ the\ geographic\ location\ for\ the\ first\
+    registration,\ and\ will\ be\ unchanged\ later\.\ Area\ County\ Registration\
+    series\ Halden\ Østfold\ AA\ AB\ AC\ Hafslund\ Østfold\ AD\ AR\ AS\ AT\ AU\ AV\
+    A
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{4,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BR:
+- source: wiki-BR.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{3})[ -]?[0-9][A-Z][0-9]{2}
+  code_group: code
+  code_position: first three-letter allocation block
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'UAR\ Amapá\ \(AP\)\ NEI\ to\ NFB\ QLN\ to\ QLT\ SAK\ to\ SAM\
+    TGO\ to\ TGQ\ UKO\ to\ UKQ\ Vertical\ distribution\ of\ sequences\ in\ alphabetical\
+    order\ \[\ edit\ \]\ Below\ is\ an\ alphabetically\ organized\ list\ of\ Letter\
+    Sequences\ and\ corresponding\ States\.\ This\ list\ is\ up\ to\ date\ as\ of\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{3})[ -]?[0-9][A-Z][0-9]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AM:
+- source: wiki-AM.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2}) ?[A-Z]{2} ?[0-9]{3}
+  code_group: code
+  code_position: two-digit group
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: er\ group\ on\ the\ top\ row,\ and\ the\ remaining\ numbers\ on\
+    the\ second\.\ The\ two\-number\ group\ is\ supposedly\ the\ regional\ code\.\
+    Production\ of\ license\ plates\ in\ the\ mid\-2000s\ was\ interrupted\ due\ to\
+    equipment\ failure\.\ \[\ citation\ needed\ \]\ A\ two\-row\ variant\ of\ t
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2}) ?[A-Z]{2} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AZ:
+- source: wiki-AZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2})[- ][A-Z]{2}[- ][0-9]{3}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: of\ the\ former\ French\ license\ plate\ system\),\ in\ Azerbaijani\
+    plates\ the\ first\ two\ digits\ of\ the\ license\ plate\ represent\ the\ department,\
+    followed\ by\ a\ progressive\ 2\-letter\ and\ 3\-number\ system\ \(progression\
+    starting\ with\ 90\-AA\-001\ and\ ending\ with\ 90\-ZZ\-999\)\.\ Below\ is\ a\
+    ta
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2})[- ][A-Z]{2}[- ][0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BB:
+- source: wiki-BB.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z]? ?[0-9]{1,5}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: icence\ plates\ to\ all\ new\ motor\ vehicle\ owners\.\ Each\
+    licence\ plate\ has\ one\ or\ two\ letters\ which\ represents\ the\ part\ of\
+    the\ island\ which\ the\ vehicle's\ owner\ resides\ or\ previously\ resided\ at\
+    the\ time\ the\ vehicle\ was\ registered\.\ The\ first\ part\ consists\ of\ one
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[A-Z]? ?[0-9]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BY:
+- source: wiki-BY.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} ?[A-Z]{2}-(?P<code>[1-8])'
+  code_group: code
+  code_position: last digit
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ifier,\ two\ letters\ –\ the\ number\ plate\ series,\ and\ the\
+    region\ code\ –\ a\ final\ digit\ indicating\ the\ region\ of\ Belarus\ in\ which\
+    the\ vehicle\ was\ registered\.\ The\ placement\ of\ the\ series\ letters\ varies\
+    for\ the\ weight\ class\ or\ type\ of\ the\ vehicle:\ 1234\ AB\-5\ \-\ f
+  examples_pattern: (?<![A-Z0-9])[0-9]{4} ?[A-Z]{2}-(?P<code>[1-8])(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BG:
+- source: wiki-BG.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[АВЕКМНОРСТУХABEKMHOPCTYX]{1,2}) ?[0-9]{4} ?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ :\ BG\.\ The\ characters\ displayed\ in\ the\ main\ field\ of\
+    the\ plate\ are:\ a\ one\-\ or\ two\-letter\ province\ code\ four\ numerals\ a\
+    final\ two\-letter\ code,\ known\ as\ the\ "series"\.\ The\ format\ is\ thus\
+    XX\ NNNN\ YY\ ,\ where\ XX\ \(or\ X\)\ is\ the\ province\ code,\ NNNN\ is\ the\
+    seria
+  examples_pattern: (?<![A-Z0-9])(?P<code>[АВЕКМНОРСТУХABEKMHOPCTYX]{1,2}) ?[0-9]{4}
+    ?[АВЕКМНОРСТУХABEKMHOPCTYX]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CV:
+- source: wiki-CV.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2})-[0-9]{2}-[A-Z]{2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ \-\ São\ Nicolau\ ST\ \-\ Santiago\ SV\ \-\ São\ Vicente\ The\
+    format\ is\ AB\-12\-CD,\ where\ AB\ is\ the\ regional\ code\.\ Vehicles\ of\ the\
+    Armed\ Forces\ bear\ registration\ plates\ of\ the\ type\ "FA\-12\-34"\.\ Diplomatic\
+    plates\ are\ white\ with\ red\ letters\ and\ usually\ have\ the\ form
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2})-[0-9]{2}-[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CM:
+- source: wiki-CM.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{3} ?[A-Z]{2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ense\ plates\ was\ introduced\ in\ 1985\.\ It\ has\ AB1234V\ formats\
+    or\ AB123VH\ where\ AB\ is\ the\ code\ region,\ 1234\ is\ the\ number,\ and\ SH\
+    is\ the\ series\.\ The\ regular\ plate\ has\ an\ orange\ background\ with\ black\
+    marks\.\ Since\ 2005,\ to\ reflect\ the\ German\ FE\ font\ use
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{3} ?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CF:
+- source: wiki-CF.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[0-9]{3} ?(?P<code>[A-Z]{2})'
+  code_group: code
+  code_position: last two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\ VZ,\ followed\ by\ a\ group\ of\ three\ digits\ ranging\ from\
+    001\ to\ 999\.\ The\ last\ two\ letters\ denote\ the\ prefecture\ of\ registration\
+    On\ the\ left\ is\ the\ emblem\ of\ the\ Central\ African\ Economic\ and\ Monetary\
+    Community\ \(CEMAC\)\ and\ the\ RCA\ code\.\ Registration\ codes\ \[\ edit\ '
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2} ?[0-9]{3} ?(?P<code>[A-Z]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TD:
+- source: wiki-TD.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2})[A-Z][0-9]{4}[A-Z]
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'to\ spot\ from\ Chad,\ is\ the\ code\ 18,\ which\ identifies\
+    the\ capital\ city\.\ Two\ first\ numbers\ in\ the\ plates\ from\ Chad,\ identifies\
+    the\ region\.\ 01\ —\ Batha\ 02\ —\ Borkou\ 03\ —\ Chari\-Baguirmi\ 04\ —\ Guéra\
+    05\ —\ Hadjer\-Lamis\ 06\ —\ Kanem\ 07\ —\ Lac\ 08\ —\ Logone\ Occidental\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2})[A-Z][0-9]{4}[A-Z](?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+HR:
+- source: wiki-HR.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-ZČŠŽ]{2}) ?[0-9]{3,4}-[A-Z]{1,2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ \(KA\ =\ Karlovac\ \)\ The\ standard\ licence\ plates\ in\ Croatia\
+    consist\ of\ a\ two\-letter\ city\ code\ which\ is\ separated\ by\ the\ coat\
+    of\ arms\ of\ Croatia\ from\ three\ or\ four\ numbers\ and\ one\ or\ two\ letters\.\
+    Regular\ plates\ \[\ edit\ \]\ The\ standard\ regular\ pla
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-ZČŠŽ]{2}) ?[0-9]{3,4}-[A-Z]{1,2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+EC:
+- source: wiki-EC.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z]{2}-[0-9]{3,4}
+  code_group: code
+  code_position: first letter
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: libri\ typeface\ for\ ECUADOR\ text\ since\ 2022\.\ Letter\ codes\
+    \[\ edit\ \]\ The\ first\ letter\ in\ the\ letter\-number\ combination\ indicates\
+    the\ province\ of\ issue\.\ The\ second\ letter,\ also\ called\ the\ "key\ letter",\
+    identifies\ the\ type\ of\ license\ plate\ \(described\ below\)\.\ Some\ plates
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[A-Z]{2}-[0-9]{3,4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GH:
+- source: wiki-GH.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{1,4}-[0-9]{2}
+  code_group: code
+  code_position: letter prefix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ates\ of\ Ghana\ are\ issued\ by\ the\ Driver\ Vehicle\ License\
+    Authority\.\ The\ plates\ indicate\ the\ region\ where\ the\ vehicles\ were\ registered\.\
+    Regulations\ \[\ edit\ \]\ Ghana\ has\ no\ national\ restrictions\ on\ number\
+    plates\.\ For\ example,\ a\ vehicle\ registered\ in\ the\ Asha
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{1,4}-[0-9]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GR:
+- source: wiki-GR.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[ABEZHIKMNOPTYXΑΒΕΖΗΙΚΜΝΟΡΤΥΧ]{2})[ABEZHIKMNOPTYXΑΒΕΖΗΙΚΜΝΟΡΤΥΧ][-
+    ][0-9]{4}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'loniki\ ,\ which\ are\ represented\ by\ just\ the\ first\ letter\
+    of\ the\ three,\ all\ other\ districts\ are\ represented\ by\ the\ first\ 2\ letters\.\
+    The\ final\ one\ or\ two\ letters\ in\ the\ sequence\ changes\ in\ Greek\ alphabetical\
+    order\ after\ 8,999\ issued\ plates\.\ For\ example,\ Patras\ plates\ are\ ΑΧΑ–1000\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[ABEZHIKMNOPTYXΑΒΕΖΗΙΚΜΝΟΡΤΥΧ]{2})[ABEZHIKMNOPTYXΑΒΕΖΗΙΚΜΝΟΡΤΥΧ][-
+    ][0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GU:
+- source: wiki-GU.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{4}
+  code_group: code
+  code_position: two-letter prefix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: e\ 12\ in\ ×\ 6\ in\ 30\ cm\ ×\ 15\ cm\ Material\ Aluminum\ Serial\
+    format\ AB\ 1234\ \(coded\ by\ municipality\)\ Introduced\ February\ 27,\ 2009\
+    \(\ 2009\-02\-27\ \)\ History\ First\ issued\ 1916\ \(\ 1916\ \)\ The\ U\.S\.\
+    unincorporated\ territory\ of\ Guam\ first\ required\ its\ resident
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+IQ:
+- source: wiki-IQ.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2}) ?[A-Z] ?[0-9]{5}
+  code_group: code
+  code_position: numeric governorate group
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: late\ size\ restrictions\.\ Below\ are\ the\ codes\ for\ governorates\
+    of\ Iraq\.\ Code\ Governorate\ 11\ Baghdad\ Governorate\ 12\ Nineveh\ Governorate\
+    13\ Maysan\ Governorate\ 14\ Basra\ Governorate\ 15\ Al\ Anbar\ Governorate\ 16\
+    Al\-Qādisiyyah\ Governorate\ 17\ Muthanna\ Govern
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2}) ?[A-Z] ?[0-9]{5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+KZ:
+- source: wiki-KZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{3} ?[A-Z]{3} ?(?P<code>[0-9]{2})'
+  code_group: code
+  code_position: two digits at right
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ackground\ with\ a\ Kazakh\ flag\ and\ the\ country\ code\ KZ\
+    on\ the\ left\.\ The\ two\ digit\ area\ code\ is\ located\ on\ the\ square\ located\
+    on\ the\ right\ and\ the\ rest\ of\ the\ plate\ follows\ the\ format\ 111AAA\.\
+    This\ format\ was\ introduced\ in\ 2011\ and\ was\ implemented\ from\ A
+  examples_pattern: (?<![A-Z0-9])[0-9]{3} ?[A-Z]{3} ?(?P<code>[0-9]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+KG:
+- source: wiki-KG.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2}) ?[0-9]{3} ?[A-Z]{3}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\]\ Starting\ from\ July\ 2015,\ a\ new\ system\ has\ entered\
+    into\ circulation\.\ Each\ province\ now\ has\ a\ two\ digit\ code\.\ The\ new\
+    license\ plates\ have\ the\ font\ FE\-Schrift\ \.\ The\ numbers\ usually\ have\
+    a\ font\ size\ slightly\ larger\ than\ the\ letters,\ similar\ to\ Russian\ vehicle\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2}) ?[0-9]{3} ?[A-Z]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+LB:
+- source: wiki-LB.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]) ?[0-9]{1,6}
+  code_group: code
+  code_position: Latin letter
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 's\ classification\ all\ in\ white\.\ The\ rest\ of\ the\ plate\
+    is\ white,\ with\ a\ Latin\ letter\ representing\ the\ vehicle''s\ registration\
+    area\ and\ Arabic\ numbers\ next\ to\ the\ letter\ in\ bold\.\ Different\ colors\
+    represent\ different\ usages\ \(e\.g\.,\ red\ ones\ are\ used\ by\ taxis\ and\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]) ?[0-9]{1,6}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MG:
+- source: wiki-MG.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} ?(?P<code>[A-Z])[A-Z]{2}'
+  code_group: code
+  code_position: first letter after numeric serial
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: rs\ with\ the\ current\ format\ \(1234\ XAB\)\ with\ 4\ random\
+    numbers,\ with\ the\ first\ letter\ as\ a\ province\ code,\ and\ the\ last\ 2\
+    random\ letters\.\ History\ \[\ edit\ \]\ License\ plate\ of\ Toamasina\.\ White\
+    license\ plate\ with\ black\ lettering\ were\ resolved\ until\ 2014\.\ The\ l
+  examples_pattern: (?<![A-Z0-9])[0-9]{4} ?(?P<code>[A-Z])[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MN:
+- source: wiki-MN.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{2}[- ]?[0-9]{2} ?(?P<code>[А-ЯӨҮ]{2})[А-ЯӨҮ]'
+  code_group: code
+  code_position: first two letters of suffix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: icence\ plates\ have\ used\ the\ Roboto\ typeface\ in\ lieu\ of\
+    DIN\ 1451\ \.\ The\ first\ two\ letters\ of\ the\ three\-letter\ suffix\ indicate\
+    the\ province\ \(or\ aimag\ in\ Mongolian\)\ where\ the\ vehicle\ was\ registered:\
+    Suffix\ Aimag\ АР\ Arkhangai\ aimag\ БH\ Bayankhongor\ aimag\ БP\ Baganuur\ \(\
+    U
+  examples_pattern: (?<![A-Z0-9])[0-9]{2}[- ]?[0-9]{2} ?(?P<code>[А-ЯӨҮ]{2})[А-ЯӨҮ](?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+ME:
+- source: wiki-ME.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2})[ -][A-Z]{2}[ -]?[0-9]{3}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ernational\ automobile\ code\ \(MNE\);\ continuing\ in\ white\
+    background,\ the\ two\-letter\ code\ of\ the\ municipality\ where\ the\ vehicle\
+    was\ registered\ in,\ then\ the\ coat\-of\-arms\ of\ Montenegro\ following\ by\
+    the\ registration\ code,\ which\ generally\ consists\ of\ two\ letters\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2})[ -][A-Z]{2}[ -]?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MZ:
+- source: wiki-MZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{3} ?(?P<code>[A-Z]{2})'
+  code_group: code
+  code_position: last two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: s\ are\ in\ the\ format\ ABC\ 123\ followed\ by\ the\ Mozambique\
+    crest\ and\ then\ two\ more\ letters\ that\ represent\ the\ province\ where\ the\
+    car\ is\ registered\.\ Two\ row\ plates\ are\ in\ the\ format\ ABC\ at\ the\ top\
+    left\ followed\ by\ the\ Mozambique\ crest\ offset\ at\ the\ top\ right\ on\ the\
+    fir
+  examples_pattern: (?<![A-Z0-9])[A-Z]{3} ?[0-9]{3} ?(?P<code>[A-Z]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NA:
+- source: wiki-NA.json
+  series_id: ordinary
+  series_status: current
+  pattern: N ?[0-9]{1,3}(?:-[0-9]{3})? ?(?P<code>[A-Z]{1,2})
+  code_group: code
+  code_position: last one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 3\-456\ A\ N\ 123\-456\ AB\ The\ first\ letter\ is\ always\ "N"\
+    for\ Namibia\ \.\ The\ last\ one\ or\ two\ letters\ indicate\ the\ town\ or\ region\
+    the\ car\ originates\ from\.\ In\ between,\ numbers\ are\ issued\ sequentially\
+    within\ each\ region,\ starting\ with\ single\-digit\ numbers,\ and\ increasing
+  examples_pattern: (?<![A-Z0-9])N ?[0-9]{1,3}(?:-[0-9]{3})? ?(?P<code>[A-Z]{1,2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NI:
+- source: wiki-NI.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{1,2}) ?[0-9]{3,5}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ ×\ 300\ mm\)\.\ The\ background\ of\ the\ plate\ presents\ a\
+    map\ of\ Nicaragua\ \.\ One\ or\ two\ letters\ identifies\ the\ region\ followed\
+    by\ a\ serial\ number\.\ Past\ plates\ \[\ edit\ \]\ Image\ First\ issued\ Design\
+    Slogan\ Serial\ format\ Serials\ issued\ Notes\ \[\ when\?\ \]\ White\ on\ black\
+    Nicara
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,2}) ?[0-9]{3,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NE:
+- source: wiki-NE.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[1-8])[A-Z] ?[0-9]{4}
+  code_group: code
+  code_position: first digit
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: le\ license\ plates,\ introduced\ in\ 2005,\ uses\ the\ 1A\ 2345\
+    format,\ where\ 1\ represents\ the\ area\ code,\ A\ represents\ the\ series,\
+    and\ 2345\ represents\ random\ digits\.\ Regular\ plates\ have\ a\ white\ background\
+    with\ black\ characters\.\ At\ the\ right\ side\ of\ the\ p
+  examples_pattern: (?<![A-Z0-9])(?P<code>[1-8])[A-Z] ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NG:
+- source: wiki-NG.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{3})[ -]?[0-9]{3}[ -]?[A-Z]{2}
+  code_group: code
+  code_position: first three letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \]\ The\ unique\ plate\ combination\ itself\ is\ in\ the\ format\
+    ABC\-123DE\.\ The\ first\ three\ letters\ indicate\ the\ Local\ Government\ Area\
+    in\ which\ the\ vehicle\ was\ registered,\ which\ are\ followed\ by\ three\ digits\
+    and\ two\ letters\.\ The\ background\ consists\ of\ an\ outline\ of\ a\ map\ of\
+    Nigeria\.\ B
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{3})[ -]?[0-9]{3}[ -]?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MK:
+- source: wiki-MK.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{4}[- ]?[A-Z]{2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: isting\ codes,\ one\ new\ code\ was\ introduced:\ PE\.\ Current\
+    codes\ \[\ edit\ \]\ Vehicle\ registration\ plate\ codes\ by\ municipalities\
+    in\ English\ alphabetical\ order:\ Code\ Region\ Municipalities\ covered\ by\
+    the\ code\ Appearance\ BE\ Berovo\ Berovo\ BT\ Bitola\ Bitola\ ,\ Mogila\ ,\ Novaci\
+    DB\ Debar
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{4}[- ]?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+PE:
+- source: wiki-PE.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z0-9]{2}-[0-9]{3}
+  code_group: code
+  code_position: leading letter in current series
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: an\ Serial\ format\ Serials\ issued\ Notes\ 2008\ Passenger\ car\
+    None\ AB\-1234\ 2010\ Series\ \[\ edit\ \]\ 2010\ license\ plate\ dimensions\
+    The\ redesign\ of\ the\ Peruvian\ plates\ included\ many\ changes\.\ The\ national\
+    flag\ of\ Peru\ is\ displayed\ in\ co
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[A-Z0-9]{2}-[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+PH:
+- source: wiki-PH.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z]{2} ?[0-9]{4}
+  code_group: code
+  code_position: first letter (position varies for motorcycles)
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: pectedly\ rapid\ depletion\ of\ available\ combinations\.\ In\
+    all\ cases,\ the\ first\ letter,\ regardless\ of\ its\ position,\ indicates\ the\
+    region\ where\ the\ motorcycle\ was\ registered\.\ The\ LTO\ has\ not\ stated\
+    that\ the\ current\ set\ of\ formats\ is\ final,\ and\ additional\ combinatio
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[A-Z]{2} ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+RO:
+- source: wiki-RO.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{1,2}) ?[0-9]{2,3} ?[A-Z]{3}
+  code_group: code
+  code_position: first one or two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'k\ letters\ on\ white\ background\ in\ the\ format\ CC\ 12\ ABC\
+    ,\ where\ CC\ is\ a\ two\ letter\ county\ code\ ,\ 12\ is\ a\ two\ digit\ group,\
+    and\ ABC\ is\ a\ three\ letter\ group\.\ For\ Bucharest,\ the\ format\ is\ B\
+    12\ ABC\ or\ B\ 123\ ABC\ ,\ where\ B\ is\ code\ for\ Bucharest\ city,\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,2}) ?[0-9]{2,3} ?[A-Z]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+RS:
+- source: wiki-RS.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{3,4}-[A-ZČĆŠĐŽ]{2}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ansitional\ period\ until\ the\ end\ of\ 2011\.\ Standard\ plates\
+    \[\ edit\ \]\ The\ two\-letter\ regional\ code\ is\ followed\ by\ three\ or\ four\-digit\
+    numeric\ code\ separated\ by\ the\ Serbian\ cross\ shield\ and\ a\ Cyrillic\ letter\
+    combination\ for\ the\ region\ below,\ and\ then\ followed\ b
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{3,4}-[A-ZČĆŠĐŽ]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+SI:
+- source: wiki-SI.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2})[ -][A-Z0-9]{2,3}-[A-Z0-9]{2,3}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ and\ regional\ divisions\ \[\ edit\ \]\ On\ regular\ issue\
+    license\ plates,\ the\ first\ 2\ letters\ before\ the\ shield\ sticker\ denote\
+    the\ region\ where\ the\ car\ was\ initially\ registered\.\ Further\ division\
+    is\ made\ by\ the\ coat\ of\ arms\ of\ the\ corresponding\ city,\ placed\ afte
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2})[ -][A-Z0-9]{2,3}-[A-Z0-9]{2,3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TJ:
+- source: wiki-TJ.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} ?[A-Z]{2} ?(?P<code>[0-9]{2})'
+  code_group: code
+  code_position: two-digit suffix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ries\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\ 4\.3\ in\ Serial\
+    format\ 1234AB56\ \(56\ being\ the\ regional\ code\)\ Colour\ \(front\)\ Black\
+    on\ white\ Colour\ \(rear\)\ Black\ on\ white\ Tajik\ vehicle\ registration\ plates\
+    are\ registration\ plates\ for\ vehicles\ registered\ in\ the\ '
+  examples_pattern: (?<![A-Z0-9])[0-9]{4} ?[A-Z]{2} ?(?P<code>[0-9]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TM:
+- source: wiki-TM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[ -]?[0-9]{4}[ -]?(?P<code>[A-Z]{2})'
+  code_group: code
+  code_position: two-letter suffix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: tin\ serial/counter\ letter;\ \#\ is\ a\ digit\ in\ the\ range\
+    0\-9;\ and\ XX\ is\ a\ two\-letter\ province\ identifier\)\.\ The\ format\ was\
+    updated\ to\ XX\ \#\#\ \#\#\ XX\ in\ 2010\.\ Trailers\ \[\ edit\ \]\ Province\
+    identifiers\ \[\ edit\ \]\ Suffix\ Province\ AG\ Ashgabat\ AH\ Ahal\ AK\ Arkadag\
+    BN\ Ba
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2}[ -]?[0-9]{4}[ -]?(?P<code>[A-Z]{2})(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+UZ:
+- source: wiki-UZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2}) ?[A-Z] ?[0-9]{3} ?[A-Z]{2}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: se\-plate\ format\ has\ two\ variations\.\ The\ standard\ format\
+    consists\ of\ a\ two\-digit\ location\ code,\ followed\ by\ a\ one\-letter\ series,\
+    three\ digits,\ and\ two\ Latin\ letters\.\ The\ alternative\ format\ consists\
+    of\ a\ two\-digit\ location\ code,\ three\ digits,\ an
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2}) ?[A-Z] ?[0-9]{3} ?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+VE:
+- source: wiki-VE.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[0-9]{3}[A-Z](?P<code>[A-Z])'
+  code_group: code
+  code_position: last letter
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: hicle\ was\ registered\.\ It\ means\ that\ in\ the\ example\ plate\
+    AA000AB,\ the\ last\ letter\ "B"\ would\ identify\ the\ region\.\ In\ previous\
+    resolutions,\ this\ was\ located\ in\ the\ first\ letter\.\ Code\ State\ A\ Caracas\
+    /\ Capital\ District\ B\ Anzoátegui\ C\ Apure\ D\ Aragua\ E\ Barinas\ F\ Bol
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2}[0-9]{3}[A-Z](?P<code>[A-Z])(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+XK:
+- source: wiki-XK.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2}) ?[0-9]{3}-[A-Z]{2}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ed\ containing\ the\ letters\ RKS\ \(Republic\ of\ Kosovo\)\ on\
+    a\ blue\ field,\ a\ two\ digit\ number\ corresponding\ to\ the\ districts\ of\
+    Kosovo\ ,\ the\ coat\ of\ arms\ of\ Kosovo\ ,\ a\ three\-digit\ number\ and\ finally\
+    two\ serial\ letters\.\ The\ three\-digit\ number\ starts\ at\ 101\ and\ the\
+    serial\ let
+  examples_pattern: (?<![A-Z0-9])(?P<code>[0-9]{2}) ?[0-9]{3}-[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+IT:
+- source: wiki-IT.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[ ·-]?[0-9]{3}[ ·-]?[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\ a\ defined\ format\ \(2\ letters,\ 3\ numbers,\ and\ then\
+    2\ letters\)\ which\ is\ issued\ nationwide,\ regardless\ of\ the\ local\ registration\
+    office\.\ Starting\ from\ 7\ February\ 1999,\ this\ format\ was\ slightly\ redesigned,\
+    adding\ a\ blue\ strip\ on\ the\ left\ containing\ the\ EU\ flag\ above\ the\
+    country\ code\ I\ '
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2}[ ·-]?[0-9]{3}[ ·-]?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+- source: wiki-IT.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{2}|Roma)[ -]?[A-Z0-9]{5,6}
+  code_group: code
+  code_position: historic province prefix/suffix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\ a\ defined\ format\ \(2\ letters,\ 3\ numbers,\ and\ then\
+    2\ letters\)\ which\ is\ issued\ nationwide,\ regardless\ of\ the\ local\ registration\
+    office\.\ Starting\ from\ 7\ February\ 1999,\ this\ format\ was\ slightly\ redesigned,\
+    adding\ a\ blue\ strip\ on\ the\ left\ containing\ the\ EU\ flag\ above\ the\
+    country\ code\ I\ '
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '1994'
+FR:
+- source: wiki-FR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: h\ was\ responsible\ for\ issuing\ the\ plates\ in\ the\ early\
+    20th\ century\.\ A\ pre\-2009\ car\ plate\ with\ the\ two\-digit\ code\ for\ Paris\
+    \(75\)\.\ Since\ 1901,\ various\ systems\ have\ been\ successively\ introduced,\
+    the\ most\ recent\ dating\ from\ 2009\.\ The\ registration\ plates\ issued\ since
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2}-[0-9]{3}-[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TH:
+- source: wiki-TH.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]?[ก-ฮ]{2} ?[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'n\ ID,\ which\ usually\ consists\ of\ Thai\ letters\ and\ a\
+    number\ string\.\ The\ province\ of\ registration\ is\ shown\ below\ the\ ID\.\
+    \[\ a\ \]\ The\ letters\ are\ embossed,\ and\ all\ plates\ must\ also\ be\ embossed\
+    with\ a\ seal\ bearing\ the\ letters\ "ขส"\.\ The\ current\ designs\ are\ regulated\
+    by\ the\ '
+  examples_pattern: (?<![A-Z0-9])[0-9]?[ก-ฮ]{2} ?[0-9]{1,4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+PK:
+- source: wiki-PK.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2,3}[- ]?[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: s\ are\ blue\ with\ white\ letters\ and\ numbers\.\ Provincial\
+    plates\ \[\ edit\ \]\ Each\ province\ and\ territory\ has\ its\ own\ vehicle\
+    registration\ plate\ design\.\ Azad\ Jammu\ \&\ Kashmir\ \[\ edit\ \]\ Azad\ Jammu\
+    \&\ Kashmir\ vehicle\ registration\ plates\ Vehicle\ Type\ Image\ Example\ Descript
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2,3}[- ]?[0-9]{1,4}(?![A-Z0-9])
+  notes: Syntactic family only; province printing and local variants are needed. No
+    district inference authorized by this record.
+  valid_to: null
+ES:
+- source: wiki-ES.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{1,3})[- ][0-9]{1,4}(?:[- ][A-Z]{1,2})?
+  code_group: code
+  code_position: leading province letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: te\ from\ Orense\ \.\ The\ first\ system,\ introduced\ in\ 1900,\
+    consisted\ of\ a\ letter\ code\ denoting\ the\ province\ the\ vehicle\ was\ registered\
+    in\ \(see\ below\ for\ the\ full\ list\ of\ codes\),\ followed\ by\ a\ sequence\
+    number\ of\ up\ to\ six\ digits\ \(\ XXX\-NNNNNN\ \)\.\ The\ codes\ wer
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,3})[- ][0-9]{1,4}(?:[- ][A-Z]{1,2})?(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: 2000-09
+- source: wiki-ES.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} ?[BCDFGHJKLMNPRSTVWXYZ]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: te\ from\ Orense\ \.\ The\ first\ system,\ introduced\ in\ 1900,\
+    consisted\ of\ a\ letter\ code\ denoting\ the\ province\ the\ vehicle\ was\ registered\
+    in\ \(see\ below\ for\ the\ full\ list\ of\ codes\),\ followed\ by\ a\ sequence\
+    number\ of\ up\ to\ six\ digits\ \(\ XXX\-NNNNNN\ \)\.\ The\ codes\ wer
+  examples_pattern: (?<![A-Z0-9])[0-9]{4} ?[BCDFGHJKLMNPRSTVWXYZ]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AL:
+- source: wiki-AL.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{4} ?[A-Z]
+  code_group: code
+  code_position: leading letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \.\ Current\ series\ \[\ edit\ \]\ Private\ Vehicles\ \[\ edit\
+    \]\ The\ new\ format\ is\ no\ longer\ based\ on\ regional\ district\ abbreviations,\
+    while\ old\ plates\ are\ still\ valid\ A\ new\ format\ similar\ to\ the\ post\-1994\
+    Italian\ and\ post\-2009\ French\ plate\ designs\ has\ been\ in
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2}) ?[0-9]{4} ?[A-Z](?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '2011'
+LT:
+- source: wiki-LT.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: '[A-Z](?P<code>[A-Z])[A-Z] ?[0-9]{3}'
+  code_group: code
+  code_position: second letter of three
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ EU\ stripe\ for\ two\-line\ or\ narrow\ plates\)\.\ Area\ designations\
+    \[\ edit\ \]\ Until\ 2004\ the\ second\ of\ the\ three\ letters\ in\ each\ registration\
+    mark\ indicated\ the\ geographical\ administrative\ area\ in\ which\ the\ vehicle\
+    had\ originally\ been\ registered,\ as\ follows:\ A\ K\ L\ M\ P\ S
+  examples_pattern: (?<![A-Z0-9])[A-Z](?P<code>[A-Z])[A-Z] ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '2004'
+- source: wiki-LT.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ EU\ stripe\ for\ two\-line\ or\ narrow\ plates\)\.\ Area\ designations\
+    \[\ edit\ \]\ Until\ 2004\ the\ second\ of\ the\ three\ letters\ in\ each\ registration\
+    mark\ indicated\ the\ geographical\ administrative\ area\ in\ which\ the\ vehicle\
+    had\ originally\ been\ registered,\ as\ follows:\ A\ K\ L\ M\ P\ S
+  examples_pattern: (?<![A-Z0-9])[A-Z]{3} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+MD:
+- source: wiki-MD.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{1,2}) ?[A-Z]{2} ?[0-9]{3}
+  code_group: code
+  code_position: first one/two letters before 2015
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: gh,\ made\ of\ metal\ with\ embossed\ characters\ using\ the\
+    FE\-Schrift\ font\.\ Pre\-2015\ plates\ have\ seven\ characters:\ two\ letters\
+    for\ the\ region\ \(except\ for\ Chișinău\ ,\ which\ only\ has\ the\ letters\
+    C\ and\ K\),\ two\ letters\ for\ the\ series\ and\ three\ digits,\ all\ written\
+    usin
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,2}) ?[A-Z]{2} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '2015'
+- source: wiki-MD.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: gh,\ made\ of\ metal\ with\ embossed\ characters\ using\ the\
+    FE\-Schrift\ font\.\ Pre\-2015\ plates\ have\ seven\ characters:\ two\ letters\
+    for\ the\ region\ \(except\ for\ Chișinău\ ,\ which\ only\ has\ the\ letters\
+    C\ and\ K\),\ two\ letters\ for\ the\ series\ and\ three\ digits,\ all\ written\
+    usin
+  examples_pattern: (?<![A-Z0-9])[A-Z]{3} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+SK:
+- source: wiki-SK.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{2})[- ]?[0-9]{3}[A-Z]{2}
+  code_group: code
+  code_position: first two letters before 2023
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ number\ and\ LL\ were\ two\ additional\ letters\ \(assigned\
+    alphabetically\)\.\ From\ January\ 2023,\ a\ new\ state\-wide\ numbering\ scheme\
+    was\ introduced,\ preserving\ the\ same\ layout,\ but\ replacing\ the\ initial\
+    two\-letter\ district\ code\ with\ arbitrary\ letters\ of\ the\ alphabet\ \(assigne
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2})[- ]?[0-9]{3}[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '2022'
+- source: wiki-SK.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[0-9]{3}[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ number\ and\ LL\ were\ two\ additional\ letters\ \(assigned\
+    alphabetically\)\.\ From\ January\ 2023,\ a\ new\ state\-wide\ numbering\ scheme\
+    was\ introduced,\ preserving\ the\ same\ layout,\ but\ replacing\ the\ initial\
+    two\-letter\ district\ code\ with\ arbitrary\ letters\ of\ the\ alphabet\ \(assigne
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2} ?[0-9]{3}[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NL:
+- source: wiki-NL.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{1,2})[- ]?[0-9]{1,5}
+  code_group: code
+  code_position: old leading letters
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'the\ present\ system\.\ From\ 1906,\ a\ new\ system\ used\ the\
+    format\ xx\-ddddd,\ where\ xx\ was\ a\ province\ code\ and\ ddddd\ a\ serial\
+    number\.\ This\ system\ lasted\ until\ 1951\ when\ the\ current\ system\ was\
+    introduced\.\ Province\ codes\ \[\ edit\ \]\ A:\ Groningen\ B:\ Friesland\ D:'
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '1951'
+SE:
+- source: wiki-SE.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z]{1,2}) ?[0-9]{1,5}
+  code_group: code
+  code_position: historic letter prefix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ty\ codes\ from\ 2007,\ after\ the\ merger\ of\ some\ counties\.\
+    Codes\ \[\ edit\ \]\ A,\ AA,\ AB\ –\ City\ of\ Stockholm\ \(today\ part\ of\ Stockholms\
+    län\ \)\ B,\ BA,\ BB\ –\ Stockholms\ län\ C\ –\ Uppsala\ län\ D\ –\ Södermanlands\
+    län\ E,\ EA\ –\ Östergötlands\ län\ F,\ FA\ '
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{1,2}) ?[0-9]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '1973'
+- source: wiki-SE.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{2}[A-Z0-9]'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ty\ codes\ from\ 2007,\ after\ the\ merger\ of\ some\ counties\.\
+    Codes\ \[\ edit\ \]\ A,\ AA,\ AB\ –\ City\ of\ Stockholm\ \(today\ part\ of\ Stockholms\
+    län\ \)\ B,\ BA,\ BB\ –\ Stockholms\ län\ C\ –\ Uppsala\ län\ D\ –\ Södermanlands\
+    län\ E,\ EA\ –\ Östergötlands\ län\ F,\ FA\ '
+  examples_pattern: (?<![A-Z0-9])[A-Z]{3} ?[0-9]{2}[A-Z0-9](?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+IS:
+- source: wiki-IS.json
+  series_id: historic-geographic
+  series_status: historic
+  pattern: (?P<code>[A-Z])[- ]?[0-9]{1,5}
+  code_group: code
+  code_position: historic letter prefix
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: cle\ plates\ are\ 240\ mm\ ×\ 130\ mm\ \(9\.4\ in\ ×\ 5\.1\ in\)\.\
+    History\ \[\ edit\ \]\ An\ older\ decentralized\ district\ plate\ system\ was\
+    used\ 1938\ until\ 31\ December\ 1988\ \(see\ below\)\.\ The\ current\ registration\
+    system\ was\ introduced\ on\ 1\ January\ 1989\.\ Antique\ cars\ were\ allowed\
+    to\ keep
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z])[- ]?[0-9]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: '1988-12-31'
+CY:
+- source: wiki-CY.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'rus\ are\ composed\ of\ three\ letters\ and\ three\ digits\ \(e\.g\.\
+    ABC\ 123\ \)\.\ A\ simple\ incremental\ numbering\ system\ is\ used;\ numbers\
+    run\ from\ 001\ to\ 999\ per\ letter\ sequence\ \(alphabetic\),\ so\ that,\ for\
+    example,\ the\ plate\ to\ be\ issued\ after\ MAA\ 999\ would\ be\ MAB\ 001\ \.\ '
+  examples_pattern: (?<![A-Z0-9])[A-Z]{3} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BE:
+- source: wiki-BE.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[12]-[A-Z]{3}-[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: de\ of\ red\ \(ruby\ red\ \-\ RAL\ 3003\)\ is\ used\.\ The\ combination\
+    on\ the\ plate\ does\ not\ give\ any\ information\ about\ the\ geographical\ location\.\
+    Sometimes\ the\ first\ letter\ \(or\ first\ and\ second\ letter\)\ has\ a\ special\
+    meaning:\ CD:\ Diplomats\ \(CD\ stands\ for\ 'Corps\ Diplomatique'\)\ G:\ Agricu
+  examples_pattern: (?<![A-Z0-9])[12]-[A-Z]{3}-[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+DK:
+- source: wiki-DK.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[0-9]{2} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: n\ centers\ \(Skat\ Motor\ center\)\.\ The\ combination\ is\ simply\
+    a\ serial\ and\ has\ no\ connection\ with\ a\ geographic\ location,\ but\ the\
+    digits\ have\ number\ series\ based\ on\ vehicle\ type\.\ The\ country's\ official\
+    international\ road\ code\ is\ DK\ ,\ excluding\ the\ Faroe\ Islands\ \.\ Danish
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2} ?[0-9]{2} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+HU:
+- source: wiki-HU.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[A-Z]{2}[- ]?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: plates\ also\ included\ the\ year\ of\ issue\ next\ to\ the\ regional\
+    code\.\ The\ same\ regional\ system\ was\ maintained\ until\ 1933,\ even\ though\
+    the\ territory\ of\ Hungary\ was\ significantly\ reduced\ after\ the\ Treaty\
+    of\ Trianon\ \.\ In\ 1933\ the\ regional\ system\ was\ changed\ to\ a\ two\ letter
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2} ?[A-Z]{2}[- ]?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AD:
+- source: wiki-AD.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] ?[0-9]{4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 0s\ plate\ Temporary\ plate\ In\ Andorra\ ,\ vehicle\ registration\
+    plates\ are\ composed\ of\ one\ letter\ and\ four\ digits\ \(e\.g\.\ A1234\),\
+    and\ have\ the\ coat\ of\ arms\ of\ Andorra\ and\ country\ code\ \(AND\)\ to\
+    the\ left\ of\ the\ serial\ and\ Principat\ d'Andorra\ in\ blue\ below\ the\ serial\.
+  examples_pattern: (?<![A-Z0-9])[A-Z] ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+AI:
+- source: wiki-AI.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] ?[0-9]{4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ers\ and\ are\ North\ American\ standard\ 6\ by\ 12\ inches\ \(152\
+    mm\ ×\ 300\ mm\)\.\ Vehicle\ plates\ have\ an\ 'A'\ followed\ by\ four\ digits\.\
+    The\ letter\ denoting\ the\ type\ of\ vehicle\ has\ been\ moved\ to\ the\ front\
+    and\ 'P'\ is\ now\ designated\ for\ personal\ vehicles\.\ Image\ First\ issu
+  examples_pattern: (?<![A-Z0-9])[A-Z] ?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BH:
+- source: wiki-BH.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,6}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'ation\ plate\ from\ 2010\ Country\ Bahrain\ Country\ code\ BRN\
+    Current\ series\ Serial\ format\ 123456\ Introduced\ 2010\ Vehicle\ registration\
+    plates\ of\ Bahrain\ have\ the\ Flag\ of\ Bahrain\ and\ the\ country''s\ name\
+    in\ Arabic\ and\ Latin\ script\.\ Special\ vehicles,\ '
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+BM:
+- source: wiki-BM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{5}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 75\ Bermudian\ licence\ plates\ issued\ to\ general\ passenger\
+    vehicles\ have\ five\ black\ digits\ on\ a\ plain\ white\ background\ \(both\
+    front\ and\ rear\)\.\ Non\-private\ vehicles\ have\ plates\ with\ one\ or\ two\
+    preceding\ letters\ followed\ by\ three\ or\ four\ numbers\.\ Personalised\ plates\
+    allo
+  examples_pattern: (?<![A-Z0-9])[0-9]{5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GL:
+- source: wiki-GL.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[0-9]{2} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: n\ centers\ \(Skat\ Motor\ center\)\.\ The\ combination\ is\ simply\
+    a\ serial\ and\ has\ no\ connection\ with\ a\ geographic\ location,\ but\ the\
+    digits\ have\ number\ series\ based\ on\ vehicle\ type\.\ The\ country's\ official\
+    international\ road\ code\ is\ DK\ ,\ excluding\ the\ Faroe\ Islands\ \.\ Danish
+  examples_pattern: (?<![A-Z0-9])[A-Z]{2} ?[0-9]{2} ?[0-9]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+GT:
+- source: wiki-GT.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] ?[0-9]{3}[A-Z]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \[\ edit\ \]\ Guatemala\ uses\ the\ same\ format\ for\ all\ types,\
+    123ABC,\ with\ a\ prefix\ at\ the\ start\ to\ show\ the\ vehicle\ class\.\ P\
+    is\ for\ passenger\ vehicles\ and\ is\ the\ most\ common\ type\.\ C\ is\ for\
+    commercial\ vehicles\.\ Image\ First\ issued\ Design\ Slogan\ Serial\ format\
+    Serials\ issued
+  examples_pattern: (?<![A-Z0-9])[A-Z] ?[0-9]{3}[A-Z]{3}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+JM:
+- source: wiki-JM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} ?[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ The\ license\ plates\ for\ private\ cars\ \(introduced\ in\
+    1987\)\ follows\ the\ format\ 1234\ AB\.\ Coding\ is\ not\ provided\.\ The\ plates\
+    use\ blue\ lettering\ on\ a\ white\ background\.\ For\ motorcycles,\ the\ 1234\
+    A\ series\ is\ valid,\ also\ without\ coding\ and\ in
+  examples_pattern: (?<![A-Z0-9])[0-9]{4} ?[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NC:
+- source: wiki-NC.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,6} ?NC'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: '\ F\ Current\ series\ Size\ 520\ mm\ ×\ 110\ mm\ 20\.5\ in\ ×\
+    4\.3\ in\ Serial\ format\ 123456\ NC\ Colour\ \(front\)\ White\ on\ black\ Colour\
+    \(rear\)\ White\ on\ black\ New\ Caledonia\ requires\ its\ residents\ to\ register\
+    their\ motor\ vehicles\ and\ display\ vehicle\ '
+  examples_pattern: (?<![A-Z0-9])[0-9]{1,6} ?NC(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+NU:
+- source: wiki-NU.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: None\ Current\ series\ Slogan\ None\ Size\ 372\ mm\ ×\ 134\ mm\
+    14\.6\ in\ ×\ 5\.3\ in\ Serial\ format\ 1234\ Niue\ requires\ its\ residents\
+    to\ register\ their\ motor\ vehicles\ and\ display\ vehicle\ registration\ plates\
+    \.\ Current\ plates\ are\ New\ Zealand\ standard\ 360\ mm
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+SM:
+- source: wiki-SM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]?[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: es\ with\ distinctive\ licence\ plates\ which\ are\ white\ with\
+    blue\ figures,\ usually\ a\ letter\ followed\ by\ up\ to\ four\ numbers\.\ To\
+    the\ left\ of\ these\ figures\ is\ displayed\ the\ national\ coat\ of\ arms\ of\
+    San\ Marino\ \.\ Custom\ licence\ plates\ were\ offered\ starting\ in\ 2004\.\
+    In\ 2023,\ th
+  examples_pattern: (?!)
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TG:
+- source: wiki-TG.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4}-[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: ntroduced\ in\ 2007\.\ It\ has\ a\ format\ 1234\-AB,\ where\ 1234\
+    is\ the\ number,\ AB\ is\ the\ series\.\ Regular\ plates\ have\ a\ white\ background\
+    with\ dark\ blue\ or\ black\ signs\.\ On\ the\ left\ side\ of\ the\ plate\ is\
+    an\ image\ of\ the\ flag\ of\ the\ country\ under\ whi
+  examples_pattern: (?<![A-Z0-9])[0-9]{4}-[A-Z]{2}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TO:
+- source: wiki-TO.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] ?[0-9]{1,5}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: e\ plate\ made\.\ Current\ plate\ format\ \[\ edit\ \]\ The\ current\
+    format\ uses\ a\ letter\ followed\ by\ 1\-5\ digits\.\ The\ letter\ used\ denotes\
+    the\ type\ of\ vehicle\.\ This\ table\ is\ incomplete\ ;\ you\ can\ help\ by\
+    adding\ missing\ items\ \.\ Image\ First\ issued\ Design\ Serial\ form
+  examples_pattern: (?<![A-Z0-9])[A-Z] ?[0-9]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+VA:
+- source: wiki-VA.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?:SCV|CV) ?[0-9]{1,5}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'n\ plates\ of\ official\ road\ vehicles\ registered\ in\ Vatican\
+    City\ use\ the\ prefix\ SCV\ \(\ Latin\ :\ Status\ Civitatis\ Vaticanae\ ,\ lit\.\
+    ''\ Vatican\ City\ State\ ''\ \)\ followed\ by\ a\ series\ of\ digits\ while\
+    vehicle\ registration\ plates\ of\ residential\ '
+  examples_pattern: (?<![A-Z0-9])(?:SCV|CV) ?[0-9]{1,5}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+CX:
+- source: wiki-CX.json
+  series_id: ordinary
+  series_status: current
+  pattern: CI[· ]?[0-9]{4}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: 'eries\ Slogan\ None\ Size\ 372\ mm\ ×\ 134\ mm\ 14\.6\ in\ ×\
+    5\.3\ in\ Serial\ format\ CI•1234\ Introduced\ 2003\ ;\ 23\ years\ ago\ \(\ 2003\
+    \)\ History\ First\ issued\ 1972\ ;\ 54\ years\ ago\ \(\ 1972\ \)\ Vehicle\ registration\
+    plates\ of\ Christmas\ Island\ started\ to\ '
+  examples_pattern: (?<![A-Z0-9])CI[· ]?[0-9]{4}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+JE:
+- source: wiki-JE.json
+  series_id: ordinary
+  series_status: current
+  pattern: J[0-9]{1,6}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC, trim outer whitespace; retain original script and separators
+  evidence_pattern: \ but\ it\ is\ not\ blue\ and\ is\ not\ valid\ under\ the\ Vienna\
+    Convention\.\ The\ standard\ format\ for\ registration\ marks\ in\ the\ island\
+    has\ been\ in\ use\ since\ 1915\.\ Standard\ issue\ plates\ in\ Jersey\ must\
+    be\ flat\ and\ unbroken\ and\ in\ the\ prescribed\ font\ according\ to\ British\
+    s
+  examples_pattern: (?<![A-Z0-9])J[0-9]{1,6}(?![A-Z0-9])
+  notes: Ordinary syntactic candidate only. Check known codes and series dates; exclusions,
+    validity, and issuance are not fully encoded. Source examples may be illustrative
+    specimens.
+  valid_to: null
+TR:
+- source: wiki-TR-fixed.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[0-9]{2})[ -]?[A-Z]{1,3}[ -]?[0-9]{2,5}
+  code_group: code
+  code_position: first two digits
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: First\ two\ digits\ indicating\ the\ province\ code:\ Code\ Province\
+    Code\ Province\ Code\ Province\ 01\ Adana\ 28\ Giresun\ 55\ Samsun\ 02\ Adıyaman\
+    29\ Gümüşhane\ 56\ Siirt\ 03\ Afyonkarahisar\ 30\ Hakkari\ 57\ Sinop\ 04\ Ağrı\
+    31\ Hatay\ 58\ Sivas\ 05\ Amasya\ 32\ Isparta\ 59\ Tekirdağ\ 06\ Ankara\ 33\ Mersin\
+    60\ Tokat\ 07\ Antalya\ 34\ İstanbul\ 61\ Trabzon\ 08\ Artvin\ 35\ İzmir\ 62\
+    Tunceli\ 09\ Aydın\ 36\ Kars\ 63\ Şanlıurfa\ 10\ Balıkesir\ 37\ Kastamonu\ 64\
+    Uşak\ 11\ Bilecik\ 38\ Kayseri\ 65\ Van\ 12\ Bingöl\ 39\ Kırklareli\ 66\ Yozgat\
+    13\ Bitlis\ 40\ Kırşehir\ 67\ Zonguldak\ 14\ Bolu\ 41\ Kocaeli\ 68\ Aksaray\ 15\
+    Burdur\ 42\ Konya\ 69\ Bayburt\ 16\ Bursa\ 43\ Kütahya\ 70\ Karaman\ 17\ Çanakkale\
+    44\ Malatya\ 71\ Kırıkkale\ 18\ Çankırı\ 45\ Manisa\ 72\ Batman\ 19\ Çorum\ 46\
+    Kahramanmaraş\ 73\ Şırnak\ 20\ Denizli\ 47\ Mardin\ 74\ Bartın\ 21\ Diyarbakır\
+    48\ Muğla\ 75\ Ardahan\ 22\ Edirne\ 49\ Muş\ 76\ Iğdır\ 23\ Elazığ\ 50\ Nevşehir\
+    77\ Yalova\ 24\ Erzincan\ 51\ Niğde\ 78\ Karabük\ 25\ Erzurum\ 52\ Ordu\ 79\ Kilis\
+    26\ Eskişehir\ 53\ Rize\ 80\ Osmaniye\ 27\ Gaziantep\ 54\ Sakarya\ 81\ Düzce\
+    Province\ names\ until\ code\ 67\ go\ alphabetically,\ with\ the\ exception\ of\
+    Mersin,\ Kahramanmaraş\ and\ Şanlıurfa\ provinces\ for\ their\ previous\ names\
+    taken\ in\ account\ were\ İçel,\ Maraş\ and\ Urfa,\ respectively
+  examples_pattern: (?!)
+  notes: Conservative syntax candidate; source-written examples may be specimens.
+    Requires code-list membership and exceptions.
+PL:
+- source: wiki-PL.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2,3})[ -][A-Z0-9]{4,5}
+  code_group: code
+  code_position: first two or three letters
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: Vehicle\ registration\ plates\ of\ Poland\ indicate\ the\ region\
+    of\ registration\ of\ the\ vehicle\ given\ the\ number\ plate
+  examples_pattern: (?<![A-Z0-9])(?P<code>[A-Z]{2,3})[ -][A-Z0-9]{4,5}(?![A-Z0-9])
+  notes: Conservative syntax candidate; source-written examples may be specimens.
+    Requires code-list membership and exceptions.
+AR:
+- source: wiki-AR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} [0-9]{3} [A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\ 123\ CD
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+AS:
+- source: wiki-AS.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+AW:
+- source: wiki-AW.json
+  series_id: ordinary
+  series_status: current
+  pattern: A ?[0-9]{1,5}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ A\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+BA:
+- source: wiki-BA.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z][0-9]{2}-[A-Z]-[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ A12\-B\-345
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+BO:
+- source: wiki-BO.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{3,4}[A-Z]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234ABC
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CI:
+- source: wiki-CI.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[- ]?[0-9]{3}[- ]?[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Registration\ plates\ issued\ from\ 1\ June\ 2023\ use\ a\ XX\-NNN\-ZZ\
+    format\ ,\ composed\ of\ a\ series\ of\ 7\ alphanumeric\ characters:\ 2\ letters,\
+    3\ numbers,\ and\ then\ 2\ letters\ \(e
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CK:
+- source: wiki-CK-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CL:
+- source: wiki-CL.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} [A-Z]{2} [0-9]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\ CD\ 12
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CR:
+- source: wiki-CR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3}-[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ ABC\-123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CU:
+- source: wiki-CU.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] [0-9]{3} [0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ P\ 123\ 456
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+CW:
+- source: wiki-CW.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] [0-9]{2}-[0-9]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ A\ 12\-34
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+EE:
+- source: wiki-EE.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{3} [A-Z]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 123\ ABC
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+FI:
+- source: wiki-FI.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2,3}-[0-9]{1,3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Since\ 1989\ the\ code\ has\ no\ connection\ with\ the\ geographic\
+    location,\ except\ that\ Åland\ has\ its\ own\ type\ of\ plate
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+FJ:
+- source: wiki-FJ.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[- ]?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\ 123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+FM:
+- source: wiki-FM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GA:
+- source: wiki-GA.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\-123\-CD
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GD:
+- source: wiki-GD.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3}[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ ABC123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GE:
+- source: wiki-GE-country.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\-123\-CD
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+HK:
+- source: wiki-HK.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} ?[1-9][0-9]{0,3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: standard\ format\ for\ these\ vehicles\ is\ "XX\ \(\#\)\#\#\#",\
+    where\ 'XX'\ are\ two\ letters\ from\ the\ Latin\ alphabet\ ,\ and\ '\(\#\)\#\#\#'\
+    is\ a\ sequence\ of\ between\ three\ and\ four\ digits
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+IL:
+- source: wiki-IL.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{3}-[0-9]{2}-[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Current\ civil\ registration\ numbers\ \(since\ July\ 2017\)\
+    consist\ of\ eight\ digits,\ separated\ by\ dashes\ between\ the\ third\ and\
+    fourth\ digits\ and\ between\ the\ fifth\ and\ sixth\ digits\ \(XXX\-XX\-X\ XX\
+    \)
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+KI:
+- source: wiki-KI.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} [0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ ABC\ 123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+KW:
+- source: wiki-KW.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{2}-[0-9]{5}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 12\-45678
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+LI:
+- source: wiki-LI.json
+  series_id: ordinary
+  series_status: current
+  pattern: FL ?[1-9][0-9]{0,4}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: letters\ FL\ ,\ standing\ for\ Fürstentum\ Liechtenstein\ ,\ followed\
+    by\ the\ small\ version\ of\ the\ coat\ of\ arms\ of\ Liechtenstein\ and\ up\
+    to\ five\ digits
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+LU:
+- source: wiki-LU.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2} [0-9]{4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+LV:
+- source: wiki-LV.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}-[1-9][0-9]{0,3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: consist\ of\ two\ letters\ \(trailers\ plates\ have\ one\ letter\),\
+    a\ hyphen\ and\ one\ to\ four\ numbers\ \(depending\ on\ the\ age\ of\ registration\)\
+    ,\ e
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+MH:
+- source: wiki-MH-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+NR:
+- source: wiki-NR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} [0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AAA\ 123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+OM:
+- source: wiki-OM.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4} [A-Z]{1,2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1\(234\)\ A\(B\)
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+PA:
+- source: wiki-PA.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[0-9]{4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: AB1234\ format\ began
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+PR:
+- source: wiki-PR.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} [0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ ABC\ 123
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+QA:
+- source: wiki-QA.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,6}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 123\(45\)
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+SX:
+- source: wiki-SX.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z] ?[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ A\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+TV:
+- source: wiki-TV.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}[0-9]{4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+TZ:
+- source: wiki-TZ.json
+  series_id: ordinary
+  series_status: current
+  pattern: T ?[0-9]{3}[A-Z]{3}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ T\ 123ABC
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+WS:
+- source: wiki-WS.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ 1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+MT:
+- source: wiki-MT.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{3} ?[0-9]{3}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: XXX999\ format
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+SR:
+- source: wiki-SR.json
+  series_id: ordinary
+  series_status: current
+  pattern: P[A-Z] ?[0-9]{4}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Configuration\ is\ two\ letters\ and\ four\ numbers\ where\ first\
+    letter\ is\ always\ letter\ P
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+BW:
+- source: wiki-BW.json
+  series_id: ordinary
+  series_status: current
+  pattern: B ?[0-9]{3} ?[A-PR-Z]{3}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: begin\ with\ the\ letter\ B,\ followed\ by\ three\ digits,\ followed\
+    by\ three\ letters
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+MO:
+- source: wiki-MO.json
+  series_id: ordinary
+  series_status: current
+  pattern: M[A-Z]?-[0-9]{2}-[0-9]{2}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ MA\-12\-34
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+VG:
+- source: wiki-VG.json
+  series_id: ordinary
+  series_status: current
+  pattern: PV ?[0-9]{5}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: sequenced\ 'PV'\ followed\ by\ five\ digits
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+AX:
+- source: wiki-AX-local.json
+  series_id: ordinary
+  series_status: current
+  pattern: ÅL[A-Z]? ?[0-9]{1,5}
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: mit\ ÅL\ beginnt
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+AO:
+- source: wiki-AO.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{3})-[0-9]{2}-[0-9]{2}-[A-Z]{2}
+  code_group: code
+  code_position: first three letters
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: ABC\ being\ the\ regional\ code
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+BT:
+- source: wiki-BT.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z]{2}-(?P<code>[0-9])-[A-Z][0-9]{4}'
+  code_group: code
+  code_position: digit after vehicle type
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Serial\ format\ AB\-1\-C1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GQ:
+- source: wiki-GQ.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2})-[0-9]{3}-[A-Z]
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: AB\ being\ the\ regional\ code
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GM:
+- source: wiki-GM-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2,3})-[0-9]{4}-[A-Z]
+  code_group: code
+  code_position: first two/three letters
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: XXX\ or\ XX\ indicate\ the\ three\ or\ two\ letter\ regional\
+    code
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GW:
+- source: wiki-GW-local.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z]{2}) ?[0-9]{1,4}
+  code_group: code
+  code_position: first two letters
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: zwei\ Buchstaben\ für\ die\ Region
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+PS:
+- source: wiki-PS.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]-[0-9]{4}-(?P<code>[A-N])'
+  code_group: code
+  code_position: last letter (West Bank)
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: last\ letter\ in\ the\ number\ will\ be\ determined
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+VI:
+- source: wiki-VI.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z]{2} [0-9]{3}
+  code_group: code
+  code_position: first letter
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: coded\ by\ island\ of\ issuance
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+PG:
+- source: wiki-PG.json
+  series_id: ordinary
+  series_status: current
+  pattern: (?P<code>[A-Z])[A-Z]{2} [0-9]{3}
+  code_group: code
+  code_position: first letter
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: first\ letter\ identifying\ the\ province
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+GG:
+- source: wiki-GG.json
+  series_id: Alderney
+  series_status: current
+  pattern: (?P<code>AY) [0-9]{1,4}
+  code_group: code
+  code_position: initial AY
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: Alderney\ are\ issued\ with\ the\ prefix\ 'AY'
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate; this grammar is not an issuance validator.
+    Unlisted historical/special layouts remain gaps.
+US:
+- source: wiki-US-ID.json
+  series_id: Idaho-county-1945
+  series_status: current
+  pattern: (?P<code>[1-9]?[A-Z]) ?[A-Z0-9]{1,6}
+  code_group: code
+  code_position: initial county code
+  normalization: Unicode NFC; trim outer whitespace; retain script and internal separators
+  evidence_pattern: County\ coding
+  examples_pattern: (?!)
+  notes: Idaho ordinary county series only. Requires US-ID jurisdiction and code membership;
+    other US states are not described by this rule.
+  subdivision_scope: US-ID
+BL:
+- source: wiki-BL-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{2,3} [A-Z]{1,2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: Serial\ format\ 12\(3\)\ A\(B\)
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate. Geographic applicability and completeness
+    are not established.
+KM:
+- source: wiki-KM-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{4} [A-Z] [0-9]{2}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: Serial\ format\ 1234\ A\ 56
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate. Geographic applicability and completeness
+    are not established.
+VC:
+- source: wiki-VC-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[A-Z][0-9]{1,4}'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: Serial\ format\ A1234
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate. Geographic applicability and completeness
+    are not established.
+WF:
+- source: wiki-WF-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[0-9]{1,4} WF'
+  code_group: null
+  code_position: null
+  normalization: Unicode NFC; trim outer whitespace
+  evidence_pattern: Serial\ format\ 1234\ WF
+  examples_pattern: (?!)
+  notes: Source-described syntax candidate. Geographic applicability and completeness
+    are not established.
+TT:
+- source: wiki-TT-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: '[PDHRVXT][A-Z]{0,2} ?[1-9][0-9]{0,3}'
+  code_group: null
+  code_position: none
+  normalization: Unicode NFC, trim outer whitespace; retain script and separators
+  evidence_pattern: Each\ registration\ number\ begins\ with\ a\ letter\ designating\
+    the\ class\ of\ vehicle
+  examples_pattern: PAA 1|PAA 9999
+  notes: Candidate ordinary syntax only; source specimens are illustrative, not authenticated
+    live vehicles. No subnational geographic code.
+SB:
+- source: wiki-SB.json
+  series_id: ordinary
+  series_status: current
+  pattern: M[A-Z]-[0-9]{4}
+  code_group: null
+  code_position: none
+  normalization: Unicode NFC, trim outer whitespace; retain script and separators
+  evidence_pattern: MA\-0000\ to\ MA\-9999,\ then\ MB\-0000\ onwards
+  examples_pattern: MA-0000|MA-9999|MB-0000
+  notes: Candidate ordinary syntax only; source specimens are illustrative, not authenticated
+    live vehicles. No subnational geographic code.
+ST:
+- source: wiki-ST-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: STP-[0-9]{2}-[0-9]{2}[A-Z]{1,2}
+  code_group: null
+  code_position: none
+  normalization: Unicode NFC, trim outer whitespace; retain script and separators
+  evidence_pattern: The\ current\ standard\ has\ the\ form\ «STP\-12\-34AA»
+  examples_pattern: STP-12-34AA
+  notes: Candidate ordinary syntax only; source specimens are illustrative, not authenticated
+    live vehicles. No subnational geographic code.
+GP:
+- source: wiki-FR-fr.json
+  series_id: SIV
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: none in serial
+  normalization: Unicode NFC; preserve separators
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  examples_pattern: (?!)
+  notes: Source explicitly applies the French SIV family to this territory. No territory-specific
+    specimen collected; same syntax across French SIV jurisdictions.
+RE:
+- source: wiki-FR-fr.json
+  series_id: SIV
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: none in serial
+  normalization: Unicode NFC; preserve separators
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  examples_pattern: (?!)
+  notes: Source explicitly applies the French SIV family to this territory. No territory-specific
+    specimen collected; same syntax across French SIV jurisdictions.
+GF:
+- source: wiki-FR-fr.json
+  series_id: SIV
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: none in serial
+  normalization: Unicode NFC; preserve separators
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  examples_pattern: (?!)
+  notes: Source explicitly applies the French SIV family to this territory. No territory-specific
+    specimen collected; same syntax across French SIV jurisdictions.
+MQ:
+- source: wiki-FR-fr.json
+  series_id: SIV
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: none in serial
+  normalization: Unicode NFC; preserve separators
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  examples_pattern: (?!)
+  notes: Source explicitly applies the French SIV family to this territory. No territory-specific
+    specimen collected; same syntax across French SIV jurisdictions.
+YT:
+- source: wiki-FR-fr.json
+  series_id: SIV
+  series_status: current
+  pattern: '[A-Z]{2}-[0-9]{3}-[A-Z]{2}'
+  code_group: null
+  code_position: none in serial
+  normalization: Unicode NFC; preserve separators
+  evidence_pattern: La\ Guadeloupe\ ,\ La\ Réunion\ et\ Mayotte\ sont\ des\ départements\
+    et\ des\ régions\ d’outre\-mer\ et\ utilisent\ le\ format\ SIV\ comme\ la\ métropole\
+    tout\ comme\ la\ Guyane\ et\ la\ Martinique
+  examples_pattern: (?!)
+  notes: Source explicitly applies the French SIV family to this territory. No territory-specific
+    specimen collected; same syntax across French SIV jurisdictions.
+PM:
+- source: wiki-PM-resolved.json
+  series_id: ordinary
+  series_status: current
+  pattern: SPM [0-9]{1,3} [A-Z]
+  code_group: null
+  code_position: none within territory
+  normalization: Unicode NFC; retain separators
+  evidence_pattern: Since\ 2000,\ all\ numbers\ have\ begun\ with\ the\ letters\ SPM\
+    followed\ by\ a\ serial\ number\ and\ serial\ letter
+  examples_pattern: SPM 1 A
+  notes: Whole-territory prefix; candidate ordinary syntax, no island distinction.

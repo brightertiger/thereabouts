@@ -1,655 +1,515 @@
-# Source acquisition pipeline
+# Thereabouts pipeline
 
-The four primary adapters acquire pinned raw inputs and publish validated,
-bounded Parquet for [DATA_PLAN.md](DATA_PLAN.md). Reconciliation and H3 building
-are separate stages for the primary sources. The seven additional lookup adapters
-below also produce their H3 keys during acquisition. Acquisition retains source identities, naming evidence,
-administrative roles and provenance; it does not decide which source wins.
+The `pipeline` package builds Thereabouts from frozen sources through verified
+geographic and lookup tables. All stages share configuration, a relative-path
+ledger, resource admission, and one fingerprint rule. The former `build_data`
+package has been removed. Versioned release assembly and fsspec publication are
+implemented; real pack writing awaits the Rust client merge.
+[PIPELINE_STATUS.md](PIPELINE_STATUS.md) records measured validation.
 
-The separate [`plates` source](PLATES.md) acquires vehicle registration evidence:
-a country/territory survey, geographic code associations and plate-format rules.
-It uses pinned Wikipedia revisions, Wikidata responses and reusable official
-lists. Its three Parquet kinds deliberately have no H3 keys or golden-place joins.
-Run `python -m build_data.acquire plates --data-dir data`; its raw snapshots,
-licences, partial coverage and offline regeneration procedure are documented in
-[PLATES.md](PLATES.md).
+A **stage** owns one kind of work. A **unit** is a resumable item within a stage,
+such as a source, country or H3 block. The **ledger** records a completed unit's
+input fingerprint and the size and SHA256 of every output. Unit definitions are
+retained separately from completions so that invalidating a completion schedules
+work instead of removing it from the plan.
 
-## Commands
+## Inspect an existing workspace
 
-```sh
-uv sync
-uv run python -m build_data.acquire all
-uv run python -m build_data.acquire status
-uv run python -m build_data.acquire osm_land --stage download
-uv run python -m build_data.acquire overture --stage normalize
-uv run python -m build_data.acquire geonames --stage all
-uv run python -m build_data.acquire geoboundaries
-```
-
-With `.venv` activated, `python -m build_data.acquire all` is equivalent. Source
-keys include `osm_land`, `overture`, `geonames`, `geoboundaries` and the additional
-lookups listed below; `--stage` defaults to
-`all`. Every command accepts `--data-dir /absolute/path`, defaulting to `data/`.
-The explicit source mapping in `__main__.py` runs stages sequentially.
-
-`status` reads inventories, manifest counts, file sizes and SQLite completion
-records. It reports downloaded units/bytes, normalized units/partitions/bytes,
-and rows by kind, including completed checkpoints when no final manifest exists.
-It never downloads, extracts, transforms, initializes a missing workspace or
-rehashes world datasets. “Complete” is the recorded completion state with present
-outputs of the recorded sizes; run `all` to verify full SHA256 integrity. Ordinary
-SQLite read connections may use WAL/SHM sidecars while another process runs.
-
-## Current verified snapshot
-
-| Source | Pinned release | Contribution | Rows | Licence |
-| --- | --- | --- | ---: | --- |
-| OSM land | `2026-10-01T03:37:19Z` (data date `2026-10-01T00:00:00Z`) | Split physical-land polygons, overlaps retained | 873,311 areas | ODbL 1.0; OpenStreetMap contributors |
-| Overture divisions | `2026-09-23.1` | All division roles, area variants, parents and language-tagged aliases | 1,080,670 areas; 4,688,229 places; 9,893,479 names | ODbL 1.0; Overture/OpenStreetMap and recorded upstream attribution |
-| GeoNames | `20261001T160939Z` | All P and A classes and aliases referring to retained entities | 5,775,916 places; 10,884,490 names | CC BY 4.0; GeoNames |
-| geoBoundaries | `gbOpen-a5b064cdf7dc8c3cb70b` | Every available gbOpen ADM0/ADM1, plus PHL ADM2 | 3,839 areas | Per-layer source licence, preserved verbatim |
-
-OSM contributes 1,220 partitions; Overture 1,350; GeoNames 258; geoBoundaries
-440 from 430 layer units. Overture's 1,080,667 source areas produce three extra
-rows after lossless geometry splitting. GeoNames audits six rejected alias lines;
-excluded non-P/A features and aliases of excluded entities are counted separately.
-The other three current snapshots report zero rejected features.
-
-geoBoundaries has 18 distinct publisher licence labels, including ODbL, CC BY,
-CC BY-SA, CC0/public domain and country-specific terms. See
-`raw/geoboundaries/licenses-resolved.json`, each row's `license`, and its
-`provenance.license_url`; gbOpen is not a single licence. Corrected inventory
-records and source-count discrepancies retain both the original evidence and
-corroborating unsimplified SHP/GeoJSON identities. Coverage gaps are reported.
-
-## Additional H3 lookup sources
-
-Run only these adapters when sharing the data directory with reconciliation:
+Install dependencies in this checkout, then use its interpreter. Every relative
+`data/pipeline-work/` path below belongs to this checkout, never to the existing
+workspace passed with `--root`:
 
 ```sh
-LOOKUP_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
-for source in postal codes airports unlocode timezones phone dbip; do
-  uv run --no-sync python -m build_data.acquire "$source" --data-dir "$LOOKUP_DATA"
-done
-uv run --no-sync python -m build_data.acquire status --data-dir "$LOOKUP_DATA"
-uv run --no-sync python -m build_data.acquire.lookup_verify --data-dir "$LOOKUP_DATA"
+mkdir -p data/pipeline-work/tmp
+export TMPDIR="$PWD/data/pipeline-work/tmp"
+UV_CACHE_DIR="$PWD/data/pipeline-work/cache" uv sync --all-extras --locked
+.venv/bin/python -m pipeline plan --root /path/to/existing/data
+.venv/bin/python -m pipeline status --root /path/to/existing/data
 ```
 
-Repeat the loop for a fully verified no-work run. `--stage download` and
-`--stage normalize` work separately. Downloads can run detached with stdout/stderr
-redirected to `work/<source>-extra-download.log`; normalizers use the matching
-`*-extra-normalize.log`. Each source owns its own advisory lock and shares the
-existing checkpoint ledger. Do not run `all` merely to repeat these seven sources:
-`all` also dispatches the four primary sources.
+Pipeline runtime libraries are declared in the `pipeline` dependency group;
+`dev` includes that group plus test, lint and typing tools. A runtime-only checkout
+can use `uv sync --group pipeline --no-default-groups --locked`. The development
+command above remains appropriate for running the full gate. Keep the locked
+native library versions unchanged when combining this branch with the client.
 
-The reviewed pins are in `lookup_catalog.py`; inventories freeze HTTP validators,
-byte sizes, source URLs, licensing and retrieval dates before transferring bytes.
-The one-byte GET probe verifies Range support, including DB-IP's endpoint, which
-rejects HEAD requests. Git URLs use full commits; all 226 libphonenumber files
-also verify against their Git blob hashes. DB-IP's advertised MD5 is for the
-**decompressed CSV**, not its `.gz` transport. Raw ZIP CRCs and compressed-stream
-checksums are verified. A changed remote validator fails while preserving the
-partial file; choose a new inventory deliberately rather than mixing snapshots.
-The October 2026 DB-IP pin is intentional; updating months requires a new pin.
-GeoNames country/admin references are copied from the verified existing snapshot
-when available, otherwise downloaded. Their original directories are read only.
+`plan` reads the ledger and verifies output hashes. It reports current, stale and
+new units, with `--details` explaining noncurrent units. Intentionally absent
+reconciliation outputs and offloaded raw files have a separate `absent` count.
+Their recorded hashes keep unchanged consumers current; a consumer that must run
+first requires its missing direct inputs to be materialized. Remote custody is
+recorded evidence; migration validation does not check remote objects.
 
-| Source key | Download / pinned edition | Normalized contribution | Licence |
-| --- | --- | --- | --- |
-| `postal` | GeoNames `allCountries.zip`, `GB_full.csv.zip`, `NL_full.csv.zip`, `CA_full.csv.zip`, README; 2026-10-01 | 5,036,067 postal observations | CC BY 4.0; GB also retains the Royal Mail copyright/database-right 2022 notice |
-| `codes` | DataHub `2e9d6498…` (2026-10-01), pycountry `4c6a6992…` (2026-02-18), existing GeoNames reference files | 252 countries; 5,046 ISO subdivisions; 3,865 GeoNames admin1 codes | PDDL 1.0 + GeoNames CC BY 4.0; iso-codes/pycountry LGPL 2.1 or later |
-| `airports` | OurAirports CSV, 2026-10-01 | 86,154 airports, including closed sites and heliports | Public domain |
-| `unlocode` | DataHub `b1309b37…` (2026-07-27); package identifies data as **2024.2.0** | 116,213 locations; 92,874 located | PDDL 1.0, UNECE/DataHub attribution retained |
-| `timezones` | timezone-boundary-builder **2026d with oceans**, IANA **2026e** | 444 zones; 4,567,490 compact memberships; 821 IANA rows | ODbL 1.0 / OpenStreetMap attribution; IANA tables public domain |
-| `phone` | libphonenumber `0ae309f1…` (2026-09-24), all geographic-description languages | 254 territory/service metadata entries; 427,963 prefix descriptions | Apache 2.0 |
-| `dbip` | DB-IP Lite City **2026-10**, CSV gzip, IPv4 + IPv6 | 7,786,864 ranges: 3,620,434 IPv4 + 4,166,430 IPv6 | CC BY 4.0; “IP Geolocation by DB-IP” with https://db-ip.com attribution |
+For a legacy ledger, `plan` prints **SIMULATED ADOPTION** and verifies the proposed
+migration in memory. It does not alter the saved identities or any workspace
+file. After real migration, the same command compares the saved identities with
+the current declarations and reports changes normally. `--ledger /path/to/copy`
+selects another completion database for read-only inspection; artifact paths
+still belong to `--root`.
 
-Upstream source/licence evidence: [GeoNames postal README](https://download.geonames.org/export/zip/),
-[OurAirports data](https://ourairports.com/data/),
-[DataHub country codes](https://github.com/datasets/country-codes),
-[pycountry](https://github.com/pycountry/pycountry),
-[DataHub UN/LOCODE](https://github.com/datasets/un-locode),
-[timezone-boundary-builder](https://github.com/evansiroky/timezone-boundary-builder),
-[IANA](https://www.iana.org/time-zones),
-[libphonenumber](https://github.com/google/libphonenumber),
-[DB-IP Lite](https://db-ip.com/db/download/ip-to-city-lite).
-UNECE's direct download endpoint returned HTTP 403, so UN/LOCODE uses the openly
-licensed mirror above; it is older than UNECE's advertised 2025-1 release.
-DataHub's country-code README includes its upstream standards-rights caveat and
-is retained verbatim. No licence is inferred from a GitHub repository's visibility.
+`status` reports recorded units, recorded output bytes, locally present bytes and
+missing files per ledger stage. It does not hash payloads or assert completion.
+Read-only commands open SQLite with `mode=ro&immutable=1`, create no sidecars, and
+refuse a nonempty WAL rather than silently ignore recent commits. Stop and
+checkpoint any existing writer before inspection. No command here discovers or
+contacts an upstream service.
 
-### Verified extra-source snapshot (2026-10-02 IST)
+Use `--report /path/outside/data/plan.json` to save a plan or status report. Dry-run
+migration reports default to `.cache/pipeline/migration.json` in the current
+working directory. Reports must remain outside the inspected data workspace.
 
-All seven new sources report download and normalization **complete**. Structural
-rejects are zero for each source. Every stored H3 index and point/cell agreement
-was validated during atomic Parquet publication; the final verification rechecked
-all manifest, input and output hashes. A second run performed no acquisition,
-normalization or report rewriting: **5,011 raw/normalized files** retained exactly
-the same sizes and modification times. Evidence is in
-`work/extra-lookups-rerun.json` and `work/extra-lookups-verification.json`.
+## Configuration and identity
 
-| Source | Retained raw bytes | Normalized Parquet bytes |
-| --- | ---: | ---: |
-| Postal | 44,700,758 | 188,037,213 |
-| Codes | 843,631 | 487,677 |
-| Airports | 12,734,002 | 10,212,926 |
-| UN/LOCODE | 7,297,966 | 9,191,072 |
-| Timezones | 89,226,948 | 179,887,498 |
-| Phone | 12,194,851 | 10,360,961 |
-| DB-IP | 85,827,400 | 360,258,499 |
-
-The additional sources, receipts, manifests and audits occupy **1,013,898,554
-bytes**; task logs/reports add about 0.18 MB. This excludes the pre-existing shared
-ledger and environment. The largest measured normalization RSS was **240,549,888
-bytes** (timezones). No task process remains detached after completion.
-
-Publisher comparisons: OurAirports' published 86,154-airport count matches;
-pycountry's documented 5,046 subdivisions match; all 444 timezone names in the
-release's names JSON match; DB-IP's 7,786,864 rows and decompressed CSV MD5 match.
-Postal inputs have no independent published row total: streamed counts are
-1,826,904 base rows + 900,676 CA + 1,839,678 GB + 468,809 NL. Phone normalization
-accounts for every data line in the 224 pinned geographic-prefix files plus all
-254 XML territories/services; comments are format metadata. The mirror's 116,213
-UN/LOCODE rows are accounted for, but equivalence to newer UNECE 2025-1 is unverified.
-
-Spot checks: US `10001` -> `882a100d25fffff` in Manhattan; BLR ->
-`8860169047fffff`, JFK -> `882a103b15fffff`, both matching their source coordinates.
-Bengaluru's `(12.9716,77.5946)` cell `8860145b49fffff` maps to `Asia/Kolkata`;
-New York's `(40.7128,-74.0060)` cell `882a107289fffff` maps to `America/New_York`.
-The ocean point `(0,-150)` maps to `Etc/GMT+10`. `8.8.8.8` is in
-`8.8.8.0–8.8.8.255`, US / Mountain View, cell `8828347509fffff`.
-
-**Upstream postal discrepancy:** all nine GeoNames `IN/560001` observations name
-Bengaluru but supply `(13.2257,77.575)`, cell `8860169523fffff`, about 28 km north
-of central Bengaluru. The requested central-Bengaluru spot check therefore fails.
-These original coordinates, names and accuracy values are retained, and the
-verifier records the discrepancy as a data-quality finding; it does not invent a
-correction or label that check passed. A wrong stored H3 key remains a hard error.
-
-The timezone interval audit covers all **691,776,122** valid resolution-8 cells,
-with **zero gaps** and 2,021,513 additional memberships from source overlaps.
-There are no zones without resolution-8 centers and no geometry repairs/rejects.
-These are cell-center coverage results, not a claim of exact boundary accuracy.
-
-Repository validation: `uv run --no-sync pytest` (184 passed, 7 existing skips),
-`uv run --no-sync ruff check`, `uv run --no-sync ruff format --check`, and
-`uv run --no-sync mypy`. Tests are synthetic and external networking remains
-blocked by the existing test guard.
-
-### Lookup schemas and cleaning
-
-All new kinds use the existing manifest-v2 contract and bounded Parquet writer.
-They add `lookup_schema_version=1` and `h3_reference_resolution=8` metadata;
-the original `areas`, `places`, `names` schema bytes and fingerprints are unchanged.
-Every row has the existing source identity, release, licence and JSON provenance
-fields. Provenance contains raw evidence, source and licence URLs, attribution,
-and retrieval time. Per-source `licenses-<inventory hash>.json` files are manifest
-auxiliaries. Distribute those notices with the derived tables.
-
-| Kind | Join keys and additional fields |
-| --- | --- |
-| `postal_codes` | Country + postal code + source variant; place, admin1/2/3 names/codes, original accuracy value; point/H3 fields |
-| `countries` | `country_code` alpha-2; alpha3, zero-padded ISO numeric/M49, UN region/subregion/intermediate codes and names, calling code, currency, languages, TLD, continent |
-| `subdivisions` | `(code_system, code)` distinguishes ISO-3166-2 from GeoNames-admin1; country, name/type, parent code, GeoNames ID and ASCII name where supplied |
-| `airports` | OurAirports `ident`, IATA/ICAO/GPS/local codes, type, municipality, country/region; point/H3 fields |
-| `trade_locations` | `locode`, country/location components, original function flags, subdivision, names, status, IATA, date/change/remarks; point/H3 fields |
-| `timezones` | `(tzid, part)`; valid WGS84 longitude-first WKB geometry and ocean indicator; large geometry parts split without simplification |
-| `timezone_cells` | `(h3, tzid)` membership, `h3_uint64`, actual `h3_resolution` from 0 through 8; geometry joins on `tzid` |
-| `zone_tables` | IANA `zone.tab`, `zone1970.tab`, `zonenow.tab`; zone, country associations, comments and original representative coordinates plus point/H3 fields |
-| `phone_metadata` | Territory (including non-geographical service code `001`) + country calling code; dialing prefixes, leading digits and metadata XML |
-| `phone_prefixes` | `(prefix, language)`; calling code, description, list of candidate territory codes |
-| `ip_ranges` | Inclusive start/end addresses, address family, 16-byte big-endian packed bounds (IPv4 left padded), country/region/city; point/H3 fields |
-
-Point/H3 fields are `latitude`, `longitude`, canonical lowercase `h3`,
-`h3_uint64: uint64` and `h3_resolution=8`. Unknown coordinates remain null;
-malformed coordinates retain the record, raw values and `coordinate_error` in
-provenance. They are counted separately from structural rejects. The UN/LOCODE
-snapshot has 23,339 unlocated rows, including 278 invalid coordinate strings
-(e.g. minutes >= 60). No guessed decimal-degree conversion is applied.
-DB-IP's source sentinel `ZZ` and supplied `(0,0)` remain as published, with raw
-provenance; an H3 key does not make a geolocation estimate authoritative.
-
-Postal partial and full variants coexist, preserving duplicate code/place
-observations. Consumers choose their preferred variant. GeoNames' additional
-country entries remain alongside the 249 ISO countries. Phone descriptions keep
-all 224 localized files; shared calling codes retain all candidate territories
-instead of inventing a unique country or geocoding their text. Prefixes have no
-H3 field; use longest-prefix matching and language selection in a later linker.
-
-Timezone cells represent **resolution-8 cell-center membership** in the source
-polygons. Interiors are stored as compacted ancestors; only boundary regions need
-fine cells. H3 logical descendants are not geometrically contained in the parent
-hexagon: the implementation uses conservative spherical child envelopes based
-on H3's maximum-edge bounds, then tests the original polygon at the finest level.
-It handles holes, poles and longitude wrap, and compacts complete sibling sets,
-including pentagons. Tests compare against exhaustive fine-cell membership.
-To look up a resolution-8 cell, compute its nine ancestors (resolutions 0..8) and
-join their keys to `timezone_cells`; no geometry test or global expansion is needed.
-This uses the builder's full historical zone IDs, not its merged `now` variant.
-Ocean `Etc/GMT±N` polygons are included as supplied (IANA's sign convention is
-reversed); source overlaps remain potentially multiple results. Near a boundary,
-a cell's center may differ from an arbitrary point in that cell. Geometry remains
-available for later exact-boundary handling. IANA table dates can be newer than
-the boundary release and do not silently relabel the polygons.
-
-Text normalization checkpoints at 10,000 input records and timezones checkpoint
-per zone. No global dataframe or decompressed postal/IP file is built. All seven
-sources together have an additional 6 GB disk admission cap. The original global
-45 GB workspace cap and 20 GB free-space reserve still apply. Row, batch and file
-bounds remain 8/32/128 MB. Temporary timezone shapefiles are removed only after
-manifest verification; a verified rerun skips extraction and transformation.
-`lookup_verify` validates manifests, source accounting and named spot checks,
-then measures global timezone coverage with dense descendant-rank intervals,
-without expanding hundreds of millions of fine cells. Its report is
-`work/extra-lookups-verification.json`.
-
-## Files and module responsibilities
-
-```text
-data/
-  raw/<source>/inventory.json        # frozen source pins and retrieval evidence
-  raw/<source>/<snapshot>/...        # original archives/Parquet, receipts, notices
-  normalized/<source>/manifest.json  # sole current output list, committed in ledger
-  normalized/<source>/<kind>/<inputs_hash>/<sha256(unit)>-00000.parquet
-  normalized/<source>/audits/...     # per-unit verification (OSM audits sit by parts)
-  normalized/<source>/verification-<hash>.json  # immutable final verification
-  normalized/<source>/verification.json         # latest report for inspection
-  work/ledger.sqlite3               # shared WAL SQLite checkpoints
-  work/<source>/...                 # expendable extraction/index work, retained audits
-  work/*.log, work/*report*.json     # logs and verification evidence
-```
-
-Some sources have additional raw layouts: geoBoundaries stores full-commit ZIPs,
-per-layer pins and `inventory-resolved.json`; GeoNames uses per-file pin directories
-inside its dated snapshot. OSM retains verified extracted SHP/SHX/DBF/PRJ and the
-publisher README under `raw/`. No cleanup step removes raw files, even superseded
-GeoNames partial downloads. Receipts (`*.download.json`) retain validators and hashes.
-
-The source entry modules acquire data and dispatch normalization. `*_reader.py`
-reads source formats and builds source-specific access structures; `*_rows.py`
-(and `overture_areas.py`) maps records; `*_units.py` transforms bounded units;
-`*_normalize.py` coordinates checkpoints; `*_report.py` checks source accounting.
-Settings retain the original builder/policy identifiers and fingerprint inputs.
-The shared modules provide:
-
-- `runtime.py`: source ownership, geometry-worker lock, disk budgets and RSS.
-- `geometry.py`: WGS84 bounds, polygon validation, explicit repair policies and
-  component/bisection splitting without simplification.
-- `writer.py`, `parquet.py`, `schemas.py`: bounded batching, atomic validated
-  Parquet publication and the fixed Arrow contract.
-- `artifacts.py`, `manifests.py`, `lifecycle.py`: immutable verification reports,
-  one manifest format, verified resume, pruning and intermediate cleanup.
-- `ledger.py`, `io.py`, `download.py`: concurrent checkpoints, durable file
-  publication and pinned/resumable HTTP.
-
-There is no adapter base class or registration framework.
-
-## Manifest contract and the next stage
-
-Every source writes **manifest version 2**, independently of **Arrow schema
-version 1**. Fields are identical across sources:
-
-```json
-{
-  "manifest_version": 2,
-  "schema_version": "1",
-  "source": "overture",
-  "source_release": "2026-09-23.1",
-  "configuration": {"builder": "overture-normalize-1", "policy": "..."},
-  "inventory": {"path": "/absolute/.../inventory.json", "size": 123, "sha256": "..."},
-  "inputs": [{"path": "/absolute/.../raw.parquet", "size": 123, "sha256": "..."}],
-  "units": [{"stage": "overture.normalize", "unit_id": "object#row-group=0", "inputs_hash": "..."}],
-  "partitions": [{"path": "/absolute/.../part.parquet", "kind": "areas", "rows": 100, "size": 123, "sha256": "..."}],
-  "rows": {"areas": 100},
-  "bytes": 123,
-  "auxiliary": [{"path": "/absolute/.../verification-<hash>.json", "size": 123, "sha256": "..."}]
-}
-```
-
-The example shortens hashes/configuration and uses illustrative sizes. `inputs`
-are retained raw dependencies; `auxiliary` contains immutable reports, rejection
-audits and required code maps. Expendable intermediate indexes and large TSVs
-are not dependencies of completed normalized output. Paths are absolute; moving
-an existing workspace requires deliberately rebasing manifests and checkpoint
-paths, or rebuilding in the new location.
-
-Consumers must use this shared function, exported from `build_data.acquire`:
-
-```python
-from build_data.acquire import Workspace, current_partitions
-
-for path in current_partitions(Workspace(), "overture", "areas"):
-    # Open one bounded file, or iterate its row groups.
-    ...
-```
-
-`current_partitions(workspace, source, kind) -> tuple[Path, ...]` verifies the
-manifest commit, frozen inventory/release, raw dependencies, auxiliary hashes,
-unit fingerprints, output hashes and row counts before returning any paths.
-Unknown kinds, missing/corrupt files or uncommitted manifests fail explicitly.
-Never glob a normalized directory: an interrupted run can leave unpublished
-files or files from older fingerprints.
-
-Publishing verifies every unit and its Parquet schema/footer before atomically
-writing the manifest, then commits its hash as `<source>.manifest/current` in the
-ledger. A crash between these steps leaves an uncommitted manifest, which readers
-reject. Only after that verification does pruning remove unlisted Parquet and
-abandoned normalized `.part` files. Verification reports and raw files remain.
-Legacy manifests take the normal per-unit verification path once; their existing
-fingerprints and Parquet are reused, and their metadata becomes version 2.
-
-## Resume, failures and cleanup
-
-Each source has one advisory lock covering both download and normalization.
-Polygon normalizers also hold the shared geometry lock; a competing owner fails
-clearly. SQLite initialization retries only BUSY/LOCKED errors with a bounded
-30-second deadline, using a fresh connection on retry. Transactions use WAL,
-FULL synchronous mode and the same busy timeout. Separate processes can commit
-different units concurrently; no source carries a private ledger retry loop.
-
-Downloads freeze URLs, release, size, ETag/Last-Modified, retrieval time and
-licences. SHA256s identify locally verified bytes; absent publisher checksums,
-they do not establish publisher authentication. ZIP CRCs, Parquet footers and
-source counts provide additional integrity checks. Downloads preserve partial
-bodies and use Range/If-Range to resume; changed validators cannot append bytes
-from another snapshot. GeoNames can pin a new path after daily rollover while
-preserving superseded partial evidence. Other pin changes fail for review.
-
-Unit identities remain source-specific: OSM bounded SHX spatial buckets,
-Overture object/row-group pairs, GeoNames complete-line byte intervals, and
-geoBoundaries country/level layers. Fingerprints retain source hashes, versions,
-policy and relevant schema/library/partition settings. A unit is complete only
-after every output is validated, atomically published, fsynced and hashed into
-the ledger. Every rejection or repair is counted in the unit and final reports;
-writer failures fail the unit instead of being misclassified as source rejects.
-
-A verified current manifest with matching configuration skips extraction,
-indexing and transformation as well as partition writing. Completed downloads
-reuse that manifest's verified raw dependency records. Repeating `all` still
-performs integrity I/O, but does not re-download, normalize or rewrite reports.
-If an output is corrupt, only unfinished/corrupt units are transformed; deleted
-access indexes or extracted text may need rebuilding to access those units.
-A configuration/input change resumes using the original per-unit fingerprints,
-so unaffected work remains reusable. An interrupted run never publishes a
-partial new manifest or prunes the previous current output.
-
-After successful manifest verification, cleanup removes GeoNames' large extracted
-`allCountries.txt` and `alternateNamesV2.txt` plus its lookup database, Overture's
-entity database, and geoBoundaries' extracted layer shapes. Small code maps,
-extraction reports, rejection JSONL, unit reports, logs and the ledger remain.
-OSM's spatial access index is retained as a verified auxiliary artifact.
-
-## Schema and resource bounds
-
-`SCHEMAS["areas"|"places"|"names"]` fixes ordered fields, types and nullability.
-All rows carry source-scoped opaque string IDs, `source_release`, `license`, and
-JSON `provenance` with nonempty `source_url`, `license_url`, `attribution`.
-Provenance preserves raw names/attributes, hierarchy, upstream evidence,
-retrieval/represented dates, repair/split details and original identities.
-
-Areas are valid, nonempty 2D Polygon/MultiPolygon WKB in EPSG:4326, x/longitude
-first, with actual finite xmin/ymin/xmax/ymax bounds. Splits preserve source and
-entity IDs and carry a part ordinal. Overture names join through `entity_id`,
-not the division-area record ID. Preserve territorial/land variants and source
-roles. OSM overlapping split edges are not automatically coastline; reconciliation
-must remove interior split boundaries and handle seam/polar closure separately.
-
-Unknown optional values are null. Names use NFC and normalized whitespace;
-English requires explicit language evidence, never an ASCII inference. Preserve
-alias language tags, flags and raw validity intervals. Country codes use ISO
-alpha-2 plus XK; GeoNames admin codes remain source codes, not ISO subdivisions.
-Population zero differs from unknown. GeoNames P rows are settlements; A rows
-retain administrative roles. Source eligibility, global uniqueness, foreign keys
-and hierarchy checks are performed by adapters and reported separately from
-structural schema validation.
-
-Every adapter buffers rows through `PartitionWriter`, which preserves the original
-source-specific batching targets and delegates to `write_partition`. Validation
-runs before ledger completion and before atomic Parquet replacement. Hard limits:
-8 MB per row, 32 MB per batch/row group, and 128 MB per file on disk, summed
-uncompressed row-group bytes, and decoded Arrow data. Parquet uses zstd with
-plain values; dictionary/delta encodings are rejected before decoding. Large
-geometries are split by components and bounded bbox intersections, preserving
-holes and area; oversized raw shapes that cannot be safely read are audited.
-
-Admission checks preserve 12 GB free and cap the whole workspace at 60 GB
-(decimal). Source caps are OSM 8 GB, Overture 25 GB, GeoNames 10 GB and
-geoBoundaries 12 GB. Run world stages sequentially as the CLI does. RSS/timing are
-recorded; admission checks are not reservations or a process-tree memory limit.
-There is no global GeoDataFrame or whole-dataset Parquet read.
-
-## Regenerate and verify
-
-From an empty destination:
+Structured defaults are merged with `config/sources/*.yaml`, `config/engines.yaml`, `config/release.yaml`, then
+`config/pipeline.yaml`, an optional `config/profiles/<name>.yaml`, and `key=value`
+overrides. Each source declares an `options_schema` dataclass, loaded without importing
+its normalizer. Unknown adapter options fail during configuration loading:
 
 ```sh
-uv sync
-uv run python -m build_data.acquire all --data-dir /path/to/new-data
-uv run python -m build_data.acquire status --data-dir /path/to/new-data
-uv run python -m build_data.acquire all --data-dir /path/to/new-data  # verified no-op
+.venv/bin/python -m pipeline plan --profile laptop \
+  --root /path/to/existing/data resources.workers=2
 ```
 
-Use a fresh directory to keep existing downloads safe. Overture, GeoNames and
-geoBoundaries discover and freeze their inventories on their first download;
-new upstream releases can therefore produce different counts. OSM has explicit
-release/size/validator constants in `osm_land.py`: if its mutable service no longer
-serves that pin, acquisition fails rather than accepting changed data. Choosing a
-new OSM snapshot requires deliberately updating those pins. Exact reproduction of
-the table above requires preserving its pinned raw snapshots and inventories;
-rerunning normalization reuses them offline. Do not erase hours of downloads to
-reset checkpoints. Semantic changes require an intentional builder/policy bump.
+Unknown keys, invalid types, invalid paths, missing stage packages, dependency
+cycles and invalid resource limits are errors. The schema lives in
+`pipeline/config`. Only the workspace root can be absolute; its configured
+subdirectories and persisted artifact paths are relative to it. Paths cannot
+escape through `..` or a symlink. Read-time symlink containment checks do not
+replace persisted logical paths with resolved machine paths.
 
-Repository checks:
+Each stage declares production entry modules, configuration sections and
+native-library dependencies. Its identity hashes the transitive closure of local
+Python imports, including shared helpers and package initializers. Runtime
+implementation, the stage contract and the configuration schema are excluded.
+The source stages share only their controller identity; each source unit adds
+its own adapter import closure, settings, pin and policy-file hashes. A pin or
+adapter edit therefore invalidates that source and consumers of its outputs. Native versions must match `uv.lock`; Shapely's GEOS version is also
+included. Stages that use SQLite also hash its actual runtime library version,
+because SQLite ships with Python rather than as a lockfile distribution. The
+committed `.python-version` selects Python 3.12.8, used by the retained SQLite
+artifacts; reproduction was measured with SQLite 3.47.1. Tests, fixtures, documentation and client source files are excluded.
+The explicit `thereabouts.format.CELL_FORMAT_VERSION` participates where the cell
+codec matters. Adding that constant does not change the encoding.
+
+A unit hashes that identity, its parameters and the recorded hashes of the
+upstream outputs it reads. A code change may make a consumer provisionally stale
+in a plan; if rebuilding the upstream unit produces identical bytes, execution
+can still skip that consumer. Migration retains original input digests as
+adoption evidence while source/engine-specific discovery is being ported.
+
+## Sources and frozen versions
+
+Each `config/sources/<name>.yaml` declares a name, adapter module, schema family,
+upstream, attribution, byte limits, and typed normalization options. Adding a
+source does not require editing a source-name list. The thirteen retained sources
+are enabled. `plate_country` is declared but disabled because the retained
+workspace has no build or payload inventory for it; enabling it requires an
+explicit reviewed pin proposal.
+
+`pins.lock` records exact input names, sizes, SHA256, upstream metadata, and the
+fingerprint of the inventory used by the retained source manifest. It stores no
+duplicate inventory document. Download inventories are reconstructed from those
+file records and metadata. Large plate policies live in
+`config/policies/plates/`, outside the structured configuration graph, and are
+hashed only into the units that use them. An inventory found later under
+the same raw directory is not assumed to describe the built output. In particular,
+the committed geoBoundaries lock uses the manifest's resolved inventory.
 
 ```sh
-uv run pytest
-uv run ruff check
-uv run ruff format --check
-uv run mypy
+# Read-only: compare the lock with an already-built workspace's exact manifests.
+.venv/bin/python -m pipeline pins check --from-workspace /path/to/existing/data
+# Resolve upstream and write a candidate lock plus a file-level diff.
+.venv/bin/python -m pipeline pins update ghsl
+# Review .cache/pipeline/pins-proposal.yaml and pins-proposal.diff.json.
+# Accept those exact bytes without contacting upstream again.
+.venv/bin/python -m pipeline pins update ghsl \
+  --from-file .cache/pipeline/pins-proposal.yaml --accept
+# Bootstrap from a built workspace's manifests, without upstream access.
+.venv/bin/python -m pipeline pins update \
+  --from-workspace /path/to/existing/data --accept
 ```
 
-Mypy is strict for the whole repository. Tests use synthetic inputs and loopback
-HTTP servers only. The root autouse network guard blocks external DNS, TCP
-connect/connect_ex and UDP destinations, including the real OSM download URL;
-there is no acquisition-specific override that enables outside networking.
+Only `pins update` resolves upstream versions. Without `--accept`, it writes a
+proposal and a JSON diff while leaving `pins.lock` unchanged. `--proposal PATH`
+selects the candidate output; its companion diff uses `.diff.json`. Inspect the
+candidate before accepting it with `--from-file ... --accept`; running a fresh
+upstream proposal with `--accept` accepts freshly resolved bytes instead.
+An unchanged inspection preserves the previous pin, including its timestamp.
 
-## Raw offload and restore
+Adapters expose `propose(settings)`. Catalogs in `config/proposals/` declare file
+selections, GitHub commit/release selectors, IANA versions and Overture listing
+prefixes. geoBoundaries resolves every selected layer to a complete commit and
+repairs contradictory ALL records through the country's API. GeoNames and OSM
+release dates come from publisher Last-Modified evidence. GHSL's reviewed
+release URL is explicit in its catalog; its checksum is recomputed. Plate URLs
+remain the reviewed evidence set in the plate policy, including frozen Wikipedia
+revisions; changing that set requires policy review. The disabled plate-country
+catalog is empty until the owner selects evidence URLs.
 
-Raw custody is explicit and independent of normalized completion. The acquisition
-CLI supports a non-destructive transfer and an already-verified-transfer record:
+Proposals HEAD each payload, then stream it to SHA256 under the configured byte
+and retry limits, without saving payloads. This can read the full upstream source
+size where the publisher has no SHA256; the later download stage still verifies
+and mirrors the accepted pin. Conditional requests and size/ETag checks reject
+an upstream object changing during inspection. Tests use only loopback HTTP.
+No real upstream proposal has been exercised in this implementation session.
+`pins check` without `--from-workspace` checks lock structure and hashes only;
+it does not verify upstream availability or remote mirror custody.
+
+On a separate writable workspace, `run --through normalize` downloads every
+enabled source and publishes its normalized manifest. Configure
+`storage.gcs_raw=gs://BUCKET/raw` for future production execution; local tests use
+`storage.gcs_raw=file:///absolute/path/to/a/mirror` or `memory://mirror`.
+The fsspec GCS driver is pinned in `uv.lock`. No cloud operation was used to test
+this implementation.
+
+Downloads reuse verified local files, then try the mirror, then the frozen
+upstream URL. Each payload is copied to `sha256/<checksum>` in the mirror and
+rehashed before the download unit can complete. Historical offload prefixes are
+retained as fallback restore locations, with their original custody evidence;
+restored bytes must match the recorded size and SHA256. Adoption itself does
+not contact these locations. Interrupted downloads resume at file boundaries,
+not by appending an unverified HTTP response to a partial file.
+
+Normalize streams bounded partitions and retains source identities, licences,
+and rejection evidence. GeoNames extraction/index and Overture parent-index
+caches are regenerated before row conversion and remain tracked normalize
+outputs. Plate parsing rules now live in YAML. PDF evidence requires the
+configured Poppler `pdftotext` version (25.11.0 was measured on this laptop);
+this is a prerequisite for future PDF normalization, not evidence of the version
+used by every historical build.
+
+## Geographic stages
+
+Each geographic stage supplies its own parameter callback. Shared runtime code
+only applies the returned policy, reservation and discovery-refresh decision.
+`config/engines.yaml` names the land, urban-centre, registration and plate-country
+source roles; source `kind` selects place/area inventory and lookup behavior.
+Changing a source's name does not change those decisions. Unknown role references
+and incompatible source kinds fail configuration loading before workspace writes.
+
+Reconciliation extracts and links each country, builds canonical entities and
+land, then verifies country quality. Cells index resolution-3 blocks, derive
+compact resolution-8 answers, and retain an immutable base manifest. Cities
+build canonical city indexes and mappings; evaluate checks the pilot and its
+policy-bound review. Normalize-cells applies city semantics and checks stored
+output. Lookups preserve every source row while adding code or spatial links,
+then enforce cross-table references and publish the final manifest.
 
 ```sh
-PIPELINE_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
-uv run --no-sync python -m build_data.acquire offload \
-  --sources osm_land overture geonames geoboundaries \
-  --remote gs://pyofflinegeocoder-summer-sector-488705-m8/raw \
-  --record-existing --data-dir "$PIPELINE_DATA"
-uv run --no-sync python -m build_data.acquire status --data-dir "$PIPELINE_DATA"
-uv run --no-sync python -m build_data.acquire restore \
-  --sources overture --data-dir "$PIPELINE_DATA"
+# Use a separate writable workspace with reviewed pins and local inputs/mirror.
+.venv/bin/python -m pipeline plan --root /path/to/new/workspace
+.venv/bin/python -m pipeline run --root /path/to/new/workspace --through reconcile
+.venv/bin/python -m pipeline run --root /path/to/new/workspace --through lookups
 ```
 
-`offload` without `--record-existing` first verifies the local snapshot and runs
-`gcloud storage rsync --recursive <raw/source> <remote/source>`. Neither command
-deletes files. `--record-existing` records the operator's prior verification of
-remote file count and bytes; it does not pretend to have rechecked remote hashes.
-The source-scoped `work/offloaded/<source>.json` binds custody to the exact current
-normalized manifest and records the destination and evidence. The four original
-sources were recorded this way after their verified external transfer.
+These are future build commands, never commands run against the protected data
+for this refactor. The default selection is worldwide. For a small development
+workspace, `engines.countries=[ZZ] engines.blocks=[83754efffffffff]` selects units;
+every country required by a selected block must be included. Full pilot
+acceptance still requires all configured pilot countries. A newly built block
+index refreshes discovery during the same run. Corruption invalidates its unit;
+unchanged verified outputs are skipped. Missing adopted inputs regenerate before
+a consumer actually runs, including the deliberately deleted source caches and
+reconciliation outputs.
 
-`status` reports matching records as **offloaded**. `all`, or a source CLI command,
-verifies and reuses its completed normalized outputs without downloading those
-raw files. A missing/corrupt normalized output fails explicitly and requires
-restoration before rebuilding. `current_partitions` still verifies local inputs,
-auxiliary evidence, normalized checkpoints and hashes; only missing raw files
-covered by the exact offload record are allowed. Present but corrupt raw files
-are never excused. A changed manifest does not inherit a stale offload exemption.
+`config/policies/reconcile.yaml` holds reconciliation conventions. City policy
+is `config/policies/cities/common.yaml` plus country files. Their exact resolved
+canonical fingerprints match the previous JSON; tests cover every two-letter
+country projection. `config/reviews/cities-pilot.yaml` retains the historical
+owner approval and two precisely scoped boundary exceptions. Editing the policy
+requires a matching reviewed fingerprint. Review validation occurs before any
+writable workspace opens. Evaluation fixtures live under `eval/`, outside build
+identities; changing a fixture alone does not regenerate geographic data.
+Evaluation is an execution prerequisite for normalization: a failed gate stops
+the run. Its receipt is not consumed as geographic data, so a changed review
+alone does not rebuild unaffected countries. Country units hash their resolved
+common and country policy; blocks hash the policies of their contributing countries.
 
-`restore` runs `gcloud storage rsync --recursive <recorded-remote> <raw/source>`,
-then verifies every pinned raw dependency and normalized artifact before clearing
-the offloaded marker. Interrupted/failed restores leave that marker intact.
-Existing resource guards still apply to restore admission. Keep small inventories,
-receipts and licence notices available locally for status and provenance.
+The optional `plate_country` stage derives syntax, priors, coverage and an
+inference bundle from normalized pinned evidence. It has zero units while its
+source is disabled. Its resolver preserves ambiguity and verifies bundle/table
+checksums before use. The retained workspace has no reviewed plate-country raw
+inventory, so only synthetic inputs exercise this engine here.
 
-## Golden H3 dataset
+New outputs use configured `reconciled/`, `cities/`, `cells/` and `work/` paths,
+with immutable input-hash subdirectories. `cells/base/current.json` points to the
+base manifest; `cells/current.json` points to the verified normalized manifest.
+Every artifact record is relative to the workspace root. The release schema and
+worked reads are in [DATASET_README.md](DATASET_README.md). The pack stage calls the client-owned
+`thereabouts._core.write_pack(dataset_dir, family, output_dir, options)` binding.
+The old pipeline pack format and exporters have been removed; real pack builds
+require the Rust client branch to merge.
 
-This is the lower-level base-cell stage. Use the full controller documented
-below for the current normalized dataset. The standalone commands here target
-a separate workspace with acquired/reconciled inputs, not an active v2 symlink.
-
-`build_data.golden` consumes canonical country checkpoints as they become ready,
-without waiting for a new reconciled world manifest. It exports canonical places,
-timezone memberships and code/phone links first. It then builds resolution-3 H3
-blocks whose actual r8 descendant envelopes touch only completed countries, using
-the reconciled lookup and conservative certificates. Postal, airport, trade and
-IP rows join their existing r8 key through the resulting compact cell table.
-Pending, unlocated, ineligible and unresolved rows remain distinguishable.
+The old controller-specific tests were retired with their controllers. Their
+shared-runtime replacements and the preserved source/engine decisions are listed
+in [PIPELINE_TEST_COVERAGE.md](PIPELINE_TEST_COVERAGE.md). To reproduce the bounded
+read-only pilot proof, keep scratch in this checkout:
 
 ```sh
-GOLDEN_DATA=/path/to/base-stage-data
-uv run --no-sync python -m build_data.golden pilot --countries BE NL LU CA --workers 2 --data-dir "$GOLDEN_DATA"
-uv run --no-sync python -m build_data.golden run --workers 2 --watch --data-dir "$GOLDEN_DATA"
-uv run --no-sync python -m build_data.golden status --data-dir "$GOLDEN_DATA"
+THEREABOUTS_PIPELINE_DATA=/path/to/existing/data TMPDIR="$PWD/data/pipeline-work/tmp" \
+  .venv/bin/pytest tests/pipeline/test_pilot_equivalence.py -q \
+  --basetemp data/pipeline-work/pilot-proof
 ```
 
-Outputs are Parquet beneath `golden/`, with `manifest.json`, `quality.json`,
-`DATA_LICENSES.md` and `DATASET_CARD.md`. The shared ledger owns `golden.*`
-checkpoints; `work/golden/run.json` records progress. Use the manifest's completion
-flag and table inventory, never an unrestricted glob. The full layout, all columns,
-certificate argument, checks and resumption commands are in
-[GOLDEN_DATASET.md](GOLDEN_DATASET.md). No new raw downloads are required.
+This reads existing normalized sources, reconstructs only Malaysia and the
+complete land features intersecting one block's search window, writes locally,
+and compares both radius settings with the retained pilot Parquets. It does not
+execute a stage against the existing workspace.
 
+## Migration and its boundary
 
-### Disk-neutral golden v1 replacement
-
-The v1 reconciliation rebuild replaces one verified country at a time and deletes
-that country's superseded SQLite file and extract/link intermediates immediately.
-The acquisition manifests and normalized sources remain immutable. The old
-reconciled manifest is archived under `work/reconcile/history/`; the active
-manifest is explicitly incomplete while the new generation builds. A verified
-country resumes without reconstructing its retired intermediates.
-
-The original v1 results and retirement mechanism are historical records in
-[GOLDEN_V1.md](GOLDEN_V1.md). The current rebuild controller below reuses verified
-reconciliation and base-cell checkpoints; city normalization never retires or
-modifies reconciled inputs.
-
-## Acquired sources to normalized golden data
-
-The 2026-10-02 world v2 run is verified and locally active. `data/golden` resolves
-to `data/golden-v2`; the retained v1 directory is `data/golden-v1`. Full measured
-results and limitations are in [GOLDEN_V2.md](GOLDEN_V2.md).
-
-`uv run --no-sync python -m build_data.acquire ghsl` acquires the pinned
-GHS-UCDB R2024A V1.2 general-characteristics ZIP (6,902,089 bytes, SHA256
-`bc879d82320504f89df2041b7936221c8239cd808abe93980493aed062b4f3d6`). It validates
-the ZIP and GeoPackage, converts the declared Mollweide geometry to WGS84, and
-publishes 11,422 `areas` rows through the common bounded writer, ledger and
-manifest-v2 contract. Licence: CC BY 4.0, European Commission/JRC; the manifest
-retains attribution and the GHSL reference publication. This is a built-up urban
-extent source, not municipal boundaries. See the [producer overview](https://human-settlement.emergency.copernicus.eu/ucdb2024Overview.php)
-and [attribution requirements](https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php).
-
-The single controller is `build_data.rebuild_golden`. Its chain is acquisition →
-reconciliation → base cells (`build_data.golden`) → canonical cities/maps
-(`build_data.cities`) → normalized cells, joins and verification
-(`build_data.normalize_cells`) → optional local activation. Packages name jobs;
-`golden-1` and `golden-2` are dataset schemas.
+First review a dry run:
 
 ```sh
-uv sync --frozen
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
-# After examining the generated pilot, bind the reasoned decision to its hashes:
-uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
-  --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
-nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --through world > data/work/v2-world.log 2>&1 < /dev/null &
+.venv/bin/python -m pipeline migrate --dry-run --root /path/to/existing/data \
+  --report .cache/pipeline/migration.json
 ```
 
-The committed `docs/city-normalization-pilot-review.json` records the examined
-exceptions for this pinned snapshot. It is evaluation evidence, never an input
-to city assignment. The review command binds it to freshly verified artifacts
-and rejects changed loss counts or destinations; inspect new source editions
-before issuing a new receipt.
+The report identifies every retained/dropped legacy row, path relocation, JSON
+rewrite and proposed JSON evidence copy, with before/after checksums. The mapping
+rules are in `pipeline/migration/mapping.py`; unrecognized stages, conflicting
+artifacts and missing/corrupt outputs stop adoption. The migration never repairs
+a discrepancy by rebuilding.
 
-Use the same controller command to resume any interrupted stage. From an empty
-workspace it acquires all sources, runs the reconciliation pilot and world,
-builds base cells, then evaluates the city pilot. Exact source-date reproduction
-requires the preserved acquired snapshots; fresh discovery may retrieve newer
-GeoNames bytes. Existing verified acquisition/reconciliation checkpoints are reused
-without restoring offloaded raw files. `--sample-gate` can additionally require
-the historical reconciliation improvement gate.
+Base-cell records are matched to the selected immutable base by block/country,
+original table identity and content hash. They cannot be verified through an
+active `golden` symlink that now points at normalized cells. Superseded pilot,
+normalization and lookup receipts are dropped; the old ledger remains backed up.
+GeoNames extraction/index and Overture index outputs remain owned by normalize.
+Present bytes must re-verify. Deliberately deleted caches are adopted as absent
+only under `work/geonames/` and `work/overture/`, tied to the matching normalize
+source. A future normalize rebuild must regenerate those caches first. Reconciliation
+absence is allowed only under `reconciled/` and `work/reconcile/`; those units
+retain recorded hashes and `outputs_absent`.
+Missing raw payloads require an offload receipt bound to the exact source
+manifest. Present corrupt files are never excused by either mechanism.
 
-The base stage's complete tables are verified against reconciled inputs and cell
-code, then hard-linked into `base_cells/<digest>/`. `base_cells/current.json`
-points to that committed manifest. It is an explicit immutable dependency, not
-an assumption that the active `golden/` directory happens to contain v1.
-Normalization builds `golden-v2/` beside the active dataset. Country indexes/maps,
-cell blocks, refreshed joins and country quality each have input/code/policy
-checkpoints. The base snapshot's hard links add no duplicate payload bytes.
+Six plate-source auxiliary JSON files originally lived in the repository. The
+migration verifies their original recorded hashes, proposes byte-identical
+copies under `raw/plates/configuration/<sha256>/`, and makes their references
+portable. JSON repairs preserve indentation, separators, key order and unchanged
+tokens, and update file-record hashes only when the original bytes match;
+a historical review whose hashes do not match current evidence is not silently
+rebound to that evidence. Parquet and SQLite data payloads are never rewritten.
 
-Logs and controller state are under `work/rebuild/`; world progress also lives in
-`work/v2-run.json`. `--through world` stops only after final stored-cell quality and
-integrity verification. Examined individual boundary losses can be supplied with
-`--review`; each exception must match the exact city, count and destinations.
-`--through publish` activates the verified result locally through a stable symlink
-and retains the prior directory as `golden-v1/`. No external publication is done.
-See [GOLDEN_V2.md](GOLDEN_V2.md) for measured results, gate receipts, all-boundaries
-checks, split-isolated scoring, and known limitations.
-
-Final boundary reviews are bound to the incomplete output manifest, including
-its absolute artifact paths. A clean machine must bind its own receipt after
-examining `golden-v2/quality.json`; it cannot reuse another machine's manifest
-fingerprint. For the same pinned sources, the committed pilot review supplies
-the two already-examined source-overlap exceptions. The final verifier checks
-their boundary IDs, counts and destinations against the new report:
+The reviewer, after reviewing the proposed changes, applies the combined steps:
 
 ```sh
-uv run --no-sync python - <<'PY'
-from pathlib import Path
-from build_data.acquire.artifacts import read_json
-from build_data.acquire.io import fingerprint, write_json
-
-output = Path("data/golden-v2")
-notes = read_json(Path("docs/city-normalization-pilot-review.json"))
-write_json(Path("data/work/v2-world-review.json"), {
-    "manifest": fingerprint(read_json(output / "manifest.json")),
-    "boundary_exceptions": notes["boundary_exceptions"],
-})
-PY
-uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
-  --through world --review data/work/v2-world-review.json
+.venv/bin/python -m pipeline migrate --root /path/to/existing/data \
+  --report .cache/pipeline/migration-applied.json
+.venv/bin/python -m pipeline migrate check --root /path/to/existing/data
+.venv/bin/python -m pipeline plan --root /path/to/existing/data
 ```
 
-This receipt records a review; it changes no city assignment. If source editions
-produce additional losses, inspect them before adding any further exception.
+`migrate paths` performs the optional path-only step; `migrate adopt` also performs
+any remaining path changes. Prefer the combined command. A path-only ledger is
+still legacy and its printed stage counts describe the subsequent adoption.
+`migrate check` is read-only. Applying the migration again checks the existing
+adoption and makes no further workspace changes.
 
-### Rebuilding for a content-neutral rename
+When a ported implementation replaces a retained stage, run
+`migrate handover --dry-run` against its adopted ledger. It requires identical
+independently discovered unit keys and re-verifies every present output. Only
+identity, unit parameters and input hash may change; outputs and completion
+history stay intact. A real `migrate handover` applies that one-time proposal.
+The command refuses a second identity change after handover. Against a legacy
+ledger, its dry run first simulates adoption; it cannot apply a handover until
+adoption has actually been applied. Simulated zero-stale results check mapping
+and hashes only, not engine equivalence.
 
-The controller accepts `--through base` to stop after a newly guarded base is
-built and snapshotted, before pilot or evaluation work. Record logical contents
-with `python -m build_data.digest_golden` before rebuilding, and compare the
-regenerated base with `--compare` before continuing to the normalized world.
-Use a separate `--output` directory and preserve the old datasets until both
-comparisons and ordinary verification succeed.
+Apply and recovery first check write permission on every target directory and
+print exact commands to enable and restore it. They make no workspace changes
+when permission is missing. An existing backup must match the original ledger
+hash, including across separate paths/adopt operations.
 
-For a controlled rebuild with unchanged city policy, inputs and normalization
-code, `--reuse-development` retains the existing `data/work/v2-dev.json` verbatim
-and skips development scoring. It requires that report to exist; it does not
-skip pilot measurements, stored probe blocks, review gates or world verification.
-Use this option on every controller invocation after `--through base` when the
-completed evaluation must not be scored again. The retained report is historical
-evidence, not a newly executed score. The holdout is never a controller stage.
+The apply operation saves `work/ledger.pre-migration.sqlite3`, journals the
+original JSON metadata, publishes changed JSON atomically, and replaces the
+prepared ledger last. A subsequent apply recovers an interrupted transaction
+before preparing another one. Recovery refuses metadata that was manually
+changed after interruption. Stop old builders before migrating, and do not run
+them against an adopted workspace. Removing the old checkout-name symlink is a
+separate reviewer action after migration verification; the migration does not
+remove it because it lies outside the worktree.
 
-Acquisition configurations have separate schema dependencies: original geographic
-sources use the area/place/name contracts; existing lookups use their lookup
-contracts; plates uses its own three contracts. Adding a standalone source does
-not invalidate unrelated acquired data. Changes to a family's existing contracts
-still invalidate that family's checkpoints.
+The real workspace is read-only for migration implementation and validation.
+The opt-in world test applies migration to a copied ledger and copied JSON
+inside this worktree, then checks that ledger using the original payloads as read-only evidence. It
+copies no Parquet tree and creates no hard links.
 
-The digest command sorts the same SHA256 row values in 250,000-row disk runs,
-with at most 64 input runs per merge. This keeps scratch access sequential on
-small machines; schema descriptors, row encoding, duplicate counts and the final
-hash format are unchanged from its original SQLite sorter. Scratch is disposable
-and separate from the pipeline ledger. Each logical table's scratch is removed
-after its digest completes.
+## Execution and resource limits
+
+The runtime runner implements `run [--through STAGE | --only STAGE]`. Download
+and normalize execute frozen source pins, followed by the ported geographic
+engines and release stages. Use execution only on a separate writable workspace,
+never the protected existing workspace used for this redesign.
+
+Before each unit starts, the resource guard requires at least 5,000,000,000 free
+disk bytes, the configured workspace allowance and process RSS headroom. It
+pauses and logs its reason instead of failing on resource pressure. Concurrent
+workers share declared disk reservations. Workspace size is measured at most
+once per `resources.workspace_scan_seconds` (60 seconds by default), outside the
+admission lock; completed output bytes and active reservations are accounted for
+between scans. Streaming source normalizers account for each allocation and
+refresh the measured total at their unit boundary, including removed scratch
+files. Free disk and RSS are checked before every admission.
+These admission checks do not impose limits on arbitrary stage code.
+The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
+and a 2 GB RSS allowance. Engine-specific limits live in `config/engines.yaml`; the completed pilot
+measurements are in the status report.
+
+Run logs and summaries go in `work/runs/<UTC timestamp>/`. Atomic outputs use a
+sibling `.part` file, fsync and replacement; failed publication does not complete
+a unit. Stage finalization is idempotent and retried even when every unit was
+already committed, so an interrupted manifest publication is recoverable.
+`--only` refreshes the selected stage's declared ancestors when needed; it does
+not run unrelated units. `invalidate STAGE [--units ID ...]` removes completion
+records only, retaining unit definitions and payloads. It requires an adopted ledger and a
+workspace writer lock. Do not use either write command against the real workspace
+during migration validation.
+
+## Validation and historical evidence
+
+```sh
+.venv/bin/pytest --basetemp=data/pipeline-work/pytest
+.venv/bin/ruff check
+.venv/bin/ruff format --check
+.venv/bin/mypy
+# Explicit opt-in; reads real payloads and writes only copies in this worktree.
+THEREABOUTS_PIPELINE_DATA=/path/to/existing/data .venv/bin/pytest \
+  tests/pipeline/test_world_adoption.py --basetemp=data/pipeline-work/world-proof -s
+```
+
+The ordinary tests use small synthetic inputs and the existing network guard.
+The world proof has the existing `world` marker, enforces a worktree-local test
+output and checks disk before copying. It is excluded unless the environment
+variable is supplied. Leave capacity for its copied ledger/metadata in addition
+to any concurrently running scratch job.
+
+The [historical acquisition guide](history/source-and-golden-pipeline.md),
+[normalization results](history/city-normalization-results.md),
+[policy investigation](history/city-normalization-plan.md) and
+[content-neutral integration proof](history/rename-integration.md) retain the
+original measurements and commands. They are historical evidence rather than
+instructions to rebuild the protected workspace. [SERVING_FORMAT.md](SERVING_FORMAT.md)
+records the pre-Rust pack format. The client owns the current binary format and
+writer. [DATASET_README.md](DATASET_README.md) is the rendered release schema,
+measured inventory and runnable reader guide.
+
+Logical table comparisons are available through `python -m pipeline digest
+DATASET --output REPORT.json --temp-dir SCRATCH [--compare BASELINE.json]`.
+The command reads the dataset and writes only to the explicitly separate report
+and scratch directories. Row order, partitioning and Parquet metadata do not
+change its digest.
+
+Engine grid sizes, batch counts, SQLite caches and DuckDB budgets are supplied
+from configuration. Engines no longer construct fallback limits. The table
+contract still requires H3 resolution 8 and the shared block codec requires 3;
+configuration validation rejects incompatible changes before execution.
+
+Each enabled source's `download_bytes` allows twice the bytes in its retained
+pin. The source YAML records that measured baseline. This is a capacity allowance
+for one release up to twice the retained size, not a prediction of upstream growth;
+review the proposal's sizes before accepting a larger release. Disabled
+`plate_country` remains at zero until its inputs are chosen. The VM profile sets
+`storage.gcs_raw` to the retained raw-mirror bucket; no bucket access was made
+while validating these changes.
+
+## Versioned releases
+
+`dataset`, `packs` and `publish` are registered stages but discover no units until
+`release.enabled=true` and a version is configured. Versions use `YYYY.MM[.patch]`;
+quote numeric-looking strings in YAML or dot-list arguments, for example
+`'release.version="2026.10"'`. A version's contents cannot be replaced in place.
+Fill the contact, citation, documentation and release bucket region in
+`config/release.yaml` before a public release.
+
+The dataset stage consumes the completed `lookups/manifest/current` unit, whose
+manifest includes normalized cells and country catalogues. It checks each input's
+SHA256, row count and schema before and after reading. Cell files group resolution-3
+blocks by a resolution-1 parent (up to 49 blocks); the world routing has at most
+842 groups. Within each file, every retained block occupies one Parquet row
+group, sorted by block. The cells manifest entry's `blocks` list maps each block
+to its zero-based `row_group` and `rows`. Empty blocks are omitted. Buffering is
+bounded by one block's reference-cell count; `row_group_rows` controls other
+tables. The full reader contract is in the dataset README's Cell keys section.
+`config/dataset.yaml` declares all fourteen retained table schemas, their keys,
+column meanings, units and physical nullability. Additional optional plate tables
+must be given reviewed schemas there before release; those sources are disabled.
+
+Parquet, documents, per-table logical digests and the manifest are built in an
+owned temporary directory, then published together. The output cap applies before
+each write, including Parquet footers. Resource admission accounts for output
+bytes and reserves digest scratch. Logical digests preserve duplicates and do not
+depend on row order, compression or file boundaries. `CHANGES.md` compares with
+`release.previous_version` when supplied; the prior release is verified first.
+The prior digest is an explicit unit parameter. The current manifest references
+all output files and is the last local publication boundary.
+
+`release prepare` is a standalone use of the same assembler for an existing,
+completed snapshot. It requires a separate output root; it neither migrates nor
+creates a ledger for the input. Its identity uses the same stage fingerprint and
+an explicit input manifest hash. Both entry points verify the lock against the
+normalized input inventories; changing pins without rebuilding cannot silently
+relabel that input evidence. Prepare only from a completed snapshot of the same
+build: this command does not run the source workspace or repair stale stages.
+For the measured read-only subset:
+
+```sh
+.venv/bin/python -m pipeline release prepare \
+  --from /path/to/existing/data/golden --root "$PWD" --version 2026.10 \
+  paths.dataset=data/dataset paths.work=data/pipeline-work/work \
+  'release.countries=[MY,SG]' \
+  'release.blocks=[836505fffffffff,836500fffffffff,836526fffffffff]' \
+  release.dataset.max_output_bytes=412318215 resources.max_workspace=3000000000 \
+  'release.packs.families=[]' --report data/pipeline-work/release-prepare.json
+.venv/bin/python examples/dataset/verify_readme.py data/dataset/2026.10
+```
+
+The example runner needs the reader's optional `pandas`, `pyarrow`, `duckdb` and
+`h3` packages. Pandas is not a pipeline runtime dependency. This task tested it
+using worktree-local copies of already-installed pandas 2.2.2 and NumPy 1.26.4;
+the pipeline environment retains its locked NumPy 2.3.5. No package was fetched.
+The README template is `config/templates/dataset-readme.md`; the rendered copy
+is committed as [DATASET_README.md](DATASET_README.md).
+
+`packs` delegates each configured family to
+`thereabouts._core.write_pack(dataset_dir, family, output_dir, options)`. The
+adapter adds source notices and input provenance and re-verifies returned files.
+Tests inject a fake writer; they do not implement the binary format. Real use
+requires the Rust branch merge **and support in that writer for the manifest's
+block/row-group index**. The refreshed subset contains one grouped file with
+22,404 rows across three indexed blocks; the client must read the specified row
+group for each block before real pack validation.
+No real pack-size claim is made here. Writer changes must update the client
+package version or cell format version; client source bytes are not hashed.
+
+Publication reads a verified dataset and the configured pack-family manifests.
+Each object is uploaded through an fsspec transaction, re-hashed from the backend,
+and skipped if already present with the correct size and checksum. Conflicting
+objects are refused before uploading; investigate them instead of overwriting a
+published version. The `<version>/_SUCCESS` inventory is committed last.
+`release upload --dry-run` performs inventory and remote checks without creating
+objects or a success marker. The runner's `publish` stage performs the upload;
+`release upload` is its explicit standalone counterpart.
+
+```sh
+.venv/bin/python -m pipeline release upload --root "$PWD" --version 2026.10 \
+  paths.dataset=data/dataset 'release.packs.families=[]' \
+  "storage.s3_release=file://$PWD/data/pipeline-work/local-release" --dry-run
+# Omit --dry-run only for the explicitly selected destination.
+.venv/bin/python -m pipeline release registry --root "$PWD" --version 2026.10 \
+  storage.s3_release=s3://OWNER-DECISION-BUCKET \
+  --report docs/release-registry.yaml
+```
+
+The same generic upload implementation supports `memory://` and local files in
+tests. Actual S3 use requires an installed fsspec S3 driver (`s3fs`) compatible with
+the locked fsspec version; that optional driver is not installed or locked in this
+checkout. Its dependency resolution and real multipart behavior remain owner
+validation before cloud publication. GCS raw-mirror support is separate and uses
+the existing locked `gcsfs` dependency. No remote backend was contacted here.
+
+The owner-run [release procedure](RELEASE_PROCEDURE.md) covers migration and
+symlink removal, GCP provisioning, the monthly pin/build cycle, staging checks and
+registry submission. The VM scripts and registry PR text are drafts for future
+execution; no VM or cloud publication was performed during this task.

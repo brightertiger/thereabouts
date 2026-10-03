@@ -1,0 +1,12 @@
+footprints:
+- city_id: city:geonames:1735161
+  reference: https://ppkl.dbkl.gov.my/en/pskl2020/
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+parts: {}
+independent:
+- city:geonames:1735158
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.

@@ -1,0 +1,275 @@
+# Byte budgets are decimal. Source settings are merged from config/sources/*.yaml.
+paths:
+  root: data
+storage:
+  local: file://
+resources:
+  duckdb_memory: 1GB
+  duckdb_threads: 1
+  workers: 1
+  rss_limit: 2000000000
+  disk_floor: 5000000000
+  max_workspace: 60000000000
+  poll_seconds: 10
+  ledger_timeout_seconds: 30
+  workspace_scan_seconds: 60
+h3:
+  block_resolution: 3
+  cell_resolution: 8
+# Every stage declares the production packages and native libraries it reads.
+stages:
+  - name: download
+    packages: [pipeline/stages/sources.py, pipeline/sources/download.py, pipeline/storage,
+               pipeline/pins/models.py, pipeline/sources/contract.py,
+               pipeline/sources/shared/manifest.py]
+    config: []
+  - name: normalize
+    needs: [download]
+    packages: [pipeline/stages/sources.py, pipeline/sources/contract.py,
+               pipeline/sources/shared, pipeline/sources/download.py, pipeline/storage]
+    config: [h3]
+    native: [duckdb, shapely, h3, pyarrow, pyshp, numpy, regex, sqlite3]
+  - name: reconcile
+    needs:
+    - normalize
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/reconcile
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
+  - name: cells
+    needs:
+    - reconcile
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/cells.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/cells
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    cell_format: true
+  - name: cities
+    needs:
+    - reconcile
+    - normalize
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/cities.py
+    - pipeline/engines/cities
+    - pipeline/engines/cells/nearest.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
+  - name: evaluate
+    needs:
+    - cells
+    - cities
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/evaluate.py
+    - pipeline/stages/development.py
+    - pipeline/stages/cities.py
+    - pipeline/stages/cells.py
+    - pipeline/stages/reconcile.py
+    - pipeline/stages/engine_views.py
+    - pipeline/config/reviews.py
+    - pipeline/engines/cities
+    - pipeline/engines/cells
+    - pipeline/engines/normalize_cells/score.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+  - name: normalize_cells
+    needs:
+    - cells
+    - cities
+    - evaluate
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/normalize_cells.py
+    - pipeline/stages/cities.py
+    - pipeline/stages/reconcile.py
+    - pipeline/stages/engine_views.py
+    - pipeline/engines/query.py
+    - pipeline/engines/normalize_cells
+    - pipeline/engines/cities
+    - pipeline/engines/cells
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    config:
+    - engines
+    - h3
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    cell_format: true
+  - name: lookups
+    needs:
+    - normalize
+    - normalize_cells
+    - plate_country
+    packages:
+    - pipeline/stages/geographic.py
+    - pipeline/stages/engine_data.py
+    - pipeline/stages/engine_discovery.py
+    - pipeline/stages/engine_recipes.py
+    - pipeline/stages/engine_io.py
+    - pipeline/engines/artifact_io.py
+    - pipeline/engines/cache.py
+    - pipeline/config/policies.py
+    - pipeline/stages/lookups.py
+    - pipeline/stages/lookup_manifest.py
+    - pipeline/stages/reconcile.py
+    - pipeline/engines/query.py
+    - pipeline/engines/cells
+    - pipeline/engines/cities/gates.py
+    - pipeline/engines/normalize_cells/references.py
+    - pipeline/config/reviews.py
+    - pipeline/engines/reconcile
+    - pipeline/engines/hierarchy.py
+    - pipeline/engines/sphere.py
+    - pipeline/engines/oracle.py
+    - pipeline/engines/schema.py
+    - pipeline/geometry
+    native:
+    - sqlite3
+    - duckdb
+    - shapely
+    - h3
+    - numpy
+    - scipy
+    - pyarrow
+    config:
+    - engines
+    - h3
+  - name: plate_country
+    needs: [normalize]
+    packages: [pipeline/stages/plate_country.py, pipeline/stages/geographic.py,
+               pipeline/stages/engine_discovery.py, pipeline/stages/engine_recipes.py,
+               pipeline/stages/engine_data.py, pipeline/stages/engine_io.py,
+               pipeline/engines/plate_country, pipeline/engines/artifact_io.py,
+               pipeline/config/policies.py, pipeline/sources/plates]
+    config: [engines]
+    native: [pyarrow, regex]
+
+  - name: dataset
+    needs: [lookups]
+    packages: [pipeline/stages/dataset.py]
+    config: [h3, content]
+    native: [pyarrow, h3]
+    cell_format: true
+  - name: packs
+    needs: [dataset]
+    packages: [pipeline/stages/packs.py]
+    config: []
+    native: [thereabouts]
+    cell_format: true
+  - name: publish
+    needs: [dataset, packs]
+    packages: [pipeline/stages/publish.py]
+    config: []
+    native: [fsspec]
+
+# The full-world proof used 250k-row sorting runs at 541 MB RSS.
+content:
+  batch_rows: 1024
+  chunk_rows: 250000
+  merge_fan_in: 64
+  write_buffer_bytes: 1048576

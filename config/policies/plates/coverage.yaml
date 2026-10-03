@@ -1,0 +1,71 @@
+JP:
+  scope: Current ordinary regional markings (not moped municipal plates)
+  baseline: jp-codes.pdf
+  expected_codes: 138
+  comparisons:
+  - source: wiki-JP.json
+    status: current
+  - source: wiki-JP-regions.json
+    status: current
+  basis: Entire MLIT regional-marking column extracted; exact code-set equality with
+    both pinned Wikipedia lists. Multiple office seats sharing a marking remain separate
+    rows.
+TH:
+  scope: '2023 special international plates: province/Betong numeric identifiers'
+  baseline: th-gazette.pdf
+  expected_codes: 78
+  comparisons: []
+  basis: 'Entire Gazette appendix, 26 rows × 3 columns: 77 provinces/metropolitan
+    area plus Betong. Does not imply that an ordinary Thai car serial identifies province.'
+TR:
+  scope: Ordinary two-digit province prefixes
+  baseline: wiki-TR-fixed.json
+  expected_codes: 81
+  comparisons:
+  - source: wd-TR.json
+    status: any
+  basis: All province-list rows 01–81 extracted; each listed code also occurs in the
+    country Wikidata response. No official current registry cross-check.
+VN:
+  scope: Province prefixes after July 2025 mergers
+  baseline: wiki-VN.json
+  expected_codes: 80
+  comparisons: []
+  basis: All 34 provincial rows in the three geographic tables; ranges expanded. Numeric
+    80 for national authorities excluded. Separately compared with the retained July-2025
+    Lai Chau government table; same code set, Hue naming difference. Government reuse
+    terms unconfirmed, so output rows use Wikipedia.
+ID:
+  scope: Leading area prefixes, excluding non-motorised vehicle codes
+  baseline: wiki-ID.json
+  expected_codes: 61
+  comparisons:
+  - source: wiki-ID-local.json
+    status: current
+  basis: Entire English geographic prefix table; every motor-vehicle prefix also occurs
+    in the Indonesian district list. Suffix refinements, exceptions and temporal allocation
+    completeness are not established.
+GB:
+  scope: DVLA INF104 Great Britain local memory-tag allocation table
+  baseline: gb-inf104.pdf
+  expected_codes: 433
+  comparisons: []
+  basis: Entire published DVLA table, including continuation lines and ranges; I/Q/Z
+    and explicitly reserved MN excluded; HW mapped using the Isle of Wight footnote.
+    Wikipedia differs on select-issue reservations and NF. Northern Ireland and private
+    transfers need separate interpretation.
+PL:
+  scope: Ordinary statutory province/county prefixes in 2024 regulation plus 2025/2026
+    amendments
+  baseline:
+  - pl-law2024.pdf
+  - pl-law2025.pdf
+  - pl-law2026-isap.pdf
+  expected_codes: 689
+  comparisons: []
+  basis: All 380 county/city rows in Annex 13 yield 677 allocated codes; 2025 amendment
+    adds 4 and 2026 amendment adds 8. Shared provincial alternative letters are combined
+    with county suffixes as prescribed by the table. Wikipedia omits many alternatives
+    and additionally calls STY current; NOG is explicitly former and now historic.
+    Completeness is limited to these published ordinary allocations, not all issued/special
+    plates.

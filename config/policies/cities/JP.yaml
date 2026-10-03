@@ -1,0 +1,36 @@
+footprints:
+- city_id: city:geonames:1850147
+  members:
+  - 004124e6-0784-4454-9865-f794c04e280c
+  - 00449a5e-cc3b-4414-9b55-6bdf4d22db2a
+  - 0609bb5d-6236-47e0-96da-357322e1831b
+  - 18bd315d-ba3b-4e83-86b9-c2f6364915b0
+  - 21766799-1aab-4aea-8385-f5d6b96f79ba
+  - 36b9fa80-d93a-43d1-a730-9c780ebbc1ed
+  - 3a88f029-33f0-4835-97f1-dcb40092fe7e
+  - 66a4c369-d03e-4c33-a315-4659f7101e11
+  - 66fc8f97-2ef6-4e0c-b4c3-2cab7b531eee
+  - 6eb763aa-dc82-4510-a45d-d3ccee8543b3
+  - 7759e38b-4310-4cb5-82b2-cfd84a6f6429
+  - 7c58f3da-ef55-4551-ae2c-c1b83e97c951
+  - 7dc4ea76-24a1-4144-8edd-5f154ac5da94
+  - 81129248-9fa5-48e9-b0b9-f6ab457e9505
+  - 85142460-67be-43f8-8995-e58f86165046
+  - 9917dccb-777f-4c6a-91f9-20cbfc716c9a
+  - a0045d82-d9e4-465f-8eaf-1a8b7d265a42
+  - b78bc637-a2bb-4904-8ca0-f38563453206
+  - bb6d5f39-9e3d-4dfb-a644-2da7faccc2cd
+  - c0280993-77bb-4fdd-815c-2955dcf61473
+  - cb1dbb5a-56d2-4cd1-a1dc-1e10646a23e7
+  - d45a7707-836b-4c46-8982-475f9f935a7d
+  - dcdaacf0-0765-474c-9849-17da30e797b0
+  reference: Existing reviewed reconciliation policy; pinned membership
+  reason: Owner-approved single-city extent from retained municipal boundary or pinned
+    administrative parts; urban clipping where specified excludes broad rural administration.
+parts: {}
+independent:
+- city:geonames:1848354
+reason: 'Owner city convention: absorb city parts; retain separate neighbouring cities.
+  Pinned source identities make the convention reproducible.'
+reference: docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled
+  policy.json for this country.
