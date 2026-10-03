@@ -31,7 +31,7 @@ export function systemIo() {
 }
 export async function run(argv, io = systemIo()) {
   try {
-    return await execute(parse(argv), io);
+    return await execute(await parse(argv), io);
   } catch (error) {
     if (error.code === "EPIPE") return 0;
     if (error.code === "ENOSPC") {
@@ -51,7 +51,7 @@ export async function run(argv, io = systemIo()) {
 async function execute(parsed, io) {
   const { command, values, options: o } = parsed;
   if (parsed.help) {
-    io.stdout(help(command));
+    io.stdout(await help(command));
     return 0;
   }
   if (parsed.version) {
@@ -64,15 +64,10 @@ async function execute(parsed, io) {
     return 0;
   }
   if (!command) {
-    io.stderr(help());
+    io.stderr(await help());
     return 2;
   }
-  if (
-    o.fields !== undefined &&
-    o.fields.split(",").some((f) => !module.fields().split("\n").includes(f))
-  )
-    throw usage("Unknown result field");
-  const root = directory(o["data-dir"], io.env),
+  const root = await directory(o["data-dir"], io.env),
     format =
       o.format ??
       (o.json ? "json" : o.csv ? "csv" : io.stdoutTTY ? "table" : "ndjson");

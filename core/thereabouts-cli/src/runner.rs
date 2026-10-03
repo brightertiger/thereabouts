@@ -8,20 +8,62 @@ use crate::{
     render::{self, Renderer},
     store,
 };
-use clap::{CommandFactory, Parser};
+use clap::Parser;
+use thereabouts_cli_core::grammar;
 
 /// Execute argv including its program name. Help and version never touch data.
 pub fn run(argv: &[String], io: &mut dyn Io) -> i32 {
-    let cli = match Cli::try_parse_from(argv) {
+    let parsed = match grammar::parse(argv.get(1..).unwrap_or_default()) {
+        Ok(parsed) => parsed,
+        Err(error) => {
+            let _ = io.stderr(&format!("{error}\n"));
+            return error.exit_code();
+        }
+    };
+    if parsed.help
+        || parsed.command.is_empty()
+            && !parsed.version
+            && parsed
+                .options
+                .get("fields")
+                .and_then(serde_json::Value::as_str)
+                != Some("")
+    {
+        return match grammar::help(&parsed.command) {
+            Ok(text) => {
+                if parsed.help {
+                    io.stdout(&text).map_or(2, |()| 0)
+                } else {
+                    let _ = io.stderr(&text);
+                    2
+                }
+            }
+            Err(error) => {
+                let _ = io.stderr(&format!("{error}\n"));
+                error.exit_code()
+            }
+        };
+    }
+    if parsed.version {
+        return io
+            .stdout(concat!("thereabouts ", env!("CARGO_PKG_VERSION"), "\n"))
+            .map_or(2, |()| 0);
+    }
+    if parsed
+        .options
+        .get("fields")
+        .and_then(serde_json::Value::as_str)
+        == Some("")
+    {
+        return io
+            .stdout(&format!("{}\n", render::FIELDS.join("\n")))
+            .map_or(2, |()| 0);
+    }
+    let cli = match Cli::try_parse_from(&parsed.argv) {
         Ok(cli) => cli,
         Err(error) => {
-            let code = if error.use_stderr() { 2 } else { 0 };
-            let printed = if code == 0 {
-                io.stdout(&error.to_string())
-            } else {
-                io.stderr(&error.to_string())
-            };
-            return if printed.is_err() { 4 } else { code };
+            let _ = io.stderr(&format!("{error}"));
+            return 2;
         }
     };
     match execute(&cli, io) {
@@ -43,7 +85,7 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
         return Ok(0);
     }
     let Some(command) = &cli.command else {
-        io.stderr(&Cli::command().render_help().to_string())?;
+        io.stderr(&grammar::help("")?)?;
         return Ok(2);
     };
     let fields = render::fields(cli.global.fields.as_deref())?;

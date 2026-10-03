@@ -59,7 +59,7 @@ export class Geocoder {
         paths[name] = path.resolve(filename);
       }
     } else {
-      const root = directory(dataDir);
+      const root = await directory(dataDir);
       for (const name of FAMILIES) {
         try {
           paths[name] = await installed(root, name);
@@ -87,7 +87,10 @@ export class Geocoder {
     }
     const geo = new Geocoder(module, paths, verify);
     try {
-      for (const name of Object.keys(paths)) geo.handle(name);
+      // Explicit pack selections retain handles from open. Store families stay lazy
+      // unless the caller requested eager full verification of the entire selection.
+      if (pack || packs || verify)
+        for (const name of Object.keys(paths)) geo.handle(name);
       return geo;
     } catch (e) {
       await geo.close();

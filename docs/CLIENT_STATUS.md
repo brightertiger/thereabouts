@@ -9,7 +9,8 @@ earlier implementation and measurements remain in Git history and the JSON.
 One Rust core owns format 2.2, all lookups and result semantics. Python uses
 PyO3 abi3-py311; Node 22/24 uses wasm-bindgen with host positioned reads.
 A separate native writer uses typed Arrow batches and disk-backed staging.
-The native clap CLI and Node grammar share Rust parsing of batch records,
+Native clap dispatch and Node consume one JSON grammar through the same Rust
+argument parser, help renderer and errors. They also share batch parsing,
 rendering and exit policy. MCP is a thin optional Python host with one tool per verb.
 
 Core provides reverse/H3 and city names. Postal, airports, LOCODE, phone, IP
@@ -26,6 +27,29 @@ are deleted. The hand-written Node reader was removed in package 4.
 Only four stable cell constants remain in thereabouts.format. The pipeline's
 internal hierarchy codec now lives with the pipeline. Original conformance
 JSON and synthetic Parquet inputs remain; no runtime compatibility shim exists.
+
+## Final review fixes
+
+H1: Node output retries short writes and EAGAIN; slow-reader tests retain the
+entire enlarged info object and all 3,000 batch rows. Stream failures preserve
+their IO exit policy and never suggest reinstalling a valid pack.
+H2: the writer accepts empty grouped cell files, rejects empty block entries
+and validates each block against its partition parent. An offline fixture
+captures the reproduced MY/SG manifest inventory and its provenance.
+M1-M2: interrupted transfers retain partials with an exit-2 resume instruction.
+Rust and Node share an exclusive .lock PID/time lease with coordinated stale
+recovery; live contention exits 2. No network port is reserved.
+M3-M4: derived H3 centres retain the documented 1e-10 degree tolerance; terminal
+width comes from COLUMNS or the host terminal, shrinking widest columns first.
+Low: process substitution/FIFO input, in-tree npm caches, first-seen structured
+field order, source-aware version hints, verified identity Range requests,
+async disposal types, common store-path policy and lazy discovered families
+are covered. Every command and flag has shared help/diagnostic wording.
+
+The final pass briefly exceeded the 4 GB worktree allowance when build outputs
+and pytest scratch overlapped. Those artifacts were removed immediately and
+the remaining gates prune debug outputs before Python tests. Free disk stayed
+above 5 GB; no real data or files outside the worktree were written.
 
 ## Use
 
@@ -102,10 +126,10 @@ Current and synthetic vectors total 478;
 Node library and bin coverage includes typed/NUL boundary exceptions documented
 in CLI.md. Python and Rust assert the same files and legacy mappings.
 
-Latest completed gate: 101 Rust tests; 501 pytest
+Latest completed gate: 103 Rust tests; 505 pytest
 passed, 2 skipped; mypy 463 files;
-48 Node tests on 22.
-Node 24: 48 tests.
+61 Node tests on 22.
+Node 24: 61 tests.
 Rust fmt, clippy all targets/all features with warnings denied, core/CLI-core/WASM
 target checks, ruff, ruff format, mypy, npm build and TypeScript check passed.
 Fresh installed-package import/version and artifact checks are documented in
@@ -113,8 +137,8 @@ Fresh installed-package import/version and artifact checks are documented in
 
 ## Recorded performance and sizes
 
-Apple M2, 8 GB. These existing lookup measurements are retained from the accepted
-format/Node passes; package 5 changes lifecycle and release integration.
+Apple M2, 8 GB. Python and format measurements are retained from the accepted
+format pass; Node figures below were regenerated after the final review fixes.
 Python hot median/p99: 7.750/9.584 µs;
 random: 4.584/14.291 µs.
 Columnar throughput: 636,292 hot and
@@ -125,17 +149,17 @@ fuzzy timings and historical comparisons remain in CLIENT_CORE_MEASUREMENTS.json
 
 | Node verb | Median / p99 µs | Batch results/s |
 | --- | ---: | ---: |
-| reverse | 6.375 / 8.750 | 148,126 |
-| postal | 8.875 / 11.375 | 91,486 |
-| airport | 8.792 / 10.084 | 108,518 |
-| locode | 8.708 / 9.208 | 115,651 |
-| phone | 10.417 / 11.625 | 137,180 |
-| ip | 8.250 / 8.792 | 122,388 |
-| plate | 4.792 / 6.291 | 157,259 |
-| geocode | 8.291 / 9.667 | 103,134 |
+| reverse | 6.333 / 8.708 | 150,352 |
+| postal | 8.708 / 10.875 | 92,781 |
+| airport | 8.667 / 9.875 | 109,190 |
+| locode | 8.542 / 9.042 | 117,370 |
+| phone | 10.500 / 11.125 | 136,962 |
+| ip | 8.000 / 8.625 | 124,510 |
+| plate | 4.875 / 6.500 | 158,358 |
+| geocode | 8.250 / 9.583 | 102,481 |
 
 Forward batch measurements are ordered scalar loops; reverse uses reverseMany.
-The reproducibly built WASM is 2,438,752 bytes, not committed.
+The reproducibly built WASM is 2,530,341 bytes, not committed.
 Process-start measurements, including npx overhead, remain in the same JSON.
 
 Core sample bytes, including the forward catalogue closure:

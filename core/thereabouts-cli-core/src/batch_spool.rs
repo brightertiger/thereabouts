@@ -1,6 +1,5 @@
 //! Tabular NDJSON needs the union of input keys before emitting its header.
 use crate::error::{Error, Result};
-use serde_json::{Map, Value};
 use std::{
     collections::BTreeSet,
     io::{self, SeekFrom},
@@ -15,20 +14,23 @@ pub(crate) fn collect(
     mut file: Box<dyn crate::io::Temporary>,
     mut read: impl FnMut(&mut String) -> io::Result<usize>,
 ) -> Result<(Box<dyn crate::io::Temporary>, Vec<String>)> {
-    let mut fields = BTreeSet::new();
+    let mut seen = BTreeSet::new();
+    let mut fields = Vec::new();
     let mut bytes = 0usize;
     let mut line = first.to_owned();
     loop {
-        match serde_json::from_str::<Map<String, Value>>(&line) {
+        match serde_json::from_str::<crate::object::Object>(&line) {
             Ok(object) => {
-                for (key, _) in object {
-                    if fields.insert(key.clone()) {
+                for key in object.keys {
+                    if seen.insert(key.clone()) {
                         bytes += key.len();
+                        fields.push(key);
                     }
                 }
             }
             Err(_) => {
-                if fields.insert("input".into()) {
+                if seen.insert("input".into()) {
+                    fields.push("input".into());
                     bytes += "input".len();
                 }
             }
@@ -46,5 +48,5 @@ pub(crate) fn collect(
     }
     file.flush()?;
     file.seek(SeekFrom::Start(0))?;
-    Ok((file, fields.into_iter().collect()))
+    Ok((file, fields))
 }

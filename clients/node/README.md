@@ -129,3 +129,9 @@ H3-derived cell-centre coordinates can differ from native results by a few
 floating-point ULPs. Compare these values within 1e-10 degrees; serialized
 number text is not a byte-identity contract. Other result fields and candidate
 ordering share exact conformance.
+
+Both command hosts consume one JSON grammar and Rust parser/help renderer.
+Store paths use the same portable policy as Python. Explicit pack selections
+open their handles immediately; discovery through a store defers each family
+until its first lookup (verify: true opens all selected families for verification).
+All opened handles remain held until close or async disposal.

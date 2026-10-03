@@ -100,29 +100,29 @@ test("coded discovery/corruption failures do not leak handles", async (t) => {
   await assert.rejects(Geocoder.open({ dataDir: root }), CorruptPackError);
   assert.equal(handleCount(), before);
 });
-test("platform store paths agree with documented Python/native policy", () => {
+test("platform store paths agree with documented Python/native policy", async () => {
   assert.equal(
-    directory(undefined, { HOME: "/home/test" }, "darwin"),
+    await directory(undefined, { HOME: "/home/test" }, "darwin"),
     "/home/test/Library/Application Support/Thereabouts",
   );
   assert.equal(
-    directory(undefined, { HOME: "/home/test" }, "linux"),
+    await directory(undefined, { HOME: "/home/test" }, "linux"),
     "/home/test/.local/share/thereabouts",
   );
   assert.equal(
-    directory(undefined, { XDG_DATA_HOME: "/data" }, "linux"),
+    await directory(undefined, { XDG_DATA_HOME: "/data" }, "linux"),
     "/data/thereabouts",
   );
   assert.equal(
-    directory(undefined, { LOCALAPPDATA: "/local" }, "win32"),
+    await directory(undefined, { LOCALAPPDATA: "/local" }, "win32"),
     "/local/Thereabouts",
   );
   assert.equal(
-    directory("~/custom", { HOME: "/home/test" }),
+    await directory("~/custom", { HOME: "/home/test" }),
     "/home/test/custom",
   );
   assert.equal(
-    directory("/explicit", { THEREABOUTS_DATA: "/env" }),
+    await directory("/explicit", { THEREABOUTS_DATA: "/env" }),
     "/explicit",
   );
 });
@@ -165,4 +165,22 @@ test("trusted root aliases work while artifacts remain protected", async (t) => 
   } finally {
     await geo.close();
   }
+});
+
+test("store discovery opens family payloads lazily, while explicit packs stay stable", async (t) => {
+  const root = temporary(t);
+  fixtureStore(root, {
+    ...selection("packs/postal-sample"),
+    ...selection("packs/phone-sample"),
+  });
+  const before = handleCount();
+  const geo = await Geocoder.open({ dataDir: root });
+  assert.equal(handleCount(), before);
+  await geo.reverse({ lat: 48.8566, lon: 2.3522 });
+  const coreHandles = handleCount();
+  assert.ok(coreHandles > before);
+  await geo.postal("75001", { country: "FR" });
+  assert.ok(handleCount() > coreHandles);
+  await geo[Symbol.asyncDispose]();
+  assert.equal(handleCount(), before);
 });

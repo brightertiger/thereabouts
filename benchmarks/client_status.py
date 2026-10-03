@@ -125,7 +125,8 @@ earlier implementation and measurements remain in Git history and the JSON.
 One Rust core owns format 2.2, all lookups and result semantics. Python uses
 PyO3 abi3-py311; Node 22/24 uses wasm-bindgen with host positioned reads.
 A separate native writer uses typed Arrow batches and disk-backed staging.
-The native clap CLI and Node grammar share Rust parsing of batch records,
+Native clap dispatch and Node consume one JSON grammar through the same Rust
+argument parser, help renderer and errors. They also share batch parsing,
 rendering and exit policy. MCP is a thin optional Python host with one tool per verb.
 
 Core provides reverse/H3 and city names. Postal, airports, LOCODE, phone, IP
@@ -142,6 +143,29 @@ are deleted. The hand-written Node reader was removed in package 4.
 Only four stable cell constants remain in thereabouts.format. The pipeline's
 internal hierarchy codec now lives with the pipeline. Original conformance
 JSON and synthetic Parquet inputs remain; no runtime compatibility shim exists.
+
+## Final review fixes
+
+H1: Node output retries short writes and EAGAIN; slow-reader tests retain the
+entire enlarged info object and all 3,000 batch rows. Stream failures preserve
+their IO exit policy and never suggest reinstalling a valid pack.
+H2: the writer accepts empty grouped cell files, rejects empty block entries
+and validates each block against its partition parent. An offline fixture
+captures the reproduced MY/SG manifest inventory and its provenance.
+M1-M2: interrupted transfers retain partials with an exit-2 resume instruction.
+Rust and Node share an exclusive .lock PID/time lease with coordinated stale
+recovery; live contention exits 2. No network port is reserved.
+M3-M4: derived H3 centres retain the documented 1e-10 degree tolerance; terminal
+width comes from COLUMNS or the host terminal, shrinking widest columns first.
+Low: process substitution/FIFO input, in-tree npm caches, first-seen structured
+field order, source-aware version hints, verified identity Range requests,
+async disposal types, common store-path policy and lazy discovered families
+are covered. Every command and flag has shared help/diagnostic wording.
+
+The final pass briefly exceeded the 4 GB worktree allowance when build outputs
+and pytest scratch overlapped. Those artifacts were removed immediately and
+the remaining gates prune debug outputs before Python tests. Free disk stayed
+above 5 GB; no real data or files outside the worktree were written.
 
 ## Use
 
@@ -218,8 +242,8 @@ Fresh installed-package import/version and artifact checks are documented in
 
 ## Recorded performance and sizes
 
-Apple M2, 8 GB. These existing lookup measurements are retained from the accepted
-format/Node passes; package 5 changes lifecycle and release integration.
+Apple M2, 8 GB. Python and format measurements are retained from the accepted
+format pass; Node figures below were regenerated after the final review fixes.
 Python hot median/p99: {hot["scalar_median_us"]:.3f}/{hot["scalar_p99_us"]:.3f} µs;
 random: {random["scalar_median_us"]:.3f}/{random["scalar_p99_us"]:.3f} µs.
 Columnar throughput: {hot["reverse_columns_points_per_second"]:,.0f} hot and

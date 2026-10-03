@@ -183,3 +183,39 @@ pub fn lock_state(contents: &str, modified_ms: f64, now_ms: f64) -> Result<Strin
 pub fn lock_recovery_name(name: &str, contents: &str) -> String {
     thereabouts_cli_core::lease::recovery_name(name, contents)
 }
+
+/// Export the normative command tree without a second JS description.
+#[wasm_bindgen(js_name = grammar)]
+#[must_use]
+pub fn grammar() -> String {
+    thereabouts_cli_core::grammar::description().into()
+}
+/// Shared argv validation and diagnostic wording; no data is opened.
+#[wasm_bindgen(js_name = parseArgs)]
+pub fn parse_args(argv: &str) -> Result<String, JsValue> {
+    let argv = serde_json::from_str::<Vec<String>>(argv).map_err(|e| cli_error(e.into()))?;
+    json(&thereabouts_cli_core::grammar::parse(&argv).map_err(cli_error)?)
+}
+/// Command help has the same first line, flags and formatting in every host.
+#[wasm_bindgen(js_name = commandHelp)]
+pub fn command_help(command: &str) -> Result<String, JsValue> {
+    thereabouts_cli_core::grammar::help(command).map_err(cli_error)
+}
+
+/// Return shared store path components; Node owns native path resolution.
+#[wasm_bindgen(js_name = storeDirectory)]
+#[allow(clippy::needless_pass_by_value)]
+pub fn store_directory(
+    explicit: Option<String>,
+    platform: &str,
+    environment: &str,
+) -> Result<String, JsValue> {
+    let env: std::collections::BTreeMap<String, String> =
+        serde_json::from_str(environment).map_err(|e| cli_error(e.into()))?;
+    json(
+        &thereabouts_cli_core::directory::components(explicit.as_deref(), platform, |key| {
+            env.get(key).cloned()
+        })
+        .map_err(cli_error)?,
+    )
+}

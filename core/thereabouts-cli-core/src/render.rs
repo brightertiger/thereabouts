@@ -117,10 +117,12 @@ impl Renderer {
     }
     /// Emit one detached public result or pass-through row.
     pub fn row(&mut self, value: &Value, io: &mut dyn Io) -> Result<()> {
+        let keys = self.columns.clone().unwrap_or_else(|| ordered(value));
+        let structured = crate::object::Ordered { value, keys: &keys };
         match self.format {
-            Format::Ndjson => io.stdout(&format!("{}\n", serde_json::to_string(value)?))?,
+            Format::Ndjson => io.stdout(&format!("{}\n", serde_json::to_string(&structured)?))?,
             Format::Json if !self.batch => {
-                io.stdout(&format!("{}\n", serde_json::to_string_pretty(value)?))?;
+                io.stdout(&format!("{}\n", serde_json::to_string_pretty(&structured)?))?;
             }
             Format::Json => {
                 io.stdout(if self.rows == 0 {
@@ -128,16 +130,16 @@ impl Renderer {
                 } else {
                     ",\n"
                 })?;
-                io.stdout(&serde_json::to_string_pretty(value)?)?;
+                io.stdout(&serde_json::to_string_pretty(&structured)?)?;
             }
             Format::Csv | Format::Table => self.tabular(value, io)?,
         }
         self.rows += 1;
         Ok(())
     }
-    /// Set the tabular order before emitting its first header.
+    /// Set output order; structured rows may have different input keys.
     pub fn columns(&mut self, columns: Vec<String>) {
-        if self.columns.is_none() {
+        if self.columns.is_none() || matches!(self.format, Format::Json | Format::Ndjson) {
             self.columns = Some(columns);
         }
     }

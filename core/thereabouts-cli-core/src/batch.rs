@@ -220,12 +220,19 @@ fn ndjson(
     host: &RefCell<&mut dyn Io>,
 ) -> Result<()> {
     loop {
-        match serde_json::from_str::<Map<String, Value>>(&first) {
-            Ok(input) => {
+        match serde_json::from_str::<crate::object::Object>(&first) {
+            Ok(object) => {
+                if matches!(output.format, Format::Json | Format::Ndjson) {
+                    output.input_fields = object.keys;
+                }
+                let input = object.values;
                 let coords = numeric(input.get("lat")).zip(numeric(input.get("lon")));
                 output.row(input, coords, None, *host.borrow_mut())?;
             }
             Err(error) => {
+                if matches!(output.format, Format::Json | Format::Ndjson) {
+                    output.input_fields = vec!["input".into()];
+                }
                 let input =
                     Map::from_iter([("input".into(), Value::String(first.trim_end().into()))]);
                 output.row(

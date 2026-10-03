@@ -2,9 +2,12 @@
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 pub mod batch;
 mod batch_spool;
+pub mod directory;
 pub mod error;
+pub mod grammar;
 pub mod io;
 pub mod lease;
+mod object;
 pub mod render;
 mod table;
 use serde::{Deserialize, Serialize};

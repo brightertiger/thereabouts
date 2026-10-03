@@ -2,9 +2,12 @@
 
 This is the normative grammar for the Rust CLI and the Node command
 tree. The console entry and python -m thereabouts invoke the same Rust
-run(argv, io) function. Node mirrors the argument grammar and calls
+run(argv, io) function. Both hosts use the JSON command description in
+[grammar.json](../core/thereabouts-cli-core/src/grammar/grammar.json) through its shared argument parser,
+help renderer and diagnostic policy; WASM exports the description verbatim.
+Native clap provides typed dispatch after shared validation. Node calls
 thereabouts-cli-core through WASM for batch parsing, rendering, field projection
-and lookup exit policy; Node owns filesystem and HTTP operations. Native argv
+and lookup exit policy, and owns filesystem and HTTP operations. Native argv
 includes its program name; Io owns standard
 streams, environment and TTY detection. Python supplies the optional MCP host.
 See [CLIENT_STATUS.md](CLIENT_STATUS.md) for qualification and measurements.
@@ -103,8 +106,10 @@ Evidence is never printed in tables; use --json --evidence.
 Scalar JSON/NDJSON is one result object. Batch --json streams one object with
 a results array; it does not retain the whole batch. CSV preserves input header order, then appends thereabouts_* columns in public
 result order (or --fields order). Scalar CSV uses that same result order; object/array values are compact JSON in quoted CSV cells, null
-is an empty cell, and quoting follows RFC 4180. JSON keys are alphabetically
-ordered by the current renderer; consumers must address keys by name.
+is an empty cell, and quoting follows RFC 4180. Scalar JSON/NDJSON uses public
+result field order, or --fields order. Batch structured rows preserve their
+input key/header order before the appended result fields. Nested object order
+is not a contract; consumers address keys by name.
 
 Management outputs are objects: data path returns {"path": ...}; data list
 returns {"packs": [...]} with family, data_version, path, active and
@@ -136,7 +141,8 @@ line beginning with { or [ selects NDJSON. Other input uses comma-separated CSV.
 input produces a usage error explaining CSV headers and NDJSON objects. Empty input emits no rows (or
 {"results": []} with --json).
 
-NDJSON-to-CSV/table needs the union of input keys before writing a header.
+NDJSON-to-CSV/table needs the union of input keys, in first-seen order, before
+writing a header.
 It spools input to an automatically removed temporary file, retaining at most
 4,096 keys and 1 MiB of key names. Disk exhaustion during spooling reports “not enough disk” (exit 2). JSON/NDJSON output and CSV input stream directly. Missing input fields
 become null tabular cells. Batch hint is always present (nullable), and evidence
@@ -414,7 +420,8 @@ exact command.
 
 Bare invocation writes help to stderr and exits 2. Explicit --help writes to
 stdout and exits 0. Reverse help shows coordinate and FILE|- forms separately.
-Python discovery delegates directory selection to the same native store policy;
+Python and Node discovery delegate directory selection to the same portable
+store policy (native and WASM respectively);
 macOS, Linux and Windows rules are compared with platformdirs in tests.
 
 The Rust thereabouts-cli-core crate owns batch detection/parsing, result-field

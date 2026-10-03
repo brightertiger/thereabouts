@@ -1,0 +1,349 @@
+{
+  "about": "Offline geographic context from explicitly installed data.",
+  "globals": [
+    {
+      "name": "data-dir",
+      "value": "PATH",
+      "description": "Select the installed data store (overrides THEREABOUTS_DATA)."
+    },
+    {
+      "name": "format",
+      "value": "FORMAT",
+      "description": "Choose table, JSON, NDJSON or CSV output; table on a TTY.",
+      "choices": [
+        "table",
+        "json",
+        "ndjson",
+        "csv"
+      ],
+      "error": "format"
+    },
+    {
+      "name": "json",
+      "value": "",
+      "description": "Print one pretty JSON object (a results array for batches)."
+    },
+    {
+      "name": "csv",
+      "value": "",
+      "description": "Print CSV with input columns followed by result columns."
+    },
+    {
+      "name": "fields",
+      "value": "?",
+      "description": "Select comma-separated result paths; omit the value to list paths."
+    },
+    {
+      "name": "evidence",
+      "value": "",
+      "description": "Include source and method details; tables omit evidence."
+    },
+    {
+      "name": "quiet",
+      "value": "",
+      "description": "Suppress optional progress; preserve results and errors."
+    },
+    {
+      "name": "no-input",
+      "value": "",
+      "description": "Disable interactive confirmation; destructive operations need --yes."
+    },
+    {
+      "name": "strict",
+      "value": "",
+      "description": "Exit 1 on no match; batch row errors still exit 5."
+    }
+  ],
+  "commands": [
+    {
+      "name": "reverse",
+      "about": "Find geographic context or read CSV/NDJSON points.",
+      "args": "--lat LAT --lon LON",
+      "options": [
+        {
+          "name": "lat",
+          "value": "LAT",
+          "description": "Latitude in decimal degrees.",
+          "numeric": "float"
+        },
+        {
+          "name": "lon",
+          "value": "LON",
+          "description": "Longitude in decimal degrees.",
+          "numeric": "float"
+        },
+        {
+          "name": "lat-col",
+          "value": "COLUMN",
+          "description": "Select the CSV latitude header."
+        },
+        {
+          "name": "lon-col",
+          "value": "COLUMN",
+          "description": "Select the CSV longitude header."
+        }
+      ],
+      "arity": "reverse"
+    },
+    {
+      "name": "h3",
+      "about": "Find the stored ancestor of an H3 cell.",
+      "args": "CELL",
+      "options": [],
+      "arity": "one"
+    },
+    {
+      "name": "geocode",
+      "about": "Finds towns and cities by name. Street addresses are not supported.",
+      "args": "TEXT",
+      "options": [
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code."
+        },
+        {
+          "name": "subdivision",
+          "value": "CODE",
+          "description": "Filter by subdivision code."
+        },
+        {
+          "name": "limit",
+          "value": "N",
+          "description": "Maximum candidates, 1\u2013100 (default 5).",
+          "numeric": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "error": "limit"
+        },
+        {
+          "name": "prefer",
+          "value": "population",
+          "description": "Select the population winner explicitly.",
+          "choices": [
+            "population"
+          ],
+          "error": "prefer"
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "postal",
+      "about": "Find a postal code in its source country.",
+      "args": "CODE --country CC",
+      "options": [
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code.",
+          "required": "postal"
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "airport",
+      "about": "Find an airport by IATA/ICAO or an explicit scheme.",
+      "args": "CODE",
+      "options": [
+        {
+          "name": "scheme",
+          "value": "iata|icao|gps|local|ident",
+          "description": "Select an airport code scheme.",
+          "choices": [
+            "iata",
+            "icao",
+            "gps",
+            "local",
+            "ident"
+          ],
+          "ignore_case": true,
+          "error": "scheme"
+        },
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code."
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "locode",
+      "about": "Find a five-character country/location code.",
+      "args": "CODE",
+      "options": [
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code."
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "ip",
+      "about": "Find published context for an IPv4 or IPv6 literal.",
+      "args": "ADDRESS",
+      "options": [],
+      "arity": "one"
+    },
+    {
+      "name": "phone",
+      "about": "Find an E.164 prefix; country narrows shared calling codes.",
+      "args": "NUMBER",
+      "options": [
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code."
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "plate",
+      "about": "Find registration country and series context.",
+      "args": "TEXT",
+      "options": [
+        {
+          "name": "country",
+          "value": "CC",
+          "description": "Filter by ISO country code."
+        },
+        {
+          "name": "series",
+          "value": "NAME",
+          "description": "Select a registration series."
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "info",
+      "about": "Report active pack identities and capabilities.",
+      "args": "",
+      "options": [],
+      "arity": "none"
+    },
+    {
+      "name": "mcp",
+      "about": "Serve lookup verbs through the optional Python MCP host.",
+      "args": "",
+      "options": [],
+      "arity": "none"
+    },
+    {
+      "name": "data",
+      "about": "Explicitly manage installed data.",
+      "args": "COMMAND",
+      "options": [],
+      "arity": "none"
+    },
+    {
+      "name": "data install",
+      "about": "Install selected pack families.",
+      "args": "PACK\u2026",
+      "options": [
+        {
+          "name": "version",
+          "value": "V",
+          "description": "Select a dataset version."
+        },
+        {
+          "name": "from",
+          "value": "URL|DIR",
+          "description": "Use a local release directory or HTTP(S) base URL."
+        },
+        {
+          "name": "yes",
+          "value": "",
+          "description": "Confirm the requested operation without prompting."
+        }
+      ],
+      "arity": "many"
+    },
+    {
+      "name": "data list",
+      "about": "List installed or available packs.",
+      "args": "",
+      "options": [
+        {
+          "name": "remote",
+          "value": "",
+          "description": "Read the configured release index."
+        }
+      ],
+      "arity": "none"
+    },
+    {
+      "name": "data verify",
+      "about": "Check installed sizes and optionally all hashes.",
+      "args": "",
+      "options": [
+        {
+          "name": "full",
+          "value": "",
+          "description": "Verify all installed artifact hashes."
+        }
+      ],
+      "arity": "none"
+    },
+    {
+      "name": "data remove",
+      "about": "Remove all versions of a pack family.",
+      "args": "PACK",
+      "options": [
+        {
+          "name": "yes",
+          "value": "",
+          "description": "Confirm the requested operation without prompting."
+        }
+      ],
+      "arity": "one"
+    },
+    {
+      "name": "data path",
+      "about": "Print the resolved data directory.",
+      "args": "",
+      "options": [],
+      "arity": "none"
+    },
+    {
+      "name": "data update",
+      "about": "Check for a newer supported release.",
+      "args": "--check",
+      "options": [
+        {
+          "name": "check",
+          "value": "",
+          "description": "Check for a newer compatible release without installing.",
+          "required": "update"
+        }
+      ],
+      "arity": "none"
+    }
+  ],
+  "errors": {
+    "unknown_option": "Unknown option: {option}",
+    "repeated_option": "Repeated option: --{name}",
+    "no_value": "--{name} takes no value",
+    "needs_value": "--{name} requires a value",
+    "unknown_command": "Unknown command: {command}",
+    "unknown_data": "Unknown data command: {command}",
+    "output_conflict": "Conflicting output selectors",
+    "format": "Use --format table|json|ndjson|csv",
+    "data": "data requires a command",
+    "reverse_choice": "Use reverse --lat LAT --lon LON or reverse FILE|-",
+    "reverse_required": "reverse requires both --lat and --lon, or a FILE",
+    "number": "Invalid --{name} number",
+    "install": "Name at least one pack to install",
+    "positionals": "{command} requires {count} positional argument(s)",
+    "postal": "postal requires --country CC",
+    "update": "data update requires --check",
+    "scheme": "Unknown airport scheme",
+    "prefer": "Use --prefer population",
+    "limit": "geocode --limit must be 1..100"
+  }
+}

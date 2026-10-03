@@ -75,46 +75,22 @@ pub fn family(value: &str) -> Result<()> {
 }
 /// Resolve explicit, environment, then platform user-data paths.
 pub fn directory(explicit: Option<&Path>, io: &dyn Io) -> Result<PathBuf> {
-    if let Some(path) = explicit {
-        return expand(path, io);
-    }
-    if let Some(value) = io.env("THEREABOUTS_DATA").filter(|v| !v.is_empty()) {
-        return expand(Path::new(&value), io);
-    }
-    platform_directory(std::env::consts::OS, io)
+    let explicit = explicit.map(|p| p.to_string_lossy().into_owned());
+    Ok(thereabouts_cli_core::directory::components(
+        explicit.as_deref(),
+        std::env::consts::OS,
+        |key| io.env(key),
+    )?
+    .iter()
+    .collect())
 }
-/// Platform policy is injectable for cross-platform parity tests.
+/// Injectable platform selection retains native separator assembly in the host.
 pub fn platform_directory(platform: &str, io: &dyn Io) -> Result<PathBuf> {
-    let home = || {
-        io.env("HOME")
-            .map(PathBuf::from)
-            .ok_or_else(|| Error::Usage("Set THEREABOUTS_DATA or HOME".into()))
-    };
-    match platform {
-        "macos" => Ok(home()?.join("Library/Application Support/Thereabouts")),
-        "windows" => io
-            .env("LOCALAPPDATA")
-            .map(|v| PathBuf::from(v).join("Thereabouts"))
-            .ok_or_else(|| Error::Usage("Set THEREABOUTS_DATA or LOCALAPPDATA".into())),
-        _ => Ok(io
-            .env("XDG_DATA_HOME")
-            .filter(|v| !v.is_empty())
-            .map_or_else(
-                || home().map(|p| p.join(".local/share")),
-                |v| Ok(PathBuf::from(v)),
-            )?
-            .join("thereabouts")),
-    }
-}
-fn expand(path: &Path, io: &dyn Io) -> Result<PathBuf> {
-    if let Ok(tail) = path.strip_prefix("~") {
-        let home = io
-            .env("HOME")
-            .or_else(|| io.env("USERPROFILE"))
-            .ok_or_else(|| Error::Usage("Cannot expand home directory".into()))?;
-        return Ok(PathBuf::from(home).join(tail));
-    }
-    Ok(path.to_owned())
+    Ok(
+        thereabouts_cli_core::directory::platform_components(platform, |key| io.env(key))?
+            .iter()
+            .collect(),
+    )
 }
 /// Read bounded JSON metadata; reject symlinked store paths.
 pub fn read_json<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T> {

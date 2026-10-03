@@ -34,33 +34,24 @@ export function component(value) {
     throw integrity("Invalid release directory component");
   return value;
 }
-export function directory(
+export async function directory(
   explicit,
   env = process.env,
   platform = process.platform,
 ) {
-  let result = explicit ?? (env.THEREABOUTS_DATA || undefined);
-  if (result) {
-    if (result === "~" || result.startsWith("~/")) {
-      const home = env.HOME || env.USERPROFILE;
-      if (!home) throw usage("Cannot expand home directory");
-      result = path.join(home, result.slice(2));
-    }
-    return path.resolve(result);
-  }
-  if (platform === "win32") {
-    if (!env.LOCALAPPDATA) throw usage("Set THEREABOUTS_DATA or LOCALAPPDATA");
-    return path.join(env.LOCALAPPDATA, "Thereabouts");
-  }
-  if (platform !== "darwin" && env.XDG_DATA_HOME)
-    return path.join(env.XDG_DATA_HOME, "thereabouts");
-  if (!env.HOME) throw usage("Set THEREABOUTS_DATA or HOME");
-  return path.join(
-    env.HOME,
-    platform === "darwin"
-      ? "Library/Application Support/Thereabouts"
-      : ".local/share/thereabouts",
+  const variables = Object.fromEntries(
+    ["THEREABOUTS_DATA", "HOME", "USERPROFILE", "LOCALAPPDATA", "XDG_DATA_HOME"]
+      .filter((k) => env[k] !== undefined)
+      .map((k) => [k, env[k]]),
   );
+  const components = JSON.parse(
+    (await wasm()).storeDirectory(
+      explicit,
+      platform,
+      JSON.stringify(variables),
+    ),
+  );
+  return path.resolve(...components);
 }
 export function readJson(filename) {
   const meta = fs.lstatSync(filename);
@@ -183,7 +174,7 @@ export async function inventory(root, all = false) {
       }
     }
   const core = await wasm();
-  for (const filename of [...paths].sort()) {
+  for (const filename of all ? [...paths].sort() : paths) {
     try {
       result.push({
         path: filename,
