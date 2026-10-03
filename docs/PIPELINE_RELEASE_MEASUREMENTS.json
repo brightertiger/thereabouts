@@ -549,7 +549,7 @@
         "rows": 408
       },
       "cells": {
-        "bytes": 183373,
+        "bytes": 173850,
         "files": 1,
         "rows": 22404
       },
@@ -973,10 +973,10 @@
       "timezones",
       "unlocode"
     ],
-    "manifest_sha256": "00be7db6330dfcb3bbc0b4a18b5d5101e47fd08d4eed1e0fd60b7d6a84dd0c35",
-    "readme_sha256": "0769a59ce7583cc3c656511df90924f0821b7fbd7a3c2cbc24694fc28979ad2f",
-    "dataset_directory": "data/dataset-review-readme-fixed/2026.10",
-    "dataset_bytes": 8810295,
+    "manifest_sha256": "c43983107777db804a92f3065ddb3c31f079fb2b3493ee387f2c9d3544a099cc",
+    "readme_sha256": "80cd3f7dce5c132a2c136002e053109411404f013c554d8dd4d9d42c8c69033d",
+    "dataset_directory": "data/dataset-review/2026.10",
+    "dataset_bytes": 8802046,
     "examples": [
       "DuckDB: [('country:MY', 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city:geonames:1735161', 'Kuala Lumpur', 'policy_polygon')]",
       "PyArrow: {'country_id': 'country:MY', 'state_id': 'state:overture:06cd1f1b-805b-4799-ab53-d77b370f0af5', 'city_id': 'city:geonames:1735161', 'city_method': 'policy_polygon'}",
@@ -993,15 +993,32 @@
       "Public-Domain"
     ],
     "all_row_licences_in_notices": true,
-    "wall_seconds": 14.58,
-    "rss_bytes": 465944576,
+    "wall_seconds": 17.05,
+    "rss_bytes": 442040320,
     "cell_files": [
       {
+        "blocks": [
+          {
+            "block": "836500fffffffff",
+            "row_group": 0,
+            "rows": 11107
+          },
+          {
+            "block": "836505fffffffff",
+            "row_group": 1,
+            "rows": 8019
+          },
+          {
+            "block": "836526fffffffff",
+            "row_group": 2,
+            "rows": 3278
+          }
+        ],
         "kind": "cells",
         "path": "cells/group=81653ffffffffff/part.parquet",
         "rows": 22404,
-        "sha256": "a4aa9d85f163ea5a239a70e55b78158b80191815f9549f361a0537e4bec8ff04",
-        "size": 183373
+        "sha256": "dadb3586c398660fc4633bb634d343d330949411fafbac7d339ba95c43cb364e",
+        "size": 173850
       }
     ]
   }

@@ -275,7 +275,11 @@ source configs actually used, `DATASET_CARD.md` from `release.yaml` plus
 measured statistics, and `CHANGES.md` comparing with the previous version's
 digest. Versions are `YYYY.MM[.patch]`.
 
-`packs` runs the existing serving exporter from the dataset directory.
+`packs` calls the client package's
+`thereabouts._core.write_pack(dataset_dir, family, output_dir, options)`.
+The pipeline owns no copy of the binary pack format. The client writer reads
+the cells row-group index below; its implementation is coordinated on the
+Rust client branch and must be merged before real packs can be built here.
 
 `publish` uploads `dataset/<version>/` and `packs/<version>/` to
 `storage.s3_release` with multipart uploads, verifies checksums, skips objects
@@ -284,9 +288,20 @@ already present with the right hash (so it is idempotent), and writes
 request to `awslabs/open-data-registry` (name, description, licence, update
 frequency, contact, resources, tutorials).
 
-Cell files are 41k objects of ~15 KB; the dataset stage coalesces them to one
-Parquet file per resolution‑3 block group (about 1,000 files) so the published
-layout is S3-friendly while the ledger keeps the fine-grained units.
+Cell inputs are about 41k objects; the dataset stage coalesces resolution-3
+blocks by their resolution-1 parent into
+`cells/group=<r1 hex>/part.parquet` (about 1,000 files for world coverage).
+Each file has **one Parquet row group per retained resolution-3 block**, sorted
+by ascending block ID. Blocks spanning multiple input files or batches still
+occupy one row group. Empty blocks are omitted; empty files have no row groups.
+Every cells file entry in both `manifest.json.tables` and `manifest.json.files`
+has `blocks: [{"block": "<r3 hex>", "row_group": i, "rows": n}]`, with lowercase
+hexadecimal H3 IDs without `0x`, zero-based row-group indices and positive row
+counts matching the Parquet footer. Block IDs are unique across the dataset;
+their row counts sum to each file's `rows`. Every row belongs to its indexed
+block. This is the contract the client pack writer reads: route by block using
+the manifest index, then read that row group. The ledger retains its original
+fine-grained units; coalescing changes packaging, not logical cell values.
 
 Licence: the dataset includes ODbL inputs (OSM land, Overture divisions,
 timezone boundaries) and is therefore published as a derivative database under

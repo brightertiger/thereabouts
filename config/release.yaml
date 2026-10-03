@@ -22,6 +22,7 @@ dataset:
   # MY/SG proof: 8.74 MB output, 360 MB RSS with these batch sizes.
   # Up to 49 r3 blocks share an r1 group.
   batch_rows: 1024
+  # Non-cell tables only; cells use exactly one row group per retained r3 block.
   row_group_rows: 16384
   compression: zstd
   cell_group_resolution: 1

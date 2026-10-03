@@ -343,5 +343,324 @@
     "ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
     "workspace_bytes": 995195541,
     "disk_free_bytes": 50093326336
+  },
+  "8": {
+    "plan": {
+      "seconds": 322.47,
+      "rss_bytes": 1418297344,
+      "report": ".cache/pipeline/final-review-8-plan.json",
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      }
+    },
+    "pytest": {
+      "seconds": 46.96,
+      "rss_bytes": 447119360,
+      "passed": 692,
+      "skipped": 8,
+      "pytest_seconds": 46.29
+    },
+    "ruff": "check and format passed",
+    "mypy": "strict passed",
+    "ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+    "workspace_bytes": 1069461976,
+    "disk_free_bytes": 49140457472,
+    "config_load_seconds": [
+      0.158456916018622,
+      0.15393645799485967,
+      0.15760587499244139
+    ],
+    "dataset_proof": {
+      "measurements": "docs/PIPELINE_RELEASE_MEASUREMENTS.json#readme_render",
+      "rows": 181548,
+      "bytes": 8802046,
+      "cells_rows": 22404,
+      "cells_bytes": 173850,
+      "cell_row_groups": [
+        11107,
+        8019,
+        3278
+      ],
+      "block_index_checked_against_parquet": true,
+      "logical_sha256": "7263899d1ac9fefa8fec7e147e69448626de2e811232d819b84ce9578aea40e0",
+      "logical_digest_unchanged": true,
+      "readme_examples_passed": 3,
+      "checksum_example_verified_files": 22
+    },
+    "handover": {
+      "report": ".cache/pipeline/final-review-8-handover.json",
+      "seconds": 331.66,
+      "rss_bytes": 1262174208,
+      "mode": "simulation",
+      "adopted_units": 85577,
+      "stages": {
+        "cells": {
+          "current": 41442,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "cities": {
+          "current": 555,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "download": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 4,
+          "stale": 0
+        },
+        "evaluate": {
+          "current": 1,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "lookups": {
+          "current": 726,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "normalize": {
+          "current": 13,
+          "new": 0,
+          "outputs_absent": 2,
+          "stale": 0
+        },
+        "normalize_cells": {
+          "current": 41716,
+          "new": 0,
+          "outputs_absent": 0,
+          "stale": 0
+        },
+        "reconcile": {
+          "current": 1111,
+          "new": 0,
+          "outputs_absent": 1111,
+          "stale": 0
+        }
+      },
+      "identity_handover": {
+        "changed_units": 85577,
+        "identities": [
+          {
+            "changed": 13,
+            "new_identity": "d68b546fb5c39c85793066c6863bd08c72c66cd1aedfb3659bca7268900a63b4",
+            "old_identity": [
+              "beadaafe63f643c3974b18a568b7228afbe6cf1529297c374f52da471de9b9df"
+            ],
+            "stage": "download",
+            "units": 13
+          },
+          {
+            "changed": 13,
+            "new_identity": "76110ca3e120d36755776db2f8040e157355f8d3532ca4bebe1075385d7537ca",
+            "old_identity": [
+              "eb2b65cdaee665536f5304376c3be89d8727c9963758ecd29a7ae6ae1a69632c"
+            ],
+            "stage": "normalize",
+            "units": 13
+          },
+          {
+            "changed": 1111,
+            "new_identity": "f44e9988a5786a7a756e185a8b64edc0fec87084bef388060536d7afd308c58b",
+            "old_identity": [
+              "aff3c93e785f90dc532c0ebacaf1a38616702b21b880f0aba3aa8dee269b554c"
+            ],
+            "stage": "reconcile",
+            "units": 1111
+          },
+          {
+            "changed": 41442,
+            "new_identity": "21a691579c7a9f56bedfb286e57f31a68359cc519405c7fbc90e8b4f873bcdce",
+            "old_identity": [
+              "69172108231916deba2537a459f9c1a163e11f90af5980faf755dd46569fb549"
+            ],
+            "stage": "cells",
+            "units": 41442
+          },
+          {
+            "changed": 555,
+            "new_identity": "a9873eb932a2d57a8179d24e6eb55f612f2e1b48465af8cc79ff5d26e7c891cc",
+            "old_identity": [
+              "4583393f586aee7ea8db12233a3186fe3959420c7556e291d8c62197ec194f3c"
+            ],
+            "stage": "cities",
+            "units": 555
+          },
+          {
+            "changed": 1,
+            "new_identity": "d56e4016cffb21f981095374ed7f3699439f86e6fe14b596307a8a8a126b3d61",
+            "old_identity": [
+              "695fe04b3edd186c7fdc0d38eb81b9d7a775d23e02f25723183589369e46173f"
+            ],
+            "stage": "evaluate",
+            "units": 1
+          },
+          {
+            "changed": 41716,
+            "new_identity": "4275a01b1085408fdfe1e9e6a1397c33d4aa817887340d9931d387cd6039d654",
+            "old_identity": [
+              "94a6206c0ca89bb41d482ba9456b0afccccd8e5b85bcb8a20f7fbd7c76836c1b"
+            ],
+            "stage": "normalize_cells",
+            "units": 41716
+          },
+          {
+            "changed": 0,
+            "new_identity": "ce240651a8509f832f8313cd9274afb007dfeba710952382f8cffa2a34d5c81b",
+            "old_identity": [],
+            "stage": "plate_country",
+            "units": 0
+          },
+          {
+            "changed": 726,
+            "new_identity": "c8df496494ec103a7ebc87ad307b8c691cb60f10cf5c1feac12cc0ea7e3a86a2",
+            "old_identity": [
+              "e63b0ab7a947273f25aa2f50c56a30254cc6c41337504896c123a2e6c17a6e04"
+            ],
+            "stage": "lookups",
+            "units": 726
+          },
+          {
+            "changed": 0,
+            "new_identity": "ab37abfeed404720713eac12a645da3f7f3f601e7f41415e681a38b22571fa74",
+            "old_identity": [],
+            "stage": "dataset",
+            "units": 0
+          },
+          {
+            "changed": 0,
+            "new_identity": "0ec0418f0f027958c184aa583abdc13080ea5607344eb3447099d83bb5535bd4",
+            "old_identity": [],
+            "stage": "packs",
+            "units": 0
+          },
+          {
+            "changed": 0,
+            "new_identity": "b7450636ddc44ad862eddf181394171c3680aa1ebaaef60b01c4ea227356ad02",
+            "old_identity": [],
+            "stage": "publish",
+            "units": 0
+          }
+        ],
+        "ledger_sha256": null,
+        "mode": "handover simulation",
+        "scope": "mapping and hashes only; no engine equivalence claim",
+        "stages": {
+          "cells": {
+            "current": 41442,
+            "new": 0,
+            "outputs_absent": 0,
+            "stale": 0
+          },
+          "cities": {
+            "current": 555,
+            "new": 0,
+            "outputs_absent": 0,
+            "stale": 0
+          },
+          "download": {
+            "current": 13,
+            "new": 0,
+            "outputs_absent": 4,
+            "stale": 0
+          },
+          "evaluate": {
+            "current": 1,
+            "new": 0,
+            "outputs_absent": 0,
+            "stale": 0
+          },
+          "lookups": {
+            "current": 726,
+            "new": 0,
+            "outputs_absent": 0,
+            "stale": 0
+          },
+          "normalize": {
+            "current": 13,
+            "new": 0,
+            "outputs_absent": 2,
+            "stale": 0
+          },
+          "normalize_cells": {
+            "current": 41716,
+            "new": 0,
+            "outputs_absent": 0,
+            "stale": 0
+          },
+          "reconcile": {
+            "current": 1111,
+            "new": 0,
+            "outputs_absent": 1111,
+            "stale": 0
+          }
+        }
+      },
+      "ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+      "original_ledger_sha256": "d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37",
+      "bytes_hashed": 17677116404,
+      "absent_paths_by_prefix": {
+        "raw/geoboundaries/": 63,
+        "raw/geonames/": 2,
+        "raw/osm_land/": 4,
+        "raw/overture/": 9,
+        "reconciled/": 834,
+        "work/geonames/": 3,
+        "work/overture/": 1,
+        "work/reconcile/": 1662
+      }
+    }
   }
 }

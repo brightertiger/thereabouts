@@ -4,10 +4,12 @@ from pathlib import Path
 
 import pyarrow.parquet as pq
 
+from pipeline.config.schema import H3
 from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.paths import located
 
+from .cell_groups import verify_index
 from .source import Row
 
 
@@ -20,6 +22,11 @@ def verify_dataset(root: Path) -> Row:
     ):
         raise ValueError("Incomplete release manifest")
     seen = set()
+    seen_blocks: set[str] = set()
+    grid = H3(
+        cell_resolution=manifest["reference_resolution"],
+        block_resolution=manifest["block_resolution"],
+    )
     for record in manifest["files"]:
         path = located(root, record["path"])
         if record["path"] in seen:
@@ -32,6 +39,9 @@ def verify_dataset(root: Path) -> Row:
             raise ValueError(f"Release checksum mismatch: {record['path']}")
         if "rows" in record and pq.read_metadata(path).num_rows != record["rows"]:
             raise ValueError(f"Release row count mismatch: {record['path']}")
+        if record.get("kind") == "cells":
+            with pq.ParquetFile(path) as file:
+                verify_index(record, file, grid, seen_blocks)
     for table in manifest["tables"]:
         if table not in manifest["files"]:
             raise ValueError("Release table is not in the verified file inventory")

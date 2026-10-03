@@ -9,10 +9,13 @@ schema is [DATASET_README.md](DATASET_README.md).
 Final-review fixes 1–6 cover automatic recovery, per-file/row licence notices,
 profile caps, the release runner proof, README/key checks and explicit H3 grids.
 Fix 7 adds the `pipeline` dependency group and a README render regression test;
-the offline lock refresh preserved all package/native versions. The refreshed
-subset is **8,810,295 bytes**; three reader examples and checksum verification
-passed. Render inputs are committed in the release measurements JSON.
-Fix 8's cells row-group contract and final handover remain next.
+the offline lock refresh preserved all package/native versions. Fix 8 implements
+the cells contract: one row group per retained r3 block, sorted by block, with a
+`blocks: [{block, row_group, rows}]` index in both manifest inventories. The MY/SG
+subset is **8,802,046 bytes** (17.05 s / 442,040,320 bytes RSS), with three row groups
+of **11,107 / 8,019 / 3,278 rows**. All three reader examples, index validation and
+checksums passed; its logical digest is unchanged. Render inputs are committed
+in the release measurements JSON. Final gate, plan and handover all pass.
 
 Package 1 supplies configuration, the single ledger/fingerprint rule, resource
 admission, runner and recoverable migration. Package 2 supplies the 13 retained
@@ -50,8 +53,8 @@ are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
-config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 53.69 s**
-(the independent review measured 175 s before fixes). Current suite: **684
+config `load()` **2.646 s → 0.158 s**; pytest **187.68 s → 46.29 s**
+(the independent review measured 175 s before fixes). Current suite: **692
 passed, 8 skipped**; Ruff check/format and strict mypy pass. The six Malaysia
 artifacts, including base cells, city index and mapping, match retained SHA256:
 **20.32 s**, **435,535,872 bytes RSS**, **141,524,404 output bytes**.
@@ -76,8 +79,8 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 | dataset / packs / publish (disabled) | 0 | 0 | 0 | 0 | 0 |
 | **Total** | **85,577** | **85,577** | **0** | **0** | **1,117** |
 
-Latest final-review plan: **333.06 s**, **1,410,711,552 bytes RSS**.
-Latest handover: package 4, **331.70 s / 1,473,708,032 bytes RSS**; repeated at fix 8.
+Latest final-review plan: **322.47 s**, **1,418,297,344 bytes RSS**.
+Final handover dry-run: **331.66 s / 1,262,174,208 bytes RSS**; all 85,577 units pass.
 Gate reports: [PIPELINE_FINAL_REVIEW_MEASUREMENTS.json](PIPELINE_FINAL_REVIEW_MEASUREMENTS.json).
 Real ledger SHA256 before/after:
 `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
@@ -166,9 +169,9 @@ availability has not been tested in this task.
 No stage or migration application ran with the real workspace as its output root;
 no full data rebuild, cloud access, push or public publication occurred. Real pack
 writing awaits `feat/rust-core` and its `thereabouts._core.write_pack` binding.
-The pipeline owns no copy of the binary format. The Rust writer also needs
-coalesced-cell input support: its inspected implementation expects one r3 block
-per table. Real packs and their sizes are unverified. The optional `s3fs` driver
+The pipeline owns no copy of the binary format. The Rust writer must consume
+the agreed block/row-group index in spec §8 and the dataset README; its code was
+not changed here. Real packs and their sizes are unverified. The optional `s3fs` driver
 is not installed/locked; resolve it before cloud publication. Only local and
 memory backends were exercised. VM setup execution is outside this task.
 
@@ -185,7 +188,7 @@ Retain this short status and linked detailed evidence. Update the frozen client'
 `src/thereabouts/manifest.py` missing-data command on the Rust branch; its current
 `python -m build_data` message and client test were intentionally left unchanged here.
 
-Worktree bytes: **995,195,541**; free disk: **50,093,326,336**. The initial scratch cleanup removed
+Worktree bytes: **1,069,461,976**; free disk: **49,140,457,472**. The initial scratch cleanup removed
 **1,049,266,242 bytes**. This task keeps new outputs below 3 GB and free disk above
 5 GB; all subsequent tests set workspace TMPDIR and pytest has a worktree basetemp.
 One early targeted pytest invocation omitted TMPDIR and wrote small synthetic
@@ -193,3 +196,5 @@ fixtures under macOS's external temporary directory (`pytest-233`); a temp-dir
 diagnostic also used OS temp. These exceptions were disclosed when found. The
 real `data/` was unaffected. No claim is made that absolutely every temporary
 write in this session stayed inside the worktree.
+The review reports earlier backup pushes from the main clone; their author is
+unverified here. No push command was issued while applying these final fixes.

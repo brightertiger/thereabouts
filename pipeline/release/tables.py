@@ -13,6 +13,7 @@ from pipeline.config.release import DatasetLimits
 from pipeline.engines.artifact_io import file_record
 
 from .budget import Budget, Sink
+from .cell_groups import CellGroups
 from .selection import Selection
 from .source import Row, Snapshot, TableFile
 
@@ -29,7 +30,9 @@ def groups(
 ) -> dict[str, list[TableFile]]:
     result: dict[str, list[TableFile]] = defaultdict(list)
     for kind, records in sorted(snapshot.tables.items()):
-        for record in sorted(records, key=lambda item: item.path):
+        for record in sorted(
+            records, key=lambda item: (int(item.block or "0", 16), item.path)
+        ):
             if not selection.includes(record):
                 continue
             partition = ""
@@ -89,6 +92,9 @@ def assemble_tables(
                 compression=cast(Literal["zstd", "snappy"], limits.compression),
             ) as writer,
         ):
+            cell_groups = (
+                CellGroups(writer, schema, selection.grid) if kind == "cells" else None
+            )
             for record in records:
                 original = snapshot.verify(record)
                 with pq.ParquetFile(original) as file:
@@ -114,6 +120,10 @@ def assemble_tables(
                                 for value in selected.column("license").to_pylist()
                                 if value
                             )
+                        rows += selected.num_rows
+                        if cell_groups is not None:
+                            cell_groups.add(record.block, selected)
+                            continue
                         pending.append(selected)
                         pending_rows += selected.num_rows
                         if pending_rows >= limits.row_group_rows:
@@ -123,8 +133,9 @@ def assemble_tables(
                             )
                             pending.clear()
                             pending_rows = 0
-                        rows += selected.num_rows
                 snapshot.verify(record)
+            if cell_groups is not None:
+                cell_groups.finish()
             if pending:
                 writer.write_table(
                     pa.Table.from_batches(pending, schema=schema),
@@ -132,5 +143,8 @@ def assemble_tables(
                 )
         if pq.read_metadata(path).num_rows != rows:
             raise ValueError(f"Written row count differs: {relative}")
-        tables.append({**file_record(output, path), "kind": kind, "rows": rows})
+        entry: Row = {**file_record(output, path), "kind": kind, "rows": rows}
+        if cell_groups is not None:
+            entry["blocks"] = cell_groups.blocks
+        tables.append(entry)
     return tables, sources, row_licences

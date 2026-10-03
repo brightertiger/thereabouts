@@ -8,7 +8,7 @@ real migration was applied, and no cloud upload was made during this task.
 
 The measured development sample is an Apple M2 with 8 GiB RAM. The release proof
 contains Malaysia/Singapore catalogues and three spatial blocks, not a world
-release: 181,548 rows, 14 tables and 8,736,970 bytes. Its three reader examples and
+release: 181,548 rows, 14 tables and 8,802,046 bytes. Its three reader examples and
 local/memory publication tests passed. See
 [PIPELINE_RELEASE_MEASUREMENTS.json](PIPELINE_RELEASE_MEASUREMENTS.json) and the
 [dataset README](DATASET_README.md). VM capacity and cloud throughput have not been
@@ -18,9 +18,10 @@ measured.
 
 Merge the reviewed pipeline and Rust client work together. The pipeline calls
 `thereabouts._core.write_pack(dataset_dir, family, output_dir, options)` and owns
-no pack-format implementation. The inspected Rust writer still expects one r3
-block per Parquet input, whereas the release groups blocks under their r1 parent.
-Teach the client writer to handle those coalesced inputs, then validate its packs
+no pack-format implementation. The release groups blocks under their r1 parent,
+with one row group per retained r3 block, sorted by block. Each cells manifest
+entry's `blocks` index gives the block ID, zero-based `row_group` and `rows`.
+Update the Rust writer to route through that index, then validate its packs
 and clients against a complete release. The small dataset subset validates
 Parquet readers; it is not a proof of every pack's catalogue-reference closure.
 

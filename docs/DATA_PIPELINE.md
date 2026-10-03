@@ -427,7 +427,11 @@ The dataset stage consumes the completed `lookups/manifest/current` unit, whose
 manifest includes normalized cells and country catalogues. It checks each input's
 SHA256, row count and schema before and after reading. Cell files group resolution-3
 blocks by a resolution-1 parent (up to 49 blocks); the world routing has at most
-842 groups. Each group is streamed, with bounded batches and row groups.
+842 groups. Within each file, every retained block occupies one Parquet row
+group, sorted by block. The cells manifest entry's `blocks` list maps each block
+to its zero-based `row_group` and `rows`. Empty blocks are omitted. Buffering is
+bounded by one block's reference-cell count; `row_group_rows` controls other
+tables. The full reader contract is in the dataset README's Cell keys section.
 `config/dataset.yaml` declares all fourteen retained table schemas, their keys,
 column meanings, units and physical nullability. Additional optional plate tables
 must be given reviewed schemas there before release; those sources are disabled.
@@ -472,10 +476,10 @@ is committed as [DATASET_README.md](DATASET_README.md).
 `thereabouts._core.write_pack(dataset_dir, family, output_dir, options)`. The
 adapter adds source notices and input provenance and re-verifies returned files.
 Tests inject a fake writer; they do not implement the binary format. Real use
-requires the Rust branch merge **and support in that writer for coalesced cell
-inputs**. At inspection, its `emission::cells` still required one block per table
-and at most 16,807 stored rows. The release contains a grouped file with 22,404
-rows, so the client needs to stream/group that file before real pack validation.
+requires the Rust branch merge **and support in that writer for the manifest's
+block/row-group index**. The refreshed subset contains one grouped file with
+22,404 rows across three indexed blocks; the client must read the specified row
+group for each block before real pack validation.
 No real pack-size claim is made here. Writer changes must update the client
 package version or cell format version; client source bytes are not hashed.
 

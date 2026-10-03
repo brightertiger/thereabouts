@@ -10,7 +10,7 @@ This release is an immutable, measured export of completed normalization outputs
 dataset/2026.10/
 ├── airports/part.parquet  # 25 rows; 14,291 bytes
 ├── canonical_cities/country=*/part.parquet  # 408 rows; 34,789 bytes
-├── cells/group=*/part.parquet  # 22,404 rows; 183,373 bytes
+├── cells/group=*/part.parquet  # 22,404 rows; 173,850 bytes
 ├── countries/part.parquet  # 2 rows; 18,584 bytes
 ├── ip_ranges/part.parquet  # 36,547 rows; 1,493,691 bytes
 ├── phone_metadata/part.parquet  # 2 rows; 26,146 bytes
@@ -37,6 +37,8 @@ The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.j
 Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-1 parent selects the coalesced file. The directory `group=<r1 hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this export has no result, including outside the subset or land coverage.
 
 `h3` is lowercase hexadecimal text without `0x`; `h3_uint64` is the same unsigned 64-bit H3 index, with resolution in bits 52–55 and base-cell/child digits in the standard H3 representation. These are global H3 indexes, not a client pack's local integer offsets. `h3_resolution` says how many levels that stored row represents. Resolution 8 is the reference precision; coarser rows encode identical assignments for their descendant centres.
+
+Each coalesced cells file contains **one Parquet row group per retained resolution-3 block**, ordered by ascending block ID. All rows of a block occupy that single row group, even when the input spans several files or batches. Blocks with no selected rows are omitted; an empty cells file has no row groups. Every cells entry in both `manifest.json.tables` and `manifest.json.files` includes `blocks: [{"block": "<r3 hex>", "row_group": 0, "rows": n}, ...]`. Block IDs are lowercase hexadecimal without `0x`, `row_group` is the zero-based Parquet row-group index, and `rows` is that group's row count. Readers and the client pack writer locate the coordinate's resolution-3 parent in this index, read that row group, then match the stored ancestors described above. The file's `rows` equals the sum of its block counts; no row group contains multiple blocks.
 
 Cell `country_id`, `state_id` and `city_id` link to `places.place_id`. The `canonical_cities` table contains eligible city/town anchors that can absorb other settlements; it is not a catalogue of every rural result. Standalone villages and other rural settlements can retain their own place IDs in `city_id`. `places.normalized_city_id` and `place_to_city.city_id` expose the reviewed mapping, including self-mappings and nulls for non-settlements. Source city/municipality strings are retained independently. The selected settlement can differ from the nearest named place or an administrative district. Legacy `city:` ID prefixes do not prove an entity is a city; inspect its `role` and `settlement_kind`.
 
@@ -107,7 +109,7 @@ Layout: `canonical_cities/country=*/part.parquet`. Primary key: city_id. 2 files
 
 ### `cells`
 
-Layout: `cells/group=*/part.parquet`. Primary key: h3_uint64. 1 files, 22,404 rows, 183,373 compressed bytes.
+Layout: `cells/group=*/part.parquet`. Primary key: h3_uint64. 1 files, 22,404 rows, 173,850 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -504,7 +506,7 @@ Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positi
 
 Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `<version>/_SUCCESS` receipt, written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
-The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
+The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
 
 With Python 3.11 or newer and `DATASET` set, verify local bytes without loading the tables:
 
