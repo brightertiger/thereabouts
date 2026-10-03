@@ -49,9 +49,7 @@ pub fn write_pack(
     options: &Options,
 ) -> Result<Manifest> {
     if family != "core" {
-        return Err(Error::Incompatible(
-            "Only the core family is implemented".into(),
-        ));
+        return Err(Error::Input("Only the core family is implemented".into()));
     }
     ensure(
         !options.data_version.is_empty(),
@@ -79,7 +77,16 @@ pub fn write_pack(
         .ok_or_else(|| Error::Input("Invalid output name".into()))?;
     let stage = parent.join(format!(".{name}.building"));
     // create_dir is the exclusive writer lock; interrupted work is kept for review.
-    fs::create_dir(&stage)?;
+    fs::create_dir(&stage).map_err(|error| {
+        if error.kind() == std::io::ErrorKind::AlreadyExists {
+            Error::Input(format!(
+                "Staging directory exists; remove {} and retry",
+                stage.display()
+            ))
+        } else {
+            error.into()
+        }
+    })?;
     let result = build(&data, &stage, options, input_digest, identity);
     match result {
         Ok(manifest) => {
@@ -87,7 +94,8 @@ pub fn write_pack(
             Ok(manifest)
         }
         Err(error) => {
-            fs::remove_dir_all(&stage)?;
+            // Cleanup is best effort; never hide the original export failure.
+            let _ = fs::remove_dir_all(&stage);
             Err(error)
         }
     }

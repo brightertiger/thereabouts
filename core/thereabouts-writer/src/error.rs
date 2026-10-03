@@ -6,8 +6,6 @@ use thiserror::Error;
 pub enum Error {
     #[error("{0}")]
     Input(String),
-    #[error("{0}")]
-    Incompatible(String),
     #[error(transparent)]
     Core(#[from] thereabouts_core::Error),
     #[error(transparent)]
@@ -22,14 +20,14 @@ pub enum Error {
     Sql(#[from] rusqlite::Error),
 }
 impl Error {
-    /// Stable boundary code; reader failures retain their original code.
+    /// Stable export boundary code; no writer failure masquerades as a reader failure.
     #[must_use]
     pub fn code(&self) -> &'static str {
         match self {
-            Self::Core(error) => error.code(),
-            Self::Incompatible(_) => "incompatible_data",
-            Self::Input(_) => "invalid_input",
-            _ => "corrupt_pack",
+            Self::Input(_) | Self::Json(_) | Self::Parquet(_) | Self::Arrow(_) => {
+                "writer_input_error"
+            }
+            Self::Core(_) | Self::Io(_) | Self::Sql(_) => "writer_error",
         }
     }
 }

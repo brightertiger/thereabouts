@@ -6,6 +6,8 @@ use thiserror::Error;
 pub enum Error {
     #[error("thereabouts data install core")]
     Missing,
+    #[error("Pack not found: {0}")]
+    PackNotFound(std::path::PathBuf),
     #[error("{0}")]
     Incompatible(String),
     #[error("{0}")]
@@ -25,6 +27,7 @@ impl Error {
     pub const fn code(&self) -> &'static str {
         match self {
             Self::Missing => "data_not_installed",
+            Self::PackNotFound(_) => "pack_not_found",
             Self::Incompatible(_) => "incompatible_data",
             Self::Closed => "closed_geocoder",
             Self::Input(_) => "invalid_input",

@@ -8,7 +8,7 @@ class GeocoderError(Exception):
 
 
 class DataNotInstalledError(GeocoderError):
-    """No data pack was selected or the selected directory does not exist."""
+    """No core pack is installed in the selected store."""
 
     code = "data_not_installed"
 
@@ -37,3 +37,21 @@ class CorruptPackError(GeocoderError):
     """A pack's checksum, record, or inventory failed validation."""
 
     code = "corrupt_pack"
+
+
+class PackNotFoundError(GeocoderError, FileNotFoundError):
+    """An explicitly selected pack directory does not exist."""
+
+    code = "pack_not_found"
+
+
+class WriterError(GeocoderError, ValueError):
+    """A staging or output operation failed during dataset export."""
+
+    code = "writer_error"
+
+
+class WriterInputError(WriterError):
+    """Dataset input, options or staging state prevents export."""
+
+    code = "writer_input_error"

@@ -70,7 +70,7 @@ pub fn artifact_path(root: &Path, name: &str) -> Result<PathBuf> {
 /// Read compatible metadata, limiting allocations before JSON parsing.
 pub fn read(root: &Path) -> Result<Manifest> {
     if !root.exists() {
-        return Err(Error::Missing);
+        return Err(Error::PackNotFound(root.to_owned()));
     }
     let path = artifact_path(root, "manifest.json")?;
     ensure(

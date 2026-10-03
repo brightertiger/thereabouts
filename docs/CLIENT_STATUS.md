@@ -25,6 +25,9 @@ Review fix 7 asserts all 35 legacy reverse requests against their original
 expectations in Rust and Python, with only two declared migrations: accepting
 case 47 at r3 and using the canonical city name. A committed source extract
 makes the independent golden comparison part of offline pytest.
+Review fix 8 distinguishes absent explicit paths (pack_not_found), missing
+store data and writer inputs. Stale-stage messages name the cleanup path;
+cleanup failures no longer hide the original export error.
 Remaining review fixes are in progress.
 
 ## Built and usable

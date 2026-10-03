@@ -20,6 +20,9 @@ fn error(py: Python<'_>, error: &Error) -> PyErr {
 fn coded_error(py: Python<'_>, code: &str, message: &str) -> PyErr {
     let name = match code {
         "data_not_installed" => "DataNotInstalledError",
+        "pack_not_found" => "PackNotFoundError",
+        "writer_input_error" => "WriterInputError",
+        "writer_error" => "WriterError",
         "incompatible_data" => "IncompatibleDataError",
         "closed_geocoder" => "ClosedGeocoderError",
         _ => "CorruptPackError",
@@ -146,8 +149,8 @@ fn write_pack(
         .import("json")?
         .call_method1("dumps", (options,))?
         .extract()?;
-    let options: writer::Options =
-        serde_json::from_str(&json).map_err(|e| PyValueError::new_err(e.to_string()))?;
+    let options: writer::Options = serde_json::from_str(&json)
+        .map_err(|e| coded_error(py, "writer_input_error", &e.to_string()))?;
     let manifest = py
         .detach(|| {
             writer::write_pack(

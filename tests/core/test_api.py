@@ -54,6 +54,9 @@ def test_public_exports_and_keyword_coordinates() -> None:
         "IncompatibleDataError",
         "CorruptPackError",
         "ClosedGeocoderError",
+        "PackNotFoundError",
+        "WriterError",
+        "WriterInputError",
     }
     with Geocoder(SAMPLE) as geo:
         with pytest.raises(TypeError):

@@ -284,8 +284,12 @@ SHA-256 and whole-pack structural verification are opt-in at open
 (`Pack::open(path, true)`, Python `Geocoder(path, verify=True)`).
 `verify_pack` always checks every hash, every record and catalogue ordering
 across shard boundaries. Default opening does not promise detection of damage
-in unused payloads. Neither lookup nor verification performs network I/O. Missing packs raise
-`data_not_installed` with message `thereabouts data install core`; unsupported
+in unused payloads. Neither lookup nor verification performs network I/O. Missing store installations raise `data_not_installed` with message
+`thereabouts data install core`. A missing explicit directory raises
+`pack_not_found` and includes the path. Writer inputs raise
+`writer_input_error` (Python `WriterInputError`, a `ValueError` subclass); staging
+IO failures use `writer_error`. A stale stage names the directory to remove
+before retry; failed cleanup never replaces the original export error. Unsupported
 format/family raises `incompatible_data`, damage raises `corrupt_pack`, and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query
 values are result statuses, not pack exceptions.
