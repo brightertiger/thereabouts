@@ -44,6 +44,15 @@ def test_interrupt_between_json_and_ledger_is_recoverable(
         finally:
             migration.context.ledger.close()
     assert (root / "work/migration/pending.json").exists()
+    target = root / "normalized/ghsl"
+    interrupted_files = {p: p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    target.chmod(0o555)
+    try:
+        with pytest.raises(ValueError, match=r"chmod u\+w"):
+            recover(root, path, root / "work")
+        assert all(p.read_bytes() == data for p, data in interrupted_files.items())
+    finally:
+        target.chmod(0o755)
     recover(root, path, root / "work")
     assert not (root / "work/migration/pending.json").exists()
     assert all(p.read_bytes() == data for p, data in before.items())
@@ -58,6 +67,7 @@ def test_interrupt_between_json_and_ledger_is_recoverable(
 def test_separate_paths_and_adopt_steps_and_idempotence(tmp_path: Path) -> None:
     root = tmp_path / "data"
     path = legacy_workspace(root)
+    original = path.read_bytes()
     common = ["--root", str(root), "--report", str(tmp_path / "report.json")]
     assert main(["migrate", "paths", *common]) == 0
     with Ledger(root, path) as ledger:
@@ -68,6 +78,7 @@ def test_separate_paths_and_adopt_steps_and_idempotence(tmp_path: Path) -> None:
             for output in r.outputs
         )
     assert main(["migrate", "adopt", *common]) == 0
+    assert (root / "work/ledger.pre-migration.sqlite3").read_bytes() == original
     before = {
         p: (p.stat().st_mtime_ns, p.read_bytes())
         for p in root.rglob("*")

@@ -20,12 +20,15 @@ from pipeline.runtime.paths import located
 from pipeline.runtime.resources import disk_free
 
 from .adoption import Migration
+from .backup import verify_backup
+from .preflight import apply_targets, check_writable, recovery_targets
 
 
 def recover(root: Path, ledger_path: Path, work: Path) -> None:
     journal = work / "migration/pending.json"
     if not journal.exists():
         return
+    check_writable(recovery_targets(root, work))
     record = read_object(journal)
     db = read_connection(ledger_path)
     try:
@@ -68,6 +71,8 @@ def apply(migration: Migration, source: Ledger, target: Path) -> None:
     ctx = migration.context
     root = ctx.root
     work = located(root, ctx.config.paths.work)
+    check_writable(apply_targets(migration, target))
+    verify_backup(ctx, migration.report)
     if source.path is None or source.path.absolute() != target.absolute():
         raise ValueError("Migration must apply to the workspace's original ledger")
     if sha256_file(source.path) != migration.report["ledger_sha256"]:
@@ -94,7 +99,7 @@ def apply(migration: Migration, source: Ledger, target: Path) -> None:
 
 def _apply(migration: Migration, source: Ledger, target: Path, work: Path) -> None:
     root = migration.context.root
-    backup = work / "ledger.pre-migration.sqlite3"
+    backup = verify_backup(migration.context, migration.report)
     if not backup.exists():
         with atomic_output(backup) as temporary:
             assert source.path is not None
@@ -111,6 +116,11 @@ def _apply(migration: Migration, source: Ledger, target: Path, work: Path) -> No
             temporary.write_bytes(original)
     marker = uuid.uuid4().hex
     db = migration.context.ledger.db
+    db.execute("CREATE TABLE migration_origin (sha256 TEXT NOT NULL)")
+    db.execute(
+        "INSERT INTO migration_origin VALUES (?)",
+        (migration.report["original_ledger_sha256"],),
+    )
     db.execute("CREATE TABLE migration_commit (digest TEXT NOT NULL)")
     db.execute("INSERT INTO migration_commit VALUES (?)", (marker,))
     db.commit()

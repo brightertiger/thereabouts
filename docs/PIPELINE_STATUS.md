@@ -5,6 +5,58 @@ the retained workspace. Work is on `feat/pipeline`; commits are local only. Pack
 deferred at this reviewable package boundary. The real workspace has only been
 read, and its migration has not been applied.
 
+## Review fixes 1–3
+
+Fixes H1, H2 and M4 are implemented together: verified one-time identity handover,
+permission preflight before lock/backup/journal creation (including recovery), and
+original-backup verification across separate paths/adopt operations. The source
+ledger remains `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
+Checks: 685 tests passed, 8 skipped; Ruff/format passed (468 files); strict mypy
+passed (452 source files). Read-only plan and handover dry-run both reproduce the
+stage table below: 85,577 current, zero stale/new.
+
+`migrate handover --dry-run` on an adopted ledger compares independently discovered
+ported-stage keys with the saved keys, verifies outputs, and proposes only new
+identity, parameters and input hash. Outputs, completion times, custody and absent
+markers stay intact. It refuses changed dependencies and a second identity change
+after handover. The handover audit lives separately in SQLite. No stage is ported
+yet, so the real-workspace dry run has zero eligible ported stages at this commit;
+the transition is exercised on synthetic applied ledgers.
+
+The protected workspace still has its legacy ledger. A handover dry run there
+first simulates adoption using `config/adoption.yaml`, then checks any ported
+stages' independent discovery. Plan prints explicitly that zero stale under this
+simulation is by construction: it checks mapping and hashes, not engine
+semantics. Packages 2 and 3 must additionally pass handover on an applied copied
+ledger and the independent source/engine tests. Ordinary plan against an applied
+ledger remains strict and does not silently hand over changed identities.
+
+For reviewer application, generate a fresh dry-run report first. It lists exactly
+the existing directories needing temporary write permission in
+`writable_directories` (302 at this checkpoint). Apply and recover also print each
+exact `chmod u+w` command and its matching `chmod a-w` command if permission is
+missing. Neither command runs chmod itself. Run these commands **only as the
+reviewer applying the approved migration**, from this worktree:
+
+```sh
+PIPELINE_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
+.venv/bin/python -m pipeline migrate --dry-run --root "$PIPELINE_DATA" --report .cache/pipeline/migration.json
+.venv/bin/python -c 'import json; print("\n".join(json.load(open(".cache/pipeline/migration.json"))["writable_directories"]))' > .cache/pipeline/writable-directories.txt
+while IFS= read -r directory; do
+  [ -z "$directory" ] || chmod u+w "$PIPELINE_DATA/$directory"
+done < .cache/pipeline/writable-directories.txt
+.venv/bin/python -m pipeline migrate --root "$PIPELINE_DATA" --report .cache/pipeline/migration-applied.json
+.venv/bin/python -m pipeline migrate check --root "$PIPELINE_DATA"
+while IFS= read -r directory; do
+  [ -z "$directory" ] || chmod a-w "$PIPELINE_DATA/$directory"
+done < .cache/pipeline/writable-directories.txt
+```
+
+Keep the directory list until application/recovery has completed and protections
+are restored. It is generated before chmod and is not replaced by the application
+report. No chmod command above was executed against the real workspace.
+Review fixes 4–9, then packages 2 and 3, are the next work.
+
 ## What is built
 
 The runtime includes OmegaConf schemas/profiles and overrides, a relative-path

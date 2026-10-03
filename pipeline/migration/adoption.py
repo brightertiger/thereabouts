@@ -16,6 +16,7 @@ from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.verification import Verifier
 from pipeline.stages.contract import Context, Stage, make_unit
 
+from .backup import original_hash
 from .candidates import Candidate, collect, parameters
 from .dependencies import dependencies
 from .evidence import add_evidence
@@ -149,6 +150,7 @@ def simulate(
     report: Object = {
         "mode": "simulation",
         "ledger_sha256": ledger_hash,
+        "original_ledger_sha256": original_hash(source),
         "identities": {name: value for name, value in identities.items()},
         "unit_inputs": [
             {

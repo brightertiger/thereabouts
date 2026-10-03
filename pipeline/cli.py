@@ -9,9 +9,8 @@ from pathlib import Path
 
 from pipeline.config import Config, load
 from pipeline.config.loader import CONFIG_DIR
-from pipeline.migration.adoption import simulate
-from pipeline.migration.apply import recover
 from pipeline.migration.command import migrate, migration_step
+from pipeline.migration.simulation import SIMULATION_NOTICE, simulate_handover
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.paths import located
@@ -92,13 +91,6 @@ def execute(args: argparse.Namespace) -> int:
         raise ValueError("--details is a plan option")
     if args.report and args.command not in {"plan", "migrate", "status"}:
         raise ValueError("--report is a plan, status or migrate option")
-    if args.command == "migrate" and not args.dry_run and step != "check":
-        with exclusive(located(root, config.paths.work) / "pipeline.lock"):
-            recover(root, ledger_path, root / config.paths.work)
-            with Ledger(root, ledger_path) as ledger:
-                return migrate(
-                    context(config, root, ledger), stages, step, False, report
-                )
     with Ledger(root, ledger_path, readonly=True) as ledger:
         ctx = context(config, root, ledger)
         if args.command == "migrate":
@@ -143,12 +135,8 @@ def execute(args: argparse.Namespace) -> int:
             return 0
         migration = None
         if not ledger.migrated:
-            print(
-                "SIMULATED ADOPTION: on-disk ledger unchanged; "
-                "verifying existing bytes.",
-                flush=True,
-            )
-            migration = simulate(root, ledger, config, stages)
+            print(SIMULATION_NOTICE, flush=True)
+            migration = simulate_handover(ctx, stages)
             ctx = migration.context
         try:
             decisions = migration.decisions if migration else plan(ctx, stages)
