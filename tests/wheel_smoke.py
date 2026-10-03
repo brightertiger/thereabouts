@@ -3,7 +3,7 @@
 import importlib.util
 import os
 import subprocess
-import sys
+import sysconfig
 import tempfile
 from pathlib import Path
 
@@ -17,7 +17,13 @@ def main() -> None:
     with tempfile.TemporaryDirectory() as directory:
         env = os.environ | {"THEREABOUTS_DATA": directory}
         result = subprocess.run(
-            [str(Path(sys.executable).with_name("thereabouts")), "--version"],
+            [
+                str(
+                    Path(sysconfig.get_path("scripts"))
+                    / ("thereabouts.exe" if os.name == "nt" else "thereabouts")
+                ),
+                "--version",
+            ],
             env=env,
             capture_output=True,
             text=True,

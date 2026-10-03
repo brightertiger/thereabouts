@@ -1,0 +1,27 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "python": "3.12.8",
+  "artifacts": {
+    "thereabouts-0.1.0-cp311-abi3-macosx_11_0_arm64.whl": {
+      "bytes": 6223453,
+      "sha256": "fcea1f2ce8dcf574dafb94e5171717746c3d29f800dee1046ad0c8d450396ac8"
+    },
+    "thereabouts-0.1.0.tar.gz": {
+      "bytes": 189342,
+      "sha256": "fa9e1e03d0fb884508c6f60d2ad86772f08c4f3f718fdc731bc412f0fd8bd9f2"
+    },
+    "thereabouts-0.1.0.tgz": {
+      "bytes": 904011,
+      "sha256": "fbaf72f2c0bd2716fefc9f871ceb92fff32b260fc494792e783c9ea5e3630e28"
+    }
+  },
+  "checks": [
+    "fresh pip install . no-data import/version",
+    "wheel no-data import/version",
+    "sdist wheel build and no-data import/version",
+    "npm packed library lookup",
+    "npm packed bin version"
+  ],
+  "remote_workflows_executed": false,
+  "published": false
+}

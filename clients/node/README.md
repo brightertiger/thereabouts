@@ -3,7 +3,8 @@
 Offline geographic context from one Rust core compiled to WebAssembly.
 Node 22 or 24, ESM, with TypeScript declarations. No geographic data is bundled,
 and lookups never download data. The package version is 0.1.0; it has not been
-published. Code licensing remains UNLICENSED pending the owner's release decision.
+published. The registry's 0.0.1 placeholder is replaced only by the owner's
+0.1.0 publication. Code licensing remains UNLICENSED pending the owner's decision.
 
 ~~~js
 import { Geocoder } from "thereabouts";
@@ -51,6 +52,14 @@ and time zones; standalone forward packs retain their own source fields and
 have null city/timezone detail. Catalogue pins are checked before enrichment.
 verify: true checks full checksums and structures. Normal open checks
 manifests, inventory and sizes. Keep pack files immutable.
+
+## Install an artifact
+
+Build with npm pack from this directory, then install the resulting
+thereabouts-0.1.0.tgz in your application with npm install /path/to/the/archive.
+The Node workflow builds and tests on 22 and 24 and retains that tarball.
+No workflow has been run remotely; publication requires a manually approved tag.
+See repository docs/CLIENT_RELEASE.md and LICENSE-DECISION.md.
 
 ## Commands and data
 

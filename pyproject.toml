@@ -5,8 +5,10 @@ build-backend = "maturin"
 [project]
 name = "thereabouts"
 version = "0.1.0"
-description = "Offline H3 city, state and country lookup"
-readme = "README.md"
+description = "Offline geographic context from a shared Rust core"
+readme = "src/thereabouts/README.md"
+# A decision note is not a granted code licence.
+license-files = []
 requires-python = ">=3.11"
 dependencies = ["numpy>=2.0,<2.4"]
 

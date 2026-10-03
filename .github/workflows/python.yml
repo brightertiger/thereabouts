@@ -1,0 +1,122 @@
+name: Python
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the approved tagged 0.1.0 artifacts
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.99"
+          components: clippy, rustfmt
+          targets: wasm32-unknown-unknown
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff check && uv run ruff format --check && uv run mypy
+      - run: uv run pytest
+      - working-directory: core
+        run: |
+          cargo fmt --check
+          cargo clippy --locked --all-targets --all-features -- -D warnings
+          cargo test --locked
+          cargo check --locked -p thereabouts-core -p thereabouts-cli-core -p thereabouts-wasm --target wasm32-unknown-unknown
+  wheels:
+    needs: qualify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: x86_64
+            manylinux: "2014"
+            interpreter: /opt/python/cp311-cp311/bin/python
+          - os: ubuntu-24.04-arm
+            target: aarch64
+            manylinux: "2014"
+            interpreter: /opt/python/cp311-cp311/bin/python
+          - os: macos-15-intel
+            target: x86_64
+            manylinux: "off"
+            interpreter: python
+          - os: macos-14
+            target: aarch64
+            manylinux: "off"
+            interpreter: python
+          - os: windows-latest
+            target: x86_64
+            manylinux: "off"
+            interpreter: python
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: ${{ matrix.manylinux }}
+          rust-toolchain: "1.99"
+          command: build
+          args: --locked --release --out dist --interpreter ${{ matrix.interpreter }}
+      - name: Install and smoke test the wheel without data
+        shell: bash
+        run: |
+          python -m pip install dist/*.whl
+          python tests/wheel_smoke.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.target }}
+          path: dist/*.whl
+  sdist:
+    needs: qualify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.99"
+      - uses: astral-sh/setup-uv@v6
+      - run: uvx --from "maturin>=1.9,<2" maturin sdist --out dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-distribution
+          path: dist/*.tar.gz
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish && startsWith(github.ref, 'refs/tags/v')
+    needs: [qualify, wheels, sdist]
+    runs-on: ubuntu-24.04
+    # Owner must configure required reviewers and trusted publishing for this environment.
+    environment: pypi-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Require the tag to match the package version
+        run: python -c 'import os,tomllib; assert os.environ["GITHUB_REF_NAME"] == "v"+tomllib.load(open("pyproject.toml","rb"))["project"]["version"]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: source-distribution
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1

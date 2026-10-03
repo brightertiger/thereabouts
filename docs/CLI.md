@@ -356,8 +356,8 @@ returning the same result JSON as Python, including evidence when requested.
 There are no install or arbitrary-path tools. The optional thereabouts[mcp]
 extra is imported only for mcp; startup without it exits 2 with an explicit
 installation hint. No banner is printed on the MCP protocol stream.
-Legacy CLI and catalogue MCP modules remain under commandline/application.py
-and mcp_service/catalogue_server.py for existing callers until package 5.
+The old Python CLI and catalogue MCP modules have been retired. The public
+console delegates directly to the native Rust command tree.
 
 ## Conformance boundaries
 
@@ -445,3 +445,12 @@ NUL values use the same JS runner and typed non-string values remain library
 assertions. Numeric comparison uses the Rust runner's 1e-10 absolute tolerance
 for target-specific transcendental arithmetic in H3 cell centres. No expected
 geography, statuses or candidate ordering is changed for Node.
+
+## Building a local release
+
+The pipeline release packs command produces packs/<version>/index.json and
+one deterministic ustar archive per family, after all requested packs verify.
+Pass that version directory to data install --from. Core must be included when
+building forward packs so their catalogue pins have a concrete dependency.
+See [DATA_PIPELINE.md](DATA_PIPELINE.md) for prepared-dataset commands and
+[CLIENT_RELEASE.md](CLIENT_RELEASE.md) for package artifact workflows.
