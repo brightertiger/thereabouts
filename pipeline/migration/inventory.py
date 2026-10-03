@@ -9,6 +9,7 @@ from pipeline.runtime.jsonio import Object, digest, read_object, sha256_file
 from pipeline.runtime.paths import located, relative
 from pipeline.runtime.records import Output, outputs_from_json
 
+from .layout import ACTIVE_MANIFEST, NORMALIZED, OFFLOADED
 from .paths import portable
 
 
@@ -31,7 +32,7 @@ class Inventory:
     @classmethod
     def read(cls, root: Path) -> "Inventory":
         result = cls(root)
-        for path in sorted((root / "normalized").glob("*/manifest.json")):
+        for path in sorted((root / NORMALIZED).glob("*/manifest.json")):
             manifest = read_object(path)
             source = str(manifest["source"])
             if source != path.parent.name or source in result.sources:
@@ -39,7 +40,7 @@ class Inventory:
             result.sources[source] = manifest
             if source == "plates":
                 result._plate_evidence(manifest)
-            offload = root / "work" / "offloaded" / f"{source}.json"
+            offload = root / OFFLOADED / f"{source}.json"
             if offload.exists():
                 state = read_object(offload)
                 if state.get("offloaded"):
@@ -62,7 +63,7 @@ class Inventory:
                 if kind in {"cells", "places"}:
                     key = str(table["block" if kind == "cells" else "country"])
                     result.base_units[kind, key] = output
-        active = root / "golden/manifest.json"
+        active = root / ACTIVE_MANIFEST
         if active.exists():
             result.active = read_object(active)
             tables = cast(list[Object], result.active["tables"])

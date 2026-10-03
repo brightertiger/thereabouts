@@ -7,7 +7,7 @@
 The world rebuild is complete. This report uses the final published stored cells
 and [quality.json](../../data/golden/quality.json), with v0 figures explicitly marked
 for comparison. Schema and lookup semantics are in
-[GOLDEN_DATASET.md](golden-dataset.md); source and city policy are in
+[GOLDEN_DATASET.md](../GOLDEN_DATASET.md); source and city policy are in
 [RECONCILIATION.md](../RECONCILIATION.md).
 
 ## Final table rows and cell resolutions

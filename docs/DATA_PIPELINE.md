@@ -16,7 +16,9 @@ work instead of removing it from the plan.
 
 ## Inspect an existing workspace
 
-Install dependencies in this checkout, then use its interpreter:
+Install dependencies in this checkout, then use its interpreter. Every relative
+`data/pipeline-work/` path below belongs to this checkout, never to the existing
+workspace passed with `--root`:
 
 ```sh
 mkdir -p data/pipeline-work/tmp
@@ -31,7 +33,7 @@ new units, with `--details` explaining noncurrent units. Intentionally absent
 reconciliation outputs and offloaded raw files have a separate `absent` count.
 Their recorded hashes keep unchanged consumers current; a consumer that must run
 first requires its missing direct inputs to be materialized. Remote custody is
-recorded evidence, not a claim that remote objects were checked during this task.
+recorded evidence; migration validation does not check remote objects.
 
 For a legacy ledger, `plan` prints **SIMULATED ADOPTION** and verifies the proposed
 migration in memory. It does not alter the saved identities or any workspace
@@ -99,16 +101,20 @@ a discrepancy by rebuilding.
 Base-cell records are matched to the selected immutable base by block/country,
 original table identity and content hash. They cannot be verified through an
 active `golden` symlink that now points at normalized cells. Superseded pilot,
-normalization and lookup receipts are dropped, along with expendable acquisition
-indexes; the old ledger remains backed up. Reconciliation units whose outputs
-were intentionally deleted retain their recorded hashes and `outputs_absent`.
+normalization and lookup receipts are dropped; the old ledger remains backed up.
+GeoNames extraction/index and Overture index outputs remain owned by normalize.
+Their bytes must re-verify; already-missing auxiliary payloads currently block
+the real workspace adoption (see [status](PIPELINE_STATUS.md)). Reconciliation
+absence is allowed only under `reconciled/` and `work/reconcile/`; those units
+retain recorded hashes and `outputs_absent`.
 Missing raw payloads require an offload receipt bound to the exact source
 manifest. Present corrupt files are never excused by either mechanism.
 
 Six plate-source auxiliary JSON files originally lived in the repository. The
 migration verifies their original recorded hashes, proposes byte-identical
 copies under `raw/plates/configuration/<sha256>/`, and makes their references
-portable. JSON metadata is rewritten with matching file-record hashes updated;
+portable. JSON repairs preserve indentation, separators, key order and unchanged
+tokens, and update file-record hashes only when the original bytes match;
 a historical review whose hashes do not match current evidence is not silently
 rebound to that evidence. Parquet and SQLite data payloads are never rewritten.
 
@@ -127,18 +133,33 @@ still legacy and its printed stage counts describe the subsequent adoption.
 `migrate check` is read-only. Applying the migration again checks the existing
 adoption and makes no further workspace changes.
 
+When a ported implementation replaces a retained stage, run
+`migrate handover --dry-run` against its adopted ledger. It requires identical
+independently discovered unit keys and re-verifies every present output. Only
+identity, unit parameters and input hash may change; outputs and completion
+history stay intact. A real `migrate handover` applies that one-time proposal.
+The command refuses a second identity change after handover. Against a legacy
+ledger, its dry run first simulates adoption; it cannot apply a handover until
+adoption has actually been applied. Simulated zero-stale results check mapping
+and hashes only, not engine equivalence.
+
+Apply and recovery first check write permission on every target directory and
+print exact commands to enable and restore it. They make no workspace changes
+when permission is missing. An existing backup must match the original ledger
+hash, including across separate paths/adopt operations.
+
 The apply operation saves `work/ledger.pre-migration.sqlite3`, journals the
 original JSON metadata, publishes changed JSON atomically, and replaces the
 prepared ledger last. A subsequent apply recovers an interrupted transaction
 before preparing another one. Recovery refuses metadata that was manually
 changed after interruption. Stop old builders before migrating, and do not run
 them against an adopted workspace. Removing the old checkout-name symlink is a
-separate reviewer action after migration verification; this task never removes
-it because it lies outside the worktree.
+separate reviewer action after migration verification; the migration does not
+remove it because it lies outside the worktree.
 
-The real workspace is read-only for this implementation task. The opt-in world
-test applies migration to a copied ledger and copied JSON inside this worktree,
-then checks that ledger using the original payloads as read-only evidence. It
+The real workspace is read-only for migration implementation and validation.
+The opt-in world test applies migration to a copied ledger and copied JSON
+inside this worktree, then checks that ledger using the original payloads as read-only evidence. It
 copies no Parquet tree and creates no hard links.
 
 ## Execution and resource limits
@@ -153,8 +174,11 @@ resumption and restoration of deliberately absent inputs.
 Before each unit starts, the resource guard requires at least 5,000,000,000 free
 disk bytes, the configured workspace allowance and process RSS headroom. It
 pauses and logs its reason instead of failing on resource pressure. Concurrent
-workers share declared disk reservations. These are admission checks, not a
-promise that an arbitrary stage implementation cannot exceed its own limits.
+workers share declared disk reservations. Workspace size is measured at most
+once per `resources.workspace_scan_seconds` (60 seconds by default), outside the
+admission lock; completed output bytes and active reservations are accounted for
+between scans. Free disk and RSS are checked before every admission.
+These admission checks do not impose limits on arbitrary stage code.
 The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
 and a 2 GB RSS allowance. Engine-specific limits and measurements follow with
 their ports.
@@ -164,10 +188,10 @@ sibling `.part` file, fsync and replacement; failed publication does not complet
 a unit. Stage finalization is idempotent and retried even when every unit was
 already committed, so an interrupted manifest publication is recoverable.
 `--only` refreshes the selected stage's declared ancestors when needed; it does
-not run unrelated units. `invalidate STAGE [--units ID ...]` removes completion records only,
-retaining unit definitions and payloads. It requires an adopted ledger and a
+not run unrelated units. `invalidate STAGE [--units ID ...]` removes completion
+records only, retaining unit definitions and payloads. It requires an adopted ledger and a
 workspace writer lock. Do not use either write command against the real workspace
-during this task.
+during migration validation.
 
 ## Validation and historical evidence
 
@@ -188,10 +212,11 @@ variable is supplied. Leave capacity for its copied ledger/metadata in addition
 to any concurrently running scratch job.
 
 The [historical acquisition guide](history/source-and-golden-pipeline.md),
-[base schema](history/golden-dataset.md), [normalization results](history/city-normalization-results.md),
+[normalization results](history/city-normalization-results.md),
 [policy investigation](history/city-normalization-plan.md) and
 [content-neutral integration proof](history/rename-integration.md) retain the
 original measurements and commands. They are historical evidence rather than
 instructions to rebuild the protected workspace. [SERVING_FORMAT.md](SERVING_FORMAT.md)
-still defines the unchanged pack format. The new release README layout draft is
+still defines the unchanged pack format. [GOLDEN_DATASET.md](GOLDEN_DATASET.md)
+is the current golden table schema until the release README replaces it. The new release README layout draft is
 [DATASET_README.md](DATASET_README.md); dataset and pack generation are package 4.

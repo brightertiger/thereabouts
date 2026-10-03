@@ -10,6 +10,8 @@ from typing import cast
 from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException
 
+from thereabouts.format import BLOCK_RESOLUTION
+
 from .schema import DISK_FLOOR, Config
 
 CONFIG_DIR = Path(__file__).parents[2] / "config"
@@ -68,8 +70,17 @@ def validate(config: Config) -> None:
         )
     if not re.fullmatch(r"[1-9][0-9]*(MB|GB)", resources.duckdb_memory):
         raise ValueError("resources.duckdb_memory must be a positive MB or GB size")
+    if (
+        not math.isfinite(resources.workspace_scan_seconds)
+        or resources.workspace_scan_seconds <= 0
+    ):
+        raise ValueError("resources.workspace_scan_seconds must be finite and positive")
     if not 0 <= config.h3.block_resolution <= config.h3.cell_resolution <= 15:
         raise ValueError("h3 resolutions must satisfy 0 <= block <= cell <= 15")
+    if config.h3.block_resolution != BLOCK_RESOLUTION:
+        raise ValueError(
+            f"h3.block_resolution must match the cell codec ({BLOCK_RESOLUTION})"
+        )
     if "local" not in config.storage:
         raise ValueError("storage.local is required")
     for name, url in config.storage.items():

@@ -179,7 +179,14 @@ class Executor:
 
     def _run(self, stage: Stage, unit: Unit) -> list[Path]:
         self.ctx.guard.admit(unit.required_bytes)
+        outputs: list[Path] | None = None
         try:
-            return stage.run(self.ctx, unit)
+            outputs = stage.run(self.ctx, unit)
+            return outputs
         finally:
-            self.ctx.guard.release(unit.required_bytes)
+            written = None
+            try:
+                if outputs is not None:
+                    written = sum(path.stat().st_size for path in outputs)
+            finally:
+                self.ctx.guard.release(unit.required_bytes, written_bytes=written)

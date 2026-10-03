@@ -61,5 +61,5 @@ resolution is a different operation and can return the wrong row.
 The full reference must explain the stored cell encoding, canonical city joins,
 nullable answers, distant-nearest method, and ambiguity without hiding source
 disagreements. It will include local/S3 DuckDB, PyArrow and pandas examples
-executed against the measured release subset. Until then, the historical schema
-and measurements remain in [the golden-dataset documentation](history/golden-dataset.md).
+executed against the measured release subset. Until then, the current schema and
+recorded measurements remain in [the golden-dataset documentation](GOLDEN_DATASET.md).

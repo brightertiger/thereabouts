@@ -35,13 +35,11 @@ ENGINE_ACTIONS = {
     "normalize-cells.lookup": ("lookups", "spatial"),
 }
 RETIRED = {
-    "geonames.extract": "expendable extraction cache, owned by normalize",
-    "geonames.index": "expendable source index, owned by normalize",
-    "overture.index": "expendable source index, owned by normalize",
     "golden.lookup": "superseded joins; active joins belong to lookups",
     "golden-v2.cells": "superseded pilot implementation",
     "golden-v2.places": "superseded pilot implementation",
 }
+AUXILIARY_NORMALIZE = {"geonames.extract", "geonames.index", "overture.index"}
 
 
 @dataclass(frozen=True)
@@ -61,6 +59,10 @@ def destination(
         return Mapping(None, unit_id, RETIRED[stage])
     source, _, action = stage.partition(".")
     if source in inventory.sources:
+        if stage in AUXILIARY_NORMALIZE:
+            return Mapping(
+                "normalize", source, "retained auxiliary normalization output"
+            )
         if action in SOURCE_ACTIONS:
             return Mapping(SOURCE_ACTIONS[action], source, "aggregate source unit")
         if stage == "osm_land.index":

@@ -5,7 +5,7 @@ published stored cells at resolution-8 centres, as recorded in
 [quality.json](../data/golden/quality.json). They replace the earlier pilot and
 interim scalar measurements. The v0 failure classification is retained in
 [GOLDEN_V1.md](history/base-cell-results.md#baseline-analysis-before-implementation-changes), and
-[GOLDEN_DATASET.md](history/golden-dataset.md) defines the schema and reader contract.
+[GOLDEN_DATASET.md](GOLDEN_DATASET.md) defines the schema and reader contract.
 Source acquisition is unchanged.
 
 ## Final city rule and limits

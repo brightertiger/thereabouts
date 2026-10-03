@@ -1,7 +1,9 @@
 """Executable synthetic stages and legacy evidence, with no external inputs."""
 
 import json
+import resource
 import sqlite3
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -18,6 +20,11 @@ from pipeline.runtime.records import Recipe
 from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.verification import Verifier
 from pipeline.stages.contract import Context, Unit, make_unit
+
+
+def peak_rss() -> int:
+    usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return int(usage if sys.platform == "darwin" else usage * 1024)
 
 
 def context(root: Path, ledger: Ledger) -> Context:
@@ -71,20 +78,20 @@ def record(path: Path) -> Object:
     return {"path": name, "size": path.stat().st_size, "sha256": sha256_file(path)}
 
 
-def legacy_workspace(root: Path) -> Path:
-    raw = root / "raw/ghsl/input.zip"
+def legacy_workspace(root: Path, *, source: str = "ghsl") -> Path:
+    raw = root / f"raw/{source}/input.zip"
     raw.parent.mkdir(parents=True)
     raw.write_bytes(b"synthetic archive")
     inventory = raw.parent / "inventory.json"
-    write_json(inventory, {"source": "ghsl", "files": {"input": record(raw)}})
-    part = root / "normalized/ghsl/areas/part.parquet"
+    write_json(inventory, {"source": source, "files": {"input": record(raw)}})
+    part = root / f"normalized/{source}/areas/part.parquet"
     part.parent.mkdir(parents=True)
     part.write_bytes(b"synthetic parquet bytes")
     manifest = part.parent.parent / "manifest.json"
     write_json(
         manifest,
         {
-            "source": "ghsl",
+            "source": source,
             "source_release": "fixture",
             "inventory": record(inventory),
             "auxiliary": [],
@@ -92,7 +99,7 @@ def legacy_workspace(root: Path) -> Path:
             "partitions": [record(part)],
             "units": [
                 {
-                    "stage": "ghsl.normalize",
+                    "stage": f"{source}.normalize",
                     "unit_id": "world",
                     "inputs_hash": "old-inputs",
                 }
@@ -111,7 +118,7 @@ def legacy_workspace(root: Path) -> Path:
             db.execute(
                 "INSERT INTO units VALUES (?,?,?,?,?,?)",
                 (
-                    f"ghsl.{stage}",
+                    f"{source}.{stage}",
                     key,
                     "old-inputs",
                     json.dumps([record(output)]),

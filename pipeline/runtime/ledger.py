@@ -10,8 +10,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from pipeline.config.schema import Resources
-
 from .jsonio import Object, encode, sha256_file
 from .paths import relative
 from .records import Completion, Output, Recipe, outputs_from_json, recipe_from_json
@@ -52,12 +50,14 @@ class Ledger:
         elif readonly:
             self.db = read_connection(path)
         else:
+            if timeout is None:
+                raise ValueError(
+                    "Pass the configured timeout to a writable file ledger"
+                )
             path.parent.mkdir(parents=True, exist_ok=True)
             self.db = sqlite3.connect(
                 path,
-                timeout=Resources().ledger_timeout_seconds
-                if timeout is None
-                else timeout,
+                timeout=timeout,
                 check_same_thread=False,
             )
             self.db.execute("PRAGMA synchronous=FULL")

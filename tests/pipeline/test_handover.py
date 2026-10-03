@@ -100,7 +100,9 @@ def test_handover_accepts_recorded_absence_but_rejects_corruption(
     root = tmp_path / "data"
     path = adopted(root)
     raw = root / "raw/ghsl/input.zip"
-    with Ledger(root, path, readonly=False) as ledger:
+    with Ledger(
+        root, path, readonly=False, timeout=load().resources.ledger_timeout_seconds
+    ) as ledger:
         record = ledger.get("download", "ghsl")
         assert record
         with ledger.transaction():

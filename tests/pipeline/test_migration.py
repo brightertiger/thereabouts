@@ -15,7 +15,7 @@ from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.planning import plan
 from pipeline.stages.registry import registry
 
-from .helpers import legacy_workspace
+from .helpers import context, legacy_workspace
 
 
 def test_adoption_is_readonly_until_applied_and_portable(tmp_path: Path) -> None:
@@ -51,8 +51,6 @@ def test_adoption_is_readonly_until_applied_and_portable(tmp_path: Path) -> None
     moved = tmp_path / "moved"
     shutil.move(str(root), moved)
     with Ledger(moved, moved / "work/ledger.sqlite3") as ledger:
-        from .helpers import context
-
         assert all(d.state == "current" for d in plan(context(moved, ledger), stages))
         assert all(
             not o.path.startswith("/") for r in ledger.records() for o in r.outputs

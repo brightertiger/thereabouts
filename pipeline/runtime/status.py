@@ -1,12 +1,15 @@
 """Summarize recorded completions and unique local output bytes without hashing."""
 
 import json
+from collections.abc import Callable
 
 from .ledger import Ledger
-from .paths import located
+from .paths import located, validate_relative
 
 
-def status(ledger: Ledger) -> dict[str, dict[str, int]]:
+def status(
+    ledger: Ledger, path_name: Callable[[str], str] = validate_relative
+) -> dict[str, dict[str, int]]:
     result: dict[str, dict[str, int]] = {}
     seen: dict[str, set[str]] = {}
     for row in ledger.db.execute("SELECT stage,outputs FROM units ORDER BY stage"):
@@ -23,10 +26,7 @@ def status(ledger: Ledger) -> dict[str, dict[str, int]]:
                 continue
             paths.add(name)
             counts["recorded_bytes"] += output["size"]
-            if name.startswith("/"):
-                from pipeline.migration.paths import legacy_relative
-
-                name = legacy_relative(name, ledger.root)
+            name = path_name(name)
             path = located(ledger.root, name)
             if path.is_file():
                 counts["local_bytes"] += path.stat().st_size

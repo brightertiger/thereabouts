@@ -521,7 +521,7 @@ Outputs are Parquet beneath `golden/`, with `manifest.json`, `quality.json`,
 checkpoints; `work/golden/run.json` records progress. Use the manifest's completion
 flag and table inventory, never an unrestricted glob. The full layout, all columns,
 certificate argument, checks and resumption commands are in
-[GOLDEN_DATASET.md](golden-dataset.md). No new raw downloads are required.
+[GOLDEN_DATASET.md](../GOLDEN_DATASET.md). No new raw downloads are required.
 
 
 ### Disk-neutral golden v1 replacement

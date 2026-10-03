@@ -5,6 +5,8 @@ import tomllib
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
+from shapely import geos_version_string
+
 from .jsonio import digest, sha256_file
 
 REPOSITORY = Path(__file__).parents[2]
@@ -22,8 +24,6 @@ def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
             raise ValueError(f"{name} {installed} differs from uv.lock {pinned[name]}")
         result[name] = installed
     if "shapely" in names:
-        from shapely import geos_version_string
-
         result["geos"] = geos_version_string
     return result
 
@@ -49,8 +49,11 @@ def identity(
         if not candidates:
             raise ValueError(f"Empty stage code package: {package}")
         for path in candidates:
-            if path.suffix == ".py":
-                files[path.relative_to(repository).as_posix()] = sha256_file(path)
+            if path.suffix != ".py":
+                raise ValueError(f"Stage code file must be Python: {path}")
+            if not path.resolve().is_relative_to((repository / "pipeline").resolve()):
+                raise ValueError(f"Stage code symlink escapes pipeline/: {path}")
+            files[path.relative_to(repository).as_posix()] = sha256_file(path)
     return digest(
         {
             "code": files,

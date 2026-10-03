@@ -59,3 +59,31 @@ def test_memory_pause_resumes_when_resident_usage_falls(tmp_path: Path) -> None:
     )
     guard.admit()
     assert len(pauses) == 1
+
+
+def test_workspace_walk_is_cached_and_completed_bytes_are_accounted(
+    tmp_path: Path,
+) -> None:
+    scans = []
+    now = [0.0]
+
+    def measured(root: Path) -> int:
+        scans.append(root)
+        return 100
+
+    guard = ResourceGuard(
+        tmp_path,
+        Resources(),
+        free=lambda _: 10_000_000_000,
+        used=measured,
+        rss=lambda: 0,
+        clock=lambda: now[0],
+    )
+    for _ in range(1000):
+        guard.admit(10)
+        guard.release(10, written_bytes=7)
+    assert scans == [tmp_path]
+    assert guard.usage() == 7100
+    now[0] = 60.0
+    assert guard.usage() == 100
+    assert scans == [tmp_path, tmp_path]

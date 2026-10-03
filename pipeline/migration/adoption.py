@@ -1,6 +1,7 @@
 """Verify retained outputs, then simulate new identities in an in-memory ledger."""
 
 import hashlib
+from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -21,7 +22,10 @@ from .candidates import Candidate, collect, parameters
 from .dependencies import dependencies
 from .evidence import add_evidence
 from .inventory import Inventory
+from .repair_report import file_class, in_spec, summarize
 from .rewrites import Rewrites, prepare
+
+ABSENT_RECONCILE_PREFIXES = ("reconciled/", "work/reconcile/")
 
 
 @dataclass
@@ -38,7 +42,11 @@ def _verify(candidate: Candidate, verifier: Verifier) -> None:
         if problem is None:
             continue
         missing = problem.startswith("output missing:")
-        if (missing and candidate.stage == "reconcile") or (
+        if (
+            missing
+            and candidate.stage == "reconcile"
+            and output.path.startswith(ABSENT_RECONCILE_PREFIXES)
+        ) or (
             missing
             and candidate.stage == "download"
             and candidate.custody
@@ -134,11 +142,17 @@ def simulate(
     if invalid:
         ledger.close()
         raise ValueError(f"Adoption produced noncurrent units: {invalid[:5]}")
-    rewrite_details: list[JSON] = []
+    rewrite_details: list[Object] = []
     for name, data in rewrites.after.items():
         rewrite_details.append(
             {
                 "path": name,
+                "class": file_class(name, created=name not in rewrites.before),
+                "in_spec": in_spec(name),
+                "repairs": {
+                    key: count
+                    for key, count in rewrites.statistics.get(name, {}).items()
+                },
                 "before": hashlib.sha256(rewrites.before[name]).hexdigest()
                 if name in rewrites.before
                 else None,
@@ -167,11 +181,27 @@ def simulate(
         "json_files_created": len(rewrites.after) - len(rewrites.before),
         "outputs_absent_units": sum(bool(c.absent) for c in candidates.values()),
         "outputs_absent_files": sum(len(c.absent) for c in candidates.values()),
+        "absent_paths_by_prefix": {
+            prefix: count
+            for prefix, count in Counter(
+                next(
+                    (
+                        prefix
+                        for prefix in ABSENT_RECONCILE_PREFIXES
+                        if path.startswith(prefix)
+                    ),
+                    f"raw/{candidate.unit_id}/",
+                )
+                for candidate in candidates.values()
+                for path in candidate.absent
+            ).items()
+        },
         "offloaded_sources": [name for name in sorted(inventory.offloaded)],
         "remote_verified": False,
         "bytes_hashed": verifier.bytes_hashed,
         "stages": {name: dict(value) for name, value in counts(decisions).items()},
         "changes": [change for change in changes],
-        "json_changes": rewrite_details,
+        "json_changes": [item for item in rewrite_details],
+        "metadata_repairs": summarize(rewrite_details),
     }
     return Migration(ctx, rewrites, report, decisions)

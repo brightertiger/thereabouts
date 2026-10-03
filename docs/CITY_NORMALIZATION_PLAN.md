@@ -1,0 +1,1 @@
+The approved city-normalization investigation and policy rationale are preserved in [the historical normalization plan](history/city-normalization-plan.md). This stable link remains for policy, fixture and review references. Use [DATA_PIPELINE.md](DATA_PIPELINE.md) for current pipeline commands and [GOLDEN_DATASET.md](GOLDEN_DATASET.md) for the active dataset schema.

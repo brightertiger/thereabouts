@@ -5,11 +5,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
 
-from pipeline.runtime.jsonio import JSON, Object, digest
+from pipeline.runtime.jsonio import JSON, Object, digest, sha256_file
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Output
 
 from .inventory import Inventory
+from .layout import OFFLOADED
 from .mapping import destination
 from .paths import legacy_relative
 
@@ -94,12 +95,10 @@ def collect(
         for output in inventory.source_outputs(source):
             stage = "download" if output.path.startswith("raw/") else "normalize"
             candidates[stage, source].add(output)
-        custody = inventory.root / "work/offloaded" / f"{source}.json"
+        custody = inventory.root / OFFLOADED / f"{source}.json"
         if source in inventory.offloaded:
             candidate = candidates["download", source]
-            candidate.custody = f"work/offloaded/{source}.json"
-            from pipeline.runtime.jsonio import sha256_file
-
+            candidate.custody = f"{OFFLOADED}/{source}.json"
             candidate.add(
                 Output(candidate.custody, custody.stat().st_size, sha256_file(custody))
             )

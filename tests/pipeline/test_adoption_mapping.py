@@ -74,3 +74,25 @@ def test_paths_are_translated_without_rewriting_overture_json_pointers(
         "inputs": [{"path": "raw/source/input.zip"}],
         "audit": [{"path": "/properties/names/primary"}],
     }
+
+
+@pytest.mark.parametrize("prefix", ["other/", "work/unrelated/", "reconciled-other/"])
+def test_reconcile_absence_is_limited_to_documented_directories(
+    tmp_path: Path, prefix: str
+) -> None:
+    output = Output(prefix + "missing.sqlite3", 10, digest("recorded bytes"))
+    candidate = Candidate("reconcile", "land/world", outputs={output.path: output})
+    with pytest.raises(ValueError, match="Cannot adopt"):
+        _verify(candidate, Verifier(tmp_path))
+
+
+@pytest.mark.parametrize(
+    "stage", ["geonames.extract", "geonames.index", "overture.index"]
+)
+def test_extraction_and_index_payloads_remain_owned_by_normalize(
+    tmp_path: Path, stage: str
+) -> None:
+    source = stage.split(".")[0]
+    inventory = Inventory(tmp_path, sources={source: {}})
+    mapping = destination(inventory, stage, "auxiliary", [])
+    assert (mapping.stage, mapping.unit_id) == ("normalize", source)

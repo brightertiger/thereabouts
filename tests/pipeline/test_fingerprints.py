@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from pipeline.runtime.fingerprints import identity
 
 
@@ -65,3 +67,11 @@ def test_pins_native_versions_and_explicit_cell_format_change_identity(
         )
         == 4
     )
+
+
+def test_non_python_package_file_is_not_an_empty_code_identity(tmp_path: Path) -> None:
+    path = tmp_path / "pipeline/config.txt"
+    path.parent.mkdir()
+    path.write_text("not Python")
+    with pytest.raises(ValueError, match="must be Python"):
+        identity([path], config={}, pins={}, native={}, repository=tmp_path)

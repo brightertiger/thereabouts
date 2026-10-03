@@ -18,6 +18,7 @@ from pipeline.config import load
         "paths.raw=/tmp/raw",
         "paths.work=../other",
         "h3.block_resolution=9",
+        "h3.block_resolution=2",
         "resources.poll_seconds=0",
         "resources.ledger_timeout_seconds=-1",
         "storage.local=plain",

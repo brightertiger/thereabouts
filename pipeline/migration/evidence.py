@@ -8,6 +8,7 @@ from pipeline.runtime.records import Output
 
 from .candidates import Candidate
 from .inventory import Inventory
+from .layout import PILOT
 
 
 def file_output(root: Path, name: str) -> Output:
@@ -56,7 +57,7 @@ def add_evidence(
             candidate.add(inventory.output(raw))
         candidates[candidate.key] = candidate
     # The current pilot receipt is selected by its input file hashes, not by mtime.
-    gates = sorted((inventory.root / "work/v2-pilot").glob("*gate.json"))
+    gates = sorted((inventory.root / PILOT).glob("*gate.json"))
     for gate in gates:
         value = read_object(gate)
         records = [

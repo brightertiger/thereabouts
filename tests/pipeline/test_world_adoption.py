@@ -8,17 +8,19 @@ from pathlib import Path
 
 import pytest
 
-from pipeline.cli import context
 from pipeline.config import load
 from pipeline.migration.adoption import simulate
 from pipeline.migration.apply import apply
 from pipeline.migration.command import migrate
+from pipeline.runtime.context import context
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.planning import counts, plan
-from pipeline.runtime.resources import ResourceGuard, peak_rss, workspace_bytes
+from pipeline.runtime.resources import ResourceGuard, workspace_bytes
 from pipeline.runtime.verification import Verifier
 from pipeline.stages.registry import registry
+
+from .helpers import peak_rss
 
 
 @pytest.mark.world

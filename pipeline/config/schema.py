@@ -29,6 +29,7 @@ class Resources:
     max_workspace: int = 60_000_000_000
     poll_seconds: float = 10.0
     ledger_timeout_seconds: float = 30.0
+    workspace_scan_seconds: float = 60.0
 
 
 @dataclass

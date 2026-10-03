@@ -1,9 +1,7 @@
 """Admission guard: pause on disk or memory pressure; never delete user data."""
 
 import os
-import resource
 import shutil
-import sys
 import threading
 import time
 from collections.abc import Callable
@@ -12,11 +10,6 @@ from pathlib import Path
 import psutil
 
 from pipeline.config.schema import Resources
-
-
-def peak_rss() -> int:
-    usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    return int(usage if sys.platform == "darwin" else usage * 1024)
 
 
 def current_rss() -> int:
@@ -56,19 +49,49 @@ class ResourceGuard:
         rss: Callable[[], int] = current_rss,
         sleep: Callable[[float], None] = time.sleep,
         log: Callable[[str], None] = print,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.root, self.limits = root, limits
         self.free, self.used, self.rss = free, used, rss
         self.sleep, self.log = sleep, log
+        self.clock = clock
         self.lock = threading.Lock()
+        self.scan_lock = threading.Lock()
         self.reserved = 0
+        self.measured: int | None = None
+        self.measured_at = 0.0
+        self.growth = 0
+
+    def usage(self) -> int:
+        with self.lock:
+            if (
+                self.measured is not None
+                and self.clock() - self.measured_at < self.limits.workspace_scan_seconds
+            ):
+                return self.measured
+        with self.scan_lock:
+            with self.lock:
+                if (
+                    self.measured is not None
+                    and self.clock() - self.measured_at
+                    < self.limits.workspace_scan_seconds
+                ):
+                    return self.measured
+                previous_growth = self.growth
+            # Do not hold the admission/reservation lock during the filesystem walk.
+            measured = self.used(self.root)
+            with self.lock:
+                self.measured = measured + self.growth - previous_growth
+                self.measured_at = self.clock()
+                return self.measured
 
     def admit(self, required_bytes: int = 0) -> None:
         if required_bytes < 0:
             raise ValueError("A unit's disk reservation cannot be negative")
         while True:
+            self.usage()
             with self.lock:
-                free, used, rss = self.free(self.root), self.used(self.root), self.rss()
+                free, used, rss = self.free(self.root), self.measured or 0, self.rss()
                 needed = self.reserved + required_bytes
                 if (
                     free - needed >= self.limits.disk_floor
@@ -83,6 +106,10 @@ class ResourceGuard:
             )
             self.sleep(self.limits.poll_seconds)
 
-    def release(self, reserved_bytes: int) -> None:
+    def release(self, reserved_bytes: int, *, written_bytes: int | None = None) -> None:
         with self.lock:
             self.reserved -= reserved_bytes
+            written = reserved_bytes if written_bytes is None else written_bytes
+            self.growth += written
+            if self.measured is not None:
+                self.measured += written

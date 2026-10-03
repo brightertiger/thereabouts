@@ -12,6 +12,7 @@ resources:
   max_workspace: 60000000000
   poll_seconds: 10
   ledger_timeout_seconds: 30
+  workspace_scan_seconds: 60
 h3:
   block_resolution: 3
   cell_resolution: 8

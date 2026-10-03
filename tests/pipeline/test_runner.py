@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.config import load
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.planning import plan
 from pipeline.runtime.records import Dependency, Recipe
@@ -23,7 +24,12 @@ def test_dynamic_units_are_discovered_after_upstream_finish(tmp_path: Path) -> N
         needs=("first",),
         discover_after="first.json",
     )
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         assert run(ctx, [first, second])["completed"] == 2
         assert second.calls == ["two"]
@@ -40,7 +46,12 @@ def test_upstream_change_only_rebuilds_consumers_of_changed_bytes(
         [Recipe("second", "one", dependencies=(Dependency("first", "one"),))],
         needs=("first",),
     )
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         run(ctx, [first, second])
         first.implementation = "changed code, same bytes"
@@ -66,7 +77,12 @@ def test_absent_upstream_is_materialized_only_when_needed(tmp_path: Path) -> Non
         [Recipe("second", "two", dependencies=(Dependency("first", "one"),))],
         needs=("first",),
     )
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         run(ctx, [first, second])
         record = ledger.get("first", "one")
@@ -92,7 +108,12 @@ def test_absent_upstream_is_materialized_only_when_needed(tmp_path: Path) -> Non
 
 def test_failed_output_is_not_committed_and_resume_completes(tmp_path: Path) -> None:
     stage = SyntheticStage("first", [Recipe("first", "one")], fail=True)
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         with pytest.raises(ValueError, match="interruption"):
             run(ctx, [stage])
@@ -106,7 +127,9 @@ def test_failed_output_is_not_committed_and_resume_completes(tmp_path: Path) -> 
 
 def test_invalid_graph_and_target_fail_before_creating_logs(tmp_path: Path) -> None:
     stage = SyntheticStage("one", [], needs=("missing",))
-    with Ledger(tmp_path, None, readonly=False) as ledger:
+    with Ledger(
+        tmp_path, None, readonly=False, timeout=load().resources.ledger_timeout_seconds
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         with pytest.raises(ValueError, match="Unknown stage"):
             run(ctx, [stage])
@@ -118,7 +141,12 @@ def test_failed_finish_is_retried_without_rebuilding_units(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     stage = SyntheticStage("first", [Recipe("first", "one")])
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
 
         def interrupted_finish(ctx: Context) -> None:
@@ -146,7 +174,12 @@ def test_dependencies_within_a_stage_rebuild_in_one_run(tmp_path: Path) -> None:
             Recipe("chain", "result", dependencies=(Dependency("chain", "input"),)),
         ],
     )
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         assert run(ctx, [stage])["completed"] == 2
         stage.content = "changed bytes"
@@ -173,7 +206,12 @@ def test_only_refreshes_ancestors_and_defers_absent_inputs_until_needed(
         needs=("source", "absent"),
     )
     stages = [source, absent, chain]
-    with Ledger(tmp_path, tmp_path / "work/ledger.sqlite3", readonly=False) as ledger:
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
         ctx = context(tmp_path, ledger)
         run(ctx, stages)
         record = ledger.get("absent", "one")

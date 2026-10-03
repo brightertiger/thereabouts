@@ -78,7 +78,7 @@ These are build-output sizes, not serving-pack sizes. Much of the place schema i
 source IDs and JSON evidence; it is not appropriate to materialize 6.9 million
 Python objects on open. Lookup rows preserve observations and duplicates, rather
 than constituting unique geographic entities. Schema details are in
-[GOLDEN_DATASET](history/golden-dataset.md) and [GOLDEN_V1](history/base-cell-results.md).
+[GOLDEN_DATASET](GOLDEN_DATASET.md) and [GOLDEN_V1](history/base-cell-results.md).
 
 The worktree’s [GOLDEN_V2](history/city-normalization-results.md) records a passed pilot and a world build
 in progress. It adds canonical cities, place-to-city mappings, settlement kinds

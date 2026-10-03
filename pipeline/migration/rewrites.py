@@ -6,11 +6,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
 
-from pipeline.runtime.jsonio import JSON, digest, encode
+from pipeline.runtime.jsonio import JSON, digest
 from pipeline.runtime.records import Output
 
 from .candidates import Candidate
 from .inventory import Inventory
+from .json_patch import patch
+from .layout import NORMALIZED, OFFLOADED, PILOT
 from .paths import portable
 
 
@@ -22,6 +24,7 @@ class Rewrites:
     after: dict[str, bytes] = field(default_factory=dict)
     visiting: set[str] = field(default_factory=set)
     done: set[str] = field(default_factory=set)
+    statistics: dict[str, dict[str, int]] = field(default_factory=dict)
 
     def output(self, record: Output) -> Output:
         if record.path not in self.after:
@@ -37,16 +40,18 @@ class Rewrites:
         self.visiting.add(name)
         original = cast(JSON, json.loads(self.before[name]))
         converted = self.references(portable(original, self.root, self.aliases))
-        if name.startswith("work/offloaded/") and isinstance(converted, dict):
+        if name.startswith(OFFLOADED + "/") and isinstance(converted, dict):
             source = str(converted["source"])
-            manifest = f"normalized/{source}/manifest.json"
+            manifest = f"{NORMALIZED}/{source}/manifest.json"
             if manifest in self.before:
                 self.rewrite(manifest)
                 converted["manifest_sha256"] = digest(
                     json.loads(self.after.get(manifest, self.before[manifest]))
                 )
         if converted != original:
-            self.after[name] = encode(converted) + b"\n"
+            self.after[name], self.statistics[name] = patch(
+                self.before[name], original, converted
+            )
         self.visiting.remove(name)
         self.done.add(name)
 
@@ -85,7 +90,7 @@ def prepare(
                 names.add(output.path)
     names.update(
         p.relative_to(inventory.root).as_posix()
-        for p in (inventory.root / "work/v2-pilot").glob("*gate.json")
+        for p in (inventory.root / PILOT).glob("*gate.json")
     )
     result = Rewrites(inventory.root, aliases=inventory.aliases)
     for name in sorted(names):

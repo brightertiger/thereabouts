@@ -99,12 +99,16 @@ def apply(migration: Migration, source: Ledger, target: Path) -> None:
 
 def _apply(migration: Migration, source: Ledger, target: Path, work: Path) -> None:
     root = migration.context.root
+    if source.path is None:
+        raise ValueError("Migration requires an on-disk source ledger")
     backup = verify_backup(migration.context, migration.report)
     if not backup.exists():
-        with atomic_output(backup) as temporary:
-            assert source.path is not None
-            with source.path.open("rb") as old_stream, temporary.open("wb") as copied:
-                shutil.copyfileobj(old_stream, copied)
+        with (
+            atomic_output(backup) as temporary,
+            source.path.open("rb") as old_stream,
+            temporary.open("wb") as copied,
+        ):
+            shutil.copyfileobj(old_stream, copied)
     for name in migration.rewrites.after.keys() - migration.rewrites.before.keys():
         if located(root, name).exists():
             raise ValueError(f"New metadata path appeared during migration: {name}")
