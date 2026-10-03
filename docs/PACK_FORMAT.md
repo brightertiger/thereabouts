@@ -283,7 +283,7 @@ validated on first access (UTF-8, references, H3 validity, key ordering, ancesto
 disjointness, dictionaries and method/null rules as applicable). Catalogue
 shards retain raw records and string pools; individual places are constructed
 on demand. Retained caches use byte-budgeted LRU eviction: 8 MiB for decoded
-blocks and 16 MiB for raw catalogue bytes. Active concurrent lookups can retain
+blocks, 16 MiB for raw catalogue bytes, and 4 MiB for on-demand decoded places. Active concurrent lookups can retain
 evicted values until they finish. Files are reopened for cache misses; the pack
 directory must remain available and immutable while a handle is open.
 
@@ -300,3 +300,17 @@ before retry; failed cleanup never replaces the original export error. Unsupport
 format/family raises `incompatible_data`, damage raises `corrupt_pack`, and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query
 values are result statuses, not pack exceptions.
+
+
+## Columnar binding representation
+
+The Python reverse_columns result omits candidates (reverse never produces
+them) and evidence. Each string field is an int32 code array plus a
+`<field>_categories` string array, in first-use order. Code -1 means null;
+categories never contain null. String fields flatten nested names, such as
+country_code, state_name, city_id and cell. Numeric point coordinates, city
+point coordinates and distance_band_greater_than_km/distance_band_at_most_km
+are float64 with a corresponding boolean `_valid` mask. city_population uses
+uint32 and its own validity mask. Invalid slots contain NaN or zero but must
+be interpreted through masks. Buffers are filled while iterating, without
+retaining a batch of result objects.

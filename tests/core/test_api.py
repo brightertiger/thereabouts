@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pyarrow as pa
 import pytest
 
 import thereabouts
@@ -25,6 +26,12 @@ from thereabouts.store import core_pack
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SAMPLE = FIXTURES / "packs/core-sample"
+
+
+def text_column(columns: dict[str, Any], name: str) -> list[str | None]:
+    codes = columns[name]
+    categories = columns[f"{name}_categories"]
+    return [None if code < 0 else str(categories[code]) for code in codes]
 
 
 @pytest.mark.parametrize(
@@ -115,14 +122,27 @@ def test_columns_strides_null_masks_and_order() -> None:
     with Geocoder(SAMPLE) as geo:
         columns = geo.reverse_columns(lat, lon)
         results = list(geo.reverse_many(zip(lat, lon, strict=True)))
-        assert list(columns["status"]) == [r.status for r in results]
-        assert list(columns["country_code"]) == [
+        assert text_column(columns, "status") == [r.status for r in results]
+        assert text_column(columns, "country_code") == [
             r.country.code if r.country else None for r in results
         ]
         assert not columns["point_lat_valid"][-1]
         assert not columns["distance_band_at_most_km_valid"].any()
         assert columns["city_population"].dtype == np.uint32
-        assert all(len(value) == 4 for value in columns.values())
+        assert all(
+            len(value) == 4
+            for key, value in columns.items()
+            if not key.endswith("_categories")
+        )
+        assert "candidates" not in columns
+        assert columns["country_code"].dtype == np.int32
+        arrow = pa.DictionaryArray.from_arrays(
+            pa.array(columns["country_code"], mask=columns["country_code"] < 0),
+            pa.array(columns["country_code_categories"]),
+        )
+        assert arrow.dictionary_decode().to_pylist() == text_column(
+            columns, "country_code"
+        )
         assert all(
             len(value) == 0
             for value in geo.reverse_columns(np.array([]), np.array([])).values()
@@ -140,7 +160,7 @@ def test_parallel_native_batches() -> None:
         lat, lon = np.full(1000, 50.85), np.full(1000, 4.35)
         tasks = [pool.submit(geo.reverse_columns, lat, lon) for _ in range(2)]
         for task in tasks:
-            assert all(task.result()["country_code"] == "BE")
+            assert text_column(task.result(), "country_code") == ["BE"] * 1000
 
 
 def test_discovery_exact_command_and_integrity(

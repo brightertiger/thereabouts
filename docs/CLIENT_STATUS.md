@@ -31,6 +31,11 @@ cleanup failures no longer hide the original export error.
 Review fix 9 makes result status/kind/match Rust enums and indexes country,
 subdivision and zone membership metadata. State fields use the subdivision
 row for the place code, falling back only when that row is absent.
+Review fix 10 constructs scalar dictionaries directly and streams native
+results into fixed-width/dictionary buffers. A 4 MiB decoded-place LRU avoids
+repeated validation for hot places while retaining bounded memory. The random
+workload exposes catalogue-cache misses and has lower throughput than eager
+reading; that tradeoff is measured below.
 Remaining review fixes are in progress.
 
 ## Built and usable
@@ -72,18 +77,17 @@ return not-found. Coarse queries do not pick a descendant's geographic label.
 `reverse_many` streams in input order. `reverse_columns` accepts numeric 1-D
 NumPy arrays, including strided arrays, and returns NumPy arrays. It copies
 inputs before releasing the GIL, so concurrent input mutation cannot invalidate
-borrowed buffers. Rust lookup runs outside the GIL; Python object-array creation
-runs with it. Batch execution currently materializes native result rows before
-column conversion; further allocation work can improve throughput.
+borrowed buffers. Rust fills fixed-width buffers one row at a time outside the
+GIL. Strings are dictionary encoded: `<column>` is int32, with null code -1,
+and `<column>_categories` is an array of unique strings in first-use order.
+Numeric columns retain `<column>_valid` masks. Coordinates and both distance
+band bounds use float64; city_population uses uint32. Categories have their
+own length, so only row buffers and validity masks match the input length.
+Candidates are absent from column output because reverse never produces them.
+Scalar dictionaries are built directly from the Rust result. Evidence is opt-in.
 
-Column names flatten nested fields (`country_code`, `city_name`, `point_lat`,
-`city_point_lat`, etc.). String nulls are Python `None`; numeric columns have
-explicit `<column>_valid` boolean masks. Population uses uint32 storage with
-invalid zero slots, coordinates/distance use float64 with invalid NaN slots.
-Consumers must use validity masks when constructing Arrow arrays. Ambiguous
-rows preserve a `candidates` object column. Scalar JSON never substitutes zero
-or empty strings for missing values. Evidence is opt-in; distance_band publishes the nearest policy bounds, since
-the dataset does not publish exact distances.
+For Arrow, use `pa.DictionaryArray.from_arrays(pa.array(codes, mask=codes < 0),
+pa.array(categories))`. Numeric arrays use their explicit validity masks.
 
 Discovery reuses `packs/<family>/v-<version>/<manifest_sha256>/` and
 `packs/<family>/current.json`. Explicit `data_dir` takes precedence over
@@ -183,18 +187,19 @@ sample size, repetitions, latency, throughput and process peak RSS.
 
 | New Python path, real sample | Measured result |
 | --- | ---: |
-| Open | 10.102 ms |
-| Open RSS delta | 1,015,808.000 bytes |
-| cache_hot scalar median / p99 | 12.917 / 27.667 µs |
-| cache_hot columns | 184,956 points/s |
-| random scalar median / p99 | 5.542 / 14.000 µs |
-| random columns | 320,130 points/s |
+| Open | 3.108 ms |
+| Open RSS delta | 1,097,728 bytes |
+| cache_hot scalar median / p99 | 7.417 / 8.041 µs |
+| cache_hot columns | 754,774 points/s |
+| random scalar median / p99 | 4.417 / 37.541 µs |
+| random columns | 417,683 points/s |
 
 Before lazy opening, the same script measured 59.041 ms
 and an RSS delta of 21,872,640 bytes. The random workload
 uses 100,000 coordinates rejection-sampled inside inventoried r3 blocks.
-Lookup throughput currently regressed because on-demand places are repeatedly
-decoded and validated; review fix 10 addresses the binding allocation path.
+Hot throughput exceeds the eager baseline; random throughput remains below it
+because catalogue records are decoded and validated on cache misses. The JSON
+retains both eager and pre-binding-change measurements for comparison.
 
 The historical reader figures are 10.291 µs scalar median / 531,994 column
 rows/s for Cython and 12.750 µs / 530,437 for Python. They came from

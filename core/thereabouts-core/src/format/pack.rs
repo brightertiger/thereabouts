@@ -21,6 +21,9 @@ use std::{
 pub const BLOCK_CACHE_BYTES: usize = 8 * 1024 * 1024;
 /// Retained raw catalogue bytes: four nominal 4 MiB writer shards, not decoded places.
 pub const CATALOGUE_CACHE_BYTES: usize = 16 * 1024 * 1024;
+/// Four MiB for repeatedly projected places; charged by owned string capacities.
+/// The sample's hot workload touches tens of places; random queries exercise eviction.
+pub const PLACE_CACHE_BYTES: usize = 4 * 1024 * 1024;
 
 #[derive(Debug)]
 struct BlockSource {
@@ -44,6 +47,7 @@ pub struct Pack {
     place_count: usize,
     block_cache: Mutex<Cache<u32, Block>>,
     catalogue_cache: Mutex<Cache<usize, Catalogue>>,
+    place_cache: Mutex<Cache<u32, Place>>,
 }
 impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
@@ -112,6 +116,7 @@ impl Pack {
             place_count,
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             catalogue_cache: Mutex::new(Cache::new(CATALOGUE_CACHE_BYTES)),
+            place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
         })
     }
     pub(crate) fn block(&self, block: u32) -> Result<Option<Arc<Block>>> {
@@ -144,10 +149,17 @@ impl Pack {
         Ok(Some(cache.insert(block, value, bytes)))
     }
     /// Reference zero is null; other references decode and validate one raw record.
-    pub fn place(&self, reference: u32) -> Result<Option<Place>> {
+    pub fn place(&self, reference: u32) -> Result<Option<Arc<Place>>> {
         let Some(index) = reference.checked_sub(1).map(|v| v as usize) else {
             return Ok(None);
         };
+        let mut places = self
+            .place_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+        if let Some(place) = places.get(reference) {
+            return Ok(Some(place));
+        }
         let shard_index = self.catalogues.partition_point(|s| s.end <= index);
         let source = self
             .catalogues
@@ -168,6 +180,14 @@ impl Pack {
         };
         let place = catalogue.place(index - source.first)?;
         place.validate(self.place_count)?;
-        Ok(Some(place))
+        let bytes = size_of::<Place>()
+            + place
+                .text
+                .iter()
+                .chain(std::iter::once(&place.timezone))
+                .filter_map(Option::as_ref)
+                .map(String::capacity)
+                .sum::<usize>();
+        Ok(Some(places.insert(reference, place, bytes)))
     }
 }

@@ -12,39 +12,39 @@
     "seed": 20261003,
     "pack_bytes": 4498416
   },
-  "open_seconds": 0.01010208300431259,
-  "open_rss_delta_bytes": 1015808,
+  "open_seconds": 0.0031077500025276095,
+  "open_rss_delta_bytes": 1097728,
   "cache_hot": {
     "points": 20000,
-    "scalar_median_us": 12.917,
-    "scalar_p99_us": 27.667,
-    "reverse_columns_points_per_second": 184956.13070533614,
+    "scalar_median_us": 7.417,
+    "scalar_p99_us": 8.041,
+    "reverse_columns_points_per_second": 754773.9454316051,
     "reverse_columns_repeats": [
-      190597.1288962652,
-      184956.13070533614,
-      180495.2337758869,
-      183496.05975045476,
-      184222.21134472452,
-      185999.8680208291,
-      185980.33725665938
+      750844.690986482,
+      754773.9454316051,
+      752223.7426432954,
+      756746.8613382104,
+      757063.1620909007,
+      757977.7159384436,
+      753460.039246313
     ]
   },
   "random": {
     "points": 100000,
-    "scalar_median_us": 5.542,
-    "scalar_p99_us": 14.0,
-    "reverse_columns_points_per_second": 320130.01480034285,
+    "scalar_median_us": 4.417,
+    "scalar_p99_us": 37.541,
+    "reverse_columns_points_per_second": 417682.95716796536,
     "reverse_columns_repeats": [
-      327693.6352236071,
-      304140.33878259815,
-      316036.6066421557,
-      320130.01480034285,
-      322095.38144402293,
-      322517.48583610053,
-      319447.2713579062
+      412797.62118614535,
+      414451.3654011148,
+      417682.95716796536,
+      414359.84768939286,
+      422599.196987938,
+      422455.33272415976,
+      422734.9689983277
     ]
   },
-  "peak_rss_bytes": 672710656,
+  "peak_rss_bytes": 124911616,
   "historical_reader": {
     "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",
@@ -107,6 +107,40 @@
       "python_scalar_median_us": 12.75,
       "cython_columns_points_per_second": 531994,
       "python_columns_points_per_second": 530437
+    }
+  },
+  "after_lazy_open": {
+    "open_seconds": 0.01010208300431259,
+    "open_rss_delta_bytes": 1015808,
+    "cache_hot": {
+      "points": 20000,
+      "scalar_median_us": 12.917,
+      "scalar_p99_us": 27.667,
+      "reverse_columns_points_per_second": 184956.13070533614,
+      "reverse_columns_repeats": [
+        190597.1288962652,
+        184956.13070533614,
+        180495.2337758869,
+        183496.05975045476,
+        184222.21134472452,
+        185999.8680208291,
+        185980.33725665938
+      ]
+    },
+    "random": {
+      "points": 100000,
+      "scalar_median_us": 5.542,
+      "scalar_p99_us": 14.0,
+      "reverse_columns_points_per_second": 320130.01480034285,
+      "reverse_columns_repeats": [
+        327693.6352236071,
+        304140.33878259815,
+        316036.6066421557,
+        320130.01480034285,
+        322095.38144402293,
+        322517.48583610053,
+        319447.2713579062
+      ]
     }
   }
 }

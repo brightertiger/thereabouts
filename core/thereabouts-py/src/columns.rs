@@ -1,8 +1,8 @@
-//! Native batch execution owns input copies before releasing the GIL.
+//! Fixed-width output buffers are filled while detached, one result at a time.
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyDict};
-use std::sync::Arc;
-use thereabouts_core::{format::Pack, result::LookupResult};
+use std::{collections::HashMap, sync::Arc};
+use thereabouts_core::{Error, Result, format::Pack, result::LookupResult};
 
 type TextColumn = (&'static str, fn(&LookupResult) -> Option<&str>);
 type FloatColumn = (&'static str, fn(&LookupResult) -> Option<f64>);
@@ -30,97 +30,143 @@ const TEXT_COLUMNS: [TextColumn; 15] = [
     ("rank_basis", |r| r.rank_basis.as_deref()),
 ];
 
+const FLOAT_COLUMNS: [FloatColumn; 6] = [
+    ("point_lat", |r| r.point.as_ref().map(|p| p.lat)),
+    ("point_lon", |r| r.point.as_ref().map(|p| p.lon)),
+    ("city_point_lat", |r| {
+        r.city.as_ref()?.point.as_ref().map(|p| p.lat)
+    }),
+    ("city_point_lon", |r| {
+        r.city.as_ref()?.point.as_ref().map(|p| p.lon)
+    }),
+    ("distance_band_greater_than_km", |r| {
+        r.distance_band.as_ref().map(|b| b.greater_than_km)
+    }),
+    ("distance_band_at_most_km", |r| {
+        r.distance_band.as_ref().map(|b| b.at_most_km)
+    }),
+];
+
+struct Dictionary {
+    codes: Vec<i32>,
+    categories: Vec<String>,
+    index: HashMap<String, i32>,
+}
+impl Dictionary {
+    fn new(rows: usize) -> Self {
+        Self {
+            codes: Vec::with_capacity(rows),
+            categories: vec![],
+            index: HashMap::new(),
+        }
+    }
+    fn push(&mut self, value: Option<&str>) -> Result<()> {
+        let code = if let Some(value) = value {
+            if let Some(code) = self.index.get(value) {
+                *code
+            } else {
+                let code = i32::try_from(self.categories.len())
+                    .map_err(|_| Error::Input("Too many string categories".into()))?;
+                self.index.insert(value.into(), code);
+                self.categories.push(value.into());
+                code
+            }
+        } else {
+            -1
+        };
+        self.codes.push(code);
+        Ok(())
+    }
+}
+struct Nullable<T> {
+    values: Vec<T>,
+    valid: Vec<bool>,
+}
+impl<T> Nullable<T> {
+    fn new(rows: usize) -> Self {
+        Self {
+            values: Vec::with_capacity(rows),
+            valid: Vec::with_capacity(rows),
+        }
+    }
+    fn push(&mut self, value: Option<T>, null: T) {
+        self.valid.push(value.is_some());
+        self.values.push(value.unwrap_or(null));
+    }
+}
+struct Columns {
+    text: Vec<Dictionary>,
+    floats: Vec<Nullable<f64>>,
+    population: Nullable<u32>,
+}
+impl Columns {
+    fn fill(pack: &Pack, lat: Vec<f64>, lon: Vec<f64>) -> Result<Self> {
+        let count = lat.len();
+        let mut columns = Self {
+            text: TEXT_COLUMNS
+                .iter()
+                .map(|_| Dictionary::new(count))
+                .collect(),
+            floats: FLOAT_COLUMNS.iter().map(|_| Nullable::new(count)).collect(),
+            population: Nullable::new(count),
+        };
+        for (lat, lon) in lat.into_iter().zip(lon) {
+            let row = pack.reverse(lat, lon, false)?;
+            for (column, (_, get)) in columns.text.iter_mut().zip(TEXT_COLUMNS) {
+                column.push(get(&row))?;
+            }
+            for (column, (_, get)) in columns.floats.iter_mut().zip(FLOAT_COLUMNS) {
+                column.push(get(&row), f64::NAN);
+            }
+            columns
+                .population
+                .push(row.city.as_ref().and_then(|city| city.population), 0);
+        }
+        Ok(columns)
+    }
+}
 pub fn reverse<'py>(
     py: Python<'py>,
     pack: &Arc<Pack>,
     lat: &PyReadonlyArray1<'py, f64>,
     lon: &PyReadonlyArray1<'py, f64>,
 ) -> PyResult<Bound<'py, PyDict>> {
-    // Copies also support strided arrays and prevent concurrent NumPy mutation
-    // while detached from Python from creating an unsafe borrowed-buffer race.
+    // Own strided inputs before detaching: concurrent Python mutation cannot race a borrow.
     let lat: Vec<_> = lat.as_array().iter().copied().collect();
     let lon: Vec<_> = lon.as_array().iter().copied().collect();
     if lat.len() != lon.len() {
         return Err(PyValueError::new_err("lat and lon must have equal lengths"));
     }
-    let rows: Vec<_> = py
-        .detach(|| {
-            lat.into_iter()
-                .zip(lon)
-                .map(|(a, b)| pack.reverse(a, b, false))
-                .collect::<thereabouts_core::Result<Vec<_>>>()
-        })
+    let columns = py
+        .detach(|| Columns::fill(pack, lat, lon))
         .map_err(|e| crate::error(py, &e))?;
     let dict = PyDict::new(py);
-    for (name, get) in TEXT_COLUMNS {
-        let values: Vec<Py<PyAny>> = rows
-            .iter()
-            .map(|r| {
-                get(r).map_or_else(
-                    || Ok(py.None()),
-                    |s| Ok(s.into_pyobject(py)?.into_any().unbind()),
-                )
-            })
+    for ((name, _), column) in TEXT_COLUMNS.into_iter().zip(columns.text) {
+        dict.set_item(name, PyArray1::from_vec(py, column.codes))?;
+        let categories: Vec<Py<PyAny>> = column
+            .categories
+            .into_iter()
+            .map(|s| Ok(s.into_pyobject(py)?.into_any().unbind()))
             .collect::<PyResult<_>>()?;
-        dict.set_item(name, PyArray1::from_vec(py, values))?;
-    }
-    let floats: [FloatColumn; 6] = [
-        ("point_lat", |r| r.point.as_ref().map(|p| p.lat)),
-        ("point_lon", |r| r.point.as_ref().map(|p| p.lon)),
-        ("city_point_lat", |r| {
-            r.city.as_ref()?.point.as_ref().map(|p| p.lat)
-        }),
-        ("city_point_lon", |r| {
-            r.city.as_ref()?.point.as_ref().map(|p| p.lon)
-        }),
-        ("distance_band_greater_than_km", |r| {
-            r.distance_band.as_ref().map(|b| b.greater_than_km)
-        }),
-        ("distance_band_at_most_km", |r| {
-            r.distance_band.as_ref().map(|b| b.at_most_km)
-        }),
-    ];
-    for (name, get) in floats {
         dict.set_item(
-            name,
-            PyArray1::from_vec(
-                py,
-                rows.iter().map(|r| get(r).unwrap_or(f64::NAN)).collect(),
-            ),
+            format!("{name}_categories"),
+            PyArray1::from_vec(py, categories),
         )?;
+    }
+    for ((name, _), column) in FLOAT_COLUMNS.into_iter().zip(columns.floats) {
+        dict.set_item(name, PyArray1::from_vec(py, column.values))?;
         dict.set_item(
             format!("{name}_valid"),
-            PyArray1::from_vec(py, rows.iter().map(|r| get(r).is_some()).collect()),
+            PyArray1::from_vec(py, column.valid),
         )?;
     }
     dict.set_item(
         "city_population",
-        PyArray1::from_vec(
-            py,
-            rows.iter()
-                .map(|r| r.city.as_ref().and_then(|c| c.population).unwrap_or(0))
-                .collect(),
-        ),
+        PyArray1::from_vec(py, columns.population.values),
     )?;
     dict.set_item(
         "city_population_valid",
-        PyArray1::from_vec(
-            py,
-            rows.iter()
-                .map(|r| r.city.as_ref().and_then(|c| c.population).is_some())
-                .collect(),
-        ),
+        PyArray1::from_vec(py, columns.population.valid),
     )?;
-    let candidates: Vec<_> = rows
-        .iter()
-        .map(|r| {
-            crate::value_to_python(
-                py,
-                &serde_json::to_value(&r.candidates)
-                    .map_err(|e| PyValueError::new_err(e.to_string()))?,
-            )
-        })
-        .collect::<PyResult<_>>()?;
-    dict.set_item("candidates", PyArray1::from_vec(py, candidates))?;
     Ok(dict)
 }

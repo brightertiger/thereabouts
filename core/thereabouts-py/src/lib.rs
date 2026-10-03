@@ -1,5 +1,6 @@
 //! Thin `CPython` boundary. Dataset policy and lookup semantics live in the core.
 mod columns;
+mod result;
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
@@ -66,15 +67,6 @@ fn value_to_python(py: Python<'_>, value: &Value) -> PyResult<Py<PyAny>> {
         }
     })
 }
-fn result_value(
-    py: Python<'_>,
-    result: &thereabouts_core::result::LookupResult,
-) -> PyResult<Py<PyAny>> {
-    value_to_python(
-        py,
-        &serde_json::to_value(result).map_err(|e| PyValueError::new_err(e.to_string()))?,
-    )
-}
 /// Native handle; closing drops this owner's reference while active batches finish.
 #[pyclass(module = "thereabouts._core")]
 struct Geocoder {
@@ -93,7 +85,7 @@ impl Geocoder {
 impl Geocoder {
     #[pyo3(signature=(lat,lon,*,evidence=false))]
     fn reverse(&self, py: Python<'_>, lat: f64, lon: f64, evidence: bool) -> PyResult<Py<PyAny>> {
-        result_value(
+        result::encode(
             py,
             &self
                 .pack(py)?
@@ -104,7 +96,7 @@ impl Geocoder {
     #[pyo3(signature=(cell,*,evidence=false))]
     #[allow(clippy::wrong_self_convention)] // Public API verb, not a constructor.
     fn from_h3(&self, py: Python<'_>, cell: &str, evidence: bool) -> PyResult<Py<PyAny>> {
-        result_value(
+        result::encode(
             py,
             &self
                 .pack(py)?

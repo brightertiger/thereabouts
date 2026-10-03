@@ -67,7 +67,7 @@ class Geocoder:
     def reverse_columns(
         self, lat: NDArray[Any], lon: NDArray[Any]
     ) -> dict[str, NDArray[Any]]:
-        """Return NumPy columns; numeric nulls have explicit *_valid masks."""
+        """Return dictionary string codes/categories and numeric *_valid masks."""
         self._ensure_open()
         if lat.ndim != 1 or lon.ndim != 1:
             raise ValueError("lat and lon must be one-dimensional")

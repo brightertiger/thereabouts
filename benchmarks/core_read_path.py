@@ -163,6 +163,23 @@ def main() -> None:
     if args.iterations < 100:
         parser.error("at least 100 iterations are required")
     result = measure(args.iterations)
+    if args.output and args.output.exists():
+        previous = json.loads(args.output.read_text())
+        if "before_lazy_open" in previous:
+            result["before_lazy_open"] = previous["before_lazy_open"]
+        result["after_lazy_open"] = previous.get(
+            "after_lazy_open",
+            {
+                key: previous[key]
+                for key in (
+                    "open_seconds",
+                    "open_rss_delta_bytes",
+                    "cache_hot",
+                    "random",
+                )
+                if key in previous
+            },
+        )
     if args.baseline:
         result["before_lazy_open"] = json.loads(args.baseline.read_text())
     payload = json.dumps(result, indent=2) + "\n"
