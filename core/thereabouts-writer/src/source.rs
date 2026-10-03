@@ -77,7 +77,11 @@ impl Dataset {
                 a.iter().filter(|r| r["kind"] == kind).collect()
             })
     }
-    pub fn scan(&self, table: &Value, mut visit: impl FnMut(Value) -> Result<()>) -> Result<()> {
+    pub fn scan(
+        &self,
+        table: &Value,
+        mut visit: impl FnMut(super::arrow::Row<'_>) -> Result<()>,
+    ) -> Result<()> {
         let name = required(table, "path")?;
         let path = artifact_path(&self.root, name)?;
         ensure(
@@ -123,16 +127,6 @@ pub(crate) fn policy_distance(policy: &Value, key: &str) -> Result<u32> {
             ))
         })
 }
-pub(crate) fn population(row: &Value) -> Result<u32> {
-    let value = field(row, "population");
-    if value.is_null() {
-        return Ok(0);
-    }
-    value
-        .as_u64()
-        .and_then(|value| value.try_into().ok())
-        .ok_or_else(|| Error::Input("population must be null or a nonnegative u32 integer".into()))
-}
 pub(crate) fn field<'a>(row: &'a Value, key: &str) -> &'a Value {
     row.get(key).unwrap_or(&Value::Null)
 }
@@ -147,24 +141,7 @@ pub fn required<'a>(row: &'a Value, field: &str) -> Result<&'a str> {
 mod tests {
     use super::*;
     #[test]
-    fn population_and_policy_never_coerce_invalid_values() {
-        for value in [
-            serde_json::json!(-1),
-            serde_json::json!(1.5),
-            serde_json::json!("10"),
-            serde_json::json!(true),
-            serde_json::json!(u64::MAX),
-        ] {
-            assert!(population(&serde_json::json!({"population":value})).is_err());
-        }
-        assert_eq!(
-            population(&serde_json::json!({"population":null})).unwrap(),
-            0
-        );
-        assert_eq!(
-            population(&serde_json::json!({"population":123})).unwrap(),
-            123
-        );
+    fn policy_is_explicit() {
         assert!(policy_distance(&serde_json::json!({}), "nearest_m").is_err());
     }
     #[test]

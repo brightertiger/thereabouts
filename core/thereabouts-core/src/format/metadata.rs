@@ -27,7 +27,7 @@ impl Metadata {
             .timezone_sets
             .get(reference as usize)
             .ok_or_else(|| crate::Error::Corrupt("Dangling timezone set".into()))?;
-        Ok(zones
+        let narrowed: Vec<_> = zones
             .iter()
             .filter(|zone| {
                 country.is_none_or(|country| {
@@ -38,7 +38,12 @@ impl Metadata {
                 })
             })
             .cloned()
-            .collect())
+            .collect();
+        Ok(if narrowed.is_empty() {
+            zones.clone()
+        } else {
+            narrowed
+        })
     }
     /// Validate fields used by lookup and preserve unknown source metadata.
     pub fn validate(&self) -> Result<()> {
@@ -87,6 +92,18 @@ impl Metadata {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn missing_country_membership_retains_a_single_published_zone() {
+        let metadata = Metadata {
+            timezone_sets: vec![vec![], vec!["Area/One".into()]],
+            ..Metadata::default()
+        };
+        let index = super::super::metadata_index::MetadataIndex::build(&metadata).unwrap();
+        assert_eq!(
+            metadata.narrow_timezones(&index, 1, Some("XK")).unwrap(),
+            vec!["Area/One"]
+        );
+    }
     #[test]
     fn invalid_metadata_never_silently_loses_a_country_code() {
         let mut metadata = Metadata {

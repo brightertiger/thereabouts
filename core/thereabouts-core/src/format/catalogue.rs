@@ -1,5 +1,5 @@
 //! Eighty-byte place records with a shard-local UTF-8 pool.
-use super::container::{Container, encode, index, put, uint};
+use super::container::{Container, FileShard, encode, index, put, uint};
 use crate::{Result, error::ensure, result::Point};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -152,9 +152,6 @@ impl Catalogue {
         ensure(previous == pool.len(), "Invalid terminal string offset")?;
         Ok(Self { container })
     }
-    pub(crate) fn bytes(&self) -> usize {
-        self.container.bytes.len()
-    }
     pub(crate) fn len(&self) -> usize {
         self.container.section(0).len() / 80
     }
@@ -183,30 +180,76 @@ impl Catalogue {
             .section(0)
             .get(start..start + 80)
             .ok_or_else(|| crate::Error::Corrupt("Dangling place reference".into()))?;
-        let mut text = std::array::from_fn(|_| None);
-        let mut refs = [0; 4];
-        for (i, value) in text.iter_mut().enumerate() {
-            *value = self.string(uint(row, i * 4, 4)?)?;
-        }
-        for (i, value) in refs.iter_mut().enumerate() {
-            *value = u32::try_from(uint(row, 48 + i * 4, 4)?)
-                .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?;
-        }
-        Ok(Place {
-            text,
-            refs,
-            latitude: u32::try_from(uint(row, 64, 4)?)
-                .map_err(|_| crate::Error::Corrupt("Invalid latitude".into()))?
-                .cast_signed(),
-            longitude: u32::try_from(uint(row, 68, 4)?)
-                .map_err(|_| crate::Error::Corrupt("Invalid longitude".into()))?
-                .cast_signed(),
-            population: u32::try_from(uint(row, 72, 4)?)
-                .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?,
-            timezone: self.string(uint(row, 76, 4)?)?,
-        })
+        decode_record(row, |reference| self.string(reference))
     }
 }
+fn decode_record(
+    row: &[u8],
+    mut string: impl FnMut(u64) -> Result<Option<String>>,
+) -> Result<Place> {
+    let mut text = std::array::from_fn(|_| None);
+    let mut refs = [0; 4];
+    for (i, value) in text.iter_mut().enumerate() {
+        *value = string(uint(row, i * 4, 4)?)?;
+    }
+    for (i, value) in refs.iter_mut().enumerate() {
+        *value = u32::try_from(uint(row, 48 + i * 4, 4)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?;
+    }
+    Ok(Place {
+        text,
+        refs,
+        latitude: u32::try_from(uint(row, 64, 4)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid latitude".into()))?
+            .cast_signed(),
+        longitude: u32::try_from(uint(row, 68, 4)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid longitude".into()))?
+            .cast_signed(),
+        population: u32::try_from(uint(row, 72, 4)?)
+            .map_err(|_| crate::Error::Corrupt("Invalid u32".into()))?,
+        timezone: string(uint(row, 76, 4)?)?,
+    })
+}
+/// Validate pool sentinels without loading offsets or strings into memory.
+pub(crate) fn validate_header(shard: &FileShard) -> Result<()> {
+    let length = shard.len(1)?;
+    ensure(length >= 16, "Missing string offsets")?;
+    let initial = shard.range(1, 0, 16)?;
+    ensure(
+        initial.iter().all(|b| *b == 0),
+        "Invalid null string offset",
+    )?;
+    ensure(
+        index(uint(&shard.range(1, length - 8, 8)?, 0, 8)?)? == shard.len(2)?,
+        "Invalid terminal string offset",
+    )
+}
+/// Read only the requested record and referenced offset pairs and UTF-8 spans.
+pub(crate) fn read_place(shard: &FileShard, record: usize) -> Result<Place> {
+    let offset = record
+        .checked_mul(80)
+        .ok_or_else(|| crate::Error::Corrupt("Record overflow".into()))?;
+    let row = shard.range(0, offset, 80)?;
+    decode_record(&row, |reference| {
+        if reference == 0 {
+            return Ok(None);
+        }
+        let offset = index(reference)?
+            .checked_mul(8)
+            .ok_or_else(|| crate::Error::Corrupt("String reference overflow".into()))?;
+        let pair = shard.range(1, offset, 16)?;
+        let start = index(uint(&pair, 0, 8)?)?;
+        let end = index(uint(&pair, 8, 8)?)?;
+        let length = end
+            .checked_sub(start)
+            .ok_or_else(|| crate::Error::Corrupt("Invalid string offsets".into()))?;
+        let text = shard.range(2, start, length)?;
+        String::from_utf8(text)
+            .map(Some)
+            .map_err(|_| crate::Error::Corrupt("Invalid UTF-8".into()))
+    })
+}
+
 /// Full verification materializes one shard at a time; runtime decodes on demand.
 pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
     let catalogue = Catalogue::decode(bytes)?;
@@ -216,6 +259,30 @@ pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn record_miss_neither_reads_nor_validates_unrelated_strings() {
+        let first = Place {
+            text: std::array::from_fn(|i| Some(if i == 11 { "{}".into() } else { "first".into() })),
+            refs: [0; 4],
+            latitude: i32::MIN,
+            longitude: i32::MIN,
+            population: 0,
+            timezone: None,
+        };
+        let mut second = first.clone();
+        second.text[0] = Some("second".into());
+        let mut bytes = encode_places(&[first, second]).unwrap();
+        let start = bytes.windows(6).position(|s| s == b"second").unwrap();
+        bytes[start] = 255;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("catalogue.bin");
+        std::fs::write(&path, &bytes).unwrap();
+        let shard = FileShard::open(&path, 2, &[80, 8, 1]).unwrap();
+        validate_header(&shard).unwrap();
+        assert_eq!(read_place(&shard, 0).unwrap().field(0), "first");
+        assert!(read_place(&shard, 1).is_err());
+        assert!(Catalogue::decode(bytes).is_err());
+    }
     #[test]
     fn invalid_point_and_dangling_reference() {
         let mut place = Place {

@@ -35,24 +35,25 @@ pub fn cells(
         let mut rows = vec![];
         data.scan(table, |row| {
             ensure(rows.len() < 16807, "Too many stored rows in a block")?;
-            let cell = required(&row, "h3")?
+            let cell = row
+                .required("h3")?
                 .parse::<CellIndex>()
                 .map_err(|_| Error::Input("Invalid dataset H3 cell".into()))?;
             ensure(
                 cell.resolution() >= Resolution::Three
                     && cell.resolution() <= Resolution::Eight
                     && cell.parent(Resolution::Three) == Some(root)
-                    && row["h3_uint64"].as_u64() == Some(u64::from(cell))
-                    && row["h3_resolution"].as_u64()
+                    && row.unsigned("h3_uint64")? == Some(u64::from(cell))
+                    && row.unsigned("h3_resolution")?
                         == Some(u64::from(u8::from(cell.resolution()))),
                 "Dataset H3 columns disagree",
             )?;
-            let country = catalogue::reference(db, row["country_id"].as_str())?;
-            let subdivision = catalogue::reference(db, row["state_id"].as_str())?;
-            let city = catalogue::reference(db, row["city_id"].as_str())?;
+            let country = catalogue::reference(db, row.text("country_id")?)?;
+            let subdivision = catalogue::reference(db, row.text("state_id")?)?;
+            let city = catalogue::reference(db, row.text("city_id")?)?;
             rows.push((
                 address::address(cell).1,
-                Label([country, subdivision, city, flags(&row)?, 0]),
+                Label([country, subdivision, city, flags(row)?, 0]),
             ));
             Ok(())
         })?;

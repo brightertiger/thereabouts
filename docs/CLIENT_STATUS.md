@@ -1,7 +1,7 @@
 # Thereabouts client status
 
-Work package 1 and its review rework are complete on `feat/rust-core`.
-Package 2 has not started. The approved design is
+Work package 1 and the package-2 prerequisite fixes are complete on `feat/rust-core`.
+Forward families are the next work in package 2. The approved design is
 [the client redesign specification](superpowers/specs/2026-10-03-client-redesign-design.md);
 [PACK_FORMAT.md](PACK_FORMAT.md) defines the version-2 wire format.
 
@@ -24,6 +24,29 @@ reads, cached SQL and bounded insert batches improve the writer without a world
 run. Staging has a disk precheck. Coarse queries retain their own cell, batch
 coordinates are named, core discovery has no legacy-reader dependency, and
 timezone compaction cannot merge above a source cell's original resolution.
+
+## Package 2 prerequisites (N1–N5 and writer fix 11)
+
+Shards retain open descriptors and use positioned reads. Catalogue misses read
+only the requested record, offset pairs and strings. Linked-key LRU operations
+are O(1), with IO and decoding outside locks. Country narrowing that removes
+every timezone now retains the original set. Result enums exactly follow the
+specification. Writer hot scans borrow typed Arrow fields and stage typed SQL
+columns; JSON remains only for published evidence and small metadata sections.
+Output bytes remain deterministic against the existing synthetic pack.
+SQLite scratch may use a separate filesystem. No world export was run.
+
+`uv run python -m benchmarks.multishard_read_path --record before|after` builds
+a local synthetic pack with 256 catalogue shards,
+16,384 places and 36,678,465 bytes. The same seeded
+100,000 random queries run before and after, with seven columnar repetitions.
+On the Apple M2 / 8 GiB machine, scalar median is
+18.459 → 13.209 µs, p99 is
+53.166 → 107.750 µs, and columns are
+39,707 → 140,439 points/s.
+The range-read implementation improves median and throughput on this workload,
+but its p99 is worse; it is not a claim of improved tail latency or world performance.
+The benchmark pack is generated under .tmp, not committed as a large fixture.
 
 ## Built and usable
 
@@ -90,9 +113,8 @@ and uses pack_not_found. Queries never download anything.
 Default open validates directories and sizes. `Geocoder(path, verify=True)`
 or `_core.verify_pack(path)` checks all hashes and structural invariants.
 Unused payload damage may remain undetected during a default open. Retained
-cache budgets are 8 MiB decoded blocks, 16 MiB raw catalogue shards and 4 MiB
-decoded places; active readers can temporarily retain evicted values.
-The pack directory must remain available and immutable while open.
+cache budgets are 8 MiB decoded blocks and 4 MiB decoded places; active readers can temporarily retain evicted values.
+Open shards retain their file handles and use positioned reads. Replacing paths is safe; in-place mutation of open files is unsupported.
 
 ## Writer and samples
 
@@ -106,8 +128,9 @@ nonnegative u32 integer. Writer inputs raise a coded ValueError subclass.
 The 512 MiB admission budget covers bounded Arrow scans, block-local timezone
 joins, output shards and a 16 MiB SQLite cache; it is not a proven world RSS
 limit. Inserts are capped by rows and payload bytes inside the transaction.
-staging_directory chooses the parent of output staging and SQLite on the same
-filesystem; it is excluded from pack identity. Preflight requires a 5 GiB floor
+staging_directory chooses the output staging parent on the same filesystem.
+sqlite_directory can use a separate disk with its own admission check. Both
+options are excluded from pack identity. Preflight requires a 5 GiB floor
 plus eight times consumed compressed input size and a 64 MiB shard reserve.
 The estimate is not a world-build guarantee. Existing output is verified and
 reused only for the same input identity; changed inputs are never overwritten.
@@ -189,14 +212,14 @@ a controlled comparison with this real sample.
 Required gates are cargo fmt --check, cargo clippy --all-targets -- -D warnings,
 cargo test, pytest, ruff check, ruff format --check and strict mypy. Additional
 checks cover the wasm target and Clippy with all features. All passed at the
-end of the rework: 28 Rust tests, 667 Python tests (9 skipped), and mypy over
-419 source files. Property tests
+end of the rework: 32 Rust tests, 667 Python tests (9 skipped), and mypy over
+420 source files. Property tests
 include invalid payloads with recomputed checksums, verified open, full verify
 and lazy access without panics. No application Rust unsafe is used.
 
 ## Deliberately not done and unverified
 
-Package 2 forward families and the names index have not started. The new CLI,
+Package 2 forward families and the names index follow the prerequisite commit. The new CLI,
 installer, MCP wiring and Node/WASM host adapter remain later packages.
 Legacy modules, their helper implementations and their tests remain importable
 until package 5; core discovery imports only retained helpers. build_data is

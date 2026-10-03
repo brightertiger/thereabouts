@@ -1,7 +1,7 @@
 //! Lazy core-pack ownership. No lookup reads outside its inventoried shards.
 use super::{
     cache::Cache,
-    catalogue::{Catalogue, Place},
+    catalogue::{self, Place},
     container::{Container, FileShard},
     manifest::{self, Manifest},
     metadata::Metadata,
@@ -19,8 +19,6 @@ use std::{
 /// Retained decoded blocks: 8 MiB accommodates the sample's 133k sparse labels.
 /// Eviction is by allocated vector bytes; active readers may retain an evicted Arc.
 pub const BLOCK_CACHE_BYTES: usize = 8 * 1024 * 1024;
-/// Retained raw catalogue bytes: four nominal 4 MiB writer shards, not decoded places.
-pub const CATALOGUE_CACHE_BYTES: usize = 16 * 1024 * 1024;
 /// Four MiB for repeatedly projected places; charged by owned string capacities.
 /// The sample's hot workload touches tens of places; random queries exercise eviction.
 pub const PLACE_CACHE_BYTES: usize = 4 * 1024 * 1024;
@@ -48,7 +46,6 @@ pub struct Pack {
     catalogues: Vec<CatalogueSource>,
     place_count: usize,
     block_cache: Mutex<Cache<u32, Block>>,
-    catalogue_cache: Mutex<Cache<usize, Catalogue>>,
     place_cache: Mutex<Cache<u32, Place>>,
 }
 impl Pack {
@@ -68,6 +65,7 @@ impl Pack {
             match file.kind.as_str() {
                 "catalogue" => {
                     let shard = FileShard::open(&path, 2, &[80, 8, 1])?;
+                    catalogue::validate_header(&shard)?;
                     let end = place_count
                         .checked_add(shard.len(0)? / 80)
                         .ok_or_else(|| Error::Corrupt("Catalogue count overflow".into()))?;
@@ -123,7 +121,6 @@ impl Pack {
             catalogues,
             place_count,
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
-            catalogue_cache: Mutex::new(Cache::new(CATALOGUE_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
         })
     }
@@ -138,6 +135,7 @@ impl Pack {
         if let Some(value) = cache.get(block) {
             return Ok(Some(value));
         }
+        drop(cache);
         let mut spans: [Vec<u8>; 3] = std::array::from_fn(|_| Vec::new());
         for (section, &(offset, length)) in source.entry.spans.iter().enumerate() {
             if let Some(span) = spans.get_mut(section) {
@@ -154,6 +152,10 @@ impl Pack {
         )?;
         let bytes = value.keys.capacity() * size_of::<u16>()
             + value.labels.capacity() * size_of::<spatial::Label>();
+        let mut cache = self
+            .block_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
         Ok(Some(cache.insert(block, value, bytes)))
     }
     /// Reference zero is null; other references decode and validate one raw record.
@@ -168,25 +170,13 @@ impl Pack {
         if let Some(place) = places.get(reference) {
             return Ok(Some(place));
         }
+        drop(places);
         let shard_index = self.catalogues.partition_point(|s| s.end <= index);
         let source = self
             .catalogues
             .get(shard_index)
             .ok_or_else(|| Error::Corrupt("Dangling place reference".into()))?;
-        let catalogue = {
-            let mut cache = self
-                .catalogue_cache
-                .lock()
-                .map_err(|_| Error::Corrupt("Poisoned catalogue cache".into()))?;
-            if let Some(value) = cache.get(shard_index) {
-                value
-            } else {
-                let value = Catalogue::decode(source.shard.all()?)?;
-                let bytes = value.bytes();
-                cache.insert(shard_index, value, bytes)
-            }
-        };
-        let place = catalogue.place(index - source.first)?;
+        let place = catalogue::read_place(&source.shard, index - source.first)?;
         place.validate(self.place_count)?;
         let bytes = size_of::<Place>()
             + place
@@ -196,6 +186,10 @@ impl Pack {
                 .filter_map(Option::as_ref)
                 .map(String::capacity)
                 .sum::<usize>();
+        let mut places = self
+            .place_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
         Ok(Some(places.insert(reference, place, bytes)))
     }
 }

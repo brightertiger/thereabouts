@@ -11,3 +11,5 @@ pub mod verify;
 
 mod cache;
 mod metadata_index;
+
+mod positioned;

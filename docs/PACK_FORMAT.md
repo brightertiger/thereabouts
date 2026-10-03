@@ -173,7 +173,7 @@ It can split a spatial ancestor at timezone boundaries, then compact identical
 five-field labels within each original stored source cell. Compaction must
 not combine distinct source cells into a new coarse ancestor. Missing coverage produces set 0.
 Overlapping zones form a sorted unique set, without choosing a source winner.
-Timezone overlap never changes geographic status, including an all-zero
+If country narrowing leaves no survivors, retain the original zone set (including an otherwise valid single zone). Timezone overlap never changes geographic status, including an all-zero
 (unassigned) label. When a country is assigned, retain only zone names whose
 `zone_tables.country_codes` comma-separated list contains that country code
 (across any row for the zone). With no country, retain the whole set.
@@ -266,7 +266,7 @@ after a bounded Arrow scan, with row counts checked. The writer does no
 geographic reconciliation. Existing output is verified and returned only when
 its input identity agrees; changed inputs are rejected without overwriting.
 
-An exclusive `.<name>.building` directory owns SQLite and output artifacts.
+An exclusive .<name>.building directory owns output artifacts. SQLite defaults to that directory; options.sqlite_directory can place its temporary file on another filesystem, with its own disk admission check. Both paths are operational and excluded from pack identity.
 Its parent defaults to the output parent; `options.staging_directory` selects
 another parent on the same filesystem. This operational option is excluded
 from pack identity. Preflight requires at least 5 GiB free plus an estimate of
@@ -279,8 +279,8 @@ implemented. The caller must explicitly remove abandoned staging before retry.
 
 The writer's admission budget constant is 512 MiB: 1,024-row Arrow batches,
 Parquet row groups and Arrow batches at most 128 MiB uncompressed, a 16 MiB
-SQLite cache, typed Arrow array reads (no batch JSON round trip), cached SQL
-statements and multi-row inserts (at most 256 rows / 1 MiB, with a single
+SQLite cache, borrowed typed Arrow fields and typed SQLite columns (no per-row JSON maps in cells, places, canonical cities, mappings or timezone scans), cached SQL
+statements and multi-row inserts (at most 256 rows / 999 bindings / 1 MiB, with a single
 larger row bounded at 128 MiB) within the existing transaction,
 block-local timezone joins, and bounded output shards. It rejects oversized
 units. Full verification visits one decoded shard at a time. This budget is
@@ -290,11 +290,15 @@ Runtime opening validates the manifest, inventory sizes, shard headers and
 directories, and the small metadata table. Spatial payloads are decoded and
 validated on first access (UTF-8, references, H3 validity, key ordering, ancestor
 disjointness, dictionaries and method/null rules as applicable). Catalogue
-shards retain raw records and string pools; individual places are constructed
-on demand. Retained caches use byte-budgeted LRU eviction: 8 MiB for decoded
-blocks, 16 MiB for raw catalogue bytes, and 4 MiB for on-demand decoded places. Active concurrent lookups can retain
-evicted values until they finish. Files are reopened for cache misses; the pack
-directory must remain available and immutable while a handle is open.
+records range-read their 80-byte record, referenced offset pairs and UTF-8
+spans only. No catalogue miss loads or validates an entire shard. Retained
+caches use constant-time linked-key LRU eviction: 8 MiB for decoded blocks and
+4 MiB for decoded places. IO and decoding occur outside the cache mutex.
+Concurrent misses may decode the same immutable record; insertion reuses an
+existing cached value. Active readers can retain evicted values until finished.
+Every shard retains the file handle opened with its validated directory and
+uses positioned reads; replacing its path cannot change the handle's contents.
+In-place mutation of an open shard is unsupported.
 
 SHA-256 and whole-pack structural verification are opt-in at open
 (`Pack::open(path, true)`, Python `Geocoder(path, verify=True)`).

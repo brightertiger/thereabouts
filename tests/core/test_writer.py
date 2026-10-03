@@ -25,7 +25,8 @@ def test_writer_preserves_overlaps_without_ambiguous_reverse() -> None:
 def test_writer_staging_location_does_not_change_identity(tmp_path: Path) -> None:
     original = json.loads((FIXTURES / "packs/core-synthetic/manifest.json").read_text())
     options = original["inputs"]["options"] | {
-        "staging_directory": str(tmp_path / "scratch")
+        "staging_directory": str(tmp_path / "scratch"),
+        "sqlite_directory": str(tmp_path / "sqlite"),
     }
     result = _core.write_pack(
         str(FIXTURES / "datasets/core-synthetic/golden"),
@@ -36,6 +37,8 @@ def test_writer_staging_location_does_not_change_identity(tmp_path: Path) -> Non
     assert result == original
     assert "staging_directory" not in result["inputs"]["options"]
     assert list((tmp_path / "scratch").iterdir()) == []
+    assert list((tmp_path / "sqlite").iterdir()) == []
+    assert "sqlite_directory" not in result["inputs"]["options"]
     assert (tmp_path / "pack/manifest.json").is_file()
 
 

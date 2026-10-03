@@ -25,7 +25,7 @@ fn overlap_narrows_by_country_and_never_changes_geographic_status() {
         (false, ["AA", "BB"], None, vec!["Area/One", "Area/Two"]),
         (true, ["AA", "BB"], Some("Area/One"), vec![]),
         (true, ["AA", "AA"], None, vec!["Area/One", "Area/Two"]),
-        (true, ["BB", "BB"], None, vec![]),
+        (true, ["BB", "BB"], None, vec!["Area/One", "Area/Two"]),
     ] {
         let dir = tempfile::tempdir().unwrap();
         let mut manifest = manifest::read(&fixture).unwrap();

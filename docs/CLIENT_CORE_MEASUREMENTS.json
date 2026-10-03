@@ -142,5 +142,49 @@
         319447.2713579062
       ]
     }
+  },
+  "multishard": {
+    "before": {
+      "points": 100000,
+      "scalar_median_us": 18.4585,
+      "scalar_p99_us": 53.16600999999999,
+      "reverse_columns_points_per_second": 39706.65714406321,
+      "reverse_columns_repeats": [
+        40734.45166291532,
+        38877.61995333118,
+        37370.93771491131,
+        38826.11255236362,
+        40557.497948381075,
+        41118.219587185624,
+        39706.65714406321
+      ],
+      "open_seconds": 0.013366458006203175,
+      "open_rss_delta_bytes": 819200,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    },
+    "after": {
+      "points": 100000,
+      "scalar_median_us": 13.209,
+      "scalar_p99_us": 107.75040999999979,
+      "reverse_columns_points_per_second": 140438.74592035104,
+      "reverse_columns_repeats": [
+        136172.28342340904,
+        139055.5463852437,
+        141935.54179639663,
+        141500.8571366643,
+        139262.47188178747,
+        140438.74592035104,
+        141104.5985455971
+      ],
+      "open_seconds": 0.04758241699892096,
+      "open_rss_delta_bytes": 524288,
+      "catalogue_shards": 256,
+      "places": 16384,
+      "pack_bytes": 36678465,
+      "seed": 20261003
+    }
   }
 }

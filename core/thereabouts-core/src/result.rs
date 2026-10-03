@@ -13,6 +13,8 @@ pub enum Status {
     NotFound,
     /// The query cannot be interpreted in this domain.
     InvalidInput,
+    /// The input requests detail finer than the dataset supports.
+    UnsupportedGranularity,
 }
 impl Status {
     /// Stable JSON spelling, also used by column dictionaries.
@@ -23,6 +25,7 @@ impl Status {
             Self::Ambiguous => "ambiguous",
             Self::NotFound => "not_found",
             Self::InvalidInput => "invalid_input",
+            Self::UnsupportedGranularity => "unsupported_granularity",
         }
     }
 }
@@ -34,16 +37,18 @@ pub enum Kind {
     City,
     /// A spatial cell, including country-only reverse context.
     Cell,
-    /// A country identified by a forward lookup.
-    Country,
-    /// An administrative subdivision.
-    Region,
     /// A postal code with a published anchor.
-    Postcode,
+    Postal,
     /// An airport identified by a supported code.
     Airport,
     /// A port or other transport location.
-    Port,
+    TradeLocation,
+    /// A published IP address interval.
+    IpRange,
+    /// A published calling-code or telephone prefix.
+    PhonePrefix,
+    /// A vehicle registration format or series.
+    Plate,
 }
 impl Kind {
     /// Stable JSON spelling, also used by column dictionaries.
@@ -52,11 +57,12 @@ impl Kind {
         match self {
             Self::City => "city",
             Self::Cell => "cell",
-            Self::Country => "country",
-            Self::Region => "region",
-            Self::Postcode => "postcode",
+            Self::Postal => "postal",
             Self::Airport => "airport",
-            Self::Port => "port",
+            Self::TradeLocation => "trade_location",
+            Self::IpRange => "ip_range",
+            Self::PhonePrefix => "phone_prefix",
+            Self::Plate => "plate",
         }
     }
 }
@@ -64,6 +70,12 @@ impl Kind {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Match {
+    /// An exact normalized identifier or primary name.
+    Exact,
+    /// A published English or alternate name.
+    AlternateName,
+    /// A fuzzy name-index match.
+    Fuzzy,
     /// The dataset publishes polygon or area containment.
     Contained,
     /// The published nearest-distance band below the distant threshold.
@@ -76,6 +88,9 @@ impl Match {
     #[must_use]
     pub const fn as_str(self) -> &'static str {
         match self {
+            Self::Exact => "exact",
+            Self::AlternateName => "alternate_name",
+            Self::Fuzzy => "fuzzy",
             Self::Contained => "contained",
             Self::Nearest => "nearest",
             Self::NearestDistant => "nearest_distant",

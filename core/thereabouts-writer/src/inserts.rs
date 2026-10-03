@@ -2,7 +2,7 @@
 use crate::{Result, error::ensure};
 use rusqlite::{Connection, params_from_iter, types::Value};
 
-/// At most 768 bindings for our three-column rows, below SQLite's old 999 limit.
+/// Bound rows and total bindings; wide typed rows also stay below SQLite's old 999 limit.
 const INSERT_ROWS: usize = 256;
 // Flush text payloads at 1/16 of the SQLite cache rather than buffering 256 huge rows.
 const INSERT_BYTES: usize = 1024 * 1024;
@@ -23,9 +23,16 @@ impl<'a> Inserts<'a> {
             bytes: 0,
         }
     }
-    pub(crate) fn push<const N: usize>(&mut self, row: [Value; N]) -> Result<()> {
-        ensure(N == self.columns, "Insert arity mismatch")?;
+    pub(crate) fn push(
+        &mut self,
+        row: impl AsRef<[Value]> + IntoIterator<Item = Value>,
+    ) -> Result<()> {
+        ensure(
+            row.as_ref().len() == self.columns && self.columns > 0,
+            "Insert arity mismatch",
+        )?;
         let bytes = row
+            .as_ref()
             .iter()
             .map(|v| {
                 size_of::<Value>()
@@ -45,7 +52,9 @@ impl<'a> Inserts<'a> {
         }
         self.bytes += bytes;
         self.values.extend(row);
-        if self.values.len() >= INSERT_ROWS * self.columns || self.bytes >= INSERT_BYTES {
+        if self.values.len() >= INSERT_ROWS.min(999 / self.columns) * self.columns
+            || self.bytes >= INSERT_BYTES
+        {
             self.flush()?;
         }
         Ok(())

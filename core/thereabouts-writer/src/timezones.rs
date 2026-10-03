@@ -1,6 +1,6 @@
 //! Join all matching timezones; overlapping source zones retain their complete set.
 use super::inserts::Inserts;
-use super::source::{Dataset, required};
+use super::source::Dataset;
 use crate::{
     Error, Result,
     error::ensure,
@@ -15,14 +15,15 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     let mut fine = Inserts::new(db, "INSERT OR IGNORE INTO zones", 3);
     for table in data.tables("timezone_cells") {
         data.scan(table, |row| {
-            let cell = required(&row, "h3")?
+            let cell = row
+                .required("h3")?
                 .parse::<CellIndex>()
                 .map_err(|_| Error::Input("Invalid timezone H3 cell".into()))?;
             ensure(
                 cell.resolution() <= Resolution::Eight,
                 "Timezone resolution exceeds eight",
             )?;
-            let zone = required(&row, "tzid")?;
+            let zone = row.required("tzid")?;
             if cell.resolution() < Resolution::Three {
                 coarse.push([
                     Value::Integer(

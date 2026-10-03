@@ -1,6 +1,8 @@
-//! A disk index keeps global place closure and sorting out of process memory.
-use super::inserts::Inserts;
-use super::source::{Dataset, population, required};
+//! Typed SQLite columns keep global place closure and sorting out of process memory.
+use super::{
+    inserts::Inserts,
+    source::{Dataset, required},
+};
 use crate::{
     Error, Result,
     error::ensure,
@@ -8,11 +10,14 @@ use crate::{
 };
 use rusqlite::{Connection, OptionalExtension, types::Value as SqlValue};
 use serde_json::{Value, json};
-
 pub fn initialize(db: &Connection) -> Result<()> {
     db.execute_batch("PRAGMA cache_size=-16384; PRAGMA temp_store=FILE;
-        CREATE TABLE places(id TEXT PRIMARY KEY,payload TEXT NOT NULL) WITHOUT ROWID;
-        CREATE TABLE cities(id TEXT PRIMARY KEY,payload TEXT NOT NULL) WITHOUT ROWID;
+        CREATE TABLE places(id TEXT PRIMARY KEY,name TEXT,name_en TEXT,local_name TEXT,
+          role TEXT,settlement_kind TEXT,country_code TEXT,code TEXT,code_status TEXT,
+          parent_method TEXT,normalization_method TEXT,evidence TEXT,country_id TEXT,
+          parent_id TEXT,sovereign_id TEXT,normalized_city_id TEXT,population INTEGER) WITHOUT ROWID;
+        CREATE TABLE cities(id TEXT PRIMARY KEY,name TEXT,name_en TEXT,kind TEXT,
+          population INTEGER,latitude REAL,longitude REAL) WITHOUT ROWID;
         CREATE TABLE mappings(id TEXT PRIMARY KEY,city TEXT);
         CREATE TABLE needed(id TEXT PRIMARY KEY) WITHOUT ROWID;
         CREATE TABLE ids(reference INTEGER PRIMARY KEY,id TEXT UNIQUE);
@@ -20,39 +25,24 @@ pub fn initialize(db: &Connection) -> Result<()> {
         CREATE TABLE coarse_zones(cell INTEGER,zone TEXT,PRIMARY KEY(cell,zone)) WITHOUT ROWID;")?;
     Ok(())
 }
-#[allow(clippy::indexing_slicing)] // Arrow rows are objects; serde_json reads return Null.
 pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
-    for kind in ["places", "canonical_cities", "place_to_city"] {
-        let prefix = match kind {
-            "places" => "INSERT INTO places",
-            "canonical_cities" => "INSERT INTO cities",
-            _ => "INSERT INTO mappings",
-        };
-        let mut inserts = Inserts::new(db, prefix, 2);
-        for table in data.tables(kind) {
-            data.scan(table,|mut row| {
-                ensure(row.is_object(), "Dataset row must be an object")?;
-                if kind != "place_to_city" { population(&row)?; }
-                match kind {
-                    "places" => {
-                        let evidence=json!({"source_ids":row["source_ids"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok()),"golden_table":table["path"],"name_provenance":row["name_provenance"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok())});
-                        row["evidence"]=Value::String(serde_json::to_string(&evidence)?);
-                        row["country_id"]=Value::String(format!("country:{}",required(&row,"country_code")?));
-                        if let Some(object)=row.as_object_mut() {object.retain(|k,_| TEXT_FIELDS.contains(&k.as_str()) || REF_FIELDS.contains(&k.as_str()) || k=="population");}
-                        inserts.push([SqlValue::Text(required(&row,"place_id")?.into()),SqlValue::Text(row.to_string())])?;
-                    },
-                    "canonical_cities" => {inserts.push([SqlValue::Text(required(&row,"city_id")?.into()),SqlValue::Text(row.to_string())])?;},
-                    _ => {inserts.push([SqlValue::Text(required(&row,"place_id")?.into()),row["city_id"].as_str().map_or(SqlValue::Null,|v|SqlValue::Text(v.into()))])?;},
-                } Ok(())
-            })?;
-        }
-        inserts.flush()?;
+    load_places(db, data)?;
+    load_cities(db, data)?;
+    let mut mappings = Inserts::new(db, "INSERT INTO mappings", 2);
+    for table in data.tables("place_to_city") {
+        data.scan(table, |row| {
+            mappings.push([
+                SqlValue::Text(row.required("place_id")?.into()),
+                row.sql_text("city_id")?,
+            ])
+        })?;
     }
+    mappings.flush()?;
     let mut needed = Inserts::new(db, "INSERT OR IGNORE INTO needed", 1);
     for table in data.tables("cells") {
         data.scan(table, |row| {
             for field in ["country_id", "state_id", "city_id"] {
-                if let Some(id) = row[field].as_str() {
+                if let Some(id) = row.text(field)? {
                     needed.push([SqlValue::Text(id.into())])?;
                 }
             }
@@ -63,7 +53,7 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     loop {
         let changed = db.total_changes();
         for field in REF_FIELDS {
-            db.prepare_cached(&format!("INSERT OR IGNORE INTO needed SELECT json_extract(p.payload,'$.{field}') FROM places p JOIN needed n USING(id) WHERE json_extract(p.payload,'$.{field}') IS NOT NULL"))?.execute([])?;
+            db.prepare_cached(&format!("INSERT OR IGNORE INTO needed SELECT p.{field} FROM places p JOIN needed n USING(id) WHERE p.{field} IS NOT NULL"))?.execute([])?;
         }
         if changed == db.total_changes() {
             break;
@@ -71,7 +61,7 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     }
     let missing: Option<String> = db
         .query_row(
-            "SELECT id FROM needed LEFT JOIN places USING(id) WHERE payload IS NULL LIMIT 1",
+            "SELECT n.id FROM needed n LEFT JOIN places p USING(id) WHERE p.id IS NULL LIMIT 1",
             [],
             |r| r.get(0),
         )
@@ -81,6 +71,49 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
         .execute([])?;
     Ok(())
 }
+fn load_places(db: &Connection, data: &Dataset) -> Result<()> {
+    let mut inserts = Inserts::new(db, "INSERT INTO places", 17);
+    for table in data.tables("places") {
+        let table_path = required(table, "path")?;
+        data.scan(table, |row| {
+            row.required("place_id")?;
+            let population = row.population()?;
+            let mut values = Vec::with_capacity(17);
+            for field in TEXT_FIELDS {
+                values.push(if field == "evidence" {
+                    // These are published JSON provenance fields, not a serialized dataset row.
+                    let evidence = json!({"source_ids":row.text("source_ids")?.and_then(|s| serde_json::from_str::<Value>(s).ok()), "golden_table":table_path, "name_provenance":row.text("name_provenance")?.and_then(|s| serde_json::from_str::<Value>(s).ok())});
+                    SqlValue::Text(serde_json::to_string(&evidence)?)
+                } else { row.sql_text(field)? });
+            }
+            for field in REF_FIELDS {
+                values.push(if field == "country_id" { SqlValue::Text(format!("country:{}", row.required("country_code")?)) } else { row.sql_text(field)? });
+            }
+            values.push(SqlValue::Integer(i64::from(population)));
+            inserts.push(values)
+        })?;
+    }
+    inserts.flush()
+}
+fn load_cities(db: &Connection, data: &Dataset) -> Result<()> {
+    let mut inserts = Inserts::new(db, "INSERT INTO cities", 7);
+    for table in data.tables("canonical_cities") {
+        data.scan(table, |row| {
+            inserts.push([
+                SqlValue::Text(row.required("city_id")?.into()),
+                row.sql_text("name")?,
+                row.sql_text("name_en")?,
+                row.sql_text("kind")?,
+                SqlValue::Integer(i64::from(row.population()?)),
+                row.number("latitude")?
+                    .map_or(SqlValue::Null, SqlValue::Real),
+                row.number("longitude")?
+                    .map_or(SqlValue::Null, SqlValue::Real),
+            ])
+        })?;
+    }
+    inserts.flush()
+}
 pub fn reference(db: &Connection, id: Option<&str>) -> Result<u32> {
     match id {
         None => Ok(0),
@@ -89,54 +122,76 @@ pub fn reference(db: &Connection, id: Option<&str>) -> Result<u32> {
             .query_row([id], |r| r.get(0))?),
     }
 }
-#[allow(clippy::indexing_slicing)] // Stored rows are objects and field arrays have fixed schema lengths.
 pub fn record(db: &Connection, id: &str) -> Result<Place> {
-    let payload: String = db
-        .prepare_cached("SELECT payload FROM places WHERE id=?")?
-        .query_row([id], |r| r.get(0))?;
-    let mut row: Value = serde_json::from_str(&payload)?;
-    ensure(row.is_object(), "Catalogue payload must be an object")?;
-    if let Some(canonical) = db
-        .prepare_cached("SELECT payload FROM cities WHERE id=?")?
-        .query_row([id], |r| r.get::<_, String>(0))
-        .optional()?
-    {
-        let canonical: Value = serde_json::from_str(&canonical)?;
-        for field in ["name", "name_en", "population", "latitude", "longitude"] {
-            row[field] = canonical[field].clone();
+    let (mut text, ids, mut population) = db
+        .prepare_cached("SELECT * FROM places WHERE id=?")?
+        .query_row([id], |row| {
+            let mut text: [Option<String>; 12] = std::array::from_fn(|_| None);
+            let mut ids: [Option<String>; 4] = std::array::from_fn(|_| None);
+            for (i, value) in text.iter_mut().enumerate() {
+                *value = row.get(i)?;
+            }
+            for (i, value) in ids.iter_mut().enumerate() {
+                *value = row.get(12 + i)?;
+            }
+            Ok((text, ids, row.get::<_, u32>(16)?))
+        })?;
+    let mut point = (i32::MIN, i32::MIN);
+    let canonical = db
+        .prepare_cached(
+            "SELECT name,name_en,kind,population,latitude,longitude FROM cities WHERE id=?",
+        )?
+        .query_row([id], |r| {
+            Ok((
+                r.get::<_, Option<String>>(0)?,
+                r.get::<_, Option<String>>(1)?,
+                r.get::<_, Option<String>>(2)?,
+                r.get::<_, u32>(3)?,
+                r.get::<_, Option<f64>>(4)?,
+                r.get::<_, Option<f64>>(5)?,
+            ))
+        })
+        .optional()?;
+    if let Some((name, name_en, kind, count, lat, lon)) = canonical {
+        for (i, value) in [(1, name), (2, name_en), (5, kind)] {
+            if let Some(field) = text.get_mut(i) {
+                *field = value;
+            }
         }
-        row["settlement_kind"] = canonical["kind"].clone();
+        population = count;
+        point = match (lat, lon) {
+            (Some(lat), Some(lon))
+                if lat.is_finite()
+                    && lon.is_finite()
+                    && lat.abs() <= 90.0
+                    && lon.abs() <= 180.0 =>
+            {
+                (microdegrees(lat), microdegrees(lon))
+            }
+            (None, None) => point,
+            _ => return Err(Error::Input("Invalid catalogue coordinates".into())),
+        };
     }
-    // A supplied mapping must agree with the published normalized identity.
     if let Some(mapped) = db
         .prepare_cached("SELECT city FROM mappings WHERE id=?")?
         .query_row([id], |r| r.get::<_, Option<String>>(0))
         .optional()?
     {
         ensure(
-            mapped.as_deref() == row["normalized_city_id"].as_str(),
+            mapped == ids.get(3).cloned().flatten(),
             "Place mapping disagrees with catalogue",
         )?;
     }
     let mut refs = [0; 4];
-    for (i, field) in REF_FIELDS.iter().enumerate() {
-        refs[i] = reference(db, row[field].as_str())?;
+    for (value, id) in refs.iter_mut().zip(ids.iter()) {
+        *value = reference(db, id.as_deref())?;
     }
-    let point = match (row["latitude"].as_f64(), row["longitude"].as_f64()) {
-        (Some(lat), Some(lon))
-            if lat.is_finite() && lon.is_finite() && lat.abs() <= 90.0 && lon.abs() <= 180.0 =>
-        {
-            (microdegrees(lat), microdegrees(lon))
-        }
-        (None, None) => (i32::MIN, i32::MIN),
-        _ => return Err(Error::Input("Invalid catalogue coordinates".into())),
-    };
     Ok(Place {
-        text: std::array::from_fn(|i| row[TEXT_FIELDS[i]].as_str().map(str::to_owned)),
+        text,
         refs,
         latitude: point.0,
         longitude: point.1,
-        population: population(&row)?,
+        population,
         timezone: None,
     })
 }

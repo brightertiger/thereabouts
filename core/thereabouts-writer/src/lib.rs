@@ -37,6 +37,9 @@ pub struct Options {
     /// Parent for both the exclusive stage and SQLite file; omitted from pack identity.
     #[serde(default, skip_serializing)]
     pub staging_directory: Option<std::path::PathBuf>,
+    /// Optional SQLite scratch parent, including another filesystem; never part of pack identity.
+    #[serde(default, skip_serializing)]
+    pub sqlite_directory: Option<std::path::PathBuf>,
     /// Explicit omissions for deliberately incomplete fixtures, never inferred.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub allow_missing_tables: Vec<String>,
@@ -123,8 +126,10 @@ fn build(
     input_digest: String,
     identity: Value,
 ) -> Result<Manifest> {
-    let db_path = stage.join("catalogue.sqlite");
-    let db = Connection::open(&db_path)?;
+    let sqlite_parent = options.sqlite_directory.as_deref().unwrap_or(stage);
+    staging::sqlite_preflight(data, sqlite_parent)?;
+    let db_file = tempfile::NamedTempFile::new_in(sqlite_parent)?;
+    let db = Connection::open(db_file.path())?;
     catalogue::initialize(&db)?;
     db.execute_batch("BEGIN")?;
     catalogue::load(&db, data)?;
@@ -143,6 +148,7 @@ fn build(
     ] {
         for table in data.tables(kind) {
             data.scan(table, |row| {
+                let row = row.metadata()?;
                 metadata_bytes += serde_json::to_vec(&row)?.len();
                 ensure(
                     metadata_bytes <= 16 * 1024 * 1024,
@@ -189,7 +195,7 @@ fn build(
         )?;
     }
     drop(db);
-    fs::remove_file(db_path)?;
+    db_file.close()?;
     let mut json = serde_json::to_vec(&manifest)?;
     json.push(b'\n');
     fs::write(stage.join("manifest.json"), json)?;
@@ -207,7 +213,7 @@ fn add(stage: &Path, manifest: &mut Manifest, name: &str, kind: &str, bytes: &[u
     });
     Ok(())
 }
-fn flags(row: &Value) -> Result<u32> {
+fn flags(row: arrow::Row<'_>) -> Result<u32> {
     let methods = [
         "",
         "city_polygon",
@@ -218,30 +224,25 @@ fn flags(row: &Value) -> Result<u32> {
         "rural_nearest",
         "rural_nearest_distant",
     ];
-    let method = row["city_method"].as_str().unwrap_or("");
+    let method = row.text("city_method")?.unwrap_or("");
     let city = methods
         .iter()
         .position(|m| *m == method)
         .ok_or_else(|| Error::Input("Unknown city method".into()))?;
+    let country = row.text("country_method")?;
+    let state = row.text("state_method")?;
+    let land = row.text("land_method")?;
     ensure(
-        ["country_method", "state_method"]
+        [country, state]
             .iter()
-            .all(|k| row[k].is_null() || row[k] == "area")
-            && (row["land_method"] == "land" || row["land_method"] == "offshore"),
+            .all(|m| m.is_none() || *m == Some("area"))
+            && matches!(land, Some("land" | "offshore")),
         "Unknown assignment method",
     )?;
     Ok(
         u32::try_from(city).map_err(|_| Error::Input("Invalid city method".into()))?
-            | if row["country_method"].is_null() {
-                0
-            } else {
-                8
-            }
-            | if row["state_method"].is_null() { 0 } else { 16 }
-            | if row["land_method"] == "offshore" {
-                32
-            } else {
-                0
-            },
+            | if country.is_none() { 0 } else { 8 }
+            | if state.is_none() { 0 } else { 16 }
+            | if land == Some("offshore") { 32 } else { 0 },
     )
 }

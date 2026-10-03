@@ -112,9 +112,8 @@ fn directory(
 /// A file-backed shard whose header and directory are checked before range reads.
 #[derive(Debug)]
 pub(crate) struct FileShard {
-    path: std::path::PathBuf,
+    file: std::fs::File,
     spans: Vec<(usize, usize)>,
-    length: usize,
 }
 impl FileShard {
     pub(crate) fn open(path: &std::path::Path, kind: u32, widths: &[usize]) -> Result<Self> {
@@ -124,11 +123,7 @@ impl FileShard {
         let mut header = vec![0; 32 + widths.len() * 32];
         file.read_exact(&mut header)?;
         let spans = directory(&header, length, kind, widths)?;
-        let shard = Self {
-            path: path.to_owned(),
-            spans,
-            length,
-        };
+        let shard = Self { file, spans };
         let mut end = header.len();
         for &(start, stop) in &shard.spans {
             ensure(
@@ -161,15 +156,9 @@ impl FileShard {
         )?;
         self.read(start + offset, length)
     }
-    pub(crate) fn all(&self) -> Result<Vec<u8>> {
-        self.read(0, self.length)
-    }
     fn read(&self, start: usize, length: usize) -> Result<Vec<u8>> {
-        use std::io::{Read, Seek, SeekFrom};
-        let mut file = std::fs::File::open(&self.path)?;
-        file.seek(SeekFrom::Start(start as u64))?;
         let mut bytes = vec![0; length];
-        file.read_exact(&mut bytes)?;
+        super::positioned::read(&self.file, &mut bytes, start as u64)?;
         Ok(bytes)
     }
 }
@@ -205,6 +194,21 @@ pub fn encode(kind: u32, sections: &[(&[u8], usize)]) -> Result<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn lazy_ranges_keep_the_original_file_after_path_replacement() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("shard.bin");
+        std::fs::write(&path, encode(4, &[(b"old", 1)]).unwrap()).unwrap();
+        let shard = FileShard::open(&path, 4, &[1]).unwrap();
+        let replacement = dir.path().join("replacement.bin");
+        std::fs::write(&replacement, encode(4, &[(b"new", 1)]).unwrap()).unwrap();
+        std::fs::rename(&replacement, &path).unwrap();
+        assert_eq!(shard.section(0).unwrap(), b"old");
+        assert_eq!(
+            FileShard::open(&path, 4, &[1]).unwrap().section(0).unwrap(),
+            b"new"
+        );
+    }
     #[test]
     fn padding_and_truncation() {
         let b = encode(4, &[(b"abc", 1), (b"d", 1)]).unwrap();

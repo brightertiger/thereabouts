@@ -20,6 +20,10 @@ pub(crate) fn preflight(data: &Dataset, stage: &Path, output: &Path) -> Result<(
             "Staging and output directories must be on the same filesystem for atomic rename",
         )?;
     }
+    sqlite_preflight(data, stage)
+}
+pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
+    fs::create_dir_all(directory)?;
     let mut bytes = 0_u64;
     for kind in [
         "cells",
@@ -45,7 +49,7 @@ pub(crate) fn preflight(data: &Dataset, stage: &Path, output: &Path) -> Result<(
         .checked_mul(INPUT_EXPANSION)
         .and_then(|size| size.checked_add(SHARD_RESERVE))
         .ok_or_else(|| Error::Input("Dataset size overflows disk estimate".into()))?;
-    admit(fs2::available_space(stage)?, estimate)
+    admit(fs2::available_space(directory)?, estimate)
 }
 fn admit(available: u64, estimate: u64) -> Result<()> {
     let required = FREE_SPACE_FLOOR
