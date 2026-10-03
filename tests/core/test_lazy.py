@@ -29,7 +29,7 @@ def test_lazy_payload_validation_and_explicit_verification(tmp_path: Path) -> No
     block = struct.unpack_from("<I", data, 160)[0]
     import h3
 
-    from thereabouts.packs.address import cell_at
+    from tools.fixture_cells import cell_at
 
     cell = cell_at(block, 0)
     with Geocoder(target) as geo, pytest.raises(CorruptPackError):

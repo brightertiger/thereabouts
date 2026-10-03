@@ -6,7 +6,8 @@ from typing import overload
 import numpy as np
 from numpy.typing import NDArray
 
-from thereabouts.format import (
+from .errors import DamagedPackError
+from .format import (
     BITMAP_WORD,
     BITMAP_WORD_BITS,
     KEY_BITS,
@@ -14,8 +15,6 @@ from thereabouts.format import (
     KEYS_PER_WORD,
     bitmap_offsets,
 )
-
-from .errors import DamagedPackError
 
 IntArray = NDArray[np.int64]
 

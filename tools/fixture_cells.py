@@ -1,36 +1,21 @@
-"""Logical H3 addressing, including unused pentagon digit slots."""
+"""Enumerate fixture H3 cells from the documented block/local-key encoding."""
 
 from h3.api import basic_int as h3
 
-from .layout import (
-    BLOCK_COUNT,
-    BLOCK_RESOLUTION,
-    CHILD_RADIX,
-    H3_BASE_MASK,
-    H3_BASE_SHIFT,
-    H3_CELL_MODE,
-    H3_DIGIT_BITS,
-    H3_DIGIT_MASK,
-    H3_MAX_RESOLUTION,
-    H3_RESOLUTION_SHIFT,
-    MAX_KEY,
-)
+BLOCK_RESOLUTION = 3
+CHILD_RADIX = 7
+BLOCK_COUNT = 122 * CHILD_RADIX**BLOCK_RESOLUTION
+MAX_KEY = 19607
+H3_DIGIT_BITS = 3
+H3_MAX_RESOLUTION = 15
+H3_DIGIT_MASK = 7
+H3_CELL_MODE = 1 << 59
+H3_RESOLUTION_SHIFT = 52
+H3_BASE_SHIFT = 45
 
 
 def level_offset(depth: int) -> int:
     return int((CHILD_RADIX**depth - 1) // (CHILD_RADIX - 1))
-
-
-def address(cell: int, resolution: int) -> tuple[int, int]:
-    block = (cell >> H3_BASE_SHIFT) & H3_BASE_MASK
-    local = 0
-    for level in range(1, resolution + 1):
-        digit = (cell >> (H3_DIGIT_BITS * (H3_MAX_RESOLUTION - level))) & H3_DIGIT_MASK
-        if level <= BLOCK_RESOLUTION:
-            block = block * CHILD_RADIX + digit
-        else:
-            local = local * CHILD_RADIX + digit
-    return block, level_offset(resolution - BLOCK_RESOLUTION) + local
 
 
 def cell_at(block: int, key: int) -> int:
@@ -60,16 +45,3 @@ def cell_at(block: int, key: int) -> int:
     if not h3.is_valid_cell(cell):
         raise ValueError("Invalid pentagon address")
     return cell
-
-
-def ancestors(key: int) -> list[int]:
-    depth = 0
-    while level_offset(depth + 1) <= key:
-        depth += 1
-    local = key - level_offset(depth)
-    result = []
-    while depth:
-        depth -= 1
-        local //= CHILD_RADIX
-        result.append(level_offset(depth) + local)
-    return result

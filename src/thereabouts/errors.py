@@ -13,14 +13,6 @@ class DataNotInstalledError(GeocoderError):
     code = "data_not_installed"
 
 
-class UnsupportedSchemaError(GeocoderError):
-    """The pack uses a schema this engine cannot read."""
-
-
-class DamagedPackError(GeocoderError):
-    """A pack has invalid metadata, structure, content or checksums."""
-
-
 class ClosedGeocoderError(GeocoderError):
     """An operation was attempted after closing a geocoder."""
 

@@ -21,8 +21,8 @@ from thereabouts import (
     IncompatibleDataError,
     _core,
 )
-from thereabouts.packs.jsonio import sha256
 from thereabouts.store import active_pack
+from thereabouts.store_files import sha256
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SAMPLE = FIXTURES / "packs/core-sample"
@@ -203,12 +203,9 @@ def test_discovery_exact_command_and_integrity(
 
 
 def test_old_installation_is_discovered_and_rejected(tmp_path: Path) -> None:
-    from thereabouts.installing.install import install
-
-    source = FIXTURES / "serving"
-    install(
-        str(source), data_dir=tmp_path, manifest_sha256=sha256(source / "manifest.json")
-    )
+    pointer = tmp_path / "packs/reverse/current.json"
+    pointer.parent.mkdir(parents=True)
+    pointer.write_text("{}")
     with pytest.raises(IncompatibleDataError) as caught:
         Geocoder(data_dir=tmp_path)
     assert caught.value.code == "incompatible_data"

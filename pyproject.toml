@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Offline H3 city, state and country lookup"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["numpy>=2.0,<2.4", "h3>=4.3,<5"]
+dependencies = ["numpy>=2.0,<2.4"]
 
 [project.optional-dependencies]
 mcp = ["mcp==2.2.0"]
@@ -29,10 +29,8 @@ dev = [
     "types-PyYAML",
     "types-psutil>=7,<8",
     "mcp==2.2.0",
-    "Cython==3.3.0",
     "maturin>=1.9,<2",
-    "setuptools>=77,<81",
-    "types-setuptools",
+    "platformdirs>=4,<5",
     "pytest>=8,<10",
     "ruff>=0.11,<1",
     "mypy>=1.15,<2",
@@ -41,6 +39,7 @@ dev = [
     "types-regex>=2026.9.10.20260911",
 ]
 acquire = [
+    "h3>=4.3,<5",
     "pyarrow>=19,<24",
     "duckdb>=1.2,<2",
     "shapely>=2.1,<3",

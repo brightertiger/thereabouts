@@ -9,7 +9,7 @@ import h3
 
 from tests.conformance.core_legacy import assert_case
 from thereabouts import Geocoder, _core
-from thereabouts.packs.address import cell_at
+from tools.fixture_cells import cell_at
 from tools.synthetic_dataset import golden
 
 ROOT = Path(__file__).resolve().parents[1]

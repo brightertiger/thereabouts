@@ -19,9 +19,8 @@ def test_native_default_matches_platformdirs(monkeypatch: pytest.MonkeyPatch) ->
     import sys
 
     name = "Thereabouts" if sys.platform in ("darwin", "win32") else "thereabouts"
-    # setuptools is already a dev dependency and vendors unmodified platformdirs.
-    # This comparison adds no package download to the offline qualification.
-    platformdirs = import_module("setuptools._vendor.platformdirs")
+    # Compare the native path policy with the Python platformdirs implementation.
+    platformdirs = import_module("platformdirs")
     expected = Path(platformdirs.user_data_dir(name, appauthor=False))
     assert data_directory() == expected
     assert Path(_core.data_directory()) == expected
@@ -81,7 +80,12 @@ def test_each_platform_matches_platformdirs(
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path / "Local"))
     monkeypatch.delenv("XDG_DATA_HOME", raising=False)
-    policy = import_module(f"setuptools._vendor.platformdirs.{module}")
+    policy = import_module(f"platformdirs.{module}")
+    if platform == "windows":
+        # Exercise path assembly on other hosts using the environment resolver.
+        monkeypatch.setattr(
+            policy, "get_win_folder", policy.get_win_folder_from_env_vars
+        )
     expected = getattr(policy, class_name)(name, appauthor=False).user_data_dir
     assert Path(_core.platform_directory(platform)) == Path(expected)
 
