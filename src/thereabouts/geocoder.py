@@ -9,10 +9,9 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import NDArray
 
-from . import _core
-from .errors import ClosedGeocoderError
+from .forward_queries import ForwardQueries
+from .handles import Handles
 from .results import Result
-from .store import core_pack
 
 
 class Coordinates(Protocol):
@@ -25,8 +24,8 @@ class Coordinates(Protocol):
     def lon(self) -> float: ...
 
 
-class Geocoder:
-    """Open a core pack, or discover an installed pack in the existing store."""
+class Geocoder(ForwardQueries):
+    """Open selected families or discover installed packs from one dataset version."""
 
     def __init__(
         self,
@@ -34,17 +33,9 @@ class Geocoder:
         *,
         data_dir: str | Path | None = None,
         verify: bool = False,
+        packs: Mapping[str, str | Path] | None = None,
     ) -> None:
-        if pack is not None and data_dir is not None:
-            raise ValueError("Select pack or data_dir, not both")
-        self._reader = _core.open(
-            str(pack if pack is not None else core_pack(data_dir)), verify=verify
-        )
-        self._closed = False
-
-    def _ensure_open(self) -> None:
-        if self._closed:
-            raise ClosedGeocoderError("Geocoder is closed")
+        super().__init__(Handles(pack, packs, data_dir, verify))
 
     def reverse(self, *, lat: float, lon: float, evidence: bool = False) -> Result:
         """Return a flat result; invalid coordinates have status invalid_input."""
@@ -54,14 +45,18 @@ class Geocoder:
             or not isinstance(v, (int, float, np.integer, np.floating))
             for v in (lat, lon)
         ):
-            return Result.from_dict(self._reader.reverse(float("nan"), 0.0))
-        return Result.from_dict(self._reader.reverse(lat, lon, evidence=evidence))
+            return Result.from_dict(
+                self._handles.get("core").reverse(float("nan"), 0.0)
+            )
+        return Result.from_dict(
+            self._handles.get("core").reverse(lat, lon, evidence=evidence)
+        )
 
     def from_h3(self, cell: str, *, evidence: bool = False) -> Result:
         """Find the stored ancestor of a valid H3 cell at resolution zero to eight."""
         self._ensure_open()
         return Result.from_dict(
-            self._reader.from_h3(
+            self._handles.get("core").from_h3(
                 cell if isinstance(cell, str) else "", evidence=evidence
             )
         )
@@ -96,14 +91,13 @@ class Geocoder:
             raise ValueError("lat and lon must be one-dimensional")
         if lat.dtype.kind not in "ifu" or lon.dtype.kind not in "ifu":
             raise TypeError("lat and lon must have numeric, non-boolean dtypes")
-        return self._reader.reverse_columns(
+        return self._handles.get("core").reverse_columns(
             np.asarray(lat, dtype=np.float64), np.asarray(lon, dtype=np.float64)
         )
 
     def close(self) -> None:
         """Release this handle; repeated close calls are harmless."""
-        self._reader.close()
-        self._closed = True
+        self._handles.close()
 
     def __enter__(self) -> "Geocoder":
         self._ensure_open()

@@ -70,6 +70,19 @@ impl Dataset {
         let nearest = policy_distance(policy, "nearest_m")?;
         ensure(distant <= nearest, "distant_m exceeds nearest_m")
     }
+    pub(crate) fn require_tables(&self, required: &[&str], allowed: &[String]) -> Result<()> {
+        ensure(
+            allowed.iter().all(|kind| required.contains(&kind.as_str())),
+            "Unknown allow_missing_tables kind",
+        )?;
+        for kind in required {
+            ensure(
+                !self.tables(kind).is_empty() || allowed.iter().any(|s| s == kind),
+                &format!("Missing required dataset table: {kind}"),
+            )?;
+        }
+        Ok(())
+    }
     pub fn tables(&self, kind: &str) -> Vec<&Value> {
         self.manifest["tables"]
             .as_array()

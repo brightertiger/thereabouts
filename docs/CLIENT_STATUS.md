@@ -1,7 +1,7 @@
 # Thereabouts client status
 
 Work package 1 and the package-2 prerequisite fixes are complete on `feat/rust-core`.
-Forward families are the next work in package 2. The approved design is
+Postal is implemented in package 2; airports and the remaining families follow. The approved design is
 [the client redesign specification](superpowers/specs/2026-10-03-client-redesign-design.md);
 [PACK_FORMAT.md](PACK_FORMAT.md) defines the version-2 wire format.
 
@@ -171,7 +171,7 @@ not_found with outside_coverage**, **8 InvalidInputError → invalid_input**, an
 **1 intended change** (case 47 accepts r3 and returns no_stored_ancestor).
 The only other allow-list entry is the synthetic canonical city's display name.
 Matched assertions cover city/country/state IDs, country code, state name and
-method. The **19 postal/airport vectors remain legacy-only** until package 2.
+method. The eight postal cases now also run against the original expectations in Rust and pytest: four matched, one ambiguous, one not_found and two invalid_input. The remaining eleven airport cases follow with that family. Code matches now say exact; the canonical-name allowance is unchanged.
 
 There are **139 real reverse vectors** shared by Rust and Python. Their snapshot
 results supplement the independent oracle: offline pytest checks **131 r8
@@ -212,14 +212,14 @@ a controlled comparison with this real sample.
 Required gates are cargo fmt --check, cargo clippy --all-targets -- -D warnings,
 cargo test, pytest, ruff check, ruff format --check and strict mypy. Additional
 checks cover the wasm target and Clippy with all features. All passed at the
-end of the rework: 32 Rust tests, 667 Python tests (9 skipped), and mypy over
-420 source files. Property tests
+end of the rework: 35 Rust tests, 674 Python tests (9 skipped), and mypy over
+429 source files. Property tests
 include invalid payloads with recomputed checksums, verified open, full verify
 and lazy access without panics. No application Rust unsafe is used.
 
 ## Deliberately not done and unverified
 
-Package 2 forward families and the names index follow the prerequisite commit. The new CLI,
+The remaining package-2 forward families and names index follow the postal commit. The new CLI,
 installer, MCP wiring and Node/WASM host adapter remain later packages.
 Legacy modules, their helper implementations and their tests remain importable
 until package 5; core discovery imports only retained helpers. build_data is
@@ -227,3 +227,42 @@ unchanged. There is no world export or world performance qualification.
 Linux, Windows and other Python versions were not run; wasm was compile-checked.
 Disk use stayed inside the worktree with more than 5 GiB free. Real data was
 read-only; no source data was modified, and nothing was pushed or published.
+
+## Postal implementation
+
+The postal pack supplies country-scoped exact lookup, source points and published
+canonical-city roll-up. Unknown codes are ordinary misses; missing country and
+invalid values return invalid_input with a hint. Ambiguous flat fields are null,
+with ranked candidates. Source place and administrative names remain in evidence.
+A separate family pack can be opened directly with Geocoder(path), or several
+can be selected using Geocoder(packs={"core": core_path, "postal": postal_path}).
+All selected families must have the same dataset version. Existing store
+discovery supports a postal-only installation. No installer or CLI changes are
+part of this package.
+
+geo.postal(code, country="FR", evidence=True) returns a frozen Result.
+geo.postal_columns(codes, country="FR") releases the GIL and emits dictionary
+strings, numeric validity masks, candidate_offsets, and candidate_ columns.
+Column buffers are filled without retaining a full result per input.
+
+The committed sample contains the first 32 distinct codes per requested country
+plus named examples; every source observation of each selected code is retained.
+The sample builder takes an explicit --golden path. Countries are BE, NL, LU,
+FR, TR, IN and US. Independently extracted source rows and place_to_city mappings
+are checked offline by pytest, including source IDs, geography and point
+quantization. The synthetic pack comes from the unchanged legacy fixture builder.
+
+Forward figures below come only from benchmarks.forward_read_path and are saved
+in CLIENT_FORWARD_MEASUREMENTS.json. They use the Apple M2 / 8 GiB machine,
+20,000 scalar calls and seven native batch repetitions over three matching US
+codes. The world estimate multiplies total sample bytes per source row by the
+published source-row count. Fixed metadata and notices make that deliberately
+crude ratio strongly upward-biased; it is not a measured world pack size.
+
+## Forward measurements
+
+<!-- forward-measurements:start -->
+| Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Batch rows/s | Estimated world bytes |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| postal | 363,327 / 897 | 28 | 7.459 / 10.375 | 474,755 | 2,039,842,937 |
+<!-- forward-measurements:end -->

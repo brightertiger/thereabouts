@@ -7,7 +7,9 @@ mod arrow;
 mod catalogue;
 mod emission;
 mod error;
+mod forward;
 mod inserts;
+mod postal;
 mod source;
 mod staging;
 mod timezones;
@@ -64,17 +66,36 @@ pub fn write_pack(
     output: &Path,
     options: &Options,
 ) -> Result<Manifest> {
-    if family != "core" {
-        return Err(Error::Input("Only the core family is implemented".into()));
+    if !matches!(family, "core" | "postal") {
+        return Err(Error::Input("Unsupported export family".into()));
     }
     ensure(
         !options.data_version.is_empty(),
         "Dataset version is required",
     )?;
     let data = Dataset::open(dataset_dir)?;
-    data.validate_core(&options.allow_missing_tables)?;
-    let identity =
+    if family == "core" {
+        data.validate_core(&options.allow_missing_tables)?;
+    } else {
+        data.require_tables(
+            &[
+                "postal_codes",
+                "places",
+                "canonical_cities",
+                "place_to_city",
+                "countries",
+                "subdivisions",
+            ],
+            &options.allow_missing_tables,
+        )?;
+    }
+    let mut identity =
         json!({"manifest_sha256":data.digest,"options":options,"writer":WRITER_REVISION});
+    if family != "core"
+        && let Some(fields) = identity.as_object_mut()
+    {
+        fields.insert("family".into(), family.into());
+    }
     let input_digest = format!("{:x}", Sha256::digest(serde_json::to_vec(&identity)?));
     if output.exists() {
         let manifest = format::verify::verify(output)?;
@@ -106,7 +127,7 @@ pub fn write_pack(
             error.into()
         }
     })?;
-    let result = build(&data, &stage, options, input_digest, identity);
+    let result = build(&data, &stage, options, input_digest, identity, family);
     match result {
         Ok(manifest) => {
             fs::rename(&stage, output)?;
@@ -125,6 +146,7 @@ fn build(
     options: &Options,
     input_digest: String,
     identity: Value,
+    family: &str,
 ) -> Result<Manifest> {
     let sqlite_parent = options.sqlite_directory.as_deref().unwrap_or(stage);
     staging::sqlite_preflight(data, sqlite_parent)?;
@@ -132,38 +154,27 @@ fn build(
     let db = Connection::open(db_file.path())?;
     catalogue::initialize(&db)?;
     db.execute_batch("BEGIN")?;
-    catalogue::load(&db, data)?;
-    timezones::load(&db, data)?;
-    db.execute_batch("COMMIT")?;
-    let mut metadata = Metadata {
-        timezone_sets: vec![vec![]],
-        ..Metadata::default()
-    };
-    // Metadata remains a small side table; reject unexpectedly large inputs.
-    let mut metadata_bytes = 0;
-    for (kind, rows) in [
-        ("countries", &mut metadata.countries),
-        ("subdivisions", &mut metadata.subdivisions),
-        ("zone_tables", &mut metadata.zone_tables),
-    ] {
-        for table in data.tables(kind) {
-            data.scan(table, |row| {
-                let row = row.metadata()?;
-                metadata_bytes += serde_json::to_vec(&row)?.len();
-                ensure(
-                    metadata_bytes <= 16 * 1024 * 1024,
-                    "Metadata exceeds admission budget",
-                )?;
-                rows.push(row);
-                Ok(())
-            })?;
-        }
+    catalogue::load(
+        &db,
+        data,
+        if family == "core" {
+            "cells"
+        } else {
+            "postal_codes"
+        },
+    )?;
+    if family == "core" {
+        timezones::load(&db, data)?;
+    } else {
+        postal::load(data, &db)?;
     }
+    db.execute_batch("COMMIT")?;
+    let mut metadata = metadata(data)?;
     let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {
         schema: "thereabouts-pack-2".into(),
         format_version: 2,
-        family: "core".into(),
+        family: family.into(),
         data_version: options.data_version.clone(),
         required_features: 0,
         reference_resolution: 8,
@@ -173,10 +184,27 @@ fn build(
         sources: options.sources.clone(),
         attribution: options.attribution.clone(),
         files: vec![],
-        distant_over_m: source::policy_distance(policy, "distant_m")?,
-        cutoff_m: source::policy_distance(policy, "nearest_m")?,
+        normalization: if family == "postal" {
+            postal::NORMALIZATION.iter().map(|s| (*s).into()).collect()
+        } else {
+            vec![]
+        },
+        distant_over_m: if family == "core" {
+            source::policy_distance(policy, "distant_m")?
+        } else {
+            0
+        },
+        cutoff_m: if family == "core" {
+            source::policy_distance(policy, "nearest_m")?
+        } else {
+            0
+        },
     };
-    emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
+    if family == "core" {
+        emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
+    } else {
+        forward::emit(&db, stage, &mut manifest)?;
+    }
     emission::catalogue(&db, stage, &mut manifest)?;
     add(
         stage,
@@ -201,6 +229,33 @@ fn build(
     fs::write(stage.join("manifest.json"), json)?;
     format::verify::verify(stage)?;
     Ok(manifest)
+}
+fn metadata(data: &Dataset) -> Result<Metadata> {
+    let mut metadata = Metadata {
+        timezone_sets: vec![vec![]],
+        ..Metadata::default()
+    };
+    // Metadata remains a small side table; reject unexpectedly large inputs.
+    let mut metadata_bytes = 0;
+    for (kind, rows) in [
+        ("countries", &mut metadata.countries),
+        ("subdivisions", &mut metadata.subdivisions),
+        ("zone_tables", &mut metadata.zone_tables),
+    ] {
+        for table in data.tables(kind) {
+            data.scan(table, |row| {
+                let row = row.metadata()?;
+                metadata_bytes += serde_json::to_vec(&row)?.len();
+                ensure(
+                    metadata_bytes <= 16 * 1024 * 1024,
+                    "Metadata exceeds admission budget",
+                )?;
+                rows.push(row);
+                Ok(())
+            })?;
+        }
+    }
+    Ok(metadata)
 }
 fn add(stage: &Path, manifest: &mut Manifest, name: &str, kind: &str, bytes: &[u8]) -> Result<()> {
     let path = stage.join(name);

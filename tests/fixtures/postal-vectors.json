@@ -1,0 +1,3292 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/postal-sample",
+  "cases": [
+    {
+      "id": "postal-000",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "9401 AA"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2759633",
+          "name": "Assen",
+          "name_en": "Assen",
+          "kind": "city",
+          "population": 68836,
+          "point": {
+            "lat": 52.99667,
+            "lon": 6.5625
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.9971,
+          "lon": 6.5699
+        },
+        "cell": "88196da137fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-001",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "9401 AB"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2759633",
+          "name": "Assen",
+          "name_en": "Assen",
+          "kind": "city",
+          "population": 68836,
+          "point": {
+            "lat": 52.99667,
+            "lon": 6.5625
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.9984,
+          "lon": 6.5661
+        },
+        "cell": "88196da137fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-002",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "9401 AC"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2759633",
+          "name": "Assen",
+          "name_en": "Assen",
+          "kind": "city",
+          "population": 68836,
+          "point": {
+            "lat": 52.99667,
+            "lon": 6.5625
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.9989,
+          "lon": 6.5687
+        },
+        "cell": "88196da137fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-003",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "1000"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-BRU",
+          "name": "Bruxelles-Capitale, Région de"
+        },
+        "city": {
+          "id": "city:geonames:2800866",
+          "name": "Brussels",
+          "name_en": "Brussels",
+          "kind": "city",
+          "population": 1019022,
+          "point": {
+            "lat": 50.85045,
+            "lon": 4.34878
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.8504,
+          "lon": 4.3488
+        },
+        "cell": "881fa4418dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-004",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "1020"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-BRU",
+          "name": "Bruxelles-Capitale, Région de"
+        },
+        "city": {
+          "id": "city:geonames:2800866",
+          "name": "Brussels",
+          "name_en": "Brussels",
+          "kind": "city",
+          "population": 1019022,
+          "point": {
+            "lat": 50.85045,
+            "lon": 4.34878
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.8759,
+          "lon": 4.3484
+        },
+        "cell": "881fa44037fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-005",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "1030"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-BRU",
+          "name": "Bruxelles-Capitale, Région de"
+        },
+        "city": {
+          "id": "city:geonames:2787149",
+          "name": "Schaarbeek",
+          "name_en": "Schaarbeek",
+          "kind": "city",
+          "population": 132761,
+          "point": {
+            "lat": 50.86935,
+            "lon": 4.37737
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.8694,
+          "lon": 4.3774
+        },
+        "cell": "881fa441dbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-006",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "75000"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8534,
+          "lon": 2.3488
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-007",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "75001"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8534,
+          "lon": 2.3488
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-008",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "75002"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8534,
+          "lon": 2.3488
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-009",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "744301"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "IN",
+              "code3": "IND",
+              "name": "India"
+            },
+            "state": {
+              "code": "IN-AN",
+              "name": "Andaman and Nicobar Islands"
+            },
+            "city": {
+              "id": "city:geonames:1260201",
+              "name": "Passa",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 9.1833,
+              "lon": 92.7667
+            },
+            "cell": "88640d0909fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "IN",
+              "code3": "IND",
+              "name": "India"
+            },
+            "state": {
+              "code": "IN-AN",
+              "name": "Andaman and Nicobar Islands"
+            },
+            "city": {
+              "id": "city:geonames:1262394",
+              "name": "Mūs",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 9.2333,
+              "lon": 92.7833
+            },
+            "cell": "88640d461dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "IN",
+              "code3": "IND",
+              "name": "India"
+            },
+            "state": {
+              "code": "IN-AN",
+              "name": "Andaman and Nicobar Islands"
+            },
+            "city": {
+              "id": "city:geonames:1268579",
+              "name": "Kākana",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 9.1167,
+              "lon": 92.8
+            },
+            "cell": "88640d0b43fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": null,
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": {
+              "lat": 7.5166,
+              "lon": 93.6031
+            },
+            "cell": "8864294b41fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "postal-010",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "744302"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-AN",
+          "name": "Andaman and Nicobar Islands"
+        },
+        "city": {
+          "id": "city:geonames:1260201",
+          "name": "Passa",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 9.1833,
+          "lon": 92.7667
+        },
+        "cell": "88640d0909fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-011",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "744303"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-AN",
+          "name": "Andaman and Nicobar Islands"
+        },
+        "city": {
+          "id": "city:geonames:1260201",
+          "name": "Passa",
+          "name_en": null,
+          "kind": "settlement",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 9.1833,
+          "lon": 92.7667
+        },
+        "cell": "88640d0909fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-012",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "L-4968"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-CA",
+          "name": "Capellen"
+        },
+        "city": {
+          "id": "city:geonames:2960085",
+          "name": "Schouweiler",
+          "name_en": "Schouweiler",
+          "kind": "village",
+          "population": 1610,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5789,
+          "lon": 5.9571
+        },
+        "cell": "881fa3c9e1fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-013",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "L-4970"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "LU",
+              "code3": "LUX",
+              "name": "Luxembourg"
+            },
+            "state": {
+              "code": "LU-CA",
+              "name": "Capellen"
+            },
+            "city": {
+              "id": "city:geonames:2960648",
+              "name": "Dippach",
+              "name_en": null,
+              "kind": "village",
+              "population": 808,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 49.585,
+              "lon": 5.9726
+            },
+            "cell": "881fa3c98dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "LU",
+              "code3": "LUX",
+              "name": "Luxembourg"
+            },
+            "state": {
+              "code": "LU-CA",
+              "name": "Capellen"
+            },
+            "city": {
+              "id": "city:overture:70023a64-75c5-427e-8f70-a148c0c699de",
+              "name": "Dippach-Gare",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 49.5764,
+              "lon": 5.9949
+            },
+            "cell": "881fa3c987fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "postal-014",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "L-4971"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:overture:70023a64-75c5-427e-8f70-a148c0c699de",
+          "name": "Dippach-Gare",
+          "name_en": null,
+          "kind": "village",
+          "population": null,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5709,
+          "lon": 5.995
+        },
+        "cell": "881fa3c9bdfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-015",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "02700"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519524",
+              "name": "Güzelsu",
+              "name_en": null,
+              "kind": "village",
+              "population": 1109,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.8778,
+              "lon": 38.919
+            },
+            "cell": "882da90405fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519508",
+              "name": "Gürgenli",
+              "name_en": null,
+              "kind": "village",
+              "population": 515,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9793,
+              "lon": 38.8348
+            },
+            "cell": "882da9a947fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:297197",
+              "name": "Yenibardak",
+              "name_en": null,
+              "kind": "village",
+              "population": 471,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.15,
+              "lon": 39.1167
+            },
+            "cell": "882da93607fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519518",
+              "name": "Beşgöze",
+              "name_en": null,
+              "kind": "village",
+              "population": 391,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.8719,
+              "lon": 38.9565
+            },
+            "cell": "882da905cbfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:300914",
+              "name": "Seyitmahmut",
+              "name_en": null,
+              "kind": "village",
+              "population": 383,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9418,
+              "lon": 38.969
+            },
+            "cell": "882da904d9fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:308325",
+              "name": "Korulu",
+              "name_en": null,
+              "kind": "village",
+              "population": 337,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.8953,
+              "lon": 38.9663
+            },
+            "cell": "882da904e5fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:318692",
+              "name": "Cevizpınar",
+              "name_en": null,
+              "kind": "village",
+              "population": 331,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1767,
+              "lon": 39.1702
+            },
+            "cell": "882da93685fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:297465",
+              "name": "Yayladalı",
+              "name_en": null,
+              "kind": "village",
+              "population": 309,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9601,
+              "lon": 38.9181
+            },
+            "cell": "882da9068bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:303352",
+              "name": "Ortaca",
+              "name_en": null,
+              "kind": "village",
+              "population": 307,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1638,
+              "lon": 39.2437
+            },
+            "cell": "882da9348bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519513",
+              "name": "Sutepe",
+              "name_en": null,
+              "kind": "village",
+              "population": 297,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9447,
+              "lon": 38.8014
+            },
+            "cell": "882da91487fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:312083",
+              "name": "Gözpınar",
+              "name_en": null,
+              "kind": "village",
+              "population": 291,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0571,
+              "lon": 39.1602
+            },
+            "cell": "882da9356bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:297943",
+              "name": "Yağmurlu",
+              "name_en": null,
+              "kind": "village",
+              "population": 281,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9709,
+              "lon": 39.0309
+            },
+            "cell": "882da93159fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:306647",
+              "name": "Konacık",
+              "name_en": null,
+              "kind": "village",
+              "population": 281,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1175,
+              "lon": 39.2156
+            },
+            "cell": "882da93437fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:296458",
+              "name": "Yukarı Dağlıca",
+              "name_en": null,
+              "kind": "village",
+              "population": 253,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0433,
+              "lon": 38.9908
+            },
+            "cell": "882da93203fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:304287",
+              "name": "Gündoğdu",
+              "name_en": null,
+              "kind": "village",
+              "population": 250,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9568,
+              "lon": 38.8867
+            },
+            "cell": "882da906c9fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458455",
+              "name": "Geçitli",
+              "name_en": null,
+              "kind": "village",
+              "population": 242,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0954,
+              "lon": 38.5756
+            },
+            "cell": "882da9ba6bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:298583",
+              "name": "Üçkaya",
+              "name_en": null,
+              "kind": "village",
+              "population": 239,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0079,
+              "lon": 39.0562
+            },
+            "cell": "882da93003fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:305236",
+              "name": "Kütüklü",
+              "name_en": null,
+              "kind": "village",
+              "population": 218,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9642,
+              "lon": 38.8142
+            },
+            "cell": "882da91497fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:303496",
+              "name": "Onevler",
+              "name_en": null,
+              "kind": "village",
+              "population": 208,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0963,
+              "lon": 39.1578
+            },
+            "cell": "882da93465fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:313418",
+              "name": "Güngörmüş",
+              "name_en": null,
+              "kind": "village",
+              "population": 186,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9853,
+              "lon": 38.8492
+            },
+            "cell": "882da9a90bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:325406",
+              "name": "Açma",
+              "name_en": null,
+              "kind": "village",
+              "population": 171,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9868,
+              "lon": 38.9488
+            },
+            "cell": "882da93349fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519502",
+              "name": "Beybostan",
+              "name_en": null,
+              "kind": "village",
+              "population": 171,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9613,
+              "lon": 39.0424
+            },
+            "cell": "882da93155fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:313972",
+              "name": "Gönen",
+              "name_en": null,
+              "kind": "village",
+              "population": 156,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0384,
+              "lon": 39.1257
+            },
+            "cell": "882da93083fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:306758",
+              "name": "Köklüce",
+              "name_en": null,
+              "kind": "village",
+              "population": 96,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9327,
+              "lon": 38.9838
+            },
+            "cell": "882da904d7fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:10901466",
+              "name": "Yeşilyurt",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0495,
+              "lon": 39.0441
+            },
+            "cell": "882da932a9fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:13408075",
+              "name": "Ocaklar",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0288,
+              "lon": 38.9352
+            },
+            "cell": "882da9a991fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:303722",
+              "name": "Ocaklar",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0301,
+              "lon": 39.0332
+            },
+            "cell": "882da93059fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:318596",
+              "name": "Çifthisar",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9659,
+              "lon": 38.8985
+            },
+            "cell": "882da906ddfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:320504",
+              "name": "Budaklı",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1,
+              "lon": 39.2
+            },
+            "cell": "882da93427fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458461",
+              "name": "Saraycık",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0231,
+              "lon": 38.8897
+            },
+            "cell": "882da9a9cbfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458497",
+              "name": "Demirtaş",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.126,
+              "lon": 39.0734
+            },
+            "cell": "882da9adb1fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519482",
+              "name": "Akyürek",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0161,
+              "lon": 38.9902
+            },
+            "cell": "882da93221fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519493",
+              "name": "Üşküran",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0167,
+              "lon": 38.8831
+            },
+            "cell": "882da9a9c9fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519517",
+              "name": "Gümüşkaşık",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.8986,
+              "lon": 38.9379
+            },
+            "cell": "882da90415fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:overture:2a982976-0767-4828-adc7-5d8031589f85",
+              "name": "mezra",
+              "name_en": null,
+              "kind": "hamlet",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1,
+              "lon": 39.1
+            },
+            "cell": "882da93709fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:overture:acebab5d-e172-416b-8aac-be781e6a368f",
+              "name": "mezra",
+              "name_en": null,
+              "kind": "hamlet",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.038,
+              "lon": 39.0914
+            },
+            "cell": "882da930c7fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:overture:c1eb446e-c45e-4b7b-9c92-f6a3e29c7577",
+              "name": "mezra",
+              "name_en": null,
+              "kind": "hamlet",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0283,
+              "lon": 38.9567
+            },
+            "cell": "882da93269fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "postal-016",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "02800"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:301943",
+              "name": "Samsat",
+              "name_en": null,
+              "kind": "town",
+              "population": 9308,
+              "point": {
+                "lat": 37.58194,
+                "lon": 38.47417
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5819,
+              "lon": 38.4742
+            },
+            "cell": "882da9ce53fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:321053",
+              "name": "Taşkuyu",
+              "name_en": "Taşkuyu",
+              "kind": "village",
+              "population": 592,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6167,
+              "lon": 38.5
+            },
+            "cell": "882da9c531fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:309775",
+              "name": "Karahöyük",
+              "name_en": null,
+              "kind": "village",
+              "population": 434,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.7312,
+              "lon": 38.3996
+            },
+            "cell": "882da9c657fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519821",
+              "name": "Uzuntepe",
+              "name_en": null,
+              "kind": "village",
+              "population": 424,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6024,
+              "lon": 38.4846
+            },
+            "cell": "882da9c521fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:311922",
+              "name": "Yarımbağ",
+              "name_en": null,
+              "kind": "village",
+              "population": 353,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5593,
+              "lon": 38.478
+            },
+            "cell": "882da9ce01fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:316498",
+              "name": "Doğanca",
+              "name_en": null,
+              "kind": "village",
+              "population": 324,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6345,
+              "lon": 38.4627
+            },
+            "cell": "882da9c555fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:312302",
+              "name": "Kırmacık",
+              "name_en": null,
+              "kind": "village",
+              "population": 266,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5347,
+              "lon": 38.4628
+            },
+            "cell": "882da9ce67fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:318658",
+              "name": "Çiçek",
+              "name_en": null,
+              "kind": "village",
+              "population": 222,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6563,
+              "lon": 38.5454
+            },
+            "cell": "882da9c583fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:321060",
+              "name": "Göltarla",
+              "name_en": null,
+              "kind": "village",
+              "population": 175,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6062,
+              "lon": 38.4418
+            },
+            "cell": "882da9c569fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:322590",
+              "name": "Bağarası",
+              "name_en": null,
+              "kind": "village",
+              "population": 129,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5623,
+              "lon": 38.3934
+            },
+            "cell": "882da9c0e5fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:303121",
+              "name": "Ovacık",
+              "name_en": "Ovacık",
+              "kind": "village",
+              "population": 116,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5597,
+              "lon": 38.4425
+            },
+            "cell": "882da9ce4dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:295778",
+              "name": "Bayırlı",
+              "name_en": null,
+              "kind": "village",
+              "population": 85,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5441,
+              "lon": 38.3852
+            },
+            "cell": "882da9c1cbfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:305677",
+              "name": "Kızılöz",
+              "name_en": null,
+              "kind": "village",
+              "population": 77,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5161,
+              "lon": 38.4114
+            },
+            "cell": "882da9c1a9fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7519820",
+              "name": "Akdamar",
+              "name_en": null,
+              "kind": "village",
+              "population": 76,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6211,
+              "lon": 38.4782
+            },
+            "cell": "882da9c503fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:306202",
+              "name": "Kovanoluk",
+              "name_en": null,
+              "kind": "village",
+              "population": 32,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5765,
+              "lon": 38.5329
+            },
+            "cell": "882da9cee3fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:299280",
+              "name": "Tepeönü",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.6068,
+              "lon": 38.5423
+            },
+            "cell": "882da9ced7fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:303415",
+              "name": "Örentaş",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.5944,
+              "lon": 38.4647
+            },
+            "cell": "882da9c567fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "postal-017",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "02600"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:318904",
+              "name": "Çelikhan",
+              "name_en": null,
+              "kind": "town",
+              "population": 12961,
+              "point": {
+                "lat": 38.0256,
+                "lon": 38.23665
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0342,
+              "lon": 38.2433
+            },
+            "cell": "882da9825dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7520152",
+              "name": "Yeşiltepe",
+              "name_en": null,
+              "kind": "settlement",
+              "population": 420,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.8336,
+              "lon": 38.2593
+            },
+            "cell": "882da9998dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458450",
+              "name": "Korucak",
+              "name_en": null,
+              "kind": "village",
+              "population": 334,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0652,
+              "lon": 38.3765
+            },
+            "cell": "882da9876bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:304008",
+              "name": "Mutlu",
+              "name_en": null,
+              "kind": "village",
+              "population": 295,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0476,
+              "lon": 38.3983
+            },
+            "cell": "882da9872dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:297974",
+              "name": "Yağızatlı",
+              "name_en": null,
+              "kind": "village",
+              "population": 116,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.9924,
+              "lon": 38.4006
+            },
+            "cell": "882da980a1fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:314066",
+              "name": "Kalecik",
+              "name_en": null,
+              "kind": "village",
+              "population": 105,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1229,
+              "lon": 38.2982
+            },
+            "cell": "882da995cbfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:10483913",
+              "name": "Yeşilyayla",
+              "name_en": null,
+              "kind": "village",
+              "population": 86,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.026,
+              "lon": 38.317
+            },
+            "cell": "882da982e7fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458452",
+              "name": "Karaçayır",
+              "name_en": null,
+              "kind": "village",
+              "population": 82,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.045,
+              "lon": 38.4268
+            },
+            "cell": "882da9854dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:319578",
+              "name": "Çampınar",
+              "name_en": null,
+              "kind": "village",
+              "population": 62,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1159,
+              "lon": 38.2343
+            },
+            "cell": "882da9946dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458429",
+              "name": "Altıntaş",
+              "name_en": null,
+              "kind": "village",
+              "population": 35,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1188,
+              "lon": 38.2659
+            },
+            "cell": "882da99429fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:314140",
+              "name": "Gölbağı",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0728,
+              "lon": 38.2356
+            },
+            "cell": "882da99545fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7458454",
+              "name": "Aksu",
+              "name_en": null,
+              "kind": "settlement",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.1139,
+              "lon": 38.582
+            },
+            "cell": "882da9ba55fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:geonames:7520144",
+              "name": "Karagöl",
+              "name_en": null,
+              "kind": "village",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 37.7213,
+              "lon": 38.1382
+            },
+            "cell": "882dad6d8bfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "postal",
+            "match": "exact",
+            "country": {
+              "code": "TR",
+              "code3": "TUR",
+              "name": "Turkey"
+            },
+            "state": {
+              "code": "TR-02",
+              "name": "Adıyaman"
+            },
+            "city": {
+              "id": "city:overture:dfa66371-ab88-4aa5-a691-71e094df0c37",
+              "name": "Aligör",
+              "name_en": null,
+              "kind": "hamlet",
+              "population": null,
+              "point": null
+            },
+            "timezone": null,
+            "point": {
+              "lat": 38.0544,
+              "lon": 38.2625
+            },
+            "cell": "882da9952dfffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "postal-018",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "99553"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-AK",
+          "name": "Alaska"
+        },
+        "city": {
+          "id": "city:geonames:5879048",
+          "name": "Akutan",
+          "name_en": "Akutan",
+          "kind": "village",
+          "population": 1040,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 54.143,
+          "lon": -165.7854
+        },
+        "cell": "8822d05429fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-019",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "99571"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-AK",
+          "name": "Alaska"
+        },
+        "city": {
+          "id": "city:geonames:5859682",
+          "name": "Cold Bay",
+          "name_en": "Cold Bay",
+          "kind": "village",
+          "population": 123,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 55.1858,
+          "lon": -162.7211
+        },
+        "cell": "880cd8d817fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-020",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "99583"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-AK",
+          "name": "Alaska"
+        },
+        "city": {
+          "id": "city:geonames:5861959",
+          "name": "False Pass",
+          "name_en": null,
+          "kind": "village",
+          "population": 40,
+          "point": null
+        },
+        "timezone": null,
+        "point": {
+          "lat": 54.8542,
+          "lon": -163.4113
+        },
+        "cell": "880cda9307fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-021",
+      "request": {
+        "kind": "postal",
+        "values": [
+          " 9401 aa "
+        ],
+        "country": "nl"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "postal",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-DR",
+          "name": "Drenthe"
+        },
+        "city": {
+          "id": "city:geonames:2759633",
+          "name": "Assen",
+          "name_en": "Assen",
+          "kind": "city",
+          "population": 68836,
+          "point": {
+            "lat": 52.99667,
+            "lon": 6.5625
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.9971,
+          "lon": 6.5699
+        },
+        "cell": "88196da137fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-022",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "75001"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    },
+    {
+      "id": "postal-023",
+      "request": {
+        "kind": "postal",
+        "values": [
+          ""
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    },
+    {
+      "id": "postal-024",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "x\u0000y"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    },
+    {
+      "id": "postal-025",
+      "request": {
+        "kind": "postal",
+        "values": [
+          1000
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    },
+    {
+      "id": "postal-026",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "not-a-code"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "postal-027",
+      "request": {
+        "kind": "postal",
+        "values": [
+          "1000"
+        ],
+        "country": "BEL"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "postal",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use postal(code, country=\"XX\"); preserve leading zeros."
+      }
+    }
+  ]
+}

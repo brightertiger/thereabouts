@@ -6,7 +6,7 @@ use thereabouts_core::{Error, Result, format::Pack, result::LookupResult};
 
 type TextColumn = (&'static str, fn(&LookupResult) -> Option<&str>);
 type FloatColumn = (&'static str, fn(&LookupResult) -> Option<f64>);
-const TEXT_COLUMNS: [TextColumn; 15] = [
+const TEXT_COLUMNS: [TextColumn; 16] = [
     ("status", |r| Some(r.status.as_str())),
     ("kind", |r| Some(r.kind.as_str())),
     ("match", |r| {
@@ -28,6 +28,7 @@ const TEXT_COLUMNS: [TextColumn; 15] = [
     ("timezone", |r| r.timezone.as_deref()),
     ("cell", |r| r.cell.as_deref()),
     ("rank_basis", |r| r.rank_basis.as_deref()),
+    ("hint", |r| r.hint.as_deref()),
 ];
 
 const FLOAT_COLUMNS: [FloatColumn; 6] = [
@@ -100,27 +101,31 @@ struct Columns {
     population: Nullable<u32>,
 }
 impl Columns {
-    fn fill(pack: &Pack, lat: Vec<f64>, lon: Vec<f64>) -> Result<Self> {
-        let count = lat.len();
-        let mut columns = Self {
+    fn new(count: usize) -> Self {
+        Self {
             text: TEXT_COLUMNS
                 .iter()
                 .map(|_| Dictionary::new(count))
                 .collect(),
             floats: FLOAT_COLUMNS.iter().map(|_| Nullable::new(count)).collect(),
             population: Nullable::new(count),
-        };
+        }
+    }
+    fn push(&mut self, row: &LookupResult) -> Result<()> {
+        for (column, (_, get)) in self.text.iter_mut().zip(TEXT_COLUMNS) {
+            column.push(get(row))?;
+        }
+        for (column, (_, get)) in self.floats.iter_mut().zip(FLOAT_COLUMNS) {
+            column.push(get(row), f64::NAN);
+        }
+        self.population
+            .push(row.city.as_ref().and_then(|city| city.population), 0);
+        Ok(())
+    }
+    fn fill(pack: &Pack, lat: Vec<f64>, lon: Vec<f64>) -> Result<Self> {
+        let mut columns = Self::new(lat.len());
         for (lat, lon) in lat.into_iter().zip(lon) {
-            let row = pack.reverse(lat, lon, false)?;
-            for (column, (_, get)) in columns.text.iter_mut().zip(TEXT_COLUMNS) {
-                column.push(get(&row))?;
-            }
-            for (column, (_, get)) in columns.floats.iter_mut().zip(FLOAT_COLUMNS) {
-                column.push(get(&row), f64::NAN);
-            }
-            columns
-                .population
-                .push(row.city.as_ref().and_then(|city| city.population), 0);
+            columns.push(&pack.reverse(lat, lon, false)?)?;
         }
         Ok(columns)
     }
@@ -140,6 +145,9 @@ pub fn reverse<'py>(
     let columns = py
         .detach(|| Columns::fill(pack, lat, lon))
         .map_err(|e| crate::error(py, &e))?;
+    encode(py, columns)
+}
+fn encode(py: Python<'_>, columns: Columns) -> PyResult<Bound<'_, PyDict>> {
     let dict = PyDict::new(py);
     for ((name, _), column) in TEXT_COLUMNS.into_iter().zip(columns.text) {
         dict.set_item(name, PyArray1::from_vec(py, column.codes))?;
@@ -168,5 +176,38 @@ pub fn reverse<'py>(
         "city_population_valid",
         PyArray1::from_vec(py, columns.population.valid),
     )?;
+    Ok(dict)
+}
+
+/// Forward batches retain ambiguity as offsets plus flat candidate columns.
+pub(crate) fn forward(
+    py: Python<'_>,
+    values: Vec<String>,
+    lookup: impl Fn(&str) -> Result<LookupResult> + Send,
+) -> PyResult<Bound<'_, PyDict>> {
+    let (rows, candidates, offsets) = py
+        .detach(move || {
+            let mut rows = Columns::new(values.len());
+            let mut candidates = Columns::new(0);
+            let mut offsets = Vec::with_capacity(values.len() + 1);
+            offsets.push(0_u64);
+            let mut count = 0_u64;
+            for value in values {
+                let row = lookup(&value)?;
+                rows.push(&row)?;
+                for candidate in &row.candidates {
+                    candidates.push(candidate)?;
+                    count += 1;
+                }
+                offsets.push(count);
+            }
+            Ok::<_, Error>((rows, candidates, offsets))
+        })
+        .map_err(|e| crate::error(py, &e))?;
+    let dict = encode(py, rows)?;
+    dict.set_item("candidate_offsets", PyArray1::from_vec(py, offsets))?;
+    for (key, value) in encode(py, candidates)?.iter() {
+        dict.set_item(format!("candidate_{}", key.extract::<String>()?), value)?;
+    }
     Ok(dict)
 }

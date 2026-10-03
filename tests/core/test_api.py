@@ -22,7 +22,7 @@ from thereabouts import (
     _core,
 )
 from thereabouts.packs.jsonio import sha256
-from thereabouts.store import core_pack
+from thereabouts.store import active_pack
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 SAMPLE = FIXTURES / "packs/core-sample"
@@ -190,7 +190,7 @@ def test_discovery_exact_command_and_integrity(
             )
         )
     )
-    assert core_pack() == destination
+    assert active_pack() == destination
     with Geocoder() as geo:
         assert geo.reverse(lat=50.85, lon=4.35).status == "matched"
     data_file = next(destination.glob("cells-*.bin"))

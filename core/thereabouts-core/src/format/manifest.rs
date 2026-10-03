@@ -29,7 +29,7 @@ pub struct Manifest {
     pub schema: String,
     /// Wire format integer; this reader accepts 2.
     pub format_version: u32,
-    /// Lookup family; this package reads core only.
+    /// Pack family selects the required lookup indexes.
     pub family: String,
     /// Explicit dataset release identity, independent of library version.
     pub data_version: String,
@@ -49,6 +49,9 @@ pub struct Manifest {
     pub attribution: String,
     /// Ordered artifact inventory; order defines global catalogue references.
     pub files: Vec<Artifact>,
+    /// Ordered code normalization operations; required for forward code packs.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub normalization: Vec<String>,
     /// Exclusive lower bound for distant-nearest, in metres.
     pub distant_over_m: u32,
     /// Inclusive upper bound for distant-nearest, in metres.
@@ -100,10 +103,15 @@ pub fn read(root: &Path) -> Result<Manifest> {
         .get("format_version")
         .and_then(serde_json::Value::as_u64)
         != Some(2)
-        || value.get("family").and_then(serde_json::Value::as_str) != Some("core")
+        || !matches!(
+            value.get("family").and_then(serde_json::Value::as_str),
+            Some("core" | "postal")
+        )
         || value.get("schema").and_then(serde_json::Value::as_str) != Some("thereabouts-pack-2")
     {
-        return Err(Error::Incompatible("Requires a format-2 core pack".into()));
+        return Err(Error::Incompatible(
+            "Requires a supported format-2 pack".into(),
+        ));
     }
     let m: Manifest = serde_json::from_value(value)?;
     if m.required_features != 0 || m.reference_resolution != 8 || m.block_resolution != 3 {
@@ -115,6 +123,13 @@ pub fn read(root: &Path) -> Result<Manifest> {
         !m.data_version.is_empty() && m.distant_over_m <= m.cutoff_m,
         "Invalid dataset identity or nearest policy",
     )?;
+    if m.family == "postal"
+        && m.normalization != ["strip_ascii", "upper_ascii", "remove_ascii_spaces"]
+    {
+        return Err(Error::Incompatible(
+            "Unsupported postal normalization".into(),
+        ));
+    }
     let mut names = BTreeSet::new();
     for f in &m.files {
         ensure(

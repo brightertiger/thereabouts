@@ -100,6 +100,9 @@ pub(crate) fn encode(py: Python<'_>, value: &LookupResult) -> PyResult<Py<PyAny>
     }
     dict.set_item("candidates", candidates)?;
     dict.set_item("rank_basis", &value.rank_basis)?;
+    if let Some(hint) = &value.hint {
+        dict.set_item("hint", hint)?;
+    }
     if let Some(value) = &value.evidence {
         dict.set_item("evidence", evidence(py, value)?)?;
     }

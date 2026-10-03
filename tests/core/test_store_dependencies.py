@@ -9,7 +9,7 @@ def test_core_import_does_not_load_legacy_readers() -> None:
     program = """
 import sys
 from thereabouts import Geocoder
-from thereabouts.store import core_pack
+from thereabouts.store import active_pack
 legacy = ("thereabouts.packs", "thereabouts.reading")
 assert not any(name.startswith(legacy) for name in sys.modules)
 """
@@ -22,20 +22,20 @@ def test_legacy_pointer_raises_new_error_without_reading_legacy_pack(
     import pytest
 
     from thereabouts import IncompatibleDataError
-    from thereabouts.store import core_pack
+    from thereabouts.store import active_pack
 
     pointer = tmp_path / "packs/reverse/current.json"
     pointer.parent.mkdir(parents=True)
     pointer.write_text("{}")
     with pytest.raises(IncompatibleDataError):
-        core_pack(tmp_path)
+        active_pack(tmp_path)
 
 
 def test_unsafe_core_pointer_has_current_error_code(tmp_path: Path) -> None:
     import pytest
 
     from thereabouts import CorruptPackError
-    from thereabouts.store import core_pack
+    from thereabouts.store import active_pack
 
     outside = tmp_path / "other.json"
     outside.write_text("{}")
@@ -43,5 +43,5 @@ def test_unsafe_core_pointer_has_current_error_code(tmp_path: Path) -> None:
     pointer.parent.mkdir(parents=True)
     pointer.symlink_to(outside)
     with pytest.raises(CorruptPackError) as caught:
-        core_pack(tmp_path)
+        active_pack(tmp_path)
     assert caught.value.code == "corrupt_pack"

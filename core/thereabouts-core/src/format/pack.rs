@@ -44,9 +44,11 @@ pub struct Pack {
     pub(crate) metadata_index: MetadataIndex,
     blocks: BTreeMap<u32, BlockSource>,
     catalogues: Vec<CatalogueSource>,
-    place_count: usize,
+    pub(crate) place_count: usize,
+    pub(crate) exacts: Vec<super::exact::Exact>,
     block_cache: Mutex<Cache<u32, Block>>,
     place_cache: Mutex<Cache<u32, Place>>,
+    observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
 }
 impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
@@ -57,6 +59,7 @@ impl Pack {
             manifest::read(root)?
         };
         let mut metadata = None;
+        let mut exacts = Vec::new();
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
@@ -106,10 +109,15 @@ impl Pack {
                         )?;
                     }
                 }
+                "exact" => exacts.push(super::exact::Exact::open(&path)?),
                 "notice" => {}
                 _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
             }
         }
+        ensure(
+            manifest.family == "core" || !exacts.is_empty(),
+            "Missing required exact index",
+        )?;
         let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
         metadata.validate()?;
         let metadata_index = MetadataIndex::build(&metadata)?;
@@ -120,9 +128,46 @@ impl Pack {
             blocks,
             catalogues,
             place_count,
+            exacts,
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
+            observation_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
         })
+    }
+    pub(crate) fn observations(
+        &self,
+        key: &str,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        let mut records = Vec::new();
+        for (i, shard) in self.exacts.iter().enumerate() {
+            for row in shard.lookup(key)? {
+                let key = (i, row);
+                let cached = self
+                    .observation_cache
+                    .lock()
+                    .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+                    .get(key);
+                if let Some(value) = cached {
+                    records.push(value);
+                    continue;
+                }
+                let value = shard.record(row, self.place_count)?;
+                let bytes = size_of::<super::observation::Observation>()
+                    + value
+                        .text
+                        .iter()
+                        .flatten()
+                        .map(String::capacity)
+                        .sum::<usize>();
+                records.push(
+                    self.observation_cache
+                        .lock()
+                        .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+                        .insert(key, value, bytes),
+                );
+            }
+        }
+        Ok(records)
     }
     pub(crate) fn block(&self, block: u32) -> Result<Option<Arc<Block>>> {
         let Some(source) = self.blocks.get(&block) else {

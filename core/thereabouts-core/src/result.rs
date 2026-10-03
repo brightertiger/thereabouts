@@ -196,6 +196,9 @@ pub struct LookupResult {
     pub candidates: Vec<Self>,
     /// Forward ranking rule, absent for reverse lookups.
     pub rank_basis: Option<String>,
+    /// Actionable input guidance, emitted only when a query needs correction.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     /// Opt-in audit fields, omitted from JSON when not requested.
     pub evidence: Option<Evidence>,
@@ -217,6 +220,7 @@ impl LookupResult {
             distance_band: None,
             candidates: vec![],
             rank_basis: None,
+            hint: None,
             evidence: None,
         }
     }

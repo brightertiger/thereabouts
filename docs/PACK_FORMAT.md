@@ -339,3 +339,77 @@ are float64 with a corresponding boolean `_valid` mask. city_population uses
 uint32 and its own validity mask. Invalid slots contain NaN or zero but must
 be interpreted through masks. Buffers are filled while iterating, without
 retaining a batch of result objects.
+
+## Postal family and shared forward observation index
+
+A postal manifest has family **postal**, zero distance-policy bounds, and
+normalization **["strip_ascii", "upper_ascii", "remove_ascii_spaces"]**.
+Operations execute in that order: trim ASCII whitespace at the ends, uppercase
+ASCII a–z, then remove U+0020 throughout. Do not remove hyphens or infer numbers.
+The same operations are applied during export and lookup. Unknown operations or
+a different postal rule sequence are incompatible data. The key is the uppercase
+two-letter source country, one NUL byte, then normalized postal code. Source
+country and the country assigned by the dataset may differ; neither is rewritten.
+
+Each postal pack contains metadata, any referenced catalogue shards, at least
+one **exact** artifact, and notices. Catalogue references are local to this pack,
+with the same records and global ordering as core. Empty indexes are explicit.
+The exporter requires postal_codes, places, canonical_cities,
+place_to_city, countries, and subdivisions; fixture exceptions must be
+explicit. Catalogue closure includes every assigned country, state and city and
+their published relationships. An available place-to-city mapping replaces the
+source city's reference. No nearest city or missing coordinate is invented.
+
+Exact artifacts use container kind **4**, with five sections:
+
+| Section | Width | Contents |
+| --- | ---: | --- |
+| 1 | 8 | N+1 little-endian u64 key offsets, beginning at 0 |
+| 2 | 1 | Concatenated UTF-8 compound keys, without terminators |
+| 3 | 44 | N observation records in nondecreasing bytewise key order |
+| 4 | 8 | First-use string offsets; starts with 0, 0 for null |
+| 5 | 1 | Concatenated UTF-8 observation strings |
+
+The terminal key offset equals section 2's length. Every key span is nonempty,
+valid UTF-8, and may contain the compound-key NUL. Duplicate keys retain distinct
+source observations and may span shards. Readers search all intersecting key
+ranges and combine their observations. Shard boundaries do not alter results.
+String reference 0 is null. Positive reference r selects bytes between offsets
+r and r+1. The final offset equals the string pool length.
+
+Observation records have this shared layout:
+
+| Offset | Type | Meaning |
+| --- | --- | --- |
+| 0, 4, 8 | u32 each | Country, state, city catalogue references; 0 = absent |
+| 12, 16 | i32 each | Source latitude/longitude in microdegrees |
+| 20, 24 | u32 each | Source and source_id string references |
+| 28, 32, 36, 40 | u32 each | Name, code, scheme and details string references |
+
+Coordinates are either both i32::MIN or within geographic bounds. Source and
+source_id are required; details, if present, is JSON text. Postal details retain
+admin1/2/3 names and codes, accuracy and source variant. Place name and all
+contributing source identities remain available with evidence=True.
+The public point is the source point, separately from city.point.
+
+Keys and offsets are retained at open; observation records and strings use
+positioned range reads on demand. One **4 MiB cache per pack**, shared by all
+exact shards, retains decoded observations. Export emits nominal 4 MiB shards
+from typed SQL columns; no dataset row is serialized as a JSON object.
+
+postal(code, country=...) returns kind: postal, match: exact for matches.
+Missing/invalid country, empty/NUL code, and non-string input return
+invalid_input with an actionable hint; this optional field is omitted when
+absent. No country is inferred. Duplicate observations for the same canonical
+city and country/state context form one answer. Unmapped observations retain
+source identity instead. A grouped answer uses the first source point ordered
+by source, source_id, then name. Several distinct answers produce ambiguous,
+null flat fields and candidates ranked by population, with stable identity ties.
+rank_basis is population. Missing populations rank as zero, without claiming
+a population value. Misses have not_found.
+
+Forward column batches include candidate_offsets (u64, N+1 entries, starting
+at 0), plus the usual columns with a candidate_ prefix for the concatenated
+matched candidates. Offsets slice candidate rows for each input. Dictionary
+categories and validity masks follow the reverse convention; hint is a nullable
+dictionary string column. Scalar and batch calls use the same core lookup.

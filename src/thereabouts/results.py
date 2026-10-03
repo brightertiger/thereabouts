@@ -67,6 +67,7 @@ class Result:
     candidates: tuple["Result", ...]
     rank_basis: str | None
     evidence: Evidence | None = None
+    hint: str | None = None
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "Result":
@@ -99,6 +100,8 @@ class Result:
     def to_dict(self) -> dict[str, Any]:
         """Return snake_case JSON data, omitting evidence unless requested."""
         data = asdict(self)
+        if self.hint is None:
+            del data["hint"]
         data["candidates"] = [result.to_dict() for result in self.candidates]
         if self.evidence is None:
             del data["evidence"]

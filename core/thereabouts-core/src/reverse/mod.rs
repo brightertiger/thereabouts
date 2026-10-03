@@ -44,6 +44,7 @@ impl Pack {
         self.lookup(cell, evidence)
     }
     fn lookup(&self, cell: CellIndex, evidence: bool) -> crate::Result<LookupResult> {
+        self.require_family("core")?;
         let mut answer = LookupResult::empty(crate::result::Status::NotFound);
         let centre = LatLng::from(cell);
         answer.point = Some(Point {
@@ -127,7 +128,11 @@ impl Pack {
         }
         Ok(answer)
     }
-    fn project(&self, mut answer: LookupResult, label: Label) -> crate::Result<LookupResult> {
+    pub(crate) fn project(
+        &self,
+        mut answer: LookupResult,
+        label: Label,
+    ) -> crate::Result<LookupResult> {
         let [country, state, city, flags, _] = label.0;
         if let Some(place) = self.place(country)? {
             let code = place.field(6);

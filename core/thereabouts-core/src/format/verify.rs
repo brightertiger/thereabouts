@@ -13,6 +13,10 @@ use std::{collections::BTreeSet, fs, path::Path};
 pub fn verify(root: &Path) -> Result<Manifest> {
     let manifest = manifest::read(root)?;
     manifest::verify(root, &manifest)?;
+    ensure(
+        manifest.family == "core" || manifest.files.iter().any(|f| f.kind == "exact"),
+        "Missing required exact index",
+    )?;
     let mut metadata = None;
     let mut total = 0_usize;
     for file in &manifest.files {
@@ -33,7 +37,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     "Catalogue exceeds u32 references",
                 )?;
             }
-            "cells" | "notice" => {}
+            "cells" | "exact" | "notice" => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
     }
@@ -64,6 +68,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     ensure(blocks.insert(id), "Repeated spatial block")?;
                 }
             }
+            "exact" => super::exact::Exact::open(&path)?.verify(total)?,
             _ => {}
         }
     }

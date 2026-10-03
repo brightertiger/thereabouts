@@ -25,7 +25,7 @@ pub fn initialize(db: &Connection) -> Result<()> {
         CREATE TABLE coarse_zones(cell INTEGER,zone TEXT,PRIMARY KEY(cell,zone)) WITHOUT ROWID;")?;
     Ok(())
 }
-pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
+pub fn load(db: &Connection, data: &Dataset, kind: &str) -> Result<()> {
     load_places(db, data)?;
     load_cities(db, data)?;
     let mut mappings = Inserts::new(db, "INSERT INTO mappings", 2);
@@ -39,7 +39,7 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
     }
     mappings.flush()?;
     let mut needed = Inserts::new(db, "INSERT OR IGNORE INTO needed", 1);
-    for table in data.tables("cells") {
+    for table in data.tables(kind) {
         data.scan(table, |row| {
             for field in ["country_id", "state_id", "city_id"] {
                 if let Some(id) = row.text(field)? {

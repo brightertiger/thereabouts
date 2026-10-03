@@ -99,24 +99,24 @@ def list_packs(data_dir: str | Path | None = None) -> list[dict[str, Any]]:
     return results
 
 
-def core_pack(data_dir: str | Path | None = None) -> Path:
-    """Discover core data using the existing immutable installation layout."""
+def active_pack(data_dir: str | Path | None = None, *, family: str = "core") -> Path:
+    """Discover a format-2 family using the existing immutable installation layout."""
     from . import _core, errors
 
     try:
         root = data_directory(data_dir)
     except DataNotInstalledError as exc:
-        raise DataNotInstalledError("thereabouts data install core") from exc
+        raise DataNotInstalledError(f"thereabouts data install {family}") from exc
     try:
-        pointer = relative_file(root, "packs/core/current.json")
+        pointer = relative_file(root, f"packs/{family}/current.json")
         if not pointer.exists():
             # The old pointer is sufficient to diagnose incompatibility; do not load v1.
             legacy = relative_file(root, "packs/reverse/current.json")
-            if legacy.exists():
+            if family == "core" and legacy.exists():
                 raise errors.IncompatibleDataError(
                     "Legacy reverse data requires a format-2 core pack"
                 )
-            raise DataNotInstalledError("thereabouts data install core")
+            raise DataNotInstalledError(f"thereabouts data install {family}")
         value = parse(pointer.read_bytes())
         path = relative_file(root, string(value["path"]))
         digest = sha256(path / "manifest.json")
@@ -124,9 +124,9 @@ def core_pack(data_dir: str | Path | None = None) -> Path:
             raise ValueError("Active manifest digest mismatch")
         info = _core.pack_info(str(path))
         expected = relative_file(
-            root, f"packs/core/v-{quote(info['data_version'], safe='')}/{digest}"
+            root, f"packs/{family}/v-{quote(info['data_version'], safe='')}/{digest}"
         )
-        if path != expected:
+        if path != expected or info["family"] != family:
             raise ValueError("Active path differs from immutable pack identity")
         return path
     except (OSError, ValueError, KeyError, TypeError) as exc:

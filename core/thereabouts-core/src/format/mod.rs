@@ -13,3 +13,6 @@ mod cache;
 mod metadata_index;
 
 mod positioned;
+
+pub mod exact;
+pub mod observation;

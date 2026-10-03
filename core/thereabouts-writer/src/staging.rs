@@ -26,6 +26,7 @@ pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
     fs::create_dir_all(directory)?;
     let mut bytes = 0_u64;
     for kind in [
+        "postal_codes",
         "cells",
         "places",
         "canonical_cities",
