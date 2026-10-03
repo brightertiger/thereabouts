@@ -34,11 +34,13 @@ The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.j
 
 ## Cell keys and result semantics
 
-Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-1 parent selects the coalesced file. Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this export has no result, including outside the subset or land coverage.
+Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-1 parent selects the coalesced file. The directory `group=<r1 hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this export has no result, including outside the subset or land coverage.
 
 `h3` is lowercase hexadecimal text without `0x`; `h3_uint64` is the same unsigned 64-bit H3 index, with resolution in bits 52–55 and base-cell/child digits in the standard H3 representation. These are global H3 indexes, not a client pack's local integer offsets. `h3_resolution` says how many levels that stored row represents. Resolution 8 is the reference precision; coarser rows encode identical assignments for their descendant centres.
 
 Cell `country_id`, `state_id` and `city_id` link to `places.place_id`. The `canonical_cities` table contains eligible city/town anchors that can absorb other settlements; it is not a catalogue of every rural result. Standalone villages and other rural settlements can retain their own place IDs in `city_id`. `places.normalized_city_id` and `place_to_city.city_id` expose the reviewed mapping, including self-mappings and nulls for non-settlements. Source city/municipality strings are retained independently. The selected settlement can differ from the nearest named place or an administrative district. Legacy `city:` ID prefixes do not prove an entity is a city; inspect its `role` and `settlement_kind`.
+
+IDs carry an entity namespace and its source identity: `country:MY` uses the country code, `state:overture:<uuid>` identifies a subdivision derived from Overture, and `city:geonames:<decimal id>` identifies a GeoNames-derived settlement. Other source namespaces and policy-defined IDs also occur; treat the complete string as opaque. IDs are deterministic for unchanged source identities and policy, but are **not guaranteed stable across monthly versions**. Source merges, removals, role changes and reviewed canonicalization can retire or redirect IDs. Store the release version with an ID, and compare `places` and `place_to_city` across versions before joining historical records; a matching name is not an identity guarantee.
 
 Method columns explain the evidence or fallback used. `city_method = 'rural_nearest_distant'` is the distant-nearest flag: the policy's distant threshold is 25000 metres, and its nearest-city cutoff is 50000 metres. The full method set is `city_polygon`, `policy_polygon`, `urban_allocation`, `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null. Town radius is disabled in this snapshot; consult the exact policy in `manifest.json`. Null city means no qualifying assignment. An identifier lookup with `link_status = 'ambiguous'` preserves candidates in `place_ids`; `place_id` is populated only for a unique match. Spatial observations keep `cell_status` and nullable `country_disagrees`, so source disagreement is visible rather than silently corrected. A subset can omit a referenced catalogue entity outside its declared countries; do not interpret that as an unmatched source observation.
 
@@ -47,6 +49,8 @@ Timezone membership is independent of eligible land. `timezone_cells` can store 
 ## Tables and columns
 
 Arrow types and physical nullability below are checked during assembly. “None” for units means an identifier, category, text or dimensionless value. Required logical keys are listed separately from Arrow nullability. Observation tables have no enforced primary key: duplicate source observations are intentionally retained. Counts and bytes are for this exact export, not a world estimate.
+
+`places.place_id` is a required, non-null logical primary key. Its retained Arrow field is physically nullable, as are some other logical keys; assembly rejects null values in every declared logical primary-key column. “Yes in Arrow; no for the logical key” distinguishes these two contracts without changing the retained field schema.
 
 ### `airports`
 
@@ -244,7 +248,7 @@ Layout: `places/country=*/part.parquet`. Primary key: place_id. 2 files, 28,063 
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `place_id` | `string` | yes | none | Reconciled place identifier |
+| `place_id` | `string` | yes in Arrow; no for the logical key | none | Reconciled place identifier |
 | `name_en` | `string` | yes | none | Preferred name only when its provenance explicitly identifies English |
 | `local_name` | `string` | yes | none | Source local/default name, without an inferred translation |
 | `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
@@ -428,18 +432,24 @@ connection = duckdb.connect()
 connection.execute("SET memory_limit='256MB'")
 connection.execute("SET threads=1")
 result = connection.execute(
-    """SELECT country_id, state_id, city_id, city_method
-  FROM read_parquet(?, hive_partitioning=false)
-  WHERE h3_uint64 IN (SELECT unnest(?::UBIGINT[]))
-  ORDER BY h3_resolution DESC LIMIT 1""",
-    [pattern, keys],
+    """WITH cell AS (
+    SELECT country_id, state_id, city_id, city_method
+    FROM read_parquet(?, hive_partitioning=false)
+    WHERE h3_uint64 IN (SELECT unnest(?::UBIGINT[]))
+    ORDER BY h3_resolution DESC LIMIT 1
+  )
+  SELECT c.country_id, c.state_id, c.city_id, p.name AS city_name, c.city_method
+  FROM cell c LEFT JOIN read_parquet(?, hive_partitioning=false) p
+    ON c.city_id = p.place_id""",
+    [pattern, keys, str(root / "places" / "**" / "*.parquet")],
 ).fetchall()
 assert len(result) == 1
+assert result[0][3]  # A catalogue name for this example's selected settlement.
 print(result)
 connection.close()
 ```
 
-For S3, use the same SQL with `s3://<owner-bucket>/dataset/2026.10/cells/**/*.parquet` as the first parameter. DuckDB needs its `httpfs` extension and the bucket's region/credentials (or public anonymous access). That remote variant is provided for the future public release; only the local examples were exercised for this subset. Resolve all settlement names by joining `places/**/*.parquet` on `cells.city_id = places.place_id`; join `canonical_cities` for eligible city/town anchor details.
+For S3, use `s3://<owner-bucket>/dataset/2026.10/cells/**/*.parquet` and `s3://<owner-bucket>/dataset/2026.10/places/**/*.parquet` for the first and third SQL parameters. DuckDB needs its `httpfs` extension and the bucket's region/credentials (or public anonymous access). That remote variant is provided for the future public release; only the local examples were exercised for this subset. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
 
 ### PyArrow
 
@@ -494,22 +504,181 @@ Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positi
 
 Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `<version>/_SUCCESS` receipt, written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
+The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
+
+With Python 3.11 or newer and `DATASET` set, verify local bytes without loading the tables:
+
+```sh
+python - <<'PY'
+import hashlib
+import json
+import os
+from pathlib import Path
+
+root = Path(os.environ["DATASET"]).resolve()
+manifest = json.loads((root / "manifest.json").read_text())
+for entry in manifest["files"]:
+    path = (root / entry["path"]).resolve()
+    assert path.is_relative_to(root), entry["path"]
+    assert path.stat().st_size == entry["size"], entry["path"]
+    with path.open("rb") as stream:
+        assert hashlib.file_digest(stream, "sha256").hexdigest() == entry["sha256"], entry["path"]
+print(f"Verified {len(manifest['files'])} files")
+PY
+```
+
 ## Licences, contact and citation
 
 | Source | Licence | Attribution |
 | --- | --- | --- |
-| airports | [Public-Domain](https://ourairports.com/data/) | OurAirports contributors |
-| codes | [per-file](https://opendatacommons.org/licenses/pddl/1-0/) | Per-file source attribution and licence identifiers are retained in pins.lock and every normalized row. |
-| dbip | [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) | IP Geolocation by DB-IP https://db-ip.com |
-| geoboundaries | [per-layer](https://www.geoboundaries.org/) | geoBoundaries and each layer publisher; see pinned boundaryLicense and licenseSource |
-| geonames | [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) | GeoNames |
-| ghsl | [CC-BY-4.0](https://human-settlement.emergency.copernicus.eu/GHSLhowToCite.php) | European Commission, Joint Research Centre (JRC), GHS-UCDB R2024A; Pesaresi et al. (2024), Advances on the Global Human Settlement Layer by joint assessment of Earth Observation and population survey data, International Journal of Digital Earth 17(1). https://doi.org/10.1080/17538947.2024.2390454 |
-| osm_land | [ODbL-1.0](https://opendatacommons.org/licenses/odbl/1-0/) | © OpenStreetMap contributors; coastline service osmdata.openstreetmap.de |
-| overture | [ODbL-1.0](https://opendatacommons.org/licenses/odbl/1-0/) | © OpenStreetMap contributors, Overture Maps Foundation |
-| phone | [Apache-2.0](https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE) | The Libphonenumber Authors; Google |
-| postal | [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) | GeoNames; GB contains Royal Mail copyright and database right 2022 |
-| timezones | [per-file](https://opendatacommons.org/licenses/odbl/1-0/) | Per-file source attribution and licence identifiers are retained in pins.lock and every normalized row. |
-| unlocode | [PDDL-1.0](https://opendatacommons.org/licenses/pddl/1-0/) | UNECE; DataHub maintainers |
+| airports | Public-Domain | OurAirports contributors |
+| codes | CC-BY-4.0 | GeoNames |
+| codes | LGPL-2.1-or-later | Debian iso-codes; pycountry |
+| codes | PDDL-1.0 | DataHub maintainers |
+| codes | PDDL-1.0 | DataHub; UN Statistics Division; GeoNames; CLDR |
+| dbip | CC-BY-4.0 | IP Geolocation by DB-IP https://db-ip.com |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; Geoboundaries, Wikimedia |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; National Georegister |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; Wikimedia Commons, Wikimedia Commons |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikimedia |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikimedia Commons |
+| geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikipedia |
+| geoboundaries | Creative Commons Attribution 2.5 Generic | geoBoundaries; geoBoundaries, Wikimedia |
+| geoboundaries | Creative Commons Attribution 2.5 Generic | geoBoundaries; geoBoundaries, Wikimedia Commons |
+| geoboundaries | Creative Commons Attribution 2.5 India (CC BY 2.5 IN) | geoBoundaries; DataMeet India community, Election Commission of India |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Disaster Management and Mitigation Unit (DMMU) Zambia, OCHA ROSEA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Government of Senegal, OCHA ROWCA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Government of Sierra Leone, OCHA ROWCA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Information Management Working Group (IMWG), OCHA ROSEA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Instituto Brasileiro de Geografia e Estatística (IBGE) |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Instituto Nacional de Estadística y Geografía (INEGI) |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; La Biblioteca del Congreso Nacional de Chile (BCN), OCHA ROLAC |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; National Mapping and Resource Information Authority (NAMRIA), Philippines Statistics Authority (PSA), OCHA Philippines |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA Philippines, National Mapping and Resource Information Authority |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA ROP, Federated States of Micronesia Division of Statistics, 2010 Census of Population and Housing and Secretariat of the Pacific Community, Statistics for Development Division |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA ROSEA, South African Municipal Demarcation Board |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA Venezuela, Instituto Nacional de Estadística |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Papua New Guinea National Statistics Office, OCHA ROAP |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; South Sudan Information Management Working Group (IMWG), National Bureau of Statistics (NBS), and OCHA, OCHA South Sudan |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Survey Department of Nepal, OCHA FISS |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; UNHCR, OCHA FISS |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; UNMIL, OCHA ROWCA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; United National Development Programme (UNDP), OCHA Somalia |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; United Nations Cartographic Section (UNCS) and United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA), OCHA ROSC |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme and OCHA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme, OCHA ROAP |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme, OCHA ROWCA |
+| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Zimbabwe National Statistics Agency (ZIMSTAT www.zimstat.co.zw) Central Statistics Office, OCHA ROSEA |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; ISTAT, National Institute of Statistics |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; StatSilk, geoBoundaries |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, CIESIN |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Erik Frohne |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Wikimedia |
+| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Wikimedia Commons; credit to author 'Babbage' |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Eurostat- European Commission |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; GeoBoundaries, World Bank |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Kartverket |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Knippenberg, Erwin, & Moritz, Meyer. “The Hidden Potential of Mobile Phone Data Insights on COVID-19 in the Gambia.” Data Blog, The World Bank Data Catalog |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Myanmar Analytics Project, geoBoundaries |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Open Africa, Code for Ethiopia |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Ordce Survey Ireland |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Sentinel-2 10-Meter Land Use/LandCover |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Sentinel-2 10m LandCover |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; The Rwanda Geo Portal |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; World Bank |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; geoBoundaries, Knippenberg, Erwin, & Moritz, Meyer. “The Hidden Potential of Mobile Phone Data Insights on COVID-19 in the Gambia.” The World Bank Data Catalog |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; geoBoundaries, Open Data Watch |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; geoBoundaries, World Bank |
+| geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; openAfrica, geoBoundaries |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Australian Bureau of Statistics |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Caribbean GeoPortal, N/A |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Czech Office for Surveying |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; DNCT - Direction Nationale des Colelctivités Territorielles, DNP - Direction Nationale de la Population, United Nations Office for the Coordination of Humanitarian Affairs, Mali |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; DNCT - Direction Nationale des Collectivités Territoriales, United Nations Office for the Coordination of Humanitarian Affairs, Mali |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Direcion General de Estadica, Encuestas y Censos |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; EuroGeoGraphics, Regional IM Working Group - Europe |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; EuroGeographics and NTES (Nomenclature of Territorial Units for Statistics - Republic of Macedonia State Statistical Office), Regional IM Working Group - Europe |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; EuroGeographics, Regional IM Working Group - Europe |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Eurostat- European Commission |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; GRID3 |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Geoboundaries, Open Data Nepal |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Geoportal of Latvia |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Haiti GeoPortal |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Instituto de Geografico Nacional |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Lýsigagnagátt |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Ministry of Land, Infrastructure, Transport and Tourism National Land Numerical Information Download Site |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; NZ Stats |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Pacific Data Hub |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Sentinel-2 10-Meter Land Use/LandCover |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; World Bank |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; World Bank Group, OCHA Côte d’Ivoire |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; Zambia Data Hub |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; geoBoundaries, Qatar Open Data Portal |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; geoBoundaries, Web Vectors Map |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; geoBoundaries, Wikimedia |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; geoBoundaries, Wikimedia Commons |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; geoBoundaries, Wikipedia |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster 2 polygon from Sentinel-2 10m Land Cover where Image Year = 2022 / exclude gridcode = 1 (water) / dissolve |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster2polygon from Sentinel-2 10m Land Cover where Image Year = 2021 / exclude gridcode = 1 (water) / dissolve / erase adm0 overlap / processed by IMB |
+| geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster2polygon from Sentinel-2 10m Land Cover where Image Year = 2021 / exclude gridcode = 1 (water) / dissolve / processed by IMB |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; Federal Office for Metrology and Survey, Austria, Derived from ADM4 layer |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OSM Boundaries |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; Open Street Map |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Geofabrik |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Wambacher |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Wikipedia |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; geoBoundaries, Federal Office for Metrology and Survey, Austria |
+| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; geoBoundaries, Open Street Map, Converted Lines into Polygon Layer |
+| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Digitizedhttps, Digitizedhttps |
+| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; GeoBoundaries, Wikipedia |
+| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Princeton University Library |
+| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Wikipedia |
+| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; geoBoundaries, Wikipedia |
+| geoboundaries | Data license Germany - Attribution - Version 2.0 | geoBoundaries; Federal Agency for Cartography and Geodesy |
+| geoboundaries | Etalab Open License 2.0 | geoBoundaries; Institut national de l'information géographique et forestière (IGN-F) |
+| geoboundaries | Federal Office of Topography swisstopo License | geoBoundaries; Federal Office of Topography swisstopo |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; DG Territory |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; IPUMS DHS |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; Open Africa, Code for Ethiopia |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; Open Street Map, Wambacher (https//wambachers-osm.website/boundaries/) |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; OpenStreetMap, Wambacher |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; OpenStreetMap, Wambachers |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; Urban Redevelopment Authority, derived from ADM 3 |
+| geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; geoBoundaries, OpenStreetMap |
+| geoboundaries | Open Government Canada 2.0 | geoBoundaries; Statistics Canada (StatCan) |
+| geoboundaries | Open Government Licence v3.0 | geoBoundaries; Open Data Soft, World Food Programme |
+| geoboundaries | Open Government Licence v3.0 | geoBoundaries; OpenDataSoft, WFPGeoNode |
+| geoboundaries | Other - Humanitarian | geoBoundaries; Wiki Commons Media |
+| geoboundaries | Pixabay License for Content | geoBoundaries; geoBoundaries, Pixabay |
+| geoboundaries | Public Domain | geoBoundaries; GeoBolivia, Derived from ADM3 layer |
+| geoboundaries | Public Domain | geoBoundaries; Natural Earth |
+| geoboundaries | Public Domain | geoBoundaries; Natural Earth, geoBoundaries |
+| geoboundaries | Public Domain | geoBoundaries; RCMRD GeoPortal, Africa GeoPortal |
+| geoboundaries | Public Domain | geoBoundaries; RCMRD GeoPortal, geoBoundaries |
+| geoboundaries | Public Domain | geoBoundaries; Stanford Digital Repository |
+| geoboundaries | Public Domain | geoBoundaries; The World Factbook - CIA |
+| geoboundaries | Public Domain | geoBoundaries; U.S. Census Bureau |
+| geoboundaries | Public Domain | geoBoundaries; United States Census Bureau, MAF/TIGER Database |
+| geoboundaries | Public Domain | geoBoundaries; Wikimedia Commons |
+| geoboundaries | Public Domain | geoBoundaries; Wikimedia, geoBoundaries |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, ArcGIS Hub |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, FreeMapViewer |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, RCMRD |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, Wikimedia |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, Wikimedia Commons |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, Wikimedia Commons; credit to user 'Tachymetre' |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, Wikipedia |
+| geoboundaries | Public Domain | geoBoundaries; geoBoundaries, d-maps.com |
+| geonames | CC-BY-4.0 | GeoNames |
+| ghsl | CC-BY-4.0 | European Commission, Joint Research Centre (JRC), GHS-UCDB R2024A; Pesaresi et al. (2024), Advances on the Global Human Settlement Layer by joint assessment of Earth Observation and population survey data, International Journal of Digital Earth 17(1). https://doi.org/10.1080/17538947.2024.2390454 |
+| osm_land | ODbL-1.0 | © OpenStreetMap contributors; coastline service osmdata.openstreetmap.de |
+| overture | ODbL-1.0 | © OpenStreetMap contributors, Overture Maps Foundation |
+| phone | Apache-2.0 | The Libphonenumber Authors; Google |
+| postal | CC-BY-4.0 | GeoNames; GB contains Royal Mail copyright and database right 2022 |
+| timezones | ODbL-1.0 | timezone-boundary-builder; OpenStreetMap contributors |
+| timezones | Public-Domain | IANA Time Zone Database contributors |
+| unlocode | PDDL-1.0 | UNECE; DataHub maintainers |
 
 This derived database is licensed under ODbL 1.0, including its attribution and share-alike requirements for publicly used derivative databases. Preserve the source attribution in `DATA_LICENSES.md`; individual source terms still apply. The code's licence does not replace data licences. Pin identifiers, source checksums and provenance are in the manifest.
 

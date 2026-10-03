@@ -64,7 +64,7 @@ def assemble(
     ) as temporary:
         staging = Path(temporary) / "dataset"
         staging.mkdir()
-        tables, observed = assemble_tables(
+        tables, observed, row_licences = assemble_tables(
             snapshot, staging, selection, config.release.dataset, descriptions, budget
         )
         sources = metadata.licences(config, observed)
@@ -72,7 +72,7 @@ def assemble(
         content = logical_content(staging, tables, config, guard)
         documents = {
             "content.json": encode(content).decode() + "\n",
-            "DATA_LICENSES.md": metadata.licence_text(sources),
+            "DATA_LICENSES.md": metadata.licence_text(sources, row_licences),
             "DATASET_CARD.md": metadata.card(config, stats, content),
             "CHANGES.md": metadata.changes(config.release.version, content, previous),
             "README.md": readme.render(

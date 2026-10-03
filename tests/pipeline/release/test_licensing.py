@@ -7,7 +7,8 @@ from pipeline.release.metadata import licence_text, licences
 
 def test_per_file_licences_and_attributions_are_not_hidden() -> None:
     sources = licences(load(), {"codes", "timezones"})
-    text = licence_text(sources)
+    text = licence_text(sources, {"PDDL-1.0 AND CC-BY-4.0"})
+    assert "`PDDL-1.0 AND CC-BY-4.0`" in text
     expected = {
         file["metadata"]["license"]
         for name in ("codes", "timezones")

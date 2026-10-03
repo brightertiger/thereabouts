@@ -2,14 +2,17 @@
 
 from pathlib import Path
 
+import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
 from pipeline.cli import main
 from pipeline.config import load
+from pipeline.engines.artifact_io import file_record
 from pipeline.release.assemble import assemble
+from pipeline.release.source import external
 from pipeline.release.verify import verify_dataset
-from pipeline.runtime.jsonio import sha256_file
+from pipeline.runtime.jsonio import sha256_file, write_json
 
 from .fixtures import fixture
 
@@ -33,6 +36,12 @@ def test_coalescing_readme_and_relocation(tmp_path: Path) -> None:
         == ["rural_nearest_distant"] * 2
     )
     assert manifest["statistics"]["zone_tables"]["rows"] == 1
+    notices = (output / "DATA_LICENSES.md").read_text()
+    for table in manifest["tables"]:
+        with pq.ParquetFile(output / table["path"]) as file:
+            if "license" in file.schema_arrow.names:
+                values = file.read(columns=["license"])["license"].to_pylist()
+                assert all(value in notices for value in set(values) if value)
     assert all(not Path(record["path"]).is_absolute() for record in manifest["files"])
     text = (output / "README.md").read_text()
     for name, schema in manifest["schemas"].items():
@@ -124,3 +133,25 @@ def test_empty_batches_do_not_create_row_groups_and_changes_compare_content(
     lines = (second / "CHANGES.md").read_text().splitlines()
     changes = [line for line in lines if line.startswith("| ")][2:]
     assert changes and all(line.endswith("| no |") for line in changes)
+
+
+def test_logical_place_key_cannot_be_null_despite_arrow_nullability(
+    tmp_path: Path,
+) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    entry = snapshot.tables["places"][0]
+    path = snapshot.path(entry)
+    schema = pq.read_schema(path)
+    assert schema.field("place_id").nullable
+    row: dict[str, object] = {field.name: None for field in schema}
+    row["country_code"] = "MY"
+    pq.write_table(pa.Table.from_pylist([row], schema=schema), path)
+    for record in snapshot.manifest["tables"]:
+        if record["path"] == entry.path:
+            record.update(file_record(snapshot.root, path), rows=1)
+    write_json(snapshot.root / "manifest.json", snapshot.manifest)
+    snapshot = external(snapshot.root, config.h3)
+    output = tmp_path / "dataset"
+    with pytest.raises(ValueError, match=r"Null logical primary key: places\.place_id"):
+        assemble(snapshot, output, config, guard, "identity")
+    assert not output.exists()

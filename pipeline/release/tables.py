@@ -66,11 +66,12 @@ def assemble_tables(
     limits: DatasetLimits,
     descriptions: Row,
     budget: Budget,
-) -> tuple[list[Row], set[str]]:
+) -> tuple[list[Row], set[str], set[str]]:
     if set(snapshot.tables) != set(descriptions):
         raise ValueError("Dataset schema and input table names differ")
     tables: list[Row] = []
     sources: set[str] = set()
+    row_licences: set[str] = set()
     for relative, records in groups(snapshot, selection, limits).items():
         kind = relative.split("/")[0]
         schema = pq.read_schema(snapshot.verify(snapshot.tables[kind][0]))
@@ -96,10 +97,21 @@ def assemble_tables(
                         selected = selection.filter(kind, batch)
                         if not selected.num_rows:
                             continue
+                        for key in descriptions[kind]["primary_key"]:
+                            if selected.column(key).null_count:
+                                raise ValueError(
+                                    f"Null logical primary key: {kind}.{key}"
+                                )
                         if "source" in selected.schema.names:
                             sources.update(
                                 value
                                 for value in selected.column("source").to_pylist()
+                                if value
+                            )
+                        if "license" in selected.schema.names:
+                            row_licences.update(
+                                value
+                                for value in selected.column("license").to_pylist()
                                 if value
                             )
                         pending.append(selected)
@@ -121,4 +133,4 @@ def assemble_tables(
         if pq.read_metadata(path).num_rows != rows:
             raise ValueError(f"Written row count differs: {relative}")
         tables.append({**file_record(output, path), "kind": kind, "rows": rows})
-    return tables, sources
+    return tables, sources, row_licences

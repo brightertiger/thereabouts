@@ -50,7 +50,7 @@ def licences(config: Config, observed: set[str]) -> Row:
     }
 
 
-def licence_text(sources: Row) -> str:
+def licence_text(sources: Row, row_licences: set[str]) -> str:
     lines = [
         "# Data licences and attribution",
         "",
@@ -63,6 +63,10 @@ def licence_text(sources: Row) -> str:
         licensing.table(sources, include_files=True),
     ]
     lines += [
+        "",
+        "Licence expressions observed in exported rows: "
+        + (", ".join(f"`{value}`" for value in sorted(row_licences)) or "none")
+        + ". `AND` expressions retain the terms of every named input licence.",
         "",
         "Exact licence URLs, pins and provenance are shipped in "
         "`manifest.json.sources`: each source's `pin.files` records the filenames "

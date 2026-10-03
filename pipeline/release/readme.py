@@ -42,9 +42,12 @@ def render(
             "| --- | --- | --- | --- | --- |",
         ]
         for column in schema["columns"]:
+            nullable = "yes" if column["nullable"] else "no"
+            if column["nullable"] and column["name"] in schema["primary_key"]:
+                nullable = "yes in Arrow; no for the logical key"
             sections.append(
                 f"| `{column['name']}` | `{column['type']}` | "
-                f"{'yes' if column['nullable'] else 'no'} | "
+                f"{nullable} | "
                 f"{column['units']} | {column['meaning']} |"
             )
         sections.append("")
