@@ -17,4 +17,5 @@ mod query;
 mod read_timeout;
 mod render;
 mod runner;
+mod table;
 pub use runner::run;

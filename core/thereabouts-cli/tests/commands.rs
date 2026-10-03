@@ -82,7 +82,7 @@ fn formats_fields_evidence_help_and_all_exit_codes() {
         ]),
         0
     );
-    assert_eq!(host.out.lines().next().unwrap(), "country.code,status");
+    assert_eq!(host.out.lines().next().unwrap(), "status,country.code");
     assert_eq!(host.run(&["h3", "bad", "--fields", "imaginary"]), 2);
     assert_eq!(host.run(&["info", "--json", "--csv"]), 2);
     host.input = Cursor::new(b"lat,lon\n0,0\n91,0\n".to_vec());

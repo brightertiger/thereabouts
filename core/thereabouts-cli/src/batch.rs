@@ -49,6 +49,7 @@ struct Output<'a> {
     options: &'a Global,
     fields: Option<Vec<String>>,
     renderer: Renderer,
+    format: Format,
     failed: bool,
     missed: bool,
     input_fields: Vec<String>,
@@ -86,6 +87,20 @@ impl Output<'_> {
                 object.entry("evidence").or_insert(Value::Null);
             }
         }
+        let mut columns = if self.input_fields.is_empty() {
+            input.keys().cloned().collect()
+        } else {
+            self.input_fields.clone()
+        };
+        let selected = self.fields.clone().unwrap_or_else(|| {
+            if self.format == Format::Table {
+                crate::table::columns(&result, true)
+            } else {
+                render::ordered(&result)
+            }
+        });
+        columns.extend(selected.into_iter().map(|k| format!("thereabouts_{k}")));
+        self.renderer.columns(columns);
         if let Value::Object(fields) = render::select(&result, self.fields.as_deref()) {
             input.extend(
                 fields
@@ -148,6 +163,7 @@ pub(crate) fn run(
         options,
         fields: render::fields(options.fields.as_deref())?,
         renderer: Renderer::new(format, true),
+        format,
         failed: false,
         missed: false,
         input_fields: Vec::new(),
@@ -189,6 +205,7 @@ pub(crate) fn run(
                 "CSV headers must be unique, nonempty and outside thereabouts_".into(),
             ));
         }
+        output.input_fields = headers.iter().map(str::to_owned).collect();
         let lat = column(&headers, lat_col, &["lat", "latitude"])?;
         let lon = column(&headers, lon_col, &["lon", "longitude", "lng"])?;
         for record in csv.records() {

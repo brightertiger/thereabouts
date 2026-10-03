@@ -89,11 +89,17 @@ nulls are the exact snake_case public result contract in the design and
 [PACK_FORMAT.md](PACK_FORMAT.md). NO_COLOR disables terminal colour; plain
 tables need no colour to convey status. The implementation emits no ANSI
 colour sequences in any mode, including with NO_COLOR. Table cells replace
-control characters with spaces.
+control characters with spaces and truncate wide values with … (at most 28
+characters per cell). Each place occupies one line; candidates appear as indented
+lines beneath the query. The header appears once. Default scalar columns are
+status, country, state, city, timezone, point, match, omitting fields absent from
+the result and its candidates. Batches keep all seven summary fields to support
+rows with differing coverage. --fields uses exactly the requested column order.
+Evidence is never printed in tables; use --json --evidence.
 
 Scalar JSON/NDJSON is one result object. Batch --json streams one object with
-a results array; it does not retain the whole batch. CSV has an alphabetically
-ordered header; object/array values are compact JSON in quoted CSV cells, null
+a results array; it does not retain the whole batch. CSV preserves input header order, then appends thereabouts_* columns in public
+result order (or --fields order). Scalar CSV uses that same result order; object/array values are compact JSON in quoted CSV cells, null
 is an empty cell, and quoting follows RFC 4180. JSON keys are alphabetically
 ordered by the current renderer; consumers must address keys by name.
 

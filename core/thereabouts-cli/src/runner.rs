@@ -61,6 +61,9 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
         std::env::current_dir()?.join(root)
     };
     let mut renderer = Renderer::new(format, false);
+    if let Some(fields) = &fields {
+        renderer.columns(fields.clone());
+    }
     let (value, exit) = match command {
         Command::Data { operation } => (data::run(operation, &root, cli.global.no_input, io)?, 0),
         Command::Info => (data::info(&root)?, 0),

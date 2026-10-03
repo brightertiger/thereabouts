@@ -125,39 +125,73 @@ impl Renderer {
         self.rows += 1;
         Ok(())
     }
+    pub fn columns(&mut self, columns: Vec<String>) {
+        if self.columns.is_none() {
+            self.columns = Some(columns);
+        }
+    }
     fn tabular(&mut self, value: &Value, io: &mut dyn Io) -> Result<()> {
         let singleton = Map::from_iter([("value".into(), value.clone())]);
         let object = value.as_object().unwrap_or(&singleton);
-        if self.columns.is_none() {
-            let columns: Vec<_> = object.keys().cloned().collect();
-            self.line(&columns, io)?;
-            self.columns = Some(columns);
-        }
-        let columns = self.columns.as_deref().unwrap_or_default();
-        if object.keys().any(|key| !columns.contains(key)) {
-            return Err(Error::Usage("CSV/table output requires consistent input columns; use NDJSON for varying objects".into()));
-        }
-        self.line(
-            &columns
+        let columns = self.columns.get_or_insert_with(|| {
+            if self.format == Format::Table && object.contains_key("status") {
+                crate::table::columns(value, self.batch)
+            } else {
+                ordered(value)
+            }
+        });
+        if self.format == Format::Table
+            && columns
                 .iter()
-                .map(|key| text(object.get(key).unwrap_or(&Value::Null)))
-                .collect::<Vec<_>>(),
-            io,
-        )
-    }
-    fn line(&self, values: &[String], io: &mut dyn Io) -> Result<()> {
+                .any(|k| k.strip_prefix("thereabouts_").unwrap_or(k) == "evidence")
+        {
+            return Err(Error::Usage(
+                "Evidence requires --json --evidence, not a table".into(),
+            ));
+        }
+        if self.rows == 0 {
+            io.stdout(&if self.format == Format::Csv {
+                csv_line(columns)?
+            } else {
+                crate::table::header(columns)
+            })?;
+        }
         if self.format == Format::Csv {
-            io.stdout(&csv_line(values)?)?;
+            if object.keys().any(|key| !columns.contains(key)) {
+                return Err(Error::Usage(
+                    "CSV output requires consistent input columns; use NDJSON for varying objects"
+                        .into(),
+                ));
+            }
+            io.stdout(&csv_line(
+                &columns
+                    .iter()
+                    .map(|key| text(object.get(key).unwrap_or(&Value::Null)))
+                    .collect::<Vec<_>>(),
+            )?)?;
         } else {
-            let clean: Vec<String> = values
-                .iter()
-                .map(|v| {
-                    v.chars()
-                        .map(|c| if c.is_control() { ' ' } else { c })
-                        .collect()
-                })
-                .collect();
-            io.stdout(&format!("{}\n", clean.join(" | ")))?;
+            io.stdout(&crate::table::row(columns, value, false))?;
+            if let Some(candidates) = value
+                .get("candidates")
+                .or_else(|| value.get("thereabouts_candidates"))
+                .and_then(Value::as_array)
+            {
+                for candidate in candidates {
+                    let candidate = if object.contains_key("thereabouts_status") {
+                        Value::Object(
+                            candidate
+                                .as_object()
+                                .into_iter()
+                                .flatten()
+                                .map(|(k, v)| (format!("thereabouts_{k}"), v.clone()))
+                                .collect(),
+                        )
+                    } else {
+                        candidate.clone()
+                    };
+                    io.stdout(&crate::table::row(columns, &candidate, true))?;
+                }
+            }
         }
         Ok(())
     }
@@ -170,5 +204,21 @@ impl Renderer {
             })?;
         }
         Ok(())
+    }
+}
+
+/// Public result order, independent of JSON object storage order.
+pub(crate) fn ordered(value: &Value) -> Vec<String> {
+    let Some(object) = value.as_object() else {
+        return vec!["value".into()];
+    };
+    if object.contains_key("status") {
+        FIELDS
+            .iter()
+            .filter(|f| !f.contains('.') && object.contains_key(**f))
+            .map(|f| (*f).into())
+            .collect()
+    } else {
+        object.keys().cloned().collect()
     }
 }
