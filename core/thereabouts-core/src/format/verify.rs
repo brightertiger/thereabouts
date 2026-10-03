@@ -17,10 +17,10 @@ pub fn verify(root: &Path) -> Result<Manifest> {
         manifest.family == "core"
             || manifest.files.iter().any(|f| {
                 f.kind
-                    == if manifest.family == "phone" {
-                        "trie"
-                    } else {
-                        "exact"
+                    == match manifest.family.as_str() {
+                        "phone" => "trie",
+                        "ip" => "intervals",
+                        _ => "exact",
                     }
             }),
         "Missing required exact index",
@@ -45,7 +45,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     "Catalogue exceeds u32 references",
                 )?;
             }
-            "cells" | "exact" | "trie" | "notice" => {}
+            "cells" | "exact" | "trie" | "intervals" | "notice" => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
     }
@@ -54,6 +54,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     super::metadata_index::MetadataIndex::build(&metadata)?;
     let mut blocks = BTreeSet::new();
     let mut previous_id = None;
+    let mut previous_range = None;
     for file in &manifest.files {
         let path = manifest::artifact_path(root, &file.path)?;
         match file.kind.as_str() {
@@ -78,6 +79,14 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             }
             "exact" => super::exact::Exact::open(&path)?.verify(total)?,
             "trie" => super::trie::Trie::open(&path)?.verify(total)?,
+            "intervals" => {
+                let shard = super::intervals::Intervals::open(&path)?;
+                shard.verify(total)?;
+                if let Some((first, last)) = shard.span {
+                    super::intervals::follows(previous_range, first)?;
+                    previous_range = Some(last);
+                }
+            }
             _ => {}
         }
     }

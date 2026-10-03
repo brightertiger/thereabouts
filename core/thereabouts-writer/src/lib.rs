@@ -10,6 +10,7 @@ mod emission;
 mod error;
 mod forward;
 mod inserts;
+mod ip;
 mod locode;
 mod phone;
 mod postal;
@@ -69,7 +70,10 @@ pub fn write_pack(
     output: &Path,
     options: &Options,
 ) -> Result<Manifest> {
-    if !matches!(family, "core" | "postal" | "airports" | "locode" | "phone") {
+    if !matches!(
+        family,
+        "core" | "postal" | "airports" | "locode" | "phone" | "ip"
+    ) {
         return Err(Error::Input("Unsupported export family".into()));
     }
     ensure(
@@ -167,6 +171,7 @@ fn build(
         "airports" => airports::load(data, &db)?,
         "locode" => locode::load(data, &db)?,
         "phone" => phone::load(data, &db)?,
+        "ip" => ip::load(data, &db)?,
         _ => return Err(Error::Input("Unsupported export family".into())),
     }
     db.execute_batch("COMMIT")?;
@@ -305,12 +310,14 @@ fn primary_table(family: &str) -> &str {
         "postal" => "postal_codes",
         "locode" => "trade_locations",
         "phone" => "phone_prefixes",
+        "ip" => "ip_ranges",
         other => other,
     }
 }
 fn normalization(family: &str) -> &[&str] {
     match family {
         "postal" => &postal::NORMALIZATION,
+        "ip" => &["ip_literal"],
         "phone" => &["e164_plus", "strip_phone_presentation"],
         "airports" | "locode" => &airports::NORMALIZATION,
         _ => &[],

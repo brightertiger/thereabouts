@@ -112,3 +112,20 @@ class ForwardQueries:
         return self._handles.get("phone").phone_columns(
             [number if isinstance(number, str) else "" for number in numbers]
         )
+
+    def ip(self, address: str, *, evidence: bool = False) -> Result:
+        """Find the published interval containing an IPv4 or IPv6 address."""
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("ip").ip(
+                address if isinstance(address, str) else "",
+                evidence=evidence,
+            )
+        )
+
+    def ip_columns(self, addresss: Iterable[str]) -> dict[str, NDArray[Any]]:
+        """Return ip interval columns."""
+        self._ensure_open()
+        return self._handles.get("ip").ip_columns(
+            [address if isinstance(address, str) else "" for address in addresss]
+        )

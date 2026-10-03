@@ -15,3 +15,5 @@ pub mod locode;
 pub mod postal;
 
 pub mod phone;
+
+pub mod ip;

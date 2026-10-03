@@ -31,6 +31,7 @@ pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
         "trade_locations",
         "phone_prefixes",
         "phone_metadata",
+        "ip_ranges",
         "cells",
         "places",
         "canonical_cities",

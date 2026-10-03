@@ -496,3 +496,34 @@ description, code is the digit prefix, scheme is prefix or calling_code; details
 retains language, description, calling_code, leading_digits, national_prefix,
 international_prefix, link_status and link_method when present. The metadata
 regex fields are provenance, not a second number parser.
+
+## IP family and inclusive intervals (kind 6)
+
+The ip family requires ip_ranges and the same geographic tables as postal.
+Normalization is ["ip_literal"]. Input is a trimmed IPv4 or IPv6 address literal.
+Ports, CIDR suffixes, IPv6 zones and noncanonical IPv4 leading zeroes are invalid.
+IPv4-mapped IPv6 literals remain IPv6; the two address families never alias.
+
+Each kind-6 shard has four sections: interval records (36 bytes), shared
+observations (44 bytes), string offsets (u64), UTF-8 strings. An interval contains
+one u8 IP version (4 or 6), three reserved zero bytes, then 16-byte network-order
+start and end addresses. Endpoints are inclusive; IPv4 occupies the low 32 bits
+with zero high bits. There is exactly one observation per interval, at the same
+row index. Ranges are ordered by (version, start), strictly nonoverlapping,
+including across shards in manifest order. Adjacent ranges are allowed. An empty
+family still has an explicit empty interval shard. String rules are shared with
+the observation index.
+
+Open retains each shard's first and last bounds. Lookup rejects out-of-shard
+queries and binary-searches fixed-width bounds using positioned reads. A bounded
+1 MiB address-result LRU avoids repeated searches for identical addresses;
+observations use the pack's shared range-read cache. Full verification visits
+every range and record, enforcing ordering and cross-shard nonoverlap.
+
+The writer requires packed endpoints to agree with the published textual
+addresses and ip_version. It rejects overlaps instead of choosing an arbitrary
+source. Kind is ip_range, match exact. Source point and canonical geographic
+associations are projected. Observation name is the published city text, code
+is start + U+2013 + end, scheme is ipv4 or ipv6, and details JSON preserves
+country_code, region and city text, including explicit nulls. Source text remains
+available in evidence when it differs from canonical country/state/city fields.

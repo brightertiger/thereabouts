@@ -268,6 +268,7 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | airports | 375,778 / 213 | 33 | 7.417 / 9.334 | 469,223 | 151,994,262 |
 | locode | 349,522 / 225 | 31 | 7.750 / 15.710 | 469,668 | 180,528,890 |
 | phone | 187,284 / 389 | 29 | 4.333 / 4.583 | 967,617 | 206,165,020 |
+| ip | 234,875 / 449 | 58 | 7.875 / 12.208 | 472,964 | 4,073,362,321 |
 <!-- forward-measurements:end -->
 
 ## Airports
@@ -317,3 +318,17 @@ Thus this is a partial sample, not an authoritative complete calling-code map.
 The current real sample has country-only place links. Synthetic linked-city
 cases exercise regional projection. Non-geographic territory 001 is excluded;
 unlinked geographic territories fail strict export. World export is unverified.
+
+## IP
+
+The ip pack implements ip(address) and ip_columns over inclusive IPv4/IPv6
+intervals. Search uses positioned binary reads and a bounded repeated-address
+cache. Packed and textual endpoints must agree; export rejects overlaps.
+Canonical geographic fields follow published links; evidence retains DB-IP's
+country, region and city text, and the flat point is its published point.
+Malformed literals, ports, zones and CIDRs return invalid_input.
+
+The sample selects the first 32 ranges per country and address family, plus the
+ranges containing the two documented DNS examples. Its source extract is checked
+independently at every start, midpoint, end and successor. Shared vectors cover
+both families, misses and invalid input. No world export was run.

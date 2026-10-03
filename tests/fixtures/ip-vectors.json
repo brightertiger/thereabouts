@@ -1,0 +1,2251 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/ip-sample",
+  "cases": [
+    {
+      "id": "ip-000",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.6.0.0"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:6619347",
+          "name": "Navi Mumbai",
+          "name_en": "Navi Mumbai",
+          "kind": "city",
+          "population": 2600000,
+          "point": {
+            "lat": 19.03681,
+            "lon": 73.01582
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 19.17,
+          "lon": 73.0014
+        },
+        "cell": "88608b5097fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-001",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.6.34.63"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:6619347",
+          "name": "Navi Mumbai",
+          "name_en": "Navi Mumbai",
+          "kind": "city",
+          "population": 2600000,
+          "point": {
+            "lat": 19.03681,
+            "lon": 73.01582
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 19.17,
+          "lon": 73.0014
+        },
+        "cell": "88608b5097fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-002",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.6.68.127"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-MH",
+          "name": "Mahārāshtra"
+        },
+        "city": {
+          "id": "city:geonames:6619347",
+          "name": "Navi Mumbai",
+          "name_en": "Navi Mumbai",
+          "kind": "city",
+          "population": 2600000,
+          "point": {
+            "lat": 19.03681,
+            "lon": 73.01582
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 19.17,
+          "lon": 73.0014
+        },
+        "cell": "88608b5097fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-003",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.32.238.0"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-WA",
+          "name": "Washington"
+        },
+        "city": {
+          "id": "city:geonames:5809844",
+          "name": "Seattle",
+          "name_en": "Seattle",
+          "kind": "city",
+          "population": 780995,
+          "point": {
+            "lat": 47.60621,
+            "lon": -122.33207
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 47.6061,
+          "lon": -122.333
+        },
+        "cell": "8828d542c9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-004",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.32.238.127"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-WA",
+          "name": "Washington"
+        },
+        "city": {
+          "id": "city:geonames:5809844",
+          "name": "Seattle",
+          "name_en": "Seattle",
+          "kind": "city",
+          "population": 780995,
+          "point": {
+            "lat": 47.60621,
+            "lon": -122.33207
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 47.6061,
+          "lon": -122.333
+        },
+        "cell": "8828d542c9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-005",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.32.238.255"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-WA",
+          "name": "Washington"
+        },
+        "city": {
+          "id": "city:geonames:5809844",
+          "name": "Seattle",
+          "name_en": "Seattle",
+          "kind": "city",
+          "population": 780995,
+          "point": {
+            "lat": 47.60621,
+            "lon": -122.33207
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 47.6061,
+          "lon": -122.333
+        },
+        "cell": "8828d542c9fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-006",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.118.32.0"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3676,
+          "lon": 4.90414
+        },
+        "cell": "8819695265fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-007",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.118.47.255"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3676,
+          "lon": 4.90414
+        },
+        "cell": "8819695265fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-008",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.118.63.255"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3676,
+          "lon": 4.90414
+        },
+        "cell": "8819695265fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-009",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.178.90.0"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8575,
+          "lon": 2.35138
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-010",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.178.90.127"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8575,
+          "lon": 2.35138
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-011",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.178.90.255"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-IDF",
+          "name": "Île-de-France"
+        },
+        "city": {
+          "id": "city:geonames:2988507",
+          "name": "Paris",
+          "name_en": "Paris",
+          "kind": "city",
+          "population": 2138551,
+          "point": {
+            "lat": 48.85341,
+            "lon": 2.3488
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 48.8575,
+          "lon": 2.35138
+        },
+        "cell": "881fb46625fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-012",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.107.0"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2791951",
+          "name": "Machelen",
+          "name_en": null,
+          "kind": "town",
+          "population": 12252,
+          "point": {
+            "lat": 50.91061,
+            "lon": 4.44174
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.894,
+          "lon": 4.43626
+        },
+        "cell": "881fa4409dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-013",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.107.127"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2791951",
+          "name": "Machelen",
+          "name_en": null,
+          "kind": "town",
+          "population": 12252,
+          "point": {
+            "lat": 50.91061,
+            "lon": 4.44174
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.894,
+          "lon": 4.43626
+        },
+        "cell": "881fa4409dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-014",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.107.255"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2791951",
+          "name": "Machelen",
+          "name_en": null,
+          "kind": "town",
+          "population": 12252,
+          "point": {
+            "lat": 50.91061,
+            "lon": 4.44174
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 50.894,
+          "lon": 4.43626
+        },
+        "cell": "881fa4409dfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-015",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.132.0"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0082,
+          "lon": 28.9784
+        },
+        "cell": "881ec90247fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-016",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.135.255"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0082,
+          "lon": 28.9784
+        },
+        "cell": "881ec90247fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-017",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.17.139.255"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0082,
+          "lon": 28.9784
+        },
+        "cell": "881ec90247fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-018",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.18.250.0"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5192,
+          "lon": 6.10025
+        },
+        "cell": "881fa35007fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-019",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.18.250.127"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5192,
+          "lon": 6.10025
+        },
+        "cell": "881fa35007fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-020",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2.18.250.255"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5192,
+          "lon": 6.10025
+        },
+        "cell": "881fa35007fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-021",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001::"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-CA",
+          "name": "California"
+        },
+        "city": {
+          "id": "city:geonames:5368361",
+          "name": "Los Angeles",
+          "name_en": "Los Angeles",
+          "kind": "city",
+          "population": 3820914,
+          "point": {
+            "lat": 34.05223,
+            "lon": -118.24368
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 33.9829,
+          "lon": -118.405
+        },
+        "cell": "8829a19b15fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-022",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:0:7fff:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-CA",
+          "name": "California"
+        },
+        "city": {
+          "id": "city:geonames:5368361",
+          "name": "Los Angeles",
+          "name_en": "Los Angeles",
+          "kind": "city",
+          "population": 3820914,
+          "point": {
+            "lat": 34.05223,
+            "lon": -118.24368
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 33.9829,
+          "lon": -118.405
+        },
+        "cell": "8829a19b15fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-023",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:0:ffff:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "US"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-CA",
+          "name": "California"
+        },
+        "city": {
+          "id": "city:geonames:5368361",
+          "name": "Los Angeles",
+          "name_en": "Los Angeles",
+          "kind": "city",
+          "population": 3820914,
+          "point": {
+            "lat": 34.05223,
+            "lon": -118.24368
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 33.9829,
+          "lon": -118.405
+        },
+        "cell": "8829a19b15fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-024",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5::"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3783,
+          "lon": 4.90073
+        },
+        "cell": "881969c9bbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-025",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:0:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3783,
+          "lon": 4.90073
+        },
+        "cell": "881969c9bbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-026",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:0:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "NL"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
+        "state": {
+          "code": "NL-NH",
+          "name": "Noord-Holland"
+        },
+        "city": {
+          "id": "city:geonames:2759794",
+          "name": "Amsterdam",
+          "name_en": "Amsterdam",
+          "kind": "city",
+          "population": 741636,
+          "point": {
+            "lat": 52.37403,
+            "lon": 4.88969
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 52.3783,
+          "lon": 4.90073
+        },
+        "cell": "881969c9bbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-027",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:1::"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0796,
+          "lon": 29.0073
+        },
+        "cell": "881ec910dbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-028",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:1:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0796,
+          "lon": 29.0073
+        },
+        "cell": "881ec910dbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-029",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:1:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "TR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-34",
+          "name": "İstanbul"
+        },
+        "city": {
+          "id": "city:geonames:745044",
+          "name": "Istanbul",
+          "name_en": "Istanbul",
+          "kind": "city",
+          "population": 15701602,
+          "point": {
+            "lat": 41.01384,
+            "lon": 28.94966
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 41.0796,
+          "lon": 29.0073
+        },
+        "cell": "881ec910dbfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-030",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:5::"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2783293",
+          "name": "Zele",
+          "name_en": null,
+          "kind": "town",
+          "population": 20236,
+          "point": {
+            "lat": 51.06566,
+            "lon": 4.0403
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 51.0705,
+          "lon": 4.03988
+        },
+        "cell": "881fa4c91bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-031",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:5:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2783293",
+          "name": "Zele",
+          "name_en": null,
+          "kind": "town",
+          "population": 20236,
+          "point": {
+            "lat": 51.06566,
+            "lon": 4.0403
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 51.0705,
+          "lon": 4.03988
+        },
+        "cell": "881fa4c91bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-032",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:5:5:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "BE"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
+        "state": {
+          "code": "BE-VLG",
+          "name": "Vlaams Gewest"
+        },
+        "city": {
+          "id": "city:geonames:2783293",
+          "name": "Zele",
+          "name_en": null,
+          "kind": "town",
+          "population": 20236,
+          "point": {
+            "lat": 51.06566,
+            "lon": 4.0403
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 51.0705,
+          "lon": 4.03988
+        },
+        "cell": "881fa4c91bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-033",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:420:8f::"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-PAC",
+          "name": "Provence-Alpes-Côte-d’Azur"
+        },
+        "city": {
+          "id": "city:geonames:2995469",
+          "name": "Marseille",
+          "name_en": "Marseille",
+          "kind": "city",
+          "population": 877215,
+          "point": {
+            "lat": 43.29695,
+            "lon": 5.38107
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 43.2965,
+          "lon": 5.36978
+        },
+        "cell": "883968152bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-034",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:420:8f:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-PAC",
+          "name": "Provence-Alpes-Côte-d’Azur"
+        },
+        "city": {
+          "id": "city:geonames:2995469",
+          "name": "Marseille",
+          "name_en": "Marseille",
+          "kind": "city",
+          "population": 877215,
+          "point": {
+            "lat": 43.29695,
+            "lon": 5.38107
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 43.2965,
+          "lon": 5.36978
+        },
+        "cell": "883968152bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-035",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:420:8f:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "FR"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
+        "state": {
+          "code": "FR-PAC",
+          "name": "Provence-Alpes-Côte-d’Azur"
+        },
+        "city": {
+          "id": "city:geonames:2995469",
+          "name": "Marseille",
+          "name_en": "Marseille",
+          "kind": "city",
+          "population": 877215,
+          "point": {
+            "lat": 43.29695,
+            "lon": 5.38107
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 43.2965,
+          "lon": 5.36978
+        },
+        "cell": "883968152bfffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-036",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:451::"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5048,
+          "lon": 6.11276
+        },
+        "cell": "881fa35035fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-037",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:451:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5048,
+          "lon": 6.11276
+        },
+        "cell": "881fa35035fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-038",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:451:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "LU"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-ES",
+          "name": "Esch-sur-Alzette"
+        },
+        "city": {
+          "id": "city:geonames:2960777",
+          "name": "Bettembourg",
+          "name_en": null,
+          "kind": "town",
+          "population": 7437,
+          "point": {
+            "lat": 49.51861,
+            "lon": 6.10278
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 49.5048,
+          "lon": 6.11276
+        },
+        "cell": "881fa35035fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-039",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:1ae6::"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-DL",
+          "name": "Delhi"
+        },
+        "city": {
+          "id": "city:geonames:1273294",
+          "name": "Delhi",
+          "name_en": "Delhi",
+          "kind": "city",
+          "population": 11034555,
+          "point": {
+            "lat": 28.65195,
+            "lon": 77.23149
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 28.6139,
+          "lon": 77.2088
+        },
+        "cell": "883da11463fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-040",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:1ae6:7fff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-DL",
+          "name": "Delhi"
+        },
+        "city": {
+          "id": "city:geonames:1273294",
+          "name": "Delhi",
+          "name_en": "Delhi",
+          "kind": "city",
+          "population": 11034555,
+          "point": {
+            "lat": 28.65195,
+            "lon": 77.23149
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 28.6139,
+          "lon": 77.2088
+        },
+        "cell": "883da11463fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-041",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:470:1ae6:ffff:ffff:ffff:ffff:ffff"
+        ],
+        "country": "IN"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
+        "state": {
+          "code": "IN-DL",
+          "name": "Delhi"
+        },
+        "city": {
+          "id": "city:geonames:1273294",
+          "name": "Delhi",
+          "name_en": "Delhi",
+          "kind": "city",
+          "population": 11034555,
+          "point": {
+            "lat": 28.65195,
+            "lon": 77.23149
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 28.6139,
+          "lon": 77.2088
+        },
+        "cell": "883da11463fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-042",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "8.8.8.8"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "ip_range",
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
+        "state": {
+          "code": "US-CA",
+          "name": "California"
+        },
+        "city": {
+          "id": "city:geonames:5375480",
+          "name": "Mountain View",
+          "name_en": "Mountain View",
+          "kind": "city",
+          "population": 80435,
+          "point": {
+            "lat": 37.38605,
+            "lon": -122.08385
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 37.422,
+          "lon": -122.085
+        },
+        "cell": "8828347509fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-043",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "2001:4860:4860::8888"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-044",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "::1"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-045",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "127.0.0.1"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-046",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "::ffff:8.8.8.8"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-047",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "255.255.255.255"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-048",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "ip-049",
+      "request": {
+        "kind": "ip",
+        "values": [
+          ""
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-050",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "01.2.3.4"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-051",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "256.1.1.1"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-052",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.2.3.4/24"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-053",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.2.3.4:80"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-054",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "fe80::1%en0"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-055",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "::gg"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-056",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.2.3"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    },
+    {
+      "id": "ip-057",
+      "request": {
+        "kind": "ip",
+        "values": [
+          "1.2.3.4\u0000"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "ip_range",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use ip(address) with an IPv4 or IPv6 literal, without a port or CIDR."
+      }
+    }
+  ]
+}

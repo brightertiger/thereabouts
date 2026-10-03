@@ -202,6 +202,24 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, numbers, |number| pack.phone(number, false))
     }
+    #[pyo3(signature=(address, *, evidence=false))]
+    fn ip(&self, py: Python<'_>, address: &str, evidence: bool) -> PyResult<Py<PyAny>> {
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .ip(address, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    fn ip_columns<'py>(
+        &self,
+        py: Python<'py>,
+        addresses: Vec<String>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        columns::forward(py, addresses, |address| pack.ip(address, false))
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

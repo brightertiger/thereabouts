@@ -18,3 +18,5 @@ pub mod exact;
 pub mod observation;
 
 pub mod trie;
+
+pub mod intervals;

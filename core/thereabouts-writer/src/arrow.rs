@@ -97,6 +97,18 @@ impl<'a> Row<'a> {
             _ => return Err(Error::Input(format!("{name} must be text"))),
         }))
     }
+    pub(crate) fn binary(self, name: &str) -> Result<Option<&'a [u8]>> {
+        let Some(array) = self.column(name) else {
+            return Ok(None);
+        };
+        Ok(Some(match array.data_type() {
+            DataType::Binary => typed::<arrow_array::BinaryArray>(array)?.value(self.index),
+            DataType::FixedSizeBinary(_) => {
+                typed::<arrow_array::FixedSizeBinaryArray>(array)?.value(self.index)
+            }
+            _ => return Err(Error::Input(format!("{name} must be binary"))),
+        }))
+    }
     pub(crate) fn texts(self, name: &str) -> Result<Vec<String>> {
         let Some(array) = self.column(name) else {
             return Ok(Vec::new());

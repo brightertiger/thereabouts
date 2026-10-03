@@ -47,6 +47,9 @@ pub struct Pack {
     pub(crate) place_count: usize,
     pub(crate) exacts: Vec<super::exact::Exact>,
     pub(crate) tries: Vec<super::trie::Trie>,
+    intervals: Vec<super::intervals::Intervals>,
+    // One MiB bounds repeated exact-address queries without retaining full interval tables.
+    address_cache: Mutex<Cache<super::intervals::Address, Vec<(usize, usize)>>>,
     block_cache: Mutex<Cache<u32, Block>>,
     place_cache: Mutex<Cache<u32, Place>>,
     observation_cache: Mutex<Cache<(usize, usize), super::observation::Observation>>,
@@ -62,6 +65,7 @@ impl Pack {
         let mut metadata = None;
         let mut exacts = Vec::new();
         let mut tries = Vec::new();
+        let mut intervals = Vec::new();
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
         let mut blocks = BTreeMap::new();
@@ -113,6 +117,7 @@ impl Pack {
                 }
                 "exact" => exacts.push(super::exact::Exact::open(&path)?),
                 "trie" => tries.push(super::trie::Trie::open(&path)?),
+                "intervals" => intervals.push(super::intervals::Intervals::open(&path)?),
                 "notice" => {}
                 _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
             }
@@ -121,6 +126,7 @@ impl Pack {
             match manifest.family.as_str() {
                 "core" => true,
                 "phone" => !tries.is_empty(),
+                "ip" => !intervals.is_empty(),
                 _ => !exacts.is_empty(),
             },
             "Missing required exact index",
@@ -137,10 +143,50 @@ impl Pack {
             place_count,
             exacts,
             tries,
+            intervals,
+            address_cache: Mutex::new(Cache::new(1024 * 1024)),
             block_cache: Mutex::new(Cache::new(BLOCK_CACHE_BYTES)),
             place_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
             observation_cache: Mutex::new(Cache::new(PLACE_CACHE_BYTES)),
         })
+    }
+    pub(crate) fn interval_observations(
+        &self,
+        address: super::intervals::Address,
+    ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        let cached = self
+            .address_cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+            .get(address);
+        let selected = if let Some(rows) = cached {
+            rows
+        } else {
+            let mut rows = Vec::new();
+            for (i, shard) in self.intervals.iter().enumerate() {
+                if let Some(row) = shard.lookup(address)? {
+                    rows.push((i, row));
+                }
+            }
+            ensure(rows.len() <= 1, "Overlapping IP interval shards")?;
+            let bytes = 64 + rows.len() * size_of::<(usize, usize)>();
+            self.address_cache
+                .lock()
+                .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+                .insert(address, rows, bytes)
+        };
+        selected
+            .iter()
+            .map(|&(i, row)| {
+                let shard = self
+                    .intervals
+                    .get(i)
+                    .ok_or_else(|| Error::Corrupt("Missing IP shard".into()))?;
+                self.cached_observation((self.exacts.len() + self.tries.len() + i, row), || {
+                    shard.record(row, self.place_count)
+                })
+            })
+            .collect()
     }
     pub(crate) fn prefix_observations(
         &self,

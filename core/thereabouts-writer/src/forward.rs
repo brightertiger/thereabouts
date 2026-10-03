@@ -102,6 +102,11 @@ pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Re
     })?;
     let (kind, encoder): (&str, Encoder) = if manifest.family == "phone" {
         ("trie", thereabouts_core::format::trie::encode_entries)
+    } else if manifest.family == "ip" {
+        (
+            "intervals",
+            thereabouts_core::format::intervals::encode_entries,
+        )
     } else {
         ("exact", encode_entries)
     };
