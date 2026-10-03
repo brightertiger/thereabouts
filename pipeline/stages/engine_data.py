@@ -54,12 +54,16 @@ def countries(ctx: Context) -> list[str]:
         db.execute("SET memory_limit=?", [ctx.config.resources.duckdb_memory])
         db.execute("SET threads=?", [ctx.config.resources.duckdb_threads])
         for name in settings.reconcile_sources:
-            if name == "osm_land":
+            if name == settings.land_source:
                 continue
             manifest = source_manifest(ctx, name)
             if manifest is None:
                 return []
-            kind = "places" if name == "geonames" else "areas"
+            kind = (
+                "places"
+                if ctx.config.sources[name].kind == "places_and_names"
+                else "areas"
+            )
             paths = [
                 str(located(ctx.root, str(row["path"])))
                 for row in manifest["partitions"]

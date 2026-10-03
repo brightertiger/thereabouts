@@ -12,14 +12,15 @@ from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
 from . import engine_io as io
+from . import parameters as unit_parameters
 from .contract import Context, Unit
-from .engine_data import countries, source_manifest
+from .engine_data import Geography, countries, source_manifest
 
 
 def urban(ctx: Context) -> Urban:
-    manifest = source_manifest(ctx, "ghsl")
+    manifest = source_manifest(ctx, ctx.config.engines.urban_source)
     if manifest is None:
-        raise ValueError("Missing GHSL urban evidence")
+        raise ValueError("Missing configured urban evidence")
     return Urban(io.local(ctx, manifest["partitions"]))
 
 
@@ -96,3 +97,14 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
 
 def finish(ctx: Context) -> None:
     """Country publication validates its index, targets and Parquet cardinality."""
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    select = unit_parameters.country_policy(unit_parameters.cities(ctx), geography)
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.country_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+    )

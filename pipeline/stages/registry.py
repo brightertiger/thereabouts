@@ -76,13 +76,21 @@ def registry(config: Config) -> list[Stage]:
     reviews.load(located(REPOSITORY, config.engines.city_review), policy)
     discovery = Discovery()
     implementations = {
-        "reconcile": (reconcile.run, reconcile.finish),
-        "cells": (cells.run, cells.finish),
-        "cities": (cities.run, cities.finish),
-        "evaluate": (evaluate.run, evaluate.finish),
-        "normalize_cells": (normalize_cells.run, normalize_cells.finish),
-        "lookups": (lookups.run, lookups.finish),
-        "plate_country": (plate_country.run, plate_country.finish),
+        "reconcile": (reconcile.run, reconcile.finish, reconcile.parameters),
+        "cells": (cells.run, cells.finish, cells.parameters),
+        "cities": (cities.run, cities.finish, cities.parameters),
+        "evaluate": (evaluate.run, evaluate.finish, evaluate.parameters),
+        "normalize_cells": (
+            normalize_cells.run,
+            normalize_cells.finish,
+            normalize_cells.parameters,
+        ),
+        "lookups": (lookups.run, lookups.finish, lookups.parameters),
+        "plate_country": (
+            plate_country.run,
+            plate_country.finish,
+            plate_country.parameters,
+        ),
     }
     unknown = {stage.name for stage in config.stages} - {
         "download",

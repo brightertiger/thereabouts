@@ -98,6 +98,22 @@ passed, 8 skipped in 44.79 s**. Final plan: **85,577 current / 0 stale / 0 new u
 fixes-1–4 table above, with zero stale/new after simulated handover. The ledger remains unmigrated and all engine proof writes stay
 inside this checkout. No upstream or cloud source requests were made.
 
+## Package 2–3 review checkpoint: fix 7
+
+Geographic stages own parameter callbacks for their policies, resources and
+refresh behavior. The shared `GeographicStage` has no stage-name branches.
+Land, urban, registration and plate-country inputs are explicit engine roles;
+place/area inventory and static lookup decisions use source kinds. Tests cover
+renamed source roles, country-scoped invalidation, resource reservations and
+invalid source references. The one-source migration fixture now declares only
+its two source stages. Full gate: **666 passed, 8 skipped in 45.63 s**;
+Ruff and strict mypy pass. Real plan: **85,577 current / 0 stale / 0 new** in
+**325.65 s**, **1,097,646,080 bytes RSS**.
+Handover dry-run: **85,577 updates**, **317.48 s**,
+**1,483,177,984 bytes RSS**; the per-stage table above is unchanged.
+Both checks simulate adoption and verify mapping and hashes only. The real ledger
+SHA256 remains unchanged; no engine ran against that workspace.
+
 ## Package 3: engines and independent handover
 
 The executable registry now covers reconcile, cells, cities, evaluate,

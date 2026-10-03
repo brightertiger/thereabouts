@@ -22,6 +22,10 @@ limits:
   country_reservation_bytes: 256000000
   block_reservation_bytes: 64000000
   lookup_reservation_bytes: 512000000
+land_source: osm_land
+urban_source: ghsl
+registration_source: plates
+plate_country_source: plate_country
 reconcile_sources:
   overture: [areas, places]
   geonames: [places, names]

@@ -146,6 +146,9 @@ def source_options(root: Path) -> list[str]:
     """A one-source configuration for independent CLI discovery over tiny evidence."""
     config = load()
     config.sources = {"ghsl": config.sources["ghsl"]}
+    config.stages = [
+        stage for stage in config.stages if stage.name in {"download", "normalize"}
+    ]
     path = root.parent / "pipeline.yaml"
     path.write_text(yaml.safe_dump(asdict(config), sort_keys=False))
     return ["--config", str(path)]

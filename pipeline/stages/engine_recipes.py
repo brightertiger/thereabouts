@@ -18,6 +18,7 @@ def dependencies(
 
 
 def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
+    settings = ctx.config.engines
     codes, blocks = geography.countries, geography.blocks
     if not codes:
         return []
@@ -40,9 +41,9 @@ def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
     normalize = {
         ("normalize", name)
         for name in ctx.config.engines.reconcile_sources
-        if name != "osm_land"
+        if name != settings.land_source
     }
-    add("reconcile", "land/world", {("normalize", "osm_land")})
+    add("reconcile", "land/world", {("normalize", settings.land_source)})
     for cc in codes:
         add("reconcile", "extract/" + cc, normalize)
         add("reconcile", "links/" + cc, {("reconcile", "extract/" + cc)})
@@ -70,7 +71,7 @@ def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
         add(
             "cities",
             "country/" + cc,
-            {("reconcile", "country/" + cc), ("normalize", "ghsl")},
+            {("reconcile", "country/" + cc), ("normalize", settings.urban_source)},
         )
         add(
             "cities",
@@ -103,7 +104,12 @@ def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
         add(
             "normalize_cells",
             "block/" + block,
-            {("cells", "block/" + block), land, ("normalize", "ghsl"), gate}
+            {
+                ("cells", "block/" + block),
+                land,
+                ("normalize", settings.urban_source),
+                gate,
+            }
             | {
                 (stage, "country/" + cc)
                 for cc in countries
@@ -149,7 +155,7 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             if part["kind"] != kind:
                 continue
             parents = {("normalize", source)}
-            if source != "timezones":
+            if ctx.config.sources[source].kind != "timezones":
                 parents |= countries
             recipes.append(
                 Recipe(
@@ -175,7 +181,7 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             for cc in geography.countries
         }
     )
-    plate_source = ctx.config.sources.get("plate_country")
+    plate_source = ctx.config.sources.get(settings.plate_country_source)
     if plate_source is not None and plate_source.enabled:
         parents.add(("plate_country", "world"))
     recipes.append(

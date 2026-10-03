@@ -58,3 +58,43 @@ def test_selected_block_requires_every_country(tmp_path: Path) -> None:
             db.close()
         with pytest.raises(ValueError, match=r"unselected countries.*BB"):
             geography(ctx)
+
+
+def test_source_roles_and_kinds_do_not_depend_on_source_names(tmp_path: Path) -> None:
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        ctx = context(tmp_path, ledger)
+        ctx.config = load()
+        settings = ctx.config.engines
+        settings.land_source = "coast"
+        settings.reconcile_sources["coast"] = settings.reconcile_sources.pop("osm_land")
+        settings.urban_source = "urban"
+        settings.static_sources = {"timezone_cells": "clock_zones"}
+        source = ctx.config.sources.pop("timezones")
+        source.name = "clock_zones"
+        ctx.config.sources[source.name] = source
+        ctx.verifier.overlay["normalized/clock_zones/manifest.json"] = (
+            b'{"source":"clock_zones","partitions":[{"kind":"timezone_cells","path":"normalized/clock_zones/cells.parquet"}]}'
+        )
+        geo = Geography(["BE"], {"block": ["BE"]})
+        recipes = {
+            r.key: r for r in geographic_recipes(ctx, geo) + lookup_recipes(ctx, geo)
+        }
+        assert recipes["reconcile", "land/world"].dependencies == (
+            Dependency("normalize", "coast"),
+        )
+        assert (
+            Dependency("normalize", "urban")
+            in recipes["cities", "country/BE"].dependencies
+        )
+        assert (
+            Dependency("normalize", "urban")
+            in recipes["normalize_cells", "block/block"].dependencies
+        )
+        assert recipes["lookups", "static/timezone_cells/cells"].dependencies == (
+            Dependency("normalize", "clock_zones"),
+        )
+
+
+def test_missing_configured_source_role_fails_during_load() -> None:
+    with pytest.raises(ValueError, match=r"source references.*missing"):
+        load(overrides=["engines.urban_source=missing"])

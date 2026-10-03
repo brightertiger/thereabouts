@@ -19,7 +19,9 @@ from pipeline.runtime.paths import located
 
 from . import cities
 from . import engine_io as io
+from . import parameters as unit_parameters
 from .contract import Context, Unit
+from .engine_data import Geography
 from .engine_views import Engines
 
 
@@ -110,3 +112,14 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
 
 def finish(ctx: Context) -> None:
     """Final cross-country gates run in lookups after all country checks complete."""
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    select = unit_parameters.country_policy(unit_parameters.cities(ctx), geography)
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.country_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+    )

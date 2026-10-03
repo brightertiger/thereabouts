@@ -15,13 +15,15 @@ from pipeline.engines.cells.phone import PhoneCountries
 from pipeline.engines.cells.schemas import strings
 from pipeline.engines.reconcile.common import Row
 from pipeline.engines.storage import file_record, parquet
-from pipeline.runtime.jsonio import atomic_output, write_json
+from pipeline.runtime.jsonio import Object, atomic_output, write_json
 from pipeline.runtime.paths import located
+from pipeline.runtime.records import Recipe
 
 from . import engine_io as io
 from . import lookup_manifest, reconcile
+from . import parameters as unit_parameters
 from .contract import Context, Unit
-from .engine_data import countries, source_manifest
+from .engine_data import Geography, countries, source_manifest
 
 
 def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
@@ -40,7 +42,7 @@ def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
     part = parts[0]
     original = located(ctx.root, part["path"])
     path = root / kind / f"{name}.parquet"
-    if source == "timezones":
+    if ctx.config.sources[source].kind == "timezones":
         with atomic_output(path) as temporary:
             shutil.copyfile(original, temporary)
         return [path]
@@ -56,7 +58,7 @@ def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
     )
     index = CodeIndex(inputs)
     phone = None
-    if source == "phone":
+    if ctx.config.sources[source].kind == "phone":
         phone = PhoneCountries(
             [
                 located(ctx.root, p["path"])
@@ -174,3 +176,19 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
 
 def finish(ctx: Context) -> None:
     """The manifest unit enforces integrity before recording completion."""
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    policy = unit_parameters.cities(ctx)
+    country = unit_parameters.country_policy(policy, geography)
+
+    def select(recipe: Recipe) -> Object:
+        return policy if recipe.unit_id == "manifest/current" else country(recipe)
+
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.lookup_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+    )

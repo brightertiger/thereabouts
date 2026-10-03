@@ -3,19 +3,15 @@
 from collections.abc import Callable
 from dataclasses import asdict, replace
 from pathlib import Path
-from typing import cast
 
-from pipeline.config import policies
 from pipeline.config.schema import StageSettings
-from pipeline.engines.plate_country.policy import DATA
-from pipeline.engines.plate_country.policy import policy as plate_policy
 from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
-from pipeline.runtime.jsonio import Object
-from pipeline.runtime.paths import located
 from thereabouts.format import CELL_FORMAT_VERSION
 
 from .contract import Context, Unit, make_unit
+from .engine_data import Geography
 from .engine_discovery import Discovery
+from .parameters import Configure
 
 
 class GeographicStage:
@@ -25,10 +21,12 @@ class GeographicStage:
         discovery: Discovery,
         execute: Callable[[Context, Unit], list[Path]],
         finalize: Callable[[Context], None],
+        parameters: Callable[[Context, Geography], Configure],
     ) -> None:
         self.settings, self.discovery = settings, discovery
         self.name, self.needs = settings.name, tuple(settings.needs)
         self.execute, self.finalize = execute, finalize
+        self.parameters = parameters
 
     def identity(self, ctx: Context) -> str:
         tree = asdict(ctx.config)
@@ -45,74 +43,19 @@ class GeographicStage:
 
     def units(self, ctx: Context) -> list[Unit]:
         self.discovery.load(ctx)
-        settings = ctx.config.engines
-        reconciliation = policies.reconcile(
-            located(REPOSITORY, settings.reconcile_policy)
-        )
-        cities = policies.cities(located(REPOSITORY, settings.city_policies))
-        common = {key: value for key, value in cities.items() if key != "countries"}
-        resolved: dict[tuple[str, ...], Object] = {}
+        configure = self.parameters(ctx, self.discovery.geography)
         current_identity = self.identity(ctx)
         result = []
         for recipe in self.discovery.recipes.get(self.name, []):
-            action, _, key = recipe.unit_id.partition("/")
-            countries = (
-                self.discovery.geography.blocks.get(key, [])
-                if action == "block"
-                else [key]
-                if key in self.discovery.geography.countries
-                else self.discovery.geography.countries
-            )
-            if self.name in {"reconcile", "cells"}:
-                policy = cast(Object, reconciliation)
-            else:
-                group = tuple(countries)
-                if group not in resolved:
-                    resolved[group] = cast(
-                        Object,
-                        {
-                            **common,
-                            "countries": {
-                                cc: cities["countries"][cc]
-                                for cc in countries
-                                if cc in cities["countries"]
-                            },
-                        },
-                    )
-                policy = resolved[group]
-            if self.name == "evaluate" or (
-                self.name == "lookups" and action == "manifest"
-            ):
-                policy = cast(Object, cities)
-            parameters: Object = {"policy": policy}
-            if self.name == "plate_country":
-                parameters = {
-                    "policy": {
-                        path.stem: plate_policy(path.stem)
-                        for path in sorted(DATA.glob("*.yaml"))
-                    }
-                }
-            if action == "block":
-                parameters["countries"] = list(countries)
-            if self.name == "evaluate":
-                parameters["review"] = policies.read(
-                    located(REPOSITORY, settings.city_review)
-                )
+            options = configure(recipe)
             unit = make_unit(
-                ctx, replace(recipe, parameters=parameters), current_identity
-            )
-            required = (
-                settings.limits.block_reservation_bytes
-                if action == "block"
-                else settings.limits.lookup_reservation_bytes
-                if self.name == "lookups"
-                else settings.limits.country_reservation_bytes
+                ctx, replace(recipe, parameters=options.parameters), current_identity
             )
             result.append(
                 replace(
                     unit,
-                    required_bytes=required,
-                    refresh_discovery=self.name == "cells" and action == "plan",
+                    required_bytes=options.required_bytes,
+                    refresh_discovery=options.refresh_discovery,
                 )
             )
         return result

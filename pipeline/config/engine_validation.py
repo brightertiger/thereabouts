@@ -9,6 +9,7 @@ from h3.api import basic_int as h3
 from pipeline.runtime.paths import validate_relative
 
 from .engines import EngineSettings
+from .sources import SourceSettings
 
 
 def validate(settings: EngineSettings, block_resolution: int) -> None:
@@ -45,3 +46,41 @@ def validate(settings: EngineSettings, block_resolution: int) -> None:
             raise ValueError(f"Invalid selected H3 block: {block}")
     if len(set(settings.blocks)) != len(settings.blocks):
         raise ValueError("engines.blocks must be unique")
+
+
+def validate_sources(
+    settings: EngineSettings, sources: dict[str, SourceSettings]
+) -> None:
+    selected = (
+        set(settings.reconcile_sources)
+        | set(settings.static_sources.values())
+        | set(settings.spatial_sources.values())
+        | {
+            settings.land_source,
+            settings.urban_source,
+            settings.registration_source,
+            settings.plate_country_source,
+        }
+    ) - {""}
+    missing = selected - sources.keys()
+    if missing:
+        raise ValueError(
+            f"Engine source references are not configured: {sorted(missing)}"
+        )
+    roles = {
+        "land_source": "land",
+        "urban_source": "urban_centres",
+        "registration_source": "registration_evidence",
+        "plate_country_source": "registration_country_evidence",
+    }
+    for name, kind in roles.items():
+        source = getattr(settings, name)
+        if source and sources[source].kind != kind:
+            raise ValueError(f"engines.{name} requires source kind {kind}")
+    if settings.reconcile_sources and (
+        settings.land_source not in settings.reconcile_sources
+        or not settings.urban_source
+    ):
+        raise ValueError(
+            "Engine reconciliation requires configured land and urban sources"
+        )

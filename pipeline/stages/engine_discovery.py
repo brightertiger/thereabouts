@@ -47,15 +47,15 @@ class Discovery:
             ctx, self.geography
         ):
             self.recipes.setdefault(recipe.stage, []).append(recipe)
-        source = ctx.config.sources.get("plate_country")
+        source = ctx.config.sources.get(settings.plate_country_source)
         if source is not None and source.enabled:
             self.recipes["plate_country"] = [
                 Recipe(
                     "plate_country",
                     "world",
                     dependencies=(
-                        Dependency("normalize", "plate_country"),
-                        Dependency("normalize", "plates"),
+                        Dependency("normalize", settings.plate_country_source),
+                        Dependency("normalize", settings.registration_source),
                     ),
                 )
             ]

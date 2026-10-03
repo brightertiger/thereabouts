@@ -14,8 +14,9 @@ from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
 from . import engine_io as io
+from . import parameters as unit_parameters
 from .contract import Context, Unit
-from .engine_data import countries, source_manifest
+from .engine_data import Geography, countries, source_manifest
 
 
 def country_paths(ctx: Context, codes: list[str]) -> dict[str, Path]:
@@ -92,7 +93,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             )
         ]
     if action == "land":
-        manifest = source_manifest(ctx, "osm_land")
+        manifest = source_manifest(ctx, ctx.config.engines.land_source)
         if manifest is None:
             raise ValueError("Missing normalized physical land")
         return [
@@ -193,3 +194,15 @@ def finish(ctx: Context) -> None:
         raise ValueError(
             "Reconciliation pilot quality gate failed; inspect reconciled/pilot.json"
         )
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    policy = unit_parameters.reconciliation(ctx)
+    select = unit_parameters.constant(policy)
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.country_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+    )

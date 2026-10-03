@@ -40,6 +40,10 @@ class EngineSettings:
     block_index: str = "work/cells/blocks.sqlite"
     retained_country_inventory: str = "work/golden/countries.json"
     retained_block_index: str = "work/golden/blocks.sqlite"
+    land_source: str = ""
+    urban_source: str = ""
+    registration_source: str = ""
+    plate_country_source: str = ""
     reconcile_sources: dict[str, list[str]] = field(default_factory=dict)
     static_sources: dict[str, str] = field(default_factory=dict)
     spatial_sources: dict[str, str] = field(default_factory=dict)

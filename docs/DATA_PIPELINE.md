@@ -173,6 +173,13 @@ used by every historical build.
 
 ## Geographic stages
 
+Each geographic stage supplies its own parameter callback. Shared runtime code
+only applies the returned policy, reservation and discovery-refresh decision.
+`config/engines.yaml` names the land, urban-centre, registration and plate-country
+source roles; source `kind` selects place/area inventory and lookup behavior.
+Changing a source's name does not change those decisions. Unknown role references
+and incompatible source kinds fail configuration loading before workspace writes.
+
 Reconciliation extracts and links each country, builds canonical entities and
 land, then verifies country quality. Cells index resolution-3 blocks, derive
 compact resolution-8 answers, and retain an immutable base manifest. Cities

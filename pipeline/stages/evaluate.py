@@ -4,7 +4,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import cast
 
-from pipeline.config import reviews
+from pipeline.config import policies, reviews
 from pipeline.engines.artifacts import EVALUATION, read_json
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cities.evaluate import Comparison
@@ -18,8 +18,9 @@ from pipeline.runtime.paths import located
 
 from . import cells, cities, development
 from . import engine_io as io
+from . import parameters as unit_parameters
 from .contract import Context, Unit
-from .engine_data import countries
+from .engine_data import Geography, countries
 from .engine_views import Engines
 
 
@@ -92,3 +93,17 @@ def finish(ctx: Context) -> None:
         value = io.receipt(ctx, "evaluate", "pilot", suffix="pilot.json")
         if not value["passed"]:
             raise ValueError("Pilot evaluation has not passed")
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    policy = unit_parameters.cities(ctx)
+    select = unit_parameters.constant(policy)
+    review = policies.read(located(REPOSITORY, ctx.config.engines.city_review))
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.country_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+        extra={"review": review},
+    )

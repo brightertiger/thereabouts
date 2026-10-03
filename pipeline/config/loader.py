@@ -15,6 +15,7 @@ from omegaconf.errors import OmegaConfBaseException
 from thereabouts.format import BLOCK_RESOLUTION
 
 from .engine_validation import validate as validate_engines
+from .engine_validation import validate_sources
 from .schema import DISK_FLOOR, Config
 from .sources import load_sources, resolve_options, validate_source
 
@@ -107,6 +108,8 @@ def validate(config: Config) -> None:
         validate_source(source)
         resolve_options(source)
     validate_engines(config.engines, config.h3.block_resolution)
+    if any("engines" in stage.config for stage in config.stages):
+        validate_sources(config.engines, config.sources)
     resources = config.resources
     if resources.disk_floor < DISK_FLOOR:
         raise ValueError(f"resources.disk_floor must be at least {DISK_FLOOR}")

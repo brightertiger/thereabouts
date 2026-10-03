@@ -11,9 +11,10 @@ from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
 from . import engine_io as io
+from . import parameters as unit_parameters
 from . import reconcile
 from .contract import Context, Unit
-from .engine_data import countries, source_manifest
+from .engine_data import Geography, countries, source_manifest
 
 
 def inputs(ctx: Context, codes: list[str], policy: Row) -> Inputs:
@@ -38,12 +39,16 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
     if action == "plan":
         sources = {}
         for source in settings.reconcile_sources:
-            if source == "osm_land":
+            if source == settings.land_source:
                 continue
             manifest = source_manifest(ctx, source)
             if manifest is None:
                 raise ValueError(f"Missing normalized source: {source}")
-            kind = "places" if source == "geonames" else "areas"
+            kind = (
+                "places"
+                if ctx.config.sources[source].kind == "places_and_names"
+                else "areas"
+            )
             sources[source] = [
                 str(located(ctx.root, row["path"]))
                 for row in manifest["partitions"]
@@ -119,3 +124,16 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
 
 def finish(ctx: Context) -> None:
     """Per-unit publication validates every base artifact before ledger completion."""
+
+
+def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
+    policy = unit_parameters.reconciliation(ctx)
+    select = unit_parameters.constant(policy)
+    limits = ctx.config.engines.limits
+    return unit_parameters.prepare(
+        select,
+        geography,
+        country_bytes=limits.country_reservation_bytes,
+        block_bytes=limits.block_reservation_bytes,
+        refresh_plan=True,
+    )
