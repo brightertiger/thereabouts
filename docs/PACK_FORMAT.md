@@ -413,3 +413,28 @@ at 0), plus the usual columns with a candidate_ prefix for the concatenated
 matched candidates. Offsets slice candidate rows for each input. Dictionary
 categories and validity masks follow the reverse convention; hint is a nullable
 dictionary string column. Scalar and batch calls use the same core lookup.
+
+## Airports family
+
+The airports family requires the same catalogue and metadata tables as postal.
+Its primary input is the dataset table airports. Every non-null published
+iata_code, icao_code, gps_code, local_code and ident is indexed under the respective
+scheme iata, icao, gps, local and ident. No scheme is inferred from another field.
+Normalization is exactly ["strip_ascii", "upper_ascii"], in that order.
+
+The kind-4 exact index and 44-byte observation layout above are reused. Keys
+are UTF-8 scheme + NUL + country + NUL + normalized code. Country is the
+uppercase two-letter source country. All schemes except local additionally
+have a global key with the empty country component. The observation name
+is the airport name, code and scheme describe the indexed code, and details
+is JSON with type, municipality and region_code (nullable strings).
+
+An explicit scheme searches only that namespace. Omitted scheme searches IATA
+then ICAO and combines all results. Multiple records with the same source and
+source_id form one airport; different identities produce ranked ambiguous
+candidates, with flat fields null. Local requires an explicit country; unknown
+schemes and malformed countries are invalid_input with a hint. Published null
+geography remains null, even when a source country code can scope its index.
+Point is the published airport point. Canonical geography follows place_to_city.
+Match is exact and kind is airport. Evidence retains the contributing names,
+schemes and source identities. Airport columns use the postal column contract.

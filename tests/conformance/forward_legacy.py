@@ -13,6 +13,13 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 def resolve(
     geo: Geocoder, request: dict[str, Any], *, evidence: bool = False
 ) -> Result:
+    if request["kind"] == "airport":
+        return geo.airport(
+            request["values"][0],
+            scheme=request.get("scheme"),
+            country=request.get("country"),
+            evidence=evidence,
+        )
     return geo.postal(
         request["values"][0], country=request.get("country"), evidence=evidence
     )
@@ -20,6 +27,12 @@ def resolve(
 
 def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
     result = resolve(geo, case["request"], evidence=True)
+    if case["id"] == 52:
+        # Approved default now searches IATA + ICAO; assert against case 32's
+        # unchanged airport expectations, not against a regenerated snapshot.
+        original = json.loads((FIXTURES / "conformance.json").read_text())
+        expected = next(c["result"] for c in original["cases"] if c["id"] == 32)
+        case = {"id": 52, "request": case["request"], "result": expected}
     if "error" in case:
         assert case["error"]["name"] in {"ContextRequiredError", "InvalidInputError"}
         assert result.status == "invalid_input" and result.hint is not None
@@ -38,8 +51,11 @@ def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
         sources = [dict(s) for s in answer.evidence.source_ids or ()]
         identity = (
             answer.city.id
-            if answer.city
-            else f"postal:{sources[0]['source']}:{sources[0]['source_id']}"
+            if answer.city and case["request"]["kind"] == "postal"
+            else (
+                f"{case['request']['kind']}:"
+                f"{sources[0]['source']}:{sources[0]['source_id']}"
+            )
         )
         previous = candidates[identity]
         for field in ("country", "state", "city"):
@@ -74,6 +90,8 @@ def check(family: str = "postal") -> dict[str, int]:
     counts: Counter[str] = Counter()
     with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
         for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:
-            if case["request"]["kind"] == family:
+            if case["request"]["kind"] == (
+                "airport" if family == "airports" else family
+            ):
                 counts[assert_case(geo, case)] += 1
     return dict(counts)

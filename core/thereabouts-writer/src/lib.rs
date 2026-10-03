@@ -3,6 +3,7 @@
     test,
     allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
 )]
+mod airports;
 mod arrow;
 mod catalogue;
 mod emission;
@@ -66,7 +67,7 @@ pub fn write_pack(
     output: &Path,
     options: &Options,
 ) -> Result<Manifest> {
-    if !matches!(family, "core" | "postal") {
+    if !matches!(family, "core" | "postal" | "airports") {
         return Err(Error::Input("Unsupported export family".into()));
     }
     ensure(
@@ -79,7 +80,7 @@ pub fn write_pack(
     } else {
         data.require_tables(
             &[
-                "postal_codes",
+                primary_table(family),
                 "places",
                 "canonical_cities",
                 "place_to_city",
@@ -154,19 +155,12 @@ fn build(
     let db = Connection::open(db_file.path())?;
     catalogue::initialize(&db)?;
     db.execute_batch("BEGIN")?;
-    catalogue::load(
-        &db,
-        data,
-        if family == "core" {
-            "cells"
-        } else {
-            "postal_codes"
-        },
-    )?;
-    if family == "core" {
-        timezones::load(&db, data)?;
-    } else {
-        postal::load(data, &db)?;
+    catalogue::load(&db, data, primary_table(family))?;
+    match family {
+        "core" => timezones::load(&db, data)?,
+        "postal" => postal::load(data, &db)?,
+        "airports" => airports::load(data, &db)?,
+        _ => return Err(Error::Input("Unsupported export family".into())),
     }
     db.execute_batch("COMMIT")?;
     let mut metadata = metadata(data)?;
@@ -184,11 +178,7 @@ fn build(
         sources: options.sources.clone(),
         attribution: options.attribution.clone(),
         files: vec![],
-        normalization: if family == "postal" {
-            postal::NORMALIZATION.iter().map(|s| (*s).into()).collect()
-        } else {
-            vec![]
-        },
+        normalization: normalization(family).iter().map(|s| (*s).into()).collect(),
         distant_over_m: if family == "core" {
             source::policy_distance(policy, "distant_m")?
         } else {
@@ -300,4 +290,19 @@ fn flags(row: arrow::Row<'_>) -> Result<u32> {
             | if state.is_none() { 0 } else { 16 }
             | if land == Some("offshore") { 32 } else { 0 },
     )
+}
+
+fn primary_table(family: &str) -> &str {
+    match family {
+        "core" => "cells",
+        "postal" => "postal_codes",
+        other => other,
+    }
+}
+fn normalization(family: &str) -> &[&str] {
+    match family {
+        "postal" => &postal::NORMALIZATION,
+        "airports" => &airports::NORMALIZATION,
+        _ => &[],
+    }
 }

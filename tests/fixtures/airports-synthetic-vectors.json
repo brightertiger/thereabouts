@@ -1,0 +1,477 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/airports-synthetic",
+  "cases": [
+    {
+      "id": "legacy-32",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "zzz"
+        ],
+        "scheme": "iata",
+        "country": null
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "airport",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": {
+              "code": null,
+              "name": "München 東京 state:synthetic:A"
+            },
+            "city": {
+              "id": "city:synthetic:A",
+              "name": "München 東京",
+              "name_en": null,
+              "kind": "city",
+              "population": null,
+              "point": {
+                "lat": 12.97,
+                "lon": 77.59
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 12.576453,
+              "lon": 77.155595
+            },
+            "cell": "8860140001fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "airport",
+            "match": "exact",
+            "country": null,
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "legacy-33",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ZZZ"
+        ],
+        "scheme": "iata",
+        "country": "AA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-34",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ZZZ"
+        ],
+        "scheme": "iata",
+        "country": "BB"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-35",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "AA01"
+        ],
+        "scheme": "ident",
+        "country": null
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-36",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "AAAA"
+        ],
+        "scheme": "icao",
+        "country": null
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-37",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "GPS1"
+        ],
+        "scheme": "gps",
+        "country": null
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-38",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "L1"
+        ],
+        "scheme": "local",
+        "country": "AA"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453,
+          "lon": 77.155595
+        },
+        "cell": "8860140001fffff",
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-39",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "L1"
+        ],
+        "scheme": "local",
+        "country": "BB"
+      },
+      "result": {
+        "status": "matched",
+        "kind": "airport",
+        "match": "exact",
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-40",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "missing"
+        ],
+        "scheme": "iata",
+        "country": null
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-52",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "ZZZ"
+        ]
+      },
+      "result": {
+        "status": "ambiguous",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [
+          {
+            "status": "matched",
+            "kind": "airport",
+            "match": "exact",
+            "country": {
+              "code": "AA",
+              "code3": "AAA",
+              "name": "München 東京 country:AA"
+            },
+            "state": {
+              "code": null,
+              "name": "München 東京 state:synthetic:A"
+            },
+            "city": {
+              "id": "city:synthetic:A",
+              "name": "München 東京",
+              "name_en": null,
+              "kind": "city",
+              "population": null,
+              "point": {
+                "lat": 12.97,
+                "lon": 77.59
+              }
+            },
+            "timezone": null,
+            "point": {
+              "lat": 12.576453,
+              "lon": 77.155595
+            },
+            "cell": "8860140001fffff",
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          },
+          {
+            "status": "matched",
+            "kind": "airport",
+            "match": "exact",
+            "country": null,
+            "state": null,
+            "city": null,
+            "timezone": null,
+            "point": null,
+            "cell": null,
+            "distance_band": null,
+            "candidates": [],
+            "rank_basis": null
+          }
+        ],
+        "rank_basis": "population"
+      }
+    },
+    {
+      "id": "legacy-53",
+      "request": {
+        "kind": "airport",
+        "values": [
+          "L1"
+        ],
+        "scheme": "local"
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "airport",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_band": null,
+        "candidates": [],
+        "rank_basis": null,
+        "hint": "Use airport(code, scheme=\"iata|icao|gps|local|ident\"); local codes require country=\"XX\"."
+      }
+    }
+  ]
+}

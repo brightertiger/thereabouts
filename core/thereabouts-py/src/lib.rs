@@ -130,6 +130,34 @@ impl Geocoder {
         let pack = self.pack(py)?;
         columns::forward(py, codes, |code| pack.postal(code, country, false))
     }
+    #[pyo3(signature=(code, *, scheme=None, country=None, evidence=false))]
+    fn airport(
+        &self,
+        py: Python<'_>,
+        code: &str,
+        scheme: Option<&str>,
+        country: Option<&str>,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
+        result::encode(
+            py,
+            &self
+                .pack(py)?
+                .airport(code, scheme, country, evidence)
+                .map_err(|e| error(py, &e))?,
+        )
+    }
+    #[pyo3(signature=(codes, *, scheme=None, country=None))]
+    fn airport_columns<'py>(
+        &self,
+        py: Python<'py>,
+        codes: Vec<String>,
+        scheme: Option<&str>,
+        country: Option<&str>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        let pack = self.pack(py)?;
+        columns::forward(py, codes, |code| pack.airport(code, scheme, country, false))
+    }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
         *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
         Ok(())

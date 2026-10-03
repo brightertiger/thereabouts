@@ -17,6 +17,17 @@ class Geocoder:
     def postal_columns(
         self, codes: list[str], *, country: str | None = None
     ) -> dict[str, NDArray[Any]]: ...
+    def airport(
+        self,
+        code: str,
+        *,
+        scheme: str | None = None,
+        country: str | None = None,
+        evidence: bool = False,
+    ) -> dict[str, Any]: ...
+    def airport_columns(
+        self, codes: list[str], *, scheme: str | None = None, country: str | None = None
+    ) -> dict[str, NDArray[Any]]: ...
     def close(self) -> None: ...
 
 def open(path: str, *, verify: bool = False) -> Geocoder: ...

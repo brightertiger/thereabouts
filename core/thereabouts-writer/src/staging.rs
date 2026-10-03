@@ -27,6 +27,7 @@ pub(crate) fn sqlite_preflight(data: &Dataset, directory: &Path) -> Result<()> {
     let mut bytes = 0_u64;
     for kind in [
         "postal_codes",
+        "airports",
         "cells",
         "places",
         "canonical_cities",

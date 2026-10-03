@@ -29,17 +29,24 @@ def write(path: Path, pack: str, cases: list[dict[str, Any]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("family", choices=["postal"])
+    parser.add_argument("family", choices=["postal", "airports"])
     family = parser.parse_args().family
     source = json.loads((FIXTURES / f"{family}-source.json").read_text())
+    verb = "airport" if family == "airports" else family
     requests = []
     codes: dict[str, set[str]] = {}
     for row in source["rows"]:
-        country, code = row["country_code"], row["postal_code"]
+        country, code = (
+            row["country_code"],
+            row["postal_code"] if family == "postal" else row["ident"],
+        )
         chosen = codes.setdefault(country, set())
         if code not in chosen and len(chosen) < 3:
             chosen.add(code)
-            requests.append({"kind": family, "values": [code], "country": country})
+            requests.append(
+                {"kind": verb, "values": [code], "country": country}
+                | ({"scheme": "ident"} if family == "airports" else {})
+            )
     first = requests[0]
     requests += [
         first
@@ -54,6 +61,23 @@ def main() -> None:
         {"kind": family, "values": ["not-a-code"], "country": "FR"},
         {"kind": family, "values": ["1000"], "country": "BEL"},
     ]
+    if family == "airports":
+        requests = requests[:22] + [
+            {"kind": verb, "values": [code], **kwargs}
+            for code, kwargs in [
+                ("CDG", {}),
+                ("LFPG", {}),
+                ("CDG", {"scheme": "iata"}),
+                ("", {}),
+                ("x\0y", {}),
+                ("CDG", {"scheme": "wrong"}),
+                ("L1", {"scheme": "local"}),
+                ("CDG", {"country": "ZZ"}),
+                ("NOT-AN-AIRPORT", {}),
+                ("CDG", {"country": "FRA"}),
+                ("CDG", {"country": "fr", "scheme": "IATA"}),
+            ]
+        ]
     with Geocoder(FIXTURES / f"packs/{family}-sample") as geo:
         cases = [
             {
@@ -68,7 +92,7 @@ def main() -> None:
     with Geocoder(FIXTURES / f"packs/{family}-synthetic") as geo:
         cases = []
         for case in json.loads((FIXTURES / "conformance.json").read_text())["cases"]:
-            if case["request"]["kind"] != family:
+            if case["request"]["kind"] != verb:
                 continue
             assert_case(geo, case)
             cases.append(

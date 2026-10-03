@@ -265,4 +265,23 @@ crude ratio strongly upward-biased; it is not a measured world pack size.
 | Family | Sample bytes / rows | Real vectors | Scalar median / p99 (µs) | Batch rows/s | Estimated world bytes |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | postal | 363,327 / 897 | 28 | 7.459 / 10.375 | 474,755 | 2,039,842,937 |
+| airports | 375,778 / 213 | 33 | 7.417 / 9.334 | 469,223 | 151,994,262 |
 <!-- forward-measurements:end -->
+
+## Airports
+
+The airports pack and airport/airport_columns methods are implemented. Default
+lookup combines IATA and ICAO; scheme selects IATA, ICAO, GPS, local or ident.
+Local codes need a country. All schemes are checked against an independent
+committed source extract; 33 real vectors and 11 synthetic vectors also run in
+Rust and Python. Of the original 11 airport cases, seven remain matched, one
+not_found, one invalid_input (old context error), and two are ambiguous. The
+second ambiguous case is the one intended change: legacy case 52 now uses the
+default IATA/ICAO search and is asserted against case 32's original candidates.
+The seven matched cases retain source identity and geographic IDs; the same
+explicit canonical display-name allowance as reverse applies. Together with
+postal, all 19 legacy forward cases have direct assertions, not just snapshots.
+
+The sample selects the first 32 airport identifiers per country where available,
+plus CDG, AMS, BRU, LUX, IST, BOM, DEL and SPI. It includes BE, NL, LU, FR, TR, IN
+and US. The writer retains all five published schemes and explicit nulls.

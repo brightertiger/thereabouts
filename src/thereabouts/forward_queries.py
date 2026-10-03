@@ -39,3 +39,37 @@ class ForwardQueries:
         return self._handles.get("postal").postal_columns(
             [code if isinstance(code, str) else "" for code in codes], country=country
         )
+
+    def airport(
+        self,
+        code: str,
+        *,
+        scheme: str | None = None,
+        country: str | None = None,
+        evidence: bool = False,
+    ) -> Result:
+        """Find an airport by IATA/ICAO, or an explicitly selected code scheme."""
+        self._ensure_open()
+        return Result.from_dict(
+            self._handles.get("airports").airport(
+                code if isinstance(code, str) else "",
+                scheme=scheme,
+                country=country,
+                evidence=evidence,
+            )
+        )
+
+    def airport_columns(
+        self,
+        codes: Iterable[str],
+        *,
+        scheme: str | None = None,
+        country: str | None = None,
+    ) -> dict[str, NDArray[Any]]:
+        """Return airport columns and ambiguous candidate columns."""
+        self._ensure_open()
+        return self._handles.get("airports").airport_columns(
+            [code if isinstance(code, str) else "" for code in codes],
+            scheme=scheme,
+            country=country,
+        )

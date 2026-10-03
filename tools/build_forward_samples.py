@@ -42,17 +42,42 @@ def postal(source: Subset) -> list[dict[str, Any]]:
     return rows
 
 
+def airports(source: Subset) -> list[dict[str, Any]]:
+    chosen: dict[str, set[str]] = {c: set() for c in COUNTRIES}
+    rows: list[dict[str, Any]] = []
+    preferred = {"CDG", "AMS", "BRU", "LUX", "IST", "BOM", "DEL", "SPI"}
+    for table in source.inventory("airports"):
+        for batch in source.batches(table):
+            for row in batch.to_pylist():
+                country = row["country_code"]
+                if country not in COUNTRIES:
+                    continue
+                code = row["ident"]
+                if len(chosen[country]) < 32 or row["iata_code"] in preferred:
+                    chosen[country].add(code)
+                if code in chosen[country]:
+                    rows.append(row)
+            schema = batch.schema
+        source.write("airports", rows, schema)
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--golden", type=Path, required=True)
-    parser.add_argument("--family", choices=["postal"], required=True)
+    parser.add_argument("--family", choices=["postal", "airports"], required=True)
     args = parser.parse_args()
     output = ROOT / f"tests/fixtures/packs/{args.family}-sample"
     with tempfile.TemporaryDirectory(dir=ROOT / ".tmp", prefix="forward-") as directory:
         source = Subset(args.golden, Path(directory))
-        rows = postal(source)
+        rows = postal(source) if args.family == "postal" else airports(source)
         source.context(rows)
-        total = sum(t["rows"] for t in source.inventory("postal_codes"))
+        total = sum(
+            t["rows"]
+            for t in source.inventory(
+                "postal_codes" if args.family == "postal" else "airports"
+            )
+        )
         provenance = source.finish(args.family, total)
         _core.write_pack(
             str(source.output),
@@ -79,6 +104,12 @@ def main() -> None:
                     for k in (
                         "country_code",
                         "postal_code",
+                        "ident",
+                        "iata_code",
+                        "icao_code",
+                        "gps_code",
+                        "local_code",
+                        "name",
                         "place_name",
                         "latitude",
                         "longitude",

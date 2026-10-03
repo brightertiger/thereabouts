@@ -29,16 +29,22 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         raise ValueError("Benchmark needs matching US vectors")
     values = [queries[i % len(queries)] for i in range(iterations)]
     durations, rates = [], []
+    verb = "airport" if family == "airports" else family
+    kwargs: dict[str, Any] = {"country": country}
+    if family == "airports":
+        kwargs["scheme"] = "ident"
     with Geocoder(pack) as geo:
+        scalar = getattr(geo, verb)
+        batch = getattr(geo, verb + "_columns")
         for value in queries:
-            geo.postal(value, country=country)
+            scalar(value, **kwargs)
         for value in values:
             start = time.perf_counter_ns()
-            geo.postal(value, country=country)
+            scalar(value, **kwargs)
             durations.append(time.perf_counter_ns() - start)
         for _ in range(7):
             start_batch = time.perf_counter()
-            result = geo.postal_columns(values, country=country)
+            result = batch(values, **kwargs)
             elapsed = time.perf_counter() - start_batch
             assert len(result["status"]) == iterations
             rates.append(iterations / elapsed)
@@ -106,7 +112,7 @@ def update_status(data: dict[str, Any]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("family", choices=["postal"])
+    parser.add_argument("family", choices=["postal", "airports"])
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument(
         "--output", type=Path, default=ROOT / "docs/CLIENT_FORWARD_MEASUREMENTS.json"

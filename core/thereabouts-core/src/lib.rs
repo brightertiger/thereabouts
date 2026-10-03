@@ -9,5 +9,6 @@ pub mod result;
 pub mod reverse;
 pub use error::{Error, Result};
 
+pub mod airports;
 pub mod forward;
 pub mod postal;
