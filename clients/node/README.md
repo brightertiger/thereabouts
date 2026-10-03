@@ -124,3 +124,8 @@ node benchmarks/node_read_path.mjs from the repository root; recorded
 numbers and qualification are in docs/CLIENT_STATUS.md and
 docs/CLIENT_NODE_MEASUREMENTS.json. npm type checks cover declarations and
 consumer examples; runtime JS behavior is covered by node --test.
+
+H3-derived cell-centre coordinates can differ from native results by a few
+floating-point ULPs. Compare these values within 1e-10 degrees; serialized
+number text is not a byte-identity contract. Other result fields and candidate
+ordering share exact conformance.

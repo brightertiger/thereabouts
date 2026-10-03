@@ -1079,3 +1079,11 @@ and its archive verify. Archives are deterministic POSIX ustar, with inventoried
 artifacts and manifest.json at the archive root; transport and activation are
 specified in [CLI.md](CLI.md). Dataset Parquet, pack payloads and transport archives
 have separate inventories and digests; one does not substitute for another.
+
+### Derived-coordinate portability
+
+The point for a reverse/H3 result is computed from its cell centre. Native and
+WASM transcendental math may differ in the final floating-point digits; public
+conformance uses an absolute tolerance of 1e-10 degrees for these derived
+coordinates. This is semantic result equality, not byte-identical serialized
+numbers. Stored coordinates retain their specified on-disk precision.

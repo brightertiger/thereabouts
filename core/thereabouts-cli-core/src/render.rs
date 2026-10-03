@@ -101,6 +101,7 @@ pub struct Renderer {
     columns: Option<Vec<String>>,
     rows: usize,
     batch: bool,
+    layout: Option<crate::table::Layout>,
 }
 impl Renderer {
     /// Start an output stream in the chosen encoding.
@@ -111,6 +112,7 @@ impl Renderer {
             columns: None,
             rows: 0,
             batch,
+            layout: None,
         }
     }
     /// Emit one detached public result or pass-through row.
@@ -158,11 +160,21 @@ impl Renderer {
                 "Evidence requires --json --evidence, not a table".into(),
             ));
         }
+        if self.format == Format::Table && self.layout.is_none() {
+            self.layout = Some(crate::table::Layout::new(
+                columns,
+                value,
+                io.terminal_columns(),
+            )?);
+        }
         if self.rows == 0 {
             io.stdout(&if self.format == Format::Csv {
                 csv_line(columns)?
             } else {
-                crate::table::header(columns)
+                self.layout
+                    .as_ref()
+                    .ok_or_else(|| Error::Integrity("Missing table layout".into()))?
+                    .header(columns)
             })?;
         }
         if self.format == Format::Csv {
@@ -179,7 +191,11 @@ impl Renderer {
                     .collect::<Vec<_>>(),
             )?)?;
         } else {
-            io.stdout(&crate::table::row(columns, value, false))?;
+            let layout = self
+                .layout
+                .as_ref()
+                .ok_or_else(|| Error::Integrity("Missing table layout".into()))?;
+            io.stdout(&layout.row(columns, value, false))?;
             if let Some(candidates) = value
                 .get("candidates")
                 .or_else(|| value.get("thereabouts_candidates"))
@@ -198,7 +214,7 @@ impl Renderer {
                     } else {
                         candidate.clone()
                     };
-                    io.stdout(&crate::table::row(columns, &candidate, true))?;
+                    io.stdout(&layout.row(columns, &candidate, true))?;
                 }
             }
         }

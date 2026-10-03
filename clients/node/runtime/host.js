@@ -145,3 +145,10 @@ export function withIo(io, fn) {
 export function handleCount() {
   return handles.size;
 }
+
+export function terminalColumns() {
+  const columns = Number(output.env?.COLUMNS);
+  if (Number.isInteger(columns) && columns > 0 && columns <= 10_000)
+    return columns;
+  return output.columns > 0 ? output.columns : 80;
+}

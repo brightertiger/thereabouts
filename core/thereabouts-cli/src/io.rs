@@ -28,6 +28,16 @@ impl Io for SystemIo {
     fn stdin_tty(&self) -> bool {
         io::stdin().is_terminal()
     }
+    fn terminal_columns(&self) -> usize {
+        self.env("COLUMNS")
+            .and_then(|v| v.parse().ok())
+            .filter(|n| (1..=10_000).contains(n))
+            .or_else(|| {
+                terminal_size::terminal_size_of(io::stdout()).map(|(width, _)| usize::from(width.0))
+            })
+            .filter(|n| *n > 0)
+            .unwrap_or(80)
+    }
     fn stdout_tty(&self) -> bool {
         io::stdout().is_terminal()
     }

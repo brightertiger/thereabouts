@@ -420,7 +420,7 @@ macOS, Linux and Windows rules are compared with platformdirs in tests.
 The Rust thereabouts-cli-core crate owns batch detection/parsing, result-field
 selection, table/JSON/NDJSON/CSV rendering and the exit-code policy. It builds
 for wasm32-unknown-unknown and has no clap, HTTP or filesystem dependency.
-Hosts supply input/output streams and seekable temporary storage; table width
+Hosts supply input/output streams, terminal columns and seekable temporary storage; table width
 is measured in terminal cells (including wide Unicode text). The native crate
 owns clap, files, temporary-file lifetimes, process environment and downloads.
 The Node binding uses this same portable policy through WASM.
@@ -464,3 +464,21 @@ Interrupted transfers (including connection resets, short EOF and per-read
 stalls) retain partial archives and exit 2 with “Download interrupted; run the
 same data install again to resume”. A retry validates the exact Range response
 before appending. Checksum and protocol identity failures still exit 4.
+
+## Terminal width and numeric equality
+
+Tables use COLUMNS when it is a positive integer (at most 10,000), otherwise
+the stdout terminal's width (ioctl on native hosts), otherwise 80 columns.
+Column widths reflect the first query row and its candidates, capped at 28.
+The widest columns shrink first until the table fits; headers remain readable.
+Batch table result headers omit the thereabouts_ prefix; JSON/NDJSON/CSV keep
+it. Separators compact to two spaces when needed. Very wide input schemas
+that cannot retain readable headers require --fields or --json. A stream keeps
+one header and fixed column widths; later wide values use …, including Unicode.
+
+Results are semantically equal across native and WASM hosts. H3-derived cell
+centres can differ in the last floating-point digits because target math
+implementations differ. Compare these latitude/longitude values with absolute
+tolerance 1e-10 degrees, not byte-identical JSON or CSV text. Stored coordinate
+values, IDs, statuses, ordering and other fields retain exact conformance.
+No extra output rounding is applied.

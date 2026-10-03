@@ -96,3 +96,24 @@ fn csv_headers_preserve_source_order_then_public_or_selected_result_order() {
         "id,Lat,Lon,thereabouts_status,thereabouts_city.name"
     );
 }
+
+#[test]
+fn table_uses_columns_environment_for_scalar_and_batch() {
+    let temp = tempfile::tempdir().unwrap();
+    install(temp.path(), &["core"]);
+    let mut host = Host::new(temp.path());
+    host.tty = true;
+    host.env.insert("COLUMNS".into(), "80".into());
+    assert_eq!(
+        host.run(&["reverse", "--lat", "48.8566", "--lon", "2.3522"]),
+        0
+    );
+    assert!(host.out.lines().all(|s| s.chars().count() <= 80));
+    host.input = Cursor::new(
+        b"id,lat,lon,note\n1,48.8566,2.3522,A long input note that needs truncation\n".to_vec(),
+    );
+    assert_eq!(host.run(&["reverse", "-"]), 0, "{}", host.err);
+    assert!(host.out.lines().all(|s| s.chars().count() <= 80));
+    assert!(!host.out.contains("thereabou"));
+    assert!(host.out.lines().next().unwrap().contains("timezone"));
+}

@@ -17,6 +17,13 @@ pub trait Io {
     fn stdin_tty(&self) -> bool;
     /// Whether default output should be a human table.
     fn stdout_tty(&self) -> bool;
+    /// Terminal width supplied by the host; tests can set COLUMNS without a real TTY.
+    fn terminal_columns(&self) -> usize {
+        self.env("COLUMNS")
+            .and_then(|v| v.parse().ok())
+            .filter(|n| (1..=10_000).contains(n))
+            .unwrap_or(80)
+    }
     /// Create seekable temporary storage; the host removes it when dropped.
     fn temporary(&mut self) -> io::Result<Box<dyn Temporary>>;
     /// Optional host-owned MCP server; the native library has no Python SDK dependency.

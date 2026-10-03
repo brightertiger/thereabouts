@@ -25,6 +25,7 @@ export function systemIo() {
     env: process.env,
     stdinTTY: !!process.stdin.isTTY,
     stdoutTTY: !!process.stdout.isTTY,
+    columns: process.stdout.columns,
   };
 }
 export async function run(argv, io = systemIo()) {

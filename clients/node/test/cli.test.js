@@ -189,3 +189,32 @@ test("broken output pipes exit zero across the WASM error boundary", async (t) =
   );
   assert.equal(h.err(), "");
 });
+
+test("tables respect terminal columns and keep batch result headers readable", async (t) => {
+  const root = temporary(t);
+  fixtureStore(root, selection("packs/core-sample"));
+  for (const columns of [80, 120]) {
+    const h = host(
+      "id,lat,lon,note\n1,48.8566,2.3522,A very long note that needs truncation\n",
+      true,
+    );
+    h.io.env.COLUMNS = String(columns);
+    assert.equal(
+      await run(["--data-dir", root, "reverse", "-"], h.io),
+      0,
+      h.err(),
+    );
+    assert.ok(
+      h
+        .out()
+        .trimEnd()
+        .split("\n")
+        .every((s) => [...s].length <= columns),
+    );
+    assert.match(
+      h.out().split("\n")[0],
+      /status.*country.*state.*city.*timezone.*point.*match/,
+    );
+    assert.ok(!h.out().includes("thereabou"));
+  }
+});

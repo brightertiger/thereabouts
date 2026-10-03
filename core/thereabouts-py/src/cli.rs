@@ -26,6 +26,9 @@ impl Io for Host {
     fn stdin_tty(&self) -> bool {
         self.0.stdin_tty()
     }
+    fn terminal_columns(&self) -> usize {
+        self.0.terminal_columns()
+    }
     fn stdout_tty(&self) -> bool {
         self.0.stdout_tty()
     }

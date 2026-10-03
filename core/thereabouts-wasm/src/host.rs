@@ -22,6 +22,8 @@ extern "C" {
     fn write_at(id: u32, offset: f64, bytes: &[u8]) -> Result<(), JsValue>;
     #[wasm_bindgen(catch, js_name = readLine)]
     fn read_line() -> Result<String, JsValue>;
+    #[wasm_bindgen(js_name = terminalColumns)]
+    fn terminal_columns() -> u32;
     #[wasm_bindgen(catch, js_name = stdout)]
     fn stdout(value: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(catch, js_name = stderr)]
@@ -167,6 +169,9 @@ impl thereabouts_cli_core::io::Io for Host {
     }
     fn stdin_tty(&self) -> bool {
         false
+    }
+    fn terminal_columns(&self) -> usize {
+        terminal_columns() as usize
     }
     fn stdout_tty(&self) -> bool {
         false
