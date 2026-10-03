@@ -30,7 +30,7 @@ impl Pack {
             return Ok(result);
         };
         self.forward_result(
-            self.interval_observations(address)?,
+            self.interval_observations(address, evidence)?,
             Kind::IpRange,
             evidence,
         )

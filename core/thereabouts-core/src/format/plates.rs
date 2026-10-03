@@ -22,8 +22,6 @@ pub struct Rule {
     pub fixed_national_marks: Vec<String>,
     /// Exported information heuristic; never recalculated by the reader.
     pub specificity_bits: f64,
-    /// Published provenance, including source identifiers or URLs.
-    pub provenance: serde_json::Value,
 }
 /// One code-to-registration-unit assertion; never treated as a canonical city.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -46,10 +44,10 @@ pub struct Code {
     pub subdivision_scope: Option<String>,
     /// Explicit ISO subdivision identifiers; no name-based joins.
     pub subdivision_codes: Vec<String>,
-    /// Source URL, retained in evidence.
-    pub source_url: String,
-    /// Per-assertion license.
-    pub license: String,
+    /// Pooled URL identity supports deduplication without fetching evidence.
+    pub source_key: u64,
+    /// Row ordinal in the separate code evidence table.
+    pub evidence_row: usize,
 }
 /// Published vehicle stock counts; missing countries use their median under the policy.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -95,7 +93,7 @@ pub struct Policy {
     /// Unicode database version used by the code equality mapping.
     pub decimal_unicode_version: String,
 }
-/// Plate evidence in a kind-seven JSON section; admission is bounded by the writer.
+/// Decoded query fields; provenance is retained separately and fetched on demand.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Tables {
     /// Matching and geography policy.
@@ -108,4 +106,15 @@ pub struct Tables {
     pub priors: Vec<Prior>,
     /// Explicitly records whether vehicle-prior evidence was supplied.
     pub prior_available: bool,
+}
+
+/// Small policy metadata for the compressed plate tables.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Schema {
+    /// Source matching and ranking policy.
+    pub policy: Policy,
+    /// Whether the input supplied the vehicle counts.
+    pub prior_available: bool,
+    /// Source format and code rows, excluding policy and priors.
+    pub source_rows: u64,
 }

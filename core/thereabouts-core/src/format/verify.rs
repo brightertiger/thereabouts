@@ -15,6 +15,8 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     manifest::verify(root, &manifest)?;
     ensure(
         manifest.family == "core"
+            || manifest.forward_columns.is_some()
+            || manifest.plate_columns.is_some()
             || manifest.files.iter().any(|f| {
                 f.kind
                     == match manifest.family.as_str() {
@@ -46,7 +48,9 @@ pub fn verify(root: &Path) -> Result<Manifest> {
                     "Catalogue exceeds u32 references",
                 )?;
             }
-            "cells" | "exact" | "trie" | "intervals" | "plates" | "names" | "notice" => {}
+            "cells" | "exact" | "trie" | "intervals" | "plates" | "names" | "notice" | "keys" => {}
+            role if super::compact::ROLES.contains(&role)
+                || super::plate_columns::ROLES.contains(&role) => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
     }
@@ -81,13 +85,6 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             "exact" => super::exact::Exact::open(&path)?.verify(total)?,
             "trie" => super::trie::Trie::open(&path)?.verify(total)?,
             "names" => super::names::Names::open(&path)?.verify(total)?,
-            "plates" => {
-                let c = Container::decode(fs::read(path)?, 7, &[1])?;
-                crate::plates_index::PlateIndex::new(
-                    serde_json::from_slice(c.section(0))?,
-                    metadata.countries.len(),
-                )?;
-            }
             "intervals" => {
                 let shard = super::intervals::Intervals::open(&path)?;
                 shard.verify(total)?;
@@ -98,6 +95,15 @@ pub fn verify(root: &Path) -> Result<Manifest> {
             }
             _ => {}
         }
+    }
+    if manifest.forward_columns.is_some() {
+        super::compact::Compact::open(root, &manifest)?.verify(total)?;
+    }
+    if manifest.plate_columns.is_some() {
+        let evidence = super::plate_columns::PlateColumns::open(root, &manifest)?;
+        let tables = evidence.decode(&manifest)?;
+        evidence.verify(&tables)?;
+        crate::plates_index::PlateIndex::new(tables, evidence, metadata.countries.len())?;
     }
     Ok(manifest)
 }

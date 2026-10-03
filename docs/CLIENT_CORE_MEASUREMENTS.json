@@ -220,5 +220,226 @@
         319447.2713579062
       ]
     }
+  },
+  "forward_format": {
+    "postal": {
+      "source_rows": 897,
+      "compressed_query_bytes": 9160,
+      "compressed_evidence_bytes": 14113,
+      "query_bytes_per_row": 10.211817168338907,
+      "all_compressed_bytes_per_row": 25.9453734671126,
+      "compressed_bytes_by_role": {
+        "records": 1146,
+        "evidence": 3002,
+        "strings": 9,
+        "evidence_strings": 10466,
+        "geographies": 789,
+        "locations": 7216,
+        "details": 645
+      },
+      "artifact_bytes_by_role": {
+        "records": 1290,
+        "evidence": 3146,
+        "keys": 1217,
+        "strings": 153,
+        "evidence_strings": 10610,
+        "geographies": 933,
+        "locations": 7360,
+        "details": 789,
+        "catalogue": 66320,
+        "metadata": 1699,
+        "notice": 2692
+      },
+      "pack_bytes": 104960,
+      "before": {
+        "data_shard_bytes": 116604,
+        "data_bytes_per_row": 129.9933110367893,
+        "pack_bytes": 363327,
+        "manifest_sha256": "7b25e8d35f955398f259bee23c8d4824d4b1040b2870180c73cff09732352d2c"
+      }
+    },
+    "airports": {
+      "source_rows": 213,
+      "compressed_query_bytes": 3284,
+      "compressed_evidence_bytes": 8247,
+      "query_bytes_per_row": 15.417840375586854,
+      "all_compressed_bytes_per_row": 54.136150234741784,
+      "compressed_bytes_by_role": {
+        "records": 233,
+        "evidence": 717,
+        "postings": 471,
+        "strings": 9,
+        "evidence_strings": 6929,
+        "geographies": 497,
+        "locations": 2074,
+        "details": 601
+      },
+      "artifact_bytes_by_role": {
+        "records": 377,
+        "evidence": 861,
+        "postings": 615,
+        "keys": 2238,
+        "strings": 153,
+        "evidence_strings": 7073,
+        "geographies": 641,
+        "locations": 2218,
+        "details": 745,
+        "catalogue": 40838,
+        "metadata": 5415,
+        "notice": 2692
+      },
+      "pack_bytes": 72658,
+      "before": {
+        "data_shard_bytes": 85908,
+        "data_bytes_per_row": 403.32394366197184,
+        "pack_bytes": 375778,
+        "manifest_sha256": "444a6cfba65b294ba0ac5d79c0522e86a676c9988747416a74eb7aec8446c4df"
+      }
+    },
+    "locode": {
+      "source_rows": 225,
+      "compressed_query_bytes": 2977,
+      "compressed_evidence_bytes": 11757,
+      "query_bytes_per_row": 13.231111111111112,
+      "all_compressed_bytes_per_row": 65.48444444444445,
+      "compressed_bytes_by_role": {
+        "records": 245,
+        "evidence": 753,
+        "strings": 9,
+        "evidence_strings": 9393,
+        "geographies": 549,
+        "locations": 2174,
+        "details": 1611
+      },
+      "artifact_bytes_by_role": {
+        "records": 389,
+        "evidence": 897,
+        "keys": 1249,
+        "strings": 153,
+        "evidence_strings": 9537,
+        "geographies": 693,
+        "locations": 2318,
+        "details": 1755,
+        "catalogue": 42683,
+        "metadata": 5329,
+        "notice": 2692
+      },
+      "pack_bytes": 76762,
+      "before": {
+        "data_shard_bytes": 57844,
+        "data_bytes_per_row": 257.08444444444444,
+        "pack_bytes": 349522,
+        "manifest_sha256": "0f49404df6a916bf267f0770fbd516793705322bcf1a8b58a849e1a044336726"
+      }
+    },
+    "phone": {
+      "source_rows": 389,
+      "compressed_query_bytes": 806,
+      "compressed_evidence_bytes": 6609,
+      "query_bytes_per_row": 2.0719794344473006,
+      "all_compressed_bytes_per_row": 19.061696658097688,
+      "compressed_bytes_by_role": {
+        "records": 410,
+        "evidence": 953,
+        "strings": 9,
+        "evidence_strings": 4897,
+        "geographies": 28,
+        "locations": 359,
+        "details": 759
+      },
+      "artifact_bytes_by_role": {
+        "records": 554,
+        "evidence": 1097,
+        "keys": 728,
+        "strings": 153,
+        "evidence_strings": 5041,
+        "geographies": 172,
+        "locations": 503,
+        "details": 903,
+        "catalogue": 1029,
+        "metadata": 513,
+        "notice": 2692
+      },
+      "pack_bytes": 70262,
+      "before": {
+        "data_shard_bytes": 103797,
+        "data_bytes_per_row": 266.8303341902314,
+        "pack_bytes": 187284,
+        "manifest_sha256": "8aac6fe067a1b85e337ec5e9d7d07c3566c5c217a25b7409afe310b7575e238d"
+      }
+    },
+    "ip": {
+      "source_rows": 449,
+      "compressed_query_bytes": 5301,
+      "compressed_evidence_bytes": 5805,
+      "query_bytes_per_row": 11.806236080178174,
+      "all_compressed_bytes_per_row": 24.734966592427618,
+      "compressed_bytes_by_role": {
+        "starts4": 1575,
+        "starts6": 2214,
+        "evidence4": 1161,
+        "evidence6": 1273,
+        "strings": 9,
+        "evidence_strings": 3005,
+        "geographies": 255,
+        "locations": 1248,
+        "details": 366
+      },
+      "artifact_bytes_by_role": {
+        "starts4": 1719,
+        "starts6": 2358,
+        "evidence4": 1305,
+        "evidence6": 1417,
+        "strings": 153,
+        "evidence_strings": 3149,
+        "geographies": 399,
+        "locations": 1392,
+        "details": 510,
+        "catalogue": 18801,
+        "metadata": 2695,
+        "notice": 2692
+      },
+      "pack_bytes": 45356,
+      "before": {
+        "data_shard_bytes": 87412,
+        "data_bytes_per_row": 194.6815144766147,
+        "pack_bytes": 234875,
+        "manifest_sha256": "5e127c0a24398a42d181f256d0a3c1f19fc2e901ac81c3686290b359e95360ef"
+      }
+    },
+    "plates": {
+      "source_rows": 521,
+      "compressed_query_bytes": 13481,
+      "compressed_evidence_bytes": 1968,
+      "query_bytes_per_row": 25.87523992322457,
+      "all_compressed_bytes_per_row": 29.652591170825335,
+      "compressed_bytes_by_role": {
+        "plate_formats": 1626,
+        "plate_format_evidence": 52,
+        "plate_codes": 1154,
+        "plate_code_evidence": 112,
+        "plate_priors": 0,
+        "strings": 10701,
+        "evidence_strings": 1804
+      },
+      "artifact_bytes_by_role": {
+        "plate_formats": 1770,
+        "plate_format_evidence": 196,
+        "plate_codes": 1298,
+        "plate_code_evidence": 256,
+        "plate_priors": 96,
+        "strings": 10845,
+        "evidence_strings": 1948,
+        "metadata": 14355,
+        "notice": 2692
+      },
+      "pack_bytes": 48334,
+      "before": {
+        "data_shard_bytes": 340787,
+        "data_bytes_per_row": 654.101727447217,
+        "pack_bytes": 1139827,
+        "manifest_sha256": "7ed6396f66eff000cbbb08993878a3b1003d10ec50d8f85182e6d22431ceb7c6"
+      }
+    }
   }
 }

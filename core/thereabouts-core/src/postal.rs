@@ -22,7 +22,7 @@ impl Pack {
             return Ok(invalid());
         };
         self.forward_result(
-            self.observations(&format!("{country}\0{code}"))?,
+            self.observations(&format!("{country}\0{code}"), evidence)?,
             Kind::Postal,
             evidence,
         )

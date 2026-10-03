@@ -1,6 +1,6 @@
 # Thereabouts pack format 2
 
-This is the normative specification of `thereabouts-pack-2`, version 2.0.
+This is the normative specification of `thereabouts-pack-2`, version 2.1 (forward) and the unchanged 2.0 core layouts.
 A pack is an immutable directory: `manifest.json`, inventoried binary shards,
 and inventoried UTF-8 notices. All clients share the Rust implementation.
 This document defines `core` (reverse and canonical-city names), `postal`,
@@ -35,15 +35,15 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.2.0` for core with names and `0.1.2` for forward code families. Options contain `data_version`, `sources`, `attribution`, `notices`
+`0.2.0` for core with names and `0.3.0` for forward families. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
 rules in `input_provenance`. No absolute build paths or run timestamps enter
 pack identity. Different dataset versions must not be combined by a store.
 
 An artifact has exactly the required fields `path`, `kind`, `size`, `sha256`.
-Kinds are `cells`, `catalogue`, `metadata`, `notice`, `exact`, `trie`,
-`intervals`, `plates`, and `names`. Unknown kinds require a
+Kinds are `cells`, `catalogue`, `metadata`, `notice`, `names`, `keys`,
+and the compressed table roles defined below. Unknown kinds require a
 new compatible reader. Paths are relative, slash-separated; empty components,
 `.`/`..`, backslashes, colons, absolute paths and symlink components are invalid.
 Paths are unique and cannot be `manifest.json`. Sizes are byte counts, hashes
@@ -61,15 +61,16 @@ resolution-3 block per cell shard and targets 4 MiB catalogue shards.
 ## Binary container
 
 Unsigned integers are little endian, except the explicitly signed catalogue
-coordinates. There is no native padding, compression or host-specific header.
+coordinates. There is no native padding or host-specific header. Kinds 9 and 10 use
+compressed payload blocks as specified below.
 Every shard starts with a 32-byte header:
 
 | Offset | Type | Value |
 | --- | --- | --- |
 | 0 | 8 bytes | `54 48 45 52 45 50 4b 00` (`THEREPK` plus NUL) |
-| 8, 10 | uint16 each | Major 2, minor 0 |
+| 8, 10 | uint16 each | Major 2; minor 1 for kinds 9–11, otherwise 0 |
 | 12 | uint32 | Required features: 0 |
-| 16 | uint32 | Kind: 1 spatial, 2 catalogue, 3 metadata, 4 exact, 5 trie, 6 intervals, 7 plates, 8 names |
+| 16 | uint32 | Kind: 1 spatial, 2 catalogue, 3 metadata, 4–7 retired forward layouts, 8 names, 9 integer table, 10 string pool, 11 key FST |
 | 20 | uint32 | Section count, from the table below |
 | 24 | uint64 | Exact total file length |
 
@@ -86,13 +87,13 @@ are no overlaps, other gaps, or trailing bytes.
 | Spatial | blocks, sparse keys, values, label dictionary | 40, 2, 1, 20 |
 | Catalogue | places, string offsets, UTF-8 text | 80, 8, 1 |
 | Metadata | UTF-8 JSON object | 1 |
-| Exact | key offsets, UTF-8 keys, observations, string offsets, UTF-8 text | 8, 1, 44, 8, 1 |
-| Trie | decimal nodes, observations, string offsets, UTF-8 text | 48, 44, 8, 1 |
-| Intervals | bounds, observations, string offsets, UTF-8 text | 36, 44, 8, 1 |
-| Plates | UTF-8 JSON object | 1 |
 | Names | name FST, row offsets, spelling records, string offsets, UTF-8 text, trigram FST, posting offsets, postings | 1, 8, 20, 8, 1, 1, 8, 4 |
 
-Kind 3 was exact codes in format 1. It means metadata only in format 2;
+| Integer table / string pool | block directory, LZ4 block bytes | 48, 1 |
+| Key FST | FST bytes | 1 |
+
+Kinds 4–7 are obsolete format-2.0 forward artifacts and are not admitted by a
+format-2.1 forward pack. Kind 3 was exact codes in format 1. It means metadata only in format 2;
 checking the version before the kind is mandatory.
 
 ## Spatial shards
@@ -221,8 +222,8 @@ relative to text, plus one terminal offset. The first two offsets are zero;
 a nonzero reference may designate an empty string. Offsets are nondecreasing,
 the terminal equals text length, every span is valid UTF-8. Writers deduplicate
 exact text in first-use order, including the added timezone string.
-`place_id`, `name`, `role`, `settlement_kind`, `country_code`, `evidence` are
-nonempty. Evidence is JSON text containing `golden_table`, decoded `source_ids`
+`place_id`, `name`, `role`, `settlement_kind`, `country_code` are nonempty.
+Core additionally supplies evidence. When present, evidence is JSON text containing `golden_table`, decoded `source_ids`
 and decoded `name_provenance`; it does not contain full raw provenance.
 
 ## Country, subdivision and zone tables
@@ -347,7 +348,139 @@ uint32 and its own validity mask. Invalid slots contain NaN or zero but must
 be interpreted through masks. Buffers are filled while iterating, without
 retaining a batch of result objects.
 
-## Postal family and shared forward observation index
+## Compressed forward tables (format 2.1)
+
+Every forward family requires manifest `format_minor: 1`; older forward
+packs are incompatible and must be rebuilt. Core spatial/name packs retain
+minor zero. Shared catalogue and metadata containers keep their unchanged
+minor-zero layouts; kinds 9, 10 and 11 require container minor one.
+
+Integer-table artifacts (kind 9) and string-pool artifacts (kind 10) contain
+two sections: a directory of 48-byte entries and compressed byte payloads.
+Artifacts for the same role concatenate in manifest order. Row ordinals are
+zero-based and continuous across these artifacts. An empty table is represented
+by one artifact with two empty sections.
+
+Each directory entry contains:
+
+| Offset | Type | Meaning |
+| --- | --- | --- |
+| 0 | u64 | First global row ordinal |
+| 8 | u32 | Row count, 1 through 4,096 |
+| 12 | u32 | Uncompressed byte length, at most 65,536 |
+| 16 | u64 | Byte offset relative to compressed-payload section |
+| 24 | u32 | Compressed byte length, at most 65,536 |
+| 28 | u32 | Reserved zero |
+| 32, 40 | u64 each | Low and high words of the first search key |
+
+Search keys are row ordinals except for IP starts/evidence, where they are
+the first address in the block. Start-table keys are strictly increasing and
+must agree with the first decoded start. Payload spans are consecutive from
+zero and consume the section exactly. Blocks use raw LZ4 block encoding,
+without a frame, checksum or prepended length; lengths come only from the
+checked directory. The writer limits raw blocks to 65,024 bytes to allow LZ4
+expansion and recursively halves oversized integer blocks. It targets 8 MiB
+compressed shards. Neither compressed nor uncompressed blocks may exceed
+64 KiB. Decoded integer vectors can occupy more memory than their packed form.
+
+An uncompressed integer block starts with row count u32 and column count u32.
+Column count is 1 through 64; every family fixes its schema below. Columns
+follow consecutively, each with a 16-byte descriptor and variable payload:
+
+| Offset | Type | Meaning |
+| --- | --- | --- |
+| 0 | u8 | Mode: 0 frame of reference; 1 local dictionary |
+| 1 | u8 | Bits per packed value, 0 through 64 |
+| 2 | u16 | Dictionary entries; zero in mode 0 |
+| 4 | u32 | Reserved zero |
+| 8 | u64 | Base value; zero in mode 1 |
+
+Mode 0 stores minimum plus unsigned deltas, with the minimum in the base.
+Mode 1 stores a strictly increasing dictionary of u64 values immediately after
+the descriptor, then zero-based dictionary selectors. Dictionary cardinality
+is 1 through row count. In either mode, packed values follow in row order:
+value bit b for row r is bit `(r * width + b) % 8` in byte
+`floor((r * width + b) / 8)`. Padding bits are zero. Width zero has no payload.
+There is no per-column alignment. Addition cannot overflow and dictionary
+selectors must exist. The block ends immediately after the final payload.
+Writers choose the minimum width needed, and dictionary mode only when its
+8-byte entries plus packed selectors are strictly smaller than packed deltas.
+Byte widths 8/16/32/64 are the same representation as fixed-width integers.
+
+A string-pool block is `row_count + 1` u32 offsets followed by UTF-8 bytes.
+Offsets begin at zero, are nondecreasing, and the terminal offset equals the
+text length; every span must be valid UTF-8. A pack has one logical pool,
+partitioned as `strings` (query fields) and `evidence_strings` (cold fields).
+Each partition reserves row zero as the empty null slot; positive rows may
+represent an actual empty string. String reference zero is null. Otherwise
+reference `2*r` selects row r in strings, and `2*r+1` selects row r in
+evidence_strings. Dictionary tables use zero-based row ordinals, not these
+tagged string references. Text interning is exact Unicode byte equality.
+
+The non-plate families require `forward_columns` in the manifest, containing
+`source_rows` (original input observations, one per airport) and the ordered
+`detail_fields` listed below. These roles have fixed integer columns:
+
+| Role | Columns in order |
+| --- | --- |
+| records | location ordinal |
+| postings (airports only) | record ordinal |
+| geographies | country, state, city catalogue references |
+| locations | geography ordinal, latitude bits, longitude bits, evidence name string |
+| evidence / evidence4 / evidence6 | source string, source-id prefix string, line-plus-one, code string, scheme string, details ordinal |
+| details | One nullable JSON-scalar string reference per detail_fields entry |
+| starts4 / starts6 (IP only) | address high 64 bits, address low 64 bits, location ordinal |
+
+Geographies, locations and details reserve row zero as an all-zero null tuple.
+Coordinates in locations store the u32 bit pattern of signed i32 microdegrees;
+both must be i32::MIN when absent. Geography references use the shared catalogue.
+Records point to locations; their one-based ordinal supplies stable identity
+without fetching source strings. Source identity remains authoritative during
+writing. Airports have exactly one record per (source, source_id); conflicting
+geographic, coordinate, name or detail fields for that identity are rejected.
+
+The evidence table aligns exactly with records, or with each IP start table.
+A non-null source ID with a canonical decimal u32 suffix after its final colon
+is stored as the prefix including colon and suffix + 1. Line zero means the
+prefix contains the full source ID. A nonzero line reconstructs prefix plus
+decimal(line - 1), without leading zeroes. Source and reconstructed source_id
+must be nonempty. Details reconstruct an object from non-null scalar references;
+a reference to the text `null` represents an explicit JSON null. The object
+is not stored per row. Evidence-only names and source fields are never needed
+to project a normal result.
+
+Every non-IP, non-plate family has exactly one `keys` artifact: kind 11 with
+one byte section containing the FST map encoding specified under “FST encoding”
+below. Its keys are distinct unsigned-byte-sorted UTF-8 compound keys, and values
+are first row ordinals. The next key's value is the exclusive end; the final end
+is the records row count (postings row count for airports). A key owns at least
+one row. First ordinal is zero and subsequent values strictly increase.
+Airport postings map each scheme key to its record ordinals; repeated keys do
+not duplicate airport records. The other families group records in key order,
+then source, source_id and name byte order. Phone queries try prefixes from
+longest to shortest and use only the first terminal found.
+
+IP has separate starts4 and starts6 tables; addresses are unsigned numeric
+values, with IPv4 confined to its low 32 bits. Starts increase strictly across
+blocks and shards. A row ends immediately before the next start, or at the
+address-family maximum for the last row. A location-zero row marks an uncovered
+gap and has an all-zero evidence row. A final gap row follows the last covered
+interval unless coverage ends at the family maximum. Addresses before the first
+start are uncovered. The reader binary-searches block keys, decompresses one
+block, and binary-searches its starts. No ends are stored per row.
+
+Readers retain file handles and directories. Each compressed table has an
+8 MiB decoded-block LRU; IO and decoding occur outside its lock. Evidence
+directories are admitted at open but evidence payloads are fetched only for
+evidence=True or explicit full verification. Full verification checks every
+block, every reference, every key span and every source record. The shared
+forward catalogue omits local_name, code_status, parent_method,
+normalization_method and evidence strings; their record slots are null.
+Forward metadata keeps country_code/alpha3/name and subdivision
+code/country_code/name for referenced rows, without provenance or timezone
+tables. Plates retains all countries because each is a valid explicit hint.
+
+## Postal family
 
 A postal manifest has family **postal**, zero distance-policy bounds, and
 normalization **["strip_ascii", "upper_ascii", "remove_ascii_spaces"]**.
@@ -359,7 +492,7 @@ two-letter source country, one NUL byte, then normalized postal code. Source
 country and the country assigned by the dataset may differ; neither is rewritten.
 
 Each postal pack contains metadata, any referenced catalogue shards, at least
-one **exact** artifact, and notices. Catalogue references are local to this pack,
+one **keys** FST and the required compressed tables, and notices. Catalogue references are local to this pack,
 with the same records and global ordering as core. Empty indexes are explicit.
 The exporter requires postal_codes, places, canonical_cities,
 place_to_city, countries, and subdivisions; fixture exceptions must be
@@ -367,42 +500,10 @@ explicit. Catalogue closure includes every assigned country, state and city and
 their published relationships. An available place-to-city mapping replaces the
 source city's reference. No nearest city or missing coordinate is invented.
 
-Exact artifacts use container kind **4**, with five sections:
-
-| Section | Width | Contents |
-| --- | ---: | --- |
-| 1 | 8 | N+1 little-endian u64 key offsets, beginning at 0 |
-| 2 | 1 | Concatenated UTF-8 compound keys, without terminators |
-| 3 | 44 | N observation records in nondecreasing bytewise key order |
-| 4 | 8 | First-use string offsets; starts with 0, 0 for null |
-| 5 | 1 | Concatenated UTF-8 observation strings |
-
-The terminal key offset equals section 2's length. Every key span is nonempty,
-valid UTF-8, and may contain the compound-key NUL. Duplicate keys retain distinct
-source observations and may span shards. Readers search all intersecting key
-ranges and combine their observations. Shard boundaries do not alter results.
-String reference 0 is null. Positive reference r selects bytes between offsets
-r and r+1. The final offset equals the string pool length.
-
-Observation records have this shared layout:
-
-| Offset | Type | Meaning |
-| --- | --- | --- |
-| 0, 4, 8 | u32 each | Country, state, city catalogue references; 0 = absent |
-| 12, 16 | i32 each | Source latitude/longitude in microdegrees |
-| 20, 24 | u32 each | Source and source_id string references |
-| 28, 32, 36, 40 | u32 each | Name, code, scheme and details string references |
-
-Coordinates are either both i32::MIN or within geographic bounds. Source and
-source_id are required; details, if present, is JSON text. Postal details retain
-admin1/2/3 names and codes, accuracy and source variant. Place name and all
-contributing source identities remain available with evidence=True.
-The public point is the source point, separately from city.point.
-
-Keys and offsets are retained at open; observation records and strings use
-positioned range reads on demand. One **4 MiB cache per pack**, shared by all
-exact shards, retains decoded observations. Export emits nominal 4 MiB shards
-from typed SQL columns; no dataset row is serialized as a JSON object.
+Postal details have columns admin1_name, admin1_code, admin2_name, admin2_code,
+admin3_name, admin3_code, accuracy and variant, in that order. Evidence retains
+the source place name. The public point is the source point, separately from
+city.point; missing coordinates are never inferred.
 
 postal(code, country=...) returns kind: postal, match: exact for matches.
 Missing/invalid country, empty/NUL code, and non-string input return
@@ -429,12 +530,12 @@ iata_code, icao_code, gps_code, local_code and ident is indexed under the respec
 scheme iata, icao, gps, local and ident. No scheme is inferred from another field.
 Normalization is exactly ["strip_ascii", "upper_ascii"], in that order.
 
-The kind-4 exact index and 44-byte observation layout above are reused. Keys
+The shared columnar tables and FST index are used. Keys
 are UTF-8 scheme + NUL + country + NUL + normalized code. Country is the
 uppercase two-letter source country. All schemes except local additionally
 have a global key with the empty country component. The observation name
 is the airport name, code and scheme describe the indexed code, and details
-is JSON with type, municipality and region_code (nullable strings).
+columns are type, municipality and region_code (nullable strings), in that order.
 
 An explicit scheme searches only that namespace. Omitted scheme searches IATA
 then ICAO and combines all results. Multiple records with the same source and
@@ -450,21 +551,21 @@ schemes and source identities. Airport columns use the postal column contract.
 
 The locode family consumes trade_locations and the same required geographic
 tables as postal. Its normalization is ["strip_ascii", "upper_ascii"]. It uses
-the kind-4 exact index with a full normalized LOCODE as the key, without a
+the key FST with a full normalized LOCODE as the key, without a
 separator. LOCODE has two ASCII uppercase country letters and three uppercase
 ASCII letters or digits. Export rejects disagreement between locode,
 country_code and location. Lookup accepts the full code or three characters
 plus country. Conflicting or malformed country hints are invalid_input.
 
-The shared observation layout stores name, full code, scheme "unlocode", and
-details containing non-null name_ascii, subdivision_code, function, status,
+Evidence reconstructs name, the full key as code and scheme "unlocode".
+Details columns, in order, are name_ascii, subdivision_code, function, status,
 iata_code, date, change, remarks and coordinates_raw. Point and geographic
 references are published associations with canonical-city rollup, not a new
 reverse lookup. Identity is source plus source_id. Kind is trade_location and
 match is exact. Duplicate identities merge evidence; multiple identities are
 ambiguous. Column output has the shared dictionary and candidate-offset layout.
 
-## Phone family and decimal trie (kind 5)
+## Phone family
 
 The phone family requires phone_prefixes, phone_metadata and the five geographic
 tables required by postal. The manifest normalization is exactly
@@ -473,22 +574,9 @@ ASCII spaces, hyphens and parentheses after it are ignored. The remaining 1–15
 ASCII digits must begin with 1–9. National numbers, extensions and Unicode
 digits are invalid_input. This is prefix lookup, not subscriber validation.
 
-A trie shard has four sections: nodes (48-byte records), observations (44-byte
-shared records), string offsets (u64), UTF-8 string bytes. Each node contains
-ten little-endian u32 child references for digits 0–9, followed by u32 first
-observation and u32 observation count. Node zero is the root; child 0xFFFFFFFF
-means absent. Every child has a greater node index than its parent, has exactly
-one parent, and is reachable from the root. Depth is at most 15. The root has
-no observations. Nonempty observation ranges are contiguous, disjoint, cover
-the observation section exactly, and reference records for that node's prefix.
-The null and terminal string-offset rules are the same as the exact index.
-Empty input still emits an explicit root node.
-
-Queries follow digits from the root and retain the deepest terminal reached.
-Across shards only terminals at the maximum matched depth contribute records.
-No shorter calling-code result competes with a more specific prefix. The writer
-sorts prefixes and emits bounded shards; reader observations are range-read and
-share the pack's bounded LRU.
+The FST maps digit prefixes to compressed record spans. Query truncation is
+bounded by the E.164 maximum of 15 digits; only the longest existing prefix
+contributes. Empty input emits an explicit empty FST and record/evidence tables.
 
 Each phone_prefixes row is indexed at prefix. Each phone_metadata territory is
 a fallback at calling_code. Territory 001 is explicitly non-geographic and is
@@ -504,28 +592,17 @@ retains language, description, calling_code, leading_digits, national_prefix,
 international_prefix, link_status and link_method when present. The metadata
 regex fields are provenance, not a second number parser.
 
-## IP family and inclusive intervals (kind 6)
+## IP family
 
 The ip family requires ip_ranges and the same geographic tables as postal.
 Normalization is ["ip_literal"]. Input is a trimmed IPv4 or IPv6 address literal.
 Ports, CIDR suffixes, IPv6 zones and noncanonical IPv4 leading zeroes are invalid.
 IPv4-mapped IPv6 literals remain IPv6; the two address families never alias.
 
-Each kind-6 shard has four sections: interval records (36 bytes), shared
-observations (44 bytes), string offsets (u64), UTF-8 strings. An interval contains
-one u8 IP version (4 or 6), three reserved zero bytes, then 16-byte network-order
-start and end addresses. Endpoints are inclusive; IPv4 occupies the low 32 bits
-with zero high bits. There is exactly one observation per interval, at the same
-row index. Ranges are ordered by (version, start), strictly nonoverlapping,
-including across shards in manifest order. Adjacent ranges are allowed. An empty
-family still has an explicit empty interval shard. String rules are shared with
-the observation index.
-
-Open retains each shard's first and last bounds. Lookup rejects out-of-shard
-queries and binary-searches fixed-width bounds using positioned reads. A bounded
-1 MiB address-result LRU avoids repeated searches for identical addresses;
-observations use the pack's shared range-read cache. Full verification visits
-every range and record, enforcing ordering and cross-shard nonoverlap.
+The starts4/starts6 compressed tables use implicit ends and null-location
+gap rows as defined above. Empty families emit explicit empty tables, including
+aligned evidence4/evidence6. Details columns are city, country_code, region,
+in that order, including explicit nulls.
 
 The writer requires packed endpoints to agree with the published textual
 addresses and ip_version. It rejects overlaps instead of choosing an arbitrary
@@ -535,7 +612,7 @@ is start + U+2013 + end, scheme is ipv4 or ipv6, and details JSON preserves
 country_code, region and city text, including explicit nulls. Source text remains
 available in evidence when it differs from canonical country/state/city fields.
 
-## Plates family (kind 7)
+## Plates family
 
 The plates family currently takes an explicit adapter dataset with table kinds
 plate_formats, plate_codes, plate_policy, plate_priors, and the five geographic
@@ -545,31 +622,37 @@ table, the adapter input switches to that table; the wire model is unchanged.
 Missing vehicle priors are allowed only by the explicit fixture option
 allow_missing_tables=["plate_priors"], and are recorded in the wire payload.
 
-A single kind-7 container has one byte section: UTF-8 JSON with the following
-required fields. Unknown JSON fields may be ignored. Null strings below are
-distinct from missing required fields.
+The manifest's plate_columns object contains policy, prior_available and
+source_rows (formats plus codes). Policy has max_input_length (64),
+code_separators (string), levels (unit-kind to place/state map), script_patterns
+(script-to-regex map), weights (finite known_code, fixed_mark, script,
+specificity, log_vehicle_prior, relaxed_penalty), geography, decimal_zeroes
+(code points beginning ten decimal digits), and decimal_unicode_version.
+Geography has excluded_countries and allowed_scopes (string arrays),
+state_prefix (country to length map), unknown_status_eligible,
+block_if_non_geographic_format_matches and historic_requires_explicit_series
+(booleans). prior_available must equal whether plate_priors has any rows.
 
-- policy: max_input_length (64), code_separators (string), levels (map of unit
-  kinds to "place"/"state"), script_patterns (map of script names to regexes),
-  weights (finite numbers for known_code, fixed_mark, script, specificity,
-  log_vehicle_prior, relaxed_penalty), geography (see below), decimal_zeroes
-  (array of Unicode code points, each beginning ten consecutive decimal digits),
-  decimal_unicode_version (the source Unicode database version).
-- geography: excluded_countries and allowed_scopes (string arrays), state_prefix
-  (country to prefix-length map), unknown_status_eligible,
-  block_if_non_geographic_format_matches, historic_requires_explicit_series
-  (booleans).
-- formats: ordered records containing country_code, series_id, series_status,
-  pattern, relaxed_pattern (strings), code_group (string/null), scripts and
-  fixed_national_marks (string arrays), specificity_bits (finite number), and
-  provenance (source JSON). Regex syntax uses explicit ranges and named captures;
-  patterns are anchored to the entire input. Invalid patterns/captures fail open.
-- codes: ordered records containing country_code, code, unit_kind, scope,
-  series_status, source_url, license (strings), name_en, name_local,
-  subdivision_scope (string/null), subdivision_codes (array of explicit ISO codes).
-- priors: records containing country_code and vehicles (u64).
-- prior_available: boolean; true requires nonempty priors, false requires empty
-  priors and disables the vehicle-prior term without substituting a guessed count.
+All plate data uses kinds 9 and 10, with these fixed integer schemas:
+
+| Role | Columns in order |
+| --- | --- |
+| plate_formats | country_code, series_id, series_status, pattern, relaxed_pattern, code_group, scripts, fixed_national_marks, specificity_bits |
+| plate_codes | country_code, code, name_en, name_local, unit_kind, scope, series_status, subdivision_scope, subdivision_codes, source_url identity |
+| plate_priors | country_code, vehicles |
+| plate_format_evidence | provenance |
+| plate_code_evidence | source_url, license |
+
+Every field is a pooled string reference except specificity_bits (the u64
+IEEE-754 bit pattern of a finite f64) and vehicles (u64). scripts,
+fixed_national_marks and subdivision_codes are pooled JSON string arrays.
+Query string fields must reference the hot pool; source_url identity is a cold
+pool reference compared numerically for deduplication without reading its text.
+Each cold table aligns with its source table. provenance is pooled JSON text;
+URLs and licences are pooled plain text. Every role is inventoried even if empty.
+Formats and codes preserve input order. Invalid regexes or missing named
+captures fail admission. Null is permitted only for code_group, name_en,
+name_local and subdivision_scope; empty strings remain distinct from null.
 
 Normalization is exactly ["nfc", "upper_ascii", "collapse_python_whitespace"].
 NFC precedes ASCII-only uppercase. Whitespace is U+0009–000D, U+001C–001F,

@@ -71,7 +71,7 @@ fn directory(
         "Invalid shard magic or size",
     )?;
     ensure(
-        uint(bytes, 8, 2)? == 2 && uint(bytes, 10, 2)? == 0,
+        uint(bytes, 8, 2)? == 2 && uint(bytes, 10, 2)? == u64::from(kind >= 9),
         "Invalid shard version",
     )?;
     ensure(
@@ -168,6 +168,7 @@ pub fn encode(kind: u32, sections: &[(&[u8], usize)]) -> Result<Vec<u8>> {
     let mut bytes = vec![0; 32 + sections.len() * 32];
     bytes[..8].copy_from_slice(MAGIC);
     bytes[8..10].copy_from_slice(&2_u16.to_le_bytes());
+    bytes[10..12].copy_from_slice(&u16::from(kind >= 9).to_le_bytes());
     bytes[16..20].copy_from_slice(&kind.to_le_bytes());
     bytes[20..24].copy_from_slice(
         &u32::try_from(sections.len())

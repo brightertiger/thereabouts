@@ -25,6 +25,15 @@ pub struct Artifact {
 /// Required pack identity and source attribution, independent of build paths.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
+    /// Forward columnar packs require minor one; historical core packs retain zero.
+    #[serde(default, skip_serializing_if = "zero")]
+    pub format_minor: u16,
+    /// Compressed forward dictionary schema, absent for spatial/name-only core.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub forward_columns: Option<super::compact::Schema>,
+    /// Plate policy for columnar format/code assertions with cold provenance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub plate_columns: Option<super::plates::Schema>,
     /// Required schema identifier, thereabouts-pack-2.
     pub schema: String,
     /// Wire format integer; this reader accepts 2.
@@ -59,6 +68,10 @@ pub struct Manifest {
     pub distant_over_m: u32,
     /// Inclusive upper bound for distant-nearest, in metres.
     pub cutoff_m: u32,
+}
+#[allow(clippy::trivially_copy_pass_by_ref)] // serde's skip predicate takes a field reference.
+fn zero(value: &u16) -> bool {
+    *value == 0
 }
 /// Hash a file in bounded chunks; never load Parquet just to fingerprint it.
 #[allow(clippy::indexing_slicing)] // Read returns at most the buffer length.
@@ -117,6 +130,7 @@ pub fn read(root: &Path) -> Result<Manifest> {
         ));
     }
     let m: Manifest = serde_json::from_value(value)?;
+    compatible_minor(&m)?;
     if m.required_features != 0 || m.reference_resolution != 8 || m.block_resolution != 3 {
         return Err(Error::Incompatible(
             "Unsupported pack features or resolutions".into(),
@@ -190,6 +204,34 @@ pub fn verify(root: &Path, m: &Manifest) -> Result<()> {
             digest(&artifact_path(root, &f.path)?)? == f.sha256,
             "Shard checksum mismatch",
         )?;
+    }
+    Ok(())
+}
+
+fn compatible_minor(m: &Manifest) -> Result<()> {
+    if m.family == "core"
+        && (m.format_minor != 0 || m.forward_columns.is_some() || m.plate_columns.is_some())
+        || m.family != "core"
+            && m.files
+                .iter()
+                .any(|f| matches!(f.kind.as_str(), "exact" | "trie" | "intervals" | "plates"))
+        || m.forward_columns.is_some() && m.plate_columns.is_some()
+    {
+        return Err(Error::Incompatible(
+            "Unsupported family/container revision".into(),
+        ));
+    }
+    if m.family != "core"
+        && (m.format_minor != 1
+            || if m.family == "plates" {
+                m.plate_columns.is_none()
+            } else {
+                m.forward_columns.is_none()
+            })
+    {
+        return Err(Error::Incompatible(
+            "Forward packs require format 2.1; rebuild this pack".into(),
+        ));
     }
     Ok(())
 }

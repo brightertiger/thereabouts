@@ -164,10 +164,11 @@ impl Pack {
             });
             for hit in ordered {
                 let rule = index.rule(&hit)?;
-                sources.push(source(serde_json::json!({"source":"plate_format","source_id":rule.series_id,"series_status":rule.series_status,"code":hit.code,"score":hit.score.to_string(),"match":if hit.relaxed {"separator_relaxed"} else {"exact"},"provenance":rule.provenance.to_string()})));
+                sources.push(source(serde_json::json!({"source":"plate_format","source_id":rule.series_id,"series_status":rule.series_status,"code":hit.code,"score":hit.score.to_string(),"match":if hit.relaxed {"separator_relaxed"} else {"exact"},"provenance":index.evidence.provenance(hit.rule)?})));
             }
             for code in geography.locations {
-                sources.push(source(serde_json::json!({"source":"plate_code","source_id":code.code,"name":code.name_en.as_ref().or(code.name_local.as_ref()),"unit_kind":code.unit_kind,"source_url":code.source_url,"license":code.license})));
+                let (url, license) = index.evidence.source(code)?;
+                sources.push(source(serde_json::json!({"source":"plate_code","source_id":code.code,"name":code.name_en.as_ref().or(code.name_local.as_ref()),"unit_kind":code.unit_kind,"source_url":url,"license":license})));
             }
             answer.evidence = Some(Evidence {
                 stored_cell: None,

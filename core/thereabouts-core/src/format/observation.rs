@@ -7,6 +7,8 @@ pub const FIELDS: [&str; 6] = ["source", "source_id", "name", "code", "scheme", 
 /// One source association. Geography references are pack-global catalogue references.
 #[derive(Clone, Debug)]
 pub struct Observation {
+    /// Compact record ordinal used for identity without reading source evidence.
+    pub identity: Option<u64>,
     /// Country, subdivision and canonical-city references; zero means absent.
     pub places: [u32; 3],
     /// Source latitude in microdegrees, or `i32::MIN` when unlocated.
@@ -32,10 +34,12 @@ impl Observation {
             "Dangling observation place",
         )?;
         ensure(
-            self.text
-                .iter()
-                .take(2)
-                .all(|s| s.as_ref().is_some_and(|s| !s.is_empty())),
+            self.identity.is_some()
+                || self
+                    .text
+                    .iter()
+                    .take(2)
+                    .all(|s| s.as_ref().is_some_and(|s| !s.is_empty())),
             "Missing observation source identity",
         )?;
         ensure(
@@ -133,6 +137,7 @@ pub(crate) fn read(
         *field = string(shard, section + 1, uint(&bytes, 20 + i * 4, 4)?)?;
     }
     let record = Observation {
+        identity: None,
         places,
         latitude: u32::try_from(uint(&bytes, 12, 4)?)
             .map_err(|_| Error::Corrupt("Invalid latitude".into()))?

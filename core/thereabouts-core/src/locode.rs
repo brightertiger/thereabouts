@@ -31,7 +31,11 @@ impl Pack {
         if !valid(&code) || country.is_some_and(|c| !code.starts_with(&c)) {
             return Ok(invalid());
         }
-        self.forward_result(self.observations(&code)?, Kind::TradeLocation, evidence)
+        self.forward_result(
+            self.observations(&code, evidence)?,
+            Kind::TradeLocation,
+            evidence,
+        )
     }
 }
 /// Admit the published UN/LOCODE alphabet, including digits in location codes.

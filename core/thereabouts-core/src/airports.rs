@@ -41,10 +41,10 @@ impl Pack {
             .map_or_else(|| vec!["iata", "icao"], |s| vec![s]);
         let mut records = Vec::new();
         for scheme in schemes {
-            records.extend(self.observations(&format!(
-                "{scheme}\0{}\0{code}",
-                country.as_deref().unwrap_or("")
-            ))?);
+            records.extend(self.observations(
+                &format!("{scheme}\0{}\0{code}", country.as_deref().unwrap_or("")),
+                evidence,
+            )?);
         }
         self.forward_result(records, Kind::Airport, evidence)
     }

@@ -27,6 +27,7 @@ pub(crate) struct Compiled {
 #[derive(Debug)]
 pub(crate) struct PlateIndex {
     pub(crate) tables: Tables,
+    pub(crate) evidence: crate::format::plate_columns::PlateColumns,
     rules: Vec<Compiled>,
     codes: BTreeMap<(String, String), Vec<usize>>,
     scripts: Vec<(String, Regex, f64)>,
@@ -41,7 +42,11 @@ pub(crate) struct Hit {
     pub(crate) relaxed: bool,
 }
 impl PlateIndex {
-    pub(crate) fn new(tables: Tables, country_count: usize) -> Result<Self> {
+    pub(crate) fn new(
+        tables: Tables,
+        evidence: crate::format::plate_columns::PlateColumns,
+        country_count: usize,
+    ) -> Result<Self> {
         ensure(
             tables.policy.max_input_length == 64,
             "Unsupported plate input limit",
@@ -120,6 +125,7 @@ impl PlateIndex {
         let median = median(&counts);
         let mut index = Self {
             tables,
+            evidence,
             rules,
             codes: BTreeMap::new(),
             scripts,

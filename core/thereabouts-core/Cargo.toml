@@ -17,6 +17,7 @@ regex = "1"
 unicode-normalization = "0.1"
 unicode-casefold = "0.2"
 fst = "0.4"
+lz4_flex = { version = "0.13", default-features = false, features = ["std", "safe-encode", "safe-decode"] }
 
 [dev-dependencies]
 proptest = "1"

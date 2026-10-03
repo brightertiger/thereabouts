@@ -32,7 +32,7 @@ impl Pack {
             return Ok(result);
         };
         self.forward_result(
-            self.prefix_observations(&digits)?,
+            self.prefix_observations(&digits, evidence)?,
             Kind::PhonePrefix,
             evidence,
         )

@@ -1,15 +1,8 @@
 //! Bounded typed staging and emission for forward source associations.
 use crate::{
-    Error, Result, add,
-    arrow::Row,
-    catalogue,
-    error::ensure,
-    format::{exact::encode_entries, manifest::Manifest, observation::Observation},
-    inserts::Inserts,
+    Error, Result, arrow::Row, catalogue, format::observation::Observation, inserts::Inserts,
 };
 use rusqlite::{Connection, OptionalExtension, types::Value};
-use std::path::Path;
-type Encoder = fn(&[(String, Observation)]) -> thereabouts_core::Result<Vec<u8>>;
 pub(crate) fn initialize(db: &Connection) -> Result<()> {
     db.execute_batch("CREATE TABLE observations(key TEXT,country INTEGER,state INTEGER,city INTEGER,latitude INTEGER,longitude INTEGER,source TEXT,source_id TEXT,name TEXT,code TEXT,scheme TEXT,details TEXT)")?;
     Ok(())
@@ -34,6 +27,7 @@ pub(crate) fn association(
     let city = canonical.as_deref().or(city);
     let (latitude, longitude) = point(row.number("latitude")?, row.number("longitude")?)?;
     Ok(Observation {
+        identity: None,
         places: [
             catalogue::reference(db, row.text("country_id")?)?,
             catalogue::reference(db, row.text("state_id")?)?,
@@ -82,70 +76,4 @@ pub(crate) fn insert(rows: &mut Inserts<'_>, key: String, record: Observation) -
             .map(|v| v.map_or(Value::Null, Value::Text)),
     );
     rows.push(values)
-}
-pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
-    let mut query = db.prepare_cached("SELECT * FROM observations ORDER BY key COLLATE BINARY,source COLLATE BINARY,source_id COLLATE BINARY,name COLLATE BINARY")?;
-    let records = query.query_map([], |row| {
-        let mut text = std::array::from_fn(|_| None);
-        for (i, value) in text.iter_mut().enumerate() {
-            *value = row.get(6 + i)?;
-        }
-        Ok((
-            row.get::<_, String>(0)?,
-            Observation {
-                places: [row.get(1)?, row.get(2)?, row.get(3)?],
-                latitude: row.get(4)?,
-                longitude: row.get(5)?,
-                text,
-            },
-        ))
-    })?;
-    let (kind, encoder): (&str, Encoder) = if manifest.family == "phone" {
-        ("trie", thereabouts_core::format::trie::encode_entries)
-    } else if manifest.family == "ip" {
-        (
-            "intervals",
-            thereabouts_core::format::intervals::encode_entries,
-        )
-    } else {
-        ("exact", encode_entries)
-    };
-    let mut entries = Vec::new();
-    let mut size = 0;
-    let mut shard = 0;
-    for entry in records {
-        let entry = entry?;
-        let bytes = entry.0.len()
-            + 128
-            + entry
-                .1
-                .text
-                .iter()
-                .flatten()
-                .map(|s| s.len() + 8)
-                .sum::<usize>();
-        ensure(bytes <= 1024 * 1024, "Forward row exceeds 1 MiB")?;
-        if size + bytes > 4 * 1024 * 1024 && !entries.is_empty() {
-            add(
-                stage,
-                manifest,
-                &format!("{kind}-{shard:05}.bin"),
-                kind,
-                &encoder(&entries)?,
-            )?;
-            entries.clear();
-            size = 0;
-            shard += 1;
-        }
-        size += bytes;
-        entries.push(entry);
-    }
-    // Empty indexes are explicit, so a missing shard cannot silently become a miss.
-    add(
-        stage,
-        manifest,
-        &format!("{kind}-{shard:05}.bin"),
-        kind,
-        &encoder(&entries)?,
-    )
 }

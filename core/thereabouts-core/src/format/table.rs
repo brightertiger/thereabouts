@@ -1,0 +1,251 @@
+//! Compressed table directories and bounded decoded-block ownership.
+use super::{
+    cache::Cache,
+    columns,
+    container::{FileShard, index, put, uint},
+    manifest::{self, Manifest},
+};
+use crate::{Error, Result, error::ensure};
+use std::{
+    path::Path,
+    sync::{Arc, Mutex},
+};
+/// Each directory row contains row range, compressed span and first search key.
+pub const DIRECTORY_WIDTH: usize = 48;
+/// Integer and UTF-8 tables have distinct container kinds.
+pub const INTEGER_KIND: u32 = 9;
+/// String IDs address one pack-level pool, partitioned by evidence access.
+pub const STRING_KIND: u32 = 10;
+/// One decoded table block; strings and numeric columns have separate wire tags.
+#[derive(Debug)]
+pub(crate) enum Data {
+    Integers(Vec<Vec<u64>>),
+    Strings(Vec<String>),
+}
+#[derive(Debug)]
+struct Block {
+    file: Arc<FileShard>,
+    first: usize,
+    rows: usize,
+    raw: usize,
+    offset: usize,
+    length: usize,
+    key: u128,
+}
+/// Resident block directories; payloads enter the byte-budget LRU only on demand.
+#[derive(Debug)]
+pub(crate) struct Table {
+    blocks: Vec<Block>,
+    kind: u32,
+    keyed: bool,
+    pub(crate) rows: usize,
+    cache: Mutex<Cache<usize, Data>>,
+}
+impl Table {
+    pub(crate) fn open(root: &Path, manifest: &Manifest, role: &str, kind: u32) -> Result<Self> {
+        let keyed = matches!(role, "starts4" | "starts6");
+        let mut blocks = Vec::<Block>::new();
+        let mut rows = 0;
+        for artifact in manifest.files.iter().filter(|f| f.kind == role) {
+            let file = Arc::new(FileShard::open(
+                &manifest::artifact_path(root, &artifact.path)?,
+                kind,
+                &[DIRECTORY_WIDTH, 1],
+            )?);
+            let directory = file.section(0)?;
+            let mut end = 0;
+            for bytes in directory.as_chunks::<DIRECTORY_WIDTH>().0 {
+                let first = index(uint(bytes, 0, 8)?)?;
+                let count = index(uint(bytes, 8, 4)?)?;
+                let raw = index(uint(bytes, 12, 4)?)?;
+                let offset = index(uint(bytes, 16, 8)?)?;
+                let length = index(uint(bytes, 24, 4)?)?;
+                let key = u128::from(uint(bytes, 32, 8)?) | (u128::from(uint(bytes, 40, 8)?) << 64);
+                ensure(
+                    first == rows
+                        && (1..=columns::BLOCK_ROWS).contains(&count)
+                        && raw <= columns::BLOCK_BYTES
+                        && length <= columns::BLOCK_BYTES
+                        && offset == end
+                        && uint(bytes, 28, 4)? == 0,
+                    "Invalid compressed block directory",
+                )?;
+                end = offset
+                    .checked_add(length)
+                    .ok_or_else(|| Error::Corrupt("Block span overflow".into()))?;
+                ensure(end <= file.len(1)?, "Truncated compressed block")?;
+                rows = rows
+                    .checked_add(count)
+                    .ok_or_else(|| Error::Corrupt("Table row overflow".into()))?;
+                ensure(
+                    !keyed || blocks.last().is_none_or(|b| b.key < key),
+                    "Unsorted block keys",
+                )?;
+                blocks.push(Block {
+                    file: Arc::clone(&file),
+                    first,
+                    rows: count,
+                    raw,
+                    offset,
+                    length,
+                    key,
+                });
+            }
+            ensure(end == file.len(1)?, "Trailing compressed payload")?;
+        }
+        Ok(Self {
+            blocks,
+            kind,
+            keyed,
+            rows,
+            cache: Mutex::new(Cache::new(8 * 1024 * 1024)),
+        })
+    }
+    fn block(&self, number: usize) -> Result<Arc<Data>> {
+        if let Some(data) = self
+            .cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
+            .get(number)
+        {
+            return Ok(data);
+        }
+        let b = self
+            .blocks
+            .get(number)
+            .ok_or_else(|| Error::Corrupt("Missing block".into()))?;
+        let raw = columns::decompress(&b.file.range(1, b.offset, b.length)?, b.raw)?;
+        let (data, size) = if self.kind == INTEGER_KIND {
+            let rows = columns::decode(&raw)?;
+            ensure(rows.len() == b.rows, "Column count/directory disagreement")?;
+            if self.keyed {
+                let mut previous = None;
+                for row in &rows {
+                    let key = integer_key(row)?;
+                    ensure(previous.is_none_or(|p| p < key), "Unsorted starts in block")?;
+                    previous = Some(key);
+                }
+                ensure(
+                    rows.first().map(|r| integer_key(r)).transpose()? == Some(b.key),
+                    "Start directory key disagrees",
+                )?;
+            }
+            let size = rows
+                .iter()
+                .map(|r| r.capacity() * 8 + size_of::<Vec<u64>>())
+                .sum();
+            (Data::Integers(rows), size)
+        } else {
+            let values = decode_strings(&raw, b.rows)?;
+            let size = values
+                .iter()
+                .map(|s| s.capacity() + size_of::<String>())
+                .sum();
+            (Data::Strings(values), size)
+        };
+        Ok(self
+            .cache
+            .lock()
+            .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
+            .insert(number, data, size))
+    }
+    fn locate(&self, row: usize) -> Result<(Arc<Data>, usize)> {
+        ensure(row < self.rows, "Dangling table row")?;
+        let number = self
+            .blocks
+            .partition_point(|b| b.first <= row)
+            .checked_sub(1)
+            .ok_or_else(|| Error::Corrupt("Missing table block".into()))?;
+        let first = self
+            .blocks
+            .get(number)
+            .ok_or_else(|| Error::Corrupt("Missing table directory".into()))?
+            .first;
+        Ok((self.block(number)?, row - first))
+    }
+    pub(crate) fn row(&self, row: usize) -> Result<Vec<u64>> {
+        let (data, row) = self.locate(row)?;
+        let Data::Integers(rows) = data.as_ref() else {
+            return Err(Error::Corrupt("Expected numeric table".into()));
+        };
+        rows.get(row)
+            .cloned()
+            .ok_or_else(|| Error::Corrupt("Missing numeric row".into()))
+    }
+    pub(crate) fn string(&self, row: usize) -> Result<String> {
+        let (data, row) = self.locate(row)?;
+        let Data::Strings(rows) = data.as_ref() else {
+            return Err(Error::Corrupt("Expected string pool".into()));
+        };
+        rows.get(row)
+            .cloned()
+            .ok_or_else(|| Error::Corrupt("Missing pool string".into()))
+    }
+    pub(crate) fn block_at_key(&self, key: u128) -> Result<Option<(Arc<Data>, usize)>> {
+        let Some(i) = self.blocks.partition_point(|b| b.key <= key).checked_sub(1) else {
+            return Ok(None);
+        };
+        let b = self
+            .blocks
+            .get(i)
+            .ok_or_else(|| Error::Corrupt("Missing key directory".into()))?;
+        Ok(Some((self.block(i)?, b.first)))
+    }
+    pub(crate) fn verify(&self) -> Result<()> {
+        for i in 0..self.blocks.len() {
+            self.block(i)?;
+        }
+        Ok(())
+    }
+}
+/// Encode a bounded UTF-8 pool block with u32 local offsets.
+pub fn encode_strings(values: &[String]) -> Result<Vec<u8>> {
+    let mut offsets = Vec::new();
+    let mut text = Vec::new();
+    put(&mut offsets, 0, 4);
+    for value in values {
+        text.extend_from_slice(value.as_bytes());
+        put(&mut offsets, text.len() as u64, 4);
+    }
+    offsets.extend(text);
+    ensure(
+        offsets.len() <= columns::BLOCK_BYTES,
+        "Oversized string pool block",
+    )?;
+    Ok(offsets)
+}
+fn decode_strings(bytes: &[u8], rows: usize) -> Result<Vec<String>> {
+    let start = (rows + 1) * 4;
+    ensure(
+        start <= bytes.len() && uint(bytes, 0, 4)? == 0,
+        "Invalid string pool offsets",
+    )?;
+    let mut values = Vec::new();
+    let mut previous = 0;
+    for row in 0..rows {
+        let end = index(uint(bytes, (row + 1) * 4, 4)?)?;
+        let span = bytes
+            .get(start + previous..start + end)
+            .ok_or_else(|| Error::Corrupt("Invalid pool string span".into()))?;
+        values.push(
+            std::str::from_utf8(span)
+                .map_err(|_| Error::Corrupt("Invalid pool UTF-8".into()))?
+                .to_owned(),
+        );
+        previous = end;
+    }
+    ensure(start + previous == bytes.len(), "Trailing pool bytes")?;
+    Ok(values)
+}
+
+/// Address starts have two u64 words followed by a location reference.
+fn integer_key(row: &[u64]) -> Result<u128> {
+    ensure(row.len() == 3, "Invalid start row")?;
+    let high = row
+        .first()
+        .ok_or_else(|| Error::Corrupt("Missing start".into()))?;
+    let low = row
+        .get(1)
+        .ok_or_else(|| Error::Corrupt("Missing start".into()))?;
+    Ok((u128::from(*high) << 64) | u128::from(*low))
+}

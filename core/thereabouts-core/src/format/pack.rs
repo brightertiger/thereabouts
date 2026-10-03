@@ -37,6 +37,7 @@ struct CatalogueSource {
 /// Concurrent pack handle. Open checks inventories; lookups validate accessed payloads.
 #[derive(Debug)]
 pub struct Pack {
+    compact: Option<super::compact::Compact>,
     /// Validated release identity and policy used when projecting results.
     pub manifest: Manifest,
     /// Published side-table rows; runtime indexes refer to these rows.
@@ -58,6 +59,7 @@ pub struct Pack {
 }
 impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
+    #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
     pub fn open(root: &Path, verify: bool) -> Result<Self> {
         let manifest = if verify {
             super::verify::verify(root)?
@@ -68,7 +70,6 @@ impl Pack {
         let mut exacts = Vec::new();
         let mut tries = Vec::new();
         let mut intervals = Vec::new();
-        let mut plates = None;
         let mut names = Vec::new();
         let mut catalogues = Vec::new();
         let mut place_count = 0_usize;
@@ -111,34 +112,43 @@ impl Pack {
                 "trie" => tries.push(super::trie::Trie::open(&path)?),
                 "intervals" => intervals.push(super::intervals::Intervals::open(&path)?),
                 "names" => names.push(super::names::Names::open(&path)?),
-                "plates" => {
-                    ensure(plates.is_none(), "Repeated plate evidence")?;
-                    let c = Container::decode(fs::read(path)?, 7, &[1])?;
-                    plates = Some(serde_json::from_slice::<super::plates::Tables>(
-                        c.section(0),
-                    )?);
-                }
-                "notice" => {}
+                "notice" | "keys" => {}
+                role if super::compact::ROLES.contains(&role)
+                    || super::plate_columns::ROLES.contains(&role) => {}
                 _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
             }
         }
+        let compact = if manifest.forward_columns.is_some() {
+            Some(super::compact::Compact::open(root, &manifest)?)
+        } else {
+            None
+        };
         ensure(
             match manifest.family.as_str() {
                 "core" => true,
-                "phone" => !tries.is_empty(),
-                "ip" => !intervals.is_empty(),
-                "plates" => plates.is_some(),
-                _ => !exacts.is_empty(),
+                "phone" => compact.is_some() || !tries.is_empty(),
+                "ip" => compact.is_some() || !intervals.is_empty(),
+                "plates" => manifest.plate_columns.is_some(),
+                _ => compact.is_some() || !exacts.is_empty(),
             },
             "Missing required exact index",
         )?;
         let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata table".into()))?;
         metadata.validate()?;
         let metadata_index = MetadataIndex::build(&metadata)?;
-        let plates = plates
-            .map(|tables| crate::plates_index::PlateIndex::new(tables, metadata.countries.len()))
-            .transpose()?;
+        let plates = if manifest.plate_columns.is_some() {
+            let evidence = super::plate_columns::PlateColumns::open(root, &manifest)?;
+            let tables = evidence.decode(&manifest)?;
+            Some(crate::plates_index::PlateIndex::new(
+                tables,
+                evidence,
+                metadata.countries.len(),
+            )?)
+        } else {
+            None
+        };
         Ok(Self {
+            compact,
             manifest,
             metadata,
             metadata_index,
@@ -159,7 +169,11 @@ impl Pack {
     pub(crate) fn interval_observations(
         &self,
         address: super::intervals::Address,
+        evidence: bool,
     ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.interval(address, evidence, self.place_count);
+        }
         let cached = self
             .address_cache
             .lock()
@@ -197,7 +211,11 @@ impl Pack {
     pub(crate) fn prefix_observations(
         &self,
         key: &str,
+        evidence: bool,
     ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.prefix(key, evidence, self.place_count);
+        }
         let mut longest = 0;
         let mut selected = Vec::new();
         for (i, shard) in self.tries.iter().enumerate() {
@@ -253,7 +271,11 @@ impl Pack {
     pub(crate) fn observations(
         &self,
         key: &str,
+        evidence: bool,
     ) -> Result<Vec<Arc<super::observation::Observation>>> {
+        if let Some(compact) = &self.compact {
+            return compact.lookup(key, evidence, self.place_count);
+        }
         let mut records = Vec::new();
         for (i, shard) in self.exacts.iter().enumerate() {
             for row in shard.lookup(key)? {

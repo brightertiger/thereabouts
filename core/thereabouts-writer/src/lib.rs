@@ -5,7 +5,12 @@
 )]
 mod airports;
 mod arrow;
+mod blocks;
 mod catalogue;
+mod compact;
+mod compact_ip;
+mod compact_metadata;
+mod dictionaries;
 mod emission;
 mod error;
 mod forward;
@@ -15,6 +20,7 @@ mod ip;
 mod locode;
 mod names;
 mod phone;
+mod plate_columns;
 mod plates;
 mod postal;
 mod source;
@@ -30,7 +36,7 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.1.2";
+const WRITER_REVISION: &str = "0.3.0";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -105,8 +111,10 @@ pub fn write_pack(
     }
     let revision = if family == "core" {
         "0.2.0" // Core exports now include canonical-city spellings.
-    } else {
+    } else if family == "plates" {
         WRITER_REVISION
+    } else {
+        "0.3.0"
     };
     let mut identity = json!({"manifest_sha256":data.digest,"options":options,"writer":revision});
     if family != "core"
@@ -185,8 +193,14 @@ fn build(
     }
     db.execute_batch("COMMIT")?;
     let mut metadata = metadata(data)?;
+    if !matches!(family, "core" | "plates") {
+        compact_metadata::trim(&db, &mut metadata)?;
+    }
     let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {
+        format_minor: 0,
+        forward_columns: None,
+        plate_columns: None,
         schema: "thereabouts-pack-2".into(),
         format_version: 2,
         family: family.into(),
@@ -220,9 +234,16 @@ fn build(
         emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
         names::emit(data, &db, stage, &mut manifest)?;
     } else if family == "plates" {
-        plates::emit(data, stage, &mut manifest, &options.allow_missing_tables)?;
+        plates::emit(
+            data,
+            &db,
+            stage,
+            &mut manifest,
+            &mut metadata,
+            &options.allow_missing_tables,
+        )?;
     } else {
-        forward::emit(&db, stage, &mut manifest)?;
+        compact::emit(&db, stage, &mut manifest)?;
     }
     emission::catalogue(&db, stage, &mut manifest)?;
     add(

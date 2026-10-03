@@ -8,6 +8,7 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
+fst = "0.4"
 thereabouts-core = { path = "../thereabouts-core" }
 h3o = "0.9"
 serde = { version = "1", features = ["derive"] }

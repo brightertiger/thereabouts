@@ -114,56 +114,6 @@ fn decode_offsets(bytes: &[u8], count: usize, end: usize) -> Result<Vec<usize>> 
     )?;
     Ok(values)
 }
-fn read_map(bytes: Vec<u8>) -> Result<fst::Map<Vec<u8>>> {
-    ensure(
-        uint(&bytes, 0, 8)? == 3 && uint(&bytes, 8, 8)? == 0,
-        "Unsupported name FST encoding",
-    )?;
-    let map = fst::Map::new(bytes).map_err(fst_error)?;
-    map.as_fst().verify().map_err(fst_error)?;
-    ensure(map.len() <= 4_000_000, "Oversized name FST")?;
-    let fst = map.as_fst();
-    let mut seen = std::collections::BTreeSet::new();
-    let mut pending = vec![fst.root().addr()];
-    while let Some(address) = pending.pop() {
-        if !seen.insert(address) {
-            continue;
-        }
-        let node = fst.node(address);
-        let mut previous = None;
-        let mut inputs = [None; 256];
-        for (i, transition) in node.transitions().enumerate() {
-            ensure(
-                transition.addr < address && previous.is_none_or(|p| p < transition.inp),
-                "Name FST is not an ordered acyclic backward graph",
-            )?;
-            previous = Some(transition.inp);
-            if let Some(input) = inputs.get_mut(usize::from(transition.inp)) {
-                *input = Some(i);
-            }
-            pending.push(transition.addr);
-        }
-        if node.len() > 32 {
-            for input in 0..=u8::MAX {
-                ensure(
-                    inputs.get(usize::from(input)).copied().flatten() == node.find_input(input),
-                    "Invalid name FST input table",
-                )?;
-            }
-        }
-    }
-    let mut stream = map.stream();
-    let mut count = 0;
-    while let Some((_, value)) = stream.next() {
-        ensure(
-            value == count && count < map.len() as u64,
-            "Invalid FST ordinal",
-        )?;
-        count += 1;
-    }
-    ensure(count == map.len() as u64, "Invalid FST key count")?;
-    Ok(map)
-}
 impl Names {
     pub(crate) fn open(path: &Path) -> Result<Self> {
         // The fst crate documents panic on malformed serialized nodes. Validate
@@ -173,8 +123,8 @@ impl Names {
     }
     fn read(path: &Path) -> Result<Self> {
         let file = FileShard::open(path, 8, &[1, 8, 20, 8, 1, 1, 8, 4])?;
-        let map = read_map(file.section(0)?)?;
-        let grams = read_map(file.section(5)?)?;
+        let map = super::fst::read(file.section(0)?, true)?;
+        let grams = super::fst::read(file.section(5)?, true)?;
         ensure(
             map.len() <= 1_000_000 && grams.len() <= 4_000_000,
             "Oversized name FST",

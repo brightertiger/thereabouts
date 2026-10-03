@@ -32,7 +32,8 @@ impl Bounds {
         )
     }
 }
-fn from_key(key: &str) -> Result<Bounds> {
+/// Decode the stable staging key without changing its inclusive source bounds.
+pub fn from_key(key: &str) -> Result<Bounds> {
     let parse = |a, b| {
         key.get(a..b)
             .and_then(|s| u128::from_str_radix(s, 16).ok())
@@ -190,7 +191,7 @@ mod tests {
         fn round_trip_inclusive_bounds(start in 0_u32..u32::MAX-1024, width in 0_u32..1024) {
             let dir=tempfile::tempdir().unwrap();let path=dir.path().join("ip.bin");
             let range=Bounds{version:4,first:u128::from(start),last:u128::from(start+width)};
-            let record=Observation{places:[0;3],latitude:i32::MIN,longitude:i32::MIN,text:[Some("s".into()),Some("id".into()),None,None,None,None]};
+            let record=Observation{identity:None,places:[0;3],latitude:i32::MIN,longitude:i32::MIN,text:[Some("s".into()),Some("id".into()),None,None,None,None]};
             std::fs::write(&path,encode_entries(&[(range.key(),record)]).unwrap()).unwrap();
             let index=Intervals::open(&path).unwrap();
             prop_assert_eq!(index.lookup((4,range.first)).unwrap(),Some(0));

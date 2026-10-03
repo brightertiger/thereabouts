@@ -16,8 +16,10 @@ fn json(row: crate::arrow::Row<'_>, field: &str) -> Result<serde_json::Value> {
 }
 pub(crate) fn emit(
     data: &Dataset,
+    db: &rusqlite::Connection,
     stage: &Path,
     manifest: &mut Manifest,
+    metadata: &mut thereabouts_core::format::metadata::Metadata,
     allow_missing: &[String],
 ) -> Result<()> {
     let mut policy = None;
@@ -39,6 +41,8 @@ pub(crate) fn emit(
         prior_available: !allow_missing.iter().any(|s| s == "plate_priors"),
     };
     let mut bytes = 0;
+    let mut rule_evidence = Vec::new();
+    let mut code_evidence = Vec::new();
     for table in data.tables("plate_formats") {
         data.scan(table, |row| {
             let rule = Rule {
@@ -53,9 +57,10 @@ pub(crate) fn emit(
                 specificity_bits: row
                     .number("specificity_bits")?
                     .ok_or_else(|| Error::Input("Missing format specificity".into()))?,
-                provenance: json(row, "provenance")?,
             };
-            bytes += serde_json::to_vec(&rule)?.len();
+            let provenance = json(row, "provenance")?.to_string();
+            bytes += serde_json::to_vec(&rule)?.len() + provenance.len();
+            rule_evidence.push(provenance);
             ensure(
                 bytes <= PLATE_EVIDENCE_BYTES,
                 "Plate evidence exceeds admission budget",
@@ -76,10 +81,16 @@ pub(crate) fn emit(
                 series_status: row.required("series_status")?.into(),
                 subdivision_scope: row.text("subdivision_scope")?.map(str::to_owned),
                 subdivision_codes: list(row, "subdivision_codes")?,
-                source_url: row.required("source_url")?.into(),
-                license: row.required("license")?.into(),
+                source_key: 0,
+                evidence_row: code_evidence.len(),
             };
-            bytes += serde_json::to_vec(&code)?.len();
+            let evidence = [
+                row.required("source_url")?.to_owned(),
+                row.required("license")?.to_owned(),
+            ];
+            bytes +=
+                serde_json::to_vec(&code)?.len() + evidence.iter().map(String::len).sum::<usize>();
+            code_evidence.push(evidence);
             ensure(
                 bytes <= PLATE_EVIDENCE_BYTES,
                 "Plate evidence exceeds admission budget",
@@ -99,16 +110,7 @@ pub(crate) fn emit(
             Ok(())
         })?;
     }
-    let encoded = serde_json::to_vec(&tables)?;
-    ensure(
-        encoded.len() <= PLATE_EVIDENCE_BYTES,
-        "Encoded plate evidence exceeds admission budget",
-    )?;
-    crate::add(
-        stage,
-        manifest,
-        "plates.bin",
-        "plates",
-        &thereabouts_core::format::container::encode(7, &[(&encoded, 1)])?,
-    )
+    crate::plate_columns::emit(db, stage, manifest, &tables, &rule_evidence, &code_evidence)?;
+    crate::compact_metadata::plate(metadata, &tables);
+    Ok(())
 }

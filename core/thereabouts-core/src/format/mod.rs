@@ -23,4 +23,10 @@ pub mod intervals;
 
 pub mod plates;
 
+pub mod columns;
+pub mod compact;
+mod fst;
 pub mod names;
+pub mod table;
+
+pub(crate) mod plate_columns;

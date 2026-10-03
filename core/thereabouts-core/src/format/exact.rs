@@ -132,6 +132,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("exact.bin");
         let record = Observation {
+            identity: None,
             places: [0; 3],
             latitude: i32::MIN,
             longitude: i32::MIN,

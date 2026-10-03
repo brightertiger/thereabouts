@@ -29,6 +29,8 @@ impl Pack {
                     .ok_or_else(|| Error::Corrupt("Missing canonical city".into()))?
             } else if kind == Kind::PhonePrefix {
                 format!("{country}:{state}:{city}")
+            } else if let Some(identity) = record.identity {
+                format!("source:{identity:020}")
             } else {
                 format!(
                     "{}:{}",

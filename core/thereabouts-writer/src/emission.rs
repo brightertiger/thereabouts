@@ -77,6 +77,12 @@ pub fn catalogue(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Resu
     let mut shard = 0;
     for id in query.query_map([], |r| r.get::<_, String>(0))? {
         let mut place = catalogue::record(db, &id?)?;
+        if manifest.family != "core" {
+            // Only result projection fields belong in a forward catalogue.
+            for field in [3, 8, 9, 10, 11] {
+                place.text[field] = None;
+            }
+        }
         if let Some(point) = place.point() {
             let cell = LatLng::new(point.lat, point.lon)
                 .map_err(|_| Error::Input("Invalid point".into()))?

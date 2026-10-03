@@ -62,7 +62,7 @@ impl Place {
     /// Check geographic bounds, required text and catalogue relationships.
     pub fn validate(&self, total: usize) -> Result<()> {
         ensure(
-            [0, 1, 4, 5, 6, 11].iter().all(|i| {
+            [0, 1, 4, 5, 6].iter().all(|i| {
                 self.text
                     .get(*i)
                     .and_then(Option::as_ref)
@@ -80,7 +80,9 @@ impl Place {
                     && (-180_000_000..=180_000_000).contains(&self.longitude)),
             "Invalid catalogue point",
         )?;
-        let _: serde_json::Value = serde_json::from_str(self.field(11))?;
+        if let Some(evidence) = self.text.get(11).and_then(Option::as_deref) {
+            let _: serde_json::Value = serde_json::from_str(evidence)?;
+        }
         Ok(())
     }
 }
