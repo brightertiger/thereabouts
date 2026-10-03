@@ -5,10 +5,7 @@ use crate::{
     store,
 };
 use std::path::{Path, PathBuf};
-use thereabouts_core::{
-    format::Pack,
-    result::{LookupResult, Status},
-};
+use thereabouts_core::{format::Pack, result::LookupResult};
 
 pub(crate) fn family(command: &Command) -> Option<&'static str> {
     Some(match command {
@@ -88,11 +85,4 @@ pub(crate) fn run(pack: &Pack, command: &Command, evidence: bool) -> Result<Look
         )?,
         _ => return Err(Error::Usage("Expected scalar lookup arguments".into())),
     })
-}
-pub(crate) const fn exit(status: Status, strict: bool) -> i32 {
-    match status {
-        Status::InvalidInput | Status::UnsupportedGranularity => 2,
-        Status::NotFound if strict => 1,
-        _ => 0,
-    }
 }

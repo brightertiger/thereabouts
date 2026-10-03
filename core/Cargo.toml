@@ -1,5 +1,5 @@
 [workspace]
-members = ["thereabouts-core", "thereabouts-py", "thereabouts-writer", "thereabouts-cli"]
+members = ["thereabouts-core", "thereabouts-py", "thereabouts-writer", "thereabouts-cli", "thereabouts-cli-core"]
 resolver = "3"
 
 [workspace.package]

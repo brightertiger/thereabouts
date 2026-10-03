@@ -3,7 +3,7 @@ use crate::error::{Error, Result};
 use serde_json::{Map, Value};
 use std::{
     collections::BTreeSet,
-    io::{self, Write},
+    io::{self, SeekFrom},
 };
 
 /// Keep at most 4,096 distinct input columns and 1 MiB of names in memory.
@@ -12,9 +12,9 @@ const MAX_FIELDS: usize = 4096;
 const MAX_FIELD_BYTES: usize = 1024 * 1024;
 pub(crate) fn collect(
     first: &str,
+    mut file: Box<dyn crate::io::Temporary>,
     mut read: impl FnMut(&mut String) -> io::Result<usize>,
-) -> Result<(tempfile::NamedTempFile, Vec<String>)> {
-    let mut file = tempfile::NamedTempFile::new()?;
+) -> Result<(Box<dyn crate::io::Temporary>, Vec<String>)> {
     let mut fields = BTreeSet::new();
     let mut bytes = 0usize;
     let mut line = first.to_owned();
@@ -45,5 +45,6 @@ pub(crate) fn collect(
         }
     }
     file.flush()?;
+    file.seek(SeekFrom::Start(0))?;
     Ok((file, fields.into_iter().collect()))
 }

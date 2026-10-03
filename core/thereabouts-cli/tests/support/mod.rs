@@ -41,6 +41,9 @@ impl Host {
     }
 }
 impl Io for Host {
+    fn temporary(&mut self) -> io::Result<Box<dyn thereabouts_cli::io::Temporary>> {
+        thereabouts_cli::io::SystemIo.temporary()
+    }
     fn read_line(&mut self, line: &mut String) -> io::Result<usize> {
         self.input.read_line(line)
     }

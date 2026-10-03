@@ -1,5 +1,6 @@
 //! Bounded human summaries; details and evidence belong in JSON.
 use serde_json::Value;
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 pub(crate) const SUMMARY: &[&str] = &[
     "status", "country", "state", "city", "timezone", "point", "match",
 ];
@@ -57,23 +58,26 @@ fn summary(key: &str, value: &Value) -> String {
     }
 }
 fn cell(value: &str, width: usize) -> String {
-    let clean: Vec<_> = value
+    let clean: String = value
         .chars()
         .map(|c| if c.is_control() { ' ' } else { c })
         .collect();
-    let text = if clean.len() > width {
-        clean
-            .iter()
-            .take(width - 1)
-            .chain(std::iter::once(&'…'))
-            .collect::<String>()
+    let mut text = String::new();
+    if clean.width() > width {
+        let mut used = 0;
+        for c in clean.chars() {
+            let next = c.width().unwrap_or(0);
+            if used + next >= width {
+                break;
+            }
+            text.push(c);
+            used += next;
+        }
+        text.push('…');
     } else {
-        clean.iter().collect()
-    };
-    format!(
-        "{text}{}",
-        " ".repeat(width.saturating_sub(text.chars().count()))
-    )
+        text = clean;
+    }
+    format!("{text}{}", " ".repeat(width.saturating_sub(text.width())))
 }
 pub(crate) fn header(columns: &[String]) -> String {
     format!(
@@ -111,5 +115,6 @@ mod tests {
         assert_eq!(cell("abcdefgh", 5), "abcd…");
         assert_eq!(cell("a\nb", 5), "a b  ");
         assert_eq!(cell("éééééé", 5), "éééé…");
+        assert_eq!(cell("東京大阪", 5), "東京…");
     }
 }

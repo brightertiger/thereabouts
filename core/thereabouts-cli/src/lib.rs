@@ -1,7 +1,7 @@
 //! Native command IO and persistent installation state.
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 mod archive;
-pub mod error;
+pub use thereabouts_cli_core::{error, render};
 pub mod index;
 pub mod install;
 pub mod io;
@@ -10,12 +10,9 @@ pub mod transfer;
 
 mod args;
 mod batch;
-mod batch_spool;
 mod data;
 mod http;
 mod query;
 mod read_timeout;
-mod render;
 mod runner;
-mod table;
 pub use runner::run;

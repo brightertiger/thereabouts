@@ -1,12 +1,13 @@
 //! Output never changes result semantics, and batch rendering retains one row.
 use crate::{
-    args::Format,
+    Format,
     error::{Error, Result},
     io::Io,
 };
 use serde_json::{Map, Value};
 
-pub(crate) const FIELDS: &[&str] = &[
+/// Supported dotted paths, ordered by their public parent fields.
+pub const FIELDS: &[&str] = &[
     "status",
     "kind",
     "match",
@@ -39,7 +40,8 @@ pub(crate) const FIELDS: &[&str] = &[
     "hint",
     "evidence",
 ];
-pub(crate) fn fields(value: Option<&str>) -> Result<Option<Vec<String>>> {
+/// Validate an explicit ordered result-field selection.
+pub fn fields(value: Option<&str>) -> Result<Option<Vec<String>>> {
     value
         .map(|s| {
             s.split(',')
@@ -54,7 +56,9 @@ pub(crate) fn fields(value: Option<&str>) -> Result<Option<Vec<String>>> {
         })
         .transpose()
 }
-pub(crate) fn select(value: &Value, fields: Option<&[String]>) -> Value {
+/// Project named paths without changing their values.
+#[must_use]
+pub fn select(value: &Value, fields: Option<&[String]>) -> Value {
     fields.map_or_else(
         || value.clone(),
         |fields| {
@@ -91,13 +95,16 @@ fn csv_line(values: &[String]) -> Result<String> {
         .map_err(|e| Error::Integrity(e.to_string()))?;
     String::from_utf8(bytes).map_err(|e| Error::Integrity(e.to_string()))
 }
-pub(crate) struct Renderer {
+/// Incremental output with one header and no retained batch rows.
+pub struct Renderer {
     format: Format,
     columns: Option<Vec<String>>,
     rows: usize,
     batch: bool,
 }
 impl Renderer {
+    /// Start an output stream in the chosen encoding.
+    #[must_use]
     pub const fn new(format: Format, batch: bool) -> Self {
         Self {
             format,
@@ -106,6 +113,7 @@ impl Renderer {
             batch,
         }
     }
+    /// Emit one detached public result or pass-through row.
     pub fn row(&mut self, value: &Value, io: &mut dyn Io) -> Result<()> {
         match self.format {
             Format::Ndjson => io.stdout(&format!("{}\n", serde_json::to_string(value)?))?,
@@ -125,6 +133,7 @@ impl Renderer {
         self.rows += 1;
         Ok(())
     }
+    /// Set the tabular order before emitting its first header.
     pub fn columns(&mut self, columns: Vec<String>) {
         if self.columns.is_none() {
             self.columns = Some(columns);
@@ -195,6 +204,7 @@ impl Renderer {
         }
         Ok(())
     }
+    /// Close a streamed JSON batch, including an empty one.
     pub fn finish(&self, io: &mut dyn Io) -> Result<()> {
         if self.format == Format::Json && self.batch {
             io.stdout(if self.rows == 0 {

@@ -1,14 +1,8 @@
 //! One explicit command for each input domain.
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{Args, Parser, Subcommand};
 use std::path::PathBuf;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
-pub(crate) enum Format {
-    Table,
-    Json,
-    Ndjson,
-    Csv,
-}
+pub(crate) use thereabouts_cli_core::Format;
 
 #[derive(Debug, Args)]
 #[allow(clippy::struct_excessive_bools)] // Independent user-facing switches, validated by clap.
@@ -17,7 +11,7 @@ pub(crate) struct Global {
     #[arg(long, global = true)]
     pub data_dir: Option<PathBuf>,
     /// Choose table, JSON, NDJSON or CSV output; defaults to table on a TTY.
-    #[arg(long, global=true, value_enum, conflicts_with_all=["json","csv"])]
+    #[arg(long, global=true, conflicts_with_all=["json","csv"])]
     pub format: Option<Format>,
     /// Print one pretty JSON object (a results array for batches).
     #[arg(long, global = true, conflicts_with = "csv")]

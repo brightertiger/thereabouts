@@ -98,7 +98,7 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
             }
             let answer = query::run(&pack, command, cli.global.evidence)
                 .map_err(|e| e.at_pack(&path, family))?;
-            let exit = query::exit(answer.status, cli.global.strict);
+            let exit = thereabouts_cli_core::exit(answer.status, cli.global.strict);
             (
                 render::select(&serde_json::to_value(answer)?, fields.as_deref()),
                 exit,

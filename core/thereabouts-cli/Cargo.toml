@@ -8,16 +8,16 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
+thereabouts-cli-core = { path = "../thereabouts-cli-core" }
 clap = { version = "4", features = ["derive"] }
-csv = "1"
 ureq = { version = "3", default-features = false, features = ["rustls"] }
 thereabouts-core = { path = "../thereabouts-core" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-thiserror = "2"
 fs2 = "0.4"
 
 tempfile = "3"
 
 [dev-dependencies]
+csv = "1"
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }

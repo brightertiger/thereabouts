@@ -396,3 +396,11 @@ Bare invocation writes help to stderr and exits 2. Explicit --help writes to
 stdout and exits 0. Reverse help shows coordinate and FILE|- forms separately.
 Python discovery delegates directory selection to the same native store policy;
 macOS, Linux and Windows rules are compared with platformdirs in tests.
+
+The Rust thereabouts-cli-core crate owns batch detection/parsing, result-field
+selection, table/JSON/NDJSON/CSV rendering and the exit-code policy. It builds
+for wasm32-unknown-unknown and has no clap, HTTP or filesystem dependency.
+Hosts supply input/output streams and seekable temporary storage; table width
+is measured in terminal cells (including wide Unicode text). The native crate
+owns clap, files, temporary-file lifetimes, process environment and downloads.
+The Node binding uses this same portable policy through WASM.
