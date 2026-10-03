@@ -62,9 +62,24 @@ source points and pooled country/subdivision names and codes, with city detail
 and timezone null. A different core catalogue is incompatible, including at
 store activation. Core fixtures include the forward extracts' geographic closure;
 the reverse spatial coverage is unchanged. The writer accepts core_pack explicitly.
-The shared core sample uses 11,643,770 bytes.
+The shared core sample uses 14,740,365 bytes.
 It is larger than the original reverse-only sample because the independent
 forward source checks now resolve their full place closure through that one core.
+
+Catalogue strings are now contiguous per record, with evidence last. A miss is
+three bounded positioned reads: 80 bytes, at most 112 offset bytes and at most
+65,536 string bytes. Full verification also checks record ownership of every
+string reference. Core now requires manifest minor 2; older core packs must be rebuilt.
+The 25,000-place, single-shard workload uses 2,000 distinct random queries and
+fresh decoded caches, with warm filesystem caches; timings include Python.
+
+| Single shard | Median µs | p99 µs | Max hot strings B | Max offsets B |
+| --- | ---: | ---: | ---: | ---: |
+| before | 3784.646 | 7816.334 | 52,700,685 | 600,008 |
+| after | 88.708 | 281.082 | 31 | 48 |
+
+These measurements come from benchmarks.single_shard_read_path; both the synthetic
+and real-sample physical spans are retained in CLIENT_CORE_MEASUREMENTS.json.
 
 ## What changed in the package-2 rework
 
@@ -190,9 +205,9 @@ table below lists real vector counts; synthetic vectors additionally cover
 legacy codes, shared calling codes and alternate names. Pytest requires no real
 data. Node execution awaits its binding package.
 
-The full gate passed: 83 Rust tests; 745
+The full gate passed: 85 Rust tests; 745
 pytest passed and 9 skipped; strict mypy checked
-475 files. Rustfmt, Clippy with all targets/features, Ruff check,
+477 files. Rustfmt, Clippy with all targets/features, Ruff check,
 Ruff format and the wasm target check passed. Legacy reader and pipeline tests
 remain included. Skipped tests are reported separately from passing checks.
 
@@ -267,7 +282,7 @@ IPv6 low words are preserved; the measured export contains
 | Catalogue read path | Median µs | p99 µs | Batch rows/s |
 | --- | ---: | ---: | ---: |
 | before | 13.291 | 120.875 | 144578.55712150357 |
-| after | 7.5 | 51.083 | 242767.4272936086 |
+| after | 7.416 | 11.25 | 435478.98122715764 |
 <!-- catalogue-reads:end -->
 
 <!-- forward-scale:start -->

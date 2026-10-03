@@ -113,6 +113,8 @@ fn directory(
 #[derive(Debug)]
 pub(crate) struct FileShard {
     file: std::fs::File,
+    #[cfg(test)]
+    pub(crate) reads: std::sync::Mutex<Vec<usize>>,
     spans: Vec<(usize, usize)>,
 }
 impl FileShard {
@@ -123,7 +125,12 @@ impl FileShard {
         let mut header = vec![0; 32 + widths.len() * 32];
         file.read_exact(&mut header)?;
         let spans = directory(&header, length, kind, widths)?;
-        let shard = Self { file, spans };
+        let shard = Self {
+            file,
+            spans,
+            #[cfg(test)]
+            reads: std::sync::Mutex::new(vec![]),
+        };
         let mut end = header.len();
         for &(start, stop) in &shard.spans {
             ensure(
@@ -157,6 +164,11 @@ impl FileShard {
         self.read(start + offset, length)
     }
     fn read(&self, start: usize, length: usize) -> Result<Vec<u8>> {
+        #[cfg(test)]
+        self.reads
+            .lock()
+            .map_err(|_| Error::Corrupt("Test read log poisoned".into()))?
+            .push(length);
         let mut bytes = vec![0; length];
         super::positioned::read(&self.file, &mut bytes, start as u64)?;
         Ok(bytes)

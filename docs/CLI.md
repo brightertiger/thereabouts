@@ -268,7 +268,7 @@ The release index schema is:
               "url": "core.tar",
               "bytes": 123456,
               "sha256": "<64 lowercase hexadecimal characters>",
-              "format_minor": 0
+              "format_minor": 2
             },
             "postal": {
               "url": "postal.tar",
@@ -283,7 +283,7 @@ The release index schema is:
 
 Index JSON is limited to 16 MiB. Archive size is positive and at most 1 GiB.
 Unknown fields are rejected. The default release is the newest whose requested
-families exist and have supported format minors: core 0, forward families 2.
+families exist and have supported format minors: minor 2 for every family.
 Dotted numeric version components compare numerically; other components
 compare bytewise. Explicit unavailable/incompatible versions fail.
 

@@ -121,6 +121,13 @@ def main() -> None:
     reverse_vectors = json.loads(
         (ROOT / "tests/fixtures/core-sample-vectors.json").read_text()
     )
+    spans = core.get("single_shard", {})
+    span_rows = "\n".join(
+        f"| {phase} | {v['scalar_median_us']:.3f} | {v['scalar_p99_us']:.3f} | "
+        f"{v['single_shard_spans']['hot_text_max_bytes']:,} | "
+        f"{v['single_shard_spans']['hot_offsets_max_bytes']:,} |"
+        for phase, v in spans.items()
+    )
     text = f"""# Thereabouts client status
 
 The Rust runtime and Python reverse/forward API are implemented. This report
@@ -188,6 +195,20 @@ the reverse spatial coverage is unchanged. The writer accepts core_pack explicit
 The shared core sample uses {core["shared_catalogue"]["core_sample_bytes"]:,} bytes.
 It is larger than the original reverse-only sample because the independent
 forward source checks now resolve their full place closure through that one core.
+
+Catalogue strings are now contiguous per record, with evidence last. A miss is
+three bounded positioned reads: 80 bytes, at most 112 offset bytes and at most
+65,536 string bytes. Full verification also checks record ownership of every
+string reference. Core now requires manifest minor 2; older core packs must be rebuilt.
+The 25,000-place, single-shard workload uses 2,000 distinct random queries and
+fresh decoded caches, with warm filesystem caches; timings include Python.
+
+| Single shard | Median µs | p99 µs | Max hot strings B | Max offsets B |
+| --- | ---: | ---: | ---: | ---: |
+{span_rows}
+
+These measurements come from benchmarks.single_shard_read_path; both the synthetic
+and real-sample physical spans are retained in CLIENT_CORE_MEASUREMENTS.json.
 
 ## What changed in the package-2 rework
 

@@ -1,6 +1,6 @@
 # Thereabouts pack format 2
 
-This is the normative specification of `thereabouts-pack-2`, version 2.2 (forward) and the unchanged 2.0 core layouts.
+This is the normative specification of `thereabouts-pack-2`, version 2.2 for every family.
 A pack is an immutable directory: `manifest.json`, inventoried binary shards,
 and inventoried UTF-8 notices. All clients share the Rust implementation.
 This document defines `core` (reverse and canonical-city names), `postal`,
@@ -23,7 +23,7 @@ Required fields:
 | Field | Meaning |
 | --- | --- |
 | `schema` | `thereabouts-pack-2` |
-| `format_version`, `required_features` | Integers 2 and 0 |
+| `format_version`, `format_minor`, `required_features` | Integers 2, 2 and 0 |
 | `family` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, or `plates` |
 | `data_version` | Nonempty immutable dataset release, such as `2026.10` |
 | `reference_resolution`, `block_resolution` | Integers 8 and 3 |
@@ -35,7 +35,8 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.2.0` for core with names and `0.3.1` for forward families. Options contain `data_version`, `sources`, `attribution`, `notices`
+`0.2.2` for core with names and `0.4.0` for forward families. Forward
+identity also includes `family` and `core_catalogue`. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
 rules in `input_provenance`. No absolute build paths or run timestamps enter
@@ -227,7 +228,14 @@ Strings use a shard-local pool. Reference 0 is null. Offsets are uint64 starts
 relative to text, plus one terminal offset. The first two offsets are zero;
 a nonzero reference may designate an empty string. Offsets are nondecreasing,
 the terminal equals text length, every span is valid UTF-8. Writers deduplicate
-exact text in first-use order, including the added timezone string.
+exact text **within one record only**, in first-use order for fields 0–10,
+then timezone. Evidence has its own final string reference, even if its bytes
+equal another field. No string reference crosses a record boundary. The distinct
+nonzero references in each record are consecutive; their union, in record order,
+is exactly 1 through the last nonterminal string offset. A complete record-local
+string block, including evidence, is at most 65,536 bytes. Writers reject a
+larger record. This bound is checked before the reader allocates a string range.
+The offset range for one record is at most 14 × 8 = 112 bytes.
 `place_id`, `name`, `role`, `settlement_kind`, `country_code` are nonempty.
 Core additionally supplies evidence. When present, evidence is JSON text containing `golden_table`, decoded `source_ids`
 and decoded `name_provenance`; it does not contain full raw provenance.
@@ -312,9 +320,9 @@ directories, and the small metadata table. Spatial payloads are decoded and
 validated on first access (UTF-8, references, H3 validity, key ordering, ancestor
 disjointness, dictionaries and method/null rules as applicable). Catalogue
 records use three positioned reads on a miss: the 80-byte record, one span
-covering the minimum through maximum requested string offsets, then the
-corresponding UTF-8 text span. Only referenced strings are decoded/validated.
-Coalesced spans may contain intervening bytes; unrelated text is not decoded.
+of at most 112 bytes covering its requested offsets, then at most 65,536
+UTF-8 bytes. Record-local string blocks prevent intervening records from entering
+either range. Only referenced strings are decoded/validated.
 The evidence reference is excluded unless evidence was requested. No catalogue miss loads or validates an entire shard. Retained
 caches use constant-time linked-key LRU eviction: 8 MiB for decoded blocks and
 4 MiB for decoded places, with separate cache identities for query-only and
@@ -367,9 +375,9 @@ retaining a batch of result objects.
 
 ## Compressed forward tables (format 2.2)
 
-Every forward family requires manifest `format_minor: 2`; older forward
-packs are incompatible and must be rebuilt. Core spatial/name packs retain
-minor zero. Shared catalogue and metadata containers keep their unchanged
+Every family requires manifest `format_minor: 2`; older core and forward
+packs are incompatible and must be rebuilt. Core spatial/name packs also require
+minor two, enforcing record-local string blocks. Catalogue and metadata containers keep their
 minor-zero layouts; kinds 9, 10 and 11 require container minor one.
 
 Integer-table artifacts (kind 9) and string-pool artifacts (kind 10) contain

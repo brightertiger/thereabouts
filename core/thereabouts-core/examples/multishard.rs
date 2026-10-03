@@ -30,26 +30,35 @@ fn main() -> Result<()> {
     let output = std::env::args()
         .nth(1)
         .ok_or_else(|| Error::Input("Supply output directory".into()))?;
+    let single = std::env::args().nth(2).as_deref() == Some("single");
+    let count = if single {
+        25_000
+    } else {
+        SHARDS * PLACES_PER_SHARD
+    };
+    let per_shard = if single { count } else { PLACES_PER_SHARD };
     let output = Path::new(&output);
     fs::create_dir_all(output)?;
     let mut manifest = manifest::read(
         &Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/packs/core-synthetic"),
     )?;
     manifest.files.clear();
-    manifest.inputs = json!({"benchmark":"256 shards x 64 places; 2048-byte per-place evidence"});
+    manifest.name_normalization = None;
+    manifest.inputs = json!({"benchmark":"catalogue misses", "places":count, "places_per_shard":per_shard, "evidence_padding":2048});
     let root = LatLng::new(52.0, 4.0)
         .map_err(|e| Error::Input(e.to_string()))?
-        .to_cell(Resolution::Three);
-    let cells: Vec<_> = root
-        .children(Resolution::Eight)
-        .take(SHARDS * PLACES_PER_SHARD)
-        .collect();
-    let mut rows = Vec::new();
+        .to_cell(if single {
+            Resolution::Two
+        } else {
+            Resolution::Three
+        });
+    let cells: Vec<_> = root.children(Resolution::Eight).take(count).collect();
+    let mut rows = BTreeMap::<u32, Vec<(u16, Label)>>::new();
     let mut points = Vec::new();
-    for (shard, group) in cells.chunks(PLACES_PER_SHARD).enumerate() {
+    for (shard, group) in cells.chunks(per_shard).enumerate() {
         let mut places = Vec::new();
         for (local, cell) in group.iter().enumerate() {
-            let i = shard * PLACES_PER_SHARD + local;
+            let i = shard * per_shard + local;
             let reference = u32::try_from(i + 1).map_err(|e| Error::Input(e.to_string()))?;
             let mut text: [Option<String>; 12] = std::array::from_fn(|_| None);
             for (slot, value) in [
@@ -75,7 +84,10 @@ fn main() -> Result<()> {
                 population: 1000,
                 timezone: None,
             });
-            rows.push((address::address(*cell).1, Label([1, 0, reference, 9, 0])));
+            let (block, key) = address::address(*cell);
+            rows.entry(block)
+                .or_default()
+                .push((key, Label([1, 0, reference, 9, 0])));
             let centre = LatLng::from(*cell);
             points.push([centre.lat(), centre.lng()]);
         }
@@ -92,7 +104,7 @@ fn main() -> Result<()> {
         &mut manifest,
         "cells.bin",
         "cells",
-        &encode_blocks(&BTreeMap::from([(address::address(root).0, rows)]))?,
+        &encode_blocks(&rows)?,
     )?;
     let metadata = Metadata {
         timezone_sets: vec![vec![]],

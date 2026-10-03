@@ -75,12 +75,9 @@ impl Index {
             store::family(name)?;
         }
         let supported = |dataset: &Dataset| {
-            requested.iter().all(|name| {
-                dataset
-                    .packs
-                    .get(name)
-                    .is_some_and(|p| p.format_minor == 2 * u16::from(name != "core"))
-            })
+            requested
+                .iter()
+                .all(|name| dataset.packs.get(name).is_some_and(|p| p.format_minor == 2))
         };
         if let Some(version) = version {
             return self
@@ -125,8 +122,8 @@ mod tests {
         let mut index: Index = serde_json::from_value(serde_json::json!({
             "format": 2,
             "datasets": {
-                "2026.9": {"packs":{"core":{"url":"core.tar","bytes":1024,"sha256":"0".repeat(64),"format_minor":0}}},
-                "2026.10": {"packs":{"core":{"url":"core.tar","bytes":1024,"sha256":"0".repeat(64),"format_minor":0}}},
+                "2026.9": {"packs":{"core":{"url":"core.tar","bytes":1024,"sha256":"0".repeat(64),"format_minor":2}}},
+                "2026.10": {"packs":{"core":{"url":"core.tar","bytes":1024,"sha256":"0".repeat(64),"format_minor":2}}},
                 "2027.1": {"packs":{"core":{"url":"core.tar","bytes":1024,"sha256":"0".repeat(64),"format_minor":8}}}
             }
         })).unwrap();

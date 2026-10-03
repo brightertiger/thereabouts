@@ -559,23 +559,23 @@
     },
     "after": {
       "points": 100000,
-      "scalar_median_us": 7.5,
-      "scalar_p99_us": 51.083,
-      "reverse_columns_points_per_second": 242767.4272936086,
+      "scalar_median_us": 7.416,
+      "scalar_p99_us": 11.25,
+      "reverse_columns_points_per_second": 435478.98122715764,
       "reverse_columns_repeats": [
-        245645.14634736843,
-        271152.4008534382,
-        225659.05120585594,
-        243881.59546650405,
-        177719.28839050845,
-        227841.0571117887,
-        242767.4272936086
+        356024.6637822925,
+        409575.39600925957,
+        437207.765974292,
+        434817.346845266,
+        435478.98122715764,
+        464506.9302422855,
+        478665.0995499626
       ],
-      "open_seconds": 0.06216862500878051,
-      "open_rss_delta_bytes": 1015808,
+      "open_seconds": 0.006290708988672122,
+      "open_rss_delta_bytes": 1327104,
       "catalogue_shards": 256,
       "places": 16384,
-      "pack_bytes": 36678465,
+      "pack_bytes": 37226859,
       "seed": 20261003
     },
     "after_history": [
@@ -595,6 +595,27 @@
         ],
         "open_seconds": 0.05683249997673556,
         "open_rss_delta_bytes": 1245184,
+        "catalogue_shards": 256,
+        "places": 16384,
+        "pack_bytes": 36678465,
+        "seed": 20261003
+      },
+      {
+        "points": 100000,
+        "scalar_median_us": 7.5,
+        "scalar_p99_us": 51.083,
+        "reverse_columns_points_per_second": 242767.4272936086,
+        "reverse_columns_repeats": [
+          245645.14634736843,
+          271152.4008534382,
+          225659.05120585594,
+          243881.59546650405,
+          177719.28839050845,
+          227841.0571117887,
+          242767.4272936086
+        ],
+        "open_seconds": 0.06216862500878051,
+        "open_rss_delta_bytes": 1015808,
         "catalogue_shards": 256,
         "places": 16384,
         "pack_bytes": 36678465,
@@ -2299,10 +2320,10 @@
       "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832"
     },
     "validation": {
-      "rust_tests": 83,
+      "rust_tests": 85,
       "pytest_passed": 745,
       "pytest_skipped": 9,
-      "mypy_files": 475,
+      "mypy_files": 477,
       "gates": [
         "cargo fmt --check",
         "cargo clippy --all-targets --all-features -- -D warnings",
@@ -2727,6 +2748,62 @@
         "results_with_timezone": 0
       }
     },
-    "core_sample_bytes": 11643770
+    "core_sample_bytes": 14740365
+  },
+  "single_shard": {
+    "before": {
+      "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+      "scalar_median_us": 3784.6455,
+      "scalar_p99_us": 7816.33425,
+      "reverse_columns_points_per_second": 249.5040470203096,
+      "open_seconds": 0.002262708992930129,
+      "open_rss_delta_bytes": 704512,
+      "pack_bytes": 55854205,
+      "single_shard_spans": {
+        "catalogue_shards": 1,
+        "places": 25000,
+        "hot_text_median_bytes": 26339239.5,
+        "hot_text_p99_bytes": 52173456.089999996,
+        "hot_text_max_bytes": 52700685,
+        "hot_offsets_max_bytes": 600008,
+        "full_text_max_bytes": 52702773
+      },
+      "real_sample_spans": {
+        "catalogue_shards": 4,
+        "places": 29772,
+        "hot_text_median_bytes": 927565.0,
+        "hot_text_p99_bytes": 2082939.4600000002,
+        "hot_text_max_bytes": 2135215,
+        "hot_offsets_max_bytes": 216376,
+        "full_text_max_bytes": 2135427
+      }
+    },
+    "after": {
+      "scope": "warm file cache; 2000 distinct random places; fresh decoded caches for scalar and batch",
+      "scalar_median_us": 88.708,
+      "scalar_p99_us": 281.08183999999994,
+      "reverse_columns_points_per_second": 165459.0497555668,
+      "open_seconds": 0.0031696250080130994,
+      "open_rss_delta_bytes": 737280,
+      "pack_bytes": 56704188,
+      "single_shard_spans": {
+        "catalogue_shards": 1,
+        "places": 25000,
+        "hot_text_median_bytes": 31.0,
+        "hot_text_p99_bytes": 31.0,
+        "hot_text_max_bytes": 31,
+        "hot_offsets_max_bytes": 48,
+        "full_text_max_bytes": 2119
+      },
+      "real_sample_spans": {
+        "catalogue_shards": 4,
+        "places": 29772,
+        "hot_text_median_bytes": 90.0,
+        "hot_text_p99_bytes": 107.0,
+        "hot_text_max_bytes": 162,
+        "hot_offsets_max_bytes": 88,
+        "full_text_max_bytes": 457
+      }
+    }
   }
 }

@@ -28,18 +28,24 @@ fn cold_evidence_is_not_read_by_default_queries() {
     assert!(verify::verify(temp.path()).is_err());
 }
 #[test]
-fn forward_minor_zero_is_explicitly_incompatible() {
-    let source = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../tests/fixtures/packs/postal-synthetic");
-    let temp = tempfile::tempdir().unwrap();
-    let mut value: serde_json::Value =
-        serde_json::from_slice(&fs::read(source.join("manifest.json")).unwrap()).unwrap();
-    value["format_minor"] = 0.into();
-    fs::write(
-        temp.path().join("manifest.json"),
-        serde_json::to_vec(&value).unwrap(),
-    )
-    .unwrap();
-    let error = manifest::read(temp.path()).unwrap_err();
-    assert!(matches!(error, thereabouts_core::Error::Incompatible(_)));
+fn old_core_and_forward_minors_are_explicitly_incompatible() {
+    for family in ["postal", "core"] {
+        for minor in [0, 1] {
+            let source = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join(format!("../../tests/fixtures/packs/{family}-synthetic"));
+            let temp = tempfile::tempdir().unwrap();
+            let mut value: serde_json::Value =
+                serde_json::from_slice(&fs::read(source.join("manifest.json")).unwrap()).unwrap();
+            value["format_minor"] = minor.into();
+            fs::write(
+                temp.path().join("manifest.json"),
+                serde_json::to_vec(&value).unwrap(),
+            )
+            .unwrap();
+            assert!(matches!(
+                manifest::read(temp.path()).unwrap_err(),
+                thereabouts_core::Error::Incompatible(_)
+            ));
+        }
+    }
 }

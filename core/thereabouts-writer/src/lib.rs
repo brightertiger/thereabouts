@@ -118,7 +118,7 @@ pub fn write_pack(
         data.require_tables(&required, &options.allow_missing_tables)?;
     }
     let revision = if family == "core" {
-        "0.2.1" // Shared geography closure and country-narrowed catalogue zones.
+        "0.2.2" // Record-local catalogue strings bound positioned reads.
     } else {
         WRITER_REVISION
     };
@@ -205,7 +205,7 @@ fn build(
     let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {
         core_catalogue,
-        format_minor: 0,
+        format_minor: 2,
         forward_columns: None,
         plate_columns: None,
         storage: None,

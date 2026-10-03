@@ -1,4 +1,4 @@
-//! Eighty-byte place records with a shard-local UTF-8 pool.
+//! Eighty-byte place records with record-local UTF-8 blocks.
 use super::container::{Container, FileShard, encode, index, put, uint};
 use crate::{Result, error::ensure, result::Point};
 use serde::{Deserialize, Serialize};
@@ -86,29 +86,50 @@ impl Place {
         Ok(())
     }
 }
-/// Encode first-use string references; zero always means null.
-#[allow(clippy::indexing_slicing)] // Every present string is inserted before its reference is written.
+/// Maximum bytes in one record's strings, including evidence. The sample's
+/// largest record is below 4 KiB; 64 KiB leaves headroom without shard-sized reads.
+pub const MAX_RECORD_STRING_BYTES: usize = 64 * 1024;
+
+/// Encode record-local strings in first-use order, with cold evidence last.
+/// Identical hot strings share a reference only within the same record.
+#[allow(clippy::indexing_slicing)] // Fixed wire fields; loop indices are bounded by the 13-slot schema.
 pub fn encode_places(places: &[Place]) -> Result<Vec<u8>> {
-    let mut refs = BTreeMap::new();
     let mut offsets = vec![0_u64, 0];
     let mut text = vec![];
     let mut records = vec![];
     for place in places {
-        for value in place.text.iter().chain(std::iter::once(&place.timezone)) {
-            if let Some(s) = value
-                && !refs.contains_key(s)
-            {
-                refs.insert(s.clone(), offsets.len() - 1);
-                text.extend_from_slice(s.as_bytes());
-                offsets.push(text.len() as u64);
+        let mut refs = BTreeMap::new();
+        let mut references = [0; 13];
+        let start = text.len();
+        for i in (0..11).chain([12, 11]) {
+            let value = if i == 12 {
+                &place.timezone
+            } else {
+                &place.text[i]
+            };
+            if let Some(value) = value {
+                // Evidence always has its own final slot, even if equal to a hot string.
+                let reference = if i == 11 {
+                    None
+                } else {
+                    refs.get(value).copied()
+                };
+                let reference = reference.unwrap_or_else(|| {
+                    let reference = offsets.len() as u64 - 1;
+                    text.extend_from_slice(value.as_bytes());
+                    offsets.push(text.len() as u64);
+                    refs.insert(value, reference);
+                    reference
+                });
+                references[i] = reference;
             }
         }
-        for value in &place.text {
-            put(
-                &mut records,
-                value.as_ref().map_or(0, |s| refs[s] as u64),
-                4,
-            );
+        ensure(
+            text.len() - start <= MAX_RECORD_STRING_BYTES,
+            "Oversized record string block",
+        )?;
+        for reference in &references[..12] {
+            put(&mut records, *reference, 4);
         }
         for r in place.refs {
             put(&mut records, u64::from(r), 4);
@@ -116,11 +137,7 @@ pub fn encode_places(places: &[Place]) -> Result<Vec<u8>> {
         records.extend_from_slice(&place.latitude.to_le_bytes());
         records.extend_from_slice(&place.longitude.to_le_bytes());
         put(&mut records, u64::from(place.population), 4);
-        put(
-            &mut records,
-            place.timezone.as_ref().map_or(0, |s| refs[s] as u64),
-            4,
-        );
+        put(&mut records, references[12], 4);
     }
     let mut offset_bytes = vec![];
     for o in offsets {
@@ -152,7 +169,28 @@ impl Catalogue {
             previous = offset;
         }
         ensure(previous == pool.len(), "Invalid terminal string offset")?;
-        Ok(Self { container })
+        let catalogue = Self { container };
+        catalogue.validate_locality()?;
+        Ok(catalogue)
+    }
+    fn validate_locality(&self) -> Result<()> {
+        let offsets = self.container.section(1);
+        let mut next = 1;
+        for row in self.container.section(0).as_chunks::<80>().0 {
+            let (first, last) = string_bounds(row)?;
+            ensure(first == next, "Catalogue strings cross record boundaries")?;
+            let start = uint(offsets, index(first)? * 8, 8)?;
+            let end = uint(offsets, index(last + 1)? * 8, 8)?;
+            ensure(
+                end - start <= MAX_RECORD_STRING_BYTES as u64,
+                "Oversized record string block",
+            )?;
+            next = last + 1;
+        }
+        ensure(
+            index(next)? + 1 == offsets.len() / 8,
+            "Unused catalogue strings",
+        )
     }
     pub(crate) fn len(&self) -> usize {
         self.container.section(0).len() / 80
@@ -226,6 +264,32 @@ pub(crate) fn validate_header(shard: &FileShard) -> Result<()> {
         "Invalid terminal string offset",
     )
 }
+fn string_bounds(row: &[u8]) -> Result<(u64, u64)> {
+    let mut refs = std::collections::BTreeSet::new();
+    let evidence = uint(row, 44, 4)?;
+    for offset in (0..48).step_by(4).chain(std::iter::once(76)) {
+        let reference = uint(row, offset, 4)?;
+        if reference != 0 {
+            ensure(
+                offset == 44 || reference != evidence,
+                "Evidence shares a hot string reference",
+            )?;
+            refs.insert(reference);
+        }
+    }
+    let first = refs.first().copied().unwrap_or(0);
+    let last = refs.last().copied().unwrap_or(0);
+    ensure(
+        first != 0 && last - first + 1 == refs.len() as u64,
+        "Nonlocal record strings",
+    )?;
+    ensure(
+        evidence == 0 || evidence == last,
+        "Evidence must end the record string block",
+    )?;
+    Ok((first, last))
+}
+
 /// Coalesce one record's requested offsets and text into two positioned reads.
 /// Evidence is excluded from the reference span unless the caller requests it.
 pub(crate) fn read_place(shard: &FileShard, record: usize, evidence: bool) -> Result<Place> {
@@ -233,32 +297,30 @@ pub(crate) fn read_place(shard: &FileShard, record: usize, evidence: bool) -> Re
         .checked_mul(80)
         .ok_or_else(|| crate::Error::Corrupt("Record overflow".into()))?;
     let mut row = shard.range(0, offset, 80)?;
+    string_bounds(&row)?;
     if !evidence {
         row.get_mut(44..48)
             .ok_or_else(|| crate::Error::Corrupt("Missing evidence slot".into()))?
             .fill(0);
     }
-    let mut references = Vec::with_capacity(13);
-    for offset in (0..48).step_by(4).chain(std::iter::once(76)) {
-        let reference = uint(&row, offset, 4)?;
-        if reference != 0 {
-            references.push(reference);
-        }
-    }
-    let first = references.iter().copied().min().unwrap_or(0);
-    let last = references.iter().copied().max().unwrap_or(0);
+    let (first, last) = string_bounds(&row)?;
     let position = index(first)?
         .checked_mul(8)
         .ok_or_else(|| crate::Error::Corrupt("String offset overflow".into()))?;
     let length = index(last - first + 2)?
         .checked_mul(8)
         .ok_or_else(|| crate::Error::Corrupt("String span overflow".into()))?;
+    ensure(length <= 14 * 8, "Oversized record offset span")?;
     let offsets = shard.range(1, position, length)?;
     let text_start = index(uint(&offsets, 0, 8)?)?;
     let text_end = index(uint(&offsets, length - 8, 8)?)?;
     let length = text_end
         .checked_sub(text_start)
         .ok_or_else(|| crate::Error::Corrupt("Reversed text span".into()))?;
+    ensure(
+        length <= MAX_RECORD_STRING_BYTES,
+        "Oversized record string block",
+    )?;
     let text = shard.range(2, text_start, length)?;
     decode_record(&row, |reference| {
         if reference == 0 {
@@ -289,6 +351,73 @@ pub fn decode(bytes: Vec<u8>) -> Result<Vec<Place>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn record_reads_are_bounded_and_evidence_is_separate() {
+        let mut places = vec![];
+        for i in 0..1000 {
+            places.push(Place {
+                text: std::array::from_fn(|field| {
+                    Some(if field == 11 {
+                        format!("{{\"padding\":\"{}\",\"id\":{i}}}", "x".repeat(2048))
+                    } else {
+                        format!("field{field}:record{i}")
+                    })
+                }),
+                refs: [0; 4],
+                latitude: i32::MIN,
+                longitude: i32::MIN,
+                population: 0,
+                timezone: Some("Shared/Zone".into()),
+            });
+        }
+        let bytes = encode_places(&places).unwrap();
+        let decoded = decode(bytes.clone()).unwrap();
+        assert_eq!(decoded[999].text, places[999].text);
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("large.bin");
+        std::fs::write(&path, bytes).unwrap();
+        let shard = FileShard::open(&path, 2, &[80, 8, 1]).unwrap();
+        for evidence in [false, true] {
+            shard.reads.lock().unwrap().clear();
+            let place = read_place(&shard, 999, evidence).unwrap();
+            assert_eq!(place.timezone.as_deref(), Some("Shared/Zone"));
+            assert_eq!(place.text[11].is_some(), evidence);
+            let reads = shard.reads.lock().unwrap();
+            assert_eq!(reads.len(), 3);
+            assert_eq!(reads[0], 80);
+            assert!(reads[1] <= 112);
+            assert!(reads[2] <= if evidence { 4096 } else { 256 });
+        }
+        places[0].text[11] = Some("x".repeat(MAX_RECORD_STRING_BYTES));
+        assert!(encode_places(&places[..1]).is_err());
+    }
+    #[test]
+    fn cross_record_string_reference_is_rejected() {
+        let place = Place {
+            text: std::array::from_fn(|i| Some(if i == 11 { "{}".into() } else { "x".into() })),
+            refs: [0; 4],
+            latitude: i32::MIN,
+            longitude: i32::MIN,
+            population: 0,
+            timezone: None,
+        };
+        let mut bytes = encode_places(&[place.clone(), place]).unwrap();
+        let start = index(uint(&bytes, 40, 8).unwrap()).unwrap();
+        // The second record cannot reuse the first record's "x" reference.
+        bytes[start + 80..start + 84].copy_from_slice(&1u32.to_le_bytes());
+        assert!(decode(bytes).is_err());
+        let mut bytes = encode_places(&[Place {
+            text: std::array::from_fn(|_| Some("{}".into())),
+            refs: [0; 4],
+            latitude: i32::MIN,
+            longitude: i32::MIN,
+            population: 0,
+            timezone: None,
+        }])
+        .unwrap();
+        bytes[start + 44..start + 48].copy_from_slice(&1u32.to_le_bytes());
+        assert!(decode(bytes).is_err());
+    }
     #[test]
     fn record_miss_does_not_validate_unrelated_strings() {
         let first = Place {

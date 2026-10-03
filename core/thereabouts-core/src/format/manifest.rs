@@ -44,7 +44,7 @@ pub struct Manifest {
     /// Exact shared core catalogue identity; required for forward format 2.2.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub core_catalogue: Option<CoreCatalogue>,
-    /// Shared-catalogue forward packs require minor two; core retains zero.
+    /// All families require minor two: shared geography and bounded catalogue reads.
     #[serde(default, skip_serializing_if = "zero")]
     pub format_minor: u16,
     /// Compressed forward dictionary schema, absent for spatial/name-only core.
@@ -233,7 +233,7 @@ pub fn verify(root: &Path, m: &Manifest) -> Result<()> {
 
 fn compatible_minor(m: &Manifest) -> Result<()> {
     if m.family == "core"
-        && (m.format_minor != 0 || m.forward_columns.is_some() || m.plate_columns.is_some())
+        && (m.format_minor != 2 || m.forward_columns.is_some() || m.plate_columns.is_some())
         || m.family != "core"
             && m.files
                 .iter()
