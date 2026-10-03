@@ -196,6 +196,8 @@ def main() -> None:
                 if key in previous
             },
         )
+        # Preserve other benchmark series when refreshing only the reverse path.
+        result = previous | result
     if args.baseline:
         result["before_lazy_open"] = json.loads(args.baseline.read_text())
     payload = json.dumps(result, indent=2) + "\n"

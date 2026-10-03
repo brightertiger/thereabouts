@@ -90,7 +90,10 @@ def main() -> None:
         seed=20261003,
     )
     data = json.loads(args.output.read_text())
-    data.setdefault(args.series, {})[args.record] = result
+    series = data.setdefault(args.series, {})
+    if args.record in series:
+        series.setdefault(f"{args.record}_history", []).append(series[args.record])
+    series[args.record] = result
     args.output.write_text(json.dumps(data, indent=2) + "\n")
     if args.series == "catalogue_read_rework":
         update_status(data[args.series])

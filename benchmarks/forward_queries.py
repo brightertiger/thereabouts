@@ -1,10 +1,10 @@
 """Enumerate published sample keys, retaining each verb's required context."""
 
-import json
 from dataclasses import dataclass
 from typing import Any
 
 from benchmarks.core_read_path import ROOT
+from tools.source_fixture import read_source
 
 
 @dataclass(frozen=True, order=True)
@@ -18,9 +18,7 @@ class Query:
 
 def queries(family: str) -> list[Query]:
     """All source keys; plates use all code/country assertions, not full plates."""
-    rows = json.loads((ROOT / f"tests/fixtures/{family}-source.json").read_text())[
-        "rows"
-    ]
+    rows = read_source(ROOT / f"tests/fixtures/{family}-source.json.gz")["rows"]
     result: set[Query] = set()
     for row in rows:
         country = (("country", row.get("country_code")),)
@@ -61,8 +59,8 @@ def misses(family: str) -> list[Query]:
 
 
 def airport_defaults() -> list[Query]:
-    rows: list[dict[str, Any]] = json.loads(
-        (ROOT / "tests/fixtures/airports-source.json").read_text()
+    rows: list[dict[str, Any]] = read_source(
+        ROOT / "tests/fixtures/airports-source.json.gz"
     )["rows"]
     return sorted(
         {Query(r[k]) for r in rows for k in ("iata_code", "icao_code") if r[k]}

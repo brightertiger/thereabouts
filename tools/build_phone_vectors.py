@@ -1,13 +1,12 @@
 """Freeze shared phone vectors; source assertions remain independent."""
 
-import json
-
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
+from tools.source_fixture import read_source
 
 
 def main() -> None:
-    source = json.loads((FIXTURES / "phone-source.json").read_text())
+    source = read_source(FIXTURES / "phone-source.json.gz")
     chosen: dict[str, set[str]] = {}
     requests = []
     for row in source["rows"]:

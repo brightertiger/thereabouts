@@ -7,6 +7,7 @@ from typing import Any
 
 from tests.conformance.forward_legacy import assert_case, resolve
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests/fixtures"
@@ -31,7 +32,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("family", choices=["postal", "airports", "locode"])
     family = parser.parse_args().family
-    source = json.loads((FIXTURES / f"{family}-source.json").read_text())
+    source = read_source(FIXTURES / f"{family}-source.json.gz")
     verb = "airport" if family == "airports" else family
     requests = []
     codes: dict[str, set[str]] = {}

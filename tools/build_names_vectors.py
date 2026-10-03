@@ -1,14 +1,14 @@
 """Freeze city-name vectors; independent source/ranking assertions run in pytest."""
 
-import json
 from typing import Any
 
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
+from tools.source_fixture import read_source
 
 
 def main() -> None:
-    source = json.loads((FIXTURES / "geocode-source.json").read_text())
+    source = read_source(FIXTURES / "geocode-source.json.gz")
     seen: dict[str, int] = {}
     requests: list[dict[str, Any]] = []
     for row in source["rows"]:

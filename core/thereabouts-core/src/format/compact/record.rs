@@ -72,8 +72,19 @@ impl Compact {
         )?;
         let mut details = serde_json::Map::new();
         for (name, value) in self.schema.detail_fields.iter().zip(values) {
-            if let Some(text) = self.text(value)? {
-                details.insert(name.clone(), serde_json::from_str(&text)?);
+            ensure(value != 1, "Missing tagged scalar string")?;
+            if let Some(text) = self.text(value >> 1)? {
+                let scalar = if value & 1 == 1 {
+                    serde_json::Value::String(text)
+                } else {
+                    let scalar: serde_json::Value = serde_json::from_str(&text)?;
+                    ensure(
+                        scalar.is_null() || scalar.is_boolean() || scalar.is_number(),
+                        "Invalid non-string detail scalar",
+                    )?;
+                    scalar
+                };
+                details.insert(name.clone(), scalar);
             }
         }
         Ok(Some(serde_json::to_string(&details)?))

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -21,7 +22,7 @@ def test_phone_vectors(name: str) -> None:
 
 
 def test_independent_phone_prefixes() -> None:
-    rows = json.loads((FIXTURES / "phone-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "phone-source.json.gz")["rows"]
     with Geocoder(FIXTURES / "packs/phone-sample") as geo:
         for row in rows:
             prefix = row["prefix"] or row["calling_code"]

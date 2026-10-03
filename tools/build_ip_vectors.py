@@ -1,14 +1,14 @@
 """Freeze IP boundary, family and malformed-input vectors."""
 
 import ipaddress
-import json
 
 from thereabouts import Geocoder
 from tools.build_forward_vectors import FIXTURES, write
+from tools.source_fixture import read_source
 
 
 def main() -> None:
-    source = json.loads((FIXTURES / "ip-source.json").read_text())
+    source = read_source(FIXTURES / "ip-source.json.gz")
     selected: set[tuple[str, int]] = set()
     requests = []
     for row in source["rows"]:

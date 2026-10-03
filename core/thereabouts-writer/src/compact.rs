@@ -77,8 +77,13 @@ pub(crate) fn encode_record(
         )?;
         let mut values = Vec::new();
         for field in fields {
-            let value = object.get(*field).map(serde_json::to_string).transpose()?;
-            values.push(dict.string(value.as_deref(), true)?);
+            let value = object.get(*field);
+            let reference = match value {
+                Some(serde_json::Value::String(text)) => dict.string(Some(text), true)? * 2 + 1,
+                Some(value) => dict.string(Some(&serde_json::to_string(value)?), true)? * 2,
+                None => 0,
+            };
+            values.push(reference);
         }
         detail = dict.tuple("details", &values)?;
     }
@@ -136,6 +141,7 @@ pub(crate) fn emit(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Re
         format::compact::detail_fields(&family).len(),
     )?;
     manifest.forward_columns = Some(Schema {
+        detail_encoding: "tagged_scalars".into(),
         detail_fields: format::compact::detail_fields(&family)
             .iter()
             .map(|s| (*s).into())
@@ -153,7 +159,7 @@ fn exact(
     let airport = manifest.family == "airports";
     if airport {
         validate_airport_identity(db)?;
-        db.execute_batch("CREATE TABLE airport_rows(source TEXT,source_id TEXT,id INTEGER,PRIMARY KEY(source,source_id)) WITHOUT ROWID")?;
+        db.execute_batch("CREATE TABLE airport_rows(source TEXT,source_id TEXT,id INTEGER,name INTEGER,details INTEGER,PRIMARY KEY(source,source_id)) WITHOUT ROWID")?;
     }
     let sql = if airport {
         "SELECT * FROM observations GROUP BY source,source_id ORDER BY source COLLATE BINARY,source_id COLLATE BINARY"
@@ -169,18 +175,25 @@ fn exact(
     for row in query.query_map([], record)? {
         let (key, record) = row?;
         let ordinal = records.count;
+        let (location, fields) = encode_record(dict, &record, &manifest.family)?;
         if airport {
-            db.prepare_cached("INSERT INTO airport_rows VALUES(?,?,?)")?
+            let name = dict.string(record.text.get(2).and_then(Option::as_deref), true)?;
+            let detail = fields
+                .get(5)
+                .copied()
+                .ok_or_else(|| Error::Input("Missing airport details".into()))?;
+            db.prepare_cached("INSERT INTO airport_rows VALUES(?,?,?,?,?)")?
                 .execute(rusqlite::params![
                     record.text.first().and_then(Option::as_deref),
                     record.text.get(1).and_then(Option::as_deref),
-                    ordinal
+                    ordinal,
+                    name,
+                    detail
                 ])?;
         } else if previous.as_ref() != Some(&key) {
             keys.insert(&key, ordinal as u64).map_err(fst_error)?;
             previous = Some(key);
         }
-        let (location, fields) = encode_record(dict, &record, &manifest.family)?;
         records.push(manifest, ordinal as u128, vec![location])?;
         evidence.push(manifest, ordinal as u128, fields)?;
     }

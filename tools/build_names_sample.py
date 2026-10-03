@@ -12,6 +12,7 @@ import pyarrow as pa
 from thereabouts import _core
 from tools.build_forward_samples import ROOT
 from tools.forward_sample import COUNTRIES, Subset
+from tools.source_fixture import write_source
 
 
 def key(value: str) -> str:
@@ -115,16 +116,12 @@ def main() -> None:
             "longitude",
             "country_code",
         )
-        (ROOT / "tests/fixtures/geocode-source.json").write_text(
-            json.dumps(
-                {
-                    "provenance": provenance,
-                    "rows": [{k: r.get(k) for k in fields} for r in rows],
-                },
-                ensure_ascii=False,
-                indent=2,
-            )
-            + "\n"
+        write_source(
+            ROOT / "tests/fixtures/geocode-source.json.gz",
+            {
+                "provenance": provenance,
+                "rows": [{k: r.get(k) for k in fields} for r in rows],
+            },
         )
         print(
             json.dumps(

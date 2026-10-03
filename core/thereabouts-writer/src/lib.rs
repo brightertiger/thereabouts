@@ -40,7 +40,7 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.3.1";
+const WRITER_REVISION: &str = "0.3.3";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -115,8 +115,6 @@ pub fn write_pack(
     }
     let revision = if family == "core" {
         "0.2.0" // Core exports now include canonical-city spellings.
-    } else if family == "postal" {
-        "0.3.2" // Preserve key countries for observations without linked places.
     } else {
         WRITER_REVISION
     };

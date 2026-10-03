@@ -8,8 +8,11 @@ from typing import Any
 
 from thereabouts import _core
 from tools.forward_sample import COUNTRIES, Subset
+from tools.source_fixture import write_source
 
 ROOT = Path(__file__).resolve().parents[1]
+# Thousands of rows exercise full compressed blocks, including cold evidence.
+KEYS_PER_COUNTRY = {"postal": 1024, "airports": 512, "locode": 512}
 PREFERRED = {
     "postal": {
         "BE": {"1000"},
@@ -33,7 +36,10 @@ def postal(source: Subset) -> list[dict[str, Any]]:
                 if country not in COUNTRIES:
                     continue
                 code = row["postal_code"].strip().upper().replace(" ", "")
-                if len(chosen[country]) < 32 or code in PREFERRED["postal"][country]:
+                if (
+                    len(chosen[country]) < KEYS_PER_COUNTRY["postal"]
+                    or code in PREFERRED["postal"][country]
+                ):
                     chosen[country].add(code)
                 if code in chosen[country]:
                     rows.append(row)
@@ -56,7 +62,7 @@ def points(source: Subset, family: str) -> list[dict[str, Any]]:
                     continue
                 code = row[field]
                 if (
-                    len(chosen[country]) < 32
+                    len(chosen[country]) < KEYS_PER_COUNTRY[family]
                     or row["iata_code"] in preferred
                     or (family == "locode" and code == "INBOM")
                 ):
@@ -89,6 +95,11 @@ def main() -> None:
         }[args.family]
         total = sum(t["rows"] for t in source.inventory(primary))
         provenance = source.finish(args.family, total)
+        provenance["subset_policy"] = (
+            f"first {KEYS_PER_COUNTRY[args.family]} distinct codes per country "
+            "plus named examples; "
+            "all observations for selected keys and referenced geographic context"
+        )
         _core.write_pack(
             str(source.output),
             args.family,
@@ -136,9 +147,7 @@ def main() -> None:
                 for r in rows
             ],
         }
-        (ROOT / f"tests/fixtures/{args.family}-source.json").write_text(
-            json.dumps(oracle, ensure_ascii=False, indent=2) + "\n"
-        )
+        write_source(ROOT / f"tests/fixtures/{args.family}-source.json.gz", oracle)
     print(
         json.dumps(
             {

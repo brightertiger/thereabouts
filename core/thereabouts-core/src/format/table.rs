@@ -198,8 +198,12 @@ impl Table {
         Ok(())
     }
 }
-/// Encode a bounded UTF-8 pool block with u32 local offsets.
+/// Choose offsets or front coding by compressed size while preserving pool row IDs.
 pub fn encode_strings(values: &[String]) -> Result<Vec<u8>> {
+    ensure(
+        (1..=columns::BLOCK_ROWS).contains(&values.len()),
+        "Invalid string row count",
+    )?;
     let mut offsets = Vec::new();
     let mut text = Vec::new();
     put(&mut offsets, 0, 4);
@@ -212,9 +216,28 @@ pub fn encode_strings(values: &[String]) -> Result<Vec<u8>> {
         offsets.len() <= columns::BLOCK_BYTES,
         "Oversized string pool block",
     )?;
-    Ok(offsets)
+    let mut best = offsets;
+    let mut size = columns::compress(&best)?.len();
+    for (reverse, separate) in [(false, false), (true, false), (false, true), (true, true)] {
+        if let Ok(front) = super::string_block::encode(values, reverse, separate) {
+            let length = columns::compress(&front)?.len();
+            if length < size {
+                best = front;
+                size = length;
+            }
+        }
+    }
+    Ok(best)
 }
-fn decode_strings(bytes: &[u8], rows: usize) -> Result<Vec<String>> {
+/// Decode an admitted pool block and restore original row IDs after front coding.
+pub fn decode_strings(bytes: &[u8], rows: usize) -> Result<Vec<String>> {
+    ensure(
+        (1..=columns::BLOCK_ROWS).contains(&rows) && bytes.len() <= columns::BLOCK_BYTES,
+        "Invalid string block shape",
+    )?;
+    if uint(bytes, 0, 4)? >= u64::from(u32::MAX - 3) {
+        return super::string_block::decode(bytes, rows);
+    }
     let start = (rows + 1) * 4;
     ensure(
         start <= bytes.len() && uint(bytes, 0, 4)? == 0,

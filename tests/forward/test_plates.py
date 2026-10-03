@@ -8,6 +8,7 @@ import pytest
 
 from build_data.plate_country.resolver import Resolver
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -26,7 +27,7 @@ def test_plate_vectors() -> None:
 
 
 def test_reference_plate_matches() -> None:
-    source = json.loads((FIXTURES / "plates-source.json").read_text())
+    source = read_source(FIXTURES / "plates-source.json.gz")
     reference = copy.deepcopy(source["bundle"])
     # Missing vehicle priors are an explicit sample omission. Disable this term
     # in the independent reference; the neutral row only satisfies its constructor.

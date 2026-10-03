@@ -1,10 +1,10 @@
 """Named examples must exist in both the independent extracts and the packs."""
 
 import ipaddress
-import json
 from pathlib import Path
 
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -12,7 +12,7 @@ FIXTURES = Path(__file__).parents[1] / "fixtures"
 def test_google_ipv6_country_exception() -> None:
     address = "2001:4860:4860::8888"
     value = int(ipaddress.ip_address(address))
-    rows = json.loads((FIXTURES / "ip-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "ip-source.json.gz")["rows"]
     matches = [
         r
         for r in rows
@@ -34,14 +34,14 @@ def test_google_ipv6_country_exception() -> None:
 
 
 def test_bombay_locode_and_published_mumbai_phone_prefix() -> None:
-    rows = json.loads((FIXTURES / "locode-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "locode-source.json.gz")["rows"]
     assert any(r["locode"] == "INBOM" for r in rows)
     with Geocoder(FIXTURES / "packs/locode-sample") as geo:
         result = geo.locode("INBOM")
         assert result.status == "matched"
         assert result.country is not None and result.country.code == "IN"
         assert result == geo.locode("BOM", country="IN")
-    rows = json.loads((FIXTURES / "phone-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "phone-source.json.gz")["rows"]
     prefixes = {r["prefix"] for r in rows if (r["prefix"] or "").startswith("9122")}
     assert prefixes == {"91222", "91223", "91224", "91225", "91226", "91227"}
     with Geocoder(FIXTURES / "packs/phone-sample") as geo:

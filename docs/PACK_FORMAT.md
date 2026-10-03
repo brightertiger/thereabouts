@@ -403,13 +403,14 @@ follow consecutively, each with a 16-byte descriptor and variable payload:
 
 | Offset | Type | Meaning |
 | --- | --- | --- |
-| 0 | u8 | Mode: 0 frame of reference; 1 local dictionary |
+| 0 | u8 | Mode: 0/1 direct, 2/3 delta, 4/5 nonzero delta, 6/7 signed-u32 order; even = frame, odd = dictionary |
 | 1 | u8 | Bits per packed value, 0 through 64 |
-| 2 | u16 | Dictionary entries; zero in mode 0 |
-| 4 | u32 | Reserved zero |
-| 8 | u64 | Base value; zero in mode 1 |
+| 2 | u16 | Dictionary entries; zero in even modes |
+| 4 | u32 | Frame divisor minus one; zero for dictionary modes |
+| 8 | u64 | Base value; zero in odd modes |
 
-Mode 0 stores minimum plus unsigned deltas, with the minimum in the base.
+Mode 0 stores minimum plus packed value times divisor, with the minimum in
+the base. Multiplication and addition must not overflow u64.
 Mode 1 stores a strictly increasing dictionary of u64 values immediately after
 the descriptor, then zero-based dictionary selectors. Dictionary cardinality
 is 1 through row count. In either mode, packed values follow in row order:
@@ -417,14 +418,68 @@ value bit b for row r is bit `(r * width + b) % 8` in byte
 `floor((r * width + b) / 8)`. Padding bits are zero. Width zero has no payload.
 There is no per-column alignment. Addition cannot overflow and dictionary
 selectors must exist. The block ends immediately after the final payload.
-Writers choose the minimum width needed, and dictionary mode only when its
+For each transform, writers start with the minimum width needed, and select
+dictionary mode only when its
 8-byte entries plus packed selectors are strictly smaller than packed deltas.
-Byte widths 8/16/32/64 are the same representation as fixed-width integers.
+The writer also tries rounding width up to a whole number of bytes and keeps
+it only when LZ4 compression is smaller; ties retain minimal width. This is
+the fixed-width integer representation, with no separate alignment or tag.
+In frame modes, writers use the greatest common divisor of all differences
+from the minimum when that divisor lies in 2..u32::MAX, otherwise 1. Scaling is
+lossless and removes published fixed coordinate precision without rounding.
+Dictionary values remain unscaled.
 
-A string-pool block is `row_count + 1` u32 offsets followed by UTF-8 bytes.
+Modes 2–5 add an eight-byte initial original value immediately after the
+descriptor, before any dictionary. Decode frame/dictionary values as above,
+then undo the delta transform. Modes 2/3 encode each difference from the
+previous original value with zigzag
+`(difference << 1) XOR (0 - (difference >> 63))`; arithmetic wraps modulo 2^64.
+The first decoded delta must be zero; update the previous value by adding
+`(delta >> 1) XOR (0 - (delta AND 1))`.
+Modes 4/5 reserve encoded value zero for an original zero, which does not
+update the previous value. Nonzero encoded values are zigzag difference + 1.
+The initial original value is the first nonzero value, and the first nonzero
+encoded value must be 1; reconstructed nonzero values cannot equal zero.
+A writer cannot choose modes 4/5 if incrementing any zigzag value overflows.
+Modes 6/7 first XOR each original value with 0x80000000 and then encode
+the resulting unsigned values with the same scaled frame or dictionary.
+They are admissible only when every original value fits u32; decoded values
+must also fit u32 before undoing XOR. This places signed i32 coordinate bit
+patterns in numeric order, including points west/south of zero. No additional
+initial-value word is present in modes 6/7.
+Choose among direct/delta/nonzero-delta/signed-u32 by smallest LZ4 compressed
+column length (ties retain the earlier mode pair), then compress the whole block.
+
+A string-pool block has either direct offsets or front coding. Direct form is
+`row_count + 1` u32 offsets followed by UTF-8 bytes.
 Offsets begin at zero, are nondecreasing, and the terminal offset equals the
-text length; every span must be valid UTF-8. A pack has one logical pool,
-partitioned as `strings` (query fields) and `evidence_strings` (cold fields).
+text length; every span must be valid UTF-8.
+
+Front-coded form begins with a u32 tag, then u32 permutation bit width.
+Tags 0xffffffff and 0xfffffffe select interleaved prefix and suffix coding;
+0xfffffffd and 0xfffffffc select prefix and suffix coding with separated
+length columns. The width is `ceil(log2(row_count))` (zero for one row). Next are row_count packed unsigned
+original row ordinals, in sorted-string order, using the same bit order and
+zero padding as integer columns. They must form a permutation of 0..row_count.
+In interleaved form, each sorted string stores common-prefix byte length
+and suffix byte length followed by that suffix's bytes. In separated form,
+all row_count common-prefix lengths come first, then all row_count suffix
+lengths, then all suffix byte spans concatenated in sorted order.
+Lengths use canonical unsigned base-128 varints (low seven bits first, bit 7
+continues, at most three bytes). For suffix coding, reverse each string's UTF-8
+**bytes** before sorting and coding, then reverse each reconstructed
+byte sequence back before UTF-8 validation. Prefix coding does not reverse.
+The preceding transformed string starts empty. Prefix length cannot exceed the
+preceding string's byte length; reconstruction must yield valid UTF-8 after undoing the optional reversal,
+and transformed byte strings must have nondecreasing byte order.
+The combined reconstructed text length plus `4*(row_count+1)` cannot exceed
+64 KiB. There are no trailing bytes. Writers retain whichever representation
+has fewer LZ4 compressed bytes, choosing direct offsets, then interleaved prefix,
+interleaved suffix,
+separated prefix and separated suffix on ties.
+The permutation restores stable pool IDs independently of lexical order.
+
+A pack has one logical pool, partitioned as `strings` (query fields) and `evidence_strings` (cold fields).
 Each partition reserves row zero as the empty null slot; positive rows may
 represent an actual empty string. String reference zero is null. Otherwise
 reference `2*r` selects row r in strings, and `2*r+1` selects row r in
@@ -433,7 +488,8 @@ tagged string references. Text interning is exact Unicode byte equality.
 
 The non-plate families require `forward_columns` in the manifest, containing
 `source_rows` (original input observations, one per airport) and the ordered
-`detail_fields` listed below. These roles have fixed integer columns:
+`detail_fields` listed below and `detail_encoding: "tagged_scalars"`. These roles have fixed
+integer columns:
 
 | Role | Columns in order |
 | --- | --- |
@@ -444,7 +500,7 @@ The non-plate families require `forward_columns` in the manifest, containing
 | evidence / evidence4 / evidence6 | source string, source-id prefix string, line-plus-one, code string, scheme string, details ordinal |
 | airport_evidence | first assertion ordinal, assertion count |
 | airport_assertions | name string, details ordinal |
-| details | One nullable JSON-scalar string reference per detail_fields entry |
+| details | One tagged scalar per detail_fields entry |
 | starts4 / starts6 (IP only) | address high 64 bits, address low 64 bits, location ordinal |
 
 Geographies, locations and details reserve row zero as an all-zero null tuple.
@@ -455,8 +511,10 @@ without fetching source strings. Source identity remains authoritative during
 writing. Airports have exactly one record per (source, source_id); conflicting
 geographic or coordinate fields for that identity are rejected. Different
 published names/details are preserved as assertions. Airport_evidence aligns
-with postings (not airport records), and selects a nonempty contiguous span in
-airport_assertions. Spans concatenate from zero; assertions are distinct
+with postings (not airport records). A zero assertion count reuses that airport
+record's name/details pair; a positive count selects a contiguous span in
+airport_assertions. Spans concatenate from zero (including zero-count spans);
+assertions are distinct
 name/details pairs in bytewise name/details order for that exact scheme key and
 airport. Thus a renamed assertion without a GPS code does not acquire the GPS
 scheme from another assertion. Both tables are evidence-only.
@@ -466,8 +524,12 @@ A non-null source ID with a canonical decimal u32 suffix after its final colon
 is stored as the prefix including colon and suffix + 1. Line zero means the
 prefix contains the full source ID. A nonzero line reconstructs prefix plus
 decimal(line - 1), without leading zeroes. Source and reconstructed source_id
-must be nonempty. Details reconstruct an object from non-null scalar references;
-a reference to the text `null` represents an explicit JSON null. The object
+must be nonempty. Each details scalar is zero for an absent object key.
+Otherwise bits 1–63 contain a non-null string reference as defined above.
+Bit 0 is 1 for a JSON string containing that raw pool text, or 0 for another
+JSON scalar parsed from the pool text (including explicit JSON null).
+This shares identical raw names and detail strings without duplicating quoted
+JSON spellings. Scalar value 1 is invalid. The object
 is not stored per row. Evidence-only names and source fields are never needed
 to project a normal result.
 

@@ -10,6 +10,7 @@ from typing import Any
 from thereabouts import _core
 from tools.build_forward_samples import ROOT
 from tools.forward_sample import COUNTRIES, Subset
+from tools.source_fixture import write_source
 
 
 def extract(source: Subset) -> list[dict[str, Any]]:
@@ -28,7 +29,7 @@ def extract(source: Subset) -> list[dict[str, Any]]:
                 last = int.from_bytes(row["ip_end_packed"], "big")
                 preferred_interval = first <= preferred[version] <= last
                 if preferred_interval or (
-                    country in COUNTRIES and selected.get(key, 0) < 32
+                    country in COUNTRIES and selected.get(key, 0) < 512
                 ):
                     rows.append(row)
                     selected[key] = selected.get(key, 0) + 1
@@ -49,7 +50,7 @@ def main() -> None:
         provenance = source.finish("ip", total)
         provenance["countries"] = sorted({r["country_code"] for r in rows})
         provenance["subset_policy"] = (
-            "first 32 intervals per country and IP version, plus intervals "
+            "first 512 intervals per country and IP version, plus intervals "
             "containing 8.8.8.8 and 2001:4860:4860::8888 regardless of country"
         )
         output = ROOT / "tests/fixtures/packs/ip-sample"
@@ -88,9 +89,7 @@ def main() -> None:
             "place_to_city": source.mappings,
             "rows": [{k: r.get(k) for k in fields} for r in rows],
         }
-        (ROOT / "tests/fixtures/ip-source.json").write_text(
-            json.dumps(oracle, ensure_ascii=False, indent=2) + "\n"
-        )
+        write_source(ROOT / "tests/fixtures/ip-source.json.gz", oracle)
         print(
             json.dumps(
                 {

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -21,7 +22,7 @@ def test_ip_vectors() -> None:
 
 
 def test_independent_interval_boundaries() -> None:
-    source = json.loads((FIXTURES / "ip-source.json").read_text())
+    source = read_source(FIXTURES / "ip-source.json.gz")
     rows = source["rows"]
     ranges = [
         (
@@ -77,7 +78,7 @@ def test_independent_interval_boundaries() -> None:
 
 
 def test_ip_columns() -> None:
-    source = json.loads((FIXTURES / "ip-source.json").read_text())
+    source = read_source(FIXTURES / "ip-source.json.gz")
     values = [r["ip_start"] for r in source["rows"][:10]] + ["invalid", "::1"]
     with Geocoder(FIXTURES / "packs/ip-sample") as geo:
         columns = geo.ip_columns(addresses=values)

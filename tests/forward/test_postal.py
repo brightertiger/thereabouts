@@ -8,6 +8,7 @@ import pytest
 
 from tests.conformance.forward_legacy import check, resolve
 from thereabouts import ClosedGeocoderError, Geocoder, IncompatibleDataError
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -27,7 +28,7 @@ def test_original_legacy_expectations() -> None:
 
 
 def test_independent_postal_source_rows() -> None:
-    oracle = json.loads((FIXTURES / "postal-source.json").read_text())
+    oracle = read_source(FIXTURES / "postal-source.json.gz")
     rows = oracle["rows"]
     indexed = {(r["source"], r["source_id"]): r for r in rows}
     with Geocoder(FIXTURES / "packs/postal-sample") as geo:

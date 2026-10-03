@@ -7,6 +7,7 @@ import pytest
 
 from tests.conformance.forward_legacy import resolve
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -22,7 +23,7 @@ def test_geocode_vectors(name: str) -> None:
 
 
 def test_independent_city_rows_and_population_ranking() -> None:
-    rows = json.loads((FIXTURES / "geocode-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "geocode-source.json.gz")["rows"]
     with Geocoder(FIXTURES / "packs/core-names-sample") as geo:
         for row in rows:
             result = geo.geocode(row["name"], country=row["country_code"], limit=100)
@@ -88,7 +89,7 @@ def test_name_batch_filters_and_invalid_limit() -> None:
 
 
 def test_real_english_name_is_an_alternate_exact_key() -> None:
-    rows = json.loads((FIXTURES / "geocode-source.json").read_text())["rows"]
+    rows = read_source(FIXTURES / "geocode-source.json.gz")["rows"]
     row = next(r for r in rows if r["city_id"] == "city:geonames:11189062")
     assert row["name"] == "Kidarakulam" and row["name_en"] == "Karakulam"
     with Geocoder(FIXTURES / "packs/core-names-sample") as geo:

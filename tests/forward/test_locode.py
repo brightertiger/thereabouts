@@ -7,6 +7,7 @@ import pytest
 
 from tests.conformance.forward_legacy import resolve
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -19,7 +20,7 @@ def test_locode_vectors() -> None:
 
 
 def test_independent_locode_sources() -> None:
-    oracle = json.loads((FIXTURES / "locode-source.json").read_text())
+    oracle = read_source(FIXTURES / "locode-source.json.gz")
     with Geocoder(FIXTURES / "packs/locode-sample") as geo:
         for row in oracle["rows"]:
             result = geo.locode(row["locode"], evidence=True)
@@ -64,7 +65,7 @@ def test_independent_locode_sources() -> None:
 
 
 def test_locode_columns() -> None:
-    oracle = json.loads((FIXTURES / "locode-source.json").read_text())
+    oracle = read_source(FIXTURES / "locode-source.json.gz")
     codes = [r["locode"] for r in oracle["rows"][:12]] + ["", "ZZZZZ", "BOM"]
     with Geocoder(FIXTURES / "packs/locode-sample") as geo:
         columns = geo.locode_columns(codes)

@@ -30,3 +30,5 @@ pub mod names;
 pub mod table;
 
 pub(crate) mod plate_columns;
+
+mod string_block;

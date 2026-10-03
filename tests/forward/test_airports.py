@@ -7,6 +7,7 @@ import pytest
 
 from tests.conformance.forward_legacy import check, resolve
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 
@@ -31,7 +32,7 @@ def test_airport_legacy_expectations() -> None:
 
 
 def test_independent_airport_sources() -> None:
-    oracle = json.loads((FIXTURES / "airports-source.json").read_text())
+    oracle = read_source(FIXTURES / "airports-source.json.gz")
     with Geocoder(FIXTURES / "packs/airports-sample") as geo:
         for row in oracle["rows"]:
             for scheme, field in [

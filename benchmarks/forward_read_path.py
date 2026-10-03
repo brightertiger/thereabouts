@@ -12,6 +12,7 @@ from benchmarks.forward_queries import Query, airport_defaults, misses, queries
 from benchmarks.forward_sizes import estimate
 from benchmarks.forward_workload import run
 from thereabouts import Geocoder
+from tools.source_fixture import read_source
 
 
 def measure(family: str, iterations: int) -> dict[str, Any]:
@@ -40,7 +41,7 @@ def measure(family: str, iterations: int) -> dict[str, Any]:
         )
     countries = sorted({v for q in population for k, v in q.options if k == "country"})
     manifest = json.loads((pack / "manifest.json").read_text())
-    source = json.loads((ROOT / f"tests/fixtures/{family}-source.json").read_text())
+    source = read_source(ROOT / f"tests/fixtures/{family}-source.json.gz")
     size = sum(p.stat().st_size for p in pack.iterdir())
     world_rows = manifest["inputs"]["options"]["input_provenance"]["world_source_rows"]
     return {
@@ -157,9 +158,20 @@ def main() -> None:
         for pack in sorted((ROOT / "tests/fixtures/packs").iterdir())
         if pack.is_dir() and pack.name not in {"core-sample", "core-synthetic"}
     }
+    extracts = sum(
+        p.stat().st_size for p in (ROOT / "tests/fixtures").glob("*-source.json.gz")
+    )
+    vectors = sum(
+        p.stat().st_size
+        for p in (ROOT / "tests/fixtures").glob("*-vectors.json")
+        if not p.name.startswith("core-")
+    )
     existing["fixture_packs"] = {
         "bytes_by_pack": packs,
         "total_bytes": sum(packs.values()),
+        "source_extract_bytes": extracts,
+        "shared_vector_bytes": vectors,
+        "packs_extracts_vectors_bytes": sum(packs.values()) + extracts + vectors,
     }
     args.output.write_text(json.dumps(existing, indent=2) + "\n")
     update_status(existing)

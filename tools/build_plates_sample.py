@@ -10,6 +10,7 @@ from tools.build_forward_samples import ROOT
 from tools.forward_sample import COUNTRIES, Subset
 from tools.plate_dataset import write_tables
 from tools.plate_sample_inputs import load
+from tools.source_fixture import write_source
 
 
 def main() -> None:
@@ -69,9 +70,7 @@ def main() -> None:
             "rows": bundle["codes"] + bundle["formats"],
             "bundle": bundle | {"countries": countries},
         }
-        (ROOT / "tests/fixtures/plates-source.json").write_text(
-            json.dumps(oracle, ensure_ascii=False, indent=2) + "\n"
-        )
+        write_source(ROOT / "tests/fixtures/plates-source.json.gz", oracle)
         print(
             json.dumps(
                 {

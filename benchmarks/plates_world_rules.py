@@ -22,6 +22,7 @@ from thereabouts import Geocoder, _core
 from tools.build_sample_pack import sha
 from tools.forward_sample import Subset
 from tools.plate_dataset import write_tables
+from tools.source_fixture import read_source
 
 
 def rules() -> list[dict[str, Any]]:
@@ -61,9 +62,7 @@ def build() -> tuple[Path, int]:
     dataset.mkdir(parents=True, exist_ok=True)
     base = ROOT / "tests/fixtures/datasets/core-synthetic/golden"
     source = Subset(base, dataset)
-    bundle = json.loads((ROOT / "tests/fixtures/plates-source.json").read_text())[
-        "bundle"
-    ]
+    bundle = read_source(ROOT / "tests/fixtures/plates-source.json.gz")["bundle"]
     bundle["formats"] = rows
     bundle["priors"] = []
     for kind in ("places", "canonical_cities", "place_to_city", "subdivisions"):
@@ -102,7 +101,7 @@ def build() -> tuple[Path, int]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--record", choices=["before", "after"], required=True)
+    parser.add_argument("--record", choices=["before", "after", "final"], required=True)
     args = parser.parse_args()
     output, count = build()
     cases = json.loads((ROOT / "tests/fixtures/plates-vectors.json").read_text())[

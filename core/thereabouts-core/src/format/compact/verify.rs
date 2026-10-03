@@ -16,7 +16,6 @@ impl Compact {
                 .get(1)
                 .copied()
                 .ok_or_else(|| Error::Corrupt("Missing assertion count".into()))?;
-            ensure(count > 0, "Empty airport assertion span")?;
             end = end
                 .checked_add(count)
                 .ok_or_else(|| Error::Corrupt("Assertion count overflow".into()))?;

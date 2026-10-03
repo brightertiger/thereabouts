@@ -18,6 +18,8 @@ mod verify;
 pub struct Schema {
     /// Details are reconstructed from dictionary-coded JSON scalar columns.
     pub detail_fields: Vec<String>,
+    /// String scalars share raw pool text with names; the low bit is the JSON type.
+    pub detail_encoding: String,
     /// Source observations, counting one airport once rather than once per scheme.
     pub source_rows: u64,
 }
@@ -92,7 +94,8 @@ impl Compact {
             .clone()
             .ok_or_else(|| Error::Corrupt("Missing forward column schema".into()))?;
         ensure(
-            schema.detail_fields == detail_fields(&manifest.family),
+            schema.detail_fields == detail_fields(&manifest.family)
+                && schema.detail_encoding == "tagged_scalars",
             "Unsupported evidence schema",
         )?;
         let mut required = vec![
@@ -297,9 +300,12 @@ impl Compact {
                     .checked_add(length)
                     .ok_or_else(|| Error::Corrupt("Airport span overflow".into()))?;
                 ensure(
-                    length > 0 && end <= self.table("airport_assertions")?.rows,
+                    end <= self.table("airport_assertions")?.rows,
                     "Invalid airport evidence range",
                 )?;
+                if length == 0 {
+                    records.push(Arc::new(record.clone()));
+                }
                 for ordinal in first..end {
                     let alias = self.table("airport_assertions")?.row(ordinal)?;
                     ensure(alias.len() == 2, "Invalid airport assertion")?;
