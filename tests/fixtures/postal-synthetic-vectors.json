@@ -58,9 +58,16 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
-        "state": null,
+        "match": "exact",
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
         "city": null,
         "timezone": null,
         "point": null,
@@ -190,7 +197,11 @@
         "status": "matched",
         "kind": "postal",
         "match": "exact",
-        "country": null,
+        "country": {
+          "code": "AA",
+          "code3": "AAA",
+          "name": "München 東京 country:AA"
+        },
         "state": null,
         "city": null,
         "timezone": null,

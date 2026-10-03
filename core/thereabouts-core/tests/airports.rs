@@ -68,7 +68,15 @@ fn original_airport_expectations() {
             }
             "ambiguous" => {
                 counts[1] += 1;
-                assert!(answer.country.is_none() && answer.point.is_none());
+                // Approved flat consensus; candidate legacy geography remains checked below.
+                let mut consensus = answer.candidates.first().and_then(|c| c.country.clone());
+                for candidate in &answer.candidates {
+                    if candidate.country != consensus {
+                        consensus = None;
+                        break;
+                    }
+                }
+                assert_eq!(answer.country, consensus);
                 answer.candidates
             }
             "not_found" => {

@@ -115,6 +115,8 @@ pub fn write_pack(
     }
     let revision = if family == "core" {
         "0.2.0" // Core exports now include canonical-city spellings.
+    } else if family == "postal" {
+        "0.3.2" // Preserve key countries for observations without linked places.
     } else {
         WRITER_REVISION
     };
@@ -195,7 +197,7 @@ fn build(
     }
     let mut metadata = metadata(data, family)?;
     if !matches!(family, "core" | "plates") {
-        compact_metadata::trim(&db, &mut metadata)?;
+        compact_metadata::trim(&db, &mut metadata, family)?;
     }
     let policy = source::field(source::field(&data.manifest, "normalization"), "policy");
     let mut manifest = Manifest {

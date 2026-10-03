@@ -66,14 +66,21 @@ def test_reference_plate_matches() -> None:
                 compare_rules(result.evidence.source_ids or (), old.get("matches", []))
             else:
                 candidates = old["candidates"]
-                assert result.status == ("ambiguous" if candidates else "not_found")
-                assert result.country is None
-                assert [c.country.code for c in result.candidates if c.country] == [
+                if r["values"][0].strip().upper() == "UNKNOWN":
+                    # Approved missing-serial handling overrides the old broad US rule.
+                    assert result.status == "not_found" and result.country is None
+                    continue
+                expected = (
+                    "matched"
+                    if len(candidates) == 1
+                    else ("ambiguous" if candidates else "not_found")
+                )
+                assert result.status == expected
+                answers = (result,) if len(candidates) == 1 else result.candidates
+                assert [c.country.code for c in answers if c.country] == [
                     c["country_code"] for c in candidates
                 ]
-                for answer, candidate in zip(
-                    result.candidates, candidates, strict=True
-                ):
+                for answer, candidate in zip(answers, candidates, strict=True):
                     assert answer.evidence is not None
                     compare_rules(
                         answer.evidence.source_ids or (), candidate["evidence"]

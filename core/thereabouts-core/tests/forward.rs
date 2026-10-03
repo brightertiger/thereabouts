@@ -88,7 +88,12 @@ fn original_postal_expectations() {
                 previous["state"]["id"].as_str(),
                 evidence.state_id.as_deref()
             );
-            if let Some(country) = answer.country {
+            if case["id"] == 29 {
+                // Approved F6: source geography stays null; flat country comes from key.
+                assert!(previous["country"].is_null());
+                assert_eq!(answer.country.as_ref().unwrap().code, "AA");
+                assert_eq!(evidence.reason.as_deref(), Some("country_from_key"));
+            } else if let Some(country) = answer.country {
                 assert_eq!(
                     country.code,
                     previous["country"]["country_code"].as_str().unwrap()

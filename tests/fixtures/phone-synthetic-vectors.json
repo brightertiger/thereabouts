@@ -13,7 +13,7 @@
       "result": {
         "status": "ambiguous",
         "kind": "phone_prefix",
-        "match": null,
+        "match": "exact",
         "country": null,
         "state": null,
         "city": null,
@@ -140,7 +140,7 @@
       "result": {
         "status": "ambiguous",
         "kind": "phone_prefix",
-        "match": null,
+        "match": "exact",
         "country": null,
         "state": null,
         "city": null,

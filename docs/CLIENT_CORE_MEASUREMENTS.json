@@ -1302,5 +1302,134 @@
       "scope": "all committed rules; sample code assertions; no vehicle priors",
       "semantic_sha256": "9e73571879eb44d921a95e4139d6e65c27145f2bc2ff8de33914c2ff58707b4d"
     }
+  },
+  "result_contract_rework": {
+    "baseline_commit": "3d242a7",
+    "vectors": {
+      "airports-synthetic-vectors.json": {
+        "cases": 11,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "match": 2
+        }
+      },
+      "geocode-vectors.json": {
+        "cases": 51,
+        "changed_cases": 6,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 6,
+          "match": 6
+        }
+      },
+      "phone-synthetic-vectors.json": {
+        "cases": 6,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "match": 2
+        }
+      },
+      "plates-vectors.json": {
+        "cases": 36,
+        "changed_cases": 14,
+        "status_changes": [
+          {
+            "id": "plate-001",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-003",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-005",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-007",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-011",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-013",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-015",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-017",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-019",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-021",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-023",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-025",
+            "before": "ambiguous",
+            "after": "matched"
+          },
+          {
+            "id": "plate-027",
+            "before": "ambiguous",
+            "after": "not_found"
+          }
+        ],
+        "changed_fields": {
+          "country": 12,
+          "match": 13,
+          "status": 13,
+          "candidates": 13,
+          "rank_basis": 1
+        }
+      },
+      "postal-synthetic-vectors.json": {
+        "cases": 8,
+        "changed_cases": 2,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 2,
+          "match": 1,
+          "state": 1
+        }
+      },
+      "postal-vectors.json": {
+        "cases": 28,
+        "changed_cases": 5,
+        "status_changes": [],
+        "changed_fields": {
+          "country": 5,
+          "match": 5,
+          "candidates": 1,
+          "state": 4
+        }
+      }
+    }
   }
 }

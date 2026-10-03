@@ -841,8 +841,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -1036,8 +1040,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -1230,8 +1238,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -1425,8 +1437,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -1597,8 +1613,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -2005,8 +2025,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "city",
-        "match": null,
-        "country": null,
+        "match": "fuzzy",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "United States"
+        },
         "state": null,
         "city": null,
         "timezone": null,

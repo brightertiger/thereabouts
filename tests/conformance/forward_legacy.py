@@ -82,7 +82,12 @@ def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
             assert getattr(answer.evidence, f"{field}_id") == (
                 before["id"] if before else None
             )
-            if before is None:
+            if case["id"] == 29 and field == "country":
+                # Approved F6: original unlinked source retains null evidence ID,
+                # while its public country now comes from the AA key.
+                assert before is None and after is not None and after.code == "AA"
+                assert answer.evidence.reason == "country_from_key"
+            elif before is None:
                 assert after is None
             else:
                 assert after is not None
@@ -98,9 +103,12 @@ def assert_case(geo: Geocoder, case: dict[str, Any]) -> str:
             (o["source"], o["source_id"]) for o in previous["observations"]
         }
     if result.status == "ambiguous":
-        assert all(
-            v is None for v in (result.country, result.state, result.city, result.point)
-        )
+        # Approved consensus change: candidates still assert legacy expectations;
+        # only their agreed flat fields now propagate to the ambiguous result.
+        for field in ("country", "state", "city", "point", "timezone", "cell", "match"):
+            first = getattr(answers[0], field)
+            common = first if all(getattr(a, field) == first for a in answers) else None
+            assert getattr(result, field) == common
     return str(result.status)
 
 

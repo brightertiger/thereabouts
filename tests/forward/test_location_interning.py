@@ -7,11 +7,15 @@ from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
 
 from thereabouts import Geocoder, _core
 
 
-def test_unassigned_origin_survives_location_interning(tmp_path: Path) -> None:
+@pytest.mark.parametrize("only_unlinked", [False, True])
+def test_unassigned_origin_survives_location_interning(
+    tmp_path: Path, only_unlinked: bool
+) -> None:
     source = Path(__file__).parents[1] / "fixtures/datasets/forward-synthetic"
     dataset = tmp_path / "dataset"
     shutil.copytree(source, dataset)
@@ -23,6 +27,9 @@ def test_unassigned_origin_survives_location_interning(tmp_path: Path) -> None:
     rows = original.to_pylist()
     row = next(r for r in rows if r["source_id"] == "p6")
     row.update(latitude=0.0, longitude=0.0, place_name=None)
+    if only_unlinked:
+        rows = [row]
+    table["rows"] = len(rows)
     pq.write_table(pa.Table.from_pylist(rows, schema=original.schema), parquet)
     table.update(
         sha256=hashlib.sha256(parquet.read_bytes()).hexdigest(),
@@ -34,5 +41,9 @@ def test_unassigned_origin_survives_location_interning(tmp_path: Path) -> None:
     with Geocoder(pack, verify=True) as geo:
         answer = geo.postal("VOID", country="AA", evidence=True)
         assert answer.status == "matched"
+        assert answer.country is not None and answer.country.code == "AA"
+        assert (
+            answer.evidence is not None and answer.evidence.reason == "country_from_key"
+        )
         assert answer.point is not None
         assert (answer.point.lat, answer.point.lon) == (0.0, 0.0)

@@ -1,4 +1,4 @@
-//! Conservative plate inference: a supplied country remains certain; serials do not certify one.
+//! Plate inference preserves ranked evidence; one surviving country is matched.
 use crate::{
     Error, Result,
     format::Pack,
@@ -31,6 +31,10 @@ impl Pack {
             return Ok(result);
         }
         let value = normalize(value);
+        // A missing-value placeholder must not match a broad personalised-serial rule.
+        if country.is_none() && value == "UNKNOWN" {
+            return Ok(empty(Status::NotFound));
+        }
         let valid =
             !value.is_empty() && value.chars().count() <= index.tables.policy.max_input_length;
         let matches = if valid {
@@ -71,7 +75,7 @@ impl Pack {
                 &hits,
                 series,
                 evidence,
-                Some("open_world_catalog_and_special_series"),
+                Some("plate_country_inferred"),
             )?;
             ranked.push((score, country, answer));
         }
@@ -92,6 +96,15 @@ impl Pack {
             );
         }
         result.candidates = ranked.into_iter().map(|(_, _, r)| r).collect();
+        if result.candidates.len() == 1 {
+            let mut answer = result
+                .candidates
+                .pop()
+                .ok_or_else(|| Error::Corrupt("Missing inferred plate country".into()))?;
+            answer.rank_basis = result.rank_basis;
+            return Ok(answer);
+        }
+        result.inherit_consensus();
         Ok(result)
     }
     fn plate_country(

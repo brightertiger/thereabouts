@@ -74,7 +74,7 @@ first installed family and opens other families on demand. A missing family name
 Geocode finds towns and cities only. Code-shaped requests include a hint naming
 the appropriate verb; street addresses return unsupported_granularity. Ranking
 is population, reported in rank_basis. Multiple cities remain ambiguous with
-null flat geography and ranked candidates, even with limit=1. prefer="population"
+shared flat context and ranked candidates, even with limit=1. prefer="population"
 opts into selection. Prefix matches and typo fallback report fuzzy; English and
 alternate exact spellings report alternate_name.
 
@@ -352,3 +352,13 @@ seven-country IP subset. Named sample checks also require `locode("INBOM")` and
 includes all six published Mumbai children `91222`–`91227`, and the example
 `phone("+91 22 2345 6789")` matches `91222`. These rows still link only to India;
 Mumbai is source description evidence, not a fabricated canonical-city link.
+
+Ambiguous results now retain every agreed flat field, calculated before geocode
+candidate limits. Unlinked postal observations inherit their source key country
+with `country_from_key` evidence. A single inferred plate country is matched
+with its ranking basis and inference evidence; several remain ambiguous. The
+normalized `UNKNOWN` placeholder without a country hint returns not_found.
+Candidate ordering and explicit country-hint behavior remain unchanged. Legacy
+case 29 retains its null source-country ID while its public country now comes
+from the AA key; this is an explicit allowance alongside the original case
+52 airport-default remap and canonical-name allowance.

@@ -410,8 +410,12 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
         "state": null,
         "city": null,
         "timezone": null,
@@ -516,7 +520,11 @@
             "status": "matched",
             "kind": "postal",
             "match": "exact",
-            "country": null,
+            "country": {
+              "code": "IN",
+              "code3": "IND",
+              "name": "India"
+            },
             "state": null,
             "city": null,
             "timezone": null,
@@ -668,9 +676,16 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
-        "state": null,
+        "match": "exact",
+        "country": {
+          "code": "LU",
+          "code3": "LUX",
+          "name": "Luxembourg"
+        },
+        "state": {
+          "code": "LU-CA",
+          "name": "Capellen"
+        },
         "city": null,
         "timezone": null,
         "point": null,
@@ -796,9 +811,16 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
-        "state": null,
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-02",
+          "name": "Adıyaman"
+        },
         "city": null,
         "timezone": null,
         "point": null,
@@ -1968,9 +1990,16 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
-        "state": null,
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-02",
+          "name": "Adıyaman"
+        },
         "city": null,
         "timezone": null,
         "point": null,
@@ -2523,9 +2552,16 @@
       "result": {
         "status": "ambiguous",
         "kind": "postal",
-        "match": null,
-        "country": null,
-        "state": null,
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Turkey"
+        },
+        "state": {
+          "code": "TR-02",
+          "name": "Adıyaman"
+        },
         "city": null,
         "timezone": null,
         "point": null,

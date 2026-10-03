@@ -54,6 +54,8 @@ class Evidence:
 
 @dataclass(frozen=True, slots=True)
 class Result:
+    """A detached match; ambiguity retains fields shared by every candidate."""
+
     status: str
     kind: str
     match: str | None

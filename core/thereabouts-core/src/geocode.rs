@@ -169,19 +169,42 @@ fn ranked(mut answers: Vec<LookupResult>, options: Options<'_>) -> Result<Lookup
             .map(with_cell)
             .ok_or_else(|| Error::Corrupt("Missing name result".into()));
     }
-    answers.truncate(options.limit);
+    // A shared cell may exist even for distinct points. Stop at the first
+    // disagreement; the remaining cells need computing only if returned.
+    let mut common_cell = None;
+    for (i, answer) in answers.iter_mut().enumerate() {
+        set_cell(answer);
+        if i == 0 {
+            common_cell.clone_from(&answer.cell);
+        } else if answer.cell != common_cell {
+            common_cell = None;
+            break;
+        }
+    }
     let mut result = LookupResult::empty(Status::Ambiguous);
     result.kind = Kind::City;
     result.rank_basis = Some("population".into());
-    result.candidates = answers.into_iter().map(with_cell).collect();
+    result.candidates = answers;
+    result.inherit_consensus();
+    result.cell = common_cell;
+    result.candidates.truncate(options.limit);
+    for answer in &mut result.candidates {
+        set_cell(answer);
+    }
     Ok(result)
 }
 
 fn with_cell(mut answer: LookupResult) -> LookupResult {
+    set_cell(&mut answer);
+    answer
+}
+fn set_cell(answer: &mut LookupResult) {
+    if answer.cell.is_some() {
+        return;
+    }
     answer.cell = answer
         .point
         .as_ref()
         .and_then(|p| h3o::LatLng::new(p.lat, p.lon).ok())
         .map(|p| p.to_cell(h3o::Resolution::Eight).to_string());
-    answer
 }

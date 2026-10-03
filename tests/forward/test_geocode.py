@@ -46,7 +46,11 @@ def test_independent_city_rows_and_population_ranking() -> None:
         )
         ambiguous = geo.geocode("Springfield", limit=100)
         assert ambiguous.status == "ambiguous"
-        assert ambiguous.city is None and ambiguous.country is None
+        assert ambiguous.city is None
+        assert ambiguous.country is not None and ambiguous.country.code == "US"
+        limited = geo.geocode("Springfield", limit=1)
+        assert limited.state == ambiguous.state and limited.point == ambiguous.point
+        assert limited.country == ambiguous.country and limited.cell == ambiguous.cell
         assert [c.city.id for c in ambiguous.candidates if c.city] == [
             r["city_id"] for r in springfields
         ]

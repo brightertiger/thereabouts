@@ -106,6 +106,7 @@ impl Pack {
             result.rank_basis = Some("population".into());
         }
         result.candidates = answers;
+        result.inherit_consensus();
         Ok(result)
     }
 }

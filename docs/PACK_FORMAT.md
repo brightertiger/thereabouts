@@ -187,8 +187,11 @@ If country narrowing leaves no survivors, retain the original zone set (includin
 (across any row for the zone). With no country, retain the whole set.
 Exactly one survivor is returned as `timezone`; otherwise it is null and the
 sorted surviving list is in `evidence.timezones` when evidence is requested.
-Reverse never returns ambiguous or candidates. Forward ambiguity belongs to
-later packages: flat fields null, ranked candidates, and no `selected` field.
+Reverse never returns ambiguous or candidates. Forward ambiguity returns ranked candidates and no `selected` field.
+Every flat field (match, country, state, city, timezone, point, cell and
+distance_band) equals the common value across **all** candidates when identical,
+including nulls; otherwise it is null. Consensus precedes any candidate limit.
+Point equality compares both stored coordinates exactly; no averaging occurs.
 
 ## Catalogue shards
 
@@ -544,7 +547,13 @@ absent. No country is inferred. Duplicate observations for the same canonical
 city and country/state context form one answer. Unmapped observations retain
 source identity instead. A grouped answer uses the first source point ordered
 by source, source_id, then name. Several distinct answers produce ambiguous,
-null flat fields and candidates ranked by population, with stable identity ties.
+shared flat context and candidates ranked by population, with stable identity ties.
+A postal observation without linked country geography inherits the country of
+its FST key from the countries table. Its evidence reason is country_from_key;
+original country_id remains null, and no state or city is inferred. Postal
+metadata retains all available source key country rows, including wholly
+unlinked keys; an unlinked observation without that metadata row is an export
+error. Existing linked geography takes precedence over conflicting key context.
 rank_basis is population. Missing populations rank as zero, without claiming
 a population value. Misses have not_found.
 
@@ -572,7 +581,7 @@ columns are type, municipality and region_code (nullable strings), in that order
 An explicit scheme searches only that namespace. Omitted scheme searches IATA
 then ICAO and combines all results. Multiple records with the same source and
 source_id form one airport; different identities produce ranked ambiguous
-candidates, with flat fields null. Local requires an explicit country; unknown
+candidates, retaining their shared flat fields. Local requires an explicit country; unknown
 schemes and malformed countries are invalid_input with a hint. Published null
 geography remains null, even when a source country code can scope its index.
 Point is the published airport point. Canonical geography follows place_to_city.
@@ -718,10 +727,12 @@ Registration offices and source entity associations never become canonical citie
 
 A known country hint always returns that country with kind plate and match exact,
 even for empty input or unknown formats. Invalid country identifiers return
-invalid_input. Without a hint, inferred countries are ranked candidates with
-status ambiguous and flat fields null, including singleton candidates: this
-open-world catalogue does not certify country uniqueness. No matches return
-not_found. rank_basis is plate_evidence, or
+invalid_input. Without a hint, one inferred country returns matched, its
+rank_basis and opt-in inference evidence (reason plate_country_inferred). Several
+countries return ambiguous with ranked candidates and shared flat fields.
+No matches return not_found. The normalized literal UNKNOWN is a missing-serial
+placeholder and returns not_found without a country hint; it must not trigger
+a permissive personalised-serial rule. rank_basis is plate_evidence, or
 plate_evidence_without_vehicle_prior for an explicitly incomplete fixture.
 Source series, score, capture and geographic assertions are opt-in evidence.
 
@@ -852,7 +863,8 @@ English/alternate/ASCII keys use alternate_name. Prefix and typo fallbacks use
 fuzzy, distinguished by opt-in evidence reasons name_prefix and name_trigram.
 Ties rank by population descending (unknown as zero), then stable city ID.
 Multiple surviving cities are ambiguous even if limit=1 truncates the list.
-Flat geographic fields remain null. prefer=population explicitly selects the
+Flat fields shared by all surviving cities are retained before truncation.
+prefer=population explicitly selects the
 first candidate; a unique city is matched without that preference.
 
 limit must be 1–100; scope currently accepts only cities. Malformed arguments

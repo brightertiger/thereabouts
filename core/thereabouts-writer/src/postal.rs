@@ -5,6 +5,7 @@ use thereabouts_core::forward::normalize_code;
 pub(crate) const NORMALIZATION: [&str; 3] = ["strip_ascii", "upper_ascii", "remove_ascii_spaces"];
 pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
     let rules: Vec<_> = NORMALIZATION.iter().map(|s| (*s).to_owned()).collect();
+    let mut countries = std::collections::BTreeMap::<String, bool>::new();
     let mut inserts = Packed::new(db, "postal")?;
     for table in data.tables("postal_codes") {
         data.scan(table, |row| {
@@ -38,11 +39,26 @@ pub(crate) fn load(data: &Dataset, db: &Connection) -> Result<()> {
                 None,
                 Some(serde_json::to_string(&details)?),
             )?;
+            let unlinked = record.places.first() == Some(&0);
+            countries
+                .entry(country.to_owned())
+                .and_modify(|needed| *needed |= unlinked)
+                .or_insert(unlinked);
             inserts.push(
                 rusqlite::types::Value::Text(format!("{country}\0{code}")),
                 &record,
             )
         })?;
     }
-    inserts.finish()
+    inserts.finish()?;
+    db.execute_batch(
+        "CREATE TABLE postal_countries(country TEXT PRIMARY KEY,needs_metadata INTEGER)",
+    )?;
+    for (country, needed) in countries {
+        db.execute(
+            "INSERT INTO postal_countries VALUES(?,?)",
+            rusqlite::params![country, needed],
+        )?;
+    }
+    Ok(())
 }

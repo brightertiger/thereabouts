@@ -39,36 +39,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "BE",
-              "code3": "BEL",
-              "name": "Belgium"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -109,36 +94,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "BE",
+          "code3": "BEL",
+          "name": "Belgium"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "BE",
-              "code3": "BEL",
-              "name": "Belgium"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -179,36 +149,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "NL",
-              "code3": "NLD",
-              "name": "Netherlands"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -249,36 +204,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "NL",
+          "code3": "NLD",
+          "name": "Netherlands"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "NL",
-              "code3": "NLD",
-              "name": "Netherlands"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -321,7 +261,7 @@
       "result": {
         "status": "ambiguous",
         "kind": "plate",
-        "match": null,
+        "match": "exact",
         "country": null,
         "state": null,
         "city": null,
@@ -425,36 +365,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "FR",
+          "code3": "FRA",
+          "name": "France"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "FR",
-              "code3": "FRA",
-              "name": "France"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -498,36 +423,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Türkiye"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "TR",
-              "code3": "TUR",
-              "name": "Türkiye"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -571,36 +481,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "TR",
+          "code3": "TUR",
+          "name": "Türkiye"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "TR",
-              "code3": "TUR",
-              "name": "Türkiye"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -641,36 +536,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "IN",
-              "code3": "IND",
-              "name": "India"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -714,36 +594,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "IN",
-              "code3": "IND",
-              "name": "India"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -784,36 +649,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "IN",
+          "code3": "IND",
+          "name": "India"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "IN",
-              "code3": "IND",
-              "name": "India"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -854,36 +704,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "US"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "US",
-              "code3": "USA",
-              "name": "US"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -924,36 +759,21 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "matched",
         "kind": "plate",
-        "match": null,
-        "country": null,
+        "match": "exact",
+        "country": {
+          "code": "US",
+          "code3": "USA",
+          "name": "US"
+        },
         "state": null,
         "city": null,
         "timezone": null,
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "US",
-              "code3": "USA",
-              "name": "US"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
+        "candidates": [],
         "rank_basis": "plate_evidence_without_vehicle_prior"
       }
     },
@@ -994,7 +814,7 @@
         ]
       },
       "result": {
-        "status": "ambiguous",
+        "status": "not_found",
         "kind": "plate",
         "match": null,
         "country": null,
@@ -1004,27 +824,8 @@
         "point": null,
         "cell": null,
         "distance_band": null,
-        "candidates": [
-          {
-            "status": "matched",
-            "kind": "plate",
-            "match": "exact",
-            "country": {
-              "code": "US",
-              "code3": "USA",
-              "name": "US"
-            },
-            "state": null,
-            "city": null,
-            "timezone": null,
-            "point": null,
-            "cell": null,
-            "distance_band": null,
-            "candidates": [],
-            "rank_basis": null
-          }
-        ],
-        "rank_basis": "plate_evidence_without_vehicle_prior"
+        "candidates": [],
+        "rank_basis": null
       }
     },
     {

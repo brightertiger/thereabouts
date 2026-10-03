@@ -178,7 +178,7 @@ pub struct LookupResult {
     pub kind: Kind,
     /// Published spatial method, absent for misses and invalid inputs.
     pub r#match: Option<Match>,
-    /// Flat country context for an unambiguous match.
+    /// Matched country or the country shared by every ambiguous candidate.
     pub country: Option<Country>,
     /// Flat subdivision context, using indexed metadata.
     pub state: Option<State>,
@@ -204,6 +204,36 @@ pub struct LookupResult {
     pub evidence: Option<Evidence>,
 }
 impl LookupResult {
+    /// Retain exactly the flat fields shared by all candidates, before any limit.
+    /// Callers retain their family and ranking policy; audit evidence stays per candidate.
+    pub(crate) fn inherit_consensus(&mut self) {
+        let Some(first) = self.candidates.first() else {
+            return;
+        };
+        macro_rules! shared {
+            ($field:ident) => {
+                self.$field = if self.candidates.iter().all(|c| c.$field == first.$field) {
+                    first.$field.clone()
+                } else {
+                    None
+                };
+            };
+        }
+        shared!(country);
+        shared!(state);
+        shared!(city);
+        shared!(timezone);
+        shared!(point);
+        shared!(cell);
+        shared!(distance_band);
+        shared!(hint);
+        self.r#match = self
+            .candidates
+            .iter()
+            .all(|c| c.r#match == first.r#match)
+            .then_some(first.r#match)
+            .flatten();
+    }
     /// Empty answer for an invalid input or an ordinary miss.
     #[must_use]
     pub fn empty(status: Status) -> Self {

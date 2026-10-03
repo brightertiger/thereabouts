@@ -15,7 +15,7 @@
       "result": {
         "status": "ambiguous",
         "kind": "airport",
-        "match": null,
+        "match": "exact",
         "country": null,
         "state": null,
         "city": null,
@@ -387,7 +387,7 @@
       "result": {
         "status": "ambiguous",
         "kind": "airport",
-        "match": null,
+        "match": "exact",
         "country": null,
         "state": null,
         "city": null,

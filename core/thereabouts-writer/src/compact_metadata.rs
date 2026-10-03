@@ -3,7 +3,7 @@ use crate::Result;
 use rusqlite::Connection;
 use std::collections::BTreeSet;
 use thereabouts_core::format::metadata::Metadata;
-pub(crate) fn trim(db: &Connection, metadata: &mut Metadata) -> Result<()> {
+pub(crate) fn trim(db: &Connection, metadata: &mut Metadata, family: &str) -> Result<()> {
     let mut countries = BTreeSet::new();
     let mut subdivisions = BTreeSet::new();
     let mut query =
@@ -19,6 +19,23 @@ pub(crate) fn trim(db: &Connection, metadata: &mut Metadata) -> Result<()> {
         countries.extend(country);
         if role == "state" {
             subdivisions.extend(code);
+        }
+    }
+    if family == "postal" {
+        // Source key countries are referenced even when a postal observation has
+        // no linked place. Never discard their identity during metadata trimming.
+        let mut keys = db.prepare("SELECT country,needs_metadata FROM postal_countries")?;
+        for value in keys.query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, bool>(1)?)))? {
+            let (code, needed) = value?;
+            crate::error::ensure(
+                !needed
+                    || metadata
+                        .countries
+                        .iter()
+                        .any(|r| r["country_code"].as_str() == Some(&code)),
+                "Missing unlinked postal key country metadata",
+            )?;
+            countries.insert(code);
         }
     }
     metadata.countries.retain(|r| {
