@@ -10,10 +10,15 @@ use std::{
     path::Path,
     sync::{Arc, Mutex},
 };
-use thereabouts_core::{Error, format::Pack, writer};
+use thereabouts_core::{Error, format::Pack};
+#[cfg(feature = "writer")]
+use thereabouts_writer as writer;
 
 fn error(py: Python<'_>, error: &Error) -> PyErr {
-    let name = match error.code() {
+    coded_error(py, error.code(), &error.to_string())
+}
+fn coded_error(py: Python<'_>, code: &str, message: &str) -> PyErr {
+    let name = match code {
         "data_not_installed" => "DataNotInstalledError",
         "incompatible_data" => "IncompatibleDataError",
         "closed_geocoder" => "ClosedGeocoderError",
@@ -22,7 +27,7 @@ fn error(py: Python<'_>, error: &Error) -> PyErr {
     match py
         .import("thereabouts.errors")
         .and_then(|m| m.getattr(name))
-        .and_then(|c| c.call1((error.to_string(),)))
+        .and_then(|c| c.call1((message,)))
     {
         Ok(exception) => PyErr::from_value(exception),
         Err(e) => e,
@@ -115,6 +120,7 @@ fn open(py: Python<'_>, path: &str) -> PyResult<Geocoder> {
         pack: Mutex::new(Some(Arc::new(pack))),
     })
 }
+#[cfg(feature = "writer")]
 #[pyfunction]
 fn write_pack(
     py: Python<'_>,
@@ -138,7 +144,7 @@ fn write_pack(
                 &options,
             )
         })
-        .map_err(|e| error(py, &e))?;
+        .map_err(|e| coded_error(py, e.code(), &e.to_string()))?;
     value_to_python(
         py,
         &serde_json::to_value(manifest).map_err(|e| PyValueError::new_err(e.to_string()))?,
@@ -148,7 +154,7 @@ fn write_pack(
 fn verify_pack(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
     let manifest = py
         .detach(|| thereabouts_core::format::verify::verify(Path::new(path)))
-        .map_err(|e| error(py, &e))?;
+        .map_err(|e| coded_error(py, e.code(), &e.to_string()))?;
     value_to_python(
         py,
         &serde_json::to_value(manifest).map_err(|e| PyValueError::new_err(e.to_string()))?,
@@ -156,8 +162,8 @@ fn verify_pack(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
 }
 #[pyfunction]
 fn pack_info(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
-    let manifest =
-        thereabouts_core::format::manifest::read(Path::new(path)).map_err(|e| error(py, &e))?;
+    let manifest = thereabouts_core::format::manifest::read(Path::new(path))
+        .map_err(|e| coded_error(py, e.code(), &e.to_string()))?;
     value_to_python(
         py,
         &serde_json::to_value(manifest).map_err(|e| PyValueError::new_err(e.to_string()))?,
@@ -167,6 +173,7 @@ fn pack_info(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
 fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Geocoder>()?;
     m.add_function(wrap_pyfunction!(open, m)?)?;
+    #[cfg(feature = "writer")]
     m.add_function(wrap_pyfunction!(write_pack, m)?)?;
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;

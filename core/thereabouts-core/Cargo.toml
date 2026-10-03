@@ -13,11 +13,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 sha2 = "0.10"
-parquet = { version = "56", default-features = false, features = ["arrow", "snap", "zstd"] }
-arrow-array = "56"
-arrow-schema = "56"
-arrow-json = "56"
-rusqlite = { version = "0.32", features = ["bundled"] }
 
 [dev-dependencies]
 proptest = "1"

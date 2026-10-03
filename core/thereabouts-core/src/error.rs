@@ -18,12 +18,6 @@ pub enum Error {
     Io(#[from] std::io::Error),
     #[error(transparent)]
     Json(#[from] serde_json::Error),
-    #[error(transparent)]
-    Parquet(#[from] parquet::errors::ParquetError),
-    #[error(transparent)]
-    Arrow(#[from] arrow_schema::ArrowError),
-    #[error(transparent)]
-    Sql(#[from] rusqlite::Error),
 }
 impl Error {
     /// Machine-readable code, independent of the diagnostic text.

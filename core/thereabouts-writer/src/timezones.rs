@@ -173,7 +173,7 @@ pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::writer::catalogue;
+    use crate::catalogue;
     #[test]
     fn overlapping_zones_split_labels_and_never_choose_one() {
         let db = Connection::open_in_memory().unwrap();

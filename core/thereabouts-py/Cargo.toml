@@ -20,3 +20,10 @@ thereabouts-core = { path = "../thereabouts-core" }
 pyo3 = { version = "0.26", features = ["abi3-py311"] }
 numpy = "0.26"
 serde_json = "1"
+
+[features]
+writer = ["dep:thereabouts-writer"]
+
+[dependencies.thereabouts-writer]
+path = "../thereabouts-writer"
+optional = true

@@ -1,17 +1,11 @@
 //! Deterministic, bounded dataset-to-pack export. Sources are opened read-only.
 mod catalogue;
 mod emission;
+mod error;
 mod source;
 mod timezones;
-use crate::{
-    Error, Result,
-    error::ensure,
-    format::{
-        self,
-        manifest::{Artifact, Manifest, digest},
-        metadata::Metadata,
-    },
-};
+use error::ensure;
+pub use error::{Error, Result};
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -19,6 +13,11 @@ use sha2::{Digest, Sha256};
 use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
+use thereabouts_core::format;
+use thereabouts_core::format::{
+    manifest::{Artifact, Manifest, digest},
+    metadata::Metadata,
+};
 
 /// Explicit release identity and attribution; no release version is guessed.
 #[derive(Clone, Debug, Serialize, Deserialize)]

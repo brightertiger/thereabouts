@@ -3,5 +3,4 @@ pub mod error;
 pub mod format;
 pub mod result;
 pub mod reverse;
-pub mod writer;
 pub use error::{Error, Result};

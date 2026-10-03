@@ -44,7 +44,7 @@ acquire = [
 python-source = "src"
 module-name = "thereabouts._core"
 manifest-path = "core/thereabouts-py/Cargo.toml"
-features = ["pyo3/extension-module"]
+features = ["pyo3/extension-module", "writer"]
 include = ["src/thereabouts/py.typed", "src/thereabouts/_core.pyi"]
 
 [tool.pytest.ini_options]
@@ -77,6 +77,8 @@ cache-keys = [
     { file = "core/Cargo.lock" },
     { file = "core/thereabouts-core/Cargo.toml" },
     { file = "core/thereabouts-py/Cargo.toml" },
+    { file = "core/thereabouts-writer/Cargo.toml" },
+    { file = "core/thereabouts-writer/src/*.rs" },
     { file = "core/thereabouts-core/src/**/*.rs" },
     { file = "core/thereabouts-py/src/*.rs" },
 ]

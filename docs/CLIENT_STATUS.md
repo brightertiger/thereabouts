@@ -4,11 +4,20 @@ Work package 1 implements the shared Rust core and the new Python reverse API.
 It is local work on `feat/rust-core`, based on `3ade5da`. No package 2 work,
 remote push, pull request, merge or publication is included.
 
+## Rework progress
+
+Review fix 1 separates the writer from the runtime. The portable core passes
+`cargo check -p thereabouts-core --target wasm32-unknown-unknown`; its normal
+dependencies are h3o, serde, serde_json, sha2 and thiserror, with no `*-sys` crates.
+Remaining review fixes are in progress.
+
 ## Built and usable
 
 `core/` is an edition-2024 workspace with MSRV Rust 1.99. `thereabouts-core`
-owns format-2 containers, checksums, catalogue records, reverse lookup, timezone
-joins and Parquet export. `thereabouts-py` exposes an `abi3-py311` extension via
+owns format-2 containers, checksums, catalogue records and reverse lookup.
+The separate `thereabouts-writer` owns Parquet export and timezone joins; its
+native Arrow/SQLite dependencies never enter the portable core. The Python
+writer feature is optional in Cargo and enabled in maturin builds. `thereabouts-py` exposes an `abi3-py311` extension via
 maturin. No application Rust code uses unsafe or non-test `unwrap()` calls.
 
 The public exports are `Geocoder`, `reverse`, `Result`, `GeocoderError`,

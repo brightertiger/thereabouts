@@ -1258,13 +1258,8 @@ dependencies = [
 name = "thereabouts-core"
 version = "0.1.0"
 dependencies = [
- "arrow-array",
- "arrow-json",
- "arrow-schema",
  "h3o",
- "parquet",
  "proptest",
- "rusqlite",
  "serde",
  "serde_json",
  "sha2",
@@ -1280,6 +1275,25 @@ dependencies = [
  "pyo3",
  "serde_json",
  "thereabouts-core",
+ "thereabouts-writer",
+]
+
+[[package]]
+name = "thereabouts-writer"
+version = "0.1.0"
+dependencies = [
+ "arrow-array",
+ "arrow-json",
+ "arrow-schema",
+ "h3o",
+ "parquet",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thereabouts-core",
+ "thiserror",
 ]
 
 [[package]]
