@@ -18,6 +18,9 @@ spans, fixed schema arrays and serde_json reads that return null.
 Review fixes 4–5 keep timezone overlap in evidence without changing reverse
 status, narrow zones by country, remove selected, and replace distance_km with
 a published distance_band. Reverse candidates are always empty.
+Review fix 6 requires all eight input table kinds and explicit distance policy,
+rejects invalid populations, and enriches the synthetic Parquet fixture with
+country/subdivision metadata and overlapping timezone rows.
 Remaining review fixes are in progress.
 
 ## Built and usable

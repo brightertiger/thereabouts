@@ -6,9 +6,9 @@ from typing import Any
 
 import h3
 
-from tests.serve.fixtures import golden
 from thereabouts import Geocoder, _core
 from thereabouts.packs.address import cell_at
+from tools.synthetic_dataset import golden
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests/fixtures"

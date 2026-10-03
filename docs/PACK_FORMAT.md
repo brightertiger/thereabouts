@@ -247,7 +247,13 @@ history; including it does not yet provide historical offset computation.
 
 `write_pack(dataset_dir, "core", output_dir, options)` reads a completed
 `golden-2` manifest and its declared Parquet inventory. `data_root` resolves
-relative to that manifest. Each consumed file is SHA-256 checked before and
+relative to that manifest. Core exports require cells, places, canonical_cities,
+place_to_city, countries, subdivisions, timezone_cells and zone_tables in the
+inventory. A deliberate fixture omission must be named explicitly in the
+`allow_missing_tables` option. Both normalization policy bounds (`distant_m`,
+`nearest_m`) are required nonnegative u32 integers, with distant <= nearest.
+Population must be null (unknown) or a nonnegative u32 integer; invalid values
+are rejected even on unused catalogue rows. Each consumed file is SHA-256 checked before and
 after a bounded Arrow scan, with row counts checked. The writer does no
 geographic reconciliation. Existing output is verified and returned only when
 its input identity agrees; changed inputs are rejected without overwriting.

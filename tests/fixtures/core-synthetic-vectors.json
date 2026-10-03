@@ -16,11 +16,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -34,7 +34,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.576453009111932,
           "lon": 77.15559500254798
@@ -59,11 +59,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -77,7 +77,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.524774306922687,
           "lon": 77.00843234791073
@@ -102,11 +102,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -120,7 +120,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.733157382473275,
           "lon": 77.18732265492372
@@ -145,11 +145,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -163,7 +163,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.681363780393418,
           "lon": 77.04002577934997
@@ -188,11 +188,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -206,7 +206,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.471338300595118,
           "lon": 77.27123962262196
@@ -231,11 +231,11 @@
         "match": "nearest",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -249,7 +249,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.419770499772728,
           "lon": 77.12391121760197
@@ -277,11 +277,11 @@
         "match": "nearest_distant",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -295,7 +295,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.628135629045808,
           "lon": 77.30305754986368
@@ -349,15 +349,15 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": null,
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.941789764661811,
           "lon": 77.36682549675709
@@ -382,11 +382,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -400,7 +400,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.94258359272697,
           "lon": 76.95607948123578
@@ -425,11 +425,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -443,7 +443,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.209156607816135,
           "lon": 77.35509472066732
@@ -468,11 +468,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -486,7 +486,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.21166702930819,
           "lon": 76.94537659371919
@@ -537,11 +537,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -555,7 +555,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.209156607816135,
           "lon": 77.35509472066732
@@ -580,11 +580,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -598,7 +598,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.21166702930819,
           "lon": 76.94537659371919
@@ -623,11 +623,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -641,7 +641,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.94258359272697,
           "lon": 76.95607948123578
@@ -666,11 +666,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -684,7 +684,7 @@
             "lon": 77.59
           }
         },
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.94259307808961,
           "lon": 76.9477171816232
@@ -709,11 +709,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -752,11 +752,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {
@@ -796,15 +796,15 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": null,
-        "timezone": null,
+        "timezone": "Fixture/One",
         "point": {
           "lat": 12.971031136890282,
           "lon": 77.58605945932766
@@ -938,11 +938,11 @@
         "match": "contained",
         "country": {
           "code": "AA",
-          "code3": null,
+          "code3": "AAA",
           "name": "München 東京 country:AA"
         },
         "state": {
-          "code": null,
+          "code": "AA.A",
           "name": "München 東京 state:synthetic:A"
         },
         "city": {

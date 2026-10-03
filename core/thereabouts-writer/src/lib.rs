@@ -28,6 +28,9 @@ use thereabouts_core::format::{
 #[serde(deny_unknown_fields)]
 pub struct Options {
     pub data_version: String,
+    /// Explicit omissions for deliberately incomplete fixtures, never inferred.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub allow_missing_tables: Vec<String>,
     #[serde(default)]
     pub sources: Value,
     #[serde(default)]
@@ -55,6 +58,7 @@ pub fn write_pack(
         "Dataset version is required",
     )?;
     let data = Dataset::open(dataset_dir)?;
+    data.validate_core(&options.allow_missing_tables)?;
     let identity = json!({"manifest_sha256":data.digest,"options":options,"writer":"0.1.0"});
     let input_digest = format!("{:x}", Sha256::digest(serde_json::to_vec(&identity)?));
     if output.exists() {
@@ -139,14 +143,8 @@ fn build(
         sources: options.sources.clone(),
         attribution: options.attribution.clone(),
         files: vec![],
-        distant_over_m: policy["distant_m"]
-            .as_u64()
-            .and_then(|v| v.try_into().ok())
-            .unwrap_or(25000),
-        cutoff_m: policy["nearest_m"]
-            .as_u64()
-            .and_then(|v| v.try_into().ok())
-            .unwrap_or(50000),
+        distant_over_m: source::policy_distance(policy, "distant_m")?,
+        cutoff_m: source::policy_distance(policy, "nearest_m")?,
     };
     emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
     emission::catalogue(&db, stage, &mut manifest)?;

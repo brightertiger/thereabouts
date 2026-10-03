@@ -44,6 +44,32 @@ impl Dataset {
             digest: digest(&path)?,
         })
     }
+    pub(crate) fn validate_core(&self, allowed: &[String]) -> Result<()> {
+        const REQUIRED: [&str; 8] = [
+            "cells",
+            "places",
+            "canonical_cities",
+            "place_to_city",
+            "countries",
+            "subdivisions",
+            "timezone_cells",
+            "zone_tables",
+        ];
+        ensure(
+            allowed.iter().all(|kind| REQUIRED.contains(&kind.as_str())),
+            "Unknown allow_missing_tables kind",
+        )?;
+        for kind in REQUIRED {
+            ensure(
+                !self.tables(kind).is_empty() || allowed.iter().any(|value| value == kind),
+                &format!("Missing required dataset table: {kind}"),
+            )?;
+        }
+        let policy = field(field(&self.manifest, "normalization"), "policy");
+        let distant = policy_distance(policy, "distant_m")?;
+        let nearest = policy_distance(policy, "nearest_m")?;
+        ensure(distant <= nearest, "distant_m exceeds nearest_m")
+    }
     pub fn tables(&self, kind: &str) -> Vec<&Value> {
         self.manifest["tables"]
             .as_array()
@@ -95,6 +121,26 @@ impl Dataset {
         )
     }
 }
+pub(crate) fn policy_distance(policy: &Value, key: &str) -> Result<u32> {
+    field(policy, key)
+        .as_u64()
+        .and_then(|value| value.try_into().ok())
+        .ok_or_else(|| {
+            Error::Input(format!(
+                "normalization.policy.{key} must be a nonnegative u32 integer"
+            ))
+        })
+}
+pub(crate) fn population(row: &Value) -> Result<u32> {
+    let value = field(row, "population");
+    if value.is_null() {
+        return Ok(0);
+    }
+    value
+        .as_u64()
+        .and_then(|value| value.try_into().ok())
+        .ok_or_else(|| Error::Input("population must be null or a nonnegative u32 integer".into()))
+}
 pub(crate) fn field<'a>(row: &'a Value, key: &str) -> &'a Value {
     row.get(key).unwrap_or(&Value::Null)
 }
@@ -108,6 +154,69 @@ pub fn required<'a>(row: &'a Value, field: &str) -> Result<&'a str> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn population_and_policy_never_coerce_invalid_values() {
+        for value in [
+            serde_json::json!(-1),
+            serde_json::json!(1.5),
+            serde_json::json!("10"),
+            serde_json::json!(true),
+            serde_json::json!(u64::MAX),
+        ] {
+            assert!(population(&serde_json::json!({"population":value})).is_err());
+        }
+        assert_eq!(
+            population(&serde_json::json!({"population":null})).unwrap(),
+            0
+        );
+        assert_eq!(
+            population(&serde_json::json!({"population":123})).unwrap(),
+            123
+        );
+        assert!(policy_distance(&serde_json::json!({}), "nearest_m").is_err());
+    }
+    #[test]
+    fn every_required_kind_needs_inventory_or_explicit_exemption() {
+        let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tests/fixtures/datasets/core-synthetic/golden");
+        for kind in [
+            "cells",
+            "places",
+            "canonical_cities",
+            "place_to_city",
+            "countries",
+            "subdivisions",
+            "timezone_cells",
+            "zone_tables",
+        ] {
+            let mut data = Dataset::open(&path).unwrap();
+            data.validate_core(&[]).unwrap();
+            data.manifest["tables"]
+                .as_array_mut()
+                .unwrap()
+                .retain(|t| t["kind"] != kind);
+            assert!(
+                data.validate_core(&[])
+                    .unwrap_err()
+                    .to_string()
+                    .contains(kind)
+            );
+            data.validate_core(&[kind.into()]).unwrap();
+        }
+        for key in ["nearest_m", "distant_m"] {
+            let mut data = Dataset::open(&path).unwrap();
+            data.manifest["normalization"]["policy"]
+                .as_object_mut()
+                .unwrap()
+                .remove(key);
+            assert!(
+                data.validate_core(&[])
+                    .unwrap_err()
+                    .to_string()
+                    .contains(key)
+            );
+        }
+    }
     #[test]
     fn incomplete_dataset_is_not_admitted() {
         let temp = tempfile::tempdir().unwrap();

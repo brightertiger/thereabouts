@@ -1,5 +1,5 @@
 //! A disk index keeps global place closure and sorting out of process memory.
-use super::source::{Dataset, required};
+use super::source::{Dataset, population, required};
 use crate::{
     Error, Result,
     error::ensure,
@@ -25,6 +25,7 @@ pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
         for table in data.tables(kind) {
             data.scan(table,|mut row| {
                 ensure(row.is_object(), "Dataset row must be an object")?;
+                if kind != "place_to_city" { population(&row)?; }
                 match kind {
                     "places" => {
                         let evidence=json!({"source_ids":row["source_ids"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok()),"golden_table":table["path"],"name_provenance":row["name_provenance"].as_str().and_then(|s|serde_json::from_str::<Value>(s).ok())});
@@ -121,14 +122,12 @@ pub fn record(db: &Connection, id: &str) -> Result<Place> {
         (None, None) => (i32::MIN, i32::MIN),
         _ => return Err(Error::Input("Invalid catalogue coordinates".into())),
     };
-    let population = row["population"].as_u64().unwrap_or(0);
     Ok(Place {
         text: std::array::from_fn(|i| row[TEXT_FIELDS[i]].as_str().map(str::to_owned)),
         refs,
         latitude: point.0,
         longitude: point.1,
-        population: u32::try_from(population)
-            .map_err(|_| Error::Input("Population exceeds u32".into()))?,
+        population: population(&row)?,
         timezone: None,
     })
 }

@@ -1,4 +1,4 @@
-//! Join all matching timezones; overlapping source zones stay ambiguous.
+//! Join all matching timezones; overlapping source zones retain their complete set.
 use super::source::{Dataset, required};
 use crate::{
     Error, Result,
