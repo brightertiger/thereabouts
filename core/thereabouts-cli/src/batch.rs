@@ -143,11 +143,7 @@ pub(crate) fn run(
     let host = RefCell::new(io);
     let mut source = Input {
         host: &host,
-        file: if file == "-" {
-            None
-        } else {
-            Some(BufReader::new(File::open(file)?))
-        },
+        file: input_file(file)?,
         pending: Cursor::new(Vec::new()),
     };
     let mut first = String::new();
@@ -271,4 +267,14 @@ fn ndjson(
         }
     }
     Ok(())
+}
+
+fn input_file(file: &str) -> Result<Option<BufReader<File>>> {
+    if file == "-" {
+        return Ok(None);
+    }
+    File::open(file)
+        .map(BufReader::new)
+        .map(Some)
+        .map_err(|e| Error::Usage(format!("Cannot read input file {file}: {e}")))
 }

@@ -56,6 +56,7 @@ pub fn install(
     let index = index(source)?;
     let (version, dataset) = index.select(requested, version)?;
     let _lock = store::lock(root)?;
+    let mut pin = selection(root, version, requested)?;
     let bytes = requested.iter().try_fold(0u64, |sum, name| {
         sum.checked_add(
             dataset
@@ -67,7 +68,6 @@ pub fn install(
         .ok_or_else(|| Error::Integrity("Install size overflow".into()))
     })?;
     precheck(root, bytes)?;
-    let mut pin = selection(root, version, requested)?;
     for name in requested {
         let pack = dataset
             .packs
@@ -81,13 +81,25 @@ pub fn install(
 }
 fn selection(root: &Path, version: &str, requested: &[String]) -> Result<Active> {
     if let Some(pin) = store::active(root)? {
-        return Ok(if pin.data_version == version {
-            pin
-        } else {
-            Active {
-                data_version: version.into(),
-                packs: BTreeMap::new(),
-            }
+        if pin.data_version == version {
+            return Ok(pin);
+        }
+        if pin.packs.keys().any(|name| !requested.contains(name)) {
+            let all = store::FAMILIES
+                .iter()
+                .filter(|name| {
+                    pin.packs.contains_key(**name) || requested.iter().any(|v| v == **name)
+                })
+                .copied()
+                .collect::<Vec<_>>()
+                .join(" ");
+            return Err(Error::Usage(format!(
+                "Changing dataset version requires every active family. Run:\nthereabouts data install {all} --version {version}"
+            )));
+        }
+        return Ok(Active {
+            data_version: version.into(),
+            packs: BTreeMap::new(),
         });
     }
     let mut pin = Active {

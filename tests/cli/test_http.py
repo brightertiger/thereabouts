@@ -169,5 +169,8 @@ def test_lookup_never_fetches_a_configured_release(
         tmp_path / "empty", "reverse", "--lat", "0", "--lon", "0", source=url
     )
     assert missing.returncode == 3
-    assert missing.stderr == "thereabouts data install core\n"
+    assert missing.stderr.splitlines() == [
+        "core data is not installed. Install it with:",
+        "thereabouts data install core",
+    ]
     assert not state.requests

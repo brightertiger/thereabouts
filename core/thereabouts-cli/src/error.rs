@@ -24,6 +24,22 @@ pub enum Error {
     Json(#[from] serde_json::Error),
 }
 impl Error {
+    /// Add repair instructions while preserving missing, usage and incompatibility codes.
+    #[must_use]
+    pub fn at_pack(self, path: &std::path::Path, family: &str) -> Self {
+        if matches!(self, Self::Usage(_) | Self::Missing(_)) {
+            return self;
+        }
+        let message = format!(
+            "Unusable {family} pack at {}: {self}\nthereabouts data verify --full\nthereabouts data remove {family} --yes && thereabouts data install {family}",
+            path.display()
+        );
+        if matches!(self, Self::Pack(thereabouts_core::Error::Incompatible(_))) {
+            Self::Pack(thereabouts_core::Error::Incompatible(message))
+        } else {
+            Self::Integrity(message)
+        }
+    }
     /// Status reserved by the public command grammar.
     #[must_use]
     pub const fn exit_code(&self) -> i32 {

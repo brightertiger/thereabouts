@@ -51,7 +51,10 @@ fn formats_fields_evidence_help_and_all_exit_codes() {
     );
     assert_eq!(host.run(&["postal", "75001"]), 2);
     assert_eq!(host.run(&["reverse", "--lat", "0", "--lon", "0"]), 3);
-    assert_eq!(host.err, "thereabouts data install core\n");
+    assert_eq!(
+        host.err,
+        "core data is not installed. Install it with:\nthereabouts data install core\n"
+    );
     install(temp.path(), &["core"]);
     assert_eq!(host.run(&["reverse", "--lat", "91", "--lon", "0"]), 2);
     assert_eq!(

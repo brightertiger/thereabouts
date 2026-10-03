@@ -27,6 +27,10 @@ pub fn run(argv: &[String], io: &mut dyn Io) -> i32 {
     match execute(&cli, io) {
         Ok(code) => code,
         Err(Error::Io(error)) if error.kind() == std::io::ErrorKind::BrokenPipe => 0,
+        Err(Error::Missing(family)) => {
+            let _ = io.stderr(&format!("{family} data is not installed. Install it with:\nthereabouts data install {family}\n"));
+            3
+        }
         Err(error) => {
             let _ = io.stderr(&format!("{error}\n"));
             error.exit_code()
@@ -72,7 +76,8 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
             return io.mcp(&root);
         }
         command => {
-            let pack = query::open(&root, command)?;
+            let (pack, path) = query::open(&root, command)?;
+            let family = query::family(command).unwrap_or("core");
             if let Command::Reverse {
                 file: Some(file),
                 lat_col,
@@ -88,9 +93,11 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
                     &cli.global,
                     format,
                     io,
-                );
+                )
+                .map_err(|e| e.at_pack(&path, family));
             }
-            let answer = query::run(&pack, command, cli.global.evidence)?;
+            let answer = query::run(&pack, command, cli.global.evidence)
+                .map_err(|e| e.at_pack(&path, family))?;
             let exit = query::exit(answer.status, cli.global.strict);
             (
                 render::select(&serde_json::to_value(answer)?, fields.as_deref()),

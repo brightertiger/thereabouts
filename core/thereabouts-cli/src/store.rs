@@ -138,6 +138,15 @@ pub fn active(root: &Path) -> Result<Option<Active>> {
     Ok(Some(pin))
 }
 fn resolve(root: &Path, name: &str, pointer: &Pointer, version: Option<&str>) -> Result<PathBuf> {
+    resolve_inner(root, name, pointer, version)
+        .map_err(|e| e.at_pack(&root.join(&pointer.path), name))
+}
+fn resolve_inner(
+    root: &Path,
+    name: &str,
+    pointer: &Pointer,
+    version: Option<&str>,
+) -> Result<PathBuf> {
     let path = manifest::artifact_path(root, &pointer.path)?;
     if manifest::digest(&manifest::artifact_path(&path, "manifest.json")?)?
         != pointer.manifest_sha256

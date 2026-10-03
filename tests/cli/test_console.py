@@ -94,7 +94,10 @@ def test_empty_ndjson_and_missing_mcp_data(tmp_path: Path) -> None:
     assert result.returncode == 0 and json.loads(result.stdout) == {"results": []}
     missing = console(tmp_path / "absent", "mcp")
     assert missing.returncode == 3
-    assert missing.stderr == "thereabouts data install core\n"
+    assert missing.stderr.splitlines() == [
+        "core data is not installed. Install it with:",
+        "thereabouts data install core",
+    ]
 
 
 def test_current_mcp_missing_extra_message(tmp_path: Path) -> None:

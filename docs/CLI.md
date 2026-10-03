@@ -376,3 +376,18 @@ pack-wide key/row budgets documented in PACK_FORMAT.md. On large name indexes,
 otherwise eligible fuzzy cities may be omitted; population ranks the admitted
 candidates. Country and subdivision filters remain hard constraints on every
 returned result.
+
+A dataset version change must include every active family in the install
+transaction. Otherwise installation exits 2 before downloading, preserves the
+active pointer and prints the complete install command with --version. Installing
+another family at the current version retains all other active families.
+
+Until a release service is published, the default placeholder fails locally
+with exit 2 and instructions to set --from DIR|URL or THEREABOUTS_RELEASE_URL;
+it never performs DNS or HTTP. Missing input files are usage/environment errors
+(exit 2) naming the path. Unusable installed packs report their path, family,
+thereabouts data verify --full, and remove/reinstall commands (exit 4).
+
+Missing data exits 3 with a short sentence on stderr followed by the exact
+install command alone on the last line. Library exception messages remain the
+exact command.

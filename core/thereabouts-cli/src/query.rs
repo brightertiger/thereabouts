@@ -4,7 +4,7 @@ use crate::{
     error::{Error, Result},
     store,
 };
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use thereabouts_core::{
     format::Pack,
     result::{LookupResult, Status},
@@ -22,17 +22,28 @@ pub(crate) fn family(command: &Command) -> Option<&'static str> {
         _ => return None,
     })
 }
-pub(crate) fn open(root: &Path, command: &Command) -> Result<Pack> {
+pub(crate) fn open(root: &Path, command: &Command) -> Result<(Pack, PathBuf)> {
     let family = family(command).ok_or_else(|| Error::Usage("Expected a lookup verb".into()))?;
-    let mut pack = Pack::open(&store::installed(root, family)?, false)?;
+    let path = store::installed(root, family)?;
+    let mut pack = Pack::open(&path, false)
+        .map_err(Error::from)
+        .map_err(|e| e.at_pack(&path, family))?;
     if family != "core" {
         match store::installed(root, "core") {
-            Ok(path) => pack = pack.with_core(std::sync::Arc::new(Pack::open(&path, false)?))?,
+            Ok(core_path) => {
+                let core = Pack::open(&core_path, false)
+                    .map_err(Error::from)
+                    .map_err(|e| e.at_pack(&core_path, "core"))?;
+                pack = pack
+                    .with_core(std::sync::Arc::new(core))
+                    .map_err(Error::from)
+                    .map_err(|e| e.at_pack(&path, family))?;
+            }
             Err(Error::Missing(_)) => {}
             Err(error) => return Err(error),
         }
     }
-    Ok(pack)
+    Ok((pack, path))
 }
 pub(crate) fn run(pack: &Pack, command: &Command, evidence: bool) -> Result<LookupResult> {
     Ok(match command {

@@ -19,6 +19,12 @@ use thereabouts_core::format::{manifest, verify};
 pub(crate) fn source(explicit: Option<&str>, io: &dyn Io) -> Result<Box<dyn Source>> {
     let configured = io.env("THEREABOUTS_RELEASE_URL");
     let value = explicit.or(configured.as_deref()).unwrap_or(DEFAULT_SOURCE);
+    if value == DEFAULT_SOURCE {
+        return Err(Error::Usage(
+            "No release service is published yet; use --from DIR|URL or THEREABOUTS_RELEASE_URL"
+                .into(),
+        ));
+    }
     if value.starts_with("http://") || value.starts_with("https://") {
         Ok(Box::new(Http::new(value)?))
     } else {
@@ -64,7 +70,7 @@ fn paths(root: &Path) -> Result<Vec<PathBuf>> {
 pub(crate) fn list(root: &Path) -> Result<Value> {
     let mut packs = Vec::new();
     for path in paths(root)? {
-        let info = manifest::read(&path)?;
+        let info = inspect(root, &path, false)?;
         let active = match store::installed(root, &info.family) {
             Ok(selected) => selected == path,
             Err(Error::Missing(_)) => false,
@@ -112,11 +118,7 @@ pub(crate) fn run(command: &Data, root: &Path, no_input: bool, io: &mut dyn Io) 
                 return Err(Error::Missing("core".into()));
             }
             for path in &paths {
-                if *full {
-                    verify::verify(path)?;
-                } else {
-                    manifest::read(path)?;
-                }
+                inspect(root, path, *full)?;
             }
             // Also check pointer integrity; orphan directories need not be active.
             store::inventory(root)?;
@@ -157,4 +159,20 @@ pub(crate) fn run(command: &Data, root: &Path, no_input: bool, io: &mut dyn Io) 
                 "update_available":current.as_deref().is_none_or(|v| crate::index::compare_versions(newest,v).is_gt())}))
         }
     }
+}
+
+fn inspect(root: &Path, path: &Path, full: bool) -> Result<manifest::Manifest> {
+    let family = path
+        .strip_prefix(root)
+        .ok()
+        .and_then(|p| p.components().nth(1))
+        .and_then(|c| c.as_os_str().to_str())
+        .unwrap_or("core");
+    (if full {
+        verify::verify(path)
+    } else {
+        manifest::read(path)
+    })
+    .map_err(Error::from)
+    .map_err(|e| e.at_pack(path, family))
 }
