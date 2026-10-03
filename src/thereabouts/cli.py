@@ -8,6 +8,7 @@ from typing import Any
 
 from .client import Geocoder
 from .client_errors import InvalidInputError
+from .client_results import Resolution
 from .commandline.parser import parser
 from .commandline.rows import rows
 from .errors import GeocoderError
@@ -15,7 +16,6 @@ from .installing.errors import InstallationError
 from .installing.install import install
 from .packs.metadata import read_manifest
 from .packs.verify import verify
-from .results import Resolution
 from .store import installed_pack, list_packs
 
 

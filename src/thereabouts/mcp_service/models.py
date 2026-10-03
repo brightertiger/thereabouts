@@ -5,7 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictStr
 from typing_extensions import TypedDict
 
-from ..results import Status
+from ..client_results import Status
 
 
 class Result(TypedDict):

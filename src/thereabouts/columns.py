@@ -7,10 +7,10 @@ from types import MappingProxyType
 import numpy as np
 from numpy.typing import NDArray
 
+from .client_results import Data, Place
 from .reading.address import parents
 from .reading.batch import Batch
 from .reading.pack import Pack
-from .results import Data, Place
 
 
 @dataclass(frozen=True, slots=True)

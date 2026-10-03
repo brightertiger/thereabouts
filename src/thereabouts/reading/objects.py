@@ -2,8 +2,8 @@
 
 from typing import cast
 
+from ..client_results import Data, InputError, Query, Resolution
 from ..packs.spatial import Label
-from ..results import Data, InputError, Query, Resolution
 from .backend import StoredCell
 from .batch import Batch
 from .decode import resolution

@@ -1,22 +1,22 @@
-"""Offline H3 table lookup; queries never download data."""
+"""Offline reverse geocoding backed by the shared Rust core."""
 
-from .api import Geocoder, reverse
 from .errors import (
     ClosedGeocoderError,
-    DamagedPackError,
+    CorruptPackError,
     DataNotInstalledError,
     GeocoderError,
-    UnsupportedSchemaError,
+    IncompatibleDataError,
 )
-from .models import Location
+from .geocoder import Geocoder, reverse
+from .results import Result
 
 __all__ = [
     "ClosedGeocoderError",
-    "DamagedPackError",
+    "CorruptPackError",
     "DataNotInstalledError",
     "Geocoder",
     "GeocoderError",
-    "Location",
-    "UnsupportedSchemaError",
+    "IncompatibleDataError",
+    "Result",
     "reverse",
 ]

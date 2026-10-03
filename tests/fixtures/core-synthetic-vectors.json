@@ -1,0 +1,1242 @@
+{
+  "schema": "thereabouts-conformance-2",
+  "pack": "packs/core-synthetic",
+  "cases": [
+    {
+      "id": "legacy-0",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860140001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.576453009111932,
+          "lon": 77.15559500254798
+        },
+        "cell": "8860140001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-1",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860140401fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.524774306922687,
+          "lon": 77.00843234791073
+        },
+        "cell": "8860140401fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-2",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860140801fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.733157382473275,
+          "lon": 77.18732265492372
+        },
+        "cell": "8860140801fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-3",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860140c01fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.681363780393418,
+          "lon": 77.04002577934997
+        },
+        "cell": "8860140c01fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-4",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860141001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.471338300595118,
+          "lon": 77.27123962262196
+        },
+        "cell": "8860141001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-5",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860141401fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "nearest",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.419770499772728,
+          "lon": 77.12391121760197
+        },
+        "cell": "8860141401fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-6",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860141801fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "nearest_distant",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.628135629045808,
+          "lon": 77.30305754986368
+        },
+        "cell": "8860141801fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-7",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860142001fffff"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.577789667565582,
+          "lon": 76.746335979211
+        },
+        "cell": "8860142001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-8",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860144001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.941789764661811,
+          "lon": 77.36682549675709
+        },
+        "cell": "8860144001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-9",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860146001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.94258359272697,
+          "lon": 76.95607948123578
+        },
+        "cell": "8860146001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-10",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860148001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.209156607816135,
+          "lon": 77.35509472066732
+        },
+        "cell": "8860148001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-11",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "886014a001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.21166702930819,
+          "lon": 76.94537659371919
+        },
+        "cell": "886014a001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-12",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "886014c001fffff"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.574484329720221,
+          "lon": 77.56679176013843
+        },
+        "cell": "886014c001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-13",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860148001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.209156607816135,
+          "lon": 77.35509472066732
+        },
+        "cell": "8860148001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-14",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "886014a001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.21166702930819,
+          "lon": 76.94537659371919
+        },
+        "cell": "886014a001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-15",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860146001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.94258359272697,
+          "lon": 76.95607948123578
+        },
+        "cell": "8860146001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-16",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8860146003fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 12.94259307808961,
+          "lon": 76.9477171816232
+        },
+        "cell": "8860146003fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-17",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "8808000001fffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": 64.70000012793487,
+          "lon": 10.536199075467694
+        },
+        "cell": "8808000001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-18",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "88f29380adfffff"
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": -89.98649881049484,
+          "lon": -4.389923993545623
+        },
+        "cell": "88f29380adfffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-19",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          12.97,
+          77.59
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.971031136890282,
+          "lon": 77.58605945932766
+        },
+        "cell": "8860145b4bfffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-20",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          12.450873670161915,
+          77.77098085188615
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.453391096237922,
+          "lon": 77.76681069651902
+        },
+        "cell": "886014d34dfffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-21",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          0,
+          180
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 0.0018093229388684796,
+          "lon": 179.99728962024483
+        },
+        "cell": "887eb57221fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-22",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          0,
+          -180
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 0.0018093229388684796,
+          "lon": 179.99728962024483
+        },
+        "cell": "887eb57221fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-23",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          90,
+          0
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 89.99634693622001,
+          "lon": -1.6742331606444665
+        },
+        "cell": "880326233bfffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-24",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          -90,
+          0
+        ]
+      },
+      "result": {
+        "status": "matched",
+        "kind": "cell",
+        "match": "contained",
+        "country": {
+          "code": "AA",
+          "code3": null,
+          "name": "München 東京 country:AA"
+        },
+        "state": {
+          "code": null,
+          "name": "München 東京 state:synthetic:A"
+        },
+        "city": {
+          "id": "city:synthetic:A",
+          "name": "München 東京",
+          "name_en": null,
+          "kind": "city",
+          "population": null,
+          "point": {
+            "lat": 12.97,
+            "lon": 77.59
+          }
+        },
+        "timezone": null,
+        "point": {
+          "lat": -89.99634693622001,
+          "lon": 178.32576683937054
+        },
+        "cell": "88f29380e1fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-25",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          52.37,
+          4.9
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 52.37086494272505,
+          "lon": 4.897277258477509
+        },
+        "cell": "881969c9b3fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-41",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          true,
+          0
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-42",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          91,
+          0
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-43",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          0,
+          181
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-44",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          "0",
+          0
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-45",
+      "request": {
+        "kind": "coordinates",
+        "values": [
+          null,
+          0
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-46",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "000000000000000"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-47",
+      "request": {
+        "kind": "h3",
+        "values": [
+          "836014fffffffff"
+        ]
+      },
+      "result": {
+        "status": "not_found",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": {
+          "lat": 12.576453009111932,
+          "lon": 77.15559500254798
+        },
+        "cell": "8860140001fffff",
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-48",
+      "request": {
+        "kind": "h3",
+        "values": [
+          " 8860145b49fffff"
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    },
+    {
+      "id": "legacy-49",
+      "request": {
+        "kind": "h3",
+        "values": [
+          42
+        ]
+      },
+      "result": {
+        "status": "invalid_input",
+        "kind": "cell",
+        "match": null,
+        "country": null,
+        "state": null,
+        "city": null,
+        "timezone": null,
+        "point": null,
+        "cell": null,
+        "distance_km": null,
+        "candidates": [],
+        "selected": null,
+        "rank_basis": null
+      }
+    }
+  ]
+}

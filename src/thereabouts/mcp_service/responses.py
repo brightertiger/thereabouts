@@ -7,8 +7,8 @@ from typing import cast
 from mcp.server.mcpserver.exceptions import ToolError
 
 from ..client import Geocoder
+from ..client_results import Resolution, plain
 from ..errors import GeocoderError
-from ..results import Resolution, plain
 from .models import Airport, Batch, Cell, Coordinates, Page, Postal, Result
 
 

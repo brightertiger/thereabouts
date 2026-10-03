@@ -7,7 +7,7 @@ from h3.api import basic_int as h3
 
 from thereabouts.client import Geocoder
 from thereabouts.client_errors import AmbiguousResultError, InvalidInputError
-from thereabouts.results import Place
+from thereabouts.client_results import Place
 
 PACK = Path(__file__).parents[1] / "fixtures/serving"
 ROOT = int(h3.latlng_to_cell(12.97, 77.59, 3))

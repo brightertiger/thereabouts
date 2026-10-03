@@ -8,7 +8,7 @@ from h3.api import basic_int as h3
 
 from build_data.hierarchy import descendants, label_block
 from build_data.reference.oracle import Reference
-from thereabouts import Geocoder
+from thereabouts.api import Geocoder
 from thereabouts.table import Table
 
 pytestmark = pytest.mark.world

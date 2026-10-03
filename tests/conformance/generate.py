@@ -8,7 +8,7 @@ from h3.api import basic_int as h3
 
 from thereabouts.client import Geocoder
 from thereabouts.client_errors import InvalidInputError
-from thereabouts.results import Resolution
+from thereabouts.client_results import Resolution
 
 FIXTURES = Path(__file__).parents[1] / "fixtures"
 OUTPUT = FIXTURES / "conformance.json"

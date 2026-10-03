@@ -1,0 +1,144 @@
+//! Pack identity and safe, explicitly inventoried artifacts.
+use super::container::MAX_SHARD_BYTES;
+use crate::{Error, Result, error::ensure};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use std::{
+    collections::BTreeSet,
+    fs,
+    io::Read,
+    path::{Path, PathBuf},
+};
+
+/// Artifact identity; ranges are validated from the binary directories.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Artifact {
+    pub path: String,
+    pub kind: String,
+    pub size: u64,
+    pub sha256: String,
+}
+/// Required pack identity and source attribution, independent of build paths.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Manifest {
+    pub schema: String,
+    pub format_version: u32,
+    pub family: String,
+    pub data_version: String,
+    pub required_features: u32,
+    pub reference_resolution: u8,
+    pub block_resolution: u8,
+    pub input_digest: String,
+    pub inputs: serde_json::Value,
+    pub sources: serde_json::Value,
+    pub attribution: String,
+    pub files: Vec<Artifact>,
+    pub distant_over_m: u32,
+    pub cutoff_m: u32,
+}
+/// Hash a file in bounded chunks; never load Parquet just to fingerprint it.
+pub fn digest(path: &Path) -> Result<String> {
+    let mut file = fs::File::open(path)?;
+    let mut hash = Sha256::new();
+    let mut buffer = vec![0; 65536];
+    loop {
+        let n = file.read(&mut buffer)?;
+        if n == 0 {
+            break;
+        }
+        hash.update(&buffer[..n]);
+    }
+    Ok(format!("{:x}", hash.finalize()))
+}
+/// Reject path traversal and symlinks, including symlinked parent directories.
+pub fn artifact_path(root: &Path, name: &str) -> Result<PathBuf> {
+    ensure(
+        !name.is_empty() && !name.contains(['\\', ':']) && !name.starts_with('/'),
+        "Unsafe artifact path",
+    )?;
+    let mut path = root.to_path_buf();
+    for part in name.split('/') {
+        ensure(!matches!(part, "" | "." | ".."), "Unsafe artifact path")?;
+        path.push(part);
+        if let Ok(metadata) = fs::symlink_metadata(&path) {
+            ensure(!metadata.file_type().is_symlink(), "Symlink artifact")?;
+        }
+    }
+    Ok(path)
+}
+/// Read compatible metadata, limiting allocations before JSON parsing.
+pub fn read(root: &Path) -> Result<Manifest> {
+    if !root.exists() {
+        return Err(Error::Missing);
+    }
+    let path = artifact_path(root, "manifest.json")?;
+    ensure(
+        fs::metadata(&path)?.len() <= 16 * 1024 * 1024,
+        "Oversized manifest",
+    )?;
+    let value: serde_json::Value = serde_json::from_slice(&fs::read(path)?)?;
+    if value["format_version"] != 2
+        || value["family"] != "core"
+        || value["schema"] != "thereabouts-pack-2"
+    {
+        return Err(Error::Incompatible("Requires a format-2 core pack".into()));
+    }
+    let m: Manifest = serde_json::from_value(value)?;
+    if m.required_features != 0 || m.reference_resolution != 8 || m.block_resolution != 3 {
+        return Err(Error::Incompatible(
+            "Unsupported pack features or resolutions".into(),
+        ));
+    }
+    ensure(
+        !m.data_version.is_empty() && m.distant_over_m <= m.cutoff_m,
+        "Invalid dataset identity or nearest policy",
+    )?;
+    let mut names = BTreeSet::new();
+    for f in &m.files {
+        ensure(
+            f.path != "manifest.json" && names.insert(&f.path) && f.size <= MAX_SHARD_BYTES as u64,
+            "Invalid artifact inventory",
+        )?;
+        ensure(
+            f.sha256.len() == 64
+                && f.sha256
+                    .bytes()
+                    .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c)),
+            "Invalid checksum",
+        )?;
+        let path = artifact_path(root, &f.path)?;
+        ensure(
+            fs::metadata(path)?.len() == f.size,
+            "Artifact size mismatch",
+        )?;
+    }
+    Ok(m)
+}
+/// Verify every checksum, including notices and metadata tables.
+pub fn verify(root: &Path, m: &Manifest) -> Result<()> {
+    for f in &m.files {
+        ensure(
+            digest(&artifact_path(root, &f.path)?)? == f.sha256,
+            "Shard checksum mismatch",
+        )?;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn traversal_and_symlinks_are_rejected() {
+        let temp = tempfile::tempdir().unwrap();
+        for name in ["../secret", "/absolute", "a//b", "a\\b", "a:b", ".", ""] {
+            assert!(artifact_path(temp.path(), name).is_err());
+        }
+        assert!(artifact_path(temp.path(), "cells/one.bin").is_ok());
+        #[cfg(unix)]
+        {
+            std::os::unix::fs::symlink("missing", temp.path().join("link")).unwrap();
+            assert!(artifact_path(temp.path(), "link").is_err());
+        }
+    }
+}

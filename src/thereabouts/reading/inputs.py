@@ -8,7 +8,7 @@ from typing import Literal, cast
 from h3.api import basic_int as h3
 
 from ..client_errors import InvalidInputError
-from ..results import Query
+from ..client_results import Query
 
 BATCH_SIZE = 4096
 Errors = Literal["raise", "collect"]

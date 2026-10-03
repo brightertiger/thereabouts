@@ -228,3 +228,6 @@ node_modules/
 # in data/h3-world is committed.
 /data/*
 !/data/h3-world/
+
+.tmp/
+.cargo-cache/

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ..results import Evidence, Place, freeze
+from ..client_results import Evidence, Place, freeze
 from .cache import Cache
 
 if TYPE_CHECKING:

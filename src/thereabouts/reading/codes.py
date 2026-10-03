@@ -5,17 +5,7 @@ from typing import Any
 
 from h3.api import basic_int as h3
 
-from ..packs.code_records import payload
-from ..packs.errors import CorruptPackError
-from ..packs.keys import country_code, key, normalize
-from ..packs.layout import (
-    CITY_METHOD_MASK,
-    CITY_METHODS,
-    COUNTRY_AREA,
-    OFFSHORE,
-    STATE_AREA,
-)
-from ..results import (
+from ..client_results import (
     Candidate,
     Confidence,
     Data,
@@ -29,6 +19,16 @@ from ..results import (
     Status,
     Warning,
     freeze_object,
+)
+from ..packs.code_records import payload
+from ..packs.errors import CorruptPackError
+from ..packs.keys import country_code, key, normalize
+from ..packs.layout import (
+    CITY_METHOD_MASK,
+    CITY_METHODS,
+    COUNTRY_AREA,
+    OFFSHORE,
+    STATE_AREA,
 )
 from .pack import Pack
 

@@ -90,3 +90,36 @@ def list_packs(data_dir: str | Path | None = None) -> list[dict[str, Any]]:
             }
         )
     return results
+
+
+def core_pack(data_dir: str | Path | None = None) -> Path:
+    """Discover core data using the existing immutable installation layout."""
+    from . import _core, errors
+
+    try:
+        root = data_directory(data_dir)
+    except DataNotInstalledError as exc:
+        raise DataNotInstalledError("thereabouts data install core") from exc
+    pointer = relative_file(root, "packs/core/current.json")
+    if not pointer.exists():
+        # Old installers used the reverse family. Discover that pointer too;
+        # the native opener then reports the incompatible format explicitly.
+        legacy = relative_file(root, "packs/reverse/current.json")
+        if legacy.exists():
+            return installed_pack(root)
+        raise DataNotInstalledError("thereabouts data install core")
+    try:
+        value = parse(pointer.read_bytes())
+        path = relative_file(root, string(value["path"]))
+        digest = sha256(path / "manifest.json")
+        if digest != value["manifest_sha256"]:
+            raise ValueError("Active manifest digest mismatch")
+        info = _core.pack_info(str(path))
+        expected = relative_file(
+            root, f"packs/core/v-{quote(info['data_version'], safe='')}/{digest}"
+        )
+        if path != expected:
+            raise ValueError("Active path differs from immutable pack identity")
+        return path
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise errors.CorruptPackError(f"Invalid active pack: {exc}") from exc

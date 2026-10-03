@@ -9,7 +9,7 @@ import numpy as np
 
 from build_data.reference.oracle import Reference
 from build_data.sources import sha256
-from thereabouts import Geocoder
+from thereabouts.api import Geocoder
 
 from .sampling import sample
 

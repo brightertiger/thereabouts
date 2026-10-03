@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from build_data.reference.oracle import Reference
-from thereabouts import Location
+from thereabouts.models import Location
 
 
 @pytest.mark.parametrize(

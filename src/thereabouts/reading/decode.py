@@ -2,15 +2,7 @@
 
 from h3.api import basic_int as h3
 
-from ..packs.layout import (
-    CITY_METHOD_MASK,
-    CITY_METHODS,
-    COUNTRY_AREA,
-    OFFSHORE,
-    STATE_AREA,
-)
-from ..packs.spatial import Label
-from ..results import (
+from ..client_results import (
     Candidate,
     Confidence,
     Data,
@@ -22,6 +14,14 @@ from ..results import (
     Source,
     Warning,
 )
+from ..packs.layout import (
+    CITY_METHOD_MASK,
+    CITY_METHODS,
+    COUNTRY_AREA,
+    OFFSHORE,
+    STATE_AREA,
+)
+from ..packs.spatial import Label
 from .backend import StoredCell
 from .pack import Pack
 

@@ -12,7 +12,7 @@ from pathlib import Path
 from build_data.serve.export import export
 from tests.codes.fixtures import snapshot
 from thereabouts.client import Geocoder
-from thereabouts.results import Resolution
+from thereabouts.client_results import Resolution
 
 
 def measure(root: Path) -> dict[str, object]:

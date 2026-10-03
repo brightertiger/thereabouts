@@ -7,6 +7,7 @@ from threading import RLock
 from typing import Any, Literal
 
 from .client_errors import InvalidInputError
+from .client_results import Data, Query, Resolution
 from .columns import Columns, columns
 from .errors import ClosedGeocoderError
 from .packs.address import address
@@ -19,7 +20,6 @@ from .reading.inputs import BATCH_SIZE, Errors, batch_options, coordinates, h3_c
 from .reading.objects import result
 from .reading.pack import Pack
 from .reading.selection import Selection, open_packs, require
-from .results import Data, Query, Resolution
 
 
 class Geocoder:

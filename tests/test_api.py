@@ -7,7 +7,9 @@ from typing import Any
 
 import pytest
 
-from thereabouts import ClosedGeocoderError, Geocoder, Location
+from thereabouts.api import Geocoder
+from thereabouts.errors import ClosedGeocoderError
+from thereabouts.models import Location
 
 from .conftest import FIXTURE
 
@@ -95,7 +97,9 @@ def test_info_is_detached(geocoder: Geocoder) -> None:
 
 
 def test_discovery_and_default(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    from thereabouts import DataNotInstalledError, api, reverse
+    from thereabouts import api
+    from thereabouts.api import reverse
+    from thereabouts.errors import DataNotInstalledError
 
     monkeypatch.delenv("THEREABOUTS_DATA", raising=False)
     for path in (None, tmp_path / "missing"):

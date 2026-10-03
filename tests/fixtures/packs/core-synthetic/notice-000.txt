@@ -1,0 +1,3 @@
+LICENSE
+
+Synthetic fixture: public domain.

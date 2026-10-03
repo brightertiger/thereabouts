@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=77,<81", "wheel>=0.45,<1"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.9,<2"]
+build-backend = "maturin"
 
 [project]
 name = "thereabouts"
@@ -20,6 +20,7 @@ thereabouts = "thereabouts.cli:main"
 dev = [
     "mcp==2.2.0",
     "Cython==3.3.0",
+    "maturin>=1.9,<2",
     "setuptools>=77,<81",
     "types-setuptools",
     { include-group = "acquire" },
@@ -39,28 +40,12 @@ acquire = [
     "regex>=2024.11,<2027",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-thereabouts = ["py.typed", "reading/*.pyi"]
-
-[tool.setuptools.exclude-package-data]
-"*" = ["*.pyx", "*.c"]
-
-[tool.cibuildwheel]
-build = ["cp311-*", "cp312-*", "cp313-*", "cp314-*"]
-skip = ["*-musllinux_*"]
-test-command = "python {project}/tests/wheel_smoke.py {project}/tests/fixtures/serving cython"
-
-[tool.cibuildwheel.linux]
-archs = ["auto64"]
-
-[tool.cibuildwheel.macos]
-archs = ["auto"]
-
-[tool.cibuildwheel.windows]
-archs = ["AMD64"]
+[tool.maturin]
+python-source = "src"
+module-name = "thereabouts._core"
+manifest-path = "core/thereabouts-py/Cargo.toml"
+features = ["pyo3/extension-module"]
+include = ["src/thereabouts/py.typed", "src/thereabouts/_core.pyi"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -77,9 +62,21 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "build_data", "benchmarks", "tests", "setup.py"]
+files = ["src", "build_data", "benchmarks", "tests", "tools"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]
 module = ["scipy.spatial", "shapefile", "h3.*"]
 ignore_missing_imports = true
+
+[tool.uv]
+# Rust edits must invalidate uv's editable-wheel cache as well as Python metadata.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "core/Cargo.toml" },
+    { file = "core/Cargo.lock" },
+    { file = "core/thereabouts-core/Cargo.toml" },
+    { file = "core/thereabouts-py/Cargo.toml" },
+    { file = "core/thereabouts-core/src/**/*.rs" },
+    { file = "core/thereabouts-py/src/*.rs" },
+]

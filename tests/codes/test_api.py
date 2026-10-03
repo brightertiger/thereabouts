@@ -8,8 +8,8 @@ from thereabouts.client_errors import (
     ContextRequiredError,
     InvalidInputError,
 )
+from thereabouts.client_results import SourcePlace
 from thereabouts.errors import ClosedGeocoderError, DataNotInstalledError
-from thereabouts.results import SourcePlace
 
 
 def test_postal_preserves_leading_zeros_editions_and_ambiguity(

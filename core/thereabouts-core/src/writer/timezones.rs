@@ -1,0 +1,201 @@
+//! Join all matching timezones; overlapping source zones stay ambiguous.
+use super::source::{Dataset, required};
+use crate::{
+    Error, Result,
+    error::ensure,
+    format::{address, spatial::Label},
+};
+use h3o::{CellIndex, Resolution};
+use rusqlite::{Connection, params};
+use std::collections::{BTreeMap, BTreeSet};
+
+pub fn load(db: &Connection, data: &Dataset) -> Result<()> {
+    for table in data.tables("timezone_cells") {
+        data.scan(table, |row| {
+            let cell = required(&row, "h3")?
+                .parse::<CellIndex>()
+                .map_err(|_| Error::Input("Invalid timezone H3 cell".into()))?;
+            ensure(
+                cell.resolution() <= Resolution::Eight,
+                "Timezone resolution exceeds eight",
+            )?;
+            let zone = required(&row, "tzid")?;
+            if cell.resolution() < Resolution::Three {
+                db.execute(
+                    "INSERT OR IGNORE INTO coarse_zones VALUES (?,?)",
+                    params![u64::from(cell), zone],
+                )?;
+            } else {
+                let (block, key) = address::address(cell);
+                db.execute(
+                    "INSERT OR IGNORE INTO zones VALUES (?,?,?)",
+                    params![block, key, zone],
+                )?;
+            }
+            Ok(())
+        })?;
+    }
+    Ok(())
+}
+pub fn block_zones(db: &Connection, block: u32) -> Result<BTreeMap<u64, BTreeSet<String>>> {
+    let root = address::cell_at(block, 0)?;
+    let mut zones = BTreeMap::<u64, BTreeSet<String>>::new();
+    // Charge expanded labels conservatively, including tree and String overhead.
+    let mut charged_bytes = 0;
+    let mut add = |cell: CellIndex, zone: String| -> Result<()> {
+        for child in cell.children(Resolution::Eight) {
+            let names = zones.entry(u64::from(child)).or_default();
+            if names.insert(zone.clone()) {
+                charged_bytes += zone.len() + 128;
+                ensure(
+                    charged_bytes <= super::MEMORY_BUDGET_BYTES / 8,
+                    "Expanded timezone block exceeds admission budget",
+                )?;
+            }
+        }
+        Ok(())
+    };
+    for resolution in [Resolution::Zero, Resolution::One, Resolution::Two] {
+        if let Some(parent) = root.parent(resolution) {
+            let mut query =
+                db.prepare("SELECT zone FROM coarse_zones WHERE cell=? ORDER BY zone")?;
+            for z in query.query_map([u64::from(parent)], |r| r.get::<_, String>(0))? {
+                add(root, z?)?;
+            }
+        }
+    }
+    let mut query = db.prepare("SELECT key,zone FROM zones WHERE block=? ORDER BY key,zone")?;
+    for row in query.query_map([block], |r| {
+        Ok((r.get::<_, u16>(0)?, r.get::<_, String>(1)?))
+    })? {
+        let (key, zone) = row?;
+        add(address::cell_at(block, key)?, zone)?;
+    }
+    Ok(zones)
+}
+pub fn join(
+    db: &Connection,
+    block: u32,
+    rows: Vec<(u16, Label)>,
+    sets: &mut Vec<Vec<String>>,
+) -> Result<Vec<(u16, Label)>> {
+    let zones = block_zones(db, block)?;
+    if zones.is_empty() {
+        return Ok(rows);
+    }
+    let mut registry: BTreeMap<_, _> = sets
+        .iter()
+        .cloned()
+        .enumerate()
+        .map(|(i, v)| (v, i))
+        .collect();
+    let mut cells = BTreeMap::new();
+    for (key, label) in rows {
+        for child in address::cell_at(block, key)?.children(Resolution::Eight) {
+            let names: Vec<_> = zones
+                .get(&u64::from(child))
+                .map_or_else(Vec::new, |v| v.iter().cloned().collect());
+            let n = *registry.entry(names.clone()).or_insert_with(|| {
+                let i = sets.len();
+                sets.push(names);
+                i
+            });
+            let mut label = label;
+            label.0[4] =
+                u32::try_from(n).map_err(|_| Error::Input("Too many timezone sets".into()))?;
+            ensure(
+                cells.insert(child, label).is_none(),
+                "Overlapping dataset cells",
+            )?;
+        }
+    }
+    for r in (4..=8).rev() {
+        let resolution =
+            Resolution::try_from(r).map_err(|_| Error::Input("Invalid resolution".into()))?;
+        let parent_res =
+            Resolution::try_from(r - 1).map_err(|_| Error::Input("Invalid resolution".into()))?;
+        let parents: BTreeSet<_> = cells
+            .keys()
+            .filter(|c| c.resolution() == resolution)
+            .filter_map(|c| c.parent(parent_res))
+            .collect();
+        for parent in parents {
+            let children: Vec<_> = parent.children(resolution).collect();
+            let label = cells.get(&children[0]).copied();
+            if let Some(label) = label
+                && children.iter().all(|c| cells.get(c) == Some(&label))
+            {
+                for child in children {
+                    cells.remove(&child);
+                }
+                cells.insert(parent, label);
+            }
+        }
+    }
+    let mut rows: Vec<_> = cells
+        .into_iter()
+        .map(|(c, l)| (address::address(c).1, l))
+        .collect();
+    rows.sort_unstable();
+    Ok(rows)
+}
+
+/// Catalogue anchors need only their matching ancestors, not expanded blocks.
+pub fn at_point(db: &Connection, cell: CellIndex) -> Result<Option<String>> {
+    let mut names = BTreeSet::new();
+    let (block, _) = address::address(cell);
+    for r in 0..=8 {
+        let resolution =
+            Resolution::try_from(r).map_err(|_| Error::Input("Invalid resolution".into()))?;
+        if let Some(parent) = cell.parent(resolution) {
+            if r < 3 {
+                let mut query = db.prepare("SELECT zone FROM coarse_zones WHERE cell=?")?;
+                for zone in query.query_map([u64::from(parent)], |row| row.get::<_, String>(0))? {
+                    names.insert(zone?);
+                }
+            } else {
+                let mut query = db.prepare("SELECT zone FROM zones WHERE block=? AND key=?")?;
+                for zone in query.query_map(params![block, address::address(parent).1], |row| {
+                    row.get::<_, String>(0)
+                })? {
+                    names.insert(zone?);
+                }
+            }
+        }
+    }
+    Ok(if names.len() == 1 {
+        names.into_iter().next()
+    } else {
+        None
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::writer::catalogue;
+    #[test]
+    fn overlapping_zones_split_labels_and_never_choose_one() {
+        let db = Connection::open_in_memory().unwrap();
+        catalogue::initialize(&db).unwrap();
+        let root = h3o::LatLng::new(52.0, 4.0)
+            .unwrap()
+            .to_cell(Resolution::Three);
+        let block = address::address(root).0;
+        let fine = root.center_child(Resolution::Eight).unwrap();
+        let key = address::address(fine).1;
+        for zone in ["Europe/Amsterdam", "Europe/Berlin"] {
+            db.execute(
+                "INSERT INTO zones VALUES (?,?,?)",
+                params![block, key, zone],
+            )
+            .unwrap();
+        }
+        let mut sets = vec![vec![]];
+        let rows = join(&db, block, vec![(0, Label([0; 5]))], &mut sets).unwrap();
+        assert_eq!(sets[1], vec!["Europe/Amsterdam", "Europe/Berlin"]);
+        assert_eq!(rows.iter().find(|(k, _)| *k == key).unwrap().1.0[4], 1);
+        assert_eq!(at_point(&db, fine).unwrap(), None);
+        assert!(rows.len() > 1);
+    }
+}

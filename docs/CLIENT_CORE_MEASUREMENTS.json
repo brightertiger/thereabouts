@@ -1,0 +1,36 @@
+{
+  "machine": {
+    "chip": "Apple M2",
+    "memory_bytes": 8589934592,
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "python": "3.12.8"
+  },
+  "workload": {
+    "pack": "core-sample",
+    "iterations": 20000,
+    "coordinate_vectors": 65,
+    "seed": 20261003,
+    "pack_bytes": 4498416
+  },
+  "scalar_median_us": 8.541,
+  "scalar_p99_us": 22.291,
+  "reverse_columns_points_per_second": 577891.3278822618,
+  "reverse_columns_repeats": [
+    577891.3278822618,
+    586144.9975133556,
+    568343.957699736,
+    519849.0317565203,
+    535460.8982946872,
+    591548.9772306297,
+    608871.248058867
+  ],
+  "peak_rss_bytes": 128892928,
+  "historical_reader": {
+    "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
+    "workload": "synthetic 308032 cells / 4176 places; not the real sample",
+    "cython_scalar_median_us": 10.291,
+    "python_scalar_median_us": 12.75,
+    "cython_columns_points_per_second": 531994,
+    "python_columns_points_per_second": 530437
+  }
+}
