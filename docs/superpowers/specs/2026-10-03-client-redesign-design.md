@@ -98,6 +98,9 @@ reader never disagree.
 
 Time zone: the `packs` stage joins `timezone_cells` onto stored cells so
 reverse answers carry an IANA zone; `zone_tables` are included for offsets.
+Where zones overlap on a cell, the set is narrowed to zones valid for the
+cell's country; a single survivor is reported, otherwise `timezone` is null
+and the zone list goes in `evidence`. Overlap never changes `status`.
 
 Every pack has a manifest: format version, dataset version, family, shard
 checksums, licence notices, attribution. Packs from different dataset
@@ -118,8 +121,8 @@ Result
   timezone: IANA name | null
   point:    {lat, lon} representative point | null        (cell centre or place centroid)
   cell:     H3 resolution-8 id | null
-  distance_km: for nearest matches | null
-  candidates: [Result] when ambiguous, ranked, with rank_basis
+  distance_band: {greater_than_km, at_most_km} for nearest matches | null   (the dataset records bands, not exact distances)
+  candidates: [Result] when ambiguous, ranked, with rank_basis; the flat fields are then null
   evidence: optional detail (method chain, source ids) behind an explicit flag
 ```
 
@@ -157,8 +160,8 @@ await geo.close();
 Rules shared by both: `lat`/`lon` keyword or object only, never positional
 pairs; `geocode` rejects code-shaped input (`75001`, `8.8.8.8`, `+44`) with
 `invalid_input` and a hint naming the right method; address-shaped input
-returns `unsupported_granularity`; ambiguity returns `candidates` with
-`selected` null unless the caller opts into `prefer="population"`; errors
+returns `unsupported_granularity`; ambiguity returns `status: ambiguous` with the flat fields null and ranked
+`candidates`, unless the caller opts into `prefer="population"`; errors
 (`DataNotInstalledError`, `IncompatibleDataError`, `CorruptPackError`,
 `ClosedGeocoderError`) carry a stable `code` and, for missing data, the exact
 `thereabouts data install …` command. JSON serialisation uses `snake_case`
@@ -200,6 +203,10 @@ design driver.
 
 ## 6. Distribution
 
+- **Crates:** `thereabouts-core` (reader, lookups, result model) depends only on
+  what lookups need and must build for `wasm32-unknown-unknown`; the pack
+  writer (Parquet, SQLite staging) is a separate crate, `thereabouts-writer`,
+  linked into the Python module behind a feature and never into WASM.
 - **Python:** `maturin` builds one `abi3` wheel per platform (Linux x86_64 and
   aarch64 manylinux, macOS x86_64 and arm64, Windows x86_64) plus an sdist;
   `thereabouts` contains only the thin layer and `_core`. No pure-Python
@@ -293,6 +300,6 @@ implementation plan; all on branch `feat/rust-core` in its own worktree.
 
 ## 10. Out of scope
 
-Street-address geocoding; routing or distances beyond `distance_km` on
+Street-address geocoding; routing or distances beyond the distance band on
 nearest matches; a hosted API; publishing to PyPI/npm (owner's call);
 renaming the npm or PyPI names; the dataset's content and rules.
