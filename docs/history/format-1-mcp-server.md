@@ -1,8 +1,8 @@
 # Local MCP lookup server
 
 > Historical format-1 MCP documentation. Current commands, data store and
-> MCP are documented in [CLI.md](CLI.md); the current Python API is in
-> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> MCP are documented in [CLI.md](../CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](../CLIENT_STATUS.md). Legacy console examples require
 > `python -m thereabouts.commandline.application` in place of `thereabouts`.
 
 `thereabouts mcp` serves read-only place lookups over standard input/output. It
@@ -24,7 +24,7 @@ an application, install the `mcp` extra on an approved local Thereabouts wheel,
 for example `pip install '/media/thereabouts-0.1.0-py3-none-any.whl[mcp]'` with
 an offline dependency cache when needed. No Thereabouts package is published by
 this work. Install packs using the explicit commands in
-[DATA_INSTALLATION.md](DATA_INSTALLATION.md), then launch:
+[DATA_INSTALLATION.md](format-1-data-installation.md), then launch:
 
 ```sh
 thereabouts --data-dir /data/thereabouts mcp --families reverse postal airports
@@ -145,7 +145,7 @@ An external host UI and remote transport are deliberately unverified.
 
 ## Measurements and corrected memory incident
 
-[CLIENT_MCP_MEASUREMENTS.json](CLIENT_MCP_MEASUREMENTS.json) uses the populated
+[CLIENT_MCP_MEASUREMENTS.json](../measurements/CLIENT_MCP_MEASUREMENTS.json) uses the populated
 synthetic 4,176-place / 308,032-row / 64-block pack on Apple M2, 8 GiB RAM,
 macOS 27 arm64, CPython 3.12.8, MCP SDK 2.2.0 and Pydantic 2.13.5. The SDK host
 starts the actual stdio server. Connection/startup took **0.419 s**; 100 warmed
@@ -156,7 +156,7 @@ was **94,044,160 / 97,550,336 bytes**. This measures the complete protocol round
 trip, not the core's microsecond lookup path.
 
 The initial full-output probe is retained in
-[CLIENT_MCP_INITIAL_MEASUREMENTS.json](CLIENT_MCP_INITIAL_MEASUREMENTS.json):
+[CLIENT_MCP_INITIAL_MEASUREMENTS.json](../measurements/CLIENT_MCP_INITIAL_MEASUREMENTS.json):
 a 1,000-row reply was **17,467,570 bytes**, with **1,990,803,456 bytes** host peak
 RSS and **515,293,184 bytes** server peak. That probe exceeded the owner's 1.5 GB
 process budget and ended before corrective work. A subsequent 50-row CPU profile

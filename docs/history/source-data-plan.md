@@ -1,7 +1,7 @@
 # Source-data replacement plan
 
 Research date: **2026-10-01**. This is a plan, not a new pipeline or a completed
-accuracy evaluation. The runtime contract in [DESIGN.md](DESIGN.md) remains one
+accuracy evaluation. The runtime contract in [DESIGN.md](../DESIGN.md) remains one
 combined table: query → H3 resolution-8 cell → ancestor lookup → city, state,
 country and country code. Every answer is determined at build time from that
 cell's centre, including the coastal rule below.
@@ -52,7 +52,7 @@ the ninth from the frozen audit rather than guessing. Monaco is an additional
 required regression. Proximity to an existing cell is evidence of a coastal
 failure, not proof of which outline/rasterization mechanism caused it.
 
-**M, existing benchmark:** [build.json](../benchmarks/build.json) records
+**M, existing benchmark:** [build.json](../../benchmarks/build.json) records
 20,808,748 stored rows; 50,951,071 table bytes; 53,056,366 complete pack bytes;
 21,347,383 ZIP bytes; 687.93 seconds for table build plus verification; and
 246,595,584 bytes peak labelling RSS. It enumerated 691,776,122 centres and
@@ -442,7 +442,7 @@ not exceptions keyed to the regression coordinates or returned string.
 When no accepted locality contains the centre:
 
 - Use GeoNames feature class P with the existing current-settlement allowlist in
-  [DESIGN.md](DESIGN.md), without a population threshold; retain unknown/zero
+  [DESIGN.md](../DESIGN.md), without a population threshold; retain unknown/zero
   population. Continue excluding `PPLX`, historical, abandoned and destroyed
   places. Add Overture locality points only after excluding sub-city classes.
 - Match duplicates by shared source identifier/Wikidata where present, followed

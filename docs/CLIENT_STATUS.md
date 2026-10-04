@@ -120,7 +120,8 @@ and normalized/plates_country is absent. Core plus five forward packs were
 verified, not seven packs. No fabricated or empty substitute was produced.
 The existing plate sample and all plate vectors still pass.
 The proof outputs are scratch; results, input hashes and pack-manifest hashes
-are retained in [CLIENT_RELEASE_MEASUREMENTS.json](CLIENT_RELEASE_MEASUREMENTS.json).
+are retained in
+[CLIENT_RELEASE_MEASUREMENTS.json](measurements/CLIENT_RELEASE_MEASUREMENTS.json).
 Reproduce with benchmarks.release_path and a new worktree-local output directory.
 
 ## Conformance and qualification

@@ -77,7 +77,7 @@ def main() -> None:
     result["process_peak_rss_bytes"] = resource.getrusage(
         resource.RUSAGE_SELF
     ).ru_maxrss
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     series = data.setdefault(args.series, {})
     if args.record in series:

@@ -10,7 +10,7 @@ The measured development sample is an Apple M2 with 8 GiB RAM. The release proof
 contains Malaysia/Singapore catalogues and three spatial blocks, not a world
 release: 181,548 rows, 14 tables and 8,802,046 bytes. Its three reader examples and
 local/memory publication tests passed. See
-[PIPELINE_RELEASE_MEASUREMENTS.json](PIPELINE_RELEASE_MEASUREMENTS.json) and the
+[PIPELINE_RELEASE_MEASUREMENTS.json](measurements/PIPELINE_RELEASE_MEASUREMENTS.json) and the
 [dataset README](DATASET_README.md). VM capacity and cloud throughput have not been
 measured.
 

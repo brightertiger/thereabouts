@@ -155,7 +155,7 @@ def main() -> None:
         help="Fail if query plus evidence blocks exceed any family ceiling",
     )
     args = parser.parse_args()
-    output = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    output = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(output.read_text())
     previous = data.get("forward_format", {})
     values = {}

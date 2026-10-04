@@ -34,7 +34,7 @@ Parquet contributes **7,336,896 bytes**. Three blocks coalesce into one cell fil
 Its final build took **18.40 s** at **312,164,352 bytes RSS**.
 All three README examples ran and agreed. Local publish uploaded 23 objects,
 then skipped all 23 on repeat; the directory with `_SUCCESS` is **8,740,271 bytes**.
-[PIPELINE_RELEASE_MEASUREMENTS.json](PIPELINE_RELEASE_MEASUREMENTS.json) records
+[PIPELINE_RELEASE_MEASUREMENTS.json](measurements/PIPELINE_RELEASE_MEASUREMENTS.json) records
 per-table sizes, identities, reader outputs, timings and source attribution.
 
 Package 5 supplies the owner-run [release procedure](RELEASE_PROCEDURE.md),
@@ -49,7 +49,7 @@ on loopback HTTP (5), full Malaysia pilot proof (6), stage-owned parameters and
 configured source roles (7), removal of duplicate pack writers and `pipeline
 digest` command (8), configured grids, explicit limits and source/docs cleanup
 (9–10), and this status restructuring (11). Measurements and old → new identities
-are in [PIPELINE_REVIEW_MEASUREMENTS.json](PIPELINE_REVIEW_MEASUREMENTS.json).
+are in [PIPELINE_REVIEW_MEASUREMENTS.json](measurements/PIPELINE_REVIEW_MEASUREMENTS.json).
 
 Measured on Apple M2 / 8 GiB / macOS. Current interpreter: CPython 3.12.8 /
 SQLite 3.47.1; the pre-fix timing used CPython 3.12.2 / SQLite 3.46.0.
@@ -81,7 +81,7 @@ semantics.** Read-only SQLite uses `mode=ro&immutable=1`; reports stay here.
 
 Latest final-review plan: **322.47 s**, **1,418,297,344 bytes RSS**.
 Final handover dry-run: **331.66 s / 1,262,174,208 bytes RSS**; all 85,577 units pass.
-Gate reports: [PIPELINE_FINAL_REVIEW_MEASUREMENTS.json](PIPELINE_FINAL_REVIEW_MEASUREMENTS.json).
+Gate reports: [PIPELINE_FINAL_REVIEW_MEASUREMENTS.json](measurements/PIPELINE_FINAL_REVIEW_MEASUREMENTS.json).
 Real ledger SHA256 before/after:
 `d71802b95e36aeed8b95b53b3613e3499a4cfc7eb051dbac8880856fa5d73a37`.
 

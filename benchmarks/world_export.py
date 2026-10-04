@@ -95,7 +95,7 @@ def child(
 
 
 def update_docs(measurement: dict[str, Any]) -> None:
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     data.setdefault("world_exports", {})[measurement["family"]] = measurement
     path.write_text(json.dumps(data, indent=2) + "\n")

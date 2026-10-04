@@ -116,5 +116,6 @@ Start with [pipeline operations](docs/DATA_PIPELINE.md),
 [the dataset](docs/DATASET_README.md), [pack format 2.2](docs/PACK_FORMAT.md),
 [client status and measurements](docs/CLIENT_STATUS.md), and
 [release engineering](docs/CLIENT_RELEASE.md).
+The [documentation index](docs/README.md) lists every current document.
 The [0.1.0 changelog](CHANGELOG.md) describes the migration from the retired readers.
 Data notices are separate from the pending code licence.

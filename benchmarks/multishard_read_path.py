@@ -48,7 +48,9 @@ def main() -> None:
     parser.add_argument("--record", choices=["before", "after"], required=True)
     parser.add_argument("--series", default="multishard")
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+        "--output",
+        type=Path,
+        default=ROOT / "docs/measurements" / "CLIENT_CORE_MEASUREMENTS.json",
     )
     args = parser.parse_args()
     pack = ROOT / ".tmp/core-multishard"

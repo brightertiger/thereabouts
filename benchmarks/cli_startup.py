@@ -89,7 +89,7 @@ def main() -> None:
         "first_result_samples_ms": first,
         "total_samples_ms": total,
     }
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     measurements = json.loads(path.read_text())
     measurements["cli_startup"] = result
     path.write_text(json.dumps(measurements, indent=2) + "\n")

@@ -1,6 +1,7 @@
 """Measure scalar latency and column throughput on the committed real sample.
 
-uv run python -m benchmarks.core_read_path --output docs/CLIENT_CORE_MEASUREMENTS.json
+uv run python -m benchmarks.core_read_path \
+    --output docs/measurements/CLIENT_CORE_MEASUREMENTS.json
 Reverse measurements originate here; companion scripts record forward and scale work.
 Historical comparison figures
 are explicitly identified as measurements of the older synthetic workload.

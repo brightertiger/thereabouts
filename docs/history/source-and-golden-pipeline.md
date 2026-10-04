@@ -5,7 +5,7 @@
 > The protected workspace is not a target for rebuilding.
 
 The four primary adapters acquire pinned raw inputs and publish validated,
-bounded Parquet for [DATA_PLAN.md](../DATA_PLAN.md). Reconciliation and H3 building
+bounded Parquet for [DATA_PLAN.md](source-data-plan.md). Reconciliation and H3 building
 are separate stages for the primary sources. The seven additional lookup adapters
 below also produce their H3 keys during acquisition. Acquisition retains source identities, naming evidence,
 administrative roles and provenance; it does not decide which source wins.
@@ -565,12 +565,12 @@ uv sync --frozen
 uv run --no-sync python -m build_data.rebuild_golden --data-dir data --through pilot
 # After examining the generated pilot, bind the reasoned decision to its hashes:
 uv run --no-sync python -m build_data.normalize_cells review --data-dir data \
-  --review docs/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
+  --review docs/measurements/city-normalization-pilot-review.json --gate data/work/v2-pilot/gate.json
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
   --through world > data/work/v2-world.log 2>&1 < /dev/null &
 ```
 
-The committed `docs/city-normalization-pilot-review.json` records the examined
+The committed `docs/measurements/city-normalization-pilot-review.json` records the examined
 exceptions for this pinned snapshot. It is evaluation evidence, never an input
 to city assignment. The review command binds it to freshly verified artifacts
 and rejects changed loss counts or destinations; inspect new source editions
@@ -615,7 +615,7 @@ from build_data.acquire.artifacts import read_json
 from build_data.acquire.io import fingerprint, write_json
 
 output = Path("data/golden-v2")
-notes = read_json(Path("docs/city-normalization-pilot-review.json"))
+notes = read_json(Path("docs/measurements/city-normalization-pilot-review.json"))
 write_json(Path("data/work/v2-world-review.json"), {
     "manifest": fingerprint(read_json(output / "manifest.json")),
     "boundary_exceptions": notes["boundary_exceptions"],

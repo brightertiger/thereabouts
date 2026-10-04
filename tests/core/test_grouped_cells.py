@@ -172,7 +172,11 @@ def test_captured_my_sg_manifest_and_empty_pipeline_group(tmp_path: Path) -> Non
     path, manifest, options = setup(root)
     capture = json.loads((FIXTURES / "dataset-my-sg-cells.json").read_text())
     recorded = json.loads(
-        (FIXTURES.parents[1] / "docs/CLIENT_RELEASE_MEASUREMENTS.json").read_text()
+        (
+            FIXTURES.parents[1]
+            / "docs/measurements"
+            / "CLIENT_RELEASE_MEASUREMENTS.json"
+        ).read_text()
     )
     assert capture["manifest_sha256"] == recorded["dataset"]["manifest_sha256"]
     original = next(t for t in manifest["tables"] if t["kind"] == "cells")

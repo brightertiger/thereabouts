@@ -37,8 +37,8 @@ def test_tracked_measurement_requires_explicit_write(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(release_path, "ROOT", tmp_path)
-    tracked = tmp_path / "docs/CLIENT_RELEASE_MEASUREMENTS.json"
-    tracked.parent.mkdir()
+    tracked = tmp_path / "docs/measurements/CLIENT_RELEASE_MEASUREMENTS.json"
+    tracked.parent.mkdir(parents=True)
     tracked.write_text('{"existing": true}\n')
     output = tmp_path / "output"
     output.mkdir()

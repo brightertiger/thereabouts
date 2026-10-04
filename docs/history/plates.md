@@ -50,9 +50,9 @@ remain available in `notes` even where they have not been structurally parsed.
 
 Every code and source specimen is extracted from a fetched file. Parsing choices,
 survey interpretations, patterns and coverage checks live in
-[`plates_data`](../build_data/acquire/plates_data/), not country branches in Python.
+`plates_data` (`build_data/acquire/plates_data/`, removed), not country branches in Python.
 No codes were supplied from memory. The full
-[`sources.json`](../build_data/acquire/plates_data/sources.json) catalog records
+`sources.json` (`build_data/acquire/plates_data/sources.json`, removed) catalog records
 every upstream URL, SHA-256, byte size, licence, attribution and retrieval timestamp.
 The output manifest includes that inventory and the policy fingerprints; a
 `licenses-*.json` auxiliary file lists each source's reuse information.
@@ -114,7 +114,7 @@ the research receipts/logs and tracked in `data/work/plates-progress.md`.
 ## Table contracts
 
 The authoritative schemas are
-[`plates_schemas.py`](../build_data/acquire/plates_schemas.py). No H3 cell or golden
+`plates_schemas.py` (`build_data/acquire/plates_schemas.py`, removed). No H3 cell or golden
 place ID is fabricated for these evidence tables.
 
 | Table | Main fields and meaning |
@@ -525,7 +525,7 @@ Universe: the pinned ISO 3166-1 list (249 entries) plus Kosovo (XK). Disputed/de
 
 ## Reproducible cross-checks
 
-The table compares current code sets when both sources classify current series. Values unique to a source are retained, not silently resolved. Different scopes, withdrawn codes, script variants and office/city names can explain differences. These are not all confirmed factual conflicts. The [verification report](../data/normalized/plates/verification.json) contains the complete differing code lists, all-period comparisons (including Wikidata), per-source counts, and completeness checks. Place-name equivalence and overlapping geographic claims remain unadjudicated; consumers must retain the source of each association.
+The table compares current code sets when both sources classify current series. Values unique to a source are retained, not silently resolved. Different scopes, withdrawn codes, script variants and office/city names can explain differences. These are not all confirmed factual conflicts. The verification report (`data/normalized/plates/verification.json`, untracked workspace file) contains the complete differing code lists, all-period comparisons (including Wikidata), per-source counts, and completeness checks. Place-name equivalence and overlapping geographic claims remain unadjudicated; consumers must retain the source of each association.
 
 | Country | Left source | Right source | Shared | Left only | Right only |
 | --- | --- | --- | --- | --- | --- |
@@ -554,7 +554,7 @@ Rules without literal source specimens: AL/historic-geographic, AO/ordinary, AR/
 its country. `ABC 123`-shaped serials are shared by many jurisdictions; flags,
 colours, plate shape and printed state names would add information, but are absent
 from this string-only interface. The reference lives in
-[`build_data/plate_country`](../build_data/plate_country/). It is separate from
+`build_data/plate_country` (`build_data/plate_country/`, removed). It is separate from
 acquisition and from the eventual Python/JavaScript client APIs.
 
 With an ISO alpha-2 country or territory hint (including the survey's `XK`),
@@ -562,7 +562,7 @@ With an ISO alpha-2 country or territory hint (including the survey's `XK`),
 vanity string, unsupported format or empty input. It reports `level="place"`
 when eligible evidence identifies an office/district/city; otherwise `"state"`
 for an evidenced broader unit; otherwise `"country"`. The explicit unit-kind map
-is in [`inference.json`](../build_data/plate_country/data/inference.json).
+is in `inference.json` (`build_data/plate_country/data/inference.json`, removed).
 `place` does not mean a city point is known. Names, identifiers and coordinates
 remain source assertions, without a golden-place join or current-location claim.
 An invalid country identifier raises `ValueError`, rather than inventing one.
@@ -677,7 +677,7 @@ the caller's supplied country.
 ### Format sources, scope and remaining limitations
 
 The additive source catalog is
-[`plate_country/data/sources.json`](../build_data/plate_country/data/sources.json).
+`plate_country/data/sources.json` (`build_data/plate_country/data/sources.json`, removed).
 It reuses accepted pins and adds English, German, French, Italian, Ukrainian,
 Spanish and Norwegian Wikipedia revisions. US, Canadian and Australian table
 cells are parsed as declared serial templates, including listed retained older
@@ -711,10 +711,10 @@ were not used. No paid, private or scraped owner-information source is involved.
 ### Evaluation design and limits
 
 The committed
-[scored evaluation rows](plate-country-evaluation.json) retain each serial,
+[scored evaluation rows](../measurements/plate-country-evaluation.json) retain each serial,
 country, source/revision/hash, split, candidate ranking and geographic reason.
 The extraction/transcription policy is
-[`evaluation.json`](../build_data/plate_country/data/evaluation.json).
+`evaluation.json` (`build_data/plate_country/data/evaluation.json`, removed).
 Metadata was fetched from Wikimedia Commons country categories; image filenames
 present in the format articles were excluded. This reduces direct example reuse
 but is **not proof of independent publishers**: both collections use Wikimedia,

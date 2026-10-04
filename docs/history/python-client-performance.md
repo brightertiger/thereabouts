@@ -1,8 +1,8 @@
 # Python read-path performance
 
 > Historical: this document describes the retired Python/Cython client. Its
-> commands and API are no longer supported. See [CLIENT_RELEASE.md](CLIENT_RELEASE.md)
-> for current builds and [CLIENT_STATUS.md](CLIENT_STATUS.md) for current measurements.
+> commands and API are no longer supported. See [CLIENT_RELEASE.md](../CLIENT_RELEASE.md)
+> for current builds and [CLIENT_STATUS.md](../CLIENT_STATUS.md) for current measurements.
 
 The public reader now meets the requested warm targets on a populated synthetic
 pack: **9.375 µs scalar median with Cython**, **11.917 µs in forced Python mode**,
@@ -98,7 +98,7 @@ cache. Two explicit shuffled 5,000-query stress runs measured:
 The deliberately undersized cache retains only 31 entries. Misses decode and
 validate evidence; inserting/evicting also accounts for retained Python objects.
 The full profiles are in
-[CLIENT_PERFORMANCE_MEASUREMENTS.json](CLIENT_PERFORMANCE_MEASUREMENTS.json).
+[CLIENT_PERFORMANCE_MEASUREMENTS.json](../measurements/CLIENT_PERFORMANCE_MEASUREMENTS.json).
 A real workload exceeding the cache would require a larger measured budget or
 further optimization of miss-time evidence decoding/accounting. No format change
 is justified by the warm-path results alone. Memory retained by callers, NumPy

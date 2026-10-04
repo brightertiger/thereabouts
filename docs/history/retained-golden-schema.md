@@ -16,8 +16,8 @@ before/after measurements, once-only holdout score (78/80), reproducible command
 chain, and known limitations are in [GOLDEN_V2.md](city-normalization-results.md).
 
 All v1 measurements below are historical, from its final
-stored-cell [quality report](../data/golden-v1/quality.json). The v0 failure audit
-and rule-change evidence are in [GOLDEN_V1.md](history/base-cell-results.md).
+stored-cell quality report (`data/golden-v1/quality.json`, untracked workspace file). The v0 failure audit
+and rule-change evidence are in [GOLDEN_V1.md](base-cell-results.md).
 
 The golden stage consumes committed reconciliation country checkpoints and acquired
 lookup manifests. It writes only beneath the supplied data directory. The H3
@@ -253,7 +253,7 @@ has none. The integrity gate requires unique canonical IDs and no dangling cell,
 parent or sovereign references. A catalogue country can exist without a selected
 spatial border, as EH does under this boundary perspective.
 
-The [dataset card](../data/golden/DATASET_CARD.md) records the final snapshot.
+The dataset card (`data/golden/DATASET_CARD.md`, untracked workspace file) records the final snapshot.
 The licence summary remains a draft; original source licences and evidence remain
 attached and must be consulted when preparing a release.
 
@@ -512,7 +512,7 @@ rows and timezone hardlinks remain reusable.
 Before replacing golden files, the controller publishes `completed: false`.
 Completion requires both `work/golden/run.json` and `golden/manifest.json` to say
 `completed: true`, with the integrity checks above passing. Both markers are true for the final v1 publication;
-[GOLDEN_V1.md](history/base-cell-results.md#completed-rebuild-and-evidence) records completion and
+[GOLDEN_V1.md](base-cell-results.md#completed-rebuild-and-evidence) records completion and
 audit evidence.
 
 

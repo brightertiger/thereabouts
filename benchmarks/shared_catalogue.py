@@ -45,11 +45,15 @@ def main() -> None:
             results_with_timezone=timezone_results,
         )
         values[family] = value
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     baseline = json.loads(
         subprocess.check_output(
-            ["git", "show", f"{args.before}:docs/CLIENT_CORE_MEASUREMENTS.json"],
+            [
+                "git",
+                "show",
+                f"{args.before}:docs/measurements/CLIENT_CORE_MEASUREMENTS.json",
+            ],
             cwd=ROOT,
         )
     )

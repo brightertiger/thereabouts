@@ -219,4 +219,4 @@ The regenerated fixtures total **2,176,949 bytes**, with the original Benelux
 region retained. The three benchmark reports each identify the final table by
 manifest hash. Accuracy also records the reference hash, workloads and seeds;
 its reproducible runtime points live at `data/benchmarks/points.npy`.
-See [EVALUATION.md](../EVALUATION.md) for final measurements and their limits.
+See [EVALUATION.md](h3-table-evaluation.md) for final measurements and their limits.

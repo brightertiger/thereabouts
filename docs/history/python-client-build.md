@@ -1,8 +1,8 @@
 # Building and measuring the Python client
 
 > Historical: this document describes the retired Python/Cython client. Its
-> commands and API are no longer supported. See [CLIENT_RELEASE.md](CLIENT_RELEASE.md)
-> for current builds and [CLIENT_STATUS.md](CLIENT_STATUS.md) for current measurements.
+> commands and API are no longer supported. See [CLIENT_RELEASE.md](../CLIENT_RELEASE.md)
+> for current builds and [CLIENT_STATUS.md](../CLIENT_STATUS.md) for current measurements.
 
 The Python client can use an optional Cython kernel to reconstruct the H3 identity
 of a stored cell. `Geocoder(..., backend="python")` selects the reference path;
@@ -16,7 +16,7 @@ remain runtime dependencies, including their own compiled components. Queries
 never compile code or install dependencies.
 
 The read-path redesign and current populated-sample measurements are in
-[CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md). Both backends now meet the
+[CLIENT_PERFORMANCE.md](python-client-performance.md). Both backends now meet the
 requested warm targets there. Numeric columns reconstruct parents in NumPy;
 the Cython kernel is used by scalar/object results. The measurements below
 describe the phase 4 baseline, before that redesign.
@@ -31,7 +31,7 @@ implements no geographic policy. Tests exhaust all local keys in ordinary,
 pentagon and polar blocks, including invalid digit slots; compare scalar, batch
 and column results; and test fallback and failure propagation.
 
-[CLIENT_ACCELERATION_MEASUREMENTS.json](CLIENT_ACCELERATION_MEASUREMENTS.json)
+[CLIENT_ACCELERATION_MEASUREMENTS.json](../measurements/CLIENT_ACCELERATION_MEASUREMENTS.json)
 records the comparison on **Apple M2, 8 GiB RAM, macOS 27 arm64, Python 3.12.8**,
 H3 4.5.0 and Cython 3.3.0. The sample is the same **208,592-byte synthetic pack**
 with 67,230 stored rows, seven blocks and five retained places. Queries are
@@ -126,5 +126,5 @@ normal lookup imports neither MCP nor Pydantic. No package is published.
 
 Wheels exclude build stages, fixtures, world data and C/Cython sources. The sdist
 contains the generated C and Cython input and no shared library. Other platform
-wheels and remote CI remain unverified. See [MCP_SERVER.md](MCP_SERVER.md) for the
+wheels and remote CI remain unverified. See [MCP_SERVER.md](format-1-mcp-server.md) for the
 transport bounds, measured resource correction and tested host configuration.

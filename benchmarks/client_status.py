@@ -64,9 +64,11 @@ def main() -> None:
     parser.add_argument("--gate-log", type=Path, required=True)
     parser.add_argument("--node24-log", type=Path)
     args = parser.parse_args()
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     core = json.loads(path.read_text())
-    release = json.loads((ROOT / "docs/CLIENT_RELEASE_MEASUREMENTS.json").read_text())
+    release = json.loads(
+        (ROOT / "docs/measurements" / "CLIENT_RELEASE_MEASUREMENTS.json").read_text()
+    )
     legacy, mappings = legacy_table()
     gates = validation(args.gate_log)
     if args.node24_log:
@@ -229,7 +231,8 @@ and normalized/plates_country is absent. Core plus five forward packs were
 verified, not seven packs. No fabricated or empty substitute was produced.
 The existing plate sample and all plate vectors still pass.
 The proof outputs are scratch; results, input hashes and pack-manifest hashes
-are retained in [CLIENT_RELEASE_MEASUREMENTS.json](CLIENT_RELEASE_MEASUREMENTS.json).
+are retained in
+[CLIENT_RELEASE_MEASUREMENTS.json](measurements/CLIENT_RELEASE_MEASUREMENTS.json).
 Reproduce with benchmarks.release_path and a new worktree-local output directory.
 
 ## Conformance and qualification

@@ -32,7 +32,7 @@ def record(measurements: dict[str, Any], output: Path, *, write: bool) -> None:
     text = json.dumps(measurements, indent=2) + "\n"
     (output / "measurements.json").write_text(text)
     if write:
-        (ROOT / "docs/CLIENT_RELEASE_MEASUREMENTS.json").write_text(text)
+        (ROOT / "docs/measurements/CLIENT_RELEASE_MEASUREMENTS.json").write_text(text)
     print(text, end="")
 
 
@@ -81,7 +81,7 @@ def main() -> None:
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Also update docs/CLIENT_RELEASE_MEASUREMENTS.json",
+        help="Also update docs/measurements/CLIENT_RELEASE_MEASUREMENTS.json",
     )
     args = parser.parse_args()
     output = args.output.resolve()

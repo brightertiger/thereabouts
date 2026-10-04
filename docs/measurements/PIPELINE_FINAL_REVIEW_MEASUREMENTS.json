@@ -418,7 +418,7 @@
       0.15760587499244139
     ],
     "dataset_proof": {
-      "measurements": "docs/PIPELINE_RELEASE_MEASUREMENTS.json#readme_render",
+      "measurements": "docs/measurements/PIPELINE_RELEASE_MEASUREMENTS.json#readme_render",
       "rows": 181548,
       "bytes": 8802046,
       "cells_rows": 22404,

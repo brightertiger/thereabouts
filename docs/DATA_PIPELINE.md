@@ -478,7 +478,7 @@ adapter adds source notices and input provenance and re-verifies returned files.
 The writer is now exercised through the runner with grouped synthetic Parquet,
 including core-before-forward dependencies, full verification, local console
 installation, idempotence and corrupt archive rejection. The real MY/SG proof
-is recorded in [CLIENT_RELEASE_MEASUREMENTS.json](CLIENT_RELEASE_MEASUREMENTS.json).
+is recorded in [CLIENT_RELEASE_MEASUREMENTS.json](measurements/CLIENT_RELEASE_MEASUREMENTS.json).
 
 For an already prepared dataset, run only its local release stages:
 

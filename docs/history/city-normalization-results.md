@@ -44,7 +44,7 @@ uv sync --locked
 nohup uv run --no-sync python -m build_data.rebuild_golden --data-dir data \
   --through world --reuse-development --output data/golden-thereabouts \
   --gate data/work/v2-pilot/thereabouts-gate.json \
-  --review docs/city-normalization-thereabouts-review.json \
+  --review docs/measurements/city-normalization-thereabouts-review.json \
   > data/work/thereabouts-resume.log 2>&1 < /dev/null &
 uv run --no-sync python -m build_data.normalize_cells verify \
   --data-dir data --output data/golden
@@ -357,7 +357,7 @@ The world tables and all 277 stored-country censuses finished on **2026-10-02**;
 the controller recorded verified completion at **12:43:46 UTC**. Global integrity
 and mapping checks pass, with no unreviewed spatial gate failure. The two exact
 source-overlap exceptions are in
-[`city-normalization-world-review.json`](../city-normalization-world-review.json),
+[`city-normalization-world-review.json`](../measurements/city-normalization-world-review.json),
 bound to the incomplete world manifest. See `data/work/v2-progress.md`.
 
 | Measure | V1 | World v2, radius off |

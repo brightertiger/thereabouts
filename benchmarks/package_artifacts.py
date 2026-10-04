@@ -157,7 +157,7 @@ await geo.close();
         "remote_workflows_executed": False,
         "published": False,
     }
-    (ROOT / "docs/CLIENT_PACKAGE_MEASUREMENTS.json").write_text(
+    (ROOT / "docs/measurements/CLIENT_PACKAGE_MEASUREMENTS.json").write_text(
         json.dumps(result, indent=2) + "\n"
     )
     print(json.dumps(result, indent=2))
