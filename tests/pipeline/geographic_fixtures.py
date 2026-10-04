@@ -13,7 +13,7 @@ from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.sources.shared.schemas import SCHEMAS
 from pipeline.stages.contract import Context, make_unit
-from tests.reconciliation.conftest import area, place, write_inputs
+from tests.pipeline.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
 

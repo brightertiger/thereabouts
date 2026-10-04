@@ -17,4 +17,4 @@ jobs:
       - run: uv run ruff check pipeline && uv run ruff format --check pipeline
       - run: uv run mypy pipeline
       # All fixtures are local; network guards admit loopback only.
-      - run: uv run pytest tests/pipeline tests/cells tests/sources tests/test_city*.py tests/test_ghsl.py tests/test_network_guard.py
+      - run: uv run pytest tests/pipeline

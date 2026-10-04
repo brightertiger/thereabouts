@@ -4,7 +4,7 @@
 MY/SG dataset manifest produced by the package-5 `release prepare` command.
 The original scratch output was deleted; the final pass reproduced preparation
 from read-only golden inputs and verified that the full manifest SHA-256 is
-identical to `docs/measurements/CLIENT_RELEASE_MEASUREMENTS.json` before extracting it.
+identical to `tests/benchmarks/measurements/CLIENT_RELEASE_MEASUREMENTS.json` before extracting it.
 
 The test keeps these block IDs, paths, row counts and row-group numbers and
 constructs synthetic rows with the same shape. It replaces only file sizes and

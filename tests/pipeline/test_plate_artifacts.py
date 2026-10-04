@@ -11,7 +11,7 @@ from pipeline.engines.plate_country import build, evidence, formats, priors
 from pipeline.engines.plate_country.policy import Row
 from pipeline.engines.plate_country.resolver import Resolver
 from pipeline.runtime.jsonio import write_json
-from tests.sources.test_plate_country_sources import wiki
+from tests.pipeline.sources.test_plate_country_sources import wiki
 
 
 def test_plate_build_move_and_verification(
