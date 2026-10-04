@@ -13,7 +13,7 @@ from typing import Any
 
 from pipeline.runtime.jsonio import sha256_file
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def run(command: list[str], log: Path, cwd: Path = ROOT) -> None:
@@ -61,7 +61,9 @@ def main() -> None:
     sdist = next(output.glob("*.tar.gz"))
     with tarfile.open(sdist) as archive:
         names = archive.getnames()
-        assert any(name.endswith("src/thereabouts/README.md") for name in names)
+        assert any(
+            name.endswith("clients/python/thereabouts/README.md") for name in names
+        )
         assert any(name.endswith("core/thereabouts-cli/Cargo.toml") for name in names)
         assert not any("/thereabouts/reading/" in name for name in names)
     environment = output / "fresh"
@@ -157,9 +159,9 @@ await geo.close();
         "remote_workflows_executed": False,
         "published": False,
     }
-    (ROOT / "docs/measurements/CLIENT_PACKAGE_MEASUREMENTS.json").write_text(
-        json.dumps(result, indent=2) + "\n"
-    )
+    (
+        ROOT / "tests/benchmarks/measurements/CLIENT_PACKAGE_MEASUREMENTS.json"
+    ).write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 
 

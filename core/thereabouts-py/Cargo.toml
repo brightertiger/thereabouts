@@ -9,7 +9,7 @@ repository.workspace = true
 [lib]
 name = "_core"
 crate-type = ["cdylib", "rlib"]
-# Extension behavior is tested from its Python host in tests/core.
+# Extension behavior is tested from its Python host in tests/client/core.
 # An empty Rust harness would require a separately discoverable libpython.
 test = false
 doctest = false
