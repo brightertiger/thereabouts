@@ -13,7 +13,9 @@ from pipeline.runtime.fingerprints import REPOSITORY
 def test_committed_readme_matches_template_and_measured_subset() -> None:
     evidence = json.loads(
         (
-            REPOSITORY / "docs/measurements" / "PIPELINE_RELEASE_MEASUREMENTS.json"
+            REPOSITORY
+            / "tests/benchmarks/measurements"
+            / "PIPELINE_RELEASE_MEASUREMENTS.json"
         ).read_text()
     )["readme_render"]
     config = load(profile=evidence["profile"], overrides=evidence["overrides"])
@@ -25,5 +27,5 @@ def test_committed_readme_matches_template_and_measured_subset() -> None:
         evidence["policy"],
         REPOSITORY / config.release.readme_template,
     ).encode()
-    assert generated == (REPOSITORY / "docs/DATASET_README.md").read_bytes()
+    assert generated == (REPOSITORY / "docs/dataset/README.md").read_bytes()
     assert hashlib.sha256(generated).hexdigest() == evidence["readme_sha256"]

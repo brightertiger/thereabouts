@@ -15,7 +15,7 @@ The product has three parts:
 
 This is the **0.1.0 release draft**. The owner has not published these artifacts.
 The existing PyPI/npm 0.0.1 placeholders do not contain this client.
-Code is released under the [MIT licence](LICENSE); data notices are separate, see [LICENSE-DECISION.md](LICENSE-DECISION.md).
+Code is released under the [MIT licence](LICENSE); data notices are separate, see [docs/licenses.md](docs/licenses.md).
 
 ## Install and add data
 
@@ -61,7 +61,7 @@ with Geocoder(data_dir="./store") as geo:
 
 Use keyword arguments for coordinates. reverse_many streams named coordinate
 objects; reverse_columns accepts NumPy arrays. Results are frozen dataclasses.
-[Python details](src/thereabouts/README.md).
+[Python details](clients/python/thereabouts/README.md).
 
 ## Node
 
@@ -95,7 +95,7 @@ thereabouts --data-dir ./store data verify --full
 Explicit verbs select the input type. Tables are the TTY default; piped output
 defaults to NDJSON. CSV/NDJSON batches preserve input columns and append results.
 The optional Python MCP extra exposes the same lookup verbs.
-[Normative grammar and store contract](docs/CLI.md).
+[Normative grammar and store contract](docs/clients/cli.md).
 
 ## Semantics and coverage
 
@@ -112,10 +112,10 @@ release: committed samples and the MY/SG release proof are subsets.
 
 ## Build and release
 
-Start with [pipeline operations](docs/DATA_PIPELINE.md),
-[the dataset](docs/DATASET_README.md), [pack format 2.2](docs/PACK_FORMAT.md),
-[client status and measurements](docs/CLIENT_STATUS.md), and
-[release engineering](docs/CLIENT_RELEASE.md).
+Start with [pipeline operations](docs/pipeline/README.md),
+[the dataset](docs/dataset/README.md), [pack format 2.2](docs/dataset/pack-format.md),
+[client status and measurements](docs/clients/status.md), and
+[release engineering](docs/clients/release.md).
 The [documentation index](docs/README.md) lists every current document.
 The [0.1.0 changelog](CHANGELOG.md) describes the migration from the retired readers.
 Data notices are separate from the MIT code licence.

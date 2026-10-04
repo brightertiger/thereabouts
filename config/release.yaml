@@ -5,7 +5,7 @@ title: Thereabouts offline geocoding dataset
 description: Canonical places, H3 reverse lookup and source code observations.
 contact: 'Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues'
 citation: 'Rao, U. (2026). Thereabouts offline geocoding dataset. https://github.com/brightertiger/thereabouts'
-documentation: 'https://github.com/brightertiger/thereabouts/blob/main/docs/DATASET_README.md'
+documentation: 'https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md'
 update_frequency: Monthly
 region: "OWNER DECISION: release bucket region"
 license: ODbL-1.0

@@ -232,3 +232,6 @@ node_modules/
 
 # Reproducible Node WASM build, produced before npm packaging.
 /clients/node/pkg/
+
+# Local specifications, reviews and working notes.
+/notes/

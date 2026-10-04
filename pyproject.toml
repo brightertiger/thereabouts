@@ -6,7 +6,7 @@ build-backend = "maturin"
 name = "thereabouts"
 version = "0.1.0"
 description = "Offline geographic context from a shared Rust core"
-readme = "src/thereabouts/README.md"
+readme = "clients/python/thereabouts/README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
@@ -51,11 +51,11 @@ acquire = [
 ]
 
 [tool.maturin]
-python-source = "src"
+python-source = "clients/python"
 module-name = "thereabouts._core"
 manifest-path = "core/thereabouts-py/Cargo.toml"
 features = ["pyo3/extension-module", "writer"]
-include = ["src/thereabouts/py.typed", "src/thereabouts/_core.pyi"]
+include = ["clients/python/thereabouts/py.typed", "clients/python/thereabouts/_core.pyi"]
 
 [tool.pytest.ini_options]
 addopts = "--basetemp=.cache/pytest"
@@ -63,9 +63,10 @@ testpaths = ["tests"]
 markers = ["world: requires an explicitly built world pack"]
 
 [tool.ruff]
+src = [".", "clients/python"]
 target-version = "py311"
 line-length = 88
-extend-exclude = ["docs", "graft", "data", "eval", "explore"]
+extend-exclude = ["docs", "graft", "data", "eval", "notes"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
@@ -73,7 +74,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "pipeline", "benchmarks", "tests", "examples", "tools"]
+files = ["clients/python", "pipeline", "tests", "scripts"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]

@@ -18,4 +18,4 @@
 The owner publishes 0.1.0 to supersede the PyPI/npm 0.0.1 placeholders.
 No registry release has been made by this work. Code licensing and public release
 endpoint remain owner decisions; the real names and plate-table gaps are recorded
-in docs/CLIENT_STATUS.md.
+in docs/clients/status.md.

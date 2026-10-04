@@ -1,0 +1,935 @@
+{
+  "machine": "macOS-27.0-arm64-arm-64bit",
+  "python": "3.12.8",
+  "results": {
+    "postal": {
+      "info": {
+        "backend": "cython",
+        "packs": {
+          "postal": {
+            "block_resolution": 3,
+            "candidate_policy": "source-observations-1",
+            "catalogue_epoch": "synthetic",
+            "coverage": "keys",
+            "data_version": "synthetic",
+            "dependencies": [],
+            "export": {
+              "family": "postal",
+              "golden_sha256": "6bb7f18f41291030325e2d0ddf3faf65ed44064f6ec47be0332acb6690fbabb7",
+              "implementation": {
+                "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+                "build_data/acquire/lookup_schemas.py": "3d4d02880d2235ad931d4c51b80ddb2c40c5f83754ca7a5fde0e7c095bf37fcd",
+                "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+                "build_data/golden/reader.py": "4a11de07cee87d3f82e92a907b4d213a0ca93dd398aa685b60aca30bc47b4773",
+                "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+                "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+                "build_data/serve/__main__.py": "dea4268d834c3bfb4b870304aef0e43b641b2fb2e1bec58322700d193a12672f",
+                "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+                "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+                "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+                "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+                "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+                "build_data/serve/export.py": "065250f55b6f526d256c86d9b5dfee7891cb210e69c265b525466c6159e06eb8",
+                "build_data/serve/metadata.py": "7aa8a6e3fe149880bea6a561f8f9c293fc1bcf389b2a7e3ade2e85d4039bb393",
+                "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+                "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+                "build_data/serve_codes/__init__.py": "6756e9871ee3aff74ca6bd7342d185a0103954faf250ff5059fa96e6299d8752",
+                "build_data/serve_codes/candidates.py": "fdec1b6b79f7b9e64c23debac911c9d45f04f3638a3d45a52996d3a7d14a2732",
+                "build_data/serve_codes/catalogue.py": "059ee6adc1bfb0af925204c05149d1c973e9762db663593085c88ad5dfc630db",
+                "build_data/serve_codes/encoding.py": "73e2879072c5e7500178e4add1490c72386b58f54d91ad867ca4d92a30d89731",
+                "build_data/serve_codes/index.py": "5261ec71dab7e8da46d4c317c036d98165cd74bfb8d49957f750b8e2129d2f26",
+                "build_data/serve_codes/source.py": "6b0b9c3b286072fc00403f9be00df826a106651a13c99ee6dbf9ce5b468e393c",
+                "clients/python/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+                "clients/python/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+                "clients/python/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+                "clients/python/thereabouts/packs/code_records.py": "744fdbf0ec6efb9aec01199ce37993b868de2b9bdd615c62a306b311e86e7eb5",
+                "clients/python/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+                "clients/python/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+                "clients/python/thereabouts/packs/exact.py": "6db83798fde7ace0a72ed75d1194f10ff0c7b12364ea4c929869447cefee4bd4",
+                "clients/python/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+                "clients/python/thereabouts/packs/keys.py": "ab0b7a4f6d2070c120d63ebae74a5e1e52fd321df22a6b38805ff5e1d3d82957",
+                "clients/python/thereabouts/packs/layout.py": "7e0cfad57d9c0a528a094090c3c51cc2d1b31630061b908e12c083074ff53898",
+                "clients/python/thereabouts/packs/metadata.py": "6d4317350eaa5daf9653b3c93117ac0a26bcb0fac64da428489c594e9ab2262e",
+                "clients/python/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+                "clients/python/thereabouts/packs/verify.py": "8f8d717d8f324d41fc07a1267d2eb6c2b532a396c31cb1fab9a84dd051a90a57"
+              },
+              "release": {
+                "catalogue_epoch": "synthetic",
+                "data_version": "synthetic",
+                "notices": [
+                  {
+                    "path": "LICENSE.txt",
+                    "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                    "size": 34
+                  }
+                ],
+                "sources": [
+                  {
+                    "attribution": "Thereabouts test fixture",
+                    "license": "public-domain",
+                    "license_url": "https://example.invalid/license",
+                    "release": "fixture",
+                    "source": "synthetic",
+                    "source_url": "https://example.invalid/synthetic"
+                  }
+                ]
+              },
+              "shard_bytes": 2048,
+              "tools": {
+                "h3": {
+                  "c": "4.5.0",
+                  "python": "4.5.0"
+                },
+                "pyarrow": "23.0.1",
+                "python": "3.12.8",
+                "sqlite": "3.47.1",
+                "zlib": "1.2.12"
+              }
+            },
+            "export_fingerprint": "ff0a43ddd5e199e72e3c0dc197409ae95c20c53f622dbef6631c0a3a327ac035",
+            "family": "postal",
+            "files": [
+              {
+                "count": 6,
+                "first_id": 1,
+                "kind": "catalogue",
+                "path": "catalogue-00000.bin",
+                "sha256": "0009e851303df30de6c871a79edceac00c43d82c52b1c2ed6ef6ddc565681616",
+                "size": 1180
+              },
+              {
+                "count": 3,
+                "first_key": "AA\u000000100",
+                "kind": "exact",
+                "last_key": "AA\u0000VOID",
+                "max_record_bytes": 2316,
+                "path": "exact-00000.bin",
+                "sha256": "cd4219573402b8180d922f74504df0c67bd76b03f46922062937de4743d89471",
+                "size": 1857
+              },
+              {
+                "count": 2,
+                "first_key": "CA\u0000A1A1A1",
+                "kind": "exact",
+                "last_key": "IN\u0000560001",
+                "max_record_bytes": 1268,
+                "path": "exact-00001.bin",
+                "sha256": "5b6d4d1c9612d16996e6f58307fbdbfd144283e3f211ce043afe1b98f99386f2",
+                "size": 1315
+              },
+              {
+                "kind": "notice",
+                "path": "notices/000-LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              },
+              {
+                "kind": "notice",
+                "path": "notices/001-DATA_LICENSES.md",
+                "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+                "size": 36
+              },
+              {
+                "kind": "notice",
+                "path": "notices/002-DATASET_CARD.md",
+                "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+                "size": 48
+              }
+            ],
+            "format": {
+              "major": 1,
+              "minor": 0,
+              "required_features": 0
+            },
+            "golden_sha256": "6bb7f18f41291030325e2d0ddf3faf65ed44064f6ec47be0332acb6690fbabb7",
+            "h3_version": "4.5.0",
+            "key_normalization": {
+              "countries": {
+                "CA": [
+                  "strip_ascii",
+                  "upper_ascii",
+                  "remove_ascii_spaces"
+                ],
+                "GB": [
+                  "strip_ascii",
+                  "upper_ascii",
+                  "remove_ascii_spaces"
+                ]
+              },
+              "default": [
+                "strip_ascii",
+                "upper_ascii"
+              ]
+            },
+            "minimum_reader": "0.1.0",
+            "nearest": {
+              "cutoff_m": 50000,
+              "distant_over_m": 25000,
+              "exact_distance": false
+            },
+            "notices": [
+              "notices/000-LICENSE.txt",
+              "notices/001-DATA_LICENSES.md",
+              "notices/002-DATASET_CARD.md"
+            ],
+            "place_count": 6,
+            "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+            "reference_resolution": 8,
+            "schema": "thereabouts-pack-1",
+            "source_rows": 7,
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ],
+            "unindexed_rows": 0,
+            "manifest_sha256": "40aa4a2d49d8ba9fc9b32b43918b8feed66dd95ab030f156b00111cc253ab9c1"
+          }
+        },
+        "cache": {
+          "postal": {
+            "budget_bytes": 33554432,
+            "entries": 6,
+            "retained_bytes": 26977,
+            "hits": 5003,
+            "misses": 6,
+            "evictions": 0
+          }
+        }
+      },
+      "export_seconds": 0.06575766699097585,
+      "installed_bytes": 10917,
+      "first_lookup_ns": 987666,
+      "warm_median_ns": 3042.0,
+      "warm_p99_ns": 3958,
+      "candidates": 2
+    },
+    "airports": {
+      "info": {
+        "backend": "cython",
+        "packs": {
+          "airports": {
+            "block_resolution": 3,
+            "candidate_policy": "source-observations-1",
+            "catalogue_epoch": "synthetic",
+            "coverage": "keys",
+            "data_version": "synthetic",
+            "dependencies": [],
+            "export": {
+              "family": "airports",
+              "golden_sha256": "6bb7f18f41291030325e2d0ddf3faf65ed44064f6ec47be0332acb6690fbabb7",
+              "implementation": {
+                "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+                "build_data/acquire/lookup_schemas.py": "3d4d02880d2235ad931d4c51b80ddb2c40c5f83754ca7a5fde0e7c095bf37fcd",
+                "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+                "build_data/golden/reader.py": "4a11de07cee87d3f82e92a907b4d213a0ca93dd398aa685b60aca30bc47b4773",
+                "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+                "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+                "build_data/serve/__main__.py": "dea4268d834c3bfb4b870304aef0e43b641b2fb2e1bec58322700d193a12672f",
+                "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+                "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+                "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+                "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+                "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+                "build_data/serve/export.py": "065250f55b6f526d256c86d9b5dfee7891cb210e69c265b525466c6159e06eb8",
+                "build_data/serve/metadata.py": "7aa8a6e3fe149880bea6a561f8f9c293fc1bcf389b2a7e3ade2e85d4039bb393",
+                "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+                "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+                "build_data/serve_codes/__init__.py": "6756e9871ee3aff74ca6bd7342d185a0103954faf250ff5059fa96e6299d8752",
+                "build_data/serve_codes/candidates.py": "fdec1b6b79f7b9e64c23debac911c9d45f04f3638a3d45a52996d3a7d14a2732",
+                "build_data/serve_codes/catalogue.py": "059ee6adc1bfb0af925204c05149d1c973e9762db663593085c88ad5dfc630db",
+                "build_data/serve_codes/encoding.py": "73e2879072c5e7500178e4add1490c72386b58f54d91ad867ca4d92a30d89731",
+                "build_data/serve_codes/index.py": "5261ec71dab7e8da46d4c317c036d98165cd74bfb8d49957f750b8e2129d2f26",
+                "build_data/serve_codes/source.py": "6b0b9c3b286072fc00403f9be00df826a106651a13c99ee6dbf9ce5b468e393c",
+                "clients/python/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+                "clients/python/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+                "clients/python/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+                "clients/python/thereabouts/packs/code_records.py": "744fdbf0ec6efb9aec01199ce37993b868de2b9bdd615c62a306b311e86e7eb5",
+                "clients/python/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+                "clients/python/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+                "clients/python/thereabouts/packs/exact.py": "6db83798fde7ace0a72ed75d1194f10ff0c7b12364ea4c929869447cefee4bd4",
+                "clients/python/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+                "clients/python/thereabouts/packs/keys.py": "ab0b7a4f6d2070c120d63ebae74a5e1e52fd321df22a6b38805ff5e1d3d82957",
+                "clients/python/thereabouts/packs/layout.py": "7e0cfad57d9c0a528a094090c3c51cc2d1b31630061b908e12c083074ff53898",
+                "clients/python/thereabouts/packs/metadata.py": "6d4317350eaa5daf9653b3c93117ac0a26bcb0fac64da428489c594e9ab2262e",
+                "clients/python/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+                "clients/python/thereabouts/packs/verify.py": "8f8d717d8f324d41fc07a1267d2eb6c2b532a396c31cb1fab9a84dd051a90a57"
+              },
+              "release": {
+                "catalogue_epoch": "synthetic",
+                "data_version": "synthetic",
+                "notices": [
+                  {
+                    "path": "LICENSE.txt",
+                    "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                    "size": 34
+                  }
+                ],
+                "sources": [
+                  {
+                    "attribution": "Thereabouts test fixture",
+                    "license": "public-domain",
+                    "license_url": "https://example.invalid/license",
+                    "release": "fixture",
+                    "source": "synthetic",
+                    "source_url": "https://example.invalid/synthetic"
+                  }
+                ]
+              },
+              "shard_bytes": 2048,
+              "tools": {
+                "h3": {
+                  "c": "4.5.0",
+                  "python": "4.5.0"
+                },
+                "pyarrow": "23.0.1",
+                "python": "3.12.8",
+                "sqlite": "3.47.1",
+                "zlib": "1.2.12"
+              }
+            },
+            "export_fingerprint": "54981aadd188562fa543d40ff80bd71a81f4bfe1cca20e849100bad9c26d1b0e",
+            "family": "airports",
+            "files": [
+              {
+                "count": 5,
+                "first_id": 1,
+                "kind": "catalogue",
+                "path": "catalogue-00000.bin",
+                "sha256": "3966b992d408fd1e35da0129435f553ef37592be4cd6baaa1beb30aeedef43d2",
+                "size": 1042
+              },
+              {
+                "count": 2,
+                "first_key": "gps\u0000\u0000GPS1",
+                "kind": "exact",
+                "last_key": "gps\u0000AA\u0000GPS1",
+                "max_record_bytes": 1295,
+                "path": "exact-00000.bin",
+                "sha256": "03ee919d67c69c5a2cf62e71fcfcd6121f7234bf5e3f844eb5e295a43cedc805",
+                "size": 1364
+              },
+              {
+                "count": 3,
+                "first_key": "iata\u0000\u0000ZZZ",
+                "kind": "exact",
+                "last_key": "iata\u0000BB\u0000ZZZ",
+                "max_record_bytes": 3298,
+                "path": "exact-00001.bin",
+                "sha256": "0c3560486d5fc23eec7238ce02e0e61ef6179a27e9bb7620f2fe3f33ad6ae4a8",
+                "size": 2100
+              },
+              {
+                "count": 3,
+                "first_key": "icao\u0000\u0000AAAA",
+                "kind": "exact",
+                "last_key": "ident\u0000\u0000AA01",
+                "max_record_bytes": 2196,
+                "path": "exact-00002.bin",
+                "sha256": "2673d900288927f0b7a31db0a2e0f4378e849113702246594c5ad02c100ca0e6",
+                "size": 2020
+              },
+              {
+                "count": 3,
+                "first_key": "ident\u0000\u0000BB02",
+                "kind": "exact",
+                "last_key": "ident\u0000BB\u0000BB02",
+                "max_record_bytes": 2196,
+                "path": "exact-00003.bin",
+                "sha256": "39e5b314792e1377ba87b51985c1911ce48600280dc6b3314c6b3a8f0214f3ac",
+                "size": 1780
+              },
+              {
+                "count": 2,
+                "first_key": "local\u0000AA\u0000L1",
+                "kind": "exact",
+                "last_key": "local\u0000BB\u0000L1",
+                "max_record_bytes": 1295,
+                "path": "exact-00004.bin",
+                "sha256": "3c50f2bb0fbbe9c3712b60faa8e64d1a597607913328fabfc4d2cc32fa81d18a",
+                "size": 1244
+              },
+              {
+                "kind": "notice",
+                "path": "notices/000-LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              },
+              {
+                "kind": "notice",
+                "path": "notices/001-DATA_LICENSES.md",
+                "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+                "size": 36
+              },
+              {
+                "kind": "notice",
+                "path": "notices/002-DATASET_CARD.md",
+                "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+                "size": 48
+              }
+            ],
+            "format": {
+              "major": 1,
+              "minor": 0,
+              "required_features": 0
+            },
+            "golden_sha256": "6bb7f18f41291030325e2d0ddf3faf65ed44064f6ec47be0332acb6690fbabb7",
+            "h3_version": "4.5.0",
+            "key_normalization": {
+              "countries": {},
+              "default": [
+                "strip_ascii",
+                "upper_ascii"
+              ]
+            },
+            "minimum_reader": "0.1.0",
+            "nearest": {
+              "cutoff_m": 50000,
+              "distant_over_m": 25000,
+              "exact_distance": false
+            },
+            "notices": [
+              "notices/000-LICENSE.txt",
+              "notices/001-DATA_LICENSES.md",
+              "notices/002-DATASET_CARD.md"
+            ],
+            "place_count": 5,
+            "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+            "reference_resolution": 8,
+            "schema": "thereabouts-pack-1",
+            "source_rows": 4,
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ],
+            "unindexed_rows": 1,
+            "manifest_sha256": "cc32f7d7baef74d9245b2b67fa4068d6a11a33cb054f8cf8fe75efe9bbd5964b"
+          }
+        },
+        "cache": {
+          "airports": {
+            "budget_bytes": 33554432,
+            "entries": 5,
+            "retained_bytes": 26455,
+            "hits": 5000,
+            "misses": 5,
+            "evictions": 0
+          }
+        }
+      },
+      "export_seconds": 0.07439700000395533,
+      "installed_bytes": 16739,
+      "first_lookup_ns": 754834,
+      "warm_median_ns": 2625.0,
+      "warm_p99_ns": 6917,
+      "candidates": 2
+    }
+  },
+  "peak_process_rss_bytes": 85409792,
+  "limitations": [
+    "Synthetic seven postal and four airport rows, two-candidate warm queries.",
+    "No geographic quality, cold-disk or world capacity claim.",
+    "No network access; queries omit JSON serialization."
+  ],
+  "reverse_regression": {
+    "auto": {
+      "open_ns": 2734708,
+      "first_lookup_ns": 16397875,
+      "machine": "macOS-27.0-arm64-arm-64bit",
+      "python": "3.12.8",
+      "numpy": "2.3.5",
+      "info": {
+        "backend": "cython",
+        "packs": {
+          "reverse": {
+            "block_resolution": 3,
+            "catalogue_epoch": "synthetic",
+            "coverage": "blocks",
+            "data_version": "synthetic",
+            "dependencies": [],
+            "export": {
+              "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+              "implementation": {
+                "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+                "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+                "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+                "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+                "build_data/serve/__main__.py": "cd465e4f392648411c7397b7af3ecb5241adf6feedc7f84bce90cbf54e305cab",
+                "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+                "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+                "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+                "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+                "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+                "build_data/serve/export.py": "f7b5e87424902c1f3eac3751fc69f9f44a94d9b8d2602143a8289608d19536c2",
+                "build_data/serve/metadata.py": "b41dd040dfa92f0cdffc68f7895022ec9fae352cb7c25ff4a5ad8ff09ee2d67a",
+                "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+                "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+                "clients/python/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+                "clients/python/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+                "clients/python/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+                "clients/python/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+                "clients/python/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+                "clients/python/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+                "clients/python/thereabouts/packs/layout.py": "3e1e7c0059002f89f96d6ef5d9fc48fad940468560dbefbb7ee06a08988f0165",
+                "clients/python/thereabouts/packs/metadata.py": "1820c8efe664eac9a99359f4b4879136ea6a47e88feb3b8241d5a14b9e25d7ea",
+                "clients/python/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+                "clients/python/thereabouts/packs/verify.py": "c42a050bce4146892bd3dc6752e3b0ed3b752b5bd766dc47a32c6540475fb1f9"
+              },
+              "release": {
+                "catalogue_epoch": "synthetic",
+                "data_version": "synthetic",
+                "notices": [
+                  {
+                    "path": "LICENSE.txt",
+                    "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                    "size": 34
+                  }
+                ],
+                "sources": [
+                  {
+                    "attribution": "Thereabouts test fixture",
+                    "license": "public-domain",
+                    "license_url": "https://example.invalid/license",
+                    "release": "fixture",
+                    "source": "synthetic",
+                    "source_url": "https://example.invalid/synthetic"
+                  }
+                ]
+              },
+              "shard_bytes": 4194304,
+              "tools": {
+                "h3": {
+                  "c": "4.5.0",
+                  "python": "4.5.0"
+                },
+                "pyarrow": "23.0.1",
+                "python": "3.12.8",
+                "sqlite": "3.47.1"
+              }
+            },
+            "export_fingerprint": "d48e1fed8520daa62454fa3bf798b7bb29b7cc5388df9a92d26c271ddc5ffbcf",
+            "family": "reverse",
+            "files": [
+              {
+                "count": 4176,
+                "first_id": 1,
+                "kind": "catalogue",
+                "path": "catalogue-00000.bin",
+                "sha256": "07ff4a469963842f5d6c50617ca9c76345a33a85e3c15f1c24bda6a21cdf7a71",
+                "size": 1306534
+              },
+              {
+                "first_block": 1277,
+                "kind": "cells",
+                "last_block": 7072,
+                "path": "cells-00000.bin",
+                "sha256": "f35498bb281db3ea65c0595339bfbe27b3294809ab9b9327ab05a67f86ae706e",
+                "size": 344152
+              },
+              {
+                "first_block": 7182,
+                "kind": "cells",
+                "last_block": 8531,
+                "path": "cells-00001.bin",
+                "sha256": "b1388bb78c6bd293dbf966fa9d81be9b1f20d0353c891901228c90eb45824e01",
+                "size": 344152
+              },
+              {
+                "first_block": 8537,
+                "kind": "cells",
+                "last_block": 12656,
+                "path": "cells-00002.bin",
+                "sha256": "576f8535abccd8a372e80ed9d5d52652dbc7375433b6b1a1226a4331f7dc8b72",
+                "size": 344152
+              },
+              {
+                "first_block": 12657,
+                "kind": "cells",
+                "last_block": 28829,
+                "path": "cells-00003.bin",
+                "sha256": "a0d3f3489d5eb388c44c7f3151c33c63f32cdc7ddb07360f194b424cde852944",
+                "size": 344152
+              },
+              {
+                "first_block": 30674,
+                "kind": "cells",
+                "last_block": 32594,
+                "path": "cells-00004.bin",
+                "sha256": "d2d051526dd8fc53d9129f95f2a5722e564893f9a124d2e818cce43cd42fae40",
+                "size": 317680
+              },
+              {
+                "kind": "notice",
+                "path": "notices/000-LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              },
+              {
+                "kind": "notice",
+                "path": "notices/001-DATA_LICENSES.md",
+                "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+                "size": 36
+              },
+              {
+                "kind": "notice",
+                "path": "notices/002-DATASET_CARD.md",
+                "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+                "size": 48
+              }
+            ],
+            "format": {
+              "major": 1,
+              "minor": 0,
+              "required_features": 0
+            },
+            "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+            "h3_version": "4.5.0",
+            "minimum_reader": "0.1.0",
+            "nearest": {
+              "cutoff_m": 50000,
+              "distant_over_m": 25000,
+              "exact_distance": false
+            },
+            "notices": [
+              "notices/000-LICENSE.txt",
+              "notices/001-DATA_LICENSES.md",
+              "notices/002-DATASET_CARD.md"
+            ],
+            "place_count": 4176,
+            "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+            "reference_resolution": 8,
+            "schema": "thereabouts-pack-1",
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ],
+            "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b"
+          }
+        },
+        "cache": {
+          "reverse": {
+            "budget_bytes": 33554432,
+            "entries": 4176,
+            "retained_bytes": 8775320,
+            "hits": 868084,
+            "misses": 4176,
+            "evictions": 0
+          }
+        }
+      },
+      "installed_bytes": 3006380,
+      "peak_process_rss_bytes": 78757888,
+      "workloads": {
+        "clustered": {
+          "points": 44032,
+          "catalogue_warmup_ns": 659475167,
+          "scalar_median_ns": 9542.0,
+          "scalar_p99_ns": 17666,
+          "columns_per_second": 612153.5360411073,
+          "objects_per_second": 114091.86764135388,
+          "column_seconds": [
+            0.08430729199608322,
+            0.07256616700033192,
+            0.070289084003889,
+            0.06999641600123141,
+            0.07192966699949466
+          ],
+          "object_seconds": [
+            0.09045787500508595,
+            0.08699920801154803,
+            0.0871791670069797,
+            0.08826891699573025,
+            0.08764866599813104
+          ],
+          "scalar_profile": "         332114 function calls in 0.101 seconds\n\n   Ordered by: cumulative time\n   List reduced from 38 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.115    0.000 client.py:65(reverse)\n     5000    0.004    0.000    0.091    0.000 client.py:75(_one)\n     5000    0.009    0.000    0.059    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.040    0.000 decode.py:53(candidate)\n     5000    0.003    0.000    0.020    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.018    0.000 pack.py:87(lookup)\n    20000    0.005    0.000    0.016    0.000 places.py:23(get)\n    15000    0.003    0.000    0.014    0.000 places.py:34(place)\n     5000    0.008    0.000    0.010    0.000 inputs.py:17(coordinate_values)\n     5000    0.005    0.000    0.010    0.000 spatial.py:100(lookup)\n    20000    0.006    0.000    0.010    0.000 cache.py:40(get)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.001    0.000    0.006    0.000 pack.py:82(index_for)\n     5000    0.002    0.000    0.004    0.000 pack.py:53(spatial_for)\n     5024    0.003    0.000    0.003    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    10000    0.002    0.000    0.003    0.000 client.py:53(_pack)\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n    20000    0.001    0.000    0.001    0.000 {built-in method builtins.isinstance}\n    12089    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}\n    20000    0.001    0.000    0.001    0.000 typing.py:2183(cast)\n\n\n",
+          "column_profile": "         586711 function calls in 0.158 seconds\n\n   Ordered by: cumulative time\n   List reduced from 88 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.158    0.013 client.py:157(_column_iterator)\n       11    0.023    0.002    0.155    0.014 batch.py:30(lookup_rows)\n    44032    0.058    0.000    0.076    0.000 inputs.py:17(coordinate_values)\n    44032    0.020    0.000    0.022    0.000 __init__.py:176(latlng_to_cell)\n       25    0.012    0.000    0.017    0.001 spatial.py:125(lookup_many)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n   132121    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n       41    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     1212    0.000    0.000    0.002    0.000 fromnumeric.py:2477(any)\n       25    0.002    0.000    0.002    0.000 spatial.py:161(_labels)\n     1212    0.001    0.000    0.002    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n      235    0.000    0.000    0.001    0.000 fromnumeric.py:51(_wrapfunc)\n     1262    0.001    0.000    0.001    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       47    0.000    0.000    0.001    0.000 fromnumeric.py:1446(searchsorted)\n       47    0.001    0.000    0.001    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n      188    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       22    0.000    0.000    0.000    0.000 fromnumeric.py:41(_wrapit)\n      188    0.000    0.000    0.000    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.000    0.000 address.py:36(parents)\n\n\n"
+        },
+        "shuffled": {
+          "points": 44032,
+          "catalogue_warmup_ns": 448825709,
+          "scalar_median_ns": 10291.0,
+          "scalar_p99_ns": 12458,
+          "columns_per_second": 531994.3840611347,
+          "objects_per_second": 107067.95736858883,
+          "column_seconds": [
+            0.08680079200712498,
+            0.08297874999698251,
+            0.0826781670039054,
+            0.08276779101288412,
+            0.08233233299688436
+          ],
+          "object_seconds": [
+            0.09427079200395383,
+            0.0933986250020098,
+            0.09314112499123439,
+            0.09368404200358782,
+            0.09322941600112244
+          ],
+          "scalar_profile": "         332073 function calls in 0.103 seconds\n\n   Ordered by: cumulative time\n   List reduced from 38 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.117    0.000 client.py:65(reverse)\n     5000    0.004    0.000    0.092    0.000 client.py:75(_one)\n     5000    0.010    0.000    0.060    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.040    0.000 decode.py:53(candidate)\n     5000    0.003    0.000    0.020    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.019    0.000 pack.py:87(lookup)\n    20000    0.005    0.000    0.016    0.000 places.py:23(get)\n    15000    0.003    0.000    0.014    0.000 places.py:34(place)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.010    0.000 inputs.py:17(coordinate_values)\n    20000    0.006    0.000    0.010    0.000 cache.py:40(get)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.002    0.000    0.006    0.000 pack.py:82(index_for)\n     5000    0.002    0.000    0.004    0.000 pack.py:53(spatial_for)\n     5015    0.004    0.000    0.004    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    10000    0.002    0.000    0.003    0.000 client.py:53(_pack)\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n     5000    0.001    0.000    0.001    0.000 __init__.py:208(get_resolution)\n    20000    0.001    0.000    0.001    0.000 {built-in method builtins.isinstance}\n    12057    0.001    0.000    0.001    0.000 {method 'append' of 'list' objects}\n    20000    0.001    0.000    0.001    0.000 typing.py:2183(cast)\n\n\n",
+          "column_profile": "         599865 function calls in 0.199 seconds\n\n   Ordered by: cumulative time\n   List reduced from 88 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.199    0.017 client.py:157(_column_iterator)\n       11    0.027    0.002    0.196    0.018 batch.py:30(lookup_rows)\n    44032    0.070    0.000    0.089    0.000 inputs.py:17(coordinate_values)\n       55    0.021    0.000    0.031    0.001 spatial.py:125(lookup_many)\n    44032    0.026    0.000    0.028    0.000 __init__.py:176(latlng_to_cell)\n   220160    0.017    0.000    0.017    0.000 {method 'append' of 'list' objects}\n       54    0.007    0.000    0.007    0.000 {built-in method numpy.array}\n   132151    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     2312    0.001    0.000    0.004    0.000 fromnumeric.py:2477(any)\n     2312    0.001    0.000    0.004    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n       55    0.003    0.000    0.004    0.000 spatial.py:161(_labels)\n      466    0.000    0.000    0.002    0.000 fromnumeric.py:51(_wrapfunc)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n     2422    0.002    0.000    0.002    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       77    0.000    0.000    0.002    0.000 fromnumeric.py:1446(searchsorted)\n       55    0.000    0.000    0.002    0.000 _arraysetops_impl.py:1060(isin)\n       77    0.002    0.000    0.002    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       55    0.001    0.000    0.002    0.000 _arraysetops_impl.py:908(_in1d)\n      389    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       22    0.000    0.000    0.001    0.000 fromnumeric.py:41(_wrapit)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n      389    0.000    0.000    0.001    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.001    0.000 address.py:36(parents)\n\n\n"
+        }
+      }
+    },
+    "python": {
+      "open_ns": 1179292,
+      "first_lookup_ns": 7216750,
+      "machine": "macOS-27.0-arm64-arm-64bit",
+      "python": "3.12.8",
+      "numpy": "2.3.5",
+      "info": {
+        "backend": "python",
+        "packs": {
+          "reverse": {
+            "block_resolution": 3,
+            "catalogue_epoch": "synthetic",
+            "coverage": "blocks",
+            "data_version": "synthetic",
+            "dependencies": [],
+            "export": {
+              "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+              "implementation": {
+                "build_data/acquire/io.py": "41b405bfb59a56a8fa3fa0d5df9b2f56937722644385434d1c9fd1186eb10dd6",
+                "build_data/cities/schemas.py": "e45c3583a14213bc7c67255042bdf11c4f4d73939f052b3defe8615402ad692c",
+                "build_data/golden/schemas.py": "26c76145db43371684128cfd12c73a590ca8741c36a6bc88bde1c7116f9d4815",
+                "build_data/serve/__init__.py": "4d94e6c5c970daa7c947b92cb384b31c934c3d3a10a9648f25d8c72425c99292",
+                "build_data/serve/__main__.py": "cd465e4f392648411c7397b7af3ecb5241adf6feedc7f84bce90cbf54e305cab",
+                "build_data/serve/catalogue.py": "a2c3f6dae622b420b5092bf55aa23c94489a5565a5d892da9f521bb20670e6af",
+                "build_data/serve/cells.py": "6a93901c14ede9c77b9cab3cd2983bdf5dd6e2880e2c537da61faa80e0871df3",
+                "build_data/serve/checkpoints.py": "e271ec1f6a2326584a6203d849e5d47b4f5cff5b217e304ce1146adfe0600478",
+                "build_data/serve/encoding.py": "735ce2ff205b0bc83e4b48acef8421cfaf29723c8584ab458ff6ce077bdf6205",
+                "build_data/serve/equivalence.py": "c0b6be4f06e59f44cbf82f41866e2a4c73e1ed4b689f024dedf6ccbda44f7300",
+                "build_data/serve/export.py": "f7b5e87424902c1f3eac3751fc69f9f44a94d9b8d2602143a8289608d19536c2",
+                "build_data/serve/metadata.py": "b41dd040dfa92f0cdffc68f7895022ec9fae352cb7c25ff4a5ad8ff09ee2d67a",
+                "build_data/serve/release.py": "6f6df85916251cd09aebfa7b69cc42611ca5e7efea906b402082210fb92f9107",
+                "build_data/serve/snapshot.py": "b6576628f7b1912dc0928edec8cb145bf187b671fffe47728d57b758257643c8",
+                "clients/python/thereabouts/packs/__init__.py": "e8e139117d73e02ed4d90678f0c7c028a6664efe3bdc32e2110b0c273358efaa",
+                "clients/python/thereabouts/packs/address.py": "93a6300b8a1c55512ce52d0652d3f6fc0f52c8d02312117692879d8fb34be4f8",
+                "clients/python/thereabouts/packs/catalogue.py": "97e75cdde917814ca38a3f917a991d5397f1955875902cb06797e3ef51b0da3d",
+                "clients/python/thereabouts/packs/container.py": "b791cce3ffde157b0c05087405eb2fc7139ea30fdea8fd3c34b537e9df50b62f",
+                "clients/python/thereabouts/packs/errors.py": "1c24fb3fa127420425846b1f17fea6d0c4e7aa2ad02c1040fc6c0b9070071bbe",
+                "clients/python/thereabouts/packs/jsonio.py": "7390c949fb5db917a3ee14e7661a1b5423bfbae3a3fae18a5009588067ee8bf4",
+                "clients/python/thereabouts/packs/layout.py": "3e1e7c0059002f89f96d6ef5d9fc48fad940468560dbefbb7ee06a08988f0165",
+                "clients/python/thereabouts/packs/metadata.py": "1820c8efe664eac9a99359f4b4879136ea6a47e88feb3b8241d5a14b9e25d7ea",
+                "clients/python/thereabouts/packs/spatial.py": "8b5dccf23ac65ddf8e0db7f9650abb151643e0df62aa08303cc8a99bee0ed5ad",
+                "clients/python/thereabouts/packs/verify.py": "c42a050bce4146892bd3dc6752e3b0ed3b752b5bd766dc47a32c6540475fb1f9"
+              },
+              "release": {
+                "catalogue_epoch": "synthetic",
+                "data_version": "synthetic",
+                "notices": [
+                  {
+                    "path": "LICENSE.txt",
+                    "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                    "size": 34
+                  }
+                ],
+                "sources": [
+                  {
+                    "attribution": "Thereabouts test fixture",
+                    "license": "public-domain",
+                    "license_url": "https://example.invalid/license",
+                    "release": "fixture",
+                    "source": "synthetic",
+                    "source_url": "https://example.invalid/synthetic"
+                  }
+                ]
+              },
+              "shard_bytes": 4194304,
+              "tools": {
+                "h3": {
+                  "c": "4.5.0",
+                  "python": "4.5.0"
+                },
+                "pyarrow": "23.0.1",
+                "python": "3.12.8",
+                "sqlite": "3.47.1"
+              }
+            },
+            "export_fingerprint": "d48e1fed8520daa62454fa3bf798b7bb29b7cc5388df9a92d26c271ddc5ffbcf",
+            "family": "reverse",
+            "files": [
+              {
+                "count": 4176,
+                "first_id": 1,
+                "kind": "catalogue",
+                "path": "catalogue-00000.bin",
+                "sha256": "07ff4a469963842f5d6c50617ca9c76345a33a85e3c15f1c24bda6a21cdf7a71",
+                "size": 1306534
+              },
+              {
+                "first_block": 1277,
+                "kind": "cells",
+                "last_block": 7072,
+                "path": "cells-00000.bin",
+                "sha256": "f35498bb281db3ea65c0595339bfbe27b3294809ab9b9327ab05a67f86ae706e",
+                "size": 344152
+              },
+              {
+                "first_block": 7182,
+                "kind": "cells",
+                "last_block": 8531,
+                "path": "cells-00001.bin",
+                "sha256": "b1388bb78c6bd293dbf966fa9d81be9b1f20d0353c891901228c90eb45824e01",
+                "size": 344152
+              },
+              {
+                "first_block": 8537,
+                "kind": "cells",
+                "last_block": 12656,
+                "path": "cells-00002.bin",
+                "sha256": "576f8535abccd8a372e80ed9d5d52652dbc7375433b6b1a1226a4331f7dc8b72",
+                "size": 344152
+              },
+              {
+                "first_block": 12657,
+                "kind": "cells",
+                "last_block": 28829,
+                "path": "cells-00003.bin",
+                "sha256": "a0d3f3489d5eb388c44c7f3151c33c63f32cdc7ddb07360f194b424cde852944",
+                "size": 344152
+              },
+              {
+                "first_block": 30674,
+                "kind": "cells",
+                "last_block": 32594,
+                "path": "cells-00004.bin",
+                "sha256": "d2d051526dd8fc53d9129f95f2a5722e564893f9a124d2e818cce43cd42fae40",
+                "size": 317680
+              },
+              {
+                "kind": "notice",
+                "path": "notices/000-LICENSE.txt",
+                "sha256": "e58d62d1fe4b59e31afa4dca016772ddec7bc37a3c4a22ce9a780a4275ae3d9f",
+                "size": 34
+              },
+              {
+                "kind": "notice",
+                "path": "notices/001-DATA_LICENSES.md",
+                "sha256": "005f08c987f48032587efb95d503fdf95ebfa0348c426d29947777cd2823266e",
+                "size": 36
+              },
+              {
+                "kind": "notice",
+                "path": "notices/002-DATASET_CARD.md",
+                "sha256": "97aa5a18927fdb5150a111dc8fc5d32ff32f3cbe1ac7edfb6ddb2084c4649ad3",
+                "size": 48
+              }
+            ],
+            "format": {
+              "major": 1,
+              "minor": 0,
+              "required_features": 0
+            },
+            "golden_sha256": "df0b2b43b126d6a2c2950718b35016ccd00df959de400d6ffb3e7030e1832ebb",
+            "h3_version": "4.5.0",
+            "minimum_reader": "0.1.0",
+            "nearest": {
+              "cutoff_m": 50000,
+              "distant_over_m": 25000,
+              "exact_distance": false
+            },
+            "notices": [
+              "notices/000-LICENSE.txt",
+              "notices/001-DATA_LICENSES.md",
+              "notices/002-DATASET_CARD.md"
+            ],
+            "place_count": 4176,
+            "policy_sha256": "bc0b17591598763ab17b750c0ee2ddb9a7afaf52636d0eb5f41b074c03b8e98d",
+            "reference_resolution": 8,
+            "schema": "thereabouts-pack-1",
+            "sources": [
+              {
+                "attribution": "Thereabouts test fixture",
+                "license": "public-domain",
+                "license_url": "https://example.invalid/license",
+                "release": "fixture",
+                "source": "synthetic",
+                "source_url": "https://example.invalid/synthetic"
+              }
+            ],
+            "manifest_sha256": "7e9855cbe776ce0a10f5b6ec8118e4e690c1f45c9c9184d74247f8bce6161a6b"
+          }
+        },
+        "cache": {
+          "reverse": {
+            "budget_bytes": 33554432,
+            "entries": 4176,
+            "retained_bytes": 8775320,
+            "hits": 868084,
+            "misses": 4176,
+            "evictions": 0
+          }
+        }
+      },
+      "installed_bytes": 3006380,
+      "peak_process_rss_bytes": 78823424,
+      "workloads": {
+        "clustered": {
+          "points": 44032,
+          "catalogue_warmup_ns": 723690000,
+          "scalar_median_ns": 12208.0,
+          "scalar_p99_ns": 17125,
+          "columns_per_second": 621926.3941543892,
+          "objects_per_second": 87057.67897214518,
+          "column_seconds": [
+            0.08128216701152269,
+            0.07044108399713878,
+            0.07065041700843722,
+            0.07159091699577402,
+            0.07079937499656808
+          ],
+          "object_seconds": [
+            0.11486637500638608,
+            0.11206720799964387,
+            0.11262945798807777,
+            0.11510416699456982,
+            0.11520658301014919
+          ],
+          "scalar_profile": "         417066 function calls in 0.134 seconds\n\n   Ordered by: cumulative time\n   List reduced from 40 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.149    0.000 client.py:65(reverse)\n     5000    0.005    0.000    0.123    0.000 client.py:75(_one)\n     5000    0.009    0.000    0.091    0.000 decode.py:97(resolution)\n     5000    0.011    0.000    0.042    0.000 decode.py:53(candidate)\n     5000    0.001    0.000    0.031    0.000 _reader_py.py:6(stored_cell)\n     5000    0.020    0.000    0.030    0.000 address.py:36(cell_at)\n     5000    0.003    0.000    0.021    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.019    0.000 pack.py:87(lookup)\n    20000    0.005    0.000    0.017    0.000 places.py:23(get)\n    15000    0.003    0.000    0.015    0.000 places.py:34(place)\n     5000    0.008    0.000    0.011    0.000 inputs.py:17(coordinate_values)\n     5000    0.006    0.000    0.011    0.000 spatial.py:100(lookup)\n    20000    0.006    0.000    0.010    0.000 cache.py:40(get)\n    39976    0.006    0.000    0.006    0.000 address.py:20(level_offset)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.002    0.000    0.006    0.000 pack.py:82(index_for)\n    52065    0.004    0.000    0.004    0.000 {method 'append' of 'list' objects}\n     5000    0.003    0.000    0.004    0.000 pack.py:53(spatial_for)\n     5024    0.003    0.000    0.003    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    10000    0.002    0.000    0.003    0.000 client.py:53(_pack)\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n\n\n",
+          "column_profile": "         586711 function calls in 0.159 seconds\n\n   Ordered by: cumulative time\n   List reduced from 88 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.159    0.013 client.py:157(_column_iterator)\n       11    0.023    0.002    0.156    0.014 batch.py:30(lookup_rows)\n    44032    0.059    0.000    0.077    0.000 inputs.py:17(coordinate_values)\n    44032    0.020    0.000    0.022    0.000 __init__.py:176(latlng_to_cell)\n       25    0.012    0.000    0.017    0.001 spatial.py:125(lookup_many)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n       41    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n   132121    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     1212    0.000    0.000    0.002    0.000 fromnumeric.py:2477(any)\n       25    0.002    0.000    0.002    0.000 spatial.py:161(_labels)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n     1212    0.001    0.000    0.002    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n      235    0.000    0.000    0.001    0.000 fromnumeric.py:51(_wrapfunc)\n     1262    0.001    0.000    0.001    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       47    0.000    0.000    0.001    0.000 fromnumeric.py:1446(searchsorted)\n       47    0.001    0.000    0.001    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n      188    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n       25    0.000    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       22    0.000    0.000    0.000    0.000 fromnumeric.py:41(_wrapit)\n      188    0.000    0.000    0.000    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.000    0.000 _arraysetops_impl.py:145(unique)\n\n\n"
+        },
+        "shuffled": {
+          "points": 44032,
+          "catalogue_warmup_ns": 587401208,
+          "scalar_median_ns": 12750.0,
+          "scalar_p99_ns": 14833,
+          "columns_per_second": 530436.5241670839,
+          "objects_per_second": 82296.4833704671,
+          "column_seconds": [
+            0.08674762499867938,
+            0.08301087499421556,
+            0.08248279099643696,
+            0.08733650000067428,
+            0.08284050000656862
+          ],
+          "object_seconds": [
+            0.1215118749969406,
+            0.1178726249927422,
+            0.13066529099887703,
+            0.12204233401280362,
+            0.12024937498790678
+          ],
+          "scalar_profile": "         417043 function calls in 0.137 seconds\n\n   Ordered by: cumulative time\n   List reduced from 40 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n     5000    0.004    0.000    0.151    0.000 client.py:65(reverse)\n     5000    0.005    0.000    0.125    0.000 client.py:75(_one)\n     5000    0.009    0.000    0.091    0.000 decode.py:97(resolution)\n     5000    0.012    0.000    0.043    0.000 decode.py:53(candidate)\n     5000    0.001    0.000    0.031    0.000 _reader_py.py:6(stored_cell)\n     5000    0.020    0.000    0.030    0.000 address.py:36(cell_at)\n     5000    0.003    0.000    0.021    0.000 inputs.py:48(coordinates)\n     5000    0.002    0.000    0.020    0.000 pack.py:87(lookup)\n    20000    0.005    0.000    0.017    0.000 places.py:23(get)\n    15000    0.003    0.000    0.016    0.000 places.py:34(place)\n     5000    0.006    0.000    0.012    0.000 spatial.py:100(lookup)\n     5000    0.008    0.000    0.011    0.000 inputs.py:17(coordinate_values)\n    20000    0.006    0.000    0.011    0.000 cache.py:40(get)\n    39985    0.006    0.000    0.006    0.000 address.py:20(level_offset)\n     5000    0.005    0.000    0.006    0.000 address.py:24(address)\n     5000    0.006    0.000    0.006    0.000 <string>:2(__init__)\n     5000    0.002    0.000    0.006    0.000 pack.py:82(index_for)\n    52042    0.005    0.000    0.005    0.000 {method 'append' of 'list' objects}\n     5015    0.004    0.000    0.004    0.000 {built-in method _bisect.bisect_left}\n     5000    0.003    0.000    0.004    0.000 pack.py:53(spatial_for)\n     5000    0.003    0.000    0.003    0.000 __init__.py:176(latlng_to_cell)\n    30000    0.003    0.000    0.003    0.000 {method 'get' of 'dict' objects}\n    10000    0.002    0.000    0.003    0.000 client.py:53(_pack)\n    20000    0.002    0.000    0.002    0.000 {method 'move_to_end' of 'collections.OrderedDict' objects}\n     5000    0.001    0.000    0.001    0.000 __init__.py:146(is_valid_cell)\n\n\n",
+          "column_profile": "         599865 function calls in 0.171 seconds\n\n   Ordered by: cumulative time\n   List reduced from 88 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       12    0.001    0.000    0.171    0.014 client.py:157(_column_iterator)\n       11    0.023    0.002    0.168    0.015 batch.py:30(lookup_rows)\n    44032    0.058    0.000    0.075    0.000 inputs.py:17(coordinate_values)\n       55    0.018    0.000    0.027    0.000 spatial.py:125(lookup_many)\n    44032    0.024    0.000    0.025    0.000 __init__.py:176(latlng_to_cell)\n   220160    0.015    0.000    0.015    0.000 {method 'append' of 'list' objects}\n       54    0.006    0.000    0.006    0.000 {built-in method numpy.array}\n   132151    0.006    0.000    0.006    0.000 typing.py:2183(cast)\n    88064    0.005    0.000    0.005    0.000 {built-in method math.isfinite}\n     2312    0.001    0.000    0.004    0.000 fromnumeric.py:2477(any)\n     2312    0.001    0.000    0.003    0.000 fromnumeric.py:89(_wrapreduction_any_all)\n       55    0.002    0.000    0.003    0.000 spatial.py:161(_labels)\n      466    0.000    0.000    0.002    0.000 fromnumeric.py:51(_wrapfunc)\n     2422    0.002    0.000    0.002    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       11    0.001    0.000    0.002    0.000 columns.py:39(columns)\n    44032    0.002    0.000    0.002    0.000 _convert.py:4(_in_scalar)\n       77    0.000    0.000    0.002    0.000 fromnumeric.py:1446(searchsorted)\n       77    0.002    0.000    0.002    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}\n       55    0.000    0.000    0.001    0.000 _arraysetops_impl.py:1060(isin)\n      389    0.000    0.000    0.001    0.000 numeric.py:680(flatnonzero)\n       55    0.001    0.000    0.001    0.000 _arraysetops_impl.py:908(_in1d)\n       22    0.000    0.000    0.001    0.000 fromnumeric.py:41(_wrapit)\n       11    0.001    0.000    0.001    0.000 address.py:23(addresses)\n      389    0.000    0.000    0.001    0.000 fromnumeric.py:2018(nonzero)\n       11    0.000    0.000    0.001    0.000 address.py:36(parents)\n\n\n"
+        }
+      }
+    }
+  }
+}

@@ -28,5 +28,5 @@ may not match the pinned 25.11.0 extractor. Install that exact extractor before
 rebuilding plate evidence. The apt package is not a reproducibility guarantee.
 The Rust writer merge/coalesced-input proof and an s3fs dependency lock are also
 required before pack construction or cloud publication.
-Follow docs/RELEASE_PROCEDURE.md in the reviewed checkout.
+Follow docs/pipeline/release-procedure.md in the reviewed checkout.
 EOF

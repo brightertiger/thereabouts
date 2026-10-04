@@ -39,4 +39,4 @@ gcloud compute instances create "$PIPELINE_VM_NAME" \
 printf 'VM created in %s. Inspect startup logs before using it.\n' "$PIPELINE_VM_ZONE"
 printf 'gcloud compute ssh %q --project %q --zone %q\n' \
   "$PIPELINE_VM_NAME" "$PIPELINE_GCP_PROJECT" "$PIPELINE_VM_ZONE"
-printf 'Continue with docs/RELEASE_PROCEDURE.md; no pipeline has been started.\n'
+printf 'Continue with docs/pipeline/release-procedure.md; no pipeline has been started.\n'
