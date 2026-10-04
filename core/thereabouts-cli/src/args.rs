@@ -50,23 +50,7 @@ pub(crate) enum Command {
     #[command(
         override_usage = "thereabouts reverse --lat LAT --lon LON [OPTIONS]\n       thereabouts reverse FILE|- [OPTIONS]"
     )]
-    Reverse {
-        #[arg(conflicts_with_all=["lat","lon"])]
-        file: Option<String>,
-        #[arg(
-            long,
-            allow_hyphen_values = true,
-            requires = "lon",
-            required_unless_present = "file"
-        )]
-        lat: Option<f64>,
-        #[arg(long, allow_hyphen_values = true, requires = "lat")]
-        lon: Option<f64>,
-        #[arg(long, requires = "file")]
-        lat_col: Option<String>,
-        #[arg(long, requires = "file")]
-        lon_col: Option<String>,
-    },
+    Reverse(Box<Reverse>),
     /// Find the stored ancestor of an H3 cell.
     H3 { cell: String },
     /// Finds towns and cities by name. Street addresses are not supported.
@@ -159,4 +143,88 @@ pub(crate) enum Data {
         #[arg(long, required = true)]
         check: bool,
     },
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct Reverse {
+    #[arg(conflicts_with_all=["lat","lon","point"])]
+    pub file: Option<String>,
+    #[arg(long, allow_hyphen_values = true, requires = "lon", required = false)]
+    pub lat: Option<f64>,
+    #[arg(long, allow_hyphen_values = true, requires = "lat")]
+    pub lon: Option<f64>,
+    #[arg(long, requires = "file")]
+    pub lat_col: Option<String>,
+    #[arg(long, requires = "file")]
+    pub lon_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub frame: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub point: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub input_format: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub origin: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub reference: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub value: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub height_datum: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub hemisphere: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub band: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub x: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub y: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub z: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub height: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub geoid_separation: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub zone: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub easting: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub northing: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub accuracy_m: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub hdop: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub vdop: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub x_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub y_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub z_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub height_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub height_datum_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub geoid_separation_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub zone_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub hemisphere_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub band_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub easting_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub northing_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub value_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub accuracy_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub hdop_col: Option<String>,
+    #[arg(long, allow_hyphen_values = true)]
+    pub vdop_col: Option<String>,
 }

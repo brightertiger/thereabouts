@@ -5,11 +5,30 @@ use crate::{
     store,
 };
 use std::path::{Path, PathBuf};
-use thereabouts_core::{format::Pack, result::LookupResult};
+use thereabouts_core::{
+    coords::{self, PointResult},
+    format::Pack,
+    result::{LookupResult, Status},
+};
+
+#[derive(serde::Serialize)]
+#[serde(untagged)]
+pub(crate) enum Answer {
+    Legacy(Box<LookupResult>),
+    Point(Box<PointResult>),
+}
+impl Answer {
+    pub(crate) fn status(&self) -> Status {
+        match self {
+            Self::Legacy(value) => value.status,
+            Self::Point(value) => value.result.status,
+        }
+    }
+}
 
 pub(crate) fn family(command: &Command) -> Option<&'static str> {
     Some(match command {
-        Command::Reverse { .. } | Command::H3 { .. } | Command::Geocode { .. } => "core",
+        Command::Reverse(_) | Command::H3 { .. } | Command::Geocode { .. } => "core",
         Command::Postal { .. } => "postal",
         Command::Airport { .. } => "airports",
         Command::Locode { .. } => "locode",
@@ -42,13 +61,27 @@ pub(crate) fn open(root: &Path, command: &Command) -> Result<(Pack, PathBuf)> {
     }
     Ok((pack, path))
 }
-pub(crate) fn run(pack: &Pack, command: &Command, evidence: bool) -> Result<LookupResult> {
-    Ok(match command {
-        Command::Reverse {
-            lat: Some(lat),
-            lon: Some(lon),
-            ..
-        } => pack.reverse(*lat, *lon, evidence)?,
+pub(crate) fn run(
+    pack: &Pack,
+    command: &Command,
+    point: Option<&serde_json::Value>,
+    evidence: bool,
+) -> Result<Answer> {
+    if let Some(point) = point {
+        return Ok(Answer::Point(Box::new(coords::reverse_value(
+            pack, point, evidence,
+        )?)));
+    }
+    Ok(Answer::Legacy(Box::new(match command {
+        Command::Reverse(reverse) => pack.reverse(
+            reverse
+                .lat
+                .ok_or_else(|| Error::Usage("Missing --lat".into()))?,
+            reverse
+                .lon
+                .ok_or_else(|| Error::Usage("Missing --lon".into()))?,
+            evidence,
+        )?,
         Command::H3 { cell } => pack.from_h3(cell, evidence)?,
         Command::Postal { code, country } => pack.postal(code, Some(country), evidence)?,
         Command::Airport {
@@ -84,5 +117,5 @@ pub(crate) fn run(pack: &Pack, command: &Command, evidence: bool) -> Result<Look
             },
         )?,
         _ => return Err(Error::Usage("Expected scalar lookup arguments".into())),
-    })
+    })))
 }

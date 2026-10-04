@@ -57,7 +57,7 @@
   "commands": [
     {
       "name": "reverse",
-      "about": "Find geographic context or read CSV/NDJSON points.",
+      "about": "Find geographic context from coordinates, CSV, NDJSON or explicit NMEA logs.",
       "args": "--lat LAT --lon LON",
       "options": [
         {
@@ -81,6 +81,199 @@
           "name": "lon-col",
           "value": "COLUMN",
           "description": "Select the CSV longitude header."
+        },
+        {
+          "name": "frame",
+          "value": "FRAME",
+          "description": "Explicit coordinate frame; WGS84 geodetic remains the default."
+        },
+        {
+          "name": "point",
+          "value": "JSON",
+          "description": "Complete typed point object, including frame and metadata."
+        },
+        {
+          "name": "input-format",
+          "value": "FORMAT",
+          "description": "Input encoding: auto, csv, ndjson or nmea; independent of --format.",
+          "choices": [
+            "auto",
+            "csv",
+            "ndjson",
+            "nmea"
+          ],
+          "error": "input_format"
+        },
+        {
+          "name": "origin",
+          "value": "JSON",
+          "description": "Uniform geodetic or ECEF origin for enu/ned."
+        },
+        {
+          "name": "reference",
+          "value": "JSON",
+          "description": "Geodetic reference for a short plus code."
+        },
+        {
+          "name": "value",
+          "value": "TEXT",
+          "description": "Text geocode, H3/S2 token, DMS, NMEA or WKT."
+        },
+        {
+          "name": "height-datum",
+          "value": "DATUM",
+          "description": "Source height datum; unknown is preserved without a geoid model."
+        },
+        {
+          "name": "hemisphere",
+          "value": "N|S",
+          "description": "UTM hemisphere, alternatively supply --band."
+        },
+        {
+          "name": "band",
+          "value": "BAND",
+          "description": "UTM latitude band."
+        },
+        {
+          "name": "x",
+          "value": "X",
+          "description": "Explicit x coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "y",
+          "value": "Y",
+          "description": "Explicit y coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "z",
+          "value": "Z",
+          "description": "Explicit z coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "height",
+          "value": "HEIGHT",
+          "description": "Explicit height coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "geoid-separation",
+          "value": "GEOID-SEPARATION",
+          "description": "Explicit geoid-separation coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "zone",
+          "value": "ZONE",
+          "description": "Explicit zone coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "easting",
+          "value": "EASTING",
+          "description": "Explicit easting coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "northing",
+          "value": "NORTHING",
+          "description": "Explicit northing coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "accuracy-m",
+          "value": "ACCURACY-M",
+          "description": "Explicit accuracy-m coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "hdop",
+          "value": "HDOP",
+          "description": "Explicit hdop coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "vdop",
+          "value": "VDOP",
+          "description": "Explicit vdop coordinate or metadata value.",
+          "numeric": "float"
+        },
+        {
+          "name": "x-col",
+          "value": "COLUMN",
+          "description": "Select the CSV x header in explicit frame mode."
+        },
+        {
+          "name": "y-col",
+          "value": "COLUMN",
+          "description": "Select the CSV y header in explicit frame mode."
+        },
+        {
+          "name": "z-col",
+          "value": "COLUMN",
+          "description": "Select the CSV z header in explicit frame mode."
+        },
+        {
+          "name": "height-col",
+          "value": "COLUMN",
+          "description": "Select the CSV height header in explicit frame mode."
+        },
+        {
+          "name": "height-datum-col",
+          "value": "COLUMN",
+          "description": "Select the CSV height-datum header in explicit frame mode."
+        },
+        {
+          "name": "geoid-separation-col",
+          "value": "COLUMN",
+          "description": "Select the CSV geoid-separation header in explicit frame mode."
+        },
+        {
+          "name": "zone-col",
+          "value": "COLUMN",
+          "description": "Select the CSV zone header in explicit frame mode."
+        },
+        {
+          "name": "hemisphere-col",
+          "value": "COLUMN",
+          "description": "Select the CSV hemisphere header in explicit frame mode."
+        },
+        {
+          "name": "band-col",
+          "value": "COLUMN",
+          "description": "Select the CSV band header in explicit frame mode."
+        },
+        {
+          "name": "easting-col",
+          "value": "COLUMN",
+          "description": "Select the CSV easting header in explicit frame mode."
+        },
+        {
+          "name": "northing-col",
+          "value": "COLUMN",
+          "description": "Select the CSV northing header in explicit frame mode."
+        },
+        {
+          "name": "value-col",
+          "value": "COLUMN",
+          "description": "Select the CSV value header in explicit frame mode."
+        },
+        {
+          "name": "accuracy-col",
+          "value": "COLUMN",
+          "description": "Select the CSV accuracy header in explicit frame mode."
+        },
+        {
+          "name": "hdop-col",
+          "value": "COLUMN",
+          "description": "Select the CSV hdop header in explicit frame mode."
+        },
+        {
+          "name": "vdop-col",
+          "value": "COLUMN",
+          "description": "Select the CSV vdop header in explicit frame mode."
         }
       ],
       "arity": "reverse"
@@ -344,6 +537,7 @@
     "update": "data update requires --check",
     "scheme": "Unknown airport scheme",
     "prefer": "Use --prefer population",
-    "limit": "geocode --limit must be 1..100"
+    "limit": "geocode --limit must be 1..100",
+    "input_format": "Use --input-format auto|csv|ndjson|nmea"
   }
 }

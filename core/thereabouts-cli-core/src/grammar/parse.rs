@@ -13,6 +13,12 @@ pub struct Parsed {
     pub values: Vec<String>,
     /// Flag values; switches are booleans and explicit values are strings.
     pub options: Map<String, Value>,
+    /// Assembled typed scalar input; numeric coercion is shared by both hosts.
+    pub point: Option<Value>,
+    /// Detached invalid-input result for CLI numbers that JSON cannot represent.
+    pub invalid_point: Option<Value>,
+    /// Portable batch frame options.
+    pub coordinates: crate::coords::Options,
     /// Help has precedence once encountered in argv.
     pub help: bool,
     /// Client version, except the data-install dataset selector.
@@ -92,7 +98,12 @@ pub fn parse(argv: &[String]) -> Result<Parsed> {
             } else {
                 let value = given
                     .or_else(|| tokens.next().map(String::as_str))
-                    .filter(|v| !v.starts_with('-') || spec.numeric == "float")
+                    .filter(|v| {
+                        given.is_some()
+                            || !v.starts_with('-')
+                            || spec.numeric == "float"
+                            || spec.name == "value" && !v.starts_with("--")
+                    })
                     .ok_or_else(|| grammar.error("needs_value", &[("name", name)]))?;
                 Value::String(value.into())
             };
@@ -115,6 +126,15 @@ pub fn parse(argv: &[String]) -> Result<Parsed> {
         }
     }
     validate::run(&grammar, &output)?;
+    if output.command == "reverse"
+        && output.options.get("fields").and_then(Value::as_str) != Some("")
+    {
+        (output.point, output.coordinates) =
+            crate::coords::request(&output.options, &output.values)?;
+    }
+    if output.point.is_some() {
+        output.invalid_point = crate::coords::scalar_error(&output.options)?;
+    }
     output.argv = output.canonical(&grammar);
     Ok(output)
 }

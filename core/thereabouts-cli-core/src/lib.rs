@@ -2,6 +2,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 pub mod batch;
 mod batch_spool;
+pub mod coords;
 pub mod directory;
 pub mod error;
 pub mod grammar;

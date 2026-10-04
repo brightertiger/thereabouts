@@ -87,7 +87,7 @@ pub fn help(command: &str) -> Result<String> {
     );
     let mut output = format!("{about}\n\nUsage: thereabouts {usage}\n");
     if command == "reverse" {
-        output.push_str("       thereabouts reverse FILE|- [OPTIONS]\n");
+        output.push_str("       thereabouts reverse FILE|- [OPTIONS]\n       thereabouts reverse --frame FRAME [COMPONENTS] [OPTIONS]\n       thereabouts reverse --point JSON [OPTIONS]\n");
     }
     if command.is_empty() || command == "data" {
         output.push_str("\nCommands:\n");

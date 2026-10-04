@@ -66,7 +66,7 @@ pub fn run(argv: &[String], io: &mut dyn Io) -> i32 {
             return 2;
         }
     };
-    match execute(&cli, io) {
+    match execute(&cli, &parsed, io) {
         Ok(code) => code,
         Err(Error::Io(error)) if error.kind() == std::io::ErrorKind::BrokenPipe => 0,
         Err(Error::Missing(family)) => {
@@ -79,7 +79,7 @@ pub fn run(argv: &[String], io: &mut dyn Io) -> i32 {
         }
     }
 }
-fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
+fn execute(cli: &Cli, parsed: &grammar::Parsed, io: &mut dyn Io) -> Result<i32> {
     if cli.global.fields.as_deref() == Some("") {
         io.stdout(&format!("{}\n", render::FIELDS.join("\n")))?;
         return Ok(0);
@@ -110,41 +110,43 @@ fn execute(cli: &Cli, io: &mut dyn Io) -> Result<i32> {
     if let Some(fields) = &fields {
         renderer.columns(fields.clone());
     }
-    let (value, exit) = match command {
-        Command::Data { operation } => (data::run(operation, &root, cli.global.no_input, io)?, 0),
-        Command::Info => (data::info(&root)?, 0),
-        Command::Mcp => {
-            // A native host may supply its own MCP bridge; Python owns the optional SDK.
-            return io.mcp(&root);
-        }
-        command => {
-            let (pack, path) = query::open(&root, command)?;
-            let family = query::family(command).unwrap_or("core");
-            if let Command::Reverse {
-                file: Some(file),
-                lat_col,
-                lon_col,
-                ..
-            } = command
-            {
-                return batch::run(
-                    file,
-                    lat_col.as_deref(),
-                    lon_col.as_deref(),
-                    &pack,
-                    &cli.global,
-                    format,
-                    io,
-                )
-                .map_err(|e| e.at_pack(&path, family));
+    let (value, exit) = if let Some(invalid) = &parsed.invalid_point {
+        (render::select(invalid, fields.as_deref()), 2)
+    } else {
+        match command {
+            Command::Data { operation } => {
+                (data::run(operation, &root, cli.global.no_input, io)?, 0)
             }
-            let answer = query::run(&pack, command, cli.global.evidence)
-                .map_err(|e| e.at_pack(&path, family))?;
-            let exit = thereabouts_cli_core::exit(answer.status, cli.global.strict);
-            (
-                render::select(&serde_json::to_value(answer)?, fields.as_deref()),
-                exit,
-            )
+            Command::Info => (data::info(&root)?, 0),
+            Command::Mcp => {
+                // A native host may supply its own MCP bridge; Python owns the optional SDK.
+                return io.mcp(&root);
+            }
+            command => {
+                let (pack, path) = query::open(&root, command)?;
+                let family = query::family(command).unwrap_or("core");
+                if let Command::Reverse(reverse) = command
+                    && let Some(file) = &reverse.file
+                {
+                    return batch::run(
+                        file,
+                        reverse,
+                        &pack,
+                        &parsed.coordinates,
+                        &cli.global,
+                        format,
+                        io,
+                    )
+                    .map_err(|e| e.at_pack(&path, family));
+                }
+                let answer = query::run(&pack, command, parsed.point.as_ref(), cli.global.evidence)
+                    .map_err(|e| e.at_pack(&path, family))?;
+                let exit = thereabouts_cli_core::exit(answer.status(), cli.global.strict);
+                (
+                    render::select(&serde_json::to_value(answer)?, fields.as_deref()),
+                    exit,
+                )
+            }
         }
     };
     if matches!(format, Format::Table | Format::Csv)

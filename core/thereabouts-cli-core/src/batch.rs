@@ -20,6 +20,9 @@ use thereabouts_core::{
 pub struct Options {
     /// Filename used for explicit NDJSON extension detection; "-" denotes stdin.
     pub filename: String,
+    /// Explicit coordinate input; old WASM callers can omit these options.
+    #[serde(default)]
+    pub coordinates: crate::coords::Options,
     /// Explicit latitude header; automatic names are otherwise exact.
     pub lat_col: Option<String>,
     /// Explicit longitude header.
@@ -67,9 +70,11 @@ struct Output<'a> {
     fields: Option<Vec<String>>,
     renderer: Renderer,
     format: Format,
+    input_format: &'a str,
     failed: bool,
     missed: bool,
     input_fields: Vec<String>,
+    reserve_query: bool,
 }
 impl Output<'_> {
     fn row(
@@ -77,6 +82,7 @@ impl Output<'_> {
         mut input: Map<String, Value>,
         coords: Option<(f64, f64)>,
         why: Option<String>,
+        point: Option<std::result::Result<Value, thereabouts_core::coords::CoordError>>,
         io: &mut dyn Io,
     ) -> Result<()> {
         if input.keys().any(|k| k.starts_with("thereabouts_")) {
@@ -87,18 +93,44 @@ impl Output<'_> {
         for name in &self.input_fields {
             input.entry(name.clone()).or_insert(Value::Null);
         }
-        let answer = if let Some((lat, lon)) = coords {
-            self.pack.reverse(lat, lon, self.options.evidence)?
+        let (status, mut result) = if let Some(point) = point {
+            let answer = match point {
+                Ok(point) => thereabouts_core::coords::reverse_value(
+                    self.pack,
+                    &point,
+                    self.options.evidence,
+                )?,
+                Err(error) => thereabouts_core::coords::invalid_result(
+                    if self.input_format == "csv" {
+                        self.options.coordinates.frame.as_deref()
+                    } else {
+                        input.get("frame").and_then(Value::as_str).or(self
+                            .options
+                            .coordinates
+                            .frame
+                            .as_deref())
+                    },
+                    &error,
+                ),
+            };
+            (answer.result.status, serde_json::to_value(answer)?)
         } else {
-            let mut invalid = LookupResult::empty(Status::InvalidInput);
-            invalid.hint =
-                Some(why.unwrap_or_else(|| "Each row requires numeric lat and lon".into()));
-            invalid
+            let answer = if let Some((lat, lon)) = coords {
+                self.pack.reverse(lat, lon, self.options.evidence)?
+            } else {
+                let mut invalid = LookupResult::empty(Status::InvalidInput);
+                invalid.hint =
+                    Some(why.unwrap_or_else(|| "Each row requires numeric lat and lon".into()));
+                invalid
+            };
+            (answer.status, serde_json::to_value(answer)?)
         };
-        self.failed |= crate::exit(answer.status, false) == 2;
-        self.missed |= answer.status == Status::NotFound;
-        let mut result = serde_json::to_value(answer)?;
+        self.failed |= crate::exit(status, false) == 2;
+        self.missed |= status == Status::NotFound;
         if let Some(object) = result.as_object_mut() {
+            if self.reserve_query {
+                object.entry("query").or_insert(Value::Null);
+            }
             object.entry("hint").or_insert(Value::Null);
             if self.options.evidence {
                 object.entry("evidence").or_insert(Value::Null);
@@ -179,31 +211,57 @@ pub fn run(
         fields: render::fields(options.fields.as_deref())?,
         renderer: Renderer::new(format, true),
         format,
+        input_format: "",
         failed: false,
         missed: false,
         input_fields: Vec::new(),
+        reserve_query: options.coordinates.frame.is_some()
+            && matches!(format, Format::Csv | Format::Table),
     };
-    if std::path::Path::new(file)
+    let detected_ndjson = std::path::Path::new(file)
         .extension()
         .is_some_and(|e| e.eq_ignore_ascii_case("ndjson") || e.eq_ignore_ascii_case("jsonl"))
-        || first.trim_start().starts_with(['{', '['])
+        || first.trim_start().starts_with(['{', '[']);
+    let input_format = match options.coordinates.input_format.as_str() {
+        "" | "auto" => {
+            if detected_ndjson {
+                "ndjson"
+            } else {
+                "csv"
+            }
+        }
+        explicit => explicit,
+    };
+    output.input_format = input_format;
+    if input_format != "csv"
+        && (lat_col.is_some() || lon_col.is_some() || !options.coordinates.columns.is_empty())
     {
-        if lat_col.is_some() || lon_col.is_some() {
-            return Err(Error::Usage("Column flags apply only to CSV input".into()));
+        return Err(Error::Usage("Column flags apply only to CSV input".into()));
+    }
+    match input_format {
+        "ndjson" => {
+            if matches!(format, Format::Csv | Format::Table) {
+                let temporary = host.borrow_mut().temporary()?;
+                let (file, fields, frame_rows) =
+                    crate::batch_spool::collect(&first, temporary, |line| source.line(line))?;
+                output.input_fields = fields;
+                output.reserve_query |= frame_rows;
+                source.file = Some(Box::new(BufReader::new(file)));
+                first.clear();
+                source.line(&mut first)?;
+            }
+            ndjson(&mut source, first, &mut output, &host)?;
         }
-        if matches!(format, Format::Csv | Format::Table) {
-            let temporary = host.borrow_mut().temporary()?;
-            let (file, fields) =
-                crate::batch_spool::collect(&first, temporary, |line| source.line(line))?;
-            output.input_fields = fields;
-            source.file = Some(Box::new(BufReader::new(file)));
-            first.clear();
-            source.line(&mut first)?;
+        "csv" => {
+            source.pending = Cursor::new(first.into_bytes());
+            csv(source, &mut output, lat_col, lon_col, &host)?;
         }
-        ndjson(&mut source, first, &mut output, &host)?;
-    } else if !first.is_empty() {
-        source.pending = Cursor::new(first.into_bytes());
-        csv(source, &mut output, lat_col, lon_col, &host)?;
+        "nmea" => nmea(&mut source, first, &mut output, &host)?,
+        _ => {
+            return Err(Error::Usage(
+                "Use --input-format auto|csv|ndjson|nmea".into(),
+            ));
+        }
     }
     output.renderer.finish(*host.borrow_mut())?;
     Ok(if output.failed {
@@ -227,7 +285,11 @@ fn ndjson(
                 }
                 let input = object.values;
                 let coords = numeric(input.get("lat")).zip(numeric(input.get("lon")));
-                output.row(input, coords, None, *host.borrow_mut())?;
+                let point = match output.options.coordinates.record(&input) {
+                    Ok(point) => point.map(Ok),
+                    Err(error) => Some(Err(error)),
+                };
+                output.row(input, coords, None, point, *host.borrow_mut())?;
             }
             Err(error) => {
                 if matches!(output.format, Format::Json | Format::Ndjson) {
@@ -239,6 +301,7 @@ fn ndjson(
                     input,
                     None,
                     Some(format!("Invalid NDJSON object: {error}")),
+                    None,
                     *host.borrow_mut(),
                 )?;
             }
@@ -264,7 +327,7 @@ fn csv(
         .map_err(|e| Error::Usage(e.to_string()))?
         .clone();
     let unique: std::collections::BTreeSet<_> = headers.iter().collect();
-    if headers.len() < 2 {
+    if headers.len() < 2 && output.options.coordinates.frame.is_none() {
         return Err(Error::Usage("Expected comma-separated CSV with lat/lon columns, or NDJSON objects with lat/lon keys".into()));
     }
     if unique.len() != headers.len()
@@ -277,8 +340,25 @@ fn csv(
         ));
     }
     output.input_fields = headers.iter().map(str::to_owned).collect();
-    let lat = column(&headers, lat_col, &["lat", "latitude"])?;
-    let lon = column(&headers, lon_col, &["lon", "longitude", "lng"])?;
+    let binding = output
+        .options
+        .coordinates
+        .frame
+        .as_ref()
+        .map(|_| output.options.coordinates.bind(&headers))
+        .transpose()?;
+    let legacy = if binding.is_none() {
+        let lat = column(&headers, lat_col, &["lat", "latitude"])?;
+        let lon = column(&headers, lon_col, &["lon", "longitude", "lng"])?;
+        if lat == lon {
+            return Err(Error::Usage(
+                "Two coordinate components cannot bind the same CSV column".into(),
+            ));
+        }
+        Some((lat, lon))
+    } else {
+        None
+    };
     for record in csv.records() {
         match record {
             Ok(record) => {
@@ -289,6 +369,7 @@ fn csv(
                     .collect();
                 let coords = (record.len() == headers.len())
                     .then(|| {
+                        let (lat, lon) = legacy?;
                         record
                             .get(lat)?
                             .parse::<f64>()
@@ -296,12 +377,58 @@ fn csv(
                             .zip(record.get(lon)?.parse::<f64>().ok())
                     })
                     .flatten();
-                output.row(input, coords, None, *host.borrow_mut())?;
+                let point = binding.as_ref().map(|binding| {
+                    if record.len() == headers.len() {
+                        binding.point(&record)
+                    } else {
+                        Err(thereabouts_core::coords::CoordError::InvalidSyntax {
+                            frame: output.options.coordinates.frame.clone().unwrap_or_default(),
+                        })
+                    }
+                });
+                output.row(input, coords, None, point, *host.borrow_mut())?;
             }
             Err(error) => {
                 let input = headers.iter().map(|h| (h.into(), Value::Null)).collect();
-                output.row(input, None, Some(error.to_string()), *host.borrow_mut())?;
+                output.row(
+                    input,
+                    None,
+                    Some(error.to_string()),
+                    None,
+                    *host.borrow_mut(),
+                )?;
             }
+        }
+    }
+    Ok(())
+}
+
+fn nmea(
+    source: &mut Input<'_, '_>,
+    mut line: String,
+    output: &mut Output<'_>,
+    host: &RefCell<&mut dyn Io>,
+) -> Result<()> {
+    if output.options.coordinates.frame.as_deref() != Some("nmea") {
+        return Err(Error::Usage(
+            "--input-format nmea requires --frame nmea".into(),
+        ));
+    }
+    output.input_fields = vec!["value".into()];
+    loop {
+        if !line.trim().is_empty() {
+            let value = line.trim_end_matches(['\r', '\n']);
+            let input = Map::from_iter([("value".into(), Value::String(value.into()))]);
+            let point = output
+                .options
+                .coordinates
+                .record(&input)
+                .map(|v| v.unwrap_or(Value::Null));
+            output.row(input, None, None, Some(point), *host.borrow_mut())?;
+        }
+        line.clear();
+        if source.line(&mut line)? == 0 {
+            break;
         }
     }
     Ok(())

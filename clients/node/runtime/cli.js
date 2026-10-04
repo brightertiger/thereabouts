@@ -72,6 +72,16 @@ async function execute(parsed, io) {
     format =
       o.format ??
       (o.json ? "json" : o.csv ? "csv" : io.stdoutTTY ? "table" : "ndjson");
+  if (parsed.invalid_point) {
+    return withIo(io, () =>
+      module.render(
+        JSON.stringify(parsed.invalid_point),
+        format,
+        o.fields,
+        !!o.strict,
+      ),
+    );
+  }
   if (command === "mcp") {
     if (io !== undefined && !process.stdin)
       throw usage("MCP requires a process host");
@@ -149,6 +159,7 @@ async function execute(parsed, io) {
           geo.handle("core").batch(
             JSON.stringify({
               filename,
+              coordinates: parsed.coordinates,
               lat_col: o["lat-col"] ?? null,
               lon_col: o["lon-col"] ?? null,
               evidence: !!o.evidence,
@@ -165,11 +176,13 @@ async function execute(parsed, io) {
     }
     const result =
       command === "reverse"
-        ? await geo.reverse({
-            lat: Number(o.lat),
-            lon: Number(o.lon),
-            evidence: !!o.evidence,
-          })
+        ? parsed.point
+          ? await geo.reversePoint(parsed.point, { evidence: !!o.evidence })
+          : await geo.reverse({
+              lat: Number(o.lat),
+              lon: Number(o.lon),
+              evidence: !!o.evidence,
+            })
         : await geo[verbs[command]](values[0], {
             evidence: !!o.evidence,
             ...Object.fromEntries(

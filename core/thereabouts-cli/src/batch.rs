@@ -1,6 +1,6 @@
 //! Filesystem adapter for the shared streaming batch policy.
 use crate::{
-    args::{Format, Global},
+    args::{Format, Global, Reverse},
     error::{Error, Result},
     io::Io,
 };
@@ -12,9 +12,9 @@ use thereabouts_core::format::Pack;
 
 pub(crate) fn run(
     file: &str,
-    lat_col: Option<&str>,
-    lon_col: Option<&str>,
+    reverse: &Reverse,
     pack: &Pack,
+    coordinates: &thereabouts_cli_core::coords::Options,
     options: &Global,
     format: Format,
     io: &mut dyn Io,
@@ -30,8 +30,9 @@ pub(crate) fn run(
         pack,
         &thereabouts_cli_core::batch::Options {
             filename: file.into(),
-            lat_col: lat_col.map(str::to_owned),
-            lon_col: lon_col.map(str::to_owned),
+            coordinates: coordinates.clone(),
+            lat_col: reverse.lat_col.clone(),
+            lon_col: reverse.lon_col.clone(),
             evidence: options.evidence,
             strict: options.strict,
             fields: options.fields.clone(),

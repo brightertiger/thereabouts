@@ -39,8 +39,8 @@ global options may appear before or after a command.
 | mcp | none | Optional read-only Python MCP server on stdio |
 
 PACK is core, postal, airports, locode, phone, ip or plates. Names are part of
-core. Reverse coordinates and batch input are mutually exclusive; both
-coordinate flags are required. Negative coordinates are values.
+core. FILE, --point JSON and scalar components are mutually exclusive. Legacy scalar
+reverse requires both --lat and --lon. Frame components are listed below. Negative coordinates are values.
 
 The first line of geocode help is:
 “Finds towns and cities by name. Street addresses are not supported.”
@@ -53,6 +53,138 @@ Plate --series selects a published series, such as historic-geographic.
 Phone requires international E.164 input; --country narrows matching countries
 and does not infer a national dialing plan. Geocode limit defaults to 5 and
 must be between 1 and 100. These context flags mirror library semantics.
+
+## Explicit coordinate frames
+
+Named WGS84 `--lat`/`--lon` remains the default. Metadata never implicitly enables
+frame mode: `--height`, `--height-datum`, `--geoid-separation`, `--accuracy-m`,
+`--hdop`, `--vdop`, `--origin` and `--reference` require an explicit frame or
+belong inside a complete `--point` object. `--point` contains its own frame and
+metadata and cannot be combined with component, frame, metadata or FILE flags.
+All conversion and geographic validation run in Rust. Numeric triples and
+identifiers are never guessed. Frame labels are lower-case.
+
+| Frame | Scalar components after `--frame LABEL` | CSV headers / overrides |
+| --- | --- | --- |
+| geodetic (aliases latlon, lla, llh) | --lat LAT --lon LON; optional --height, --height-datum, --geoid-separation | Existing lat/latitude and lon/longitude/lng aliases; --lat-col, --lon-col; optional height, height_datum, geoid_separation with corresponding --*-col |
+| ecef | --x X --y Y --z Z, metres | Exact x,y,z; --x-col, --y-col, --z-col |
+| enu | --x EAST --y NORTH --z UP --origin JSON | Exact e,n,u; --x-col, --y-col, --z-col map to e,n,u |
+| ned | --x NORTH --y EAST --z DOWN --origin JSON | Exact n,e,d; --x-col, --y-col, --z-col map to n,e,d |
+| utm | --zone Z --hemisphere N\|S (or --band B) --easting E --northing N | zone, hemisphere or band, easting, northing; corresponding --*-col |
+| mgrs, geohash, pluscode, dms, nmea, wkt | --value TEXT; short pluscode also --reference JSON | value; --value-col |
+| h3, s2 | --value HEX_TOKEN | cell; --value-col |
+| geojson | Use --point JSON with coordinates:[lon,lat,height?] | Use NDJSON; CSV is refused |
+
+`--point '{"frame":"ecef","x":6378137,"y":0,"z":0}'` accepts a complete typed
+wire object. Local objects use e/n/u or n/e/d, plus an origin object limited to
+geodetic or ECEF, for example `{"frame":"geodetic","lat":48.8566,"lon":2.3522}`.
+Use hex strings for H3/S2 cell fields in CLI point objects; Node rejects Number
+identifiers to avoid precision loss. An absent origin height is explicitly
+assumed zero for local conversion; no
+other ECEF conversion invents an ellipsoidal height. `llv` is refused because it
+does not specify axis order. `crs:...` and CRS-prefixed WKT are refused with
+GeoReconcile/pyproj guidance. `--frame geojson` uses `--point` or NDJSON rather
+than interpreting --lat as x. There is no --frame-col or mixed-frame CSV.
+
+Common `--accuracy-m`, `--hdop`, `--vdop` flags are uniform for a frame-mode
+file. Optional exact CSV headers accuracy_m, hdop, vdop use --accuracy-col,
+--hdop-col, --vdop-col. Height metadata columns apply to geodetic frame mode.
+Optional columns need not exist unless a --*-col override explicitly names one.
+Each required dimension binds exactly one column, and dimensions cannot share
+a column. UTM zone/hemisphere/band can be uniform scalar flags or row columns;
+supplying the same component both ways is a usage error. Uniform metadata also
+cannot conflict with its column. Origin and plus-code reference are uniform
+JSON flags in CSV; per-row context belongs in NDJSON. Explicit text frames allow
+a single-column CSV, including quoted multiline DMS/NMEA. Raw strings, column
+order and RFC 4180 quoting are retained.
+
+A NDJSON object with frame opts into typed decoding. With no frame it retains
+legacy numeric lat/lon behavior, including unrelated extra columns, unless
+--frame supplies a uniform default. A conflicting row frame is invalid_input;
+aliases compare canonically. --origin and --reference fill missing row context;
+if both row and global context exist, their Rust-normalized values must agree.
+Arbitrary record fields pass through, but only recognized components reach the
+coordinate parser. Extra coordinate-component keys inconsistent with the frame,
+wrong numeric types, missing row components, invalid codes and invalid checksums
+produce invalid_input rows in order. Column flags apply only to CSV. Malformed
+objects retain their raw input. Globally absent/ambiguous headers and malformed
+or conflicting command syntax are usage errors (exit 2); failed rows continue
+and produce exit 5. Geographic scalar errors return invalid_input JSON and exit 2.
+
+### Provenance, heights and uncertainty
+
+Frame-mode results append query after all existing result fields, without
+requiring --evidence. `result.point` remains the H3 query-cell centre; `city.point`
+is the catalogue anchor. `query.normalized` is the exact converted input or the
+decoded representative centre. Legacy reverse, h3, streams, NumPy columns and
+MCP reverse/h3 retain their old behavior. There is no lookup-policy, ranking,
+resolution or pack change. H3 frame requests at r0–r8 call from_h3 at that
+resolution, and r9+ is refused with explicit-parent guidance. Other geocodes
+query their decoded centre, without promising agreement across their footprint.
+
+`query` includes input_frame, declared_frame, normalized, origin, conversion,
+source_height, uncertainty, cell_extent, nmea and error. Options inside query
+serialize as null, conversion is an ordered array, and empty uncertainty has
+three null members. Normalized height is ellipsoidal when known. Unknown/MSL
+height is preserved in source_height; MSL becomes ellipsoidal only with a supplied
+geoid separation. No geoid grid or vertical CRS transform is loaded. Datum labels
+are metadata. HDOP/VDOP stay dimensionless, accuracy_m remains caller-supplied,
+and no uncertainty values are statistically combined or converted into metres.
+Geocode extent is decoded precision, separate from measurement accuracy and
+existing distance_band. `cell_extent.radius_m` is the maximum spherical distance
+(R=6371008.8 m) from the centre to the listed vertices, a footprint summary;
+it is neither a confidence radius nor a guaranteed bound on curved cell edges.
+
+Tables retain their seven summary fields. --fields selects query and its scalar
+paths: input_frame, declared_frame; normalized.lat/lon/height/height_datum/
+geoid_separation; error.code/message; uncertainty.accuracy_m/hdop/vdop;
+source_height.value_m/datum/geoid_separation_m; nmea.talker/sentence/utc/quality/
+satellites; cell_extent.half_lat_deg/half_lon_deg/grid_size_m/radius_m.
+Containers origin, conversion, normalized, source_height, uncertainty, error,
+nmea and cell_extent (including boundary) are selectable too. Run --fields
+for exact dotted spellings. Scalar CSV encodes query as compact JSON. Frame CSV
+reserves nullable thereabouts_query even if its first row fails. Mixed NDJSON
+uses the existing bounded spool prepass to reserve it when any object has frame;
+legacy and malformed rows use null. Pure legacy input gains no query column.
+Streaming JSON/NDJSON may omit query on legacy rows. --fields takes precedence.
+
+### Satnav files
+
+`--input-format nmea --frame nmea` reads one sentence per nonblank line and
+preserves the raw sentence in value. Every sentence requires a valid checksum
+and active fix. Void/bad sentences are failed rows and do not stop the log.
+NMEA is never auto-detected as a log. There is no serial device reader, sentence
+pairing, clock interpolation or download. For example:
+
+```sh
+thereabouts reverse fixes.log --input-format nmea --frame nmea --json
+thereabouts reverse points.csv --frame ecef --x-col X --y-col Y --z-col Z
+thereabouts reverse --frame enu --x -10 --y 20 --z 3 --origin '{"frame":"geodetic","lat":48.8566,"lon":2.3522}'
+thereabouts reverse --frame utm --zone 31 --hemisphere N --easting 500000 --northing 0
+thereabouts reverse --frame wkt --value 'POINT (2.3522 48.8566)' --fields query.normalized
+```
+
+GPX is not read natively. Extract trkpt lat/lon into NDJSON first; retain ele with
+an explicit known or unknown datum and never assume GPX elevation is ellipsoidal.
+One standard-library preprocessing example (adapt the datum only when known):
+
+```python
+import json
+import xml.etree.ElementTree as ET
+
+for _, point in ET.iterparse("track.gpx", events=("end",)):
+    if point.tag.rsplit("}", 1)[-1] != "trkpt":
+        continue
+    row = {"frame": "geodetic", "lat": float(point.attrib["lat"]),
+           "lon": float(point.attrib["lon"])}
+    elevation = next((c for c in point if c.tag.rsplit("}", 1)[-1] == "ele"), None)
+    if elevation is not None and elevation.text is not None:
+        row.update(height=float(elevation.text), height_datum="unknown")
+    print(json.dumps(row))
+    point.clear()
+```
+
+Pipe that output to `thereabouts reverse - --input-format ndjson`.
 
 ## Global options
 
@@ -77,7 +209,7 @@ Use thereabouts --fields to list result paths without query arguments. Available
 paths are status, kind, match, country (code, code3, name), state (code, name),
 city (id, name, name_en, kind, population, point.lat, point.lon), timezone,
 point (lat, lon), cell, distance_band (greater_than_km, at_most_km), candidates,
-rank_basis, hint and evidence. Container paths, including city.point, are also
+rank_basis, hint, evidence and opt-in query metadata (listed below). Container paths, including city.point, are also
 selectable. Selections use literal dotted keys in output, for example
 "city.name". Named field selection and evidence apply to lookup results.
 Data/info output retains its documented structure. --version works at every
@@ -138,10 +270,11 @@ numeric lat/lon must be numbers, not strings or booleans; CSV fields parse as
 floating-point numbers. Out-of-range coordinates produce invalid_input.
 Malformed NDJSON records retain their raw text in an input field.
 
-Input encoding is independent of --format, which selects output. Files ending
+Input --input-format auto|csv|ndjson|nmea is independent of --format, which selects
+output. The default auto retains existing detection: files ending
 in .ndjson or .jsonl (case-insensitive) use NDJSON; otherwise the first nonblank
-line beginning with { or [ selects NDJSON. Other input uses comma-separated CSV. Single-column and semicolon-separated
-input produces a usage error explaining CSV headers and NDJSON objects. Empty input emits no rows (or
+line beginning with { or [ selects NDJSON. Other auto input uses comma-separated CSV. Without --frame, single-column and
+semicolon-separated input produces a usage error explaining CSV headers and NDJSON objects. Empty input emits no rows (or
 {"results": []} with --json).
 
 NDJSON-to-CSV/table needs the union of input keys, in first-seen order, before

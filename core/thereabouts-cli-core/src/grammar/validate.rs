@@ -55,20 +55,7 @@ pub(super) fn run(grammar: &Description, parsed: &Parsed) -> Result<()> {
     }
     match command.arity {
         Arity::Reverse => {
-            let count = parsed.values.len();
-            let lat = options.contains_key("lat");
-            let lon = options.contains_key("lon");
-            if count > 1 || count == 1 && (lat || lon) {
-                return Err(grammar.error("reverse_choice", &[]));
-            }
-            if count == 0
-                && (!lat
-                    || !lon
-                    || options.contains_key("lat-col")
-                    || options.contains_key("lon-col"))
-            {
-                return Err(grammar.error("reverse_required", &[]));
-            }
+            crate::coords::request(options, &parsed.values)?;
         }
         Arity::Many if parsed.values.is_empty() => return Err(grammar.error("install", &[])),
         Arity::Many => (),
