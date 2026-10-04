@@ -9,6 +9,7 @@
 
 ## Client users and maintainers
 
+- [Coordinate frames](clients/coordinates.md) — explicit inputs, origins, heights and query provenance.
 - [CLI contract](clients/cli.md) — command grammar, data store and transport.
 - [Client status](clients/status.md) — generated state, conformance and measurements.
 - [Client release](clients/release.md) — building and releasing Python and Node packages.

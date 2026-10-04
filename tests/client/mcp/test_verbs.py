@@ -24,6 +24,13 @@ def test_every_verb_returns_the_public_json() -> None:
                 {"lat": 48.8566, "lon": 2.3522},
                 geo.reverse(lat=48.8566, lon=2.3522).to_dict(),
             ),
+            (
+                "reverse_point",
+                {"point": {"frame": "ecef", "x": 6378137, "y": 0, "z": 0}},
+                geo.reverse_point(
+                    {"frame": "ecef", "x": 6378137, "y": 0, "z": 0}
+                ).to_dict(),
+            ),
             ("h3", {"cell": "bad"}, geo.from_h3("bad").to_dict()),
             (
                 "geocode",

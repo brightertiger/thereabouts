@@ -9,6 +9,7 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import NDArray
 
+from .coords import Frame, Origin, Point, QueryMetadata, _point_json
 from .forward_queries import ForwardQueries
 from .handles import Handles
 from .results import Result
@@ -56,6 +57,60 @@ class Geocoder(ForwardQueries):
         return Result.from_dict(
             self._handles.get("core").reverse(lat, lon, evidence=evidence)
         )
+
+    def reverse_point(self, point: Point, *, evidence: bool = False) -> Result:
+        """Normalize one explicitly framed point in Rust and retain its provenance."""
+        self._ensure_open()
+        request = _point_json(point)
+        return Result.from_dict(
+            self._handles.get("core").reverse_point(request, evidence=evidence)
+        )
+
+    def reverse_points(
+        self, points: Iterable[Point], *, evidence: bool = False
+    ) -> Iterator[Result]:
+        """Consume framed objects lazily, in order, checking lifetime on every row."""
+        self._ensure_open()
+        for point in points:
+            self._ensure_open()
+            yield self.reverse_point(point, evidence=evidence)
+            self._ensure_open()
+
+    def reverse_frame_columns(
+        self,
+        columns: Mapping[str, NDArray[Any]],
+        *,
+        frame: Frame = "geodetic",
+        origin: Origin | None = None,
+    ) -> dict[str, NDArray[Any]]:
+        """Numeric geodetic/ECEF/ENU/NED columns with immutable per-row queries.
+
+        A height column is ellipsoidal. Use reverse_points for other datums,
+        other frames or heterogeneous origins. Rust copies arrays before detach.
+        """
+        self._ensure_open()
+        if not isinstance(columns, Mapping):
+            raise TypeError("columns must be a mapping of named NumPy arrays")
+        arrays: dict[str, NDArray[Any]] = {}
+        for name, values in columns.items():
+            if not isinstance(name, str) or not isinstance(values, np.ndarray):
+                raise TypeError("columns must contain named NumPy arrays")
+            if values.ndim != 1:
+                raise ValueError("Coordinate columns must be one-dimensional")
+            if values.dtype.kind not in "ifu":
+                raise TypeError(
+                    "Coordinate columns must have numeric, non-boolean dtypes"
+                )
+            arrays[name] = np.asarray(values, dtype=np.float64)
+        result = self._handles.get("core").reverse_frame_columns(
+            arrays,
+            frame=frame,
+            origin_json=None if origin is None else _point_json(origin),
+        )
+        result["query"] = np.array(
+            [QueryMetadata.from_dict(value) for value in result["query"]], dtype=object
+        )
+        return result
 
     def from_h3(self, cell: str, *, evidence: bool = False) -> Result:
         """Find the stored ancestor of a valid H3 cell at resolution zero to eight."""

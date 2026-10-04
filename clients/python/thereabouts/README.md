@@ -63,3 +63,29 @@ phone, ip, plate, data management, info and optional MCP. Install the mcp extra
 to run thereabouts mcp. Table, JSON, NDJSON and CSV output share Rust logic
 with Node. See the repository's docs/clients/cli.md and docs/dataset/pack-format.md for the
 normative contracts, and docs/clients/status.md for coverage and measurements.
+
+## Explicit coordinate frames
+
+`reverse_point(point, *, evidence=False)` accepts discriminated `Point` inputs
+from `thereabouts.coords`; `reverse_points` streams them in order. For example:
+
+```python
+result = geo.reverse_point({"frame": "ecef", "x": 6378137, "y": 0, "z": 0})
+print(result.query.normalized)  # equator/Greenwich
+```
+
+`reverse_frame_columns(columns, *, frame="geodetic", origin=None)` supports
+numeric geodetic/ECEF/ENU/NED arrays and adds a `query` object array of frozen
+metadata. Required components use their canonical names; optional columns are
+ellipsoidal `height` (geodetic), `accuracy_m`, `hdop`, `vdop`. Arrays must be 1D,
+equal length, numeric and nonboolean; strides and empty arrays are supported.
+Use `reverse_points` for other frames/datums or heterogeneous origins.
+
+The old `Point`, top-level exports, signatures, result dictionary keys and
+column APIs retain their meanings. `result.point` is the H3 query-cell centre;
+`city.point` is a catalogue anchor. New `query.normalized` records the input's
+exact/representative location, with origin, heights, conversions, uncertainty
+and decoded footprint available without evidence. Query structures are frozen;
+old results omit query. HDOP is dimensionless; no geoid grid is applied.
+See the [coordinate guide](../../../docs/clients/coordinates.md) for every
+frame, MCP schema, exceptions, H3 limits and GPX preprocessing.

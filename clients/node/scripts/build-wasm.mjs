@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 const root = fileURLToPath(new URL("../../..", import.meta.url));
 const out = path.join(root, "clients/node/pkg");
-const target = path.join(root, "core/target");
+const target = process.env.CARGO_TARGET_DIR
+  ? path.resolve(root, process.env.CARGO_TARGET_DIR)
+  : path.join(root, "core/target");
 mkdirSync(out, { recursive: true });
 function run(executable, args) {
   const result = spawnSync(executable, args, {

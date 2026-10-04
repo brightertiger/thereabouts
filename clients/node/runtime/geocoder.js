@@ -17,6 +17,58 @@ export function freeze(value) {
   }
   return value;
 }
+// Preserve invalid optional numbers through JSON: null would erase them.
+const invalidNumber = Object.freeze({ __thereabouts_invalid_number__: true });
+function coordinateValue(value, key = "", frame, depth = 0) {
+  if (depth > 16) return invalidNumber;
+  if (key === "cell") {
+    if (typeof value === "number") return invalidNumber;
+    if (typeof value === "bigint") {
+      if (value < 0n || value > 0xffffffffffffffffn) return invalidNumber;
+      const hex = value.toString(16);
+      // S2 tokens are right-padded when decoded; preserve all 64 integer bits.
+      return frame === "s2" ? hex.padStart(16, "0") : hex;
+    }
+  }
+  if (typeof value === "number")
+    return Number.isFinite(value) ? value : invalidNumber;
+  if (value === null || typeof value === "string") return value;
+  if (Array.isArray(value))
+    return value.map((item) => coordinateValue(item, "", frame, depth + 1));
+  if (value && typeof value === "object") {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null)
+      return invalidNumber;
+    return Object.fromEntries(
+      Object.entries(value).map(([name, item]) => [
+        name,
+        coordinateValue(item, name, value.frame, depth + 1),
+      ]),
+    );
+  }
+  return invalidNumber;
+}
+function coordinateRequest(point) {
+  if (
+    !point ||
+    typeof point !== "object" ||
+    Array.isArray(point) ||
+    ![Object.prototype, null].includes(Object.getPrototypeOf(point))
+  )
+    throw new TypeError("Use a named coordinate object with an explicit frame");
+  return JSON.stringify(coordinateValue(point));
+}
+function coordinateEvidence(options) {
+  if (!options || typeof options !== "object" || Array.isArray(options))
+    throw new TypeError("Query options must be an object");
+  for (const key of Object.keys(options))
+    if (key !== "evidence")
+      throw new TypeError(`Unknown reversePoint option: ${key}`);
+  const { evidence = false } = options;
+  if (typeof evidence !== "boolean")
+    throw new TypeError("evidence must be boolean");
+  return evidence;
+}
 const families = {
   h3: "core",
   geocode: "core",
@@ -138,6 +190,27 @@ export class Geocoder {
       );
     } catch (e) {
       throw convert(e);
+    }
+  }
+  async reversePoint(point, options = {}) {
+    if (this.#closed) throw new ClosedGeocoderError();
+    const request = coordinateRequest(point);
+    const evidence = coordinateEvidence(options);
+    try {
+      return freeze(
+        JSON.parse(this.handle("core").reversePoint(request, evidence)),
+      );
+    } catch (e) {
+      throw convert(e);
+    }
+  }
+  async *reversePoints(points, options = {}) {
+    if (this.#closed) throw new ClosedGeocoderError();
+    coordinateEvidence(options);
+    for await (const point of points) {
+      if (this.#closed) throw new ClosedGeocoderError();
+      yield this.reversePoint(point, options);
+      if (this.#closed) throw new ClosedGeocoderError();
     }
   }
   #query(verb, text, options = {}) {

@@ -108,3 +108,25 @@ pub(crate) fn encode(py: Python<'_>, value: &LookupResult) -> PyResult<Py<PyAny>
     }
     Ok(dict.into_any().unbind())
 }
+
+/// Keep legacy omission rules and append only the new serialized query object.
+pub(crate) fn encode_point(
+    py: Python<'_>,
+    value: &thereabouts_core::coords::PointResult,
+) -> PyResult<Py<PyAny>> {
+    let result = encode(py, &value.result)?;
+    result
+        .bind(py)
+        .downcast::<PyDict>()?
+        .set_item("query", encode_query(py, &value.query)?)?;
+    Ok(result)
+}
+
+pub(crate) fn encode_query(
+    py: Python<'_>,
+    value: &thereabouts_core::coords::QueryMetadata,
+) -> PyResult<Py<PyAny>> {
+    let value = serde_json::to_value(value)
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
+    crate::value_to_python(py, &value)
+}

@@ -1,4 +1,5 @@
 //! Node supplies positioned IO; WASM owns pack admission, lookups and CLI policy.
+mod coords;
 mod host;
 mod query;
 use std::sync::Arc;
@@ -77,6 +78,11 @@ impl Geocoder {
                 .reverse(lat, lon, evidence)
                 .map_err(core_error)?,
         )
+    }
+    /// Normalize explicit coordinates while preserving conversion provenance.
+    #[wasm_bindgen(js_name = reversePoint)]
+    pub fn reverse_point(&self, request: &str, evidence: bool) -> Result<String, JsValue> {
+        json(&coords::reverse(self.get()?, request, evidence).map_err(core_error)?)
     }
     /// Typed dispatch of one explicit forward verb or H3 cell.
     pub fn query(&self, request: &str) -> Result<String, JsValue> {

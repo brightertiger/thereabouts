@@ -211,3 +211,30 @@ pub(crate) fn forward(
     }
     Ok(dict)
 }
+
+/// Normalize and look up numeric rows in one detached loop without JSON strings.
+pub(crate) fn points(
+    py: Python<'_>,
+    count: usize,
+    lookup: impl Fn(usize) -> Result<thereabouts_core::coords::PointResult> + Send,
+) -> PyResult<Bound<'_, PyDict>> {
+    let (rows, queries) = py
+        .detach(move || {
+            let mut rows = Columns::new(count);
+            let mut queries = Vec::with_capacity(count);
+            for index in 0..count {
+                let row = lookup(index)?;
+                rows.push(&row.result)?;
+                queries.push(row.query);
+            }
+            Ok::<_, Error>((rows, queries))
+        })
+        .map_err(|e| crate::error(py, &e))?;
+    let result = encode(py, rows)?;
+    let queries = queries
+        .iter()
+        .map(|query| crate::result::encode_query(py, query))
+        .collect::<PyResult<Vec<_>>>()?;
+    result.set_item("query", PyArray1::from_vec(py, queries))?;
+    Ok(result)
+}

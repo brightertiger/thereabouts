@@ -2,15 +2,17 @@
 
 from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, cast
 
 from mcp.server import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
-from pydantic import StrictFloat
+from pydantic import StrictBool, StrictFloat
 
+from ..coords import Point as CoordinatePoint
 from ..errors import GeocoderError
 from ..geocoder import Geocoder
+from .coords import Point
 
 READ_ONLY = ToolAnnotations(
     read_only_hint=True,
@@ -51,6 +53,19 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
         """Find geographic context for explicit latitude and longitude."""
         with tool_errors():
             return geo.reverse(lat=lat, lon=lon, evidence=evidence).to_dict()
+
+    @server.tool(annotations=READ_ONLY)
+    def reverse_point(point: Point, evidence: StrictBool = False) -> dict[str, Any]:
+        """Find context for an explicit frame; preserve normalized query provenance.
+
+        ENU/NED require an origin. Heights are metres, HDOP/VDOP dimensionless.
+        Cell formats return centre context plus a footprint, not area consensus.
+        """
+        with tool_errors():
+            return geo.reverse_point(
+                cast(CoordinatePoint, point.model_dump(exclude_unset=True)),
+                evidence=evidence,
+            ).to_dict()
 
     @server.tool(annotations=READ_ONLY)
     def h3(cell: str, evidence: bool = False) -> dict[str, Any]:
