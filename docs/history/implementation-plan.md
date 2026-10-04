@@ -2,14 +2,14 @@
 > cell-centre table for city, state and country, accepting quantization error.
 > Polygons and nearest-settlement searches are build/test tools only; runtime
 > uses H3 and NumPy. This supersedes the runtime architecture and public contract
-> below. See [the implemented table design](DESIGN.md) and the dated
-> measurements in [EVALUATION.md](EVALUATION.md). The original plan follows unchanged.
+> below. See [the implemented table design](../DESIGN.md) and the dated
+> measurements in [EVALUATION.md](h3-table-evaluation.md). The original plan follows unchanged.
 
 # Implementation plan: offline administrative containment and settlement context
 
 Build a Python package whose default answer describes the **original coordinate**: containing country/admin1, plus a separate nearest settlement and its distance. Use a coarse H3 index to accelerate administrative containment only if it beats a direct polygon spatial index on the target workload. Boundary cells must retain original-point polygon checks. Do not materialize a global fine-resolution cell-to-city table.
 
-This is a plan, not an implemented library. The experiments and evidence are in [EVALUATION.md](EVALUATION.md). All sizes and performance numbers below are **estimates [E] or proposed acceptance targets**, unless identified as **measured [M]** or **looked up [L]**. Numeric type widths, API defaults and milestone identifiers are design specifications, not measured findings.
+This is a plan, not an implemented library. The experiments and evidence are in [EVALUATION.md](h3-table-evaluation.md). All sizes and performance numbers below are **estimates [E] or proposed acceptance targets**, unless identified as **measured [M]** or **looked up [L]**. Numeric type widths, API defaults and milestone identifiers are design specifications, not measured findings.
 
 The recommended initial data product is a **cartographic global pack** from Natural Earth administration/land and GeoNames settlements. Its answers are exact only relative to that snapshot's geometry and policies. Higher-detail regional gbOpen packs come after validation. Packaging, data provenance and explicit semantics are the product; H3 is replaceable.
 
@@ -141,7 +141,7 @@ Behavior to specify before implementation:
 
 | Input | Initial role | Acquisition and policy |
 | --- | --- | --- |
-| Natural Earth countries, admin1 and land | Small global cartographic reference and initial pack | Pin archive checksums and actual versions, starting from the [measured sources](EVALUATION.md#protocol-and-meaning-of-ground-truth). Record default worldview and territories separately from sovereign states. Public domain. |
+| Natural Earth countries, admin1 and land | Small global cartographic reference and initial pack | Pin archive checksums and actual versions, starting from the [measured sources](h3-table-evaluation.md#protocol-and-meaning-of-ground-truth). Record default worldview and territories separately from sovereign states. Public domain. |
 | GeoNames cities1000, countryInfo, admin1CodesASCII, featureCodes | Settlement catalog and readable metadata | Pin daily snapshots. Preserve stable GeoNames IDs, Unicode names, feature codes and original admin codes. Retain named administrative seats according to the source selection. Explicitly record that small villages are omitted. [Download schema](https://download.geonames.org/export/dump/readme.txt) |
 | geoBoundaries gbOpen ADM0/ADM1 | Higher-detail pilot, then optional regional packs | Use [API metadata](https://www.geoboundaries.org/api.html), pin returned content hashes and boundary validity years. Review per-source licenses and contested overlaps before joining country files. Do not treat `current` as a reproducible version. |
 | Optional municipal/hydrography/OSM layers | Future country-specific capabilities | Keep out of the initial global pack. Require separate semantics, license manifests, sizes and accuracy reports before adding them. |
