@@ -1,94 +1,129 @@
 # Client state — 0.1.0 release draft
 
-## Coordinate clients — 2026-10-05 qualification
+## Coordinate clients — merged-tree qualification, 2026-10-05
 
-Implemented in `wp/coords-clients`: explicit Python scalar/stream/numeric-column
-APIs, PyO3/WASM adapters, Node scalar/stream APIs and discriminated declarations,
-strict read-only MCP `reverse_point`, frozen query metadata, and the
-`CARGO_TARGET_DIR` build-script correction. All coordinate maths remains in
-`thereabouts_core::coords`; legacy APIs and `result.Point` are unchanged. See
-[coordinate inputs](coordinates.md) and the [offline build recipe](release.md).
+Merged `feat/coordinate-frames` into `wp/coords-clients` with the authorized merge
+commit `142944a` (parents `781ee87`, `53461f6`), without conflicts. The native Rust
+coordinate module and all 380 shared vectors now live in this worktree. Removed
+the contract-only workspace, prior real-core snapshot, Python import placeholder,
+and Node fake geocoder/build-tool facades. Node adapter tests now open real WASM
+geocoders. A new MCP test exercises every shared vector. No fallback conversion
+implementation is shipped; all coordinate maths and domain validation remain in
+`thereabouts_core::coords`.
 
-**Integration is blocked in this worktree.** Its production core still lacks
-`pub mod coords` and `tests/fixtures/coordinates/vectors.json`. Those files are
-owned by coords-core and were not edited/copied into production here. The two
-planning-worktree document paths no longer exist; the frozen design in this
-checkout and `thereabouts-work/reports/coords-plan-notes.md` supplied the same
-contract. No planning/vocabulary file was edited.
+Python scalar/stream/numeric-column APIs, PyO3/WASM bindings, Node scalar/stream
+APIs and discriminated types, strict read-only MCP `reverse_point`, immutable
+query metadata, and the `CARGO_TARGET_DIR` build fix are integrated. Default
+named WGS84 reverse, legacy result keys, H3 ancestor lookup and `result.Point`
+semantics remain unchanged. Input provenance and uncertainty are available
+without evidence; decoded extent remains separate from measurement accuracy.
+See [coordinate inputs](coordinates.md) and [offline builds](release.md).
 
-| Gate actually run | Outcome |
+### Contract drift
+
+None found in the landed Rust signatures, public types, error variants, error
+codes or pinned diagnostics. No binding production changes were required after
+the merge. MCP intentionally rejects transport shapes before calling Rust; this
+is the original contract, not drift. The fixed vocabulary remains unchanged:
+cell precision is reported as extent, not measurement uncertainty, and frames
+are explicit. The absent planning-worktree paths were previously reported;
+implementation used the reproduced version-one contract.
+
+### Gates actually run on the merged tree
+
+All Cargo gates used Rust 1.99.0, offline/locked modes, one build job and the
+prescribed shared target. Local commands were sequential; the first Rust build
+waited for an active sibling build. Logs and a direct-core oracle are retained
+under `.cache/coords-integration/`.
+
+| Gate | Actual outcome |
 | --- | --- |
-| `cargo fmt --check` from core | Passed |
-| Required clippy, WASM cargo test, wasm32 cargo check | Blocked: unresolved `thereabouts_core::coords` in production core |
-| `cargo test --offline --locked -p thereabouts-py` | Exit 0; this crate has no Rust test/doctest harness, so this is not extension validation |
-| Offline uv sync into `.cache/coords-venv` | Passed; CPython 3.12.8, cached dependencies only |
-| Normal offline `maturin develop --locked --uv` | Blocked by missing production core module; inherited CONDA_PREFIX also required unsetting |
-| Root `pytest tests/client/core tests/client/mcp` | 154 passed, 1 failed: missing core-owned `coordinates/vectors.json`; using an earlier locally built real-core snapshot |
-| Ruff check/format on touched Python; strict mypy | Passed; mypy checked 19 files including new tests |
-| `npm ci --offline --ignore-scripts --no-audit --no-fund` | Blocked: `ENOTCACHED` for `undici-7.30.0.tgz` |
-| `npm run check`, `npm run format` | Passed using already-installed TypeScript 5.9.3 / Prettier 3.6.2 via PATH; this does not establish npm-ci success |
-| Python adapter/schema-only tests with test-local import placeholder | 51 passed; not native conversion evidence |
-| Initial contract-only scratch clippy | Passed after binding fixes; stub bodies were never used as conversion evidence |
+| `cargo fmt --check` | Passed |
+| Workspace `cargo clippy --offline --locked --all-targets --all-features -- -D warnings` | Passed |
+| `cargo test --offline --locked -p thereabouts-core -p thereabouts-py -p thereabouts-wasm` | 82 core tests passed, 0 failures; WASM has 0 native tests; PyO3 disables Rust test/doctest harnesses |
+| wasm32 check: core, CLI-core, WASM | Passed |
+| Offline locked uv sync and `maturin develop --offline --locked --uv` | Passed in this worktree's `.cache/coords-venv`; inherited CONDA_PREFIX unset |
+| Editable import verification | Both Python package and freshly built `_core.abi3.so` resolve under this worktree's `clients/python/thereabouts` |
+| `pytest tests/client/core tests/client/mcp` | 156 passed, 0 failed |
+| `pytest tests/client/cli/test_vectors.py tests/client/cli/test_legacy.py` | 10 passed, 0 failed; current CLI golden JSON and legacy mappings |
+| Ruff check / format check on touched Python | Passed |
+| Strict mypy on clients/python and coordinate/MCP tests | Passed: 19 files |
+| `npm ci --offline --ignore-scripts --no-audit --no-fund` | Blocked: `ENOTCACHED`, missing `undici-7.30.0.tgz` |
+| Real offline `npm run build` | Passed; script used the prescribed target for Cargo and wasm-bindgen |
+| Non-network Node tests, nine explicit files, concurrency 1 | Initial root run: 53 passed, 5 environment failures; all four coordinate tests passed |
+| Native-comparison Node recheck with real environment alias under `.cache` | 7 passed, 0 failed, including all five initially blocked tests; 58 distinct non-network tests passed across both runs |
+| `npm run check` / `npm run format` | Passed |
 
-For provisional integration, `.cache/coords-real` contains a byte-recorded copy
-of the sibling core's real Rust implementation and its then-current 380 vectors,
-plus these client bindings. It retains the existing manifests, lockfile and path
-dependencies. An offline maturin develop built a fresh native extension from
-that copy into this worktree's own editable environment; both import paths were
-verified here (`clients/python/thereabouts`, including `_core.abi3.so`). No
-extension from another checkout was reused. The test-local import placeholder
-was absent during every native test. Snapshot source/fixture hashes and logs
-are retained in `.cache/coords-results/real-snapshot.json` and adjacent logs.
+Node used the already-installed matching undici 7.30.0, TypeScript 5.9.3 and
+Prettier 3.6.2 through local ignored links/PATH; this does not qualify npm-ci.
+The five Node failures are existing native-comparison tests in `grammar.test.js`
+(four) and `lease.test.js` (one), which hard-code `.venv/bin/thereabouts` and
+receive an absent-executable result. The required editable installation instead
+lives in `.cache/coords-venv`. These test files are outside this package's
+ownership and remain unchanged. All seven tests in those two files subsequently
+passed using byte-identical copies under `.cache/coords-integration/native-node-check`,
+with its `.venv` alias pointing to the actual `.cache/coords-venv` and runtime/pkg
+links pointing to this merged worktree. Copy hashes are recorded beside the logs.
+No facade or skipped assertion was substituted. The original root invocation
+still needs its environment path fixed by the test owner; it is not reported as
+a passing root-suite run. Coordinate parity explicitly uses this worktree's native Python interpreter.
 
-The refreshed real snapshot passed **155 core/MCP tests**, including all 380
-shared vectors at their recorded tolerances. Longitude comparisons use the
-core fixture runner's wrapped angular difference; no tolerance or fixture was
-changed. H3 cases compare with the legacy `from_h3` path at their original
-resolutions. The fresh WASM snapshot passed **13 non-network Node tests**
-(`coordinates.test.js` and `library.test.js`), including native-Python
-schema/status/cell/error and normalized-value parity across all 380 vectors.
-The build-script facade checks both absolute and relative target paths against
-the same shared target; it builds no second target tree. Final TypeScript checks
-also reject mixed component sets when the default frame is omitted.
+The full `npm test` command was not run: `install.test.js` and `stall.test.js`
+use loopback HTTP, forbidden by the no-network rule. Node 23.10.0 was the only
+installed version found, so all Node results remain provisional for the supported
+Node 22/24 matrix. No remote CI, cross-platform wheels, network, pipeline or
+publication ran. Pipeline-importing tests, including
+`tests/client/forward/test_plates.py`, were excluded from collection.
 
-These results qualify only the recorded snapshot, not a combined production
-source tree. At the final audit the original sibling worktree path was no
-longer present; the tested copy and its hashes remain in this worktree's cache.
-The production Rust gates, fresh editable build, Python suite and WASM checks
-must run again after coordinated integration of the final core and CLI packages.
-CLI source was not changed by this package. Shared-reference authority gaps remain with coords-core: the
-snapshot records unauthenticated publication/edition and missing independent
-MGRS/OLC oracle evidence; client tests do not promote these to verified sources.
+### Shared fixtures and compatibility
 
-Full `npm test` was not run: npm provisioning is blocked and the suite includes
-loopback HTTP, forbidden by this task's no-network constraint. Only Node
-**23.10.0** was available; no Node 22/24 matrix, remote CI, cross-platform wheel,
-publication or deployment was run. Python tests were limited to core/MCP;
-`tests/client/forward/test_plates.py` and all pipeline tests were excluded.
-No conversion dependency was installed. No new vocabulary defect was found;
-the documented explicit-label and geodetic-pole-origin caveats remain in force.
+A scratch Rust probe linked the actual merged-tree core and existing serde_json
+artifacts, without a manifest or dependency change, and called
+`coords::reverse_value` directly for all 380 vectors. Every Python public result
+matched that direct Rust result exactly, including normalized points, conversion
+lists, error codes, status and schema. WASM matched native Python for all 380
+vectors: exact schema/status/cell/codes/conversions and fixture-owned numeric
+tolerances for normalized points. MCP returned identical public JSON for all
+372 schema-admitted vectors and validation errors for the remaining eight.
+No shared fixture or tolerance was edited. Strided/empty/bool numeric columns,
+nonfinite optional numbers, bigint precision, frozen nested metadata, H3 r0/r8/r9,
+backpressure, ordering and close-during-iteration tests passed.
+
+A retained pre-coordinate WASM artifact and original runtime source supplied
+the compatibility baseline only. The freshly built merged WASM produced identical
+bytes for **348 legacy reverse/H3 API JSON results** and **1,392 CLI outputs**
+(JSON, NDJSON, CSV and table, evidence on/off) across the two core fixture packs.
+Exit codes and stderr also matched. The 10 native CLI tests above independently
+validated committed golden JSON and the original legacy status mappings. No
+baseline artifact was used as current coordinate-conversion evidence.
+
+Independent reference gaps remain as recorded by
+[coords-core](../../tests/fixtures/coordinates/README.md): authenticated publication
+editions, independent MGRS lettering/upstream OLC tests, and a published surveyed
+station with realization/epoch. Passing client parity does not close those gates.
+CLI frame-input integration remains a separate package; its source was not edited.
 
 ### Measured coordinate artifact sizes
 
-Both builds used Rust/cargo 1.99.0, wasm32-unknown-unknown release mode,
-wasm-bindgen 0.2.129 and one Cargo job on the prescribed shared target. Before:
-original production sources. After: the recorded real-core snapshot with these
-bindings. gzip is Python gzip level 9 with mtime zero. Payload is the sum of the
-Node whitelist's runtime/bin/pkg files, declarations, README, package.json and
-licence; it excludes node_modules and tar headers. No npm pack/publish occurred.
+Before is the previously measured original production WASM; after is the fresh
+merged-tree release build. Both used Rust/cargo 1.99.0,
+wasm32-unknown-unknown, wasm-bindgen 0.2.129 and the shared target. gzip uses Python
+level 9 with mtime zero. Payload sums runtime/bin/pkg files, declarations, README,
+package.json and licence, excluding node_modules and tar headers. No npm pack ran.
 
-| Bytes | Before | After (provisional real snapshot) |
+| Bytes | Before | After (merged tree) |
 | --- | ---: | ---: |
-| Generated WASM raw | 2,535,600 | 2,650,099 |
-| Generated WASM gzip | 877,775 | 923,595 |
+| Generated WASM raw | 2,535,600 | 2,648,112 |
+| Generated WASM gzip | 877,775 | 922,714 |
 | Node source payload | 65,593 | 73,593 |
-| Node payload including generated pkg | 2,640,902 | 2,765,075 |
+| Node payload including generated pkg | 2,640,902 | 2,763,088 |
 
-Disk started at 38 GiB free and remained above the 5 GiB floor; the final check
-reported 35 GiB free. No shared-target cleanup or second target was used. All
-source changes are within the package's owned paths. Scratch, environment and
-snapshot outputs are local/ignored. Changes are uncommitted; nothing was
-pushed, tagged, published, deployed or merged.
+Python was CPython 3.12.8; Node was 23.10.0. Disk started at 35 GiB free and the
+post-build measurement was 37,635,682,304 bytes free (35.05 GiB), above the 5 GiB
+floor. No second target or target cleanup was used. Apart from the explicitly
+authorized merge importing core-owned files, source edits remain in owned paths.
+The merge is the only new commit; follow-up test/documentation changes are
+uncommitted. Nothing was pushed, tagged, published or deployed.
 
 ## Previously recorded release baseline
 

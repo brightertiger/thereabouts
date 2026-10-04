@@ -1,6 +1,7 @@
 """Strict MCP transport errors remain distinct from coordinate-domain results."""
 
 import asyncio
+import json
 from pathlib import Path
 from typing import Any
 
@@ -126,6 +127,35 @@ def test_mcp_coordinate_json_inventory_and_errors() -> None:
                 "reverse_point", {"point": {"lat": 0, "lon": 0}}
             )
             assert closed.is_error and "closed_geocoder" in str(closed.content)
+
+    with Geocoder(SAMPLE) as geo:
+        asyncio.run(check(geo))
+
+
+def test_shared_vectors_through_mcp() -> None:
+    vectors = json.loads((SAMPLE.parents[1] / "coordinates/vectors.json").read_text())
+
+    async def check(geo: Geocoder) -> None:
+        accepted = rejected = 0
+        async with Client(create_server(geo)) as client:
+            for vector in vectors["cases"]:
+                point = vector["input"]
+                try:
+                    ADAPTER.validate_python(point)
+                except ValidationError:
+                    rejected += 1
+                    response = await client.call_tool("reverse_point", {"point": point})
+                    assert response.is_error, vector["id"]
+                else:
+                    accepted += 1
+                    response = await client.call_tool("reverse_point", {"point": point})
+                    assert not response.is_error, vector["id"]
+                    assert (
+                        response.structured_content
+                        == geo.reverse_point(point).to_dict()
+                    ), vector["id"]
+        assert accepted + rejected == len(vectors["cases"])
+        assert accepted > 0 and rejected > 0
 
     with Geocoder(SAMPLE) as geo:
         asyncio.run(check(geo))

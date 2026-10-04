@@ -9,63 +9,35 @@ import { wasm } from "../runtime/wasm.js";
 import { FIXTURES, assertResult } from "./helpers.js";
 
 const pack = path.join(FIXTURES, "packs/core-sample");
-const invalidNumber = { __thereabouts_invalid_number__: true };
-function facade() {
-  const calls = [];
-  const handle = {
-    reversePoint(request, evidence) {
-      calls.push({ request: JSON.parse(request), evidence });
-      return JSON.stringify({
-        query: {
-          conversion: [],
-          uncertainty: { hdop: 0.9 },
-          cell_extent: { boundary: [{ lat: 1, lon: 2 }] },
-        },
-      });
-    },
-    free() {},
-  };
-  return {
-    calls,
-    geo: new Geocoder(
-      { Geocoder: { open: () => handle } },
-      { core: pack },
-      false,
-    ),
-  };
-}
-
-test("adapter preserves invalid optional numbers and lossless cell integers", async () => {
-  const { geo, calls } = facade();
-  for (const value of [NaN, Infinity, -Infinity, true, false, 1n]) {
-    await geo.reversePoint({
-      lat: 0,
-      lon: 0,
-      height: value,
-      geoid_separation: value,
-      uncertainty: { accuracy_m: value, hdop: value, vdop: value },
-    });
-    const { request } = calls.at(-1);
-    assert.deepEqual(request.height, invalidNumber);
-    assert.deepEqual(request.geoid_separation, invalidNumber);
-    for (const item of Object.values(request.uncertainty))
-      assert.deepEqual(item, invalidNumber);
+test("native preserves lossless cell integers and rejects invalid identifiers", async () => {
+  const geo = await Geocoder.open({ pack });
+  try {
+    for (const [frame, cell] of [
+      ["h3", 0x881fb46625fffffn],
+      ["s2", 1n],
+      ["s2", 0x89c2500000000001n],
+    ]) {
+      const hex =
+        frame === "s2"
+          ? cell.toString(16).padStart(16, "0")
+          : cell.toString(16);
+      const result = await geo.reversePoint({ frame, cell });
+      assert.equal(result.query.error, null);
+      assert.deepEqual(result, await geo.reversePoint({ frame, cell: hex }));
+    }
+    for (const frame of ["h3", "s2"])
+      for (const cell of [0x881fb46625fffff, -1n, 1n << 64n]) {
+        const result = await geo.reversePoint({ frame, cell });
+        assert.equal(result.status, "invalid_input");
+        assert.equal(result.query.error.code, "invalid_type");
+      }
+  } finally {
+    await geo.close();
   }
-  await geo.reversePoint({ frame: "h3", cell: 0x881fb46625fffffn });
-  assert.equal(calls.at(-1).request.cell, "881fb46625fffff");
-  await geo.reversePoint({ frame: "s2", cell: 1n });
-  assert.equal(calls.at(-1).request.cell, "0000000000000001");
-  await geo.reversePoint({ frame: "s2", cell: 0x89c2500000000001n });
-  assert.equal(calls.at(-1).request.cell, "89c2500000000001");
-  for (const cell of [0x881fb46625fffff, -1n, 1n << 64n]) {
-    await geo.reversePoint({ frame: "s2", cell });
-    assert.deepEqual(calls.at(-1).request.cell, invalidNumber);
-  }
-  await geo.close();
 });
 
 test("adapter rejects API shapes, freezes metadata and preserves backpressure/lifetime", async () => {
-  const { geo, calls } = facade();
+  const geo = await Geocoder.open({ pack });
   for (const point of [[1, 2, 3], null, 1, new Date()])
     await assert.rejects(geo.reversePoint(point), TypeError);
   await assert.rejects(
@@ -82,7 +54,11 @@ test("adapter rejects API shapes, freezes metadata and preserves backpressure/li
     try {
       for (let i = 0; i < 3; i++) {
         seen.push(i);
-        yield { lat: i, lon: 0 };
+        yield {
+          frame: "h3",
+          cell: "881fb46625fffff",
+          uncertainty: { hdop: 0.9 },
+        };
       }
     } finally {
       released = true;
@@ -92,7 +68,7 @@ test("adapter rejects API shapes, freezes metadata and preserves backpressure/li
   assert.deepEqual(seen, []);
   const { value: result } = await stream.next();
   assert.deepEqual(seen, [0]);
-  assert.equal(calls[0].evidence, true);
+  assert.ok(result.evidence);
   assert.throws(() => result.query.conversion.push("guessed"), TypeError);
   assert.throws(() => {
     result.query.uncertainty.hdop = 1;
@@ -127,7 +103,7 @@ test("native framed results preserve old keys, exact input and uncertainty", asy
     assert.deepEqual(query.uncertainty, input.uncertainty);
     assert.equal(result.evidence, undefined);
     assert.ok((await geo.reversePoint(input, { evidence: true })).evidence);
-    for (const value of [NaN, Infinity, -Infinity, true, "1"]) {
+    for (const value of [NaN, Infinity, -Infinity, true, false, "1", 1n]) {
       for (const field of [
         "height",
         "geoid_separation",
@@ -345,61 +321,5 @@ test("shared vectors cover every frame in WASM and agree with native Python", as
       assert.ok(frames.has(frame));
   } finally {
     await geo.close();
-  }
-});
-
-test("adapter build script uses the supplied target for cargo and bindgen", (t) => {
-  const root = path.resolve(FIXTURES, "../..");
-  const cache = path.join(root, ".cache");
-  fs.mkdirSync(cache, { recursive: true });
-  const scratch = fs.mkdtempSync(path.join(cache, "coords-build-script-"));
-  t.after(() => fs.rmSync(scratch, { recursive: true, force: true }));
-  const script = path.join(scratch, "clients/node/scripts/build-wasm.mjs");
-  fs.mkdirSync(path.dirname(script), { recursive: true });
-  fs.copyFileSync(
-    new URL("../scripts/build-wasm.mjs", import.meta.url),
-    script,
-  );
-  const bin = path.join(scratch, "bin");
-  fs.mkdirSync(bin);
-  const fake = path.join(bin, "cargo");
-  fs.writeFileSync(
-    fake,
-    `#!${process.execPath}\nconst fs = require("node:fs"); fs.appendFileSync(process.env.COORDS_TEST_LOG, JSON.stringify({target: process.env.CARGO_TARGET_DIR, args: process.argv.slice(2)}) + "\\n");\n`,
-    { mode: 0o755 },
-  );
-  // The subprocess tools are facades; no target tree is built here.
-  const target = process.env.CARGO_TARGET_DIR ?? path.join(scratch, "target");
-  const absolute = path.resolve(root, target);
-  for (const supplied of [absolute, path.relative(scratch, absolute)]) {
-    const log = path.join(scratch, "calls.jsonl");
-    fs.writeFileSync(log, "");
-    const child = spawnSync(process.execPath, [script], {
-      cwd: root,
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        PATH: `${bin}${path.delimiter}${process.env.PATH}`,
-        CARGO_TARGET_DIR: supplied,
-        WASM_BINDGEN: fake,
-        COORDS_TEST_LOG: log,
-      },
-    });
-    assert.equal(child.status, 0, child.stderr);
-    const calls = fs
-      .readFileSync(log, "utf8")
-      .trim()
-      .split("\n")
-      .map(JSON.parse);
-    assert.equal(calls.length, 2);
-    assert.equal(calls[0].target, absolute);
-    assert.equal(calls[1].target, absolute);
-    assert.equal(
-      calls[1].args.at(-1),
-      path.join(
-        absolute,
-        "wasm32-unknown-unknown/release/thereabouts_wasm.wasm",
-      ),
-    );
   }
 });
