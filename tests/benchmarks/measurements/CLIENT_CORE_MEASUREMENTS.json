@@ -47,7 +47,7 @@
   },
   "peak_rss_bytes": 125616128,
   "historical_reader": {
-    "source": "client status at 3ade5da; historical read_path benchmark",
+    "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
     "workload": "synthetic 308032 cells / 4176 places; not the real sample",
     "cython_scalar_median_us": 10.291,
     "python_scalar_median_us": 12.75,
@@ -180,7 +180,7 @@
     },
     "peak_rss_bytes": 300318720,
     "historical_reader": {
-      "source": "client status at 3ade5da; historical read_path benchmark",
+      "source": "CLIENT_STATUS.md at 3ade5da; benchmarks.read_path",
       "workload": "synthetic 308032 cells / 4176 places; not the real sample",
       "cython_scalar_median_us": 10.291,
       "python_scalar_median_us": 12.75,

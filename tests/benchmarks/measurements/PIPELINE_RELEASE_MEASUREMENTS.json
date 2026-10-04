@@ -668,7 +668,7 @@
           "independent": [],
           "parts": {},
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "GB": {
           "footprints": [
@@ -716,7 +716,7 @@
           "independent": [],
           "parts": {},
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "ID": {
           "footprints": [
@@ -804,7 +804,7 @@
             "city:overture:f5387dd2-a84c-4a89-acbf-ff25294745b4": "city:geonames:1261227"
           },
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "JP": {
           "footprints": [
@@ -844,7 +844,7 @@
           ],
           "parts": {},
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "MY": {
           "footprints": [
@@ -859,7 +859,7 @@
           ],
           "parts": {},
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "TR": {
           "alias_evidence": "Typed municipal localities Sivas Belediyesi, K\u0131r\u0131kkale Belediyesi and Isparta Belediyesi: exact city name plus municipality suffix, anchors within 500 m, retained source polygons. Government labels name the city for this product.",
@@ -882,7 +882,7 @@
           "independent": [],
           "parts": {},
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         },
         "US": {
           "container_terms": [
@@ -909,7 +909,7 @@
             "city:geonames:5139568": "city:geonames:5128581"
           },
           "reason": "Owner city convention: absorb city parts; retain separate neighbouring cities. Pinned source identities make the convention reproducible.",
-          "reference": "docs/pipeline/city-policy.md#city-granularity-rules; acquired Overture divisions and reconciled policy.json for this country."
+          "reference": "docs/CITY_NORMALIZATION_PLAN.md; acquired Overture divisions and reconciled policy.json for this country."
         }
       },
       "distant_m": 25000,
