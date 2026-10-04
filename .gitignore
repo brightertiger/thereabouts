@@ -224,10 +224,8 @@ __marimo__/
 node_modules/
 *.tgz
 
-# Build intermediates and the source archive cache; the exported world table
-# in data/h3-world is committed.
+# Build intermediates, the source archive cache and pipeline workspaces.
 /data/*
-!/data/h3-world/
 
 .tmp/
 .cargo-cache/
