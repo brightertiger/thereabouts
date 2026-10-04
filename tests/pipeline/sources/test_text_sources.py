@@ -9,6 +9,8 @@ import pyarrow.parquet as pq
 import pytest
 import yaml
 
+from pipeline.pins.lock import read_lock
+from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.runner import run
 from pipeline.sources import policy as source_policy
@@ -16,7 +18,9 @@ from pipeline.sources import policy as source_policy
 from .fixtures import archive, rows, source_context
 
 
-def test_country_fallback_and_subdivision_systems_are_retained(tmp_path: Path) -> None:
+def test_country_fallback_and_geonames_subdivisions_are_retained(
+    tmp_path: Path,
+) -> None:
     reference = [
         "BE",
         "BEL",
@@ -46,10 +50,6 @@ def test_country_fallback_and_subdivision_systems_are_retained(tmp_path: Path) -
                     {},
                 ),
                 "countryInfo.txt": (("\t".join(reference) + "\n").encode(), {}),
-                "iso3166-2.json": (
-                    b'{"3166-2":[{"code":"BE-VLG","name":"Flanders","type":"Region"}]}',
-                    {},
-                ),
                 "admin1CodesASCII.txt": (b"BE.01\tBrussels\tBrussels\t2800866\n", {}),
             },
         )
@@ -61,10 +61,44 @@ def test_country_fallback_and_subdivision_systems_are_retained(tmp_path: Path) -
             json.loads(country["provenance"])["raw"]["geonames_countryInfo"]
             == reference
         )
-        assert {row["code_system"] for row in rows(source, "subdivisions")} == {
-            "ISO-3166-2",
-            "GeoNames-admin1",
-        }
+        [subdivision] = rows(source, "subdivisions")
+        assert subdivision["code"] == "BE.01"
+        assert subdivision["code_system"] == "GeoNames-admin1"
+        assert subdivision["geoname_id"] == "2800866"
+        assert subdivision["type"] is None and subdivision["parent_code"] is None
+
+
+def test_subdivisions_carry_no_lgpl_rows_or_iso_codes(tmp_path: Path) -> None:
+    pin = read_lock(REPOSITORY / "pins.lock")["codes"]
+    licences = {str(item.metadata["license"]) for item in pin.files}
+    assert not any("LGPL" in licence for licence in licences)
+    payloads = {
+        "README.md": b"# Country codes\n",
+        "country-codes.csv": b"ISO3166-1-Alpha-2,CLDR display name\nFR,France\n",
+        "countryInfo.txt": b"FR\tFRA\t250\t\tFrance\n",
+        "admin1CodesASCII.txt": (
+            b"FR.84\tAuvergne-Rh\xc3\xb4ne-Alpes\tAuvergne-Rhone-Alpes\t11071625\n"
+            b"FR.11\t\xc3\x8ele-de-France\tIle-de-France\t3012874\n"
+        ),
+    }
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        source, stages = source_context(
+            tmp_path,
+            ledger,
+            "codes",
+            {
+                str(item.metadata["key"]): (
+                    payloads[str(item.metadata["key"])],
+                    dict(item.metadata),
+                )
+                for item in pin.files
+            },
+        )
+        run(source.runtime, stages)
+        subdivisions = rows(source, "subdivisions")
+    assert [row["code"] for row in subdivisions] == ["FR.84", "FR.11"]
+    assert {row["code_system"] for row in subdivisions} == {"GeoNames-admin1"}
+    assert {row["license"] for row in subdivisions} == {"CC-BY-4.0"}
 
 
 def test_shared_phone_calling_code_preserves_all_territories(tmp_path: Path) -> None:

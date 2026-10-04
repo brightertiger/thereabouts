@@ -1,11 +1,8 @@
-release: '{countries}+{iso}'
+release: '{countries}'
 selectors:
 - name: countries
   kind: github_commit
   url: https://api.github.com/repos/datasets/country-codes/commits/HEAD
-- name: iso
-  kind: github_commit
-  url: https://api.github.com/repos/pycountry/pycountry/commits/HEAD
 files:
 - name: README.md
   url: https://raw.githubusercontent.com/datasets/country-codes/{countries}/README.md
@@ -31,15 +28,3 @@ files:
     attribution: GeoNames
     license: CC-BY-4.0
     license_url: https://creativecommons.org/licenses/by/4.0/
-- name: iso-LICENSE.txt
-  url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt
-  metadata:
-    attribution: Debian iso-codes; pycountry
-    license: LGPL-2.1-or-later
-    license_url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt
-- name: iso3166-2.json
-  url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/src/pycountry/databases/iso3166-2.json
-  metadata:
-    attribution: Debian iso-codes; pycountry
-    license: LGPL-2.1-or-later
-    license_url: https://raw.githubusercontent.com/pycountry/pycountry/{iso}/LICENSE.txt

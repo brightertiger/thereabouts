@@ -15,20 +15,19 @@ def test_per_file_licences_and_attributions_are_not_hidden() -> None:
         for file in sources[name]["pin"]["files"]
     }
     assert expected == {
-        "LGPL-2.1-or-later",
         "CC-BY-4.0",
         "PDDL-1.0",
         "ODbL-1.0",
         "Public-Domain",
     }
     assert all(f"| {licence} |" in text for licence in expected)
-    assert "Debian iso-codes; pycountry" in text
-    assert "snapshot/iso3166-2.json" in text
+    assert "LGPL" not in text and "pycountry" not in text
+    assert "snapshot/admin1CodesASCII.txt" in text
     assert "manifest.json.sources" in text and "pins.lock" not in text
     grouped = rows(sources)
-    assert len([row for row in grouped if row["source"] == "codes"]) == 4
-    lgpl = next(row for row in grouped if row["license"] == "LGPL-2.1-or-later")
-    assert lgpl["files"] == ["snapshot/iso-LICENSE.txt", "snapshot/iso3166-2.json"]
+    codes = [row for row in grouped if row["source"] == "codes"]
+    assert {row["license"] for row in codes} == {"CC-BY-4.0", "PDDL-1.0"}
+    assert len(codes) == 3
     for file in sources["geoboundaries"]["pin"]["files"]:
         assert file["metadata"]["metadata"]["boundaryLicense"] in text
 

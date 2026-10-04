@@ -535,7 +535,6 @@ PY
 | --- | --- | --- |
 | airports | Public-Domain | OurAirports contributors |
 | codes | CC-BY-4.0 | GeoNames |
-| codes | LGPL-2.1-or-later | Debian iso-codes; pycountry |
 | codes | PDDL-1.0 | DataHub maintainers |
 | codes | PDDL-1.0 | DataHub; UN Statistics Division; GeoNames; CLDR |
 | dbip | CC-BY-4.0 | IP Geolocation by DB-IP https://db-ip.com |

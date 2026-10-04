@@ -12,7 +12,7 @@ from pipeline.engines.cells.code_links import CodeIndex, linked_rows
 from pipeline.engines.cells.inputs import Inputs
 from tests.reconciliation.conftest import reconciled
 
-from ..reconciliation.conftest import area, write_inputs
+from ..reconciliation.conftest import area, place, write_inputs
 
 
 def test_retained_district_aliases_join_without_guessing_ambiguous_names(
@@ -153,3 +153,50 @@ def test_source_qualified_aliases_preserve_type_scope_and_ambiguity(
     ]
     assert len(linked[7]["place_ids"]) == 2
     assert linked[0]["link_method"] == "source-qualified administrative alias"
+
+
+def test_geonames_admin1_codes_link_through_the_state_crosswalk(
+    tmp_path: Path,
+) -> None:
+    root = write_inputs(
+        tmp_path / "inputs",
+        geonames=[place("3", "State", 0.5, 0.5, code="ADM1")],
+        divisions=[place("s", "State", 0.5, 0.5, source="overture", subtype="region")],
+        areas=[
+            area("country", "Country", "country", (0, 0, 2, 2)),
+            area("s", "State", "region", (0, 0, 2, 2)),
+        ],
+    )
+    output = reconciled(tmp_path, root, "ZZ", policy())
+    inputs = Inputs(
+        {"ZZ": {"path": str(output)}}, {}, {}, {"ZZ"}, grid=H3(), limits=EngineLimits()
+    )
+    index = CodeIndex(inputs)
+    path = tmp_path / "codes.parquet"
+    pq.write_table(
+        pa.Table.from_pylist(
+            [
+                {
+                    "country_code": "ZZ",
+                    "code_system": "GeoNames-admin1",
+                    "code": code,
+                    "name": name,
+                    "name_ascii": name,
+                    "geoname_id": geoname_id,
+                }
+                for code, name, geoname_id in [
+                    ("ZZ.01", "Renamed", "999"),
+                    ("ZZ.99", "Nowhere", "998"),
+                ]
+            ]
+        ),
+        path,
+    )
+    linked = list(
+        linked_rows(
+            path, "subdivisions", inputs, index.countries, index.codes, index=index
+        )
+    )
+    assert [r["link_status"] for r in linked] == ["matched", "unmatched"]
+    assert linked[0]["link_method"] == "explicit code or administrative crosswalk"
+    assert linked[0]["place_id"] == "state:overture:s"

@@ -157,9 +157,12 @@ and 1 each of auxiliary metadata, pilot gate, pilot summary and retained base
 manifest. The base manifest repoints **42,160** table paths to `base_cells/`;
 metadata hashes and sizes are then cascaded. No Parquet content changes.
 
-Owner licence decision: LGPL-2.1 iso-codes (pycountry) rows inside `subdivisions`
-of an ODbL database — keep, or re-source subdivisions from geoBoundaries/GeoNames
-only. Choose release contact, citation, publication locations and plate-country inputs.
+Owner licence decision taken (see `LICENSE-DECISION.md`): `subdivisions` is
+sourced from GeoNames administrative codes (`admin1CodesASCII.txt`, CC BY 4.0)
+only. The LGPL-2.1 iso-codes (pycountry) files were removed from the `codes`
+proposal, pin and adapter; `download codes`, `normalize codes` and the
+`countries`/`subdivisions` lookups must be rebuilt before the next release.
+Choose publication locations and plate-country inputs.
 Approve changed pins and policy-bound reviews before a future rebuild. Pin
 proposals require explicit `--accept` to change the lock; real upstream proposal
 availability has not been tested in this task.

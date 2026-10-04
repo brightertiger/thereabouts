@@ -1,7 +1,6 @@
-"""Country and subdivision codes retain upstream systems and fallback evidence."""
+"""Country codes with fallback evidence, and GeoNames admin1 subdivision codes."""
 
 import csv
-import json
 from collections.abc import Iterator
 from dataclasses import replace
 from pathlib import Path
@@ -77,18 +76,7 @@ def country(raw: dict[str, str], reference: dict[str, list[str]]) -> Row:
     return row
 
 
-def subdivision(raw: Row, name: str) -> Row:
-    if name == "iso3166-2.json":
-        code = raw["code"]
-        parent = raw.get("parent")
-        return dict(
-            code=code,
-            code_system="ISO-3166-2",
-            country_code=code[:2],
-            name=raw["name"],
-            type=raw["type"],
-            parent_code=(f"{code[:2]}-{parent}" if parent else None),
-        )
+def subdivision(raw: Row) -> Row:
     values = raw["fields"]
     return dict(
         code=values[0],
@@ -137,9 +125,6 @@ def records(ctx: SourceContext, reference: dict[str, list[str]]) -> Iterator[Inp
                         "geonames_countryInfo": reference[code],
                     },
                 )
-        elif name == "iso3166-2.json":
-            for ordinal, raw in enumerate(json.loads(path.read_bytes())["3166-2"], 1):
-                yield InputRow("subdivisions", pin, ordinal, raw)
         elif name == "admin1CodesASCII.txt":
             with path.open(encoding="utf-8") as stream:
                 for ordinal, values in enumerate(csv.reader(stream, delimiter="\t"), 1):
@@ -147,14 +132,14 @@ def records(ctx: SourceContext, reference: dict[str, list[str]]) -> Iterator[Inp
 
 
 def normalize(ctx: SourceContext) -> list[Path]:
-    for name in ("country-codes.csv", "iso3166-2.json", "admin1CodesASCII.txt"):
+    for name in ("country-codes.csv", "admin1CodesASCII.txt"):
         ctx.named(name)
     reference = geonames_countries(ctx.input(ctx.named("countryInfo.txt").name))
 
     def convert(item: InputRow) -> Row:
         if item.kind == "countries":
             return country(item.raw, reference)
-        return subdivision(item.raw, str(item.pin.metadata.get("key", item.pin.name)))
+        return subdivision(item.raw)
 
     return publish_rows(ctx, records(ctx, reference), convert)
 
