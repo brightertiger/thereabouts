@@ -31,8 +31,20 @@ impl Page {
     }
     pub fn push(&mut self, value: &Value) -> Result<()> {
         self.layout.observe(&self.columns, value);
+        let mut value = value.clone();
+        if let Some(fields) = value.as_object_mut() {
+            for (key, field) in fields {
+                let name = key.strip_prefix("thereabouts_").unwrap_or(key);
+                if name == "query" || name.starts_with("query.") {
+                    // Coordinate provenance is already display-ready. Spool its
+                    // text so replay cannot round exact bounds through JSON's
+                    // decimal-to-f64 parser a second time (notably on wasm32).
+                    *field = Value::String(crate::table::summary(key, field));
+                }
+            }
+        }
         self.spool
-            .write_all(serde_json::to_string(value)?.as_bytes())?;
+            .write_all(serde_json::to_string(&value)?.as_bytes())?;
         self.spool.write_all(b"\n")?;
         Ok(())
     }

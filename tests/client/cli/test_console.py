@@ -67,6 +67,7 @@ def test_real_console_mcp_returns_current_result_json(tmp_path: Path) -> None:
             names = {tool.name for tool in (await client.list_tools()).tools}
             assert names == {
                 "reverse",
+                "reverse_point",
                 "h3",
                 "geocode",
                 "postal",

@@ -751,6 +751,74 @@ fn h3_frames_preserve_legacy_resolution_and_negative_text_is_a_value() {
 }
 
 #[test]
+fn exact_geohash_half_spans_survive_every_scalar_format() {
+    let path =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/coordinates/vectors.json");
+    let fixture: Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+    let temp = tempfile::tempdir().unwrap();
+    install(temp.path(), &["core"]);
+    let mut host = Host::new(temp.path());
+    let field = "query.cell_extent.half_lat_deg";
+    for id in [
+        "geohash_zzzzzzzzzzzz",
+        "geohash_000000000000",
+        "geohash_pbpbpbpbpbpb",
+    ] {
+        let vector = fixture["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|v| v["id"] == id)
+            .unwrap();
+        // Compare rendering with the in-memory core value. Parsing expected
+        // JSON with the same lossy decimal reader would mask this regression.
+        let expected = thereabouts_core::coords::normalize(
+            &thereabouts_core::coords::parse_point(&vector["input"]).unwrap(),
+        )
+        .unwrap()
+        .cell_extent
+        .unwrap()
+        .half_lat_deg
+        .unwrap();
+        for format in ["json", "ndjson", "csv", "table"] {
+            assert_eq!(
+                host.run(&[
+                    "reverse",
+                    "--point",
+                    &vector["input"].to_string(),
+                    "--format",
+                    format,
+                    "--fields",
+                    field,
+                ]),
+                0,
+                "{id}/{format}: {}",
+                host.err
+            );
+            if matches!(format, "json" | "ndjson") {
+                let value = json!({field: expected});
+                let text = if format == "json" {
+                    serde_json::to_string_pretty(&value).unwrap()
+                } else {
+                    serde_json::to_string(&value).unwrap()
+                };
+                assert_eq!(host.out, format!("{text}\n"), "{id}/{format}");
+            } else {
+                let actual = host
+                    .out
+                    .lines()
+                    .last()
+                    .unwrap()
+                    .trim()
+                    .parse::<f64>()
+                    .unwrap();
+                assert_eq!(actual.to_bits(), expected.to_bits(), "{id}/{format}");
+            }
+        }
+    }
+}
+
+#[test]
 fn raw_csv_frame_column_never_declares_a_row_frame() {
     let temp = tempfile::tempdir().unwrap();
     install(temp.path(), &["core"]);

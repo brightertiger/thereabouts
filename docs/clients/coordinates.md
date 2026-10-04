@@ -153,12 +153,28 @@ Rust numeric calls, including numeric columns, instead report `non_finite`.
 Bare tuples/nonobject API inputs raise TypeError; column shape errors raise
 TypeError/ValueError. Existing data and lifecycle exceptions keep their codes.
 
-MCP adds only read-only `reverse_point(point, evidence=False)`. Its strict,
+### MCP schema
+
+MCP adds read-only `reverse_point(point, evidence=False)`. Its strict,
 discriminated schema rejects transport type/shape mistakes, unknown keys and
 numeric coercion; valid shapes with out-of-domain coordinates return ordinary
 `invalid_input` JSON. Data/lifecycle failures remain coded ToolError. Existing
 MCP reverse/h3 schemas are unchanged. It exposes no installation, ingestion,
 file paths or network tools.
+
+The tool input has exactly `point` (required object) and `evidence` (optional
+boolean, default false). `point.frame` selects the variants in the frame table
+above; omission defaults to geodetic, and `latlon`, `lla`, `llh` are aliases.
+Geodetic accepts named `lat`/`lon`; ECEF takes `x`/`y`/`z`; ENU and NED take
+their named axes plus a geodetic/ECEF `origin`. UTM takes integer `zone`,
+`easting`, `northing`, and optional `hemisphere`/`band`. Text frames take `value`;
+pluscode also accepts a geodetic `reference`. H3/S2 take a string or integer
+`cell`. GeoJSON takes a two- or three-number `coordinates` array and optional
+`type: "Point"`. Every variant accepts optional `uncertainty` with
+`accuracy_m`, `hdop`, `vdop`. Numeric fields accept JSON numbers, never booleans
+or numeric strings; component/origin/uncertainty objects forbid unknown keys.
+Optional metadata may be null. Domain errors such as latitude 91 remain result
+JSON with `query.error`; malformed transport shapes are tool validation errors.
 
 ## Files and the GeoReconcile boundary
 

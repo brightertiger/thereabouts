@@ -504,13 +504,18 @@ The current optional server is available with:
     # Equivalent direct Python host:
     THEREABOUTS_DATA=./store python -m thereabouts.mcp_service.server
 
-It provides reverse, h3, geocode, postal, airport, locode, phone, ip and plate,
-returning the same result JSON as Python, including evidence when requested.
+It provides reverse, reverse_point, h3, geocode, postal, airport, locode, phone,
+ip and plate, returning the same result JSON as Python, including evidence when requested.
 There are no install or arbitrary-path tools. The optional thereabouts[mcp]
 extra is imported only for mcp; startup without it exits 2 with an explicit
 installation hint. No banner is printed on the MCP protocol stream.
 The old Python CLI and catalogue MCP modules have been retired. The public
 console delegates directly to the native Rust command tree.
+
+`reverse_point` takes a required `point` object and optional strict boolean
+`evidence` (default false). Its [coordinate schema](coordinates.md#mcp-schema)
+uses explicit frame variants, nested origin/reference and uncertainty. It has
+read-only and idempotent annotations; destructive and open-world hints are false.
 
 ## Conformance boundaries
 

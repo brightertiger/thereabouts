@@ -45,7 +45,10 @@ test("Node and native recover a dead reaper without removing a successor", async
     );
     if (native) {
       const result = spawnSync(
-        path.join(ROOT, ".venv/bin/thereabouts"),
+        path.join(
+          process.env.VIRTUAL_ENV ?? path.join(ROOT, ".venv"),
+          "bin/thereabouts",
+        ),
         ["--data-dir", root, "data", "remove", "phone", "--yes"],
         { encoding: "utf8", env: process.env },
       );

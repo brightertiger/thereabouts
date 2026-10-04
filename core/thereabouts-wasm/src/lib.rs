@@ -119,7 +119,13 @@ pub fn render(
     fields: Option<String>,
     strict: bool,
 ) -> Result<i32, JsValue> {
-    let value: serde_json::Value = serde_json::from_str(value).map_err(|e| cli_error(e.into()))?;
+    let mut parsed: serde_json::Value =
+        serde_json::from_str(value).map_err(|e| cli_error(e.into()))?;
+    if let Some(query) = parsed.get_mut("query") {
+        let source = js_sys::JSON::parse(value)?;
+        coords::restore_metadata(query, &js_sys::Reflect::get(&source, &"query".into())?)?;
+    }
+    let value = parsed;
     let format = format.parse().map_err(cli_error)?;
     let selected = thereabouts_cli_core::render::fields(fields.as_deref()).map_err(cli_error)?;
     let mut renderer = thereabouts_cli_core::render::Renderer::new(format, false);

@@ -165,7 +165,8 @@ function assertMetadata(
   if (typeof expected === "number") {
     assert.equal(typeof actual, "number", key);
     let delta = Math.abs(actual - expected);
-    if (key.endsWith(".lon")) delta = Math.min(delta, Math.abs(360 - delta));
+    if (!exactSchema && key.endsWith(".lon"))
+      delta = Math.min(delta, Math.abs(360 - delta));
     assert.ok(
       delta <= (tolerances[key] ?? 0),
       `${key}: ${actual} vs ${expected}`,
@@ -222,7 +223,11 @@ test("shared coordinate fixtures drive real WASM CLI metadata", async (t) => {
       const value = JSON.parse(result.stdout);
       const direct = await geo.reversePoint(point);
       assert.equal(value.status, direct.status, vector.id);
-      assertMetadata(value.query, direct.query, vector.tolerance, "", true);
+      // Rendering must preserve every number, including exact binary geohash
+      // half-spans. Cross-target tolerances belong only to native/WASM parity.
+      // JSON.stringify canonicalizes -0 to 0; numerical equality admits that
+      // representation only. No nonzero delta is allowed in this same-WASM path.
+      assertMetadata(value.query, direct.query, {}, "", true);
       if (vector.expected.error) {
         assert.equal(value.status, "invalid_input", vector.id);
         assert.equal(value.query.error.code, vector.expected.error, vector.id);
@@ -241,4 +246,46 @@ test("raw CSV frame columns never override the uniform declaration", (t) => {
   const row = JSON.parse(result.stdout);
   assert.equal(row.frame, "geodetic");
   assert.equal(row.thereabouts_query.declared_frame, "ecef");
+});
+
+test("exact geohash half-spans survive field selection in every scalar format", (t) => {
+  const root = store(t);
+  const fixture = JSON.parse(
+    readFileSync(
+      new URL(
+        "../../../tests/fixtures/coordinates/vectors.json",
+        import.meta.url,
+      ),
+    ),
+  );
+  const field = "query.cell_extent.half_lat_deg";
+  for (const id of [
+    "geohash_zzzzzzzzzzzz",
+    "geohash_000000000000",
+    "geohash_pbpbpbpbpbpb",
+  ]) {
+    const vector = fixture.cases.find((v) => v.id === id);
+    const expected = vector.expected.cell_extent.half_lat_deg;
+    for (const format of ["json", "ndjson", "csv", "table"]) {
+      const result = console(root, [
+        "reverse",
+        "--point",
+        JSON.stringify(vector.input),
+        "--format",
+        format,
+        "--fields",
+        field,
+      ]);
+      assert.equal(result.status, 0, result.stderr);
+      if (format === "json" || format === "ndjson")
+        assert.equal(JSON.parse(result.stdout)[field], expected, id);
+      else if (format === "csv")
+        assert.equal(
+          Number(result.stdout.trim().split("\n").at(-1)),
+          expected,
+          id,
+        );
+      else assert.ok(result.stdout.includes(String(expected)), result.stdout);
+    }
+  }
 });

@@ -281,6 +281,17 @@ test("shared vectors cover every frame in WASM and agree with native Python", as
         "error",
       ])
         assert.deepEqual(query[key], nativeQuery[key], vector.id + "." + key);
+      // Native/WASM transcendental functions differ by a few ulps: measured
+      // maxima are 5.69e-14 degrees at vertices and 3.67e-9 m in radius.
+      // Bound only those computed footprint fields (about 0.1 micrometre).
+      // Schema, codes, conversions, exact angular half-spans and grid sizes
+      // remain exact; normalized points retain the core fixture tolerances.
+      assertVector(query, nativeQuery, {
+        ...vector.tolerance,
+        "cell_extent.boundary.*.lat": 1e-12,
+        "cell_extent.boundary.*.lon": 1e-12,
+        "cell_extent.radius_m": 1e-7,
+      });
       if (vector.expected.error) {
         assert.equal(result.status, "invalid_input", vector.id);
         assert.equal(query.error.code, vector.expected.error, vector.id);
@@ -289,11 +300,6 @@ test("shared vectors cover every frame in WASM and agree with native Python", as
       } else {
         assert.equal(query.error, null, vector.id);
         assertVector(query, vector.expected, vector.tolerance);
-        assertVector(
-          { normalized: query.normalized },
-          { normalized: nativeQuery.normalized },
-          vector.tolerance,
-        );
         assert.deepEqual(
           result,
           vector.input.frame === "h3"

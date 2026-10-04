@@ -24,7 +24,7 @@ pub(crate) fn columns(value: &Value, batch: bool) -> Vec<String> {
         .map(|s| (*s).into())
         .collect()
 }
-fn summary(key: &str, value: &Value) -> String {
+pub(crate) fn summary(key: &str, value: &Value) -> String {
     match value {
         Value::Null => String::new(),
         Value::String(s) => s.clone(),
