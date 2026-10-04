@@ -1,5 +1,143 @@
 # Client state — 0.1.0 release draft
 
+## Coordinate CLI — merged-tree qualification, 2026-10-05
+
+The authorized merge of `feat/coordinate-frames` into `wp/coords-cli` is
+`0dd302d` (parents `0c4be91`, `d194cd5`), with no conflicts. This section records
+CLI-package validation in `thereabouts-coords-cli`; the coordinate-client report
+below belongs to its earlier, separate run. All contract workspaces, placeholder
+handles and obsolete snapshot runners are absent. The editable Python extension
+and generated WASM were freshly built from this merged worktree against the real
+`thereabouts_core::coords`, without a fallback implementation.
+
+Scalar flags and `--point`, CSV/NDJSON/NMEA input, shared native/Node grammar,
+ordered row failures, and optional query provenance are integrated. Legacy
+named WGS84 reverse and H3 lookup semantics remain unchanged. Query metadata is
+available without evidence; HDOP/VDOP remain dimensionless and decoded footprint
+is separate from measurement accuracy. Integration edits are limited to four
+owned test files and this explicitly authorized status document. Core/client
+source files arrived only through the authorized merge.
+
+### Contract drift
+
+No landed Rust signature, public type, error variant, error code or pinned
+message differs from the reproduced version-one contract. No production adapter
+change was needed. The tests now compare complete query schemas and direct-core
+results; Node grammar tests honor `VIRTUAL_ENV` for the required worktree-local
+editable installation. No fixture, numeric tolerance or fixed vocabulary was
+changed.
+
+Two ownership issues block complete qualification. WASM scalar rendering parses
+result JSON again in `core/thereabouts-wasm/src/lib.rs::render`; that parse changes
+some footprint numbers before CLI-core receives them. For example, geohash
+`u4pruydqqvj` has a boundary latitude of `57.649109959602356` from the WASM binding
+but `57.64910995960235` after rendering. The owning clients package must resolve
+this boundary. Separately, native and WASM footprint calculations differ in fields
+for which fixtures do not currently declare tolerances. These are reported to
+coords-core rather than silently assigning consumer-owned tolerances.
+
+### CLI gates actually run
+
+All builds used Rust 1.99.0, the prescribed shared target, offline/locked Cargo,
+one build job, and sequential build/test processes. Logs, probes and exact
+comparison outputs are under `.cache/merged-validation/`. Scratch probes link
+real libraries; a pre-coordinate source copy is used only as a compatibility
+baseline, never as conversion evidence.
+
+| Gate | Actual outcome |
+| --- | --- |
+| `cargo fmt --check` | Passed |
+| Workspace `cargo clippy --offline --locked --all-targets --all-features -- -D warnings` | Passed |
+| `cargo test --offline --locked -p thereabouts-core -p thereabouts-cli-core -p thereabouts-cli -- --skip http::tests:: --test-threads=1` | 130 passed, 0 failed; 82 core and 48 CLI/CLI-core; 2 HTTP tests excluded |
+| wasm32 `cargo check --offline --locked -p thereabouts-cli-core -p thereabouts-wasm` | Passed |
+| Offline locked uv sync and editable `maturin develop --offline --locked --uv` | Passed, including final rebuild; both imports verified under this worktree's `clients/python/thereabouts` |
+| Required pytest paths: coordinate frames, console, vectors, legacy | 30 passed, 1 failed (existing MCP tool-list assertion) |
+| Final coordinate-only pytest recheck | 17 passed, 0 failed; includes all 380 shared vectors |
+| Ruff check / format check and strict mypy on the new Python test | Passed; mypy checked 1 file |
+| `npm ci --offline --ignore-scripts --no-audit --no-fund` | Blocked: missing cached `undici-7.30.0.tgz` |
+| Real offline `npm run build` | Passed; final rebuild 20.55 s, identical WASM SHA-256 to the artifact tested |
+| Ten explicit non-network Node test files, concurrency 1 | 337 passed, 107 failed: 105 footprint vector subtests, their parent, and the existing lease environment-path test |
+| `npm run check` / `npm run format` | Passed |
+
+The Python console failure is
+`test_console.py::test_real_console_mcp_returns_current_result_json`: the existing
+assertion lists nine tools while the merged MCP service correctly includes
+`reverse_point`. That file is outside CLI ownership. The separate Node lease
+failure hard-codes `.venv/bin/thereabouts`, while this worktree uses the required
+`.cache/coords-venv`; `lease.test.js` is also outside ownership. Neither assertion
+was skipped or changed.
+
+Offline npm-ci failed with `ENOTCACHED` for `undici-7.30.0.tgz`. Provisional checks
+used copies of the already-installed pinned undici 7.30.0, TypeScript 5.9.3 and
+Prettier 3.6.2; this does not qualify npm-ci. Node 23.10.0 is the only installed
+runtime found, so Node 22/24 remain unverified. Full Rust/Node suites are blocked
+by the no-network rule: two Rust `http::tests` and Node `install.test.js` /
+`stall.test.js` use loopback HTTP. No pipeline/importing tests, remote CI,
+upstream fixture fetch, package download, publication or deployment ran.
+
+### Shared-fixture parity and compatibility
+
+A direct Rust probe called `coords::reverse_value` on every one of the 380
+shared vectors. Python's public binding matched its full query metadata and
+schema for all 380. The Python console independently matched the real binding
+for all 380. Node binding and CLI each matched direct Rust on all 380 normalized
+points (fixture-owned tolerances), conversion lists, error codes, status and
+schema. CLI provenance remains last in the existing top-level field order.
+
+The stricter full-footprint comparison remains blocked: direct Node/WASM differs
+from native Rust on 203 vectors, all in footprint radii/vertices without declared
+tolerances. The CLI differs from native Rust on 210 vectors; comparing CLI with
+its own WASM binding isolates 105 affected vectors. These differences do not
+change normalized query points, conversions, errors or statuses. They still fail
+the added exact checks; the gate is not reported as passing. Detailed paths and
+values are retained in `node-direct.json` and `node-tests-final.log`.
+
+A fresh pre-coordinate baseline from local commit `4efb85d` produced identical
+bytes to this merged tree for **340 typed reverse/H3 API results** and **1,408 CLI
+outputs per runtime**, independently in native Rust and Node/WASM. API comparisons
+cover the Rust-admitted numeric/string request shapes; eight transport-only invalid
+requests are covered by CLI comparisons and existing client tests. CLI comparisons
+include both fixture packs, evidence on/off, JSON/NDJSON/CSV/table, legacy CSV and
+NDJSON batches, exit codes and stderr. No network or old binary was used as current
+conversion evidence.
+
+The shared target reused baseline libraries on an initial final Rust rerun despite
+the different worktree sources. Forced compilation flags alone did not refresh the
+required feature variants. Refreshing only the mtimes of the merged core and
+CLI-core `src/lib.rs` forced ordinary Cargo recompilation. This is one metadata-only
+ownership exception for `core/thereabouts-core/src/lib.rs`; its bytes/hash are
+unchanged, recorded in `mtime-refresh.json`. No shared target cleanup, second target
+or core source edit occurred. Formatting, Clippy, wasm32 check and the permitted
+Rust tests then passed. The final normal-profile WASM rebuild exactly reproduced
+the already-tested artifact.
+
+Independent publication/authentication, MGRS lettering, upstream OLC and surveyed
+station/epoch gaps remain as listed by the core-owned
+[fixture reference record](../../tests/fixtures/coordinates/README.md).
+Consumer parity does not close those reference gates.
+
+### CLI artifact and environment measurements
+
+Both builds used Rust/cargo 1.99.0 and wasm-bindgen 0.2.129. gzip is level 9,
+mtime zero. Payload includes runtime/bin/pkg, declarations, Node README,
+package.json and the root licence, excluding node_modules and tar headers; no
+npm pack ran. Before is the fresh `4efb85d` build, not an inferred size.
+
+| Bytes | Before | Merged CLI tree |
+| --- | ---: | ---: |
+| Generated WASM raw | 2,535,600 | 2,748,539 |
+| Generated WASM gzip | 877,775 | 954,488 |
+| Node source payload | 65,593 | 73,949 |
+| Node payload including pkg | 2,640,902 | 2,863,871 |
+
+The editable extension is 57,490,448 bytes. Python is 3.12.8; Node is
+23.10.0. Final measured free disk is 37,562,056,704 bytes
+(34.98 GiB), above the 5 GiB floor. Generated artifacts remain local/ignored.
+
+Only the explicitly authorized merge was committed. The integration test and
+status-document changes remain uncommitted; nothing was pushed, tagged,
+published, deployed or merged onward.
+
 ## Coordinate clients — merged-tree qualification, 2026-10-05
 
 Merged `feat/coordinate-frames` into `wp/coords-clients` with the authorized merge

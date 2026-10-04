@@ -4,8 +4,12 @@ import csv
 import io
 import json
 from pathlib import Path
+from typing import cast
 
 import pytest
+
+from thereabouts import Geocoder
+from thereabouts.coords import Point
 
 from .helpers import FIXTURES, console, install_fixture
 
@@ -153,18 +157,33 @@ def test_console_help_fields_and_legacy_shape(tmp_path: Path, store: Path) -> No
 
 
 def assert_metadata(
-    actual: object, expected: object, tolerance: dict[str, float], path: str = ""
+    actual: object,
+    expected: object,
+    tolerance: dict[str, float],
+    path: str = "",
+    *,
+    exact_schema: bool = False,
 ) -> None:
     """Read core-owned path tolerances; do not duplicate conversion maths."""
     if isinstance(expected, dict):
         assert isinstance(actual, dict)
+        if exact_schema:
+            assert actual.keys() == expected.keys(), path
         for key, value in expected.items():
             assert key in actual, path
-            assert_metadata(actual[key], value, tolerance, f"{path}.{key}".lstrip("."))
+            assert_metadata(
+                actual[key],
+                value,
+                tolerance,
+                f"{path}.{key}".lstrip("."),
+                exact_schema=exact_schema,
+            )
     elif isinstance(expected, list):
         assert isinstance(actual, list) and len(actual) == len(expected)
         for left, right in zip(actual, expected, strict=True):
-            assert_metadata(left, right, tolerance, f"{path}.*")
+            assert_metadata(
+                left, right, tolerance, f"{path}.*", exact_schema=exact_schema
+            )
     elif isinstance(expected, (float, int)) and not isinstance(expected, bool):
         assert isinstance(actual, (float, int))
         delta = abs(actual - expected)
@@ -178,20 +197,26 @@ def assert_metadata(
 def test_shared_coordinate_fixtures_through_console(store: Path) -> None:
     vectors = json.loads((FIXTURES / "coordinates/vectors.json").read_text())
     assert vectors["schema_version"] == 1
-    for case in vectors["cases"]:
-        point = {"frame": "geodetic", **case["input"]}
-        result = console(store, "reverse", "--point", json.dumps(point))
-        expected_error = case["expected"].get("error")
-        assert result.returncode == (2 if expected_error else 0), (
-            case["id"],
-            result.stderr,
-        )
-        answer = json.loads(result.stdout)
-        if expected_error:
-            assert answer["status"] == "invalid_input"
-            assert answer["query"]["error"]["code"] == expected_error, case["id"]
-        else:
-            assert_metadata(answer["query"], case["expected"], case["tolerance"])
+    with Geocoder(data_dir=store) as geo:
+        for case in vectors["cases"]:
+            point = {"frame": "geodetic", **case["input"]}
+            result = console(store, "reverse", "--point", json.dumps(point))
+            expected_error = case["expected"].get("error")
+            assert result.returncode == (2 if expected_error else 0), (
+                case["id"],
+                result.stderr,
+            )
+            answer = json.loads(result.stdout)
+            direct = geo.reverse_point(cast(Point, point)).to_dict()
+            assert answer["status"] == direct["status"], case["id"]
+            assert_metadata(
+                answer["query"], direct["query"], case["tolerance"], exact_schema=True
+            )
+            if expected_error:
+                assert answer["status"] == "invalid_input"
+                assert answer["query"]["error"]["code"] == expected_error, case["id"]
+            else:
+                assert_metadata(answer["query"], case["expected"], case["tolerance"])
 
 
 def test_raw_csv_frame_column_is_not_a_declaration(store: Path) -> None:

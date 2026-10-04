@@ -14,7 +14,10 @@ import {
 
 function native(root, args, input = "") {
   return spawnSync(
-    path.join(ROOT, ".venv/bin/thereabouts"),
+    path.join(
+      process.env.VIRTUAL_ENV ?? path.join(ROOT, ".venv"),
+      "bin/thereabouts",
+    ),
     ["--data-dir", root, ...args],
     {
       input,

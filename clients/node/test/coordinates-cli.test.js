@@ -1,6 +1,7 @@
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
+import { Geocoder } from "../runtime/geocoder.js";
 import { temporary, fixtureStore, selection, console } from "./helpers.js";
 
 function store(t) {
@@ -154,7 +155,13 @@ test("NMEA is explicit, checked per sentence and preserves its raw value", (t) =
   assert.equal(rows[1].thereabouts_query.error.code, "invalid_checksum");
 });
 
-function assertMetadata(actual, expected, tolerances, key = "") {
+function assertMetadata(
+  actual,
+  expected,
+  tolerances,
+  key = "",
+  exactSchema = false,
+) {
   if (typeof expected === "number") {
     assert.equal(typeof actual, "number", key);
     let delta = Math.abs(actual - expected);
@@ -166,21 +173,30 @@ function assertMetadata(actual, expected, tolerances, key = "") {
   } else if (Array.isArray(expected)) {
     assert.equal(actual.length, expected.length, key);
     expected.forEach((v, i) =>
-      assertMetadata(actual[i], v, tolerances, `${key}.*`),
+      assertMetadata(actual[i], v, tolerances, `${key}.*`, exactSchema),
     );
   } else if (expected && typeof expected === "object") {
+    if (exactSchema)
+      assert.deepEqual(
+        Object.keys(actual).sort(),
+        Object.keys(expected).sort(),
+        key,
+      );
     for (const [field, value] of Object.entries(expected))
       assertMetadata(
         actual[field],
         value,
         tolerances,
         key ? `${key}.${field}` : field,
+        exactSchema,
       );
   } else assert.deepEqual(actual, expected, key);
 }
 
 test("shared coordinate fixtures drive real WASM CLI metadata", async (t) => {
   const root = store(t);
+  const geo = await Geocoder.open({ dataDir: root });
+  t.after(() => geo.close());
   const fixture = JSON.parse(
     readFileSync(
       new URL(
@@ -191,7 +207,7 @@ test("shared coordinate fixtures drive real WASM CLI metadata", async (t) => {
   );
   assert.equal(fixture.schema_version, 1);
   for (const vector of fixture.cases) {
-    await t.test(vector.id, () => {
+    await t.test(vector.id, async () => {
       const point = { frame: "geodetic", ...vector.input };
       const result = console(root, [
         "reverse",
@@ -204,6 +220,9 @@ test("shared coordinate fixtures drive real WASM CLI metadata", async (t) => {
         `${vector.id}: ${result.stderr}`,
       );
       const value = JSON.parse(result.stdout);
+      const direct = await geo.reversePoint(point);
+      assert.equal(value.status, direct.status, vector.id);
+      assertMetadata(value.query, direct.query, vector.tolerance, "", true);
       if (vector.expected.error) {
         assert.equal(value.status, "invalid_input", vector.id);
         assert.equal(value.query.error.code, vector.expected.error, vector.id);

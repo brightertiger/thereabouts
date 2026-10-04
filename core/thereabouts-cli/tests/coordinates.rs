@@ -548,6 +548,30 @@ fn scalar_flags(point: &Value) -> Vec<String> {
     }
     flags
 }
+fn assert_schema(actual: &Value, expected: &Value, id: &str) {
+    match expected {
+        Value::Object(fields) => {
+            let actual = actual.as_object().unwrap();
+            assert_eq!(
+                actual.keys().collect::<Vec<_>>(),
+                fields.keys().collect::<Vec<_>>(),
+                "{id}"
+            );
+            for (key, value) in fields {
+                assert_schema(&actual[key], value, id);
+            }
+        }
+        Value::Array(values) => {
+            let actual = actual.as_array().unwrap();
+            assert_eq!(actual.len(), values.len(), "{id}");
+            for (left, right) in actual.iter().zip(values) {
+                assert_schema(left, right, id);
+            }
+        }
+        Value::Number(_) => assert!(actual.is_number(), "{id}"),
+        _ => assert_eq!(actual, expected, "{id}"),
+    }
+}
 #[test]
 fn shared_coordinate_fixtures_drive_scalar_point_and_component_inputs() {
     // Core owns sources and tolerances. Missing vectors fail this gate.
@@ -558,6 +582,11 @@ fn shared_coordinate_fixtures_drive_scalar_point_and_component_inputs() {
     let temp = tempfile::tempdir().unwrap();
     install(temp.path(), &["core"]);
     let mut host = Host::new(temp.path());
+    let pack = thereabouts_core::format::Pack::open(
+        &Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/packs/core-sample"),
+        true,
+    )
+    .unwrap();
     for case in fixture["cases"].as_array().unwrap() {
         let id = case["id"].as_str().unwrap();
         let mut point = case["input"].clone();
@@ -575,6 +604,25 @@ fn shared_coordinate_fixtures_drive_scalar_point_and_component_inputs() {
             host.err
         );
         let answer: Value = serde_json::from_str(&host.out).unwrap();
+        // Decode both wire results with the same JSON reader. Its decimal-to-f64
+        // rounding differs from an in-memory Value on some footprint vertices;
+        // Python/Node additionally compare the emitted numbers with their readers.
+        let direct: Value = serde_json::from_str(
+            &serde_json::to_string(
+                &thereabouts_core::coords::reverse_value(&pack, &point, false).unwrap(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(answer["status"], direct["status"], "{id}");
+        assert_schema(&answer["query"], &direct["query"], id);
+        assert_metadata(
+            &answer["query"],
+            &direct["query"],
+            &case["tolerance"],
+            "",
+            id,
+        );
         if invalid {
             assert_eq!(answer["status"], "invalid_input", "{id}");
             assert_eq!(
@@ -594,6 +642,15 @@ fn shared_coordinate_fixtures_drive_scalar_point_and_component_inputs() {
                 let flags = flags.iter().map(String::as_str).collect::<Vec<_>>();
                 assert_eq!(host.run(&flags), 0, "{id}: {}", host.err);
                 let scalar: Value = serde_json::from_str(&host.out).unwrap();
+                assert_eq!(scalar["status"], direct["status"], "{id}");
+                assert_schema(&scalar["query"], &direct["query"], id);
+                assert_metadata(
+                    &scalar["query"],
+                    &direct["query"],
+                    &case["tolerance"],
+                    "",
+                    id,
+                );
                 assert_metadata(
                     &scalar["query"],
                     &case["expected"],
