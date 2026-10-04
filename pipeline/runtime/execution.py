@@ -21,6 +21,10 @@ class Executor:
         self.ctx, self.stages, self.event = ctx, stages, event
         self.by_stage = {stage.name: stage for stage in stages}
         self.cache: dict[str, dict[tuple[str, str], Unit]] = {}
+        # Stage identities hash the declared code closure, settings and pins;
+        # recomputing them for each of tens of thousands of refreshed units
+        # dominated start-up, so each pass computes them once per stage.
+        self.identities: dict[str, str] = {}
         self.completed = 0
         self.skipped = 0
         self.skipped_keys: set[tuple[str, str]] = set()
@@ -39,10 +43,14 @@ class Executor:
                 raise ValueError(f"Duplicate unit in stage {name}")
         return self.cache[name]
 
+    def identity(self, name: str) -> str:
+        if name not in self.identities:
+            self.identities[name] = self.by_stage[name].identity(self.ctx)
+        return self.identities[name]
+
     def refresh(self, unit: Unit) -> Unit:
-        stage = self.by_stage[unit.recipe.stage]
         return replace(
-            make_unit(self.ctx, unit.recipe, stage.identity(self.ctx)),
+            make_unit(self.ctx, unit.recipe, self.identity(unit.recipe.stage)),
             required_bytes=unit.required_bytes,
             accounts_disk=unit.accounts_disk,
             refresh_discovery=unit.refresh_discovery,
@@ -64,6 +72,7 @@ class Executor:
         finalize: bool = True,
     ) -> None:
         self.cache.pop(name, None)
+        self.identities.clear()
         required: dict[tuple[str, str], Unit] = {}
         visiting: set[tuple[str, str]] = set()
         checked: set[tuple[str, str]] = set()
@@ -116,6 +125,7 @@ class Executor:
             if refresh:
                 self._stage(stage, refresh)
                 self.cache.clear()
+                self.identities.clear()
                 self.execute(
                     name,
                     materialize=materialize,

@@ -233,3 +233,40 @@ def test_only_refreshes_ancestors_and_defers_absent_inputs_until_needed(
         assert result == {"completed": 4, "skipped": 0}
         assert (tmp_path / "absent/one").is_file()
         assert all(d.state == "current" for d in plan(ctx, stages))
+
+
+def test_stage_identity_is_computed_once_per_pass_not_per_unit(
+    tmp_path: Path,
+) -> None:
+    class CountingStage(SyntheticStage):
+        identity_calls = 0
+
+        def identity(self, ctx: Context) -> str:
+            type(self).identity_calls += 1
+            return super().identity(ctx)
+
+    many = [Recipe("first", f"unit-{i}") for i in range(200)]
+    first = CountingStage("first", many)
+    second = CountingStage(
+        "second",
+        [
+            Recipe(
+                "second", f"unit-{i}", dependencies=(Dependency("first", f"unit-{i}"),)
+            )
+            for i in range(200)
+        ],
+        needs=("first",),
+    )
+    with Ledger(
+        tmp_path,
+        tmp_path / "work/ledger.sqlite3",
+        readonly=False,
+        timeout=load().resources.ledger_timeout_seconds,
+    ) as ledger:
+        ctx = context(tmp_path, ledger)
+        run(ctx, [first, second])
+        CountingStage.identity_calls = 0
+        # A fully current workspace: two stage passes walk 600 unit refreshes,
+        # which must not each hash the stage's code closure again.
+        assert run(ctx, [first, second])["completed"] == 0
+        assert CountingStage.identity_calls <= 8

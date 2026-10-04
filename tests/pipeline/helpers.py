@@ -61,7 +61,8 @@ class SyntheticStage:
     def units(self, ctx: Context) -> list[Unit]:
         if self.discover_after and not (ctx.root / self.discover_after).exists():
             return []
-        return [make_unit(ctx, recipe, self.identity(ctx)) for recipe in self.recipes]
+        identity = self.identity(ctx)
+        return [make_unit(ctx, recipe, identity) for recipe in self.recipes]
 
     def run(self, ctx: Context, unit: Unit) -> list[Path]:
         self.calls.append(unit.recipe.unit_id)
