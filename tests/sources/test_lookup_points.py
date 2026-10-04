@@ -119,11 +119,9 @@ def test_code_systems_zero_padding_and_shared_phone_codes() -> None:
     )
     assert row["numeric"] == "356" and row["region_code"] == "142"
     assert country({"ISO3166-1-numeric": "4"}, {})["numeric"] == "004"
-    row = subdivision(
-        {"code": "FR-01", "name": "Ain", "type": "Department", "parent": "ARA"},
-        "iso3166-2.json",
-    )
-    assert row["parent_code"] == "FR-ARA" and row["code_system"] == "ISO-3166-2"
+    row = subdivision({"fields": ["FR.84", "Auvergne", "Auvergne", "11071625"]})
+    assert row["code_system"] == "GeoNames-admin1" and row["country_code"] == "FR"
+    assert row["geoname_id"] == "11071625" and "parent_code" not in row
     row = prefix(
         {"fields": ["1201", "New Jersey"]},
         "resources/geocoding/en/1.txt",
