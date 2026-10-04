@@ -116,7 +116,9 @@ def main() -> None:
     )
     parser.add_argument("--iterations", type=int, default=20000)
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "docs/CLIENT_FORWARD_MEASUREMENTS.json"
+        "--output",
+        type=Path,
+        default=ROOT / "docs/measurements" / "CLIENT_FORWARD_MEASUREMENTS.json",
     )
     parser.add_argument("--record", choices=["before", "after"], default="after")
     args = parser.parse_args()
@@ -127,7 +129,7 @@ def main() -> None:
         if args.output.exists()
         else {
             "machine": json.loads(
-                (ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json").read_text()
+                (ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json").read_text()
             )["machine"],
             "families": {},
         }
@@ -151,7 +153,7 @@ def main() -> None:
         measurement
     )
     existing["families"][args.family] = measurement
-    core_path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    core_path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     core = json.loads(core_path.read_text())
     core.setdefault("forward_workloads", {}).setdefault(args.family, {})[
         args.record

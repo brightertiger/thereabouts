@@ -90,7 +90,7 @@ previously examined boundary cells: London `88194e684dfffff` and
 `88195d368dfffff`, and secondary Dearborn geometry `882ab2cda1fffff`. Their source
 references and destinations are identical. A new review was bound to the actual
 regenerated manifest in
-[`city-normalization-thereabouts-review.json`](../city-normalization-thereabouts-review.json).
+[`city-normalization-thereabouts-review.json`](../measurements/city-normalization-thereabouts-review.json).
 The original review and original manifest hashes remain unchanged.
 The resumed controller accepted this review and finished world verification at
 2026-10-02 19:28 UTC. All 14 output table row counts match the original v2.
@@ -100,7 +100,7 @@ The resumed controller accepted this review and finished world verification at
 Every digest below is identical before and after regeneration. Counts are also
 identical within each stage. A dash means the table is absent from that stage.
 Full per-table SHA-256 values and stage guards are in
-[`rename-content-comparison.json`](../rename-content-comparison.json).
+[`rename-content-comparison.json`](../measurements/rename-content-comparison.json).
 
 | Logical table | Base rows | Normalized v2 rows | Base / v2 digest comparison |
 | --- | ---: | ---: | --- |
@@ -145,7 +145,7 @@ python -m build_data.digest_golden data/golden \
 python -m build_data.rebuild_golden --data-dir data --workers 2 \
   --through pilot --reuse-development
 python -m build_data.normalize_cells review --data-dir data \
-  --review docs/city-normalization-pilot-review.json \
+  --review docs/measurements/city-normalization-pilot-review.json \
   --gate data/work/v2-pilot/thereabouts-gate.json
 python -m build_data.rebuild_golden --data-dir data --workers 2 \
   --through world --reuse-development --output data/golden-thereabouts \

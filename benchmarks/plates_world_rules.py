@@ -130,7 +130,7 @@ def main() -> None:
     result["semantic_sha256"] = hashlib.sha256(
         json.dumps(answers, sort_keys=True).encode()
     ).hexdigest()
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     series = data.setdefault("plates_world_rules", {})
     if args.record == "after" and "before" in series:

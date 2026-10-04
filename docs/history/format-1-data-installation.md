@@ -1,8 +1,8 @@
 # Installing data and using the CLI
 
 > Historical format-1 installation documentation. Current commands, data store and
-> MCP are documented in [CLI.md](CLI.md); the current Python API is in
-> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> MCP are documented in [CLI.md](../CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](../CLIENT_STATUS.md). Legacy console examples require
 > `python -m thereabouts.commandline.application` in place of `thereabouts`.
 
 Thereabouts installs data explicitly. Queries, imports and opening a reader never
@@ -145,7 +145,7 @@ corrupt pins, disk preflight, discovery, JSONL/CSV, exit codes and broken pipes.
 No Hugging Face endpoint, external network service, Windows installation or
 published wheel was tested.
 
-[CLIENT_INSTALL_MEASUREMENTS.json](CLIENT_INSTALL_MEASUREMENTS.json) records one
+[CLIENT_INSTALL_MEASUREMENTS.json](../measurements/CLIENT_INSTALL_MEASUREMENTS.json) records one
 local install of the 208,592-byte synthetic sample on Apple M2, 8 GiB, macOS 27,
 Python 3.12.8: **0.427 seconds**, including full verification, with process peak
 RSS **41,992,192 bytes**. No cache eviction or world-scale inference is implied.
@@ -158,5 +158,5 @@ The same local/pinned-URL installer accepts `postal` and `airports`. Each family
 has its own immutable path and active pointer. Transfer staging is locked by
 manifest digest, then publication/activation is locked by family. `data list`
 reports all families; `data verify --family postal --full` verifies an installed
-optional pack without reverse data. See [CODE_PACKS.md](CODE_PACKS.md) for exact
+optional pack without reverse data. See [CODE_PACKS.md](../CODE_PACKS.md) for exact
 resolver and multi-pack selection examples. No code pack has been hosted.

@@ -1,7 +1,9 @@
 # Final H3 table evaluation — 2026-10-01
 
+> Historical: the table measured here was the v1 `data/h3-world` export, now removed from the repository; the `benchmarks.build_size` command below no longer exists.
+
 The accepted resolution-8 combined design and its exact-equivalence contract are
-in [DESIGN.md](DESIGN.md). These measurements use the rebuilt pack with both the
+in [DESIGN.md](../DESIGN.md). These measurements use the rebuilt pack with both the
 current-settlement filter and land/country eligibility rule. The previous mask
 audit, experimental layouts and their reports have been removed.
 
@@ -22,7 +24,7 @@ this precedes full verification. Source-pack creation/download and ZIP time are
 excluded from build timing. Fixture validation also ran during this build, so the
 wall-clock build time includes that machine contention.
 
-[build.json](../benchmarks/build.json) records these measurements. Rebuild with
+[build.json](../../benchmarks/build.json) records these measurements. Rebuild with
 `uv run python -m benchmarks.build_size --reference data/reference --data data/h3-world`
 after removing previous generated outputs (retain pinned `data/cache` archives).
 The command creates the reference pack if absent, builds/verifies the table and
@@ -45,7 +47,7 @@ geographic accuracy. Nearby samples are settlement-weighted, not population-weig
 filtering the catalogue also changes that sampling population. Seeds are 20261001
 for land and 20261002 for nearby points. The fixed city cutoff is 50 km.
 
-Run `uv run python -m benchmarks.accuracy`; [accuracy.json](../benchmarks/accuracy.json)
+Run `uv run python -m benchmarks.accuracy`; [accuracy.json](../../benchmarks/accuracy.json)
 records counts, policy, seeds and both manifest hashes. The sampler saves land
 points under `data/benchmarks/points.npy` for the independent runtime-only process.
 
@@ -76,7 +78,7 @@ pre-review implementation. Each scalar measurement has its own fresh Geocoder an
 scalar path shares addressing, bitmap offsets, value decoding and label unpacking
 with the batch path. It avoids singleton arrays and batch-level expansion.
 
-Run `uv run python -m benchmarks.runtime`; [runtime.json](../benchmarks/runtime.json)
+Run `uv run python -m benchmarks.runtime`; [runtime.json](../../benchmarks/runtime.json)
 records timings, workload hash, manifest hash, environment and cache conditions.
 No cold-cache, cross-platform or independent municipal-accuracy claim is made.
 

@@ -39,7 +39,7 @@ def main() -> None:
         if process.returncode:
             raise RuntimeError("Profiling loop failed")
     normalization = int(stdout.strip().split("=")[1])
-    data_path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    data_path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(data_path.read_text())
     data["geocode_profile"] = {
         "normalization_ns_per_call": normalization,

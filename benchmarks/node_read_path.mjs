@@ -98,7 +98,7 @@ try {
     report.startup[name] = { launches: LAUNCHES, warmups: 3, first_launch_ms: initial.first_ms, first_result_median_ms: percentile(values.map((v) => v.first_ms), .5), first_result_p99_ms: percentile(values.map((v) => v.first_ms), .99), samples: values };
   }
 } finally { fs.rmSync(temp, { recursive: true, force: true }); }
-const output = path.join(ROOT, "docs/CLIENT_CORE_MEASUREMENTS.json"), existing = json(output);
+const output = path.join(ROOT, "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"), existing = json(output);
 existing.node_wasm = report; fs.writeFileSync(output, JSON.stringify(existing, null, 2) + "\n");
-fs.writeFileSync(path.join(ROOT, "docs/CLIENT_NODE_MEASUREMENTS.json"), JSON.stringify(report, null, 2) + "\n");
+fs.writeFileSync(path.join(ROOT, "docs/measurements/CLIENT_NODE_MEASUREMENTS.json"), JSON.stringify(report, null, 2) + "\n");
 console.log(JSON.stringify(report, null, 2));

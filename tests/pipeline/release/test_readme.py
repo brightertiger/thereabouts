@@ -12,7 +12,9 @@ from pipeline.runtime.fingerprints import REPOSITORY
 
 def test_committed_readme_matches_template_and_measured_subset() -> None:
     evidence = json.loads(
-        (REPOSITORY / "docs/PIPELINE_RELEASE_MEASUREMENTS.json").read_text()
+        (
+            REPOSITORY / "docs/measurements" / "PIPELINE_RELEASE_MEASUREMENTS.json"
+        ).read_text()
     )["readme_render"]
     config = load(profile=evidence["profile"], overrides=evidence["overrides"])
     generated = render(

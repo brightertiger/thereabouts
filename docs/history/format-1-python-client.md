@@ -1,8 +1,8 @@
 # Reading golden serving packs in Python
 
 > Historical format-1 Python API documentation. Current commands, data store and
-> MCP are documented in [CLI.md](CLI.md); the current Python API is in
-> [CLIENT_STATUS.md](CLIENT_STATUS.md). Legacy console examples require
+> MCP are documented in [CLI.md](../CLI.md); the current Python API is in
+> [CLIENT_STATUS.md](../CLIENT_STATUS.md). Legacy console examples require
 > `python -m thereabouts.commandline.application` in place of `thereabouts`.
 
 `thereabouts.client.Geocoder` reads an immutable `thereabouts-pack-1` reverse
@@ -22,11 +22,11 @@ with Geocoder("tests/fixtures/serving", verify=True) as geo:
 
 `Geocoder(data_dir="/path/to/store")` opens an explicitly installed active pack;
 `Geocoder()` uses the environment/platform store. See
-[DATA_INSTALLATION.md](DATA_INSTALLATION.md) for installation and JSON CLI usage.
+[DATA_INSTALLATION.md](format-1-data-installation.md) for installation and JSON CLI usage.
 
 The committed fixture is synthetic and is not geographic evidence. For another
 verified golden snapshot, use the exporter described in
-[SERVING_FORMAT.md](SERVING_FORMAT.md). The top-level `thereabouts.Geocoder` now uses the Rust format-2 reader.
+[SERVING_FORMAT.md](../SERVING_FORMAT.md). The top-level `thereabouts.Geocoder` now uses the Rust format-2 reader.
 Use the explicit `thereabouts.client` import for historical format-1 packs.
 
 ## Results and evidence
@@ -35,7 +35,7 @@ Every lookup returns a frozen `Resolution`. `selected` is one candidate for
 `matched`, otherwise null; `candidates` is an ordered tuple. A coordinate/H3
 lookup has at most one candidate. `require_one()` returns it, returns None for no
 match, and raises `AmbiguousResultError` for an ambiguous envelope. Postal and airport code packs supply multiple candidates; no first-row
-selection is implied. See [CODE_PACKS.md](CODE_PACKS.md).
+selection is implied. See [CODE_PACKS.md](../CODE_PACKS.md).
 
 The candidate's `city`, `state`, `country` and `sovereign` are nullable `Place`
 records with public IDs, names, settlement kind, relationships and local evidence.
@@ -96,7 +96,7 @@ place references are null. These integers are **local to the exact manifest**;
 never join them across packs or serialize H3 uint64 as a JavaScript number.
 `decode=True` adds a mapping from the chunk's distinct references to `Place`
 records; this supplies public IDs and names without repeating their decoding for
-every row. Flags use the documented [serving format](SERVING_FORMAT.md).
+every row. Flags use the documented [serving format](../SERVING_FORMAT.md).
 
 Open once per process and use a context manager or `close()`. Close is idempotent;
 all later operations, including buffered iterators, fail with
@@ -112,7 +112,7 @@ Mapped pages and objects retained by callers are outside that budget.
 
 The default `backend="auto"` uses the optional Cython reconstruction kernel when
 installed; `backend="python"` forces the reference path. See
-[CLIENT_BUILD.md](CLIENT_BUILD.md) for profiling, parity and local wheel checks.
+[CLIENT_BUILD.md](python-client-build.md) for profiling, parity and local wheel checks.
 
 Normal opening checks compatibility and all listed payload sizes. First access
 to a shard validates its container directory/bounds, and records are checked as
@@ -127,8 +127,8 @@ remain in `thereabouts.errors`; serving corruption and unsupported formats are
 in `thereabouts.packs.errors`. Their modules stay separate while original runtime
 files are frozen.
 
-[CLIENT_PERFORMANCE.md](CLIENT_PERFORMANCE.md) reports profiles and before/after
-measurements on 4,176 synthetic places, 308,032 stored rows and 64 blocks. The latest [regression measurement](CLIENT_CODE_MEASUREMENTS.json) after adding
+[CLIENT_PERFORMANCE.md](python-client-performance.md) reports profiles and before/after
+measurements on 4,176 synthetic places, 308,032 stored rows and 64 blocks. The latest [regression measurement](../measurements/CLIENT_CODE_MEASUREMENTS.json) after adding
 optional packs gives shuffled scalar medians of 10.291 µs with Cython and
 12.750 µs in Python; numeric columns exceed 530,000 points/s in both modes. Cache-pressure runs and limitations
 are included. These are warm working-set measurements, not real-world latency

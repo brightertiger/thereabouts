@@ -73,7 +73,7 @@ def main() -> None:
         "single_shard_spans": spans(pack),
         "real_sample_spans": spans(ROOT / "tests/fixtures/packs/core-sample"),
     }
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     series = data.setdefault("single_shard", {})
     if args.record in series:

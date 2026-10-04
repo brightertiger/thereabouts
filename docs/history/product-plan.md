@@ -2,7 +2,7 @@
 
 **Recommendation, 2026-10-02:** build an offline place-context library with a
 Python + Cython core, Python/CLI/npm clients and selected integrations. Begin with
-coordinates and H3 cells: the [market check](MARKET_CHECK.md) found demand for
+coordinates and H3 cells: the [market check](market-check.md) found demand for
 reverse geocoding, while demand for the wider bundle remains unproven.
 
 ## The first page: what to build and decide
@@ -13,7 +13,7 @@ download `reverse-preview`: the existing **21.35 MB archive / 53.06 MB installed
 world table. Include offline installation, dataset identity, attribution and
 method/null semantics. Label its old nearest-settlement policy
 `legacy-nearest-50km`; freeze that snapshot rather than maintain a second pipeline.
-These are [measured old-table sizes](EVALUATION.md), not golden-data forecasts.
+These are [measured old-table sizes](h3-table-evaluation.md), not golden-data forecasts.
 
 Then ship a **golden-data Python/Cython reader in 15–25 days**, using a new exporter
 after validated v2. A *pack* is an independently installable, immutable set of
@@ -42,7 +42,7 @@ counts and pipeline completion do not establish that demand.
 
 The current `src/thereabouts/` reads `h3-table-v1`, using H3 and NumPy. It
 does not read golden Parquet. Its measured warm median of 13.54 µs and batch rate
-of 436,159 points/s describe one M2 workload. The [design](DESIGN.md) already
+of 436,159 points/s describe one M2 workload. The [design](../DESIGN.md) already
 provides useful ancestor addressing, memory-mapped files, lazy string decoding,
 bounded batches and verification. *Memory mapping* lets the operating system load
 file pages as needed; installed size is not the same as resident RAM.
@@ -78,9 +78,9 @@ These are build-output sizes, not serving-pack sizes. Much of the place schema i
 source IDs and JSON evidence; it is not appropriate to materialize 6.9 million
 Python objects on open. Lookup rows preserve observations and duplicates, rather
 than constituting unique geographic entities. Schema details are in
-[GOLDEN_DATASET](GOLDEN_DATASET.md) and [GOLDEN_V1](history/base-cell-results.md).
+[GOLDEN_DATASET](../GOLDEN_DATASET.md) and [GOLDEN_V1](base-cell-results.md).
 
-The worktree’s [GOLDEN_V2](history/city-normalization-results.md) records a passed pilot and a world build
+The worktree’s [GOLDEN_V2](city-normalization-results.md) records a passed pilot and a world build
 in progress. It adds canonical cities, place-to-city mappings, settlement kinds
 and explicit assignment methods. The town-radius rule is **off**, as already
 decided by the owner. Do not reopen that choice in the runtime. The final v2
@@ -477,7 +477,7 @@ new categories from its old table and must expose its coarser method honestly.
 | --- | --- | --- |
 | Coordinates | Finite numeric latitude/longitude in bounds; r8 H3 conversion then logical ancestors. Reject booleans/strings; normalize +180 consistently. | Distinguish ocean from eligible unassigned land. Retain country, state and sovereign separately under the published boundary perspective. |
 | H3 | Initially accept valid resolution-8 cell strings only. | Reject other resolutions with an explanation. A later explicit `mode="centre"` for coarse cells is a point interpretation, never a claim of uniform labels across the coarse cell; finer cells can explicitly map to their r8 parent. |
-| Postal | Country required; preserve leading zeros. Version country-specific space/case normalization and source-edition precedence. Exact key → all observations → candidate places. | Several cities can share a code. Retain source labels and cell-derived answers separately, including `IN/560001`’s known source-coordinate discrepancy from [DATA_PIPELINE](DATA_PIPELINE.md). Never choose the first row as truth. |
+| Postal | Country required; preserve leading zeros. Version country-specific space/case normalization and source-edition precedence. Exact key → all observations → candidate places. | Several cities can share a code. Retain source labels and cell-derived answers separately, including `IN/560001`’s known source-coordinate discrepancy from [DATA_PIPELINE](../DATA_PIPELINE.md). Never choose the first row as truth. |
 | IP | Parse literal IPv4/IPv6, normalize IPv4-mapped addresses under a documented rule, then inclusive range lookup; no DNS. | Private/reserved/unknown inputs do not get a guessed city. DB-IP source answer and spatial context remain distinguishable. Missing accuracy radius stays null. IP location is an estimate, not device location. |
 | Airport | Explicit `iata`, `icao`, `ident`, `gps` or country-scoped local scheme. Exact code postings; optional type/status filter. | Codes can be absent/reused and the source contains heliports/closed sites. Default returns candidates with status; “serves city” and “lies near city” remain different fields. |
 | Trade location | Normalize country + UN/LOCODE location component; preserve facility-function/status evidence. | A trade location is not necessarily a seaport. Retain the 23,339 v1 source rows without usable coordinates as found source entities with unresolved spatial context. |
@@ -705,7 +705,7 @@ accuracy because the builder uses those sources and policies. Do not advertise
 the old “identity or containing city” number as world city accuracy.
 
 **Independent user-facing evaluation:** use the existing
-[120-point hand-checked set](../eval/city_points/README.md): 40 development and
+[120-point hand-checked set](../../eval/city_points/README.md): 40 development and
 80 held-out points, one explicitly ambiguous holdout case. The set covers 20
 countries, is deliberately selected and correlated within cities/towns, and uses
 OSM cross-checks related to an input source. Report counts by group and evidence

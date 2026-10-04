@@ -47,7 +47,7 @@ def main() -> None:
                 "status_changes": statuses,
                 "changed_fields": dict(fields),
             }
-    path = ROOT / "docs/CLIENT_CORE_MEASUREMENTS.json"
+    path = ROOT / "docs/measurements/CLIENT_CORE_MEASUREMENTS.json"
     data = json.loads(path.read_text())
     data["result_contract_rework"] = {
         "baseline_commit": args.before,
