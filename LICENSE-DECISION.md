@@ -1,30 +1,21 @@
-# Licence decision pending
+# Licences
 
-No code LICENSE file has been added. The owner must choose a code licence and
-confirm data redistribution notices before publication. npm currently declares
-UNLICENSED; Python metadata makes no open-source licence claim.
+**Code:** MIT, decided by the owner on 2026-10-04; the text is in [LICENSE](LICENSE).
+Python (`pyproject.toml`), npm (`clients/node/package.json`) and every Cargo crate
+(`core/Cargo.toml` workspace package) declare it. MIT has no express patent-grant
+clause; retain the copyright and permission notices in redistributions.
 
-The release dataset declares ODbL 1.0. Its DATA_LICENSES.md and manifest.sources
-retain per-source licences, attribution, URLs and pins. The database obligations
-and source-specific notices remain relevant regardless of the code licence.
-Distributing code under MIT or Apache-2.0 does not relicense the data.
-Review the assembled release notices and source restrictions before redistributing
-any dataset or pack.
+**Data:** the release dataset declares ODbL 1.0. Its DATA_LICENSES.md and
+`manifest.sources` retain per-source licences, attribution, URLs and pins. The
+database obligations and source-specific notices apply regardless of the code
+licence; distributing code under MIT does not relicense the data. Review the
+assembled release notices and source restrictions before redistributing any
+dataset or pack.
 
-Code options for the owner:
+**Decided 2026-10-04:** the `subdivisions` table is sourced from GeoNames
+administrative codes (CC BY 4.0) only; the LGPL-2.1 iso-codes (pycountry) input
+was removed so that no LGPL rows remain inside the ODbL database.
 
-| Choice | Practical implications |
-| --- | --- |
-| MIT | Short permissive licence; retain copyright and permission notices. It has no express patent-grant clause. |
-| Apache-2.0 | Permissive licence with an express contributor patent grant and patent-litigation termination terms; retain required notices and mark modifications. It does not grant trademark rights. |
-
-Both choices permit commercial use and include warranty disclaimers. Neither
-choice removes third-party dependency licences or the separate database terms.
-Before choosing, review contributor ownership, patent policy and the licences of
-bundled Rust, Python and npm dependencies. Decide whether an Apache NOTICE file is
-needed for the selected distribution.
-
-After the decision, add the chosen licence text, update package metadata and
-notices, and approve release artifacts. CI environments and registry trusted
-publishers must also be configured by the owner. No licence choice or publication
-has been made on the owner's behalf.
+Third-party dependency licences for the Rust, Python and npm distributions are
+unchanged by this choice; CI environments and registry trusted publishers are
+configured by the owner before any publication.

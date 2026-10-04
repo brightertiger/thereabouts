@@ -15,7 +15,7 @@ The product has three parts:
 
 This is the **0.1.0 release draft**. The owner has not published these artifacts.
 The existing PyPI/npm 0.0.1 placeholders do not contain this client.
-Code licensing is awaiting the [owner's decision](LICENSE-DECISION.md).
+Code is released under the [MIT licence](LICENSE); data notices are separate, see [LICENSE-DECISION.md](LICENSE-DECISION.md).
 
 ## Install and add data
 
@@ -118,4 +118,4 @@ Start with [pipeline operations](docs/DATA_PIPELINE.md),
 [release engineering](docs/CLIENT_RELEASE.md).
 The [documentation index](docs/README.md) lists every current document.
 The [0.1.0 changelog](CHANGELOG.md) describes the migration from the retired readers.
-Data notices are separate from the pending code licence.
+Data notices are separate from the MIT code licence.

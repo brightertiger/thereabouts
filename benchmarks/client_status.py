@@ -294,9 +294,9 @@ Separate pipeline CI uses synthetic inputs. Publishing requires a manual run
 on a matching tag plus configured release-environment approval/trusted publishers.
 The owner must configure those protections before using the jobs.
 
-No LICENSE was added. LICENSE-DECISION.md records the pending code choice and
-the separate ODbL/source-notice obligations. Registry 0.0.1 placeholders have
-not been replaced. Public release hosting, code licensing, real names-table
+The code is MIT licensed (LICENSE); LICENSE-DECISION.md records the decision
+and the separate ODbL/source-notice obligations. Registry 0.0.1 placeholders have
+not been replaced. Public release hosting, real names-table
 adoption, real plate tables and remote/cross-platform wheel execution remain
 unverified or pending. The current names index uses canonical city names;
 alternate-name support has synthetic conformance coverage.

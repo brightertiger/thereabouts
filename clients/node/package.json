@@ -36,5 +36,5 @@
   "bin": {
     "thereabouts": "./bin/thereabouts.js"
   },
-  "license": "UNLICENSED"
+  "license": "MIT"
 }

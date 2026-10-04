@@ -58,8 +58,8 @@ credential was added. Environment protection and registry configuration are
 external prerequisites, not settings a workflow file can enforce by itself.
 Nothing is published on a normal push, pull request or unapproved tag.
 
-Choose the code licence, update metadata/notices, and review data redistribution
-requirements described in LICENSE-DECISION.md before approving artifacts.
+The code licence is MIT; review the data redistribution requirements described
+in LICENSE-DECISION.md before approving artifacts.
 Configure the release endpoint and publish verified data separately. Its local
 index and archive layout is specified in CLI.md; dataset and pack manifests
 remain separate inventories. The MY/SG proof includes core plus five forward

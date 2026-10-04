@@ -3,6 +3,8 @@ name = "thereabouts-wasm"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "Host-read WASM bindings for the shared Thereabouts core"
 
 [lib]

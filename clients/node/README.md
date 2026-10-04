@@ -4,7 +4,7 @@ Offline geographic context from one Rust core compiled to WebAssembly.
 Node 22 or 24, ESM, with TypeScript declarations. No geographic data is bundled,
 and lookups never download data. The package version is 0.1.0; it has not been
 published. The registry's 0.0.1 placeholder is replaced only by the owner's
-0.1.0 publication. Code licensing remains UNLICENSED pending the owner's decision.
+0.1.0 publication. The code is MIT licensed.
 
 ~~~js
 import { Geocoder } from "thereabouts";

@@ -684,10 +684,10 @@ PY
 
 This derived database is licensed under ODbL 1.0, including its attribution and share-alike requirements for publicly used derivative databases. Preserve the source attribution in `DATA_LICENSES.md`; individual source terms still apply. The code's licence does not replace data licences. Pin identifiers, source checksums and provenance are in the manifest.
 
-Contact: OWNER DECISION: public maintenance contact
+Contact: Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues
 
-Citation: OWNER DECISION: preferred dataset citation
+Citation: Rao, U. (2026). Thereabouts offline geocoding dataset. https://github.com/brightertiger/thereabouts
 
-Public documentation: OWNER DECISION: public documentation URL
+Public documentation: https://github.com/brightertiger/thereabouts/blob/main/docs/DATASET_README.md
 
 Owner-decision placeholders are intentionally visible and must be replaced before a public release.
