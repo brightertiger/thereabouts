@@ -1,6 +1,7 @@
 //! Thin `CPython` boundary. Dataset policy and lookup semantics live in the core.
 mod cli;
 mod columns;
+mod coords;
 mod result;
 mod store;
 use pyo3::{
@@ -94,6 +95,26 @@ impl Geocoder {
                 .reverse(lat, lon, evidence)
                 .map_err(|e| error(py, &e))?,
         )
+    }
+    #[pyo3(signature=(point_json,*,evidence=false))]
+    fn reverse_point(
+        &self,
+        py: Python<'_>,
+        point_json: &str,
+        evidence: bool,
+    ) -> PyResult<Py<PyAny>> {
+        let pack = self.pack(py)?;
+        coords::reverse(py, &pack, point_json, evidence)
+    }
+    #[pyo3(signature=(columns,*,frame="geodetic",origin_json=None))]
+    fn reverse_frame_columns<'py>(
+        &self,
+        py: Python<'py>,
+        columns: &Bound<'py, PyDict>,
+        frame: &str,
+        origin_json: Option<&str>,
+    ) -> PyResult<Bound<'py, PyDict>> {
+        coords::columns(py, &self.pack(py)?, columns, frame, origin_json)
     }
     #[pyo3(signature=(cell,*,evidence=false))]
     #[allow(clippy::wrong_self_convention)] // Public API verb, not a constructor.

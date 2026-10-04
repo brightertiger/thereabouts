@@ -3,6 +3,8 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from .coords import QueryMetadata
+
 
 @dataclass(frozen=True, slots=True)
 class Point:
@@ -70,6 +72,7 @@ class Result:
     rank_basis: str | None
     evidence: Evidence | None = None
     hint: str | None = None
+    query: QueryMetadata | None = None
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "Result":
@@ -97,6 +100,8 @@ class Result:
                     tuple(sorted(source.items())) for source in evidence["source_ids"]
                 )
             data["evidence"] = Evidence(**evidence)
+        if data.get("query") is not None:
+            data["query"] = QueryMetadata.from_dict(data["query"])
         return cls(**data)
 
     def to_dict(self) -> dict[str, Any]:
@@ -113,4 +118,8 @@ class Result:
             data["evidence"]["source_ids"] = [
                 dict(source) for source in self.evidence.source_ids
             ]
+        if self.query is None:
+            del data["query"]
+        else:
+            data["query"] = self.query.to_dict()
         return data

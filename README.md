@@ -62,6 +62,8 @@ with Geocoder(data_dir="./store") as geo:
 Use keyword arguments for coordinates. reverse_many streams named coordinate
 objects; reverse_columns accepts NumPy arrays. Results are frozen dataclasses.
 [Python details](clients/python/thereabouts/README.md).
+For explicit ECEF, ENU/NED, UTM and geocodes, use `reverse_point` / Node
+`reversePoint`; see the [coordinate guide](docs/clients/coordinates.md).
 
 ## Node
 

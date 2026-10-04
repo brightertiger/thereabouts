@@ -81,3 +81,80 @@ The MY/SG proof script supports both `python tests/benchmarks/release_path.py` a
 it writes measurements.json inside that output. Updating the tracked
 CLIENT_RELEASE_MEASUREMENTS.json additionally requires --write. Ordinary
 measurement runs leave historical tracked figures unchanged.
+
+## Offline coordinate-client development
+
+Use a dedicated worktree and its own environment. These commands require the
+existing offline cache, Rust 1.99, wasm32-unknown-unknown and wasm-bindgen
+0.2.129; they never provision a missing tool over the network. First integrate
+the core-owned coords module and `tests/fixtures/coordinates/vectors.json`.
+A contract stub compile is not a correctness gate. Never replace missing core
+code or vectors with a production fallback.
+
+```sh
+export CARGO_TARGET_DIR=/Users/ujjwal/Downloads/solo/thereabouts-work/target
+export CARGO_NET_OFFLINE=true CARGO_BUILD_JOBS=1
+export UV_OFFLINE=1 PIP_NO_INDEX=1 PROJ_NETWORK=OFF
+export UV_PROJECT_ENVIRONMENT="$PWD/.cache/coords-venv"
+/opt/homebrew/anaconda3/bin/uv sync --offline --locked --all-extras --no-install-project
+export VIRTUAL_ENV="$UV_PROJECT_ENVIRONMENT"
+export PATH="$VIRTUAL_ENV/bin:/opt/homebrew/anaconda3/bin:$PATH"
+# An inherited Conda environment conflicts with the selected worktree venv.
+env -u CONDA_PREFIX maturin develop --offline --locked --uv
+python -c 'import thereabouts, thereabouts._core; print(thereabouts.__file__); print(thereabouts._core.__file__)'
+/opt/homebrew/anaconda3/bin/uv run --offline --no-sync pytest tests/client/core tests/client/mcp
+```
+
+Both import paths must resolve to the current worktree's editable build. Never
+use another checkout's prebuilt extension as validation evidence. If provisioning
+fails, retain the exact offline error and leave the gate blocked. The example's
+uv sync installs already locked dev extras but does not run the pipeline.
+Only the explicit core/MCP test directories above are authorized here;
+`tests/client/forward/test_plates.py` imports pipeline and is excluded. Never run
+bare pytest or the pipeline/build-cache tests from this restricted recipe.
+
+Run Cargo checks from `core/`, one process at a time, with the same preset target:
+
+```sh
+cargo fmt --check
+cargo clippy --offline --locked -p thereabouts-py -p thereabouts-wasm --all-targets --all-features -- -D warnings
+cargo test --offline --locked -p thereabouts-wasm
+cargo test --offline --locked -p thereabouts-py
+cargo check --offline --locked -p thereabouts-core -p thereabouts-cli-core -p thereabouts-wasm --target wasm32-unknown-unknown
+```
+
+The Python crate disables its Rust test/doctest harnesses. Its cargo-test exit
+status does not validate the extension; the fresh editable build and pytest do.
+Check free disk before starting each build and keep it strictly above 5 GiB.
+Coordinate with sibling packages, use one Cargo job and never clean the shared
+target. Cached declarations and stubs cannot establish conversion correctness.
+
+For Node, use an already installed Node 22 or 24. From `clients/node/`:
+
+```sh
+npm ci --offline --ignore-scripts --no-audit --no-fund
+CARGO_NET_OFFLINE=true CARGO_BUILD_JOBS=1 npm run build
+npm test
+npm run check
+npm run format
+```
+
+`build-wasm.mjs` resolves a supplied `CARGO_TARGET_DIR` from the workspace root,
+uses it in Cargo's environment and reads the wasm-bindgen input from it. The
+fallback without the environment variable is `core/target`; the preset above
+is mandatory for the coordinate packages. Missing npm cache entries are blocked
+gates, not permission to fetch them. Using an installed matching TypeScript or
+Prettier binary can check source, but does not establish npm-ci success.
+
+The full Node suite includes loopback HTTP and native-Python comparisons. When
+network use is prohibited or the native extension is unavailable, run explicit
+non-network files only, for example:
+
+```sh
+node --import ./test/offline.js --test test/coordinates.test.js test/library.test.js
+```
+
+Coordinate parity tests require `THEREABOUTS_PYTHON` to select this worktree's
+fresh native installation. Report subsets, facade-only tests, snapshot builds
+and unsupported Node 23 runs separately; none qualifies the Node 22/24 matrix.
+No package archive, publication, pipeline run or remote CI is required here.

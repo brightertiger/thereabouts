@@ -4,6 +4,16 @@ import numpy as np
 from numpy.typing import NDArray
 
 class Geocoder:
+    def reverse_point(
+        self, point_json: str, *, evidence: bool = False
+    ) -> dict[str, Any]: ...
+    def reverse_frame_columns(
+        self,
+        columns: dict[str, NDArray[Any]],
+        *,
+        frame: str = "geodetic",
+        origin_json: str | None = None,
+    ) -> dict[str, NDArray[Any]]: ...
     def reverse(
         self, lat: float, lon: float, *, evidence: bool = False
     ) -> dict[str, Any]: ...

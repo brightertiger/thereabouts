@@ -3,6 +3,7 @@
     test,
     allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)
 )]
+pub mod coords;
 pub mod error;
 pub mod format;
 pub mod result;

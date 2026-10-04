@@ -137,3 +137,30 @@ Store paths use the same portable policy as Python. Explicit pack selections
 open their handles immediately; discovery through a store defers each family
 until its first lookup (verify: true opens all selected families for verification).
 All opened handles remain held until close or async disposal.
+
+## Explicit coordinate frames
+
+`reversePoint(point: CoordinatePoint, options?)` normalizes explicitly framed
+inputs and returns immutable `query` provenance. `reversePoints` accepts sync
+or async iterables and yields in order with backpressure. For example:
+
+```js
+const result = await geo.reversePoint({ frame: "ecef", x: 6378137, y: 0, z: 0 });
+console.log(result.query.normalized); // equator/Greenwich
+await geo.reversePoint({ frame: "h3", cell: 0x881fb46625fffffn });
+```
+
+H3/S2 IDs must be strings or bigint; Number IDs are refused. No triple or
+identifier is guessed. NaN/Infinity optional fields remain invalid rather than
+being silently erased by JSON serialization. ENU/NED need an explicit origin;
+HDOP/VDOP remain dimensionless, and unknown height datums are preserved.
+Query metadata is available without evidence and survives close. Existing
+`reverse`, `fromH3`, `reverseMany`, result `Point` and module shortcuts stay as-is.
+`result.point` is the H3 query-cell centre; `query.normalized` is the exact or
+representative input. See the [coordinate guide](../../docs/clients/coordinates.md).
+
+The WASM build honours `CARGO_TARGET_DIR`; relative paths resolve from the
+repository root. Without it, the existing `core/target` fallback applies.
+Cargo and wasm-bindgen use that same target path. For restricted offline work,
+use the [offline recipe](../../docs/clients/release.md) and inspect the actual
+[qualification](../../docs/clients/status.md) before relying on a build.
