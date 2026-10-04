@@ -11,7 +11,7 @@ licence:
   attribution: Per-file source attribution and licence identifiers are retained in
     pins.lock and every normalized row.
 limits:
-  # Two retained releases of capacity; current pinned bytes: 843,631.
-  download_bytes: 1687262
+  # Two retained releases of capacity; current pinned bytes: 321,140.
+  download_bytes: 642280
 options: {}
 options_schema: pipeline.config.source_options.Text
