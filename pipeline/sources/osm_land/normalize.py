@@ -18,7 +18,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     if len(ctx.pin.files) != 1:
         raise ValueError("Expected one OSM land archive")
     pin = ctx.pin.files[0]
-    directory = ctx.work / ctx.unit.inputs_hash
+    directory = ctx.work / ctx.inputs_hash
     extracted = extract(
         ctx,
         ctx.input(pin.name),
@@ -37,7 +37,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
         raise ValueError(f"Unexpected OSM land CRS: {projection}")
     index = ctx.ensure(directory / "records.sqlite3")
     reservation = int(ctx.settings.options["index_bytes"])
-    ctx.runtime.guard.admit(reservation)
+    ctx.guard.admit(reservation)
     written = 0
     try:
         count = _build_index(ctx, shp, index)
@@ -45,7 +45,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
         if written > reservation:
             raise ValueError("OSM index exceeds configured index_bytes")
     finally:
-        ctx.runtime.guard.release(reservation, written_bytes=written)
+        ctx.guard.release(reservation, written_bytes=written)
     notice = _publisher_notice(ctx, shp, count)
     source_hash = sha256_file(shp)
     evidence = {
@@ -60,7 +60,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
         if reader.numRecords != count:
             raise ValueError("OSM SHX and DBF record counts disagree")
         for key, ordinals, extent in _units(ctx, index):
-            ctx.runtime.guard.admit()
+            ctx.guard.admit()
             writer = PartitionWriter(ctx, "areas", key)
             repairs = []
             for ordinal in ordinals:
@@ -72,9 +72,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
                     repairs.append(repair)
             outputs.extend(writer.finish())
             retained += writer.count
-            audit = (
-                ctx.normalized / "audits" / ctx.unit.inputs_hash / f"{digest(key)}.json"
-            )
+            audit = ctx.normalized / "audits" / ctx.inputs_hash / f"{digest(key)}.json"
             write_json(
                 ctx.ensure(audit),
                 {

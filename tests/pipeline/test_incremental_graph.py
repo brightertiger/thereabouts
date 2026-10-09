@@ -87,17 +87,17 @@ def test_transfer_settings_change_reruns_nothing(tmp_path: Path) -> None:
         needs=("normalize",),
     )
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path, ledger, "geoboundaries", boundary_payloads(tmp_path)
         )
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
         graph: list[Stage] = [*stages, reader]
-        assert run(source.runtime, graph) == {"completed": 3, "skipped": 0}
-        settings = source.runtime.config.sources["geoboundaries"]
+        assert run(runtime, graph) == {"completed": 3, "skipped": 0}
+        settings = runtime.config.sources["geoboundaries"]
         settings.limits = replace(settings.limits, retries=9, timeout_seconds=120.0)
         settings.upstream = {**settings.upstream, "url": "https://mirror.example/x"}
-        assert all(item.state == "current" for item in plan(source.runtime, graph))
-        assert run(source.runtime, graph) == {"completed": 0, "skipped": 3}
+        assert all(item.state == "current" for item in plan(runtime, graph))
+        assert run(runtime, graph) == {"completed": 0, "skipped": 3}
 
 
 @pytest.mark.parametrize("changed", GEOGRAPHIC)

@@ -89,7 +89,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     paths = extract(
         ctx,
         ctx.input(ctx.pin.files[0].name),
-        ctx.work / ctx.unit.inputs_hash,
+        ctx.work / ctx.inputs_hash,
         lambda name: name.endswith(".gpkg"),
     )
     if len(paths) != 1:

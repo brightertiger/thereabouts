@@ -1,43 +1,62 @@
 """Source adapters consume a frozen pin and return published local artifacts."""
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+from pipeline.config.schema import H3, Paths
 from pipeline.config.sources import SourceSettings
+from pipeline.errors import InputIntegrityError
 from pipeline.pins.models import PinFile, SourcePin
 from pipeline.runtime.paths import located, relative
-from pipeline.stages.contract import Context, Unit
+from pipeline.runtime.resources import ResourceGuard
+
+
+@dataclass(frozen=True)
+class UnitInputs:
+    """`ctx.unit.inputs_hash`, kept until the plate adapters read `ctx.inputs_hash`."""
+
+    inputs_hash: str
 
 
 @dataclass(frozen=True)
 class SourceContext:
-    runtime: Context
+    """What an adapter may use; never the ledger, the verifier or other config."""
+
     settings: SourceSettings
     pin: SourcePin
-    unit: Unit
+    # The unit's inputs hash names its output and work directories.
+    inputs_hash: str
+    root: Path
+    paths: Paths
+    grid: H3
+    guard: ResourceGuard
+    storage: Mapping[str, str]
+    # Measurements such as timings go to the run log, never into outputs.
+    log: Callable[[str], None]
 
+    @property
+    def unit(self) -> UnitInputs:
+        return UnitInputs(self.inputs_hash)
+
+    # Each access re-checks that the directory stays inside the workspace.
     @property
     def raw(self) -> Path:
         return located(
-            self.runtime.root,
-            (Path(self.runtime.config.paths.raw) / self.settings.name).as_posix(),
+            self.root, (Path(self.paths.raw) / self.settings.name).as_posix()
         )
 
     @property
     def normalized(self) -> Path:
         return located(
-            self.runtime.root,
-            (
-                Path(self.runtime.config.paths.normalized) / self.settings.name
-            ).as_posix(),
+            self.root, (Path(self.paths.normalized) / self.settings.name).as_posix()
         )
 
     @property
     def work(self) -> Path:
         return located(
-            self.runtime.root,
-            (Path(self.runtime.config.paths.work) / self.settings.name).as_posix(),
+            self.root, (Path(self.paths.work) / self.settings.name).as_posix()
         )
 
     def named(self, key: str) -> PinFile:
@@ -45,7 +64,9 @@ class SourceContext:
             pin for pin in self.pin.files if pin.metadata.get("key", pin.name) == key
         ]
         if len(matches) != 1:
-            raise ValueError(f"Expected one pinned input {self.settings.name}/{key}")
+            raise InputIntegrityError(
+                f"Expected one pinned input {self.settings.name}/{key}"
+            )
         return matches[0]
 
     def input(self, name: str) -> Path:
@@ -60,11 +81,11 @@ class SourceContext:
         return located(self.raw, name)
 
     def ensure(self, path: Path) -> Path:
-        relative(self.runtime.root, path)
+        relative(self.root, path)
         return path
 
     def relative(self, path: Path) -> str:
-        return relative(self.runtime.root, path)
+        return relative(self.root, path)
 
 
 class Source(Protocol):

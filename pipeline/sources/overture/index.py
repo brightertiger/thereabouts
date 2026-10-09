@@ -11,11 +11,11 @@ from pipeline.sources.contract import SourceContext
 
 
 def build_index(ctx: SourceContext) -> Path:
-    target = ctx.work / ctx.unit.inputs_hash / "entities.sqlite3"
+    target = ctx.work / ctx.inputs_hash / "entities.sqlite3"
     ctx.ensure(target)
     options = ctx.settings.options
     reservation = int(options["index_bytes"])
-    ctx.runtime.guard.admit(reservation)
+    ctx.guard.admit(reservation)
     written = 0
     try:
         with (
@@ -36,7 +36,7 @@ def build_index(ctx: SourceContext) -> Path:
                         columns=["id", "parent_division_id"],
                         use_threads=False,
                     ):
-                        ctx.runtime.guard.admit()
+                        ctx.guard.admit()
                         db.executemany(
                             "INSERT INTO entities VALUES (?,?)",
                             (
@@ -51,4 +51,4 @@ def build_index(ctx: SourceContext) -> Path:
         written = target.stat().st_size
         return target
     finally:
-        ctx.runtime.guard.release(reservation, written_bytes=written)
+        ctx.guard.release(reservation, written_bytes=written)

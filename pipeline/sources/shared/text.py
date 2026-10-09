@@ -29,7 +29,7 @@ def publish_rows(
 ) -> list[Path]:
     writers: dict[Kind, PartitionWriter] = {}
     counts: Counter[str] = Counter()
-    report_root = ctx.normalized / "audits" / ctx.unit.inputs_hash
+    report_root = ctx.normalized / "audits" / ctx.inputs_hash
     ctx.ensure(report_root).mkdir(parents=True, exist_ok=True)
     rejects_path = ctx.ensure(report_root / "rejects.jsonl")
     # Rejection evidence is streamed too; bad input cannot fill process memory.

@@ -56,7 +56,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     return publish_rows(
         ctx,
         records(ctx),
-        lambda row: ip_range(row.raw["fields"], grid=ctx.runtime.config.h3),
+        lambda row: ip_range(row.raw["fields"], grid=ctx.grid),
     )
 
 

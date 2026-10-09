@@ -46,9 +46,7 @@ def records(ctx: SourceContext) -> Iterator[InputRow]:
 
 def normalize(ctx: SourceContext) -> list[Path]:
     ctx.named("airports.csv")
-    return publish_rows(
-        ctx, records(ctx), lambda row: airport(row.raw, grid=ctx.runtime.config.h3)
-    )
+    return publish_rows(ctx, records(ctx), lambda row: airport(row.raw, grid=ctx.grid))
 
 
 __all__ = ["Options", "normalize", "propose"]

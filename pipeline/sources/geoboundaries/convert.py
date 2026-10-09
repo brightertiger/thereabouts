@@ -97,7 +97,7 @@ def _convert(
                     "areas",
                     ctx.settings.name,
                     ctx.settings.limits,
-                    grid=ctx.runtime.config.h3,
+                    grid=ctx.grid,
                 )
         except (ValueError, shapely.errors.GEOSException) as error:
             report["rejects"].append(
@@ -139,8 +139,6 @@ def _convert(
     outputs = writer.finish()
     report["parquet_bytes"] = sum(path.stat().st_size for path in outputs)
     report["partitions"] = len(outputs)
-    ctx.runtime.log(
-        f"normalize/{ctx.settings.name} {unit}: {time.monotonic() - started:.3f}s"
-    )
+    ctx.log(f"normalize/{ctx.settings.name} {unit}: {time.monotonic() - started:.3f}s")
     report["schema_geometry_validation"] = "passed for every output row"
     return outputs, report

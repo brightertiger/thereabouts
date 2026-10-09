@@ -81,7 +81,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     auxiliary.append(index)
     outputs: list[Path] = []
     reports: list[Row] = []
-    root = ctx.normalized / "audits" / ctx.unit.inputs_hash
+    root = ctx.normalized / "audits" / ctx.inputs_hash
     rejects = ctx.ensure(root / "rejects.jsonl")
     options = ctx.settings.options
     with closing(
@@ -102,7 +102,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
                     ctx.settings.limits.chunk_bytes,
                     int(options["line_bytes"]),
                 ):
-                    ctx.runtime.guard.admit()
+                    ctx.guard.admit()
                     for offset, raw in lines(
                         paths[member], chunk, int(options["line_bytes"])
                     ):

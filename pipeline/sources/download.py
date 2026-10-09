@@ -5,6 +5,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
+from pipeline.errors import ConfigError
 from pipeline.pins.evidence import verify_publisher
 from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import sha256_file, write_json
@@ -83,11 +84,10 @@ def inventory(ctx: SourceContext) -> dict[str, Any]:
 
 
 def download(ctx: SourceContext) -> list[Path]:
-    if ctx.runtime.readonly:
-        raise ValueError("Cannot download with a read-only context")
-    base = ctx.runtime.storage.get("gcs_raw")
+    # A SourceContext exists only for a writable run (stages.sources.adapter_context).
+    base = ctx.storage.get("gcs_raw")
     if not base:
-        raise ValueError("Configure storage.gcs_raw before downloading source data")
+        raise ConfigError("Configure storage.gcs_raw before downloading source data")
     total = sum(pin.size for pin in ctx.pin.files)
     if total > ctx.settings.limits.download_bytes:
         raise ValueError(

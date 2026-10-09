@@ -43,7 +43,7 @@ def _shapefile(path: Path, geometries: list[Polygon]) -> None:
 @pytest.fixture
 def acquired(tmp_path: Path) -> Iterator[SourceContext]:
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        ctx, _ = source_context(
+        _, ctx, _ = source_context(
             tmp_path, ledger, "osm_land", {"land.zip": (b"test", {})}
         )
         yield ctx

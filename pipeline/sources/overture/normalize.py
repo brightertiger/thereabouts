@@ -32,7 +32,7 @@ def group(
     key = f"{pin.name}#row-group={ordinal}"
     kind: Kind = "places" if pin.metadata["type"] == "division" else "areas"
     sink, aliases = PartitionWriter(ctx, kind, key), PartitionWriter(ctx, "names", key)
-    root = ctx.normalized / "audits" / ctx.unit.inputs_hash
+    root = ctx.normalized / "audits" / ctx.inputs_hash
     audit_path = root / f"{digest(key)}.json"
     ctx.ensure(audit_path)
     rejects = ctx.ensure(audit_path.with_suffix(".jsonl"))
@@ -55,7 +55,7 @@ def group(
         for batch in parquet.iter_batches(
             batch_size=batch_size, row_groups=[ordinal], use_threads=False
         ):
-            ctx.runtime.guard.admit()
+            ctx.guard.admit()
             for row in batch.to_pylist():
                 stats["input_rows"] += 1
                 subtypes[row["subtype"]] += 1

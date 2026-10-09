@@ -75,7 +75,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
         lambda row: postal(
             row.raw["fields"],
             str(row.pin.metadata.get("key", row.pin.name)),
-            grid=ctx.runtime.config.h3,
+            grid=ctx.grid,
         ),
     )
 
