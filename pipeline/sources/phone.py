@@ -5,12 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterator
 from pathlib import Path
 
-from pipeline.config.source_options import Text as Options
-from pipeline.config.sources import SourceSettings
-from pipeline.pins.models import SourcePin
-
 from .contract import SourceContext
-from .proposals.resolve import propose as propose_pin
 from .shared.lookup_rows import Row
 from .shared.rows import RowRejected
 from .shared.text import InputRow, publish_rows
@@ -89,11 +84,3 @@ def normalize(ctx: SourceContext) -> list[Path]:
         )
 
     return publish_rows(ctx, records(ctx), convert)
-
-
-__all__ = ["Options", "normalize", "propose"]
-
-
-def propose(settings: SourceSettings) -> SourcePin:
-    """Resolve upstream only for an explicit pin proposal."""
-    return propose_pin(settings)

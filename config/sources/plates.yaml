@@ -1,5 +1,6 @@
 name: plates
 adapter: pipeline.sources.plates
+proposer: pipeline.sources.proposals.plates
 kind: registration_evidence
 enabled: true
 upstream: {}

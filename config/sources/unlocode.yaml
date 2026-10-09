@@ -1,5 +1,6 @@
 name: unlocode
 adapter: pipeline.sources.unlocode
+proposer: pipeline.sources.proposals.resolve
 kind: unlocode
 enabled: true
 upstream:

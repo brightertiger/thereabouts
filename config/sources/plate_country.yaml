@@ -1,5 +1,6 @@
 name: plate_country
 adapter: pipeline.sources.plate_country
+proposer: pipeline.sources.proposals.resolve
 kind: registration_country_evidence
 enabled: false
 upstream:

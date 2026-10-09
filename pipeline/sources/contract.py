@@ -89,10 +89,14 @@ class SourceContext:
 
 
 class Source(Protocol):
-    def propose(self, settings: SourceSettings) -> SourcePin:
-        """Resolve upstream metadata and hashes without writing the lock."""
-        ...
-
     def normalize(self, ctx: SourceContext) -> list[Path]:
         """Regenerate indexes, normalize bounded batches and publish a manifest."""
+        ...
+
+
+class Proposer(Protocol):
+    """The module a source's `proposer:` names."""
+
+    def propose(self, settings: SourceSettings) -> SourcePin:
+        """Resolve upstream metadata and hashes without writing the lock."""
         ...

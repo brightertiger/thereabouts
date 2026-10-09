@@ -1,5 +1,6 @@
 name: dbip
 adapter: pipeline.sources.dbip
+proposer: pipeline.sources.proposals.resolve
 kind: dbip
 enabled: true
 upstream:

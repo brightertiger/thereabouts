@@ -1,5 +1,6 @@
 name: ghsl
 adapter: pipeline.sources.ghsl
+proposer: pipeline.sources.proposals.resolve
 kind: urban_centres
 enabled: true
 upstream:
