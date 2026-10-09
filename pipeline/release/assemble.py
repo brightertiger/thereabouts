@@ -69,7 +69,9 @@ def assemble(
         )
         # A dataset the pack writer would refuse is never published.
         closure.check(staging, tables)
-        sources = metadata.licences(config, observed)
+        sources = metadata.licences(
+            config, observed, metadata.boundary_states(staging, tables)
+        )
         stats = metadata.statistics(tables)
         content = logical_content(staging, tables, config, guard)
         documents = {
