@@ -1,3 +1,1116 @@
+# Reviewed plate-country documents, beyond what the plates pin already holds.
+# Generated from config/policies/plate_country/sources.yaml and
+# eval/plate_country/evaluation.yaml; `pins update plate_country` fetches them.
+# The first 25 files are Wikipedia revisions by oldid: vehicle-stock.json
+# (vehicle priors) and the pages behind the format rules the plates pin cannot
+# support. The rest serve the plate evaluation benchmark: Commons metadata for
+# the evaluation's page ids, and the photographs it transcribes.
 release: ''
 selectors: []
-files: []
+files:
+- name: vehicle-stock.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377579042
+  metadata:
+    key: vehicle-stock.json
+    kind: wikipedia
+    revision: 1377579042
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1377579042
+- name: wiki-AG.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338001799
+  metadata:
+    key: wiki-AG.json
+    kind: wikipedia
+    revision: 1338001799
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1338001799
+- name: wiki-BQ.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345337205
+  metadata:
+    key: wiki-BQ.json
+    kind: wikipedia
+    revision: 1345337205
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1345337205
+- name: wiki-BS.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1358279279
+  metadata:
+    key: wiki-BS.json
+    kind: wikipedia
+    revision: 1358279279
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1358279279
+- name: wiki-CA-design.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1373784295
+  metadata:
+    key: wiki-CA-design.json
+    kind: wikipedia
+    revision: 1373784295
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1373784295
+- name: wiki-DJ-uk.json
+  url: https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=36058050
+  metadata:
+    key: wiki-DJ-uk.json
+    kind: wikipedia
+    revision: 36058050
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: uk.wikipedia.org contributors, revision 36058050
+- name: wiki-DM-uk.json
+  url: https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=38199368
+  metadata:
+    key: wiki-DM-uk.json
+    kind: wikipedia
+    revision: 38199368
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: uk.wikipedia.org contributors, revision 38199368
+- name: wiki-EH-de.json
+  url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=260305379
+  metadata:
+    key: wiki-EH-de.json
+    kind: wikipedia
+    revision: 260305379
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: de.wikipedia.org contributors, revision 260305379
+- name: wiki-EH-en.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338003287
+  metadata:
+    key: wiki-EH-en.json
+    kind: wikipedia
+    revision: 1338003287
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1338003287
+- name: wiki-ER-fr.json
+  url: https://fr.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=222874638
+  metadata:
+    key: wiki-ER-fr.json
+    kind: wikipedia
+    revision: 222874638
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: fr.wikipedia.org contributors, revision 222874638
+- name: wiki-FO.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338668056
+  metadata:
+    key: wiki-FO.json
+    kind: wikipedia
+    revision: 1338668056
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1338668056
+- name: wiki-GB-ni.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1370151084
+  metadata:
+    key: wiki-GB-ni.json
+    kind: wikipedia
+    revision: 1370151084
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1370151084
+- name: wiki-IO-it.json
+  url: https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=151111064
+  metadata:
+    key: wiki-IO-it.json
+    kind: wikipedia
+    revision: 151111064
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: it.wikipedia.org contributors, revision 151111064
+- name: wiki-KN.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338753711
+  metadata:
+    key: wiki-KN.json
+    kind: wikipedia
+    revision: 1338753711
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1338753711
+- name: wiki-LC.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1376852335
+  metadata:
+    key: wiki-LC.json
+    kind: wikipedia
+    revision: 1376852335
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1376852335
+- name: wiki-MP.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1344455877
+  metadata:
+    key: wiki-MP.json
+    kind: wikipedia
+    revision: 1344455877
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1344455877
+- name: wiki-MU-de.json
+  url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=223364766
+  metadata:
+    key: wiki-MU-de.json
+    kind: wikipedia
+    revision: 223364766
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: de.wikipedia.org contributors, revision 223364766
+- name: wiki-MV.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345469488
+  metadata:
+    key: wiki-MV.json
+    kind: wikipedia
+    revision: 1345469488
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1345469488
+- name: wiki-NL-current.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377707144
+  metadata:
+    key: wiki-NL-current.json
+    kind: wikipedia
+    revision: 1377707144
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1377707144
+- name: wiki-SJ-no.json
+  url: https://no.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=25912083
+  metadata:
+    key: wiki-SJ-no.json
+    kind: wikipedia
+    revision: 25912083
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: no.wikipedia.org contributors, revision 25912083
+- name: wiki-SL-de.json
+  url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=260758379
+  metadata:
+    key: wiki-SL-de.json
+    kind: wikipedia
+    revision: 260758379
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: de.wikipedia.org contributors, revision 260758379
+- name: wiki-SS-it.json
+  url: https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=148177462
+  metadata:
+    key: wiki-SS-it.json
+    kind: wikipedia
+    revision: 148177462
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: it.wikipedia.org contributors, revision 148177462
+- name: wiki-US-serials.json
+  url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377655506
+  metadata:
+    key: wiki-US-serials.json
+    kind: wikipedia
+    revision: 1377655506
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: en.wikipedia.org contributors, revision 1377655506
+- name: wiki-ZM-de.json
+  url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=242232989
+  metadata:
+    key: wiki-ZM-de.json
+    kind: wikipedia
+    revision: 242232989
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: de.wikipedia.org contributors, revision 242232989
+- name: wiki-world-es.json
+  url: https://es.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=175169987
+  metadata:
+    key: wiki-world-es.json
+    kind: wikipedia
+    revision: 175169987
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: es.wikipedia.org contributors, revision 175169987
+- name: eval-commons-AR.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=171652553%7C171652555%7C171652556&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-AR.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-AU.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=17651310%7C37521912&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-AU.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-BD.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=126771000&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-BD.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-BR.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=171652246%7C171652247%7C171652248&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-BR.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-CN.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=129604814&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-CN.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-CO.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=2866733%7C17641721%7C67482637&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-CO.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-DE.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=198472962&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-DE.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-EG.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=147682886%7C147682887%7C147682890&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-EG.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-FJ.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=32718654%7C40378058%7C40378059%7C40378060%7C171631247%7C171632116%7C172603195&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-FJ.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-GB.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=40920628%7C70945783&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-GB.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-GH.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=34608501%7C38911278%7C88493475&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-GH.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-ID.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=38218295%7C43428151%7C120276480&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-ID.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-IN.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=15287369%7C15287388%7C48300969%7C84080599&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-IN.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-IR.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=12655196%7C17800104%7C18909993%7C141123606&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-IR.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-IT.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=202503%7C2393556%7C2719713%7C2719742%7C7115895%7C15332053%7C17634306%7C18209564%7C19875170%7C26311482%7C39302671&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-IT.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-JP.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=37392677%7C46268695%7C74565857%7C74565863&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-JP.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-KE.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=72236307%7C174624649&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-KE.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-KR.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=29465588%7C175761989&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-KR.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-MA.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=19919839%7C31782908%7C86201728%7C113295681%7C113295682&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-MA.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-MX.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=67712475%7C67712492&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-MX.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-MY.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=9490659%7C9490963%7C9490989%7C9512280%7C17505987%7C17548353%7C33010486%7C187930347&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-MY.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-NG.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=99334263%7C99334325%7C99334443&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-NG.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-NL.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=5045119%7C22543291%7C26388886%7C26617984%7C35146111%7C37748932%7C44934346%7C49308089%7C67751823%7C67751824%7C68299574%7C68357199%7C68357200%7C68357201%7C174619865&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-NL.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-NZ.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=17641914%7C55760144%7C83592604&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-NZ.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-PG.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=161340102%7C161340161%7C161341123%7C161341189%7C161417117%7C161417933%7C161418933%7C161418977%7C161419379%7C161419432&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-PG.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-PK.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=19682538&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-PK.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-SE.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=5188284%7C40920544%7C128688802&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-SE.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-SG.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=8534987%7C8535035%7C17633714%7C52697803%7C70511508%7C71217807&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-SG.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-TH.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=49068518%7C162240998%7C162241214&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-TH.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-TR.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=1588054%7C50388187%7C95458092&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-TR.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-UA.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=177332684&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-UA.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-VN.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=164798080%7C167846529%7C167849296&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-VN.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-commons-ZA.json
+  url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=25847406%7C61391657&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+  metadata:
+    key: eval-commons-ZA.json
+    kind: commons_metadata
+    license: CC-BY-SA-4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution: Wikimedia Commons contributors; per-file revision and image licence retained
+      in evaluation rows
+    pinning: Pages selected by the evaluation's page ids; each response carries page revision
+      ids and file SHA-1s.
+- name: eval-image-120276480.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/0b/East_Kalimantan_License_Plate.jpg
+  metadata:
+    key: eval-image-120276480.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:MarioJump83" title="User:MarioJump83">MarioJump83</a>
+    image_sha1: 0b9357790f42ab0a06569413106f4fb013091e69
+- name: eval-image-12655196.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/7/7a/Iran_mashad_license_plate_23.jpg
+  metadata:
+    key: eval-image-12655196.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Robinsoncrusoe&amp;action=edit&amp;redlink=1"
+      class="new" title="User:Robinsoncrusoe (page does not exist)">Robinsoncrusoe</a>
+    image_sha1: da4c4ac7e21ee2826da34fade1a154a806939c89
+- name: eval-image-126771000.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/9/92/BD_Benapole_0906_%2821%29_%2816590654063%29.jpg
+  metadata:
+    key: eval-image-126771000.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/120935793@N02">Diego
+      Tirira</a> from Quito, Ecuador
+    image_sha1: 62e2542a5beb70ebf42fc7508761e3588b0b0cd4
+- name: eval-image-129604814.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/b/b8/%E4%B8%9C%E8%8E%9E%E5%B8%82%2C_%E4%B8%AD%E5%9B%BD_Mar_14%2C_2023_03-50-20_PM.jpeg
+  metadata:
+    key: eval-image-129604814.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: null
+    image_sha1: a56cb0b14a071532f15fff298f959e01b69dc621
+- name: eval-image-141123606.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/5/51/20170418_Autos_-_33438514553.jpg
+  metadata:
+    key: eval-image-141123606.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: somiz
+    image_sha1: 214a881ecc9fa60fd71ef0207b04eb744c246c2a
+- name: eval-image-147682886.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/1a/Egypte_particulier_voertuig_01.jpg
+  metadata:
+    key: eval-image-147682886.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: f556393f4a290ba7ca01fa37c95cc3c2f8702a3b
+- name: eval-image-147682887.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/f/f8/Egypte_particulier_voertuig_02.jpg
+  metadata:
+    key: eval-image-147682887.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: 739c9f4c41345a1e749e4b1c135bade3866c904f
+- name: eval-image-147682890.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/5/5d/Egypte_particulier_voertuig_03.jpg
+  metadata:
+    key: eval-image-147682890.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: fccb1de1cf18bfa01f47ad9c16f7403a85398a92
+- name: eval-image-15287369.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/a/a7/Indian_registration_1906.jpg
+  metadata:
+    key: eval-image-15287369.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: Krokodyl
+    image_sha1: 04280b2c01ccefee5c79a23c77d43fb2900d5685
+- name: eval-image-15287388.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/8b/Indian_registration_2313.jpg
+  metadata:
+    key: eval-image-15287388.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: Krokodyl
+    image_sha1: a5e9c35ef01e276b765d7197ee979670fa938a76
+- name: eval-image-1588054.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/c/c2/Turkeylicenseplate.jpg
+  metadata:
+    key: eval-image-1588054.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dantadd" title="User:Dantadd">User:Dantadd</a>
+    image_sha1: 6684fe7e4a6a0e742194ec12b08c980257512858
+- name: eval-image-162240998.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/8e/1%E0%B8%81%E0%B8%8E_%E0%B8%8A%E0%B8%B8%E0%B8%A1%E0%B8%9E%E0%B8%A3_855.jpg
+  metadata:
+    key: eval-image-162240998.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Ayakln" title="User:Ayakln">Ayakln</a>
+    image_sha1: c8a4cbd4b066f8508f608f9dcf951cbbd53bae38
+- name: eval-image-162241214.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/8f/1%E0%B8%81%E0%B8%90_%E0%B8%8A%E0%B8%B8%E0%B8%A1%E0%B8%9E%E0%B8%A3_2933.jpg
+  metadata:
+    key: eval-image-162241214.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Ayakln" title="User:Ayakln">Ayakln</a>
+    image_sha1: d95cfd19c4a05bb7e559fbf3522b448e21497de1
+- name: eval-image-164798080.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/19/Bi%E1%BB%83n_s%E1%BB%91_xe_b%C3%ACnh_d%C6%B0%C6%A1ng.jpg
+  metadata:
+    key: eval-image-164798080.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+      title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+    image_sha1: 4483bcff2bcd83fe997f17e2e54e74c2cfde15dc
+- name: eval-image-167846529.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/5/5a/Bi%E1%BB%83n_s%E1%BB%91_xe_Kon_Tum.jpg
+  metadata:
+    key: eval-image-167846529.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+      title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+    image_sha1: 755dde3f731a19508fa04fb634318d72c0f0855f
+- name: eval-image-167849296.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/f/fc/Bi%E1%BB%83n_s%E1%BB%91_xe_%C4%91%E1%BB%93ng_th%C3%A1p.jpg
+  metadata:
+    key: eval-image-167849296.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+      title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+    image_sha1: c5652647799b53ef3a0cac4198ef8aa0dea4adb5
+- name: eval-image-171652246.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/c/c6/License_plate_of_Brazil_02.jpg
+  metadata:
+    key: eval-image-171652246.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: d73a2ff03afa467e2444b2ecc2440c84e06866b5
+- name: eval-image-171652247.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/1a/License_plate_of_Brazil_03.jpg
+  metadata:
+    key: eval-image-171652247.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: 060dcc5be11b8667df4ee3737d182ef449c28058
+- name: eval-image-171652248.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/a/ac/License_plate_of_Brazil_01.jpg
+  metadata:
+    key: eval-image-171652248.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: ff3da465400555126d0be725a05cdf002115e96b
+- name: eval-image-171652553.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/7/7b/License_plate_of_Argentina_02.jpg
+  metadata:
+    key: eval-image-171652553.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: f879546aabbb2041555e41b91ef6698fe97dfba3
+- name: eval-image-171652555.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/f/fe/License_plate_of_Argentina_03.jpg
+  metadata:
+    key: eval-image-171652555.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: 3aa9c7d6aae38b3f878640a36315b46dd1e984da
+- name: eval-image-171652556.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/2/22/License_plate_of_Argentina_01.jpg
+  metadata:
+    key: eval-image-171652556.jpg
+    kind: image
+    license: CC BY 4.0
+    license_url: https://creativecommons.org/licenses/by/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: b29493adfd33ee5102f19ffe193b8e905b387762
+- name: eval-image-175761989.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/17/Republic_of_Korea_euro_license_plate.jpg
+  metadata:
+    key: eval-image-175761989.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: Republic of Korea Culture Ministry
+    image_sha1: b06d5dc82b27824c5cc5ddc536606d6bb14902b8
+- name: eval-image-17641914.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/87/NEW_ZEALAND_1986-current_number_plate_-_Flickr_-_woody1778a.jpg
+  metadata:
+    key: eval-image-17641914.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/9816248@N03">Jerry
+      "Woody"</a> from Edmonton, Canada
+    image_sha1: 0b944adc5f666f45c894de933a0f9666d8a4ffca
+- name: eval-image-18909993.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/b/b9/Iran_licenceplate.jpg
+  metadata:
+    key: eval-image-18909993.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+    image_sha1: d0d264ed555c028f3639330500321c559aa06b2f
+- name: eval-image-19682538.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/6/60/Islamabad_Capital_Territory_car_registration_plate.jpg
+  metadata:
+    key: eval-image-19682538.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:NHPak&amp;action=edit&amp;redlink=1"
+      class="new" title="User:NHPak (page does not exist)">NHPak</a>
+    image_sha1: d1b7ac6077814f478644c5f3da235903e9b52c37
+- name: eval-image-25847406.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/8e/BMW_M6_Convertible_%288363326897%29.jpg
+  metadata:
+    key: eval-image-25847406.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/39498204@N02">Shawn
+      Jooste</a>
+    image_sha1: 823d33046138f5a072b83ad2915354edc82cfb8e
+- name: eval-image-29465588.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/16/South_Korean_License_Plate_for_Rent_Passenger_car_-_Heo.jpg
+  metadata:
+    key: eval-image-29465588.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:P.Cps1120a&amp;action=edit&amp;redlink=1"
+      class="new" title="User:P.Cps1120a (page does not exist)">P.Cps1120a</a>
+    image_sha1: 2e5f44035e38d8d5f7600c9ce4960699aff8ae9c
+- name: eval-image-32718654.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/8/8e/Fiji_Car_license_plate.jpg
+  metadata:
+    key: eval-image-32718654.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Maxim75" title="User:Maxim75">Maksym
+      Kozlenko</a>
+    image_sha1: d49890185ef5e2709019a61eed2b8da4131e3fd9
+- name: eval-image-33010486.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/4/46/Kuala_Lumpur_Plate_Number.JPG
+  metadata:
+    key: eval-image-33010486.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:EurovisionNim" title="User:EurovisionNim">EurovisionNim</a>
+    image_sha1: 5cb23141cb3828095fdbf6fa1802b852ce7194c4
+- name: eval-image-34608501.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/5/53/Automobil-B%C3%BCcherei_in_Ghana.jpg
+  metadata:
+    key: eval-image-34608501.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: Beyond Access (on Flickr)
+    image_sha1: ef10a105a2653cac633b6ffa8747508669187fd1
+- name: eval-image-37392677.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/07/Japan%27s_Number_Plates_%283511670669%29.jpg
+  metadata:
+    key: eval-image-37392677.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/15622795@N05">Emran
+      Kassim</a>
+    image_sha1: 052166b4ac761233f527333583ae89eb131dd0bc
+- name: eval-image-37521912.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/4/40/Cool_numberplates_in_Oz._%2814572334424%29.jpg
+  metadata:
+    key: eval-image-37521912.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/58613084@N02">Andrew
+      Thomas</a> from Shrewsbury, UK
+    image_sha1: ff868e0fd543d619d3a20445ef1617104f6328b6
+- name: eval-image-38218295.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/c/c7/Example_design_of_vehicle_license_plate_of_Yogyakarta_%28September_2013%29.JPG
+  metadata:
+    key: eval-image-38218295.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Alqhaderi_Aliffianiko" class="mw-redirect"
+      title="User:Alqhaderi Aliffianiko">Alqhaderi Aliffianiko</a>
+    image_sha1: d11eccd26501a4c7bc4aad20df6138fa029eebf7
+- name: eval-image-38911278.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/4/4f/1980s_Austin_Metro_1.3_LS_%2814180484350%29.jpg
+  metadata:
+    key: eval-image-38911278.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/92622665@N08">Charlie</a>
+      from United Kingdom
+    image_sha1: 519e979fc92865d6f72193193389c29111dfef09
+- name: eval-image-43428151.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/1/11/Cemoro-Lawang_Indonesia_Motocycle-plate-01.jpg
+  metadata:
+    key: eval-image-43428151.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Cccefalon" title="User:Cccefalon">CEphoto,
+      Uwe Aranas</a>
+    image_sha1: 0b882c95faa4ee137ac7afdb5d2e37d4014e2b7c
+- name: eval-image-46268695.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/c/c8/Japan%27s_Number_Plates_%286504818967%29.jpg
+  metadata:
+    key: eval-image-46268695.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/8868801@N03">Iwao</a>
+    image_sha1: 74a81e8fccda8ddaa53d38ce0b5563e2b32ecb62
+- name: eval-image-48300969.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/0e/India_-_Targa_Chandigarh.JPG
+  metadata:
+    key: eval-image-48300969.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: YukioSanjo
+    image_sha1: 5f8500bf9a9b60c2d1427d7aec93e23b9279b9b9
+- name: eval-image-49068518.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/6/6b/Bus_licence_plate_Thailand.jpg
+  metadata:
+    key: eval-image-49068518.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Maxim75" title="User:Maxim75">Maksym
+      Kozlenko</a>
+    image_sha1: e466d511e114b084cdffbeabb78c103fff62e3a0
+- name: eval-image-50388187.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/5/54/Turkish_license_plate.jpg
+  metadata:
+    key: eval-image-50388187.jpg
+    kind: image
+    license: Public domain
+    license_url: null
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Fenikals" title="User:Fenikals">Fenikals</a>
+    image_sha1: d58d132193cb4aa5bf56b44df7200b0e711a5eaf
+- name: eval-image-55760144.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/a/ab/Europlate_NZ.jpg
+  metadata:
+    key: eval-image-55760144.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/64583732@N04">Riley</a>
+      from Christchurch, New Zealand
+    image_sha1: 30b126507fe641d9152aa8cd41c08882b8542cf7
+- name: eval-image-61391657.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/4/4b/License_Plate_of_Durban_Taxi.jpg
+  metadata:
+    key: eval-image-61391657.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Mhlongokhetho&amp;action=edit&amp;redlink=1"
+      class="new" title="User:Mhlongokhetho (page does not exist)">Khethuthukuthula Mhlongo</a>
+    image_sha1: cf8783b1f70be5e9b238874d8fb68d9687c03eca
+- name: eval-image-72236307.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/4/4e/Kenya_license_plate.jpg
+  metadata:
+    key: eval-image-72236307.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: Jerry "Woody"  <a rel="nofollow" class="external free" href="https://www.flickr.com/photos/woodysworld1778/">https://www.flickr.com/photos/woodysworld1778/</a>
+    image_sha1: 54eee6dac17db3dfa9163a615f9895aad04a6e3f
+- name: eval-image-74565857.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/6/6b/Japanese_vehicle_registration_plate_black_and_yellow.jpg
+  metadata:
+    key: eval-image-74565857.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Gzzz" title="User:Gzzz">Gzzz</a>
+    image_sha1: d2fff64a82d82f13e70b6f5f27de1d69c3a2a81c
+- name: eval-image-74565863.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/0c/Japanese_2_wheel_vehicle_registration_plate_white_and_black.jpg
+  metadata:
+    key: eval-image-74565863.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Gzzz" title="User:Gzzz">Gzzz</a>
+    image_sha1: 4f9a4d984f65cf73e1b89439f4ddfd91c548a63e
+- name: eval-image-84080599.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/f/f5/Yellow_plated_tourist_vehicle_%28in_India%29_%2850515336%29.jpg
+  metadata:
+    key: eval-image-84080599.jpg
+    kind: image
+    license: CC BY 2.0
+    license_url: https://creativecommons.org/licenses/by/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/72356975@N00">David
+      Lisbona</a> from Haifa, Israel
+    image_sha1: 0dff6f94da9ff833610eb48b12695e30e0c245e0
+- name: eval-image-88493475.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/2/20/A_motorcycle_number_plate.jpg
+  metadata:
+    key: eval-image-88493475.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:DaSupremo" title="User:DaSupremo">DaSupremo</a>
+    image_sha1: 79cf2c62ec914f06ba18f542df11e66145f29a0e
+- name: eval-image-9490659.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/09/Malaysia_Penang_license_plate.jpg
+  metadata:
+    key: eval-image-9490659.jpg
+    kind: image
+    license: CC BY-SA 2.0
+    license_url: https://creativecommons.org/licenses/by-sa/2.0
+    attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/photos/9816248@N03">Jerry
+      "Woody"</a>
+    image_sha1: fa877a198c1b92580974518459ca9e08771bbf0f
+- name: eval-image-9490963.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/9/9b/Malaysia_malacca_license_plate.JPG
+  metadata:
+    key: eval-image-9490963.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+    image_sha1: 5163633f7b07a45f99c65fadea77ebdebde991b1
+- name: eval-image-9490989.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/6/62/Malaysia_perak_license_plate.JPG
+  metadata:
+    key: eval-image-9490989.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+    image_sha1: 5197954b19349807fcd7f61e5524dae248e3e64a
+- name: eval-image-9512280.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/b/b7/Malaysia_federal_territory_KL_license_plate.jpg
+  metadata:
+    key: eval-image-9512280.jpg
+    kind: image
+    license: CC BY-SA 3.0
+    license_url: https://creativecommons.org/licenses/by-sa/3.0
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+    image_sha1: 5ea99ccaad880adcef087b47d34b7ae69c7ad737
+- name: eval-image-95458092.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/0/0d/License_plate_of_Turkey_%28Istanbul%29_US-size.jpg
+  metadata:
+    key: eval-image-95458092.jpg
+    kind: image
+    license: CC0
+    license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+    attribution: <a href="//commons.wikimedia.org/wiki/User:Walser.FL" title="User:Walser.FL">Walser.FL</a>
+    image_sha1: c7715f5396bbff72e61bc94f9c99411f5140484c
+- name: eval-image-99334263.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/f/fa/Nigerian_number_plate_Rivers.jpg
+  metadata:
+    key: eval-image-99334263.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+      class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+    image_sha1: 6957fd4503750557a27857684d6744d1a6c5384a
+- name: eval-image-99334325.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/2/2b/Nigeria_Lagos_License_Plate.jpg
+  metadata:
+    key: eval-image-99334325.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+      class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+    image_sha1: d30637bb17d8871074e63a7da530d72d7164ed22
+- name: eval-image-99334443.jpg
+  url: https://upload.wikimedia.org/wikipedia/commons/3/39/Nigeria_Abuja_License_Plate.jpg
+  metadata:
+    key: eval-image-99334443.jpg
+    kind: image
+    license: CC BY-SA 4.0
+    license_url: https://creativecommons.org/licenses/by-sa/4.0
+    attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+      class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+    image_sha1: be6258cb968051bf92b24333ecdb3997b7714523

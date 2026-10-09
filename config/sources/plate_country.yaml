@@ -4,12 +4,14 @@ kind: registration_country_evidence
 enabled: false
 upstream:
   proposal: config/proposals/plate_country.yaml
-  url: https://www.worldlicenseplates.com/
+  url: https://www.wikipedia.org/
 licence:
   id: per-source
-  url: https://www.worldlicenseplates.com/
-  attribution: See each reviewed plate-country source
+  url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: Wikipedia and Wikimedia Commons contributors; every pinned file keeps
+    its revision, licence and attribution
 limits:
-  download_bytes: 0
+  # Two retained releases of capacity; reviewed sizes total 75,965,326 bytes.
+  download_bytes: 151930652
 options: {}
 options_schema: pipeline.config.source_options.Text
