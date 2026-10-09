@@ -78,6 +78,15 @@ def test_cap_cleans_only_owned_staging_and_corruption_refuses(tmp_path: Path) ->
     assert not output.exists()
 
 
+def test_referentially_open_datasets_are_refused(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path, closed=False)
+    output = tmp_path / "dataset" / "2026.10"
+    # The cells name country:MY and city:one, but no place defines them.
+    with pytest.raises(ValueError, match="Dangling dataset place reference"):
+        assemble(snapshot, output, config, guard, "identity")
+    assert not output.exists()
+
+
 @pytest.mark.parametrize(
     "override",
     [
