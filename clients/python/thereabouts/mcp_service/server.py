@@ -357,7 +357,7 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
         """Describe the open Parquet dataset behind the answers.
 
         Without a table, lists every table with its purpose, grain, key and
-        columns count. With a table, returns its columns (type, nullability,
+        number of columns. With a table, returns its columns (type, nullability,
         units, meaning), primary key, joins to other tables, and the enumerated
         values of coded columns. Use it before writing SQL over the dataset.
         """

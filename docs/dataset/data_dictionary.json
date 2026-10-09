@@ -393,7 +393,7 @@
     },
     {
       "name": "describe",
-      "description": "Describe the open Parquet dataset behind the answers.\n\nWithout a table, lists every table with its purpose, grain, key and\ncolumns count. With a table, returns its columns (type, nullability,\nunits, meaning), primary key, joins to other tables, and the enumerated\nvalues of coded columns. Use it before writing SQL over the dataset.",
+      "description": "Describe the open Parquet dataset behind the answers.\n\nWithout a table, lists every table with its purpose, grain, key and\nnumber of columns. With a table, returns its columns (type, nullability,\nunits, meaning), primary key, joins to other tables, and the enumerated\nvalues of coded columns. Use it before writing SQL over the dataset.",
       "read_only": true,
       "parameters": [
         {

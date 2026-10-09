@@ -13,13 +13,14 @@ from pipeline.engines.artifact_io import file_record
 
 from .budget import Budget, Sink
 from .cell_groups import CellGroups
-from .dataset_schema import load
+from .dataset_schema import load, public
 from .selection import Selection
 from .source import Row, Snapshot, TableFile
 
 
 def schema_description(path: Path) -> dict[str, Any]:
-    return load(path)
+    """The validated schema as a released manifest embeds it."""
+    return public(load(path))
 
 
 def groups(

@@ -5,14 +5,14 @@ Tested SQL for common analytical questions over the Thereabouts dataset. Every b
 Set `DATASET` to the release directory (`.../dataset/<version>`). For an https base URL, build the views with `open_dataset` from `SKILL.md`, which reads `manifest.json` because DuckDB cannot glob over HTTP.
 
 ```python
+import json
+from pathlib import Path
+
 import duckdb
 
+manifest = json.loads((Path(DATASET) / "manifest.json").read_text())
 con = duckdb.connect()
-for table in [
-    "airports", "canonical_cities", "cells", "countries", "ip_ranges",
-    "phone_metadata", "phone_prefixes", "place_to_city", "places", "postal_codes",
-    "subdivisions", "timezone_cells", "trade_locations", "zone_tables",
-]:
+for table in sorted({entry["kind"] for entry in manifest["tables"]}):
     con.sql(
         f"CREATE VIEW {table} AS SELECT * FROM "
         f"read_parquet('{DATASET}/{table}/**/*.parquet', hive_partitioning = false)"

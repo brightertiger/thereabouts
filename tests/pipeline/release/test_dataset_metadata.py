@@ -5,11 +5,11 @@ from typing import Any
 
 import pytest
 
-from pipeline.release.dataset_schema import check
+from pipeline.release.dataset_schema import check, load
 from pipeline.release.tables import schema_description
 from pipeline.runtime.fingerprints import REPOSITORY
 
-DESCRIPTION = schema_description(REPOSITORY / "config/dataset.yaml")
+DESCRIPTION = load(REPOSITORY / "config/dataset.yaml")
 
 # A declared primary key must name the check that enforces or guarantees it.
 ENFORCED_KEYS = {
@@ -44,6 +44,18 @@ def test_the_metadata_passes_validation() -> None:
     assert all(
         table["description"] and table["grain"] for table in DESCRIPTION.values()
     )
+
+
+def test_a_released_manifest_embeds_the_metadata_without_repository_paths() -> None:
+    released = schema_description(REPOSITORY / "config/dataset.yaml")
+    assert set(released) == set(DESCRIPTION)
+    for table, schema in released.items():
+        assert schema["description"] and schema["grain"]
+        for column, source in zip(
+            schema["columns"], DESCRIPTION[table]["columns"], strict=True
+        ):
+            assert "values_from" not in column
+            assert column.get("values") == source.get("values")
 
 
 def test_every_enumeration_value_is_a_literal_in_its_declared_sources() -> None:
