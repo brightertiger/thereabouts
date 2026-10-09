@@ -207,29 +207,45 @@ class Executor:
                     stop = error
                     self.event(f"interrupted; waiting for {len(running)} units")
                     continue
-                for future in ready:
-                    unit = running.pop(future)
-                    name = f"{stage.name}/{unit.recipe.unit_id}"
-                    try:
-                        outputs, receipts = future.result()
-                    except Exception as error:
-                        self.event(f"failed {name}: {error}")
-                        stop = stop or error
-                        continue
-                    if not isinstance(stop, InputsChanged):
-                        try:
-                            self.check()
-                        except InputsChanged as error:
-                            stop = error
-                    if isinstance(stop, InputsChanged):
-                        self.event(f"not recorded {name}: hashed inputs changed")
-                        continue
-                    self._record(unit, outputs, receipts)
-                    self.event(f"complete {name}")
+                try:
+                    stop = self._collect(stage, ready, running, stop)
+                except KeyboardInterrupt as error:
+                    # Unprocessed futures stay in `running`; the next wait drains them.
+                    if isinstance(stop, KeyboardInterrupt):
+                        raise
+                    stop = error
         finally:
             pool.shutdown(wait=False, cancel_futures=True)
         if stop is not None:
             raise stop
+
+    def _collect(
+        self,
+        stage: Stage,
+        ready: set[Future[Described]],
+        running: dict[Future[Described], Unit],
+        stop: BaseException | None,
+    ) -> BaseException | None:
+        for future in ready:
+            unit = running.pop(future)
+            name = f"{stage.name}/{unit.recipe.unit_id}"
+            try:
+                outputs, receipts = future.result()
+            except Exception as error:
+                self.event(f"failed {name}: {error}")
+                stop = stop or error
+                continue
+            if not isinstance(stop, InputsChanged):
+                try:
+                    self.check()
+                except InputsChanged as error:
+                    stop = error
+            if isinstance(stop, InputsChanged):
+                self.event(f"not recorded {name}: hashed inputs changed")
+                continue
+            self._record(unit, outputs, receipts)
+            self.event(f"complete {name}")
+        return stop
 
     def _submit(
         self,
