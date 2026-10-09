@@ -28,6 +28,7 @@ from .source import Row
 FORMAT = "thereabouts-acceptance-1"
 IDS = ("country_id", "state_id", "city_id")
 FOUND = {"matched", "ambiguous"}
+REFUSED = {"invalid_input", "unsupported_granularity"}
 COORDINATE_TOLERANCE = 1e-9
 
 
@@ -51,6 +52,9 @@ def ocean(query: Query, result: Row) -> bool | None:
 
 
 def named(query: Query, result: Row) -> bool | None:
+    if result["status"] in REFUSED:
+        # The reader refuses this text as a query, before any lookup.
+        return None
     found = {(a.get("city") or {}).get("id") for a in answers(result)}
     if query.expect["city_id"] in found:
         return True
@@ -76,10 +80,25 @@ def phone(query: Query, result: Row) -> bool | None:
 
 
 def plates(query: Query, result: Row) -> bool | None:
+    """The country's format matched and read the known code from its code group.
+
+    With a country the reader always answers that country, so the format hit is
+    the evidence; whether a code then resolves to a place is plate policy.
+    """
+    code = folded(query.expect["code"])
     return result["status"] in FOUND and any(
         (a.get("country") or {}).get("code") == query.expect["country"]
+        and any(
+            source.get("source") == "plate_format"
+            and folded(str(source.get("code") or "")) == code
+            for source in evidence(a).get("source_ids") or []
+        )
         for a in answers(result)
     )
+
+
+def folded(code: str) -> str:
+    return "".join(code.split()).upper()
 
 
 def difference(actual: Any, expected: Any, path: str = "$") -> str | None:

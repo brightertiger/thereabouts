@@ -58,7 +58,9 @@ def test_every_family_passes_with_a_stable_report(
             check["agreed"] == check["applicable"]
             for check in report["checks"].values()
         )
-        assert report["checks"]["vectors"]["applicable"] > 0
+        if family != "plates":
+            # The plates bundle's only invalid case depends on its data.
+            assert report["checks"]["vectors"]["applicable"] > 0
         before = path.read_bytes()
         assert accept(release, family, settings).read_bytes() == before
     core = json.loads((release / "packs/acceptance/core.json").read_text())
@@ -123,3 +125,38 @@ def test_a_pack_the_reader_cannot_open_fails(
     shard.write_bytes(b"corrupt")
     with pytest.raises(ValueError, match="Pack probe failed at ulimit -n 256"):
         acceptance.accept(release / "dataset/2026.10", packs, "ip", "2026.10", settings)
+
+
+def result(status: str, **more: object) -> dict[str, object]:
+    return {"status": status, "candidates": [], **more}
+
+
+def test_judges_count_only_what_a_pack_can_get_wrong() -> None:
+    plate = Query(
+        "plates-0",
+        "plates",
+        "plates",
+        {"kind": "plate", "values": ["AA-000-AA 75"], "country": "FR"},
+        {"country": "FR", "code": "75"},
+    )
+    hit = {"source": "plate_format", "code": "75"}
+    found = result("matched", country={"code": "FR"}, evidence={"source_ids": [hit]})
+    assert acceptance.plates(plate, found) is True
+    # With a country the reader always answers it; the format hit is the proof.
+    missed = result("matched", country={"code": "FR"}, evidence={"source_ids": []})
+    assert acceptance.plates(plate, missed) is False
+    name = Query("names-0", "names", "core", {}, {"city_id": "city:a"})
+    assert acceptance.named(name, result("invalid_input")) is None
+    many = [{"status": "matched", "city": {"id": f"city:{n}"}} for n in range(100)]
+    assert acceptance.named(name, result("ambiguous", candidates=many)) is None
+    assert acceptance.named(name, result("ambiguous", candidates=many[:3])) is False
+    airport = Query("airports_iata-0", "airports_iata", "airports", {}, {})
+    assert acceptance.observed(airport, result("invalid_input")) is None
+    postal = Query(
+        "postal-0",
+        "postal",
+        "postal",
+        {},
+        {"country_id": "country:FR", "state_id": None, "city_id": "city:p"},
+    )
+    assert acceptance.observed(postal, result("invalid_input")) is False
