@@ -33,7 +33,7 @@ class Options:
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
     result.add_argument(
-        "command", choices=("plan", "status", "run", "invalidate", "migrate")
+        "command", choices=("plan", "status", "run", "invalidate", "migrate", "gc")
     )
     result.add_argument(
         "arguments", nargs="*", help="stage, migration step, or key=value overrides"
@@ -63,12 +63,12 @@ def parse(argv: Sequence[str] | None) -> Options:
     stages = registry(config)
     root = Path(config.paths.root).absolute()
     ledger = args.ledger or located(root, config.paths.ledger)
-    if args.command in {"migrate", "invalidate"} and not ledger.exists():
+    if args.command in {"migrate", "invalidate", "gc"} and not ledger.exists():
         raise ValueError("No existing ledger at the configured workspace")
     if args.ledger and args.command not in {"plan", "status"}:
         raise ValueError("--ledger is only for read-only plan/status")
-    if args.dry_run and args.command != "migrate":
-        raise ValueError("--dry-run is only for migrate; use plan for a dry run")
+    if args.dry_run and args.command not in {"migrate", "gc"}:
+        raise ValueError("--dry-run is for migrate and gc; use plan for a run")
     if args.command not in {"invalidate", "migrate"} and positional:
         raise ValueError(f"Unexpected arguments: {positional}")
     if (args.through or args.only) and args.command != "run":

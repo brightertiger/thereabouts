@@ -5,7 +5,13 @@ import sys
 from collections.abc import Sequence
 
 from pipeline.arguments import parse
-from pipeline.commands import execute_run, inspect_plan, inspect_status, invalidate
+from pipeline.commands import (
+    collect_garbage,
+    execute_run,
+    inspect_plan,
+    inspect_status,
+    invalidate,
+)
 from pipeline.content.command import main as digest_main
 from pipeline.migration.command import migrate
 from pipeline.pins.cli import main as pins_main
@@ -37,6 +43,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "status": inspect_status,
                 "invalidate": invalidate,
                 "run": execute_run,
+                "gc": collect_garbage,
             }
             return handlers[options.command](ctx, options)
     except (ValueError, OSError, sqlite3.Error, NotImplementedError) as error:
