@@ -12,8 +12,8 @@ Reverse geocoding and city names. A latitude and longitude, or an H3 cell, gives
 
 - Tools: `reverse`, `h3`, `geocode`
 - Inputs: Coordinates in WGS84 degrees; an H3 cell of resolution 0 to 8 as 15 hexadecimal characters; a city name of at most 128 normalized characters.
-- Built from tables: `cells`, `places`, `canonical_cities`, `place_to_city`, `countries`, `subdivisions`, `timezone_cells`, `zone_tables`
-- Notes: Every other family reads the core pack for city and timezone detail when it is installed. geocode finds towns and cities, never street addresses.
+- Built from tables: `cells`, `places`, `canonical_cities`, `place_to_city`, `names`, `countries`, `subdivisions`, `timezone_cells`, `zone_tables`
+- Notes: Every other family reads the core pack for city and timezone detail when it is installed. geocode finds towns and cities by canonical, English or alternate name (the names table), never street addresses.
 
 ### `postal`
 
@@ -66,7 +66,7 @@ Vehicle registration plate text to the countries, and sometimes the region, whos
 
 - Tools: `plate`
 - Inputs: Plate text and an optional country and series.
-- Built from tables: `places`, `canonical_cities`, `place_to_city`, `countries`, `subdivisions`
+- Built from tables: `plate_formats`, `plate_codes`, `plate_policy`, `plate_priors`, `places`, `canonical_cities`, `place_to_city`, `countries`, `subdivisions`
 - Notes: Format evidence, not a vehicle registry. Without a country the result is usually ambiguous across countries.
 
 ## Tools

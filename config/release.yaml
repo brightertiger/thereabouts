@@ -27,7 +27,7 @@ dataset:
   compression: zstd
   cell_group_resolution: 1
 packs:
-  families: [core, postal, airports, locode, phone, ip]
+  families: [core, postal, airports, locode, phone, ip, plates]
 publish:
   read_bytes: 1048576
   # S3's minimum multipart part size, also exercised by the local fake.

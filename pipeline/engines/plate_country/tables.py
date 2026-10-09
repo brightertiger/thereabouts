@@ -24,6 +24,10 @@ def required(name: str, kind: pa.DataType) -> pa.Field[pa.DataType]:
     return pa.field(name, kind, False)
 
 
+def string_list(name: str) -> pa.Field[pa.DataType]:
+    return required(name, pa.list_(pa.field("element", pa.string())))
+
+
 SCHEMAS: dict[str, pa.Schema] = {
     "plate_formats": pa.schema(
         [
@@ -32,8 +36,8 @@ SCHEMAS: dict[str, pa.Schema] = {
                 "code_group",
                 "code_group",
             ),
-            required("scripts", pa.list_(pa.string())),
-            required("fixed_national_marks", pa.list_(pa.string())),
+            string_list("scripts"),
+            string_list("fixed_national_marks"),
             required("specificity_bits", pa.float64()),
             *strings("provenance source source_file source_url license"),
         ]
@@ -45,7 +49,7 @@ SCHEMAS: dict[str, pa.Schema] = {
                 "series_id subdivision_scope",
                 "name_en name_local series_id subdivision_scope",
             ),
-            required("subdivision_codes", pa.list_(pa.string())),
+            string_list("subdivision_codes"),
             *strings("source source_url license"),
         ]
     ),
@@ -100,7 +104,12 @@ def codes(rows: Iterable[Row]) -> Iterator[Row]:
 
 
 def priors(rows: Iterable[Row]) -> Iterator[Row]:
+    """One count per country; the pack reader rejects a repeated prior."""
+    seen: set[str] = set()
     for row in rows:
+        if row["country_code"] in seen:
+            raise ValueError(f"Repeated vehicle prior: {row['country_code']}")
+        seen.add(row["country_code"])
         provenance = row["provenance"]
         yield {
             **{k: row[k] for k in ("country_code", "vehicles", "year", "source_label")},

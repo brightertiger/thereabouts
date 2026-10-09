@@ -17,6 +17,8 @@ ENFORCED_KEYS = {
     "canonical_cities": "one entry per anchor in the cities build; dangling == 0",
     "place_to_city": "normalize_cells fails if its join changes the row count",
     "cells": "stored descendants must equal the land cells (blocks.py); no nulls",
+    "names": "the names engine keeps one row per city and folded name",
+    "plate_priors": "the plate tables reject a repeated country, as the reader does",
 }
 
 # Every reference the lookups integrity gates check (cells/metrics.py and

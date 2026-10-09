@@ -243,3 +243,13 @@ def test_reference_resolver_without_priors_drops_the_prior_term(
     (match,) = candidate["evidence"]
     assert match["score_components"]["log_vehicle_prior"] == 0
     assert match["prior"] is None
+
+
+def test_plate_schemas_are_the_dataset_contract() -> None:
+    from pipeline.engines.plate_country.tables import SCHEMAS
+    from pipeline.release.tables import schema_description, validate_schema
+    from pipeline.runtime.fingerprints import REPOSITORY
+
+    descriptions = schema_description(REPOSITORY / "config/dataset.yaml")
+    for kind, schema in SCHEMAS.items():
+        validate_schema(schema, descriptions[kind], kind)

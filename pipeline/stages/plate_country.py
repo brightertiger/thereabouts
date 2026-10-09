@@ -1,4 +1,4 @@
-"""Build the writer's plate tables from pinned registration and plate-country evidence."""
+"""Build the writer's plate tables from pinned registration evidence."""
 
 from pathlib import Path
 

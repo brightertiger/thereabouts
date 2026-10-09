@@ -216,3 +216,11 @@ def test_policy_rejects_unknown_treatments(tmp_path: Path) -> None:
     policy = read(DIRECTORY / "names.yaml") | {"historic": "sometimes"}
     with pytest.raises(ValueError, match="historic"):
         run(tmp_path, policy)
+
+
+def test_names_schema_is_the_dataset_contract() -> None:
+    from pipeline.release.tables import schema_description, validate_schema
+    from pipeline.runtime.fingerprints import REPOSITORY
+
+    descriptions = schema_description(REPOSITORY / "config/dataset.yaml")
+    validate_schema(build.SCHEMA, descriptions["names"], "names")
