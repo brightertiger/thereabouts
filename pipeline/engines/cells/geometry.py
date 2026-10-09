@@ -26,7 +26,9 @@ def _large_geometry(wkb: bytes) -> BaseGeometry:
     return value
 
 
-_geometries: Cache[bytes, BaseGeometry] = Cache()
+# Prepared geometries are built lazily inside GEOS; concurrent units each keep
+# their own, since sharing one between threads can crash the process.
+_geometries: Cache[bytes, BaseGeometry] = Cache(per_thread=True)
 
 
 def geometry(wkb: bytes, limits: EngineLimits) -> BaseGeometry:
@@ -53,7 +55,7 @@ def _edge_index(wkb: bytes, limits: EngineLimits) -> STRtree:
     return STRtree(lines)
 
 
-_edges: Cache[tuple[bytes, int], STRtree] = Cache()
+_edges: Cache[tuple[bytes, int], STRtree] = Cache(per_thread=True)
 
 
 def boundaries(

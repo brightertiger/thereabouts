@@ -139,6 +139,8 @@ def _convert(
     outputs = writer.finish()
     report["parquet_bytes"] = sum(path.stat().st_size for path in outputs)
     report["partitions"] = len(outputs)
-    report["elapsed_seconds"] = time.monotonic() - started
+    ctx.runtime.log(
+        f"normalize/{ctx.settings.name} {unit}: {time.monotonic() - started:.3f}s"
+    )
     report["schema_geometry_validation"] = "passed for every output row"
     return outputs, report

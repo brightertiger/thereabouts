@@ -58,14 +58,11 @@ def test_geonames_regenerates_caches_and_preserves_reject_accounting(
         assert aliases[1]["is_historic"]
         record = ledger.get("normalize", "geonames")
         assert record
-        cache = next(
-            tmp_path / item.path
-            for item in record.outputs
-            if item.path.endswith("lookup.sqlite3")
-        )
+        # Regenerable caches are not recorded, so deleting one restores nothing.
+        assert not [item for item in record.outputs if "/work/" in f"/{item.path}"]
+        cache = next(source.work.rglob("lookup.sqlite3"))
         cache.unlink()
-        assert run(source.runtime, stages) == {"completed": 1, "skipped": 1}
-        assert cache.exists()
+        assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}
         audit = json.loads(
             next((source.normalized / "audits").rglob("report.json")).read_bytes()
         )
@@ -112,11 +109,9 @@ def test_overture_regenerates_parent_index_before_areas(tmp_path: Path) -> None:
         assert rows(source, "areas")[0]["parent_source_id"] == "parent"
         record = ledger.get("normalize", "overture")
         assert record
-        index = next(
-            tmp_path / item.path
-            for item in record.outputs
-            if item.path.endswith("entities.sqlite3")
-        )
+        assert not [i for i in record.outputs if i.path.endswith("entities.sqlite3")]
+        index = next(source.work.rglob("entities.sqlite3"))
         index.write_bytes(b"corrupt cache")
+        ledger.invalidate("normalize", ["overture"])
         assert run(source.runtime, stages) == {"completed": 1, "skipped": 1}
         assert index.read_bytes().startswith(b"SQLite format 3")

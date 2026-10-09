@@ -17,9 +17,11 @@ def validate(settings: EngineSettings, block_resolution: int) -> None:
         0 <= settings.minimum_country_coverage <= 1
     ):
         raise ValueError("engines.minimum_country_coverage must be between 0 and 1")
-    for item in fields(settings.limits):
-        if getattr(settings.limits, item.name) <= 0:
-            raise ValueError(f"engines.limits.{item.name} must be positive")
+    for section in ("batches", "runtime"):
+        values = getattr(settings, section)
+        for item in fields(values):
+            if getattr(values, item.name) <= 0:
+                raise ValueError(f"engines.{section}.{item.name} must be positive")
     for name in (
         "reconcile_policy",
         "city_policies",

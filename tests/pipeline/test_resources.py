@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from pipeline.config.schema import Resources
 from pipeline.runtime.resources import ResourceGuard
 
@@ -87,3 +89,41 @@ def test_workspace_walk_is_cached_and_completed_bytes_are_accounted(
     now[0] = 60.0
     assert guard.usage() == 100
     assert scans == [tmp_path, tmp_path]
+
+
+def test_admission_fails_after_its_timeout_naming_the_limit(tmp_path: Path) -> None:
+    now = [0.0]
+
+    def sleep(seconds: float) -> None:
+        now[0] += seconds
+
+    guard = ResourceGuard(
+        tmp_path,
+        Resources(max_workspace=100, poll_seconds=10, admission_timeout_seconds=30),
+        free=lambda _: 10_000_000_000,
+        used=lambda _: 101,
+        rss=lambda: 0,
+        sleep=sleep,
+        log=lambda _: None,
+        clock=lambda: now[0],
+    )
+    with pytest.raises(ValueError, match=r"max_workspace.*python -m pipeline gc"):
+        guard.admit()
+    assert 30 <= now[0] < 40
+    assert guard.reserved == 0
+
+
+def test_memory_limit_is_per_worker(tmp_path: Path) -> None:
+    rss = iter([2_999, 0])
+    pauses: list[float] = []
+    guard = ResourceGuard(
+        tmp_path,
+        Resources(workers=3, rss_limit=1_000),
+        free=lambda _: 10_000_000_000,
+        used=lambda _: 0,
+        rss=lambda: next(rss),
+        sleep=pauses.append,
+        log=lambda _: None,
+    )
+    guard.admit()
+    assert pauses == []

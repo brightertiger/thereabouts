@@ -42,7 +42,10 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.4.0";
+/// Forward-pack encoding revision; pipeline pack identities include it.
+pub const WRITER_REVISION: &str = "0.4.0";
+/// Core-pack encoding revision: record-local catalogue strings bound positioned reads.
+pub const CORE_REVISION: &str = "0.2.2";
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -119,7 +122,7 @@ pub fn write_pack(
         data.require_tables(&required, &options.allow_missing_tables)?;
     }
     let revision = if family == "core" {
-        "0.2.2" // Record-local catalogue strings bound positioned reads.
+        CORE_REVISION
     } else {
         WRITER_REVISION
     };

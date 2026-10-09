@@ -40,6 +40,17 @@ class SourceLimits:
     patience_seconds: float = 900.0
 
 
+# Transfer budgets bound how bytes are fetched, never what normalization makes of
+# them; patience_seconds is the download retry budget.
+DOWNLOAD_LIMITS = (
+    "download_bytes",
+    "retries",
+    "timeout_seconds",
+    "backoff_seconds",
+    "patience_seconds",
+)
+
+
 @dataclass
 class SourceSettings:
     name: str = ""
@@ -52,6 +63,19 @@ class SourceSettings:
     limits: SourceLimits = field(default_factory=SourceLimits)
     options: dict[str, Any] = field(default_factory=dict)
     policies: dict[str, str] = field(default_factory=dict)
+
+
+def normalize_settings(source: SourceSettings) -> dict[str, Any]:
+    """Settings a normalizer reads; upstream URLs and transfer limits are excluded."""
+    values = asdict(source)
+    for name in ("upstream", "enabled"):
+        values.pop(name)
+    values["limits"] = {
+        name: value
+        for name, value in values["limits"].items()
+        if name not in DOWNLOAD_LIMITS
+    }
+    return values
 
 
 def load_sources(directory: Path) -> dict[str, SourceSettings]:

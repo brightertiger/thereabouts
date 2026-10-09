@@ -57,7 +57,6 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             source,
             urban(ctx),
             policy,
-            unit.inputs_hash,
             limits,
         )
         return [
@@ -81,7 +80,6 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             {
                 "completed": True,
                 "policy": policy,
-                "inputs_hash": unit.inputs_hash,
                 "countries": {
                     cc: io.receipt(ctx, "cities", "country/" + cc, suffix="report.json")
                     for cc in countries(ctx)

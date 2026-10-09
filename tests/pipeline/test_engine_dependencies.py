@@ -80,18 +80,15 @@ def test_source_roles_and_kinds_do_not_depend_on_source_names(tmp_path: Path) ->
             r.key: r for r in geographic_recipes(ctx, geo) + lookup_recipes(ctx, geo)
         }
         assert recipes["reconcile", "land/world"].dependencies == (
-            Dependency("normalize", "coast"),
+            Dependency("normalize", "coast", ("normalized/coast/areas/*.parquet",)),
         )
-        assert (
-            Dependency("normalize", "urban")
-            in recipes["cities", "country/BE"].dependencies
-        )
-        assert (
-            Dependency("normalize", "urban")
-            in recipes["normalize_cells", "block/block"].dependencies
-        )
+        urban = Dependency("normalize", "urban", ("normalized/urban/areas/*.parquet",))
+        assert urban in recipes["cities", "country/BE"].dependencies
+        assert urban in recipes["normalize_cells", "block/block"].dependencies
         assert recipes["lookups", "static/timezone_cells/cells"].dependencies == (
-            Dependency("normalize", "clock_zones"),
+            Dependency(
+                "normalize", "clock_zones", ("normalized/clock_zones/cells.parquet",)
+            ),
         )
 
 

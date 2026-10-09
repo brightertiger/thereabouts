@@ -20,7 +20,7 @@ from pipeline.config import load
         "h3.block_resolution=9",
         "h3.block_resolution=2",
         "h3.cell_resolution=9",
-        "engines.limits.reader_cache_entries=0",
+        "engines.runtime.reader_cache_entries=0",
         "engines.countries=[ZZ,ZZ]",
         "engines.blocks=[invalid]",
         "resources.poll_seconds=0",
@@ -41,7 +41,8 @@ def test_profile_and_overrides_have_documented_precedence() -> None:
     result = load(profile="vm", overrides=["paths.root=sample", "resources.workers=2"])
     assert result.paths.root == "sample"
     assert result.resources.workers == 2
-    assert result.resources.duckdb_memory == "1GB"
+    assert result.resources.duckdb_memory == "3GB"
+    assert result.resources.max_workspace == 250_000_000_000
 
 
 def test_profile_cannot_escape_config_directory() -> None:

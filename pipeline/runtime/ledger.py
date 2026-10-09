@@ -4,14 +4,14 @@ import json
 import sqlite3
 import threading
 from collections.abc import Iterator, Sequence
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from .jsonio import Object, encode, sha256_file
-from .paths import relative
+from .jsonio import Object, encode
+from .outputs import describe
 from .records import Completion, Output, Recipe, outputs_from_json, recipe_from_json
 
 UNITS_SQL = (
@@ -21,11 +21,32 @@ UNITS_SQL = (
 )
 
 
+def hot_journal(path: Path) -> bool:
+    journal = Path(str(path) + "-journal")
+    return journal.exists() and journal.stat().st_size > 0
+
+
+def recover(path: Path) -> None:
+    """Roll back a crashed writer's journal; call while holding the writer lock."""
+    if hot_journal(path):
+        with closing(sqlite3.connect(path)) as db:
+            db.execute("SELECT count(*) FROM sqlite_master").fetchone()
+
+
 def read_connection(path: Path) -> sqlite3.Connection:
-    """Require a checkpointed ledger, rather than ignoring a live WAL."""
+    """Require a checkpointed ledger, rather than ignoring a live WAL or journal.
+
+    Immutable reads take no lock, so a journal left by a writer that is
+    committing, or that crashed while committing, would expose torn pages.
+    """
     wal = Path(str(path) + "-wal")
     if wal.exists() and wal.stat().st_size:
         raise ValueError("Ledger has an active WAL; stop/checkpoint its writer first")
+    if hot_journal(path):
+        raise ValueError(
+            "Ledger has a hot rollback journal: a writer is committing or crashed "
+            "while committing; a writer command such as `run` or `gc` rolls it back"
+        )
     return sqlite3.connect(
         path.absolute().as_uri() + "?mode=ro&immutable=1",
         uri=True,
@@ -92,35 +113,40 @@ class Ledger:
         with self.lock, self.db:
             yield
 
+    # Concurrent units share this connection; every statement holds the lock.
     @property
     def migrated(self) -> bool:
-        return bool(
-            self.db.execute(
-                "SELECT 1 FROM sqlite_master WHERE name='recipes'"
-            ).fetchone()
-        )
+        with self.lock:
+            return bool(
+                self.db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE name='recipes'"
+                ).fetchone()
+            )
 
     def recipes(self, stage: str | None = None) -> list[Recipe]:
         if not self.migrated:
             return []
         sql = "SELECT recipe FROM recipes"
-        rows = self.db.execute(
-            sql + (" WHERE stage=?" if stage else "") + " ORDER BY stage,unit_id",
-            (stage,) if stage else (),
-        )
+        with self.lock:
+            rows = self.db.execute(
+                sql + (" WHERE stage=?" if stage else "") + " ORDER BY stage,unit_id",
+                (stage,) if stage else (),
+            ).fetchall()
         return [recipe_from_json(json.loads(row[0])) for row in rows]
 
     def recipe_stages(self) -> set[str]:
         if not self.migrated:
             return set()
-        return {
-            str(row[0]) for row in self.db.execute("SELECT DISTINCT stage FROM recipes")
-        }
+        with self.lock:
+            rows = self.db.execute("SELECT DISTINCT stage FROM recipes").fetchall()
+        return {str(row[0]) for row in rows}
 
     def recipe(self, stage: str, unit_id: str) -> Recipe | None:
-        row = self.db.execute(
-            "SELECT recipe FROM recipes WHERE stage=? AND unit_id=?", (stage, unit_id)
-        ).fetchone()
+        with self.lock:
+            row = self.db.execute(
+                "SELECT recipe FROM recipes WHERE stage=? AND unit_id=?",
+                (stage, unit_id),
+            ).fetchone()
         return recipe_from_json(json.loads(row[0])) if row else None
 
     def register(self, recipe: Recipe) -> None:
@@ -139,14 +165,20 @@ class Ledger:
             return self._record(row) if row is not None else None
 
     def records(self, stage: str | None = None) -> Iterator[Completion]:
-        rows = self.db.execute(
-            "SELECT * FROM units"
-            + (" WHERE stage=?" if stage else "")
-            + " ORDER BY stage,unit_id",
-            (stage,) if stage else (),
-        )
-        for row in rows:
-            yield self._record(row)
+        with self.lock:
+            cursor = self.db.execute(
+                "SELECT * FROM units"
+                + (" WHERE stage=?" if stage else "")
+                + " ORDER BY stage,unit_id",
+                (stage,) if stage else (),
+            )
+        while True:
+            with self.lock:
+                rows = cursor.fetchmany(1024)
+            if not rows:
+                return
+            for row in rows:
+                yield self._record(row)
 
     @staticmethod
     def _record(row: sqlite3.Row) -> Completion:
@@ -185,19 +217,32 @@ class Ledger:
         *,
         metadata: Object | None = None,
     ) -> Completion:
+        outputs, receipts = describe(self.root, paths)
+        return self.record(
+            stage, unit_id, inputs_hash, outputs, receipts, metadata=metadata
+        )
+
+    def record(
+        self,
+        stage: str,
+        unit_id: str,
+        inputs_hash: str,
+        outputs: Sequence[Output],
+        receipts: dict[str, str],
+        *,
+        metadata: Object | None = None,
+    ) -> Completion:
+        """Store described outputs; receipts are location-independent JSON digests."""
         self.writable()
-        outputs = []
-        for path in paths:
-            name = relative(self.root, path)
-            if path.name.endswith(".part") or not path.is_file():
-                raise ValueError(f"Output has not been published: {name}")
-            outputs.append(Output(name, path.stat().st_size, sha256_file(path)))
+        values: Object = dict(metadata or {})
+        if receipts:
+            values["receipts"] = dict(sorted(receipts.items()))
         record = Completion(
             stage,
             unit_id,
             inputs_hash,
             tuple(outputs),
-            metadata or {},
+            values,
             datetime.now(UTC).isoformat(),
         )
         with self.transaction():

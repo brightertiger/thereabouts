@@ -8,32 +8,59 @@ import pyarrow.parquet as pq
 
 from pipeline.config import load
 from pipeline.engines.artifact_io import file_record
-from pipeline.runtime.jsonio import write_json
+from pipeline.runtime.execution import Executor
+from pipeline.runtime.jsonio import digest, write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.sources.shared.schemas import SCHEMAS
-from pipeline.stages.contract import Context, make_unit
+from pipeline.stages.contract import Context, Stage, make_unit
+from pipeline.stages.registry import ordered, registry
 from tests.pipeline.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
 
 
-def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage]:
+def partition(root: Path, source: str, kind: str) -> Path:
+    """The production layout: normalized/<source>/<kind>/<inputs hash>/<part>."""
+    path = root / "normalized" / source / kind / digest(source) / "part.parquet"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def source_receipts(
+    root: Path, ledger: Ledger, *, wide: bool = False
+) -> tuple[Context, SyntheticStage]:
+    """ZZ around the origin; `wide` adds country YY east of it and four blocks."""
     config = load()
-    config.engines.countries = ["ZZ"]
-    config.engines.blocks = [h3.latlng_to_cell(0, 0, 3)]
+    centre = h3.latlng_to_cell(0, 0, 3)
+    config.engines.countries = ["YY", "ZZ"] if wide else ["ZZ"]
+    config.engines.blocks = (
+        [centre, *sorted(set(h3.grid_ring(centre, 1)))[:3]] if wide else [centre]
+    )
     config.resources.workers = 1
     config.resources.duckdb_memory = "128MB"
     ctx = context(root, ledger)
     ctx.config = config
+    geonames = [place("1", "Town", 0, 0, population=50000)]
+    divisions = [place("town", "Town", 0, 0, source="overture")]
+    areas = [
+        area(
+            "nation", "Nation", "country", (-5, -5, 0.5, 5) if wide else (-5, -5, 5, 5)
+        ),
+        area("town", "Town", "locality", (-0.1, -0.1, 0.1, 0.1)),
+    ]
+    if wide:
+        geonames.append(place("2", "Port", 0.8, 0, population=40000, country="YY"))
+        divisions.append(place("port", "Port", 0.8, 0, source="overture", country="YY"))
+        areas += [
+            area("east", "East", "country", (0.5, -5, 5, 5), country="YY"),
+            area("port", "Port", "locality", (0.7, -0.1, 0.9, 0.1), country="YY"),
+        ]
     extracted = write_inputs(
         root / "normalized" / "fixture",
-        geonames=[place("1", "Town", 0, 0, population=50000)],
-        divisions=[place("town", "Town", 0, 0, source="overture")],
-        areas=[
-            area("nation", "Nation", "country", (-5, -5, 5, 5)),
-            area("town", "Town", "locality", (-0.1, -0.1, 0.1, 0.1)),
-        ],
+        geonames=geonames,
+        divisions=divisions,
+        areas=areas,
     )
     source_names = ["overture", "geonames", "geoboundaries", "osm_land", "ghsl"]
     stage = SyntheticStage(
@@ -43,8 +70,7 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
         source = recipe.unit_id
         parts, paths = [], []
         if source in {"osm_land", "ghsl"}:
-            path = root / "normalized" / source / "areas.parquet"
-            path.parent.mkdir(parents=True, exist_ok=True)
+            path = partition(root, source, "areas")
             rows = (
                 [area("physical", "Land", "land", (-5, -5, 5, 5), source=source)]
                 if source == "osm_land"
@@ -57,7 +83,8 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
             )
         else:
             for kind in config.engines.reconcile_sources[source]:
-                path = extracted / f"{source}_{kind}.parquet"
+                path = partition(root, source, kind)
+                (extracted / f"{source}_{kind}.parquet").rename(path)
                 paths.append(path)
                 parts.append(
                     {
@@ -80,3 +107,26 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
             },
         )
     return ctx, stage
+
+
+GEOGRAPHIC = ("reconcile", "cells", "cities", "normalize_cells", "lookups")
+
+
+def geographic_graph(ctx: Context, normalized: SyntheticStage) -> list[Stage]:
+    """The production geographic stages, with a passing synthetic review gate."""
+    review = SyntheticStage(
+        "evaluate", [Recipe("evaluate", "pilot")], needs=("cells", "cities")
+    )
+    production = [
+        stage
+        for stage in registry(ctx.config)
+        if stage.name in {*GEOGRAPHIC, "plate_country"}
+    ]
+    return ordered([normalized, review, *production])
+
+
+def build(ctx: Context, stages: list[Stage], target: str = "lookups") -> dict[str, int]:
+    """Run what the target needs; the fixture's reconcile pilot gate cannot pass."""
+    executor = Executor(ctx, stages, lambda _: None)
+    executor.execute(target)
+    return {"completed": executor.completed, "skipped": executor.skipped}
