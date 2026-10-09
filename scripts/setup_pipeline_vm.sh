@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Owner-run provisioning only. This script was not executed during implementation.
+# Provisions the pipeline VM. Instance-level SSH keys only: the project is shared with other services.
 set -euo pipefail
 
 : "${PIPELINE_GCP_PROJECT:?Set the GCP project that will own the VM}"
@@ -34,6 +34,7 @@ gcloud compute instances create "$PIPELINE_VM_NAME" \
   --boot-disk-size "${PIPELINE_DISK_GB}GB" --boot-disk-type pd-balanced \
   --image-family ubuntu-2404-lts-amd64 --image-project ubuntu-os-cloud \
   --service-account "$PIPELINE_SERVICE_ACCOUNT" --scopes cloud-platform \
+  --metadata block-project-ssh-keys=TRUE \
   --metadata-from-file "startup-script=$PIPELINE_SCRIPT_DIR/pipeline_vm_startup.sh"
 
 printf 'VM created in %s. Inspect startup logs before using it.\n' "$PIPELINE_VM_ZONE"
