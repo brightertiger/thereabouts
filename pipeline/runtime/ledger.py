@@ -10,8 +10,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import cast
 
-from .jsonio import Object, encode, sha256_file
-from .paths import relative
+from .jsonio import Object, encode
+from .outputs import describe
 from .records import Completion, Output, Recipe, outputs_from_json, recipe_from_json
 
 UNITS_SQL = (
@@ -185,19 +185,32 @@ class Ledger:
         *,
         metadata: Object | None = None,
     ) -> Completion:
+        outputs, receipts = describe(self.root, paths)
+        return self.record(
+            stage, unit_id, inputs_hash, outputs, receipts, metadata=metadata
+        )
+
+    def record(
+        self,
+        stage: str,
+        unit_id: str,
+        inputs_hash: str,
+        outputs: Sequence[Output],
+        receipts: dict[str, str],
+        *,
+        metadata: Object | None = None,
+    ) -> Completion:
+        """Store described outputs; receipts are location-independent JSON digests."""
         self.writable()
-        outputs = []
-        for path in paths:
-            name = relative(self.root, path)
-            if path.name.endswith(".part") or not path.is_file():
-                raise ValueError(f"Output has not been published: {name}")
-            outputs.append(Output(name, path.stat().st_size, sha256_file(path)))
+        values: Object = dict(metadata or {})
+        if receipts:
+            values["receipts"] = dict(sorted(receipts.items()))
         record = Completion(
             stage,
             unit_id,
             inputs_hash,
             tuple(outputs),
-            metadata or {},
+            values,
             datetime.now(UTC).isoformat(),
         )
         with self.transaction():

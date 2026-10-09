@@ -3,12 +3,15 @@
 from collections.abc import Callable, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import replace
-from pathlib import Path
 
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
+from .outputs import describe
 from .paths import located
 from .planning import decide
+from .records import Output
+
+Described = tuple[tuple[Output, ...], dict[str, str]]
 
 
 class Executor:
@@ -153,7 +156,7 @@ class Executor:
                 )
 
     def _stage(self, stage: Stage, pending: dict[tuple[str, str], Unit]) -> None:
-        running: dict[Future[list[Path]], Unit] = {}
+        running: dict[Future[Described], Unit] = {}
         with ThreadPoolExecutor(max_workers=self.ctx.config.resources.workers) as pool:
             while pending or running:
                 active = set(pending) | {u.key for u in running.values()}
@@ -189,15 +192,16 @@ class Executor:
                 ready, _ = wait(running, return_when=FIRST_COMPLETED)
                 for future in ready:
                     unit = running.pop(future)
-                    paths = future.result()
+                    outputs, receipts = future.result()
                     if stage.identity(self.ctx) != unit.identity:
                         raise ValueError(f"Stage changed during {stage.name}")
                     with self.ctx.ledger.transaction():
                         self.ctx.ledger.register(unit.recipe)
-                    self.ctx.ledger.complete(
+                    self.ctx.ledger.record(
                         *unit.key,
                         unit.inputs_hash,
-                        paths,
+                        outputs,
+                        receipts,
                         metadata={
                             "identity": unit.identity,
                             "dependency_hash": unit.dependency_hash,
@@ -210,21 +214,20 @@ class Executor:
                         self.skipped_keys.remove(unit.key)
                         self.skipped -= 1
 
-    def _run(self, stage: Stage, unit: Unit) -> list[Path]:
+    def _run(self, stage: Stage, unit: Unit) -> Described:
+        """Hash outputs in the worker, so recording stays a short serial step."""
         self.ctx.guard.admit(unit.required_bytes)
-        outputs: list[Path] | None = None
+        described: Described | None = None
         try:
-            outputs = stage.run(self.ctx, unit)
-            return outputs
+            described = describe(self.ctx.root, stage.run(self.ctx, unit))
+            return described
         finally:
             written = None
-            try:
-                if outputs is not None:
-                    written = sum(path.stat().st_size for path in outputs)
-            finally:
-                self.ctx.guard.release(
-                    unit.required_bytes,
-                    written_bytes=0 if unit.accounts_disk else written,
-                )
-                if unit.accounts_disk:
-                    self.ctx.guard.refresh_usage()
+            if described is not None:
+                written = sum(output.size for output in described[0])
+            self.ctx.guard.release(
+                unit.required_bytes,
+                written_bytes=0 if unit.accounts_disk else written,
+            )
+            if unit.accounts_disk:
+                self.ctx.guard.refresh_usage()

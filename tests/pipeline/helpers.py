@@ -79,6 +79,32 @@ class SyntheticStage:
         write_json(ctx.root / f"{self.name}.json", {"complete": True})
 
 
+@dataclass
+class HashedStage(SyntheticStage):
+    """Write like production stages: under the unit's inputs hash, with a receipt."""
+
+    note: str = "receipt"
+
+    def run(self, ctx: Context, unit: Unit) -> list[Path]:
+        self.calls.append(unit.recipe.unit_id)
+        root = ctx.root / self.name / unit.inputs_hash
+        path = root / unit.recipe.unit_id
+        with atomic_output(path) as temporary:
+            temporary.write_text(self.content)
+        receipt = root / f"{unit.recipe.unit_id}.json"
+        write_json(
+            receipt,
+            {
+                "table": {
+                    "path": path.relative_to(ctx.root).as_posix(),
+                    "sha256": sha256_file(path),
+                },
+                "note": self.note,
+            },
+        )
+        return [path, receipt]
+
+
 def record(path: Path) -> Object:
     name = str(path.absolute())
     return {"path": name, "size": path.stat().st_size, "sha256": sha256_file(path)}
