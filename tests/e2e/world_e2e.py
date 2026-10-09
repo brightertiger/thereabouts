@@ -7,7 +7,9 @@ Excluded from the default run (marker `world`). `scripts/vm/e2e.sh` runs it:
     THEREABOUTS_E2E_VERSION=<version; default: newest in packs/index.json>
     THEREABOUTS_E2E_WORK=<scratch for stores>  THEREABOUTS_E2E_REPORT=<report.md>
     THEREABOUTS_E2E_LAND / _OCEAN / _NAMES / _FORWARD / _CROSS (sample sizes)
-    THEREABOUTS_E2E_PLATE_EXAMPLES=<JSON list of {country_code, plate}>
+    THEREABOUTS_E2E_WORKSPACE=<pipeline workspace; the plate evaluation examples
+        are read from its pinned plate_country evidence>
+    THEREABOUTS_E2E_PLATE_EXAMPLES=<or a JSON list of {country_code, plate}>
 """
 
 import os
@@ -30,6 +32,7 @@ def test_world_release_end_to_end(tmp_path: Path) -> None:
     if not release:
         pytest.skip("Set THEREABOUTS_E2E_RELEASE to a staged release directory")
     examples = os.environ.get(ENV + "PLATE_EXAMPLES")
+    workspace = os.environ.get(ENV + "WORKSPACE")
     settings = driver.Settings(
         release=Path(release),
         work=Path(os.environ.get(ENV + "WORK", tmp_path / "work")),
@@ -41,6 +44,7 @@ def test_world_release_end_to_end(tmp_path: Path) -> None:
         forward_rows=setting("FORWARD", 500),
         cross_client=setting("CROSS", 1000),
         plate_examples=Path(examples) if examples else None,
+        workspace=Path(workspace) if workspace else None,
     )
     report = driver.run(settings)
     target = Path(os.environ.get(ENV + "REPORT", tmp_path / "world-e2e.md"))

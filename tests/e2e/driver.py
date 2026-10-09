@@ -34,10 +34,12 @@ from typing import Any
 
 from pipeline.config import load
 from pipeline.config.release import AcceptanceSettings
+from pipeline.engines.artifacts import read_json
 from pipeline.release import acceptance, samples
 from pipeline.release.samples import Query
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import encode
+from pipeline.runtime.paths import located
 from tests.client.cli.test_vectors import USAGE_CASES, arguments
 from tests.skill import examples
 
@@ -65,6 +67,8 @@ class Settings:
     cross_client: int = 1000
     city_points: Path | None = REPOSITORY / "eval/city_points/points.csv"
     plate_examples: Path | None = None
+    # The pipeline workspace whose plate_country pin holds the evaluation files.
+    workspace: Path | None = None
     timeout: int = 7200
 
 
@@ -326,17 +330,40 @@ def city_points(report: Report, store: Path, accept: AcceptanceSettings) -> None
         }
 
 
+def pinned_plate_examples(workspace: Path) -> list[Row]:
+    """The 127 evaluation examples, read from the workspace's pinned evidence."""
+    from tests.pipeline.sources import plate_evaluation
+
+    normalized = located(workspace, load().paths.normalized) / "plate_country"
+    manifest = read_json(normalized / "manifest.json")
+    (inventory,) = [
+        record
+        for record in manifest["auxiliary"]
+        if record["path"].endswith("sources.json")
+    ]
+    records = read_json(located(workspace, inventory["path"]))["sources"]
+    sources = {
+        record["name"]: {**record, "path": str(located(workspace, record["path"]))}
+        for record in records
+    }
+    return plate_evaluation.examples(sources)
+
+
 def plate_examples(report: Report, store: Path, accept: AcceptanceSettings) -> None:
+    """Spec §9.4: the plate evaluation examples, reported and not gated."""
     settings = report.settings
     with step(report, "plate-examples") as record:
-        if settings.plate_examples is None:
+        if settings.plate_examples is not None:
+            rows = json.loads(settings.plate_examples.read_text())
+        elif settings.workspace is not None:
+            rows = pinned_plate_examples(settings.workspace)
+        else:
             record.status = "skip"
             record.details["reason"] = (
-                "the plate_country evaluation sources are not pinned; pass "
-                "THEREABOUTS_E2E_PLATE_EXAMPLES (a JSON list of country_code, plate)"
+                "no pinned evaluation evidence: set THEREABOUTS_E2E_WORKSPACE to "
+                "the pipeline workspace (or THEREABOUTS_E2E_PLATE_EXAMPLES)"
             )
             return
-        rows = json.loads(settings.plate_examples.read_text())
         queries = [
             Query(
                 f"plate-{n:04d}",
@@ -351,7 +378,8 @@ def plate_examples(report: Report, store: Path, accept: AcceptanceSettings) -> N
         lines, _ = acceptance.run_probe(
             probe_job(store, queries), accept, settings.work
         )
-        top1 = top3 = 0
+        totals: Counter[str] = Counter()
+        found: Counter[str] = Counter()
         for query in queries:
             result = lines[query.id].get("result") or {}
             ranked = (
@@ -360,9 +388,25 @@ def plate_examples(report: Report, store: Path, accept: AcceptanceSettings) -> N
                 else result.get("candidates", [])
             )
             codes = [(answer.get("country") or {}).get("code") for answer in ranked]
-            top1 += codes[:1] == [query.expect["country_code"]]
-            top3 += query.expect["country_code"] in codes[:3]
-        record.details = {"examples": len(queries), "top1": top1, "top3": top3}
+            truth = query.expect["country_code"]
+            for split in ("all", query.expect.get("split", "unsplit")):
+                totals[split] += 1
+                found[f"{split}/top1"] += codes[:1] == [truth]
+                found[f"{split}/top3"] += truth in codes[:3]
+                found[f"{split}/candidates"] += truth in codes
+        record.details = {
+            "examples": len(queries),
+            "splits": {
+                split: {
+                    "examples": total,
+                    **{
+                        rank: found[f"{split}/{rank}"]
+                        for rank in ("top1", "top3", "candidates")
+                    },
+                }
+                for split, total in sorted(totals.items())
+            },
+        }
 
 
 def console(
@@ -709,13 +753,14 @@ def markdown(report: Report) -> str:
         lines += ["", f"Misses (expected city not returned): {misses or 'none'}."]
     plates = found.get("plate-examples")
     if plates is not None and plates.status == "pass":
-        d = plates.details
-        lines += [
-            "",
-            "## Plate examples",
-            "",
-            f"{d['top1']} of {d['examples']} top-1, {d['top3']} top-3.",
-        ]
+        lines += ["", "## Plate examples (reported, not gated)", ""]
+        lines += table(
+            ["Split", "Examples", "Top-1", "Top-3", "In candidates"],
+            [
+                [split, d["examples"], d["top1"], d["top3"], d["candidates"]]
+                for split, d in plates.details["splits"].items()
+            ],
+        )
     vectors = found.get("vectors")
     if vectors is not None:
         lines += ["", "## World-safe vectors by client", ""]
