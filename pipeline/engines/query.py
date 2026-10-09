@@ -1,11 +1,19 @@
 """One configured DuckDB connection for bounded analytical joins."""
 
 from pathlib import Path
+from typing import Protocol
 
 import duckdb
 
-from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import Resources
+
+
+class SpillLimits(Protocol):
+    """Engine limits as `connect` reads them; release stages reach this module
+    through discovery, so it must not import the hashed engine settings."""
+
+    @property
+    def duckdb_spill_bytes(self) -> int: ...
 
 
 def connection(
@@ -33,7 +41,7 @@ def connection(
 
 
 def connect(
-    work: Path, resources: Resources, limits: EngineLimits
+    work: Path, resources: Resources, limits: SpillLimits
 ) -> duckdb.DuckDBPyConnection:
     """The stages' unordered join connection, spilling under `work`."""
     work.mkdir(parents=True, exist_ok=True)
