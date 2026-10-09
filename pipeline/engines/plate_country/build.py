@@ -1,25 +1,27 @@
-"""Derive inference tables from verified registration and raw source evidence."""
+"""Derive the writer's plate tables from verified registration and source evidence."""
 
 from collections import Counter
 from pathlib import Path
 
-import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.engines.artifact_io import file_record, parquet
-from pipeline.engines.reconcile.common import encode
+from pipeline.engines.artifact_io import file_record
 from pipeline.runtime.jsonio import write_json
 
-from . import formats, priors
+from . import formats, priors, tables
+from .documents import Pool
 from .evidence import code_rows
 from .policy import Row, policy
 from .sources import source_fields
 
 
 def build(
-    root: Path, output: Path, base: Row, sources: dict[str, Row], batch_rows: int
+    root: Path, output: Path, base: Row, pins: Pool, batch_rows: int
 ) -> list[Path]:
-    universe = priors.countries(sources["countries.csv"])
+    countries = pins.get("countries.csv")
+    if countries is None:
+        raise ValueError("Missing pinned plate country universe: countries.csv")
+    universe = priors.countries(countries)
     for part in base["partitions"]:
         if part["kind"] == "plate_survey":
             known = {r["country_code"] for r in universe}
@@ -33,11 +35,12 @@ def build(
                 for r in pq.read_table(part["path"]).to_pylist()
                 if r["country_code"] not in known
             )
-    stock, rejected = priors.vehicle_rows(sources["vehicle-stock.json"], universe)
-    grammar = list(formats.rows(sources))
-    codes = code_rows(base, sources)
+    stock, rejected = priors.vehicle_rows(pins.get("vehicle-stock.json"), universe)
+    grammar = list(formats.rows(pins))
+    codes = code_rows(base, pins)
+    inference = policy("inference")
     bundle = dict(
-        policy=policy("inference"),
+        policy=inference,
         countries=universe,
         priors=stock,
         formats=grammar,
@@ -62,37 +65,23 @@ def build(
         )
         for r in universe
     ]
-    records, outputs = [], [bundle_path]
-    schema = pa.schema(
-        [
-            pa.field("country_code", pa.string(), nullable=False),
-            pa.field("evidence_json", pa.string(), nullable=False),
-        ]
-    )
-    for kind, rows in {
-        "formats": grammar,
-        "vehicle_priors": stock,
-        "coverage": coverage,
-    }.items():
-        path = output / f"{kind}.parquet"
-        record = parquet(
-            root,
-            path,
-            (
-                {"country_code": r["country_code"], "evidence_json": encode(r)}
-                for r in rows
-            ),
-            schema,
-            batch_rows,
+    records = [
+        tables.write(root, output, kind, rows, batch_rows)
+        for kind, rows in (
+            ("plate_formats", tables.formats(grammar, pins)),
+            ("plate_codes", tables.codes(codes)),
+            ("plate_policy", tables.policy(inference)),
+            ("plate_priors", tables.priors(stock)),
         )
-        records.append({**record, "kind": "plate_country_" + kind})
-        outputs.append(path)
+    ]
     report = output / "coverage.json"
     write_json(
         report,
         {
             "countries": coverage,
             "prior_rejections": rejected,
+            "prior_available": bool(stock),
+            "unpinned_sources": dict(sorted(pins.missing.items())),
             "counts": dict(Counter(r["status"] for r in coverage)),
         },
     )
@@ -104,7 +93,14 @@ def build(
             "tables": records,
             "bundle": file_record(root, bundle_path),
             "coverage": file_record(root, report),
-            "sources": {name: source_fields(pin) for name, pin in sources.items()},
+            "sources": {
+                name: source_fields(pin) for name, pin in sorted(pins.used.items())
+            },
         },
     )
-    return [*outputs, report, manifest]
+    return [
+        *(output / f"{r['kind']}.parquet" for r in records),
+        bundle_path,
+        report,
+        manifest,
+    ]

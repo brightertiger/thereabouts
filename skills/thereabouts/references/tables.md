@@ -13,10 +13,15 @@ Plain Parquet files, one directory per table. Partition labels in directory name
 | [`cells`](#cells) | One row per stored H3 cell: a resolution 8 cell, or a coarser ancestor (resolution 3 to 7) that stands for all its resolution 8 descendants when they share one label. | `h3_uint64` | `core` |
 | [`countries`](#countries) | One row per country or territory record in the pinned sources; observations can repeat. | none | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`ip_ranges`](#ip_ranges) | One row per published IP interval, from ip_start to ip_end inclusive. | none | `ip` |
+| [`names`](#names) | One row per canonical city and distinct name. Names that fold to the same text, or to the city's canonical or English name, are kept once. | `city_id`, `name` | `core` |
 | [`phone_metadata`](#phone_metadata) | One row per libphonenumber territory, including the non-geographic territory 001. | none | `phone` |
 | [`phone_prefixes`](#phone_prefixes) | One row per prefix description in one language file, so a prefix repeats once per language. | none | `phone` |
 | [`place_to_city`](#place_to_city) | One row per place; every places row has exactly one mapping row. | `place_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`places`](#places) | One row per reconciled place. | `place_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
+| [`plate_codes`](#plate_codes) | One row per source assertion of a code; a code repeats across sources, series and validity periods. | none | `plates` |
+| [`plate_formats`](#plate_formats) | One row per source rule; a country has one row per modeled series and source. | none | `plates` |
+| [`plate_policy`](#plate_policy) | Exactly one row. | none | `plates` |
+| [`plate_priors`](#plate_priors) | One row per country with a published count. | `country_code` | `plates` |
 | [`postal_codes`](#postal_codes) | One row per postal-code observation; a code can repeat for different place names or variants. | none | `postal` |
 | [`subdivisions`](#subdivisions) | One row per GeoNames first-level division; observations can repeat. | none | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`timezone_cells`](#timezone_cells) | One row per timezone and H3 cell; a cell in overlapping zones has several rows, and cells are stored at resolutions 0 to 8. | none | `core` |
@@ -272,6 +277,40 @@ Enumerated columns:
   - `pending`: No cell data exists for the point's block in this release, so no decision was made
   - `unlocated`: The row has no coordinates, so there is no cell to join
 
+### `names`
+
+Alternate names of canonical cities: every name the core pack's forward geocoder matches for a city beyond its canonical and English names in canonical_cities. Names come from GeoNames alternate names, GeoNames feature and ASCII names, and Overture division names of the city's own place or a declared identity alias, filtered by config/policies/names.yaml.
+
+- Grain: One row per canonical city and distinct name. Names that fold to the same text, or to the city's canonical or English name, are kept once.
+- Primary key: `city_id`, `name`
+- Feeds packs: `core`
+
+Joins:
+
+- `names.city_id` → `canonical_cities.city_id`: The canonical city the name finds
+- `names.place_id` → `places.place_id`: The reconciled place whose source record carries the name; the city itself or a declared identity alias
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `city_id` | `string` | no |  | Canonical city/town anchor ID |
+| `name` | `string` | no |  | The name as published by the source, NFC with collapsed whitespace |
+| `kind` | `string` | no |  | How the name relates to the city: english, alternate or ascii |
+| `language` | `string` | yes |  | Language tag from the source (GeoNames ISO 639 codes, Overture BCP 47 tags); null when the source gives none |
+| `country_code` | `string` | no |  | Country code of the canonical city |
+| `place_id` | `string` | no |  | Reconciled place whose source record carries the name |
+| `source` | `string` | no |  | Configured upstream source name |
+| `source_id` | `string` | no |  | The name's source row; a GeoNames alternate-name ID, a GeoNames feature ID for feature and ASCII names, or an Overture name digest |
+| `source_release` | `string` | no |  | Pinned upstream release or inventory identifier |
+| `license` | `string` | no |  | Upstream licence identifier |
+| `provenance` | `string` | no |  | JSON source evidence and transformation provenance |
+
+Enumerated columns:
+
+- `kind`
+  - `english`: An English name (language en or an en- tag) other than the city's name_en
+  - `alternate`: A name in another language or script, an untagged variant, or another source's name for the city
+  - `ascii`: The ASCII spelling GeoNames publishes for the city's feature
+
 ### `phone_metadata`
 
 libphonenumber territory metadata: calling code, leading digits and national and international prefixes, with the original territory XML.
@@ -481,6 +520,108 @@ Enumerated columns:
   - `village`: A standalone settlement classified as a village
   - `hamlet`: A standalone settlement classified as a hamlet
   - `settlement`: A standalone settlement without a source class
+
+### `plate_codes`
+
+Registration-code assertions: a code printed on vehicle plates and the registration unit or entity it names, from pinned national pages, Wikipedia revisions and Wikidata. Every row keeps its source URL and licence.
+
+- Grain: One row per source assertion of a code; a code repeats across sources, series and validity periods.
+- Primary key: none (observations can repeat)
+- Feeds packs: `plates`
+
+Joins:
+
+- `plate_codes.country_code` → `countries.country_code`: The country or territory issuing the plates
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `country_code` | `string` | no |  | ISO-like two-letter code of the issuing country or territory |
+| `code` | `string` | no |  | The code as the source spells it, with leading zeros and native script |
+| `name_en` | `string` | yes |  | English label of the registration unit, as published |
+| `name_local` | `string` | yes |  | Local-language label of the registration unit, as published |
+| `unit_kind` | `string` | no |  | Source unit kind, such as district, state or registration_office; plate_policy maps it to a place or state level |
+| `scope` | `string` | no |  | Whether the code identifies a registration unit or only associates an entity |
+| `series_status` | `string` | no |  | Temporal status of the assertion |
+| `series_id` | `string` | yes |  | Source series identifier the assertion belongs to |
+| `subdivision_scope` | `string` | yes |  | Narrower context the assertion requires, such as a state series |
+| `subdivision_codes` | `list<element: string>` | no |  | ISO 3166-2 identifiers the source gives for the unit; empty when none |
+| `source` | `string` | no |  | Configured upstream source name |
+| `source_url` | `string` | no |  | URL of the pinned document or query the assertion comes from |
+| `license` | `string` | no |  | Licence identifier of that document |
+
+Enumerated columns:
+
+- `scope`
+  - `registration_unit`: The source lists the code as issued by this registration unit
+  - `entity_association`: Wikidata associates the code with an entity; never used for geography
+- `series_status`
+  - `current`: The source describes the code as in current use
+  - `historic`: The source describes a former series or allocation
+  - `unknown`: The source does not establish the status
+
+### `plate_formats`
+
+Plate syntax rules: a full-match regular expression per country and series, with the relaxed form that tolerates separators only where the source shows them, the scripts it uses and its specificity. Each rule is checked against its pinned source document when built; rules whose documents are not pinned are left out.
+
+- Grain: One row per source rule; a country has one row per modeled series and source.
+- Primary key: none (observations can repeat)
+- Feeds packs: `plates`
+
+Joins:
+
+- `plate_formats.country_code` → `countries.country_code`: The country or territory issuing the plates
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `country_code` | `string` | no |  | ISO-like two-letter code of the issuing country or territory |
+| `series_id` | `string` | no |  | Source series identifier |
+| `series_status` | `string` | no |  | Temporal status of the series as the format policy records it: current, or historic (a former series, which needs an explicit series to supply geography) |
+| `pattern` | `string` | no |  | Full-match regular expression over the normalized plate text |
+| `relaxed_pattern` | `string` | no |  | The pattern with separators optional or varied only at the positions the source shows |
+| `code_group` | `string` | yes |  | Name of the capture group holding the registration code; null for series without one |
+| `scripts` | `list<element: string>` | no |  | Script names the pattern uses, from plate_policy script_patterns |
+| `fixed_national_marks` | `list<element: string>` | no |  | Literal national marks within the serial |
+| `specificity_bits` | `double` | no | bits | Information heuristic of the pattern against a 36-character baseline; not a count of valid plates |
+| `provenance` | `string` | no |  | JSON source fields of the pinned document: URL, licence, attribution, revision, digest and retrieval time |
+| `source` | `string` | no |  | Configured upstream source name |
+| `source_file` | `string` | no |  | Pinned file name of the source document |
+| `source_url` | `string` | no |  | URL of the pinned source document |
+| `license` | `string` | no |  | Licence identifier of that document |
+
+### `plate_policy`
+
+The frozen plate matching and ranking policy (input normalization, code separators, unit-kind levels, script patterns, weights, geographic restrictions and the Unicode decimal digits used for code equality), from config/policies/plate_country/inference.yaml.
+
+- Grain: Exactly one row.
+- Primary key: none (observations can repeat)
+- Feeds packs: `plates`
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `policy_json` | `string` | no |  | The policy as one JSON object |
+
+### `plate_priors`
+
+Observed road motor vehicle counts per country, the weak prior that orders candidate countries for a plate without a country. Empty when no vehicle-stock source is pinned; the plates pack then ranks by format evidence alone.
+
+- Grain: One row per country with a published count.
+- Primary key: `country_code`
+- Feeds packs: `plates`
+
+Joins:
+
+- `plate_priors.country_code` → `countries.country_code`: The counted country or territory
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `country_code` | `string` | no |  | ISO-like two-letter code of the counted country or territory |
+| `vehicles` | `uint64` | no | vehicles | Published road motor vehicle count; definitions and dates differ between countries |
+| `year` | `int64` | no | calendar year | Year of the published count |
+| `source_label` | `string` | no |  | Country label as the source table prints it |
+| `source` | `string` | no |  | Configured upstream source name |
+| `source_url` | `string` | no |  | URL of the pinned source document |
+| `license` | `string` | no |  | Licence identifier of that document |
+| `provenance` | `string` | no |  | JSON source fields and the table row the count comes from |
 
 ### `postal_codes`
 

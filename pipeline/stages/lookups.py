@@ -14,6 +14,8 @@ from pipeline.engines.cells.code_links import CodeIndex, linked_rows
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.phone import PhoneCountries
 from pipeline.engines.cells.schemas import strings
+from pipeline.engines.names.build import build as build_names
+from pipeline.engines.names.policy import load as load_names_policy
 from pipeline.engines.reconcile.common import Row
 from pipeline.runtime.jsonio import Object, atomic_output, write_json
 from pipeline.runtime.paths import located
@@ -167,6 +169,34 @@ def spatial(ctx: Context, unit: Unit, root: Path, kind: str) -> list[Path]:
     return [destination, receipt]
 
 
+def names(ctx: Context, unit: Unit, root: Path) -> list[Path]:
+    cities, sources = [], {}
+    for dep in unit.recipe.dependencies:
+        if dep.stage == "normalize_cells":
+            country = dep.unit_id.partition("/")[2]
+            for kind in ("places", "canonical_cities", "place_to_city"):
+                cities.append(
+                    io.table(ctx, dep.stage, dep.unit_id, kind, country=country)
+                )
+        elif dep.stage == "normalize":
+            manifest = source_manifest(ctx, dep.unit_id)
+            if manifest is None:
+                raise ValueError(f"Missing name source: {dep.unit_id}")
+            kinds = ctx.config.engines.name_sources[dep.unit_id]
+            sources[dep.unit_id] = [
+                p for p in manifest["partitions"] if p["kind"] in kinds
+            ]
+    return build_names(
+        ctx.root,
+        root / "names",
+        io.local(ctx, cities),
+        io.local(ctx, sources),
+        cast(Row, unit.recipe.parameters["policy"]),
+        ctx.config.resources,
+        ctx.config.engines.limits,
+    )
+
+
 def run(ctx: Context, unit: Unit) -> list[Path]:
     action, _, key = unit.recipe.unit_id.partition("/")
     root = located(ctx.root, ctx.config.paths.cells) / "lookups" / unit.inputs_hash
@@ -174,6 +204,8 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         return static(ctx, unit, root, key)
     if action == "spatial":
         return spatial(ctx, unit, root, key)
+    if action == "names":
+        return names(ctx, unit, root)
     if action == "manifest":
         return lookup_manifest.publish(
             ctx, unit, root, cast(Row, unit.recipe.parameters["policy"])
@@ -187,10 +219,15 @@ def finish(ctx: Context) -> None:
 
 def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
     policy = unit_parameters.cities(ctx)
+    names_policy = cast(Object, load_names_policy())
     country = unit_parameters.country_policy(policy, geography)
 
     def select(recipe: Recipe) -> Object:
-        return policy if recipe.unit_id == "manifest/current" else country(recipe)
+        if recipe.unit_id == "manifest/current":
+            return policy
+        if recipe.unit_id == "names/world":
+            return names_policy
+        return country(recipe)
 
     limits = ctx.config.engines.limits
     return unit_parameters.prepare(
