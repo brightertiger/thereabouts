@@ -96,6 +96,7 @@ def assemble_tables(
                 CellGroups(writer, schema, selection.grid) if kind == "cells" else None
             )
             for record in records:
+                before = rows
                 original = snapshot.verify(record)
                 with pq.ParquetFile(original) as file:
                     validate_schema(file.schema_arrow, descriptions[kind], kind)
@@ -134,6 +135,8 @@ def assemble_tables(
                             pending.clear()
                             pending_rows = 0
                 snapshot.verify(record)
+                if cell_groups is not None and rows == before:
+                    cell_groups.empty(record.block)
             if cell_groups is not None:
                 cell_groups.finish()
             if pending:
@@ -146,5 +149,6 @@ def assemble_tables(
         entry: Row = {**file_record(output, path), "kind": kind, "rows": rows}
         if cell_groups is not None:
             entry["blocks"] = cell_groups.blocks
+            entry["empty_blocks"] = cell_groups.empty_blocks
         tables.append(entry)
     return tables, sources, row_licences

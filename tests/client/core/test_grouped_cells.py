@@ -17,14 +17,16 @@ from thereabouts.store_files import sha256
 FIXTURES = Path(__file__).parents[2] / "fixtures"
 
 
-def setup(root: Path) -> tuple[Path, dict[str, Any], dict[str, Any]]:
+def setup(
+    root: Path, *, keep_empty: bool = False
+) -> tuple[Path, dict[str, Any], dict[str, Any]]:
     manifest_path, _ = golden(root)
     manifest = json.loads(manifest_path.read_text())
-    # The grouped contract omits empty block entries; compare only retained blocks.
-    manifest["tables"] = [
-        t for t in manifest["tables"] if t["kind"] != "cells" or t["rows"] > 0
-    ]
-    cells = [t for t in manifest["tables"] if t["kind"] == "cells"]
+    if not keep_empty:
+        manifest["tables"] = [
+            t for t in manifest["tables"] if t["kind"] != "cells" or t["rows"] > 0
+        ]
+    cells = [t for t in manifest["tables"] if t["kind"] == "cells" and t["rows"]]
     parent = h3.cell_to_parent(cells[0]["block"], 1)
     used = {t["block"] for t in cells}
     block = next(b for b in h3.cell_to_children(parent, 3) if b not in used)
@@ -59,28 +61,31 @@ def coalesce(root: Path, manifest: dict[str, Any]) -> list[dict[str, Any]]:
         if table["kind"] == "cells":
             groups[h3.cell_to_parent(table["block"], 1)].append(table)
     grouped = []
-    for parent, tables in sorted(groups.items()):
-        tables.sort(key=lambda t: t["block"])
+    for parent, entries in sorted(groups.items()):
+        entries.sort(key=lambda t: t["block"])
+        # Zero-row legacy files become covered empty blocks without row groups.
+        tables = [t for t in entries if t["rows"]]
         path = root / f"golden/cells/group={parent}/part.parquet"
         path.parent.mkdir(parents=True)
-        schema = pq.ParquetFile(root / tables[0]["path"]).schema_arrow
+        schema = pq.ParquetFile(root / entries[0]["path"]).schema_arrow
         with pq.ParquetWriter(path, schema) as writer:
             for table in tables:
                 writer.write_table(pq.ParquetFile(root / table["path"]).read())
         assert pq.ParquetFile(path).num_row_groups == len(tables)
-        grouped.append(
-            dict(
-                kind="cells",
-                path=path.relative_to(root).as_posix(),
-                rows=sum(t["rows"] for t in tables),
-                size=path.stat().st_size,
-                sha256=sha256(path),
-                blocks=[
-                    dict(block=t["block"], row_group=i, rows=t["rows"])
-                    for i, t in enumerate(tables)
-                ],
-            )
+        record = dict(
+            kind="cells",
+            path=path.relative_to(root).as_posix(),
+            rows=sum(t["rows"] for t in tables),
+            size=path.stat().st_size,
+            sha256=sha256(path),
+            blocks=[
+                dict(block=t["block"], row_group=i, rows=t["rows"])
+                for i, t in enumerate(tables)
+            ],
         )
+        if len(tables) < len(entries):
+            record["empty_blocks"] = [t["block"] for t in entries if not t["rows"]]
+        grouped.append(record)
     manifest["tables"] = [
         t for t in manifest["tables"] if t["kind"] != "cells"
     ] + grouped
@@ -109,9 +114,33 @@ def test_grouped_and_legacy_layouts_emit_identical_artifacts(tmp_path: Path) -> 
     assert _core.verify_pack(str(destination))["family"] == "core"
 
 
+def test_covered_empty_blocks_match_legacy_zero_row_files(tmp_path: Path) -> None:
+    root = tmp_path / "dataset"
+    path, manifest, options = setup(root, keep_empty=True)
+    empty = next(t["block"] for t in manifest["tables"] if t.get("rows") == 0)
+    legacy = tmp_path / "legacy"
+    before = _core.write_pack(str(path.parent), "core", str(legacy), options)
+    grouped = coalesce(root, manifest)
+    assert [b for t in grouped for b in t.get("empty_blocks", [])] == [empty]
+    path.write_text(json.dumps(manifest))
+    destination = tmp_path / "grouped"
+    after = _core.write_pack(str(path.parent), "core", str(destination), options)
+    assert before["files"] == after["files"]
+    ocean = h3.cell_to_center_child(empty, 8)
+    with Geocoder(legacy) as old, Geocoder(destination) as new:
+        result = new.from_h3(ocean, evidence=True)
+        assert result == old.from_h3(ocean, evidence=True)
+        assert result.status == "not_found"
+        assert result.evidence is not None and result.evidence.reason == "no_land"
+
+
 @pytest.mark.parametrize(
     "fault",
     [
+        "empty_overlap",
+        "empty_order",
+        "empty_parent",
+        "empty_legacy",
         "order",
         "rows",
         "parent",
@@ -128,7 +157,35 @@ def test_grouped_manifest_routing_is_validated(tmp_path: Path, fault: str) -> No
     path, manifest, options = setup(root)
     tables = coalesce(root, manifest)
     table = next(t for t in tables if len(t["blocks"]) > 1)
-    if fault == "order":
+    used = {b["block"] for t in tables for b in t["blocks"]}
+    spare = sorted(
+        b
+        for b in h3.cell_to_children(
+            h3.cell_to_parent(table["blocks"][0]["block"], 1), 3
+        )
+        if b not in used
+    )
+    if fault == "empty_overlap":
+        table["empty_blocks"] = [table["blocks"][0]["block"]]
+    elif fault == "empty_order":
+        table["empty_blocks"] = spare[:2][::-1]
+    elif fault == "empty_parent":
+        table["empty_blocks"] = [tables[-1]["blocks"][0]["block"]]
+    elif fault == "empty_legacy":
+        zero = root / f"golden/cells/{spare[0]}.parquet"
+        pq.write_table(pq.read_schema(root / table["path"]).empty_table(), zero)
+        manifest["tables"].append(
+            dict(
+                kind="cells",
+                block=spare[0],
+                path=zero.relative_to(root).as_posix(),
+                rows=0,
+                size=zero.stat().st_size,
+                sha256=sha256(zero),
+                empty_blocks=spare[1:2],
+            )
+        )
+    elif fault == "order":
         table["blocks"].reverse()
     elif fault == "rows":
         table["blocks"][0]["rows"] += 1
@@ -216,7 +273,8 @@ def test_captured_my_sg_manifest_and_empty_pipeline_group(tmp_path: Path) -> Non
     path.write_text(json.dumps(manifest))
     output = tmp_path / "output"
     result = _core.write_pack(str(path.parent), "core", str(output), options)
-    assert sum(f["kind"] == "cells" for f in result["files"]) == 3
+    # Grouping by size: every captured block shares one cells shard.
+    assert sum(f["kind"] == "cells" for f in result["files"]) == 1
     assert _core.verify_pack(str(output))["family"] == "core"
     # An empty index may not hide a physical row group or a nonzero file count.
     for row_count in (0, 1):

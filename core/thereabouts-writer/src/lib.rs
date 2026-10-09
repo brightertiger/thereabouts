@@ -43,6 +43,11 @@ pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
 const WRITER_REVISION: &str = "0.4.0";
+// Core packs group many blocks and places per shard.
+const CORE_REVISION: &str = "0.3.0";
+/// Cells and catalogue shards fill up to 32 MiB: about ninety files for a world core,
+/// half the 64 MiB shard ceiling so one more block or place always fits.
+pub const SHARD_TARGET_BYTES: u64 = 32 * 1024 * 1024;
 use thereabouts_core::format;
 use thereabouts_core::format::{
     manifest::{Artifact, Manifest, digest},
@@ -79,6 +84,9 @@ pub struct Options {
     #[serde(default)]
     /// Original input digests and subset policy when exporting a derived sample.
     pub input_provenance: Value,
+    /// Cells/catalogue shard target in bytes (default 32 MiB); part of identity only when set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard_bytes: Option<u64>,
 }
 /// Export a core pack atomically. Repeated identical requests verify and return.
 /// A changed dataset or options never overwrites an existing published pack.
@@ -94,10 +102,7 @@ pub fn write_pack(
     ) {
         return Err(Error::Input("Unsupported export family".into()));
     }
-    ensure(
-        !options.data_version.is_empty(),
-        "Dataset version is required",
-    )?;
+    admit(options)?;
     let data = Dataset::open(dataset_dir)?;
     if family == "core" {
         data.validate_core(&options.allow_missing_tables)?;
@@ -119,7 +124,7 @@ pub fn write_pack(
         data.require_tables(&required, &options.allow_missing_tables)?;
     }
     let revision = if family == "core" {
-        "0.2.2" // Record-local catalogue strings bound positioned reads.
+        CORE_REVISION
     } else {
         WRITER_REVISION
     };
@@ -187,6 +192,18 @@ pub fn write_pack(
         }
     }
 }
+fn admit(options: &Options) -> Result<()> {
+    ensure(
+        !options.data_version.is_empty(),
+        "Dataset version is required",
+    )?;
+    ensure(
+        options
+            .shard_bytes
+            .is_none_or(|bytes| (1..=SHARD_TARGET_BYTES).contains(&bytes)),
+        "shard_bytes must be between 1 and 32 MiB",
+    )
+}
 fn build(
     data: &Dataset,
     stage: &Path,
@@ -243,8 +260,10 @@ fn build(
             0
         },
     };
+    let target = usize::try_from(options.shard_bytes.unwrap_or(SHARD_TARGET_BYTES))
+        .map_err(|_| Error::Input("Invalid shard target".into()))?;
     if family == "core" {
-        emission::cells(data, &db, stage, &mut manifest, &mut metadata)?;
+        emission::cells(data, &db, stage, &mut manifest, &mut metadata, target)?;
         names::emit(data, &db, stage, &mut manifest)?;
     } else if family == "plates" {
         plates::emit(
@@ -259,7 +278,7 @@ fn build(
         compact::emit(&db, stage, &mut manifest)?;
     }
     if family == "core" {
-        emission::catalogue(&db, stage, &mut manifest)?;
+        emission::catalogue(&db, stage, &mut manifest, target)?;
     }
     db.execute_batch("COMMIT")?;
     add(
