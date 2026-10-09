@@ -8,7 +8,7 @@ from pipeline.pins.models import SourcePin
 from pipeline.runtime.jsonio import write_json
 
 from .contract import SourceContext
-from .proposals.resolve import propose as propose_pin
+from .proposals.plates import propose as propose_pin
 from .shared.manifest import file_record, finish
 
 __all__ = ["Options", "normalize", "propose"]
@@ -19,6 +19,8 @@ def normalize(ctx: SourceContext) -> list[Path]:
         {
             "name": pin.metadata.get("key", pin.name),
             **file_record(ctx, ctx.input(pin.name)),
+            "url": pin.url,
+            "retrieved_at": ctx.pin.pinned_at,
             "upstream": pin.metadata,
         }
         for pin in ctx.pin.files
@@ -29,5 +31,5 @@ def normalize(ctx: SourceContext) -> list[Path]:
 
 
 def propose(settings: SourceSettings) -> SourcePin:
-    """Resolve upstream only for an explicit pin proposal."""
+    """Pin the reviewed inventory's documents that the plates pin lacks."""
     return propose_pin(settings)

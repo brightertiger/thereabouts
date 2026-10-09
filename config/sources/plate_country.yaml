@@ -3,7 +3,6 @@ adapter: pipeline.sources.plate_country
 kind: registration_country_evidence
 enabled: false
 upstream:
-  proposal: config/proposals/plate_country.yaml
   url: https://www.wikipedia.org/
 licence:
   id: per-source
@@ -11,7 +10,11 @@ licence:
   attribution: Wikipedia and Wikimedia Commons contributors; every pinned file keeps
     its revision, licence and attribution
 limits:
-  # Two retained releases of capacity; reviewed sizes total 75,965,326 bytes.
-  download_bytes: 151930652
+  # Two retained releases of capacity; the reviewed files total 73,303,719 bytes
+  # (2026-10-10 fetch).
+  download_bytes: 146607438
 options: {}
+policies:
+  # Reviewed inventory; entries marked base are pinned by the plates source.
+  sources: config/policies/plate_country/sources.yaml
 options_schema: pipeline.config.source_options.Text

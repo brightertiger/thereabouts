@@ -59,6 +59,8 @@ def pool(root: Path, base: Row, extra: list[Row], extra_source: str) -> Pool:
     for item in extra:
         pin = {
             **item["upstream"],
+            "url": item["url"],
+            "retrieved_at": item["retrieved_at"],
             "sha256": item["sha256"],
             "path": str(located(root, item["path"])),
             "source": extra_source,
