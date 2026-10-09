@@ -5,6 +5,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
 from pipeline.config import Config, policies
@@ -109,12 +110,13 @@ def boundary_states(directory: Path, tables: list[Row]) -> set[str]:
     for table in tables:
         path = directory / table["path"]
         if table["kind"] == "places":
-            rows = pq.read_table(path, columns=["place_id", "country_code"])
-            states.update(
-                str(row["country_code"])
-                for row in rows.to_pylist()
-                if str(row["place_id"]).startswith("state:geoboundaries:")
+            # Filtered in Arrow: a world places table has about 6.9 M rows.
+            found = pq.read_table(
+                path,
+                columns=["country_code"],
+                filters=pc.starts_with(pc.field("place_id"), "state:geoboundaries:"),
             )
+            states.update(str(code) for code in found["country_code"].to_pylist())
         elif table["kind"] == "countries":
             for row in pq.read_table(
                 path, columns=["country_code", "alpha3"]

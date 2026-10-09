@@ -1,8 +1,11 @@
 """Every pinned licence remains visible in the shipped notices."""
 
 import json
+from pathlib import Path
 from typing import Any
 
+import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 
 from pipeline.config import load, policies
@@ -152,3 +155,23 @@ def test_public_sources_carry_no_custody_fields(
     monkeypatch.setattr(metadata, "read_lock", lambda path: pins)
     encoded = json.dumps(licences(config, {"timezones"}))
     assert "mirror" not in encoded and "private-bucket" not in encoded
+
+
+def test_state_layers_follow_the_dataset_states(tmp_path: Path) -> None:
+    places = pa.table(
+        {
+            "place_id": ["state:geoboundaries:x", "state:overture:y", "city:a"],
+            "country_code": ["CA", "US", "CA"],
+        }
+    )
+    pq.write_table(places, tmp_path / "places.parquet")
+    countries = pa.table({"country_code": ["CA", "US"], "alpha3": ["CAN", "USA"]})
+    pq.write_table(countries, tmp_path / "countries.parquet")
+    tables = [
+        {"kind": "places", "path": "places.parquet"},
+        {"kind": "countries", "path": "countries.parquet"},
+    ]
+    assert metadata.boundary_states(tmp_path, tables) == {"CAN"}
+    pq.write_table(countries.slice(1), tmp_path / "countries.parquet")
+    with pytest.raises(ValueError, match="lack alpha-3"):
+        metadata.boundary_states(tmp_path, tables)
