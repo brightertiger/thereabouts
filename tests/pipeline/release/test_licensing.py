@@ -22,7 +22,7 @@ def test_per_file_licences_and_attributions_are_not_hidden() -> None:
     }
     assert all(f"| {licence} |" in text for licence in expected)
     assert "LGPL" not in text and "pycountry" not in text
-    assert "snapshot/admin1CodesASCII.txt" in text
+    assert "`admin1CodesASCII.txt`" in text
     assert "manifest.json.sources" in text and "pins.lock" not in text
     grouped = rows(sources)
     codes = [row for row in grouped if row["source"] == "codes"]

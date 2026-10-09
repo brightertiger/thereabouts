@@ -120,6 +120,10 @@ def test_geoboundaries_repairs_identity_and_pins_full_commit(
         pin = adapter.propose(source)
         assert pin.files[0].name == commit + "/MYS-ADM0.zip"
         assert pin.files[0].metadata["metadata"] == layer
+        # Notices credit geoBoundaries and the layer publisher, as rows do.
+        assert pin.files[0].metadata["attribution"] == (
+            "geoBoundaries; Fixture publisher"
+        )
         assert pin.metadata["country_reference"]["MYS"]["alpha2"] == "MY"
         assert pin.metadata["commits"] == {"MYS-ADM0": commit}
         server.routes["/repo/commits/aaaaaaa"] = Reply(

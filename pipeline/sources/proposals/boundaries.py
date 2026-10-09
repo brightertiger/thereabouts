@@ -94,7 +94,7 @@ def propose(settings: SourceSettings) -> SourcePin:
             "original_url": url,
             "license": layer["boundaryLicense"],
             "license_url": layer.get("licenseSource", ""),
-            "attribution": layer["boundarySource"],
+            "attribution": "geoBoundaries; " + layer["boundarySource"],
         }
         pin = client.pin(
             f"{commit}/{key}.zip", f"{catalog['media']}/{commit}/{suffix}", metadata
