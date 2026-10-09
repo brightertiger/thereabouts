@@ -1908,7 +1908,7 @@
       "golden-thereabouts/places/US.parquet": "14cb39127a22321af2bbd0d282bc6e719124fb45638b4b4d27bc91343b7a5e44",
       "golden-thereabouts/places/XX.parquet": "1720bbdf65bbcd4a8a49bc4804e7380ae80a8431748ae978358ef2b837aafe1e"
     },
-    "golden_manifest_sha256": "e00247767ed54c5181b5a0bc34cdb8bc3932ec943dfa82c13e8160bec4ee6832",
+    "golden_manifest_sha256": "40ef83a5f5a729d7fd985094ef06b8059a1be1e79a35b45eec2724a2fbec5b83",
     "stored_blocks": 29,
     "subset_writer": {
       "compression": "zstd",

@@ -88,7 +88,7 @@ pub(crate) struct Compact {
     keys: Option<fst::Map<Vec<u8>>>,
 }
 fn open_tables(
-    root: &super::reader::Reader<'_>,
+    root: &super::reader::Reader,
     manifest: &Manifest,
 ) -> Result<BTreeMap<String, Table>> {
     let mut tables = BTreeMap::new();
@@ -107,7 +107,7 @@ fn open_tables(
     Ok(tables)
 }
 impl Compact {
-    pub(crate) fn open(root: &super::reader::Reader<'_>, manifest: &Manifest) -> Result<Self> {
+    pub(crate) fn open(root: &super::reader::Reader, manifest: &Manifest) -> Result<Self> {
         let schema = manifest
             .forward_columns
             .clone()

@@ -8,7 +8,11 @@ import {
   DataNotInstalledError,
   PackNotFoundError,
   CorruptPackError,
+  InvalidInputError,
 } from "../runtime/index.js";
+import * as runtime from "../runtime/index.js";
+import { convert } from "../runtime/errors.js";
+import { wasm } from "../runtime/wasm.js";
 import { handleCount } from "../runtime/host.js";
 import { directory } from "../runtime/store.js";
 import { FIXTURES, temporary, selection, fixtureStore } from "./helpers.js";
@@ -183,4 +187,32 @@ test("store discovery opens family payloads lazily, while explicit packs stay st
   assert.ok(handleCount() > coreHandles);
   await geo[Symbol.asyncDispose]();
   assert.equal(handleCount(), before);
+});
+
+test("every core failure kind converts to its own exported class", async () => {
+  const kinds = JSON.parse((await wasm()).errorKinds());
+  // Writer kinds exist only in the Python pipeline binding.
+  for (const kind of kinds.filter((k) => !k.code.startsWith("writer_"))) {
+    const error = convert(Object.assign(new Error("x"), { code: kind.code }));
+    assert.equal(error.constructor.name, kind.class);
+    assert.equal(error.code, kind.code);
+    assert.equal(error.exitCode, kind.exit);
+    assert.equal(runtime[kind.class], error.constructor);
+  }
+  const pack = (await wasm()).Geocoder.open(
+    path.join(FIXTURES, "packs/core-synthetic"),
+    false,
+  );
+  for (const request of [{ verb: "bogus" }, { verb: "h3", unknown: 1 }])
+    assert.throws(
+      () => {
+        try {
+          pack.query(JSON.stringify(request));
+        } catch (e) {
+          throw convert(e);
+        }
+      },
+      (e) => e instanceof InvalidInputError && e.exitCode === 2,
+    );
+  pack.free();
 });

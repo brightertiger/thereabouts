@@ -112,7 +112,7 @@ pub(crate) struct Intervals {
     pub(crate) span: Option<(Bounds, Bounds)>,
 }
 impl Intervals {
-    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader) -> Result<Self> {
         let file = FileShard::from_file(reader.open(path)?, 6, &[36, 44, 8, 1])?;
         let count = file.len(0)? / 36;
         ensure(

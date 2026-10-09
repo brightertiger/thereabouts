@@ -55,9 +55,9 @@ def validate_sources(
 ) -> None:
     selected = (
         set(settings.reconcile_sources)
+        | set(settings.name_sources)
         | set(settings.static_sources.values())
         | set(settings.spatial_sources.values())
-        | set(settings.name_sources)
         | {
             settings.land_source,
             settings.urban_source,
@@ -70,6 +70,9 @@ def validate_sources(
         raise ValueError(
             f"Engine source references are not configured: {sorted(missing)}"
         )
+    for name, kinds in settings.name_sources.items():
+        if not kinds or len(set(kinds)) != len(kinds):
+            raise ValueError(f"engines.name_sources.{name} needs unique kinds")
     roles = {
         "land_source": "land",
         "urban_source": "urban_centres",

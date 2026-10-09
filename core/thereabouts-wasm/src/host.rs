@@ -20,6 +20,12 @@ extern "C" {
     fn temporary() -> Result<u32, JsValue>;
     #[wasm_bindgen(catch, js_name = writeAt)]
     fn write_at(id: u32, offset: f64, bytes: &[u8]) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, js_name = createDirectory)]
+    fn create_directory(root: &str, path: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, js_name = createFile)]
+    fn create_file(root: &str, path: &str) -> Result<u32, JsValue>;
+    #[wasm_bindgen(catch, js_name = syncHandle)]
+    fn sync_handle(id: u32) -> Result<(), JsValue>;
     #[wasm_bindgen(catch, js_name = readLine)]
     fn read_line() -> Result<String, JsValue>;
     #[wasm_bindgen(js_name = terminalColumns)]
@@ -61,7 +67,7 @@ impl File {
         Self::from_id(id)
     }
     #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    fn from_id(id: u32) -> io::Result<Self> {
+    pub(crate) fn from_id(id: u32) -> io::Result<Self> {
         let size = match file_size(id) {
             Ok(size)
                 if size.is_finite()
@@ -148,7 +154,22 @@ impl io::Seek for File {
 pub(crate) struct Host;
 impl Source for Host {
     fn open(&self, path: &Path) -> thereabouts_core::Result<Arc<dyn ReadAt>> {
-        Ok(Arc::new(File::open(path)?))
+        let name = path
+            .to_str()
+            .ok_or_else(|| io::Error::other("Non-UTF8 path"))?;
+        let id = open_handle(name).map_err(|value| {
+            let code = js_sys::Reflect::get(&value, &"code".into())
+                .ok()
+                .and_then(|v| v.as_string());
+            if matches!(code.as_deref(), Some("EMFILE" | "ENFILE")) {
+                thereabouts_core::Error::ResourceLimit(thereabouts_core::error::file_limit(
+                    &code.unwrap_or_default(),
+                ))
+            } else {
+                failure(value).into()
+            }
+        })?;
+        Ok(Arc::new(File::from_id(id)?))
     }
 }
 impl thereabouts_cli_core::io::Io for Host {
@@ -178,6 +199,39 @@ impl thereabouts_cli_core::io::Io for Host {
     }
     fn temporary(&mut self) -> io::Result<Box<dyn thereabouts_cli_core::io::Temporary>> {
         Ok(Box::new(File::from_id(temporary().map_err(failure)?)?))
+    }
+}
+
+/// Archive entries become new host files below a staging root; the host rejects
+/// symlinked or traversing paths and never replaces an existing file.
+pub(crate) struct Staging<'a> {
+    pub(crate) root: &'a str,
+}
+impl thereabouts_cli_core::archive::Output for Staging<'_> {
+    fn directory(&mut self, path: &str) -> thereabouts_cli_core::error::Result<()> {
+        create_directory(self.root, path).map_err(failure)?;
+        Ok(())
+    }
+    fn file(
+        &mut self,
+        path: &str,
+        content: &mut dyn io::Read,
+        size: u64,
+    ) -> thereabouts_cli_core::error::Result<()> {
+        let file = File::from_id(create_file(self.root, path).map_err(failure)?)?;
+        // Large host writes: one call per MiB rather than per 8 KiB.
+        let mut writer = io::BufWriter::with_capacity(1 << 20, file);
+        let copied = io::copy(content, &mut writer)?;
+        let file = writer
+            .into_inner()
+            .map_err(io::IntoInnerError::into_error)?;
+        sync_handle(file.id).map_err(failure)?;
+        if copied != size {
+            return Err(thereabouts_cli_core::error::Error::Integrity(
+                "Truncated archive entry".into(),
+            ));
+        }
+        Ok(())
     }
 }
 

@@ -77,7 +77,7 @@ def registry(config: Config) -> list[Stage]:
     policies.reconcile(located(REPOSITORY, config.engines.reconcile_policy))
     policy = policies.cities(located(REPOSITORY, config.engines.city_policies))
     reviews.load(located(REPOSITORY, config.engines.city_review), policy)
-    discovery = Discovery()
+    discovery = Discovery({name for name, pin in pins.items() if pin.available})
     implementations = {
         "reconcile": (reconcile.run, reconcile.finish, reconcile.parameters),
         "cells": (cells.run, cells.finish, cells.parameters),

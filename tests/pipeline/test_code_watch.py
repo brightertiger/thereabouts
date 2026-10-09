@@ -14,7 +14,7 @@ from pipeline.runtime.fingerprints import REPOSITORY, stage_identity
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.runtime.runner import run
-from pipeline.runtime.watch import WATCH, InputsChanged
+from pipeline.runtime.watch import InputsChanged, Watch
 from pipeline.stages.contract import Context, Stage, Unit
 
 from .helpers import HashedStage, context
@@ -44,7 +44,9 @@ class CodeStage(HashedStage):
 
     def identity(self, ctx: Context) -> str:
         settings = StageSettings(name=self.name, packages=[self.package])
-        return stage_identity(settings, ctx.config, repository=self.repository)
+        return stage_identity(
+            settings, ctx.config, repository=self.repository, read=ctx.watch.read
+        )
 
     def run(self, ctx: Context, unit: Unit) -> list[Path]:
         if action := self.actions.get(unit.recipe.unit_id):
@@ -104,7 +106,7 @@ def test_edit_between_stages_stops_before_the_next_stage(
     stages: list[Stage] = [first, second]
     with workspace(tmp_path) as ledger:
         ctx = context(tmp_path / "workspace", ledger)
-        with WATCH.frozen():
+        with ctx.watch.frozen():
             executor = Executor(ctx, stages, event)
             with pytest.raises(InputsChanged, match="not recorded"):
                 executor.execute("second")
@@ -144,10 +146,11 @@ def test_edits_between_runs_re_identify_the_next_run(
 def test_frozen_reads_refuse_changed_bytes(tmp_path: Path) -> None:
     path = tmp_path / "module.py"
     path.write_text("value = 1\n")
-    with WATCH.frozen():
-        assert WATCH.read(path) == b"value = 1\n"
+    watch = Watch()
+    with watch.frozen():
+        assert watch.read(path) == b"value = 1\n"
         path.write_text("value = 22\n")
-        assert WATCH.changed() == [str(path)]
+        assert watch.changed() == [str(path)]
         with pytest.raises(InputsChanged):
-            WATCH.read(path)
-    assert WATCH.read(path) == b"value = 22\n"
+            watch.read(path)
+    assert watch.read(path) == b"value = 22\n"

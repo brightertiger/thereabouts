@@ -13,7 +13,6 @@ from pipeline.stages.registry import ordered
 from .execution import Executor
 from .jsonio import write_json
 from .paths import located
-from .watch import WATCH
 
 
 @contextmanager
@@ -61,7 +60,7 @@ def run(
                 with lock:
                     stream.write(message + "\n")
 
-            with WATCH.frozen():
+            with ctx.watch.frozen():
                 # Identities are computed here, once, inside the frozen watch.
                 executor = Executor(ctx, stages, event)
                 complete = False

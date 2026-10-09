@@ -4,7 +4,6 @@ import json
 import shutil
 import subprocess
 import sys
-import tarfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -91,9 +90,9 @@ def test_runner_real_writer_and_console_install(tmp_path: Path) -> None:
     )
     assert {u.remote for u in uploads} >= {
         "packs/2026.10/index.json",
-        "packs/2026.10/core.tar",
-        "packs/2026.10/postal.tar",
-        "packs/2026.10/airports.tar",
+        "packs/2026.10/core.tar.zst",
+        "packs/2026.10/postal.tar.zst",
+        "packs/2026.10/airports.tar.zst",
     }
     store = tmp_path / "installed"
     subprocess.run(
@@ -119,12 +118,9 @@ def test_runner_real_writer_and_console_install(tmp_path: Path) -> None:
     with Geocoder(data_dir=store) as geo:
         assert geo.postal("00100", country="AA").status == "matched"
         assert geo.airport("ZZZ").status == "ambiguous"
-    archive = release / "postal.tar"
-    with tarfile.open(archive) as reader:
-        member = next(m for m in reader if m.size > 10)
-        offset = member.offset_data
+    archive = release / "postal.tar.zst"
     with archive.open("r+b") as stream:
-        stream.seek(offset)
+        stream.seek(archive.stat().st_size // 2)
         stream.write(b"corrupt")
     with pytest.raises(ValueError, match=r"checksum|archive"):
         packs(config, tmp_path)

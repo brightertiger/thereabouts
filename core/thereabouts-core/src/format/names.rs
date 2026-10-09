@@ -113,7 +113,7 @@ fn decode_offsets(bytes: &[u8], count: usize, end: usize) -> Result<Vec<usize>> 
     Ok(values)
 }
 impl Names {
-    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader) -> Result<Self> {
         // The fst crate documents panic on malformed serialized nodes. Validate
         // the full DAG at admission and convert that boundary to a coded error.
         // Reader borrows finish before FST traversal; unwinding drops the whole
@@ -121,7 +121,7 @@ impl Names {
         std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| Self::read(path, reader)))
             .map_err(|_| Error::Corrupt("Malformed serialized name FST".into()))?
     }
-    fn read(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+    fn read(path: &Path, reader: &super::reader::Reader) -> Result<Self> {
         let file = FileShard::from_file(reader.open(path)?, 8, &[1, 8, 20, 8, 1, 1, 8, 4])?;
         let map = super::fst::read(file.section(0)?, true)?;
         let grams = super::fst::read(file.section(5)?, true)?;

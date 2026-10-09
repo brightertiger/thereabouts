@@ -1,38 +1,61 @@
 """Declare country, block and table dependencies from source and block inventories."""
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Collection
 from pathlib import Path
 
-from pipeline.runtime.outputs import role
 from pipeline.runtime.records import Dependency, Recipe
 
 from .contract import Context
 from .engine_data import Geography, source_manifest
+from .sources import PARTITIONS
 
-Key = tuple[str, str]
+# The outputs consumers read of each producing stage, as that stage declares them;
+# only those are hashed and restored.
+READS = {"normalize": PARTITIONS}
 
 
 def dependencies(
-    keys: set[Key],
-    *,
-    evaluation_gate: bool = False,
-    reads: Mapping[Key, tuple[str, ...]] | None = None,
+    keys: set[tuple[str, str]], *, evaluation_gate: bool = False
 ) -> tuple[Dependency, ...]:
-    """Dependencies with `reads` patterns hash and restore only those outputs."""
     return tuple(
         Dependency(
             *key,
-            paths=(reads or {}).get(key, ()),
+            paths=READS.get(key[0], ()),
             control=evaluation_gate and key[0] == "evaluate",
         )
         for key in sorted(keys)
     )
 
 
-def partitions(ctx: Context, source: str, kinds: Iterable[str]) -> tuple[str, ...]:
-    """Role patterns of a source's normalized partitions; caches and audits excluded."""
-    root = ctx.config.paths.normalized
-    return tuple(f"{root}/{source}/{kind}/*.parquet" for kind in sorted(kinds))
+def registration_enabled(ctx: Context) -> bool:
+    source = ctx.config.sources.get(ctx.config.engines.registration_source)
+    return source is not None and source.enabled
+
+
+def plate_recipes(ctx: Context, available: Collection[str]) -> list[Recipe]:
+    """`plate_country/world` exists with its registration evidence.
+
+    It reads that source's partitions, and the whole plate-country evidence unit
+    (a JSON inventory, not partitions) when that source is enabled and pinned.
+    """
+    if not registration_enabled(ctx):
+        return []
+    settings = ctx.config.engines
+    parents = list(dependencies({("normalize", settings.registration_source)}))
+    evidence = ctx.config.sources.get(settings.plate_country_source)
+    if (
+        evidence is not None
+        and evidence.enabled
+        and settings.plate_country_source in available
+    ):
+        parents.append(Dependency("normalize", settings.plate_country_source))
+    return [
+        Recipe(
+            "plate_country",
+            "world",
+            dependencies=tuple(sorted(parents, key=lambda item: item.key)),
+        )
+    ]
 
 
 def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
@@ -42,24 +65,13 @@ def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
         return []
     recipes: list[Recipe] = []
 
-    urban = ("normalize", settings.urban_source)
-    reads = {
-        ("normalize", name): partitions(ctx, name, kinds)
-        for name, kinds in settings.reconcile_sources.items()
-    } | {
-        ("normalize", settings.land_source): partitions(
-            ctx, settings.land_source, ["areas"]
-        ),
-        urban: partitions(ctx, settings.urban_source, ["areas"]),
-    }
-
-    def add(stage: str, key: str, parents: set[Key]) -> None:
+    def add(stage: str, key: str, parents: set[tuple[str, str]]) -> None:
         recipes.append(
             Recipe(
                 stage,
                 key,
                 dependencies=dependencies(
-                    parents, evaluation_gate=stage == "normalize_cells", reads=reads
+                    parents, evaluation_gate=stage == "normalize_cells"
                 ),
             )
         )
@@ -186,16 +198,11 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             parents = {("normalize", source)}
             if ctx.config.sources[source].kind != "timezones":
                 parents |= countries
-            read: tuple[str, ...] = (role(part["path"]),)
-            if ctx.config.sources[source].kind == "phone":
-                read += partitions(ctx, source, ["phone_metadata"])
             recipes.append(
                 Recipe(
                     "lookups",
                     f"static/{kind}/{Path(part['path']).stem}",
-                    dependencies=dependencies(
-                        parents, reads={("normalize", source): read}
-                    ),
+                    dependencies=dependencies(parents),
                 )
             )
     for kind, source in settings.spatial_sources.items():
@@ -203,29 +210,15 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             parents = {("normalize", source)} | {
                 ("normalize_cells", "block/" + b) for b in geography.blocks
             }
-            reads = {("normalize", source): partitions(ctx, source, [kind])}
             recipes.append(
-                Recipe(
-                    "lookups",
-                    "spatial/" + kind,
-                    dependencies=dependencies(parents, reads=reads),
-                )
+                Recipe("lookups", "spatial/" + kind, dependencies=dependencies(parents))
             )
-    names: dict[str, list[str]] = {}
-    for source, kinds in settings.name_sources.items():
-        manifest = source_manifest(ctx, source)
-        published = {p["kind"] for p in manifest["partitions"]} if manifest else set()
-        if published & set(kinds):
-            names[source] = sorted(published & set(kinds))
-    if names:
-        reads = {("normalize", s): partitions(ctx, s, k) for s, k in names.items()}
-        places = {("normalize_cells", "places/" + cc) for cc in geography.countries}
+    if settings.name_sources:
+        parents = {("normalize", source) for source in settings.name_sources} | {
+            ("normalize_cells", "places/" + cc) for cc in geography.countries
+        }
         recipes.append(
-            Recipe(
-                "lookups",
-                "names/world",
-                dependencies=dependencies(set(reads) | places, reads=reads),
-            )
+            Recipe("lookups", "names/world", dependencies=dependencies(parents))
         )
     parents = (
         {recipe.key for recipe in recipes}
@@ -236,32 +229,9 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             for cc in geography.countries
         }
     )
-    if plate_recipe(ctx) is not None:
+    if registration_enabled(ctx):
         parents.add(("plate_country", "world"))
     recipes.append(
         Recipe("lookups", "manifest/current", dependencies=dependencies(parents))
     )
     return recipes
-
-
-def plate_recipe(ctx: Context) -> Recipe | None:
-    """Plate tables need only normalized registration evidence; a pinned
-    plate-country source adds documents and vehicle priors."""
-    settings = ctx.config.engines
-    if source_manifest(ctx, settings.registration_source) is None:
-        return None
-    reads = {
-        ("normalize", settings.registration_source): (
-            *partitions(
-                ctx, settings.registration_source, ["plate_codes", "plate_survey"]
-            ),
-            f"{ctx.config.paths.normalized}/{settings.registration_source}/manifest.json",
-        )
-    }
-    parents = set(reads)
-    source = ctx.config.sources.get(settings.plate_country_source)
-    if source is not None and source.enabled:
-        parents.add(("normalize", settings.plate_country_source))
-    return Recipe(
-        "plate_country", "world", dependencies=dependencies(parents, reads=reads)
-    )

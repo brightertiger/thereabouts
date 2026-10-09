@@ -1,4 +1,4 @@
-//! Full verification retains at most one shard's decoded records at a time.
+//! Full verification retains at most one shard's decoded records and handle at a time.
 use super::{
     catalogue,
     container::Container,
@@ -17,7 +17,7 @@ pub fn verify(root: &Path) -> Result<Manifest> {
     verify_with(&super::reader::Reader::native(root))
 }
 /// Validate byte identity and all structure through a supplied host file source.
-pub fn verify_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
+pub fn verify_with(root: &super::reader::Reader) -> Result<Manifest> {
     let manifest = manifest::read_with(root)?;
     manifest::verify_with(root, &manifest)?;
     ensure(
@@ -60,6 +60,7 @@ pub fn verify_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
                 || super::plate_columns::ROLES.contains(&role) => {}
             _ => return Err(Error::Incompatible("Unknown artifact kind".into())),
         }
+        root.release(&path)?;
     }
     let metadata = metadata.ok_or_else(|| Error::Corrupt("Missing metadata".into()))?;
     metadata.validate()?;
@@ -106,12 +107,13 @@ pub fn verify_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
             }
             _ => {}
         }
+        root.release(&path)?;
     }
     verify_forward(root, &manifest, total, metadata.countries.len())?;
     Ok(manifest)
 }
 fn verify_forward(
-    root: &super::reader::Reader<'_>,
+    root: &super::reader::Reader,
     manifest: &Manifest,
     total: usize,
     countries: usize,

@@ -48,7 +48,7 @@ def server(tmp_path: Path) -> Iterator[tuple[str, State]]:
                 self.send_error(404)
                 return
             requested = self.headers.get("Range")
-            if self.path.endswith(".tar"):
+            if self.path.endswith(".tar.zst"):
                 state.ranges.append(requested)
                 if state.corrupt:
                     value = value[:-1] + bytes([value[-1] ^ 1])
@@ -65,7 +65,7 @@ def server(tmp_path: Path) -> Iterator[tuple[str, State]]:
             if offset:
                 self.send_header("Content-Range", f"bytes {offset}-{total - 1}/{total}")
             self.end_headers()
-            if state.interrupt and self.path.endswith(".tar"):
+            if state.interrupt and self.path.endswith(".tar.zst"):
                 state.interrupt = False
                 self.wfile.write(value[:1024])
                 self.wfile.flush()
@@ -97,6 +97,8 @@ def test_interrupted_transfer_resumes_exact_range(
         in first.stderr
     )
     assert not (store / "active.json").exists()
+    # A partial archive is never expanded.
+    assert not (store / "packs").exists() and not (store / ".staging").exists()
     partial = next((store / ".downloads").glob("*.part"))
     assert partial.stat().st_size == 1024
     state.ignore_range = True
@@ -142,7 +144,7 @@ def test_remote_inventory_update_and_missing_artifact(
     assert console(store, "data", "install", "phone", "--from", url).returncode == 0
     listed = console(store, "data", "list", "--remote", source=url)
     assert listed.returncode == 0
-    assert json.loads(listed.stdout)["format"] == 2
+    assert json.loads(listed.stdout)["format"] == 3
     checked = console(store, "data", "update", "--check", source=url)
     assert checked.returncode == 0
     assert json.loads(checked.stdout)["update_available"] is False
@@ -151,7 +153,7 @@ def test_remote_inventory_update_and_missing_artifact(
     state.files["/index.json"] = json.dumps(index).encode()
     checked = console(store, "data", "update", "--check", source=url)
     assert json.loads(checked.stdout)["update_available"] is True
-    del state.files["/phone.tar"]
+    del state.files["/phone.tar.zst"]
     missing = console(tmp_path / "empty", "data", "install", "phone", "--from", url)
     assert missing.returncode == 4
 

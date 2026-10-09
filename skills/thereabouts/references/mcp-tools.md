@@ -374,6 +374,9 @@ Every lookup tool returns one result object. `evidence` appears only when reques
 - `data_not_installed`: No core pack is installed in the selected store
 - `geocoder_error`: Base class for offline geocoder failures
 - `incompatible_data`: The selected pack requires a different reader or family
+- `internal_error`: A library invariant failed, such as a poisoned lock; please report it
+- `invalid_input`: A value could not be encoded or looked up; the pack itself is fine
 - `pack_not_found`: An explicitly selected pack directory does not exist
+- `resource_limit`: The process ran out of file descriptors; raise the open-file limit
 - `writer_error`: A staging or output operation failed during dataset export
 - `writer_input_error`: Dataset input, options or staging state prevents export

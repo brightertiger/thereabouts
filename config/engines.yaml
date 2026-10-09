@@ -41,8 +41,8 @@ static_sources:
   phone_prefixes: phone
   timezone_cells: timezones
   zone_tables: timezones
-# Alternate names of canonical cities: aliases (names) and the feature and ASCII
-# names of linked records (places).
+# Sources the lookups `names/world` unit reads, with the partition kinds it uses:
+# aliases (names) and the feature and ASCII names of linked records (places).
 name_sources:
   geonames: [names, places]
   overture: [names]

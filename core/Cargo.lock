@@ -1356,6 +1356,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ruzstd"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a252f5e20f038fe7b4ea53e073e65398d652c864cc162fc77c56c2f13717b888"
+
+[[package]]
 name = "ryu"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1545,6 +1551,7 @@ dependencies = [
  "thereabouts-cli-core",
  "thereabouts-core",
  "ureq",
+ "zstd",
 ]
 
 [[package]]
@@ -1552,12 +1559,15 @@ name = "thereabouts-cli-core"
 version = "0.1.0"
 dependencies = [
  "csv",
+ "ruzstd",
  "serde",
  "serde_json",
  "sha2",
+ "tempfile",
  "thereabouts-core",
  "thiserror",
  "unicode-width",
+ "zstd",
 ]
 
 [[package]]
@@ -1586,6 +1596,7 @@ dependencies = [
  "pyo3",
  "serde_json",
  "thereabouts-cli",
+ "thereabouts-cli-core",
  "thereabouts-core",
  "thereabouts-writer",
 ]
