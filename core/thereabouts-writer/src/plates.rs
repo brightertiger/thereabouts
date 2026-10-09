@@ -6,7 +6,7 @@ use thereabouts_core::format::{
     plates::{Code, Policy, Prior, Rule, Tables},
 };
 // Plate evidence is small compared with spatial/IP data. The 2026-10 world inputs
-// need about 105 MiB of resident typed rows (143,971 code assertions; Wikidata query
+// need about 107 MiB of resident typed rows (143,971 code assertions whose source
 // URLs average 523 bytes). Admission caps them at 256 MiB, half the 512 MiB
 // working-set ceiling, leaving space for JSON encoding within the 2 GiB writer limit.
 const PLATE_EVIDENCE_BYTES: usize = 256 * 1024 * 1024;
