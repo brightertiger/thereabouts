@@ -3,10 +3,11 @@
 import re
 from collections.abc import Iterator
 
-from pipeline.sources.plates.html import clean_text
+from pipeline.sources.plates.html import Document, clean_text
 from pipeline.sources.plates.reader import document
 from pipeline.sources.plates.rules import evidence
 
+from .documents import Pins
 from .policy import Row, base_policy, policy, scripts
 from .sources import source_fields
 from .syntax import SEPARATORS, TOKEN, relaxed_pattern, specificity, template_pattern
@@ -40,7 +41,8 @@ def _decorate(row: Row, source: str, pin: Row) -> Row:
     )
 
 
-def rows(pins: dict[str, Row]) -> Iterator[Row]:
+def rows(pins: Pins) -> Iterator[Row]:
+    """Rules whose source document is not pinned are skipped; the pool counts them."""
     rules = [
         dict(rule, country_code=country)
         for country, items in base_policy("formats").items()
@@ -48,23 +50,34 @@ def rows(pins: dict[str, Row]) -> Iterator[Row]:
     ]
     rules.extend(policy("formats"))
     rules.extend(policy("supplemental_formats"))
-    documents = {
-        name: document(pin)
-        for name, pin in pins.items()
-        if pin.get("kind") == "wikipedia"
-    }
+    documents: dict[str, Document] = {}
+
+    def pinned(source: str) -> tuple[Row, Document] | None:
+        pin = pins.get(source)
+        if pin is None:
+            return None
+        if source not in documents:
+            documents[source] = document(pin)
+        return pin, documents[source]
+
     for rule in rules:
         source = rule["source"]
+        found = pinned(source)
+        if found is None:
+            continue
         row = {
             k: v
             for k, v in rule.items()
             if k not in ("evidence_pattern", "examples_pattern", "source")
         }
-        row["evidence"] = evidence(documents[source], rule["evidence_pattern"])
-        yield _decorate(row, source, pins[source])
+        row["evidence"] = evidence(found[1], rule["evidence_pattern"])
+        yield _decorate(row, source, found[0])
     for rule in policy("templates"):
         source = rule["source"]
-        cells = documents[source].tables[rule["table"]].grid()[rule["row"]]
+        found = pinned(source)
+        if found is None:
+            continue
+        cells = found[1].tables[rule["table"]].grid()[rule["row"]]
         cell = clean_text(cells[rule["column"]].text)
         if rule["template"] not in cell:
             raise ValueError(f"Source template changed: {rule}")
@@ -74,4 +87,4 @@ def rows(pins: dict[str, Row]) -> Iterator[Row]:
             code_group=None,
         )
         row["pattern"] = template_pattern(rule["template"], rule["placeholders"])
-        yield _decorate(row, source, pins[source])
+        yield _decorate(row, source, found[0])

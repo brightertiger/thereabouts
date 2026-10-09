@@ -35,7 +35,10 @@ def countries(pin: Row) -> list[Row]:
         ]
 
 
-def vehicle_rows(pin: Row, universe: list[Row]) -> tuple[list[Row], list[Row]]:
+def vehicle_rows(pin: Row | None, universe: list[Row]) -> tuple[list[Row], list[Row]]:
+    """Observed counts only; without a pinned stock table there are none."""
+    if pin is None:
+        return [], []
     names = {
         alias.casefold(): r["country_code"] for r in universe for alias in r["aliases"]
     }
@@ -66,6 +69,7 @@ def vehicle_rows(pin: Row, universe: list[Row]) -> tuple[list[Row], list[Row]]:
                 year=int(year),
                 source_label=label,
                 locator=f"table:0/row:{index}",
+                source=pin.get("source"),
                 provenance=source_fields(pin),
             )
         )

@@ -8,9 +8,10 @@ import pytest
 
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.plate_country import build, evidence, formats, priors
+from pipeline.engines.plate_country.documents import Pool
 from pipeline.engines.plate_country.policy import Row
 from pipeline.engines.plate_country.resolver import Resolver
-from pipeline.runtime.jsonio import write_json
+from pipeline.runtime.jsonio import sha256_file, write_json
 from tests.pipeline.sources.test_plate_country_sources import wiki
 
 
@@ -65,13 +66,22 @@ def test_plate_build_move_and_verification(
         root,
         root / "plate_country",
         {"partitions": []},
-        {"countries.csv": {"path": str(countries)}, "vehicle-stock.json": stock},
+        Pool(
+            {
+                "countries.csv": {
+                    "path": str(countries),
+                    "sha256": sha256_file(countries),
+                    "source": "plates",
+                },
+                "vehicle-stock.json": stock | {"source": "plates"},
+            }
+        ),
         2,
     )
     path = root / "plate_country/manifest.json"
     saved = read_json(path)
-    assert len(saved["tables"]) == 3
-    assert len(outputs) == 6
+    assert len(saved["tables"]) == 4
+    assert len(outputs) == 7
     assert all(not row["path"].startswith("/") for row in saved["tables"])
     moved = tmp_path / "moved"
     root.rename(moved)
