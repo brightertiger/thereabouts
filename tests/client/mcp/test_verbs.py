@@ -49,7 +49,8 @@ def test_every_verb_returns_the_public_json() -> None:
         async def check() -> None:
             async with Client(create_server(geo)) as client:
                 tools = (await client.list_tools()).tools
-                assert {tool.name for tool in tools} == {c[0] for c in cases}
+                names = {c[0] for c in cases} | {"describe"}
+                assert {tool.name for tool in tools} == names
                 for tool in tools:
                     assert tool.annotations is not None
                     assert tool.annotations.read_only_hint

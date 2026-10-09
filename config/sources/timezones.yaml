@@ -4,7 +4,7 @@ kind: timezones
 enabled: true
 upstream:
   proposal: config/proposals/timezones.yaml
-  url: https://github.com/evansiroky/timezone-boundary-builder/releases/download/2026d/timezone-names-with-oceans.json
+  url: https://github.com/evansiroky/timezone-boundary-builder/releases
 licence:
   id: per-file
   url: https://opendatacommons.org/licenses/odbl/1-0/

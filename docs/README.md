@@ -4,6 +4,7 @@
 
 - [Dataset guide](dataset/README.md) — Parquet layout, columns, counts and query examples.
 - [Pack format](dataset/pack-format.md) — normative serving format 2.2 for every family.
+- [Data dictionary](dataset/DATA_DICTIONARY.md) — generated tables, joins, enumerations, MCP tools and result fields; machine form in [`data_dictionary.json`](dataset/data_dictionary.json).
 - [Code packs](dataset/code-packs.md) — postal and airport packs and their lookups.
 - [Licences](licenses.md) — code licence and separate data obligations.
 

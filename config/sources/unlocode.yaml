@@ -4,7 +4,7 @@ kind: unlocode
 enabled: true
 upstream:
   proposal: config/proposals/unlocode.yaml
-  url: https://raw.githubusercontent.com/datasets/un-locode/b1309b37edea63334a819a78c22b8967f61c37ad/README.md
+  url: https://github.com/datasets/un-locode
 licence:
   id: PDDL-1.0
   url: https://opendatacommons.org/licenses/pddl/1-0/

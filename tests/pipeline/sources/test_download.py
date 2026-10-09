@@ -107,24 +107,6 @@ def test_airport_normalization_writes_only_relative_metadata(tmp_path: Path) -> 
         assert row["h3_resolution"] == 8
 
 
-def test_recorded_legacy_mirror_restores_and_is_reverified(tmp_path: Path) -> None:
-    with Ledger(tmp_path, None, readonly=False) as ledger:
-        source = fixture(tmp_path, ledger, b"pinned legacy bytes")
-        pin = source.pin.files[0]
-        source.pin.metadata["mirror_base"] = "memory://retained/" + tmp_path.name
-        legacy = str(source.pin.metadata["mirror_base"]) + "/" + pin.name
-        fs, name = backend(legacy)
-        with fs.open(name, "wb") as stream:
-            stream.write(b"pinned legacy bytes")
-        upstream, key = backend(pin.url)
-        upstream.rm(key)
-        download(source)
-        assert source.input(pin.name).read_bytes() == b"pinned legacy bytes"
-        assert backend(mirror_url(source.runtime.storage["gcs_raw"], pin))[0].exists(
-            backend(mirror_url(source.runtime.storage["gcs_raw"], pin))[1]
-        )
-
-
 def test_mirror_failure_leaves_runner_unit_uncommitted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

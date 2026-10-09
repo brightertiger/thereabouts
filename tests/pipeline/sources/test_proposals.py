@@ -168,11 +168,12 @@ def test_proposal_then_explicit_accept_and_unchanged_refresh(
         )
         config = load()
         config.sources = {"airports": source}
-        monkeypatch.setattr(cli, "load", lambda: config)
+        monkeypatch.setattr(cli, "load", lambda **_: config)
         lock, proposal = tmp_path / "pins.lock", tmp_path / "candidate.yaml"
         args = ["update", "--lock", str(lock), "--proposal", str(proposal)]
-        assert cli.main(args) == 0
+        assert cli.main([*args, "--root", str(tmp_path / "workspace")]) == 0
         assert not lock.exists()
+        assert len(list((tmp_path / "workspace/raw/airports/sha256").iterdir())) == 1
         assert json.loads(proposal.with_suffix(".diff.json").read_bytes())["airports"][
             "added"
         ] == ["airports.csv"]
@@ -180,7 +181,7 @@ def test_proposal_then_explicit_accept_and_unchanged_refresh(
         assert cli.main([*args, "--from-file", str(proposal), "--accept"]) == 0
         assert len(server.requests) == count
         before = lock.read_bytes()
-        assert cli.main([*args, "--accept"]) == 0
+        assert cli.main([*args, "--root", str(tmp_path / "workspace"), "--accept"]) == 0
         assert lock.read_bytes() == before
         assert read_lock(lock)["airports"].files[0].name == "airports.csv"
 
@@ -191,7 +192,7 @@ def test_changed_etag_and_oversized_payload_refuse_proposals(
     with publisher() as server:
         source = settings(tmp_path, monkeypatch, "airports", {})
         server.routes["/payload"] = Reply(b"payload", get_headers={"ETag": '"changed"'})
-        with pytest.raises(ValueError, match="changed during proposal"):
+        with pytest.raises(ValueError, match="changed during transfer"):
             Client(source).pin("input", server.url + "/payload", {})
         source.limits.download_bytes = 1
         server.requests.clear()

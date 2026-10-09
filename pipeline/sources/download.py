@@ -1,86 +1,75 @@
-"""Fetch frozen source bytes and verify their mirror before completing a unit."""
+"""Fetch frozen source bytes into content-addressed objects and mirror them."""
 
-import time
-import urllib.error
-import urllib.request
-from collections.abc import Iterator
-from contextlib import contextmanager
 from dataclasses import asdict
-from http.client import HTTPException
+from functools import partial
 from pathlib import Path
-from typing import Any, BinaryIO, cast
+from typing import Any
 
+from pipeline.pins.evidence import verify_publisher
 from pipeline.pins.models import PinFile
-from pipeline.runtime.jsonio import atomic_output, sha256_file, write_json
-from pipeline.storage.objects import backend, copy_stream, fetch, mirror
+from pipeline.runtime.jsonio import sha256_file, write_json
+from pipeline.storage.objects import address, backend, mirror
+from pipeline.storage.retry import Patience, retrying
+from pipeline.storage.transfer import fetch
 
 from .contract import SourceContext
 from .shared.manifest import inventory_path
 
 
 def mirror_url(base: str, pin: PinFile) -> str:
-    return base.rstrip("/") + "/sha256/" + pin.sha256
+    return base.rstrip("/") + "/" + address(pin.sha256)
 
 
-@contextmanager
-def upstream(pin: PinFile, timeout: float) -> Iterator[BinaryIO]:
-    if pin.url.startswith(("http://", "https://")):
-        headers = {"Accept-Encoding": "identity", "User-Agent": "Thereabouts/pipeline"}
-        if pin.etag and not pin.etag.startswith("W/"):
-            headers["If-Match"] = pin.etag
-        elif pin.last_modified:
-            headers["If-Unmodified-Since"] = pin.last_modified
-        request = urllib.request.Request(pin.url, headers=headers)
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            yield cast(BinaryIO, response)
-    else:
-        fs, name = backend(pin.url)
-        with fs.open(name, "rb") as stream:
-            yield stream
+def conditions(pin: PinFile) -> dict[str, str]:
+    """Ask upstream for the pinned representation only."""
+    if pin.etag and not pin.etag.startswith("W/"):
+        return {"If-Match": pin.etag}
+    if pin.last_modified:
+        return {"If-Unmodified-Since": pin.last_modified}
+    return {}
+
+
+def exists(url: str) -> bool:
+    fs, name = backend(url)
+    return fs.exists(name)
+
+
+def intact(path: Path, pin: PinFile) -> bool:
+    return path.stat().st_size == pin.size and sha256_file(path) == pin.sha256
 
 
 def acquire(ctx: SourceContext, pin: PinFile, base: str) -> Path:
     target = ctx.input(pin.name)
     limits = ctx.settings.limits
-    if target.exists():
-        if target.stat().st_size != pin.size or sha256_file(target) != pin.sha256:
-            raise ValueError(f"Local pinned input is corrupt: {ctx.relative(target)}")
-    else:
-        mirrors = [mirror_url(base, pin)]
-        if retained := ctx.pin.metadata.get("mirror_base"):
-            mirrors.append(str(retained).rstrip("/") + "/" + pin.name)
-        restored = False
-        for remote in mirrors:
-            fs, name = backend(remote)
-            if fs.exists(name):
-                fetch(remote, target, pin.size, pin.sha256, limits.read_bytes)
-                restored = True
-                break
-        if not restored:
-            delay = limits.backoff_seconds
-            for attempt in range(limits.retries + 1):
-                try:
-                    with (
-                        atomic_output(target) as temporary,
-                        upstream(pin, limits.timeout_seconds) as stream,
-                        temporary.open("wb") as output,
-                    ):
-                        copy_stream(
-                            stream, output, pin.size, pin.sha256, limits.read_bytes
-                        )
-                    break
-                except (OSError, HTTPException, urllib.error.URLError):
-                    if attempt == limits.retries:
-                        raise
-                    time.sleep(delay)
-                    delay = min(limits.timeout_seconds, delay * 2)
+    patience = Patience.of(limits)
+    if target.exists() and not intact(target, pin):
+        # The name is the checksum, so a mismatch is damage, never a new version.
+        target.unlink()
+    if not target.exists():
+        remote = mirror_url(base, pin)
+        mirrored = retrying(patience, partial(exists, remote))
+        fetch(
+            remote if mirrored else pin.url,
+            target,
+            size=pin.size,
+            sha256=pin.sha256,
+            headers={} if mirrored else conditions(pin),
+            limits=limits,
+        )
+    verify_publisher(target, pin.metadata, limits.read_bytes, pin.name)
     # Existing local files must also be mirrored; a failed mirror leaves no unit
-    # completion, while the verified local file can be reused on the next attempt.
-    mirror(target, mirror_url(base, pin), pin.size, pin.sha256, limits.read_bytes)
+    # completion, while the verified local object is reused on the next attempt.
+    retrying(
+        patience,
+        lambda: mirror(
+            target, mirror_url(base, pin), pin.size, pin.sha256, limits.read_bytes
+        ),
+    )
     return target
 
 
 def inventory(ctx: SourceContext) -> dict[str, Any]:
+    """Map each logical name to its pinned record and content-addressed object."""
     return {
         "source": ctx.settings.name,
         "source_release": ctx.pin.release,
@@ -104,7 +93,8 @@ def download(ctx: SourceContext) -> list[Path]:
         raise ValueError(
             f"Pinned source exceeds {ctx.settings.name}.limits.download_bytes"
         )
-    paths = [acquire(ctx, pin, base) for pin in ctx.pin.files]
+    # Names that pin identical bytes share one object.
+    paths = list(dict.fromkeys(acquire(ctx, pin, base) for pin in ctx.pin.files))
     manifest = inventory_path(ctx)
     write_json(manifest, inventory(ctx))
     return [*paths, manifest]

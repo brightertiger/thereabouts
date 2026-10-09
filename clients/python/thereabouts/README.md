@@ -63,3 +63,8 @@ phone, ip, plate, data management, info and optional MCP. Install the mcp extra
 to run thereabouts mcp. Table, JSON, NDJSON and CSV output share Rust logic
 with Node. See the repository's docs/clients/cli.md and docs/dataset/pack-format.md for the
 normative contracts, and docs/clients/status.md for coverage and measurements.
+
+The MCP server also describes the dataset. Its read-only describe tool and the
+thereabouts://dictionary resources (JSON, and /markdown) serve the data
+dictionary of the installed core pack, or the copy packaged with this client.
+The repository's skills/thereabouts teaches agents to use both.
