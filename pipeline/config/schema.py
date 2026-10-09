@@ -29,12 +29,15 @@ class Resources:
     duckdb_memory: str = "1GB"
     duckdb_threads: int = 1
     workers: int = 1
+    # Resident memory per worker; the process may use rss_limit * workers.
     rss_limit: int = 2_000_000_000
     disk_floor: int = DISK_FLOOR
     max_workspace: int = 60_000_000_000
     poll_seconds: float = 10.0
     ledger_timeout_seconds: float = 30.0
     workspace_scan_seconds: float = 60.0
+    # Admission fails after this wait instead of pausing forever.
+    admission_timeout_seconds: float = 1800.0
 
 
 @dataclass
