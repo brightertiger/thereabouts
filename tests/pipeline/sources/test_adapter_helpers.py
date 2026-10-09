@@ -2,20 +2,29 @@
 
 import json
 import math
+import sqlite3
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import closing
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
 
+from pipeline.errors import ConfigError
 from pipeline.runtime.jsonio import encode
+from pipeline.runtime.ledger import Ledger
+from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.rows import (
     RowRejected,
     canonical_json,
     clean_text,
     provenance,
 )
+from pipeline.sources.shared.scratch import scratch_index
+
+from .fixtures import source_context
 
 ACUTE, NBSP, EN_QUAD = chr(0x0301), chr(0x00A0), chr(0x2000)
 TEXTS: list[object] = [
@@ -148,3 +157,47 @@ def test_provenance_puts_licence_evidence_first_and_details_in_order() -> None:
 def test_row_rejected_is_one_value_error_with_its_reason() -> None:
     error = RowRejected("empty source alias")
     assert isinstance(error, ValueError) and str(error) == "empty source alias"
+
+
+@pytest.fixture
+def source(tmp_path: Path) -> Iterator[SourceContext]:
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        _, ctx, _ = source_context(
+            tmp_path, ledger, "overture", {"divisions.parquet": (b"x", {})}
+        )
+        yield ctx
+
+
+def test_scratch_index_publishes_a_checked_index_and_releases_its_bytes(
+    source: SourceContext,
+) -> None:
+    with scratch_index(
+        source, "entities.sqlite3", 10**8, label="Test", cache_kib=1024
+    ) as index:
+        index.db.execute("CREATE TABLE entities (id TEXT PRIMARY KEY)")
+        with index.db:
+            index.db.execute("INSERT INTO entities VALUES ('a')")
+        assert index.db.execute("PRAGMA cache_size").fetchone() == (-1024,)
+        assert index.db.execute("PRAGMA temp_store").fetchone() == (1,)
+        index.check_size()
+        assert not index.path.exists()
+    assert index.path == source.work / source.inputs_hash / "entities.sqlite3"
+    assert source.guard.reserved == 0
+    assert source.guard.growth == index.path.stat().st_size
+    with closing(sqlite3.connect(index.path)) as db:
+        assert db.execute("SELECT id FROM entities").fetchall() == [("a",)]
+
+
+def test_scratch_index_over_its_reservation_publishes_nothing(
+    source: SourceContext,
+) -> None:
+    with (
+        pytest.raises(ConfigError, match="Test index exceeds configured index_bytes"),
+        scratch_index(
+            source, "lookup.sqlite3", 1, label="Test", check="integrity_check"
+        ) as index,
+    ):
+        index.db.execute("CREATE TABLE lookup (id INTEGER)")
+        index.check_size()
+    assert not (source.work / source.inputs_hash / "lookup.sqlite3").exists()
+    assert (source.guard.reserved, source.guard.growth) == (0, 0)
