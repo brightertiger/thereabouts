@@ -17,6 +17,7 @@ class Policy:
     colloquial: str
     historic: str
     short: str
+    guarded_kinds: dict[str, frozenset[str]]
     max_folded_length: int
 
 
@@ -36,6 +37,7 @@ def parse(value: dict[str, Any]) -> Policy:
         value["colloquial"],
         value["historic"],
         value["short"],
+        {k: frozenset(v) for k, v in value.get("guarded_kinds", {}).items()},
         int(value["max_folded_length"]),
     )
 

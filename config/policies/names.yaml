@@ -21,6 +21,12 @@ colloquial: drop
 # isHistoric, or a validity end date (a former name such as Bombay).
 historic: guarded
 short: guarded
+# Source name kinds that also need the guard. Overture's `alternate` variant mixes
+# nicknames and abbreviations (Frisco, San Fran; 2.8% collide), and a linked
+# Overture record's `primary` name that differs from the city's often names a
+# merged municipality (Colón, Benito Juárez; 23.8% collide).
+guarded_kinds:
+  overture: [alternate, primary]
 
 # Longest name after NFKC and case folding (15 names exceed it). Token
 # expansions then keep every key within the writer's 128-character limit.

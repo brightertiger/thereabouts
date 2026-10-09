@@ -43,11 +43,12 @@ COLUMNS = (
     "l.city_id, l.place_id, l.country_code, n.source, n.source_id, n.name, "
     "n.source_release, n.license, n.provenance"
 )
-ALIASES = f"""SELECT {COLUMNS}, n.language, n.is_preferred, n.is_short,
+ALIASES = f"""SELECT {COLUMNS}, n.language, n.name_kind, n.is_preferred, n.is_short,
   n.is_colloquial, n.is_historic OR n.valid_to IS NOT NULL AS is_historic, 0 AS origin
   FROM {{view}} n JOIN links l ON l.source = n.source AND l.id = n.entity_source_id"""
-PLACES = f"""SELECT {COLUMNS}, NULL AS language, false AS is_preferred,
-  false AS is_short, false AS is_colloquial, false AS is_historic, 1 AS origin
+PLACES = f"""SELECT {COLUMNS}, NULL AS language, NULL AS name_kind,
+  false AS is_preferred, false AS is_short, false AS is_colloquial,
+  false AS is_historic, 1 AS origin
   FROM {{view}} n JOIN links l ON l.source = n.source AND l.id = n.source_id"""
 
 
@@ -117,6 +118,8 @@ def treatment(row: Row, policy: Policy) -> tuple[str, str]:
         for flag in ("colloquial", "historic", "short")
         if row[f"is_{flag}"]
     ]
+    if row["name_kind"] in policy.guarded_kinds.get(row["source"], ()):
+        flags.append(("guarded", "name_kind"))
     return max(flags, key=lambda item: TREATMENTS[item[0]], default=("keep", ""))
 
 

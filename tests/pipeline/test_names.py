@@ -113,6 +113,9 @@ def inputs(root: Path) -> tuple[list[Row], dict[str, list[Row]]]:
     ]
     overture = [
         alias("ov-1", "ov-a", "Łódź Miasto", source="overture", license="ODbL-1.0"),
+        # A linked record's own name that names another city is guarded.
+        alias("ov-2", "ov-a", "Frisco", source="overture", name_kind="primary"),
+        alias("ov-3", "ov-a", "Lodzia", source="overture", name_kind="alternate"),
     ]
     sources = {
         "geonames": [
@@ -156,20 +159,21 @@ def test_names_link_filter_and_kind(tmp_path: Path) -> None:
         ("city:a", "Lodz City", "english"),
         ("city:a", "Litzmannstadt", "alternate"),
         ("city:a", "Łódź Miasto", "alternate"),
+        ("city:a", "Lodzia", "alternate"),
     }
     first = next(r for r in rows if r["name"] == "Łódź")
     assert first["source_id"] == "10" and first["place_id"] == "city:a"
     assert first["country_code"] == "ZZ" and first["license"] == "CC-BY-4.0"
     assert receipt["dropped"] == {
         "canonical": 4,
-        "collision": 1,
+        "collision": 2,
         "colloquial": 2,
         "duplicate": 2,
         "empty": 1,
         "language": 2,
         "long": 1,
     }
-    assert receipt["rows"] == 5 and receipt["max_per_city"] == 5
+    assert receipt["rows"] == 6 and receipt["max_per_city"] == 6
     assert "inputs_hash" not in json.dumps(receipt)
 
 
