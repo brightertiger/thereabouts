@@ -25,6 +25,8 @@ pipeline = [
     "psutil>=7,<8",
     { include-group = "acquire" },
     "scipy>=1.14,<1.17",
+    # The s3:// publication driver; tests publish to memory:// and file:// only.
+    "s3fs>=2026.9,<2027",
 ]
 dev = [
     { include-group = "pipeline" },

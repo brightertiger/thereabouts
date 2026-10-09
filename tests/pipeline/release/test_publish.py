@@ -123,3 +123,8 @@ def test_owner_decisions_block_a_public_release_only(tmp_path: Path) -> None:
     result = publish([item], destination, "2026.10", private, dry_run=False)
     assert result["unresolved"] == ["dataset/2026.10/DATA_LICENSES.md"]
     assert fs.exists(base + "/dataset/2026.10/_SUCCESS")
+
+
+def test_the_s3_driver_is_locked_and_importable() -> None:
+    # Resolving the class imports s3fs; nothing contacts S3.
+    assert fsspec.get_filesystem_class("s3").__module__.startswith("s3fs")
