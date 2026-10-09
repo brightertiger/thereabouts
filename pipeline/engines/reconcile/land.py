@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -22,7 +23,12 @@ from .spatial import containing
 
 
 def build_land(
-    root: Path, paths: list[str], output: Path, limits: EngineLimits
+    root: Path,
+    paths: list[str],
+    output: Path,
+    limits: EngineLimits,
+    *,
+    log: Callable[[str], None] | None = None,
 ) -> Path:
     with atomic_output(output) as temp:
         db = connect(temp, cache_kib=limits.sqlite_cache_kib)
@@ -40,8 +46,8 @@ def build_land(
                         path,
                     )
                 db.commit()
-                if index % 100 == 0:
-                    print(f"land {index + 1}/{len(paths)}", flush=True)
+                if log is not None and index % 100 == 0:
+                    log(f"land {index + 1}/{len(paths)}")
         finally:
             db.close()
         check_database(temp, limits.sqlite_cache_kib)

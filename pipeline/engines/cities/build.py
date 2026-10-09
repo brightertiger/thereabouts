@@ -1,5 +1,6 @@
 """Atomic, input-keyed country normalization without modifying reconciliation."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 import shapely
@@ -27,6 +28,8 @@ def build_country(
     urban: Urban,
     policy: Row,
     limits: EngineLimits,
+    *,
+    log: Callable[[str], None] | None = None,
 ) -> Row:
     report_path = root / "report.json"
     db = connect(source, readonly=True, cache_kib=limits.sqlite_cache_kib)
@@ -181,9 +184,9 @@ def build_country(
         "rejected_areas": rejected,
     }
     write_json(report_path, report)
-    print(
-        f"normalize {cc}: {len(cities)} cities/towns, "
-        f"{len(footprints)} footprints, {len(rejected)} rejected areas",
-        flush=True,
-    )
+    if log is not None:
+        log(
+            f"normalize {cc}: {len(cities)} cities/towns, "
+            f"{len(footprints)} footprints, {len(rejected)} rejected areas"
+        )
     return report

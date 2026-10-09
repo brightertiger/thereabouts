@@ -104,6 +104,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
                 [r["path"] for r in manifest["partitions"] if r["kind"] == "areas"],
                 target / "land.sqlite",
                 limits,
+                log=ctx.log,
             )
         ]
     codes = countries(ctx)

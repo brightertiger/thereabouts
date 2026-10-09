@@ -11,6 +11,8 @@ import sqlite3
 from collections.abc import Iterator, Sequence
 from typing import Any, cast
 
+from pipeline.errors import ArtifactIntegrityError
+
 from .codec import Row, pack, unpack
 from .types import Entity
 
@@ -23,7 +25,7 @@ def find_entity(db: sqlite3.Connection, identity: str) -> Entity | None:
 def entity(db: sqlite3.Connection, identity: str) -> Entity:
     value = find_entity(db, identity)
     if value is None:
-        raise ValueError(f"Dangling canonical identity: {identity}")
+        raise ArtifactIntegrityError(f"Dangling canonical identity: {identity}")
     return value
 
 

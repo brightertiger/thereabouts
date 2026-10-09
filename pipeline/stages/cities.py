@@ -58,6 +58,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             urban(ctx),
             policy,
             limits,
+            log=ctx.log,
         )
         return [
             located(ctx.root, report[name]["path"]) for name in ("index", "table")
