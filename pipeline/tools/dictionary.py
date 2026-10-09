@@ -14,9 +14,10 @@ from typing import Any
 
 import yaml
 
+from pipeline.release import dataset_schema
 from pipeline.runtime.fingerprints import REPOSITORY
 
-from . import dataset_schema, dictionary_markdown, dictionary_surface
+from . import dictionary_markdown, dictionary_surface
 
 FORMAT = "thereabouts-data-dictionary-1"
 JSON_NAME = "data_dictionary.json"
