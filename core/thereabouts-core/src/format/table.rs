@@ -50,7 +50,7 @@ pub(crate) struct Table {
 }
 impl Table {
     pub(crate) fn open(
-        root: &super::reader::Reader<'_>,
+        root: &super::reader::Reader,
         manifest: &Manifest,
         role: &str,
         kind: u32,

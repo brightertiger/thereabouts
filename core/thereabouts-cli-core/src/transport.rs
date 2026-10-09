@@ -11,13 +11,5 @@ pub const INDEX_FORMAT: u32 = 3;
 /// Every family archive is a zstd-compressed POSIX ustar stream.
 pub const ARCHIVE_SUFFIX: &str = ".tar.zst";
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn caps_fit_javascript_safe_integers() {
-        // Node compares these as Numbers; both must stay below 2^53.
-        assert!(MAX_ARCHIVE_BYTES < MAX_UNPACKED_BYTES);
-        assert!(MAX_UNPACKED_BYTES < (1 << 53));
-    }
-}
+// Node compares these as Numbers; both must stay exact below 2^53.
+const _: () = assert!(MAX_ARCHIVE_BYTES < MAX_UNPACKED_BYTES && MAX_UNPACKED_BYTES < (1 << 53));

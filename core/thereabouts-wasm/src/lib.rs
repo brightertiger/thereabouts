@@ -53,7 +53,8 @@ impl Geocoder {
     #[wasm_bindgen(js_name = open)]
     pub fn open(path: &str, verify: bool) -> Result<Self, JsValue> {
         let root = host::root(path).map_err(core_error)?;
-        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify).map_err(core_error)?;
+        let pack = Pack::open_with(&Reader::new(&root, Arc::new(host::Host)), verify)
+            .map_err(core_error)?;
         Ok(Self {
             pack: Some(Arc::new(pack)),
         })
@@ -62,7 +63,7 @@ impl Geocoder {
     #[wasm_bindgen(js_name = openWithCore)]
     pub fn open_with_core(path: &str, verify: bool, core: &Self) -> Result<Self, JsValue> {
         let root = host::root(path).map_err(core_error)?;
-        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify)
+        let pack = Pack::open_with(&Reader::new(&root, Arc::new(host::Host)), verify)
             .and_then(|p| p.with_core(Arc::clone(core.get().map_err(|_| Error::Closed)?)))
             .map_err(core_error)?;
         Ok(Self {
@@ -143,7 +144,7 @@ pub fn render(
 #[wasm_bindgen(js_name = packInfo)]
 pub fn pack_info(path: &str, full: bool) -> Result<String, JsValue> {
     let root = host::root(path).map_err(core_error)?;
-    let reader = Reader::new(&root, &host::Host);
+    let reader = Reader::new(&root, Arc::new(host::Host));
     let info = if full {
         thereabouts_core::format::verify::verify_with(&reader)
     } else {

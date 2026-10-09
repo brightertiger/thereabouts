@@ -56,7 +56,7 @@ impl From<std::io::Error> for Error {
         }
     }
 }
-/// EMFILE/ENFILE (ERROR_TOO_MANY_OPEN_FILES on Windows): the process or system fd table is full.
+/// `EMFILE`/`ENFILE` (`ERROR_TOO_MANY_OPEN_FILES` on Windows): the descriptor table is full.
 #[must_use]
 pub fn is_file_limit(error: &std::io::Error) -> bool {
     #[cfg(windows)]

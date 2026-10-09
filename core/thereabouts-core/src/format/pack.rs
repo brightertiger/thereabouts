@@ -86,8 +86,8 @@ impl Pack {
         }
         Self::open_with(&super::reader::Reader::native(root), verify)
     }
-    /// Open through host reads; all shards retain their original handles after admission.
-    pub fn open_with(root: &super::reader::Reader<'_>, verify: bool) -> Result<Self> {
+    /// Open through host reads; shards borrow handles from the reader's bounded pool.
+    pub fn open_with(root: &super::reader::Reader, verify: bool) -> Result<Self> {
         let manifest = if verify {
             super::verify::verify_with(root)?
         } else {
@@ -380,7 +380,7 @@ impl Pack {
 fn catalogue_source(
     path: &Path,
     first: usize,
-    reader: &super::reader::Reader<'_>,
+    reader: &super::reader::Reader,
 ) -> Result<CatalogueSource> {
     let shard = FileShard::from_file(reader.open(path)?, 2, &[80, 8, 1])?;
     catalogue::validate_header(&shard)?;
@@ -395,7 +395,7 @@ fn catalogue_source(
 }
 
 fn load_blocks(
-    reader: &super::reader::Reader<'_>,
+    reader: &super::reader::Reader,
     path: &Path,
     blocks: &mut BTreeMap<u32, BlockSource>,
 ) -> Result<()> {

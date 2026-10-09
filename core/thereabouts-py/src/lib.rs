@@ -13,7 +13,13 @@ use std::{
     path::Path,
     sync::{Arc, Mutex},
 };
-use thereabouts_core::{Error, format::Pack};
+use thereabouts_core::{
+    Error,
+    format::{
+        Pack,
+        reader::{Native, Reader},
+    },
+};
 #[cfg(feature = "writer")]
 use thereabouts_writer as writer;
 
@@ -326,12 +332,27 @@ impl Geocoder {
     }
 }
 #[pyfunction]
-#[pyo3(signature=(path, *, verify=false, core=None))]
-fn open(py: Python<'_>, path: &str, verify: bool, core: Option<&Geocoder>) -> PyResult<Geocoder> {
+#[pyo3(signature=(path, *, verify=false, core=None, max_open_files=None))]
+fn open(
+    py: Python<'_>,
+    path: &str,
+    verify: bool,
+    core: Option<&Geocoder>,
+    max_open_files: Option<usize>,
+) -> PyResult<Geocoder> {
     let shared = core.map(|c| c.pack(py)).transpose()?;
     let pack = py
         .detach(|| {
-            let pack = Pack::open(Path::new(path), verify)?;
+            let pack = match max_open_files {
+                None => Pack::open(Path::new(path), verify)?,
+                Some(_) if !Path::new(path).exists() => {
+                    return Err(Error::PackNotFound(path.into()));
+                }
+                Some(limit) => Pack::open_with(
+                    &Reader::with_open_files(Path::new(path), Arc::new(Native), limit),
+                    verify,
+                )?,
+            };
             if let Some(core) = shared {
                 pack.with_core(core)
             } else {

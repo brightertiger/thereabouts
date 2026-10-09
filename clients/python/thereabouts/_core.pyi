@@ -85,7 +85,11 @@ class Geocoder:
     def close(self) -> None: ...
 
 def open(
-    path: str, *, verify: bool = False, core: Geocoder | None = None
+    path: str,
+    *,
+    verify: bool = False,
+    core: Geocoder | None = None,
+    max_open_files: int | None = None,
 ) -> Geocoder: ...
 def write_pack(
     dataset_dir: str, family: str, output_dir: str, options: dict[str, Any]

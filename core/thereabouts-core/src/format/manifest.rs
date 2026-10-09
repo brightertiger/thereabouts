@@ -122,7 +122,7 @@ pub fn read(root: &Path) -> Result<Manifest> {
     read_with(&super::reader::Reader::native(root))
 }
 /// Admit manifest and artifact sizes through a host-provided stable file source.
-pub fn read_with(root: &super::reader::Reader<'_>) -> Result<Manifest> {
+pub fn read_with(root: &super::reader::Reader) -> Result<Manifest> {
     let path = artifact_path(root, "manifest.json")?;
     ensure(
         root.open(&path)?.size() <= 16 * 1024 * 1024,
@@ -214,12 +214,11 @@ pub fn verify(root: &Path, m: &Manifest) -> Result<()> {
     verify_with(&super::reader::Reader::native(root), m)
 }
 /// Verify digests through the same handles used by admission and later reads.
-pub fn verify_with(root: &super::reader::Reader<'_>, m: &Manifest) -> Result<()> {
+pub fn verify_with(root: &super::reader::Reader, m: &Manifest) -> Result<()> {
     for f in &m.files {
-        ensure(
-            root.digest(&artifact_path(root, &f.path)?)? == f.sha256,
-            "Shard checksum mismatch",
-        )?;
+        let path = artifact_path(root, &f.path)?;
+        ensure(root.digest(&path)? == f.sha256, "Shard checksum mismatch")?;
+        root.release(&path)?;
     }
     Ok(())
 }
