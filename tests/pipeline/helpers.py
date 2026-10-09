@@ -33,7 +33,9 @@ def peak_rss() -> int:
 
 
 def context(root: Path, ledger: Ledger) -> Context:
-    config = Config(resources=Resources(workers=2))
+    # Synthetic stages record calls in memory, so they run on threads here;
+    # process workers have their own tests.
+    config = Config(resources=Resources(workers=2, executor="thread"))
     guard = ResourceGuard(
         root,
         config.resources,

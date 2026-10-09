@@ -1,6 +1,7 @@
 """Every pinned licence remains visible in the shipped notices."""
 
 import json
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -175,3 +176,42 @@ def test_state_layers_follow_the_dataset_states(tmp_path: Path) -> None:
     pq.write_table(countries.slice(1), tmp_path / "countries.parquet")
     with pytest.raises(ValueError, match="lack alpha-3"):
         metadata.boundary_states(tmp_path, tables)
+
+
+def test_evaluation_files_are_pinned_but_never_listed_as_shipped() -> None:
+    def pinned(name: str, **metadata: str) -> dict[str, object]:
+        return {"name": name, "metadata": {"license": "CC-BY-SA-4.0"} | metadata}
+
+    sources = {
+        "plate_country": {
+            "id": "per-source",
+            "attribution": "Wikipedia and Wikimedia Commons contributors",
+            "pin": {
+                "files": [
+                    pinned("vehicle-stock.json", attribution="en.wikipedia.org"),
+                    pinned("eval-commons-DE.json", purpose="evaluation"),
+                    pinned(
+                        "eval-image-1.jpg", purpose="evaluation", license="CC-BY-2.0"
+                    ),
+                ]
+            },
+        }
+    }
+    (row,) = rows(sources)
+    assert row["files"] == ["vehicle-stock.json"]
+    text = licence_text(sources, {"CC-BY-SA-4.0"})
+    assert "eval-" not in text and "CC-BY-2.0" not in text
+    assert "plate_country" in text.split("OWNER DECISION", 1)[1]
+
+
+def test_shipped_source_records_leave_out_evaluation_files(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lock = read_lock(REPOSITORY / "pins.lock")
+    plates = lock["plates"]
+    extra = replace(plates.files[0], name="eval-image-1.jpg")
+    extra.metadata = {**extra.metadata, "purpose": "evaluation"}
+    lock["plates"] = replace(plates, files=[*plates.files, extra])
+    monkeypatch.setattr(metadata, "read_lock", lambda _: lock)
+    names = [f["name"] for f in licences(load(), {"plates"})["plates"]["pin"]["files"]]
+    assert "eval-image-1.jpg" not in names and len(names) == len(plates.files)

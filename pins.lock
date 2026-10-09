@@ -24506,12 +24506,1692 @@ phone:
     releases:
       commit: 0ae309f1940227efe688f5eb1815ef45a6fbee8d
 plate_country:
-  release: ''
-  pinned_at: ''
-  available: false
-  files: []
+  release: e2e2cdc2fc2ff302c7e4a03fbd17413135a093792ed633786a8b5e8eb0d06b57
+  pinned_at: '2026-10-09T23:04:48.583402+00:00'
+  available: true
+  files:
+  - name: eval-commons-AR.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=171652553%7C171652555%7C171652556&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6803
+    sha256: cbdfe853b9c5b5b4e80b8ee3c55d0838c5f06bab7f8a46cab5b3a3a877eea9e7
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-AR.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-AU.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=17651310%7C37521912&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 5072
+    sha256: 062d52f527a9a4486b3f27ee82e7a1041c20f5b6b230b4132eed864e535522a5
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-AU.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-BD.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=126771000&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 2351
+    sha256: fda97c79356f0aacc4a7cf0e5ee6d342e3630aff7f4e311ad654d00db519d3e9
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-BD.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-BR.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=171652246%7C171652247%7C171652248&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6752
+    sha256: 154446dba9a1ce382904292be57015dde168fb6c8e563b70d69bb63b0fddb0ab
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-BR.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-CN.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=129604814&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 2455
+    sha256: 5160e0ee92fd70f2cc14281189e9ac9e63072830408a3a7ff283bc13a825b286
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-CN.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-CO.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=2866733%7C17641721%7C67482637&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 7873
+    sha256: cc704d2e68f58bf043beafa5f23d8fb24fa4eca6ae7a399cd126852781db93e4
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-CO.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-DE.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=198472962&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 2253
+    sha256: f30ee183a0725f13de4e8f06ccf75eacdd56d4b23a9835fd3eb1c16c7dc4ce63
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-DE.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-EG.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=147682886%7C147682887%7C147682890&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6766
+    sha256: 26e754dbbafcdc2416857389437f3de63bdf3b2b70a19da6c16ee5073cfc2b97
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-EG.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-FJ.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=32718654%7C40378058%7C40378059%7C40378060%7C171631247%7C171632116%7C172603195&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 14827
+    sha256: 8489678c7c4d059f177fde7441687e9ffb270c9be5ffe4246b7fa50e734a5422
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-FJ.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-GB.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=40920628%7C70945783&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 4248
+    sha256: ffc587a7210b03d73a700d40570346e656b1ca0706bea960175105b8d2c6593f
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-GB.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-GH.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=34608501%7C38911278%7C88493475&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 8070
+    sha256: 31cb639eb370ac4337633b54d1c0434d012cbbc0f6307d170024d0d71498a194
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-GH.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-ID.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=38218295%7C43428151%7C120276480&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 9874
+    sha256: 96e95c0b29b20875b471960c8a3a03b2568216108b96f3639a4828668ce2b939
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-ID.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-IN.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=15287369%7C15287388%7C48300969%7C84080599&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 8617
+    sha256: 50fe846a17283abc822f18f019f7b428dcdf3057692700a122ede97220e8211c
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-IN.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-IR.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=12655196%7C17800104%7C18909993%7C141123606&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 8941
+    sha256: 4420552b7009a0ad5e5e27f4e248ef5815d43ec440cef07c27c1a9cdb1fb56c2
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-IR.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-IT.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=202503%7C2393556%7C2719713%7C2719742%7C7115895%7C15332053%7C17634306%7C18209564%7C19875170%7C26311482%7C39302671&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 27515
+    sha256: cd7859ba6e04d4b6c2e43af9d64c83cc65352ae91a8f3a7dc02f3216949ce1db
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-IT.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-JP.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=37392677%7C46268695%7C74565857%7C74565863&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 9745
+    sha256: 3eabc3cac7d6542f227ed0f4f408eedf777d7937752097e6584328200aa42788
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-JP.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-KE.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=72236307%7C174624649&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 4512
+    sha256: de99fe5f626939809575e77d493f854200b796f10b58d592d5918094160c0634
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-KE.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-KR.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=29465588%7C175761989&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 4507
+    sha256: 48a768823304f9f1cd62ca605691c6cf24d7442d3d02c536aed99462392bce4a
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-KR.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-MA.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=19919839%7C31782908%7C86201728%7C113295681%7C113295682&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 11314
+    sha256: 0a6535458b348060dd4f5bd4c2955e5279cc0cd5903533bb1ae777dba7167be1
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-MA.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-MX.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=67712475%7C67712492&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 5046
+    sha256: 1a514cd61a4876a47c83e0b48d89b6ae935ce6d4cdb86e4ba045799425468f8d
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-MX.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-MY.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=9490659%7C9490963%7C9490989%7C9512280%7C17505987%7C17548353%7C33010486%7C187930347&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 24431
+    sha256: d71d98bd0a517fd8da2457606b3a6565abf8575e82faefd12883f419ef756226
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-MY.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-NG.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=99334263%7C99334325%7C99334443&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6445
+    sha256: eb22a880eeb7f24eefb6652f39161aaa39a68505a8e69fd8b7fabb6be97f2974
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-NG.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-NL.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=5045119%7C22543291%7C26388886%7C26617984%7C35146111%7C37748932%7C44934346%7C49308089%7C67751823%7C67751824%7C68299574%7C68357199%7C68357200%7C68357201%7C174619865&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 34128
+    sha256: 07a31b1b02c15db1a11fc78fea71753b3d88218246c3132d678c335f60503cb0
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-NL.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-NZ.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=17641914%7C55760144%7C83592604&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6948
+    sha256: 355ad4db699fcfb315772066e4971ccb59a49286f1eee68006bd4e100564c326
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-NZ.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-PG.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=161340102%7C161340161%7C161341123%7C161341189%7C161417117%7C161417933%7C161418933%7C161418977%7C161419379%7C161419432&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 20748
+    sha256: a27274ee51c81805f953689102471477de43c1c705e6c984e824fc3e446c33f6
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-PG.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-PK.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=19682538&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 2332
+    sha256: 9b61fb6ee75085587422a80f4f025a822b2dd149f44c623510d67eda6708c63a
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-PK.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-SE.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=5188284%7C40920544%7C128688802&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 6120
+    sha256: 5bffcfa9000bd46db130db0d183770c16ed56455f7d7178d729b5e9b834b4db2
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-SE.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-SG.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=8534987%7C8535035%7C17633714%7C52697803%7C70511508%7C71217807&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 15374
+    sha256: 3c3c23d85d93ff90df55a686cf57cab61e501d95487755bf01a8d222884dd6b9
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-SG.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-TH.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=49068518%7C162240998%7C162241214&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 7539
+    sha256: 7564b524b5b6bdf609e49a0c2cf59409de1975149eed77f5dc6a5444a58fb33c
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-TH.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-TR.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=1588054%7C50388187%7C95458092&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 7800
+    sha256: 88dd6ca629b1f5b273a565f83b9d45cb30528224d94b9d55389648c0bdf723a4
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-TR.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-UA.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=177332684&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 2360
+    sha256: 4b2790e4b37852f8c90a13cce630bbcb87e8231e552d84b64407a65e2c9f339b
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-UA.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-VN.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=164798080%7C167846529%7C167849296&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 7745
+    sha256: e8f4cf5e4b65293fed39e5e06772234ebba429f167bb31dffdf234d7081c3a16
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-VN.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-commons-ZA.json
+    url: https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=25847406%7C61391657&prop=imageinfo%7Crevisions&rvprop=ids%7Ctimestamp&iiprop=extmetadata%7Curl%7Csha1&iiextmetadatalanguage=en
+    size: 4936
+    sha256: 6983da6962239486f9bc116c3ce6f4c0a27f3b60f781dec295d64ab9dcee2034
+    etag: null
+    last_modified: null
+    metadata:
+      key: eval-commons-ZA.json
+      attribution: Wikimedia Commons contributors; per-file revision and image licence
+        retained in evaluation rows
+      kind: commons_metadata
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      pinning: Pages selected by the evaluation's page ids, so the selection cannot
+        drift. The response is current page and file metadata, not a historical snapshot;
+        each evaluation row keeps its page revision id and file SHA-1.
+      purpose: evaluation
+  - name: eval-image-120276480.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/0b/East_Kalimantan_License_Plate.jpg
+    size: 55919
+    sha256: 86c09ca45b5459f658e73d9e579d7a444eb1daea09c32094ad8d00113716b968
+    etag: 81f702cfcb1ead2c299d0bb1408f4aaa
+    last_modified: Sun, 10 Jul 2022 05:00:52 GMT
+    metadata:
+      key: eval-image-120276480.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:MarioJump83" title="User:MarioJump83">MarioJump83</a>
+      image_sha1: 0b9357790f42ab0a06569413106f4fb013091e69
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-12655196.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/7/7a/Iran_mashad_license_plate_23.jpg
+    size: 411852
+    sha256: 3ca4d2fae1bc5fa555a01486f84997e2872fe7ca74c1173df13f6592d1db7407
+    etag: 692e30f43dab7c88f53ddcdc19bbc05e
+    last_modified: Fri, 10 Oct 2014 21:38:29 GMT
+    metadata:
+      key: eval-image-12655196.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Robinsoncrusoe&amp;action=edit&amp;redlink=1"
+        class="new" title="User:Robinsoncrusoe (page does not exist)">Robinsoncrusoe</a>
+      image_sha1: da4c4ac7e21ee2826da34fade1a154a806939c89
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-126771000.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/9/92/BD_Benapole_0906_%2821%29_%2816590654063%29.jpg
+    size: 57440
+    sha256: 7e1365b8bd3e0a35bf48612b58d10223b47e5da24f174c5cedf047edba6e2efd
+    etag: b25925938c5729263892628f22f96a4d
+    last_modified: Mon, 19 Dec 2022 05:17:52 GMT
+    metadata:
+      key: eval-image-126771000.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/120935793@N02">Diego
+        Tirira</a> from Quito, Ecuador
+      image_sha1: 62e2542a5beb70ebf42fc7508761e3588b0b0cd4
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-129604814.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/b/b8/%E4%B8%9C%E8%8E%9E%E5%B8%82%2C_%E4%B8%AD%E5%9B%BD_Mar_14%2C_2023_03-50-20_PM.jpeg
+    size: 3747076
+    sha256: 00e77076ccd9f4dd911e4331bcf0841eb16f4e8bc25873cb0d5276048dd0011e
+    etag: c3ea17edaa8079cde9e95c6e3c1e77f9
+    last_modified: Tue, 14 Mar 2023 23:14:18 GMT
+    metadata:
+      key: eval-image-129604814.jpg
+      attribution: null
+      image_sha1: a56cb0b14a071532f15fff298f959e01b69dc621
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-141123606.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/5/51/20170418_Autos_-_33438514553.jpg
+    size: 568164
+    sha256: 98d7f09b0bd10f850071ec406d64ace429f03e38b4d4fedb54638d3543005c68
+    etag: a467cdf4a76b906c6867b83ac2e0228a
+    last_modified: Mon, 20 Nov 2023 12:45:45 GMT
+    metadata:
+      key: eval-image-141123606.jpg
+      attribution: somiz
+      image_sha1: 214a881ecc9fa60fd71ef0207b04eb744c246c2a
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-147682886.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/1a/Egypte_particulier_voertuig_01.jpg
+    size: 935216
+    sha256: 37905180ebee70f8074cdcc37794454b3eaac128431970c8207683323a2a0321
+    etag: d7b2935d35dc4c9f0c50ff9688db14aa
+    last_modified: Wed, 24 Apr 2024 09:29:58 GMT
+    metadata:
+      key: eval-image-147682886.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: f556393f4a290ba7ca01fa37c95cc3c2f8702a3b
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-147682887.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/f/f8/Egypte_particulier_voertuig_02.jpg
+    size: 581599
+    sha256: 2c5e61f43ebd2d1f9215dd7b08f5027265ff39ce85da2d61ae4b657aa7c4918a
+    etag: 90d7fadee85b5ba4c63db4150b3d2c4c
+    last_modified: Wed, 24 Apr 2024 09:29:59 GMT
+    metadata:
+      key: eval-image-147682887.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: 739c9f4c41345a1e749e4b1c135bade3866c904f
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-147682890.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/5/5d/Egypte_particulier_voertuig_03.jpg
+    size: 527270
+    sha256: 3da1c587319d1ea3a1ae4cc604853ca1cc6825ea0924c1bf7ea7a44363d4c196
+    etag: d3b0cb01c9e2970326a3069a242a1277
+    last_modified: Wed, 24 Apr 2024 09:30:06 GMT
+    metadata:
+      key: eval-image-147682890.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: fccb1de1cf18bfa01f47ad9c16f7403a85398a92
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-15287369.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/a/a7/Indian_registration_1906.jpg
+    size: 212785
+    sha256: 57b60463a0651c64e7289b64306f4291425d6fd1027eaaefe4af20e0ecddeed0
+    etag: 9f3800a68772d853a133793a171fa9f2
+    last_modified: Fri, 10 Oct 2014 21:44:38 GMT
+    metadata:
+      key: eval-image-15287369.jpg
+      attribution: Krokodyl
+      image_sha1: 04280b2c01ccefee5c79a23c77d43fb2900d5685
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-15287388.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/8b/Indian_registration_2313.jpg
+    size: 287372
+    sha256: 51b3f7490447a46b000475adc0cce43867467eae397980b66c0fe8e0680fc56d
+    etag: dc288e6a8a2adf035449a3e21981f514
+    last_modified: Fri, 10 Oct 2014 21:33:53 GMT
+    metadata:
+      key: eval-image-15287388.jpg
+      attribution: Krokodyl
+      image_sha1: a5e9c35ef01e276b765d7197ee979670fa938a76
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-1588054.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/c/c2/Turkeylicenseplate.jpg
+    size: 99742
+    sha256: 1820b90d2a91b8c955e84af5a335b26a0e945d5edf35c593109ef9a2ca638794
+    etag: 843a51d7fc9ec853d62b85ad55f29789
+    last_modified: Wed, 08 Oct 2014 17:53:56 GMT
+    metadata:
+      key: eval-image-1588054.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dantadd" title="User:Dantadd">User:Dantadd</a>
+      image_sha1: 6684fe7e4a6a0e742194ec12b08c980257512858
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-162240998.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/8e/1%E0%B8%81%E0%B8%8E_%E0%B8%8A%E0%B8%B8%E0%B8%A1%E0%B8%9E%E0%B8%A3_855.jpg
+    size: 2166546
+    sha256: 0c925142cd85f671cb0807737779bcef4eec24ca8778effa9e145d42671dddf3
+    etag: 1d8b9c3fba9b0b178786e3416c01f00c
+    last_modified: Mon, 17 Mar 2025 06:16:55 GMT
+    metadata:
+      key: eval-image-162240998.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Ayakln" title="User:Ayakln">Ayakln</a>
+      image_sha1: c8a4cbd4b066f8508f608f9dcf951cbbd53bae38
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-162241214.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/8f/1%E0%B8%81%E0%B8%90_%E0%B8%8A%E0%B8%B8%E0%B8%A1%E0%B8%9E%E0%B8%A3_2933.jpg
+    size: 1532207
+    sha256: d31f1c347aec1ac22031b86ff8a893c4d12f2b719f15f748e266edd6587a5ee1
+    etag: 54e01459faf52d27a3712b4722dcf274
+    last_modified: Mon, 17 Mar 2025 06:23:03 GMT
+    metadata:
+      key: eval-image-162241214.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Ayakln" title="User:Ayakln">Ayakln</a>
+      image_sha1: d95cfd19c4a05bb7e559fbf3522b448e21497de1
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-164798080.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/19/Bi%E1%BB%83n_s%E1%BB%91_xe_b%C3%ACnh_d%C6%B0%C6%A1ng.jpg
+    size: 663574
+    sha256: a4a171633c6fb84898ea2407070743c5ba811430944d256cf1c8e365ada28868
+    etag: 170ce9f2ddb9d81df5698415c06f8850
+    last_modified: Tue, 06 May 2025 03:55:14 GMT
+    metadata:
+      key: eval-image-164798080.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+        title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+      image_sha1: 4483bcff2bcd83fe997f17e2e54e74c2cfde15dc
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-167846529.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/5/5a/Bi%E1%BB%83n_s%E1%BB%91_xe_Kon_Tum.jpg
+    size: 1345412
+    sha256: f93b5c5fa83e44da1960b9aa3fe8ab450d6bdb821aece65389022033cab00587
+    etag: e89806c8fd17ce7c65797f6f7d3de11f
+    last_modified: Tue, 17 Jun 2025 01:48:00 GMT
+    metadata:
+      key: eval-image-167846529.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+        title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+      image_sha1: 755dde3f731a19508fa04fb634318d72c0f0855f
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-167849296.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/f/fc/Bi%E1%BB%83n_s%E1%BB%91_xe_%C4%91%E1%BB%93ng_th%C3%A1p.jpg
+    size: 2327672
+    sha256: 57d5069d2f3e63e948c348f000693c9c54f5a012331f2ddc3663d02041195525
+    etag: e2d805a4cfe09885950e80dbd3189f20
+    last_modified: Tue, 17 Jun 2025 03:12:33 GMT
+    metadata:
+      key: eval-image-167849296.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:L%C3%AA_Hu%E1%BB%B3nh_B%E1%BB%99"
+        title="User:Lê Huỳnh Bộ">Lê Huỳnh Bộ</a>
+      image_sha1: c5652647799b53ef3a0cac4198ef8aa0dea4adb5
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-171652246.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/c/c6/License_plate_of_Brazil_02.jpg
+    size: 2368652
+    sha256: 5f6b7bdc2f6ccd00c6438fc111a938f0051674d683cf9660115a4bff47102137
+    etag: eb9b033076a24b8b7920d46f9b55ec4e
+    last_modified: Tue, 05 Aug 2025 09:03:31 GMT
+    metadata:
+      key: eval-image-171652246.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: d73a2ff03afa467e2444b2ecc2440c84e06866b5
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-171652247.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/1a/License_plate_of_Brazil_03.jpg
+    size: 2447093
+    sha256: e509ca6e93e619369d5e12eb4f13eb0a598b5f4f8a848a3473890a665cd48822
+    etag: cca7b6e8b44c9597ad33aac5be684a51
+    last_modified: Tue, 05 Aug 2025 09:03:31 GMT
+    metadata:
+      key: eval-image-171652247.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: 060dcc5be11b8667df4ee3737d182ef449c28058
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-171652248.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/a/ac/License_plate_of_Brazil_01.jpg
+    size: 363602
+    sha256: 93f635a72ae6c239c9dc931e525f449653f2e918cfdac2f8c4a0a39ae6a72a98
+    etag: aab9167c95b4c0d7875a9fa8c3830a73
+    last_modified: Tue, 05 Aug 2025 09:03:31 GMT
+    metadata:
+      key: eval-image-171652248.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: ff3da465400555126d0be725a05cdf002115e96b
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-171652553.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/7/7b/License_plate_of_Argentina_02.jpg
+    size: 245710
+    sha256: 771c9aebe9a65ba3f194153b05a53bb8e7fb32f7ab6cfa4a440082b440db1d23
+    etag: 65a62b5c5ea0a6d0952e1f03fc1b3911
+    last_modified: Tue, 05 Aug 2025 09:08:30 GMT
+    metadata:
+      key: eval-image-171652553.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: f879546aabbb2041555e41b91ef6698fe97dfba3
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-171652555.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/f/fe/License_plate_of_Argentina_03.jpg
+    size: 917270
+    sha256: 983b8e86b38c5b1578ee1369d52664a0411d968fb6a27d6b3b28cf033c9a60cf
+    etag: f5ebdd73254ed022533853aaab7f8c0a
+    last_modified: Tue, 05 Aug 2025 09:08:31 GMT
+    metadata:
+      key: eval-image-171652555.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: 3aa9c7d6aae38b3f878640a36315b46dd1e984da
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-171652556.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/2/22/License_plate_of_Argentina_01.jpg
+    size: 2490218
+    sha256: 5b3611aad4a0c2587a8c390b4e3b23e6eae65e781444fffb3bdba20c354fdbca
+    etag: 4db1de317a7ed5a3247e0e73b3f2a8d3
+    last_modified: Tue, 05 Aug 2025 09:08:31 GMT
+    metadata:
+      key: eval-image-171652556.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: b29493adfd33ee5102f19ffe193b8e905b387762
+      kind: image
+      license: CC-BY-4.0
+      license_url: https://creativecommons.org/licenses/by/4.0
+      purpose: evaluation
+  - name: eval-image-175761989.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/17/Republic_of_Korea_euro_license_plate.jpg
+    size: 211684
+    sha256: e1f443f32b4b773c6d5aea36d1f6d7149b9f4fa1545dfcbf6b8a64c3612d4e38
+    etag: d86138f2efaa8f890b9b8e337a02dbaa
+    last_modified: Mon, 29 Sep 2025 20:02:12 GMT
+    metadata:
+      key: eval-image-175761989.jpg
+      attribution: Republic of Korea Culture Ministry
+      image_sha1: b06d5dc82b27824c5cc5ddc536606d6bb14902b8
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-17641914.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/87/NEW_ZEALAND_1986-current_number_plate_-_Flickr_-_woody1778a.jpg
+    size: 125575
+    sha256: 91f59b4ca5a1ef18308c7c9dbd3bacec1e1d4688fe3e8b228d11e3d111191199
+    etag: 67d644e5f06b608cea05276764be7186
+    last_modified: Fri, 10 Oct 2014 19:23:13 GMT
+    metadata:
+      key: eval-image-17641914.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/9816248@N03">Jerry
+        "Woody"</a> from Edmonton, Canada
+      image_sha1: 0b944adc5f666f45c894de933a0f9666d8a4ffca
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-18909993.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/b/b9/Iran_licenceplate.jpg
+    size: 480013
+    sha256: ae8b2e0979bb06082ccb57dbad592b2d1525448dda6d0d42e7dde7f7e5bb956b
+    etag: c70302e56f94a51bf89f3bcc71e9860c
+    last_modified: Fri, 10 Oct 2014 16:47:32 GMT
+    metadata:
+      key: eval-image-18909993.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Dickelbers" title="User:Dickelbers">Dickelbers</a>
+      image_sha1: d0d264ed555c028f3639330500321c559aa06b2f
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-19682538.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/6/60/Islamabad_Capital_Territory_car_registration_plate.jpg
+    size: 30553
+    sha256: 80a9158c904a07e4115f93f934adb319cc93f1996b761a41b85505047c11d858
+    etag: 8c8bb77146ba41eec7d2d5da433b39e5
+    last_modified: Fri, 10 Oct 2014 01:47:32 GMT
+    metadata:
+      key: eval-image-19682538.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:NHPak&amp;action=edit&amp;redlink=1"
+        class="new" title="User:NHPak (page does not exist)">NHPak</a>
+      image_sha1: d1b7ac6077814f478644c5f3da235903e9b52c37
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-25847406.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/8e/BMW_M6_Convertible_%288363326897%29.jpg
+    size: 1620207
+    sha256: c0744cafcd6479275c7a4a71f63eece418e4979901eb14a90fbfb749b7818285
+    etag: 8ca883ee1be2f2a54a76fdf7b29ad5ad
+    last_modified: Wed, 26 Aug 2015 14:26:50 GMT
+    metadata:
+      key: eval-image-25847406.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/39498204@N02">Shawn
+        Jooste</a>
+      image_sha1: 823d33046138f5a072b83ad2915354edc82cfb8e
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-29465588.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/16/South_Korean_License_Plate_for_Rent_Passenger_car_-_Heo.jpg
+    size: 92943
+    sha256: dbafcc6bc6511d9c175bfb7f840a683e901262e6ae45df0028e7d8fc405636d9
+    etag: 33f689d8028c33ab5cae98cfe339f2c7
+    last_modified: Wed, 07 Feb 2024 16:17:02 GMT
+    metadata:
+      key: eval-image-29465588.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:P.Cps1120a&amp;action=edit&amp;redlink=1"
+        class="new" title="User:P.Cps1120a (page does not exist)">P.Cps1120a</a>
+      image_sha1: 2e5f44035e38d8d5f7600c9ce4960699aff8ae9c
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-32718654.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/8/8e/Fiji_Car_license_plate.jpg
+    size: 1378791
+    sha256: ed6516d122c5b7249281197a854be3dd22541966dcf1925576e2fed4c2003e8c
+    etag: c0539841fd29ff95168b7624d5fe16f2
+    last_modified: Wed, 08 Oct 2014 00:01:44 GMT
+    metadata:
+      key: eval-image-32718654.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Maxim75" title="User:Maxim75">Maksym
+        Kozlenko</a>
+      image_sha1: d49890185ef5e2709019a61eed2b8da4131e3fd9
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-33010486.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/4/46/Kuala_Lumpur_Plate_Number.JPG
+    size: 17404
+    sha256: 9db5cb400ace477332983943fee2c0679f25318b839673618928561bcb46c9c7
+    etag: 027ea34eb9bb7a4b5ccf4774fb3d02c7
+    last_modified: Thu, 09 Oct 2014 23:36:10 GMT
+    metadata:
+      key: eval-image-33010486.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:EurovisionNim" title="User:EurovisionNim">EurovisionNim</a>
+      image_sha1: 5cb23141cb3828095fdbf6fa1802b852ce7194c4
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-34608501.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/5/53/Automobil-B%C3%BCcherei_in_Ghana.jpg
+    size: 964635
+    sha256: 5224fe91af35e2301e2bc78f526381225eebb7a9614c403058a0f13a573f8a00
+    etag: b425b60f40a924697f3f6b1e489f42c4
+    last_modified: Thu, 09 Oct 2014 14:30:09 GMT
+    metadata:
+      key: eval-image-34608501.jpg
+      attribution: Beyond Access (on Flickr)
+      image_sha1: ef10a105a2653cac633b6ffa8747508669187fd1
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-37392677.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/07/Japan%27s_Number_Plates_%283511670669%29.jpg
+    size: 4345514
+    sha256: fc82b280eb2e25524e67d7689a16ef0baf0187bc42e56d387ecc2b84761ed3db
+    etag: 490a21ab6465f2755ffdca2c6e56c726
+    last_modified: Mon, 29 Dec 2014 10:54:46 GMT
+    metadata:
+      key: eval-image-37392677.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/15622795@N05">Emran
+        Kassim</a>
+      image_sha1: 052166b4ac761233f527333583ae89eb131dd0bc
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-37521912.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/4/40/Cool_numberplates_in_Oz._%2814572334424%29.jpg
+    size: 2724649
+    sha256: e275fba04d50fa9754e3da35ecbe8db07b2e55c6027600933859459eb52979fc
+    etag: b3231c45aa1e3418468564fec64d1d86
+    last_modified: Mon, 29 Dec 2014 11:10:15 GMT
+    metadata:
+      key: eval-image-37521912.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/58613084@N02">Andrew
+        Thomas</a> from Shrewsbury, UK
+      image_sha1: ff868e0fd543d619d3a20445ef1617104f6328b6
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-38218295.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/c/c7/Example_design_of_vehicle_license_plate_of_Yogyakarta_%28September_2013%29.JPG
+    size: 390217
+    sha256: 99e1cdde45e624b6b93fe305b11fbf1f96b76d9b7b99aab0bc68c7ea2cf73d00
+    etag: 4271234d651a0ba73d0c4968a6b2d47e
+    last_modified: Thu, 25 Jun 2015 18:04:08 GMT
+    metadata:
+      key: eval-image-38218295.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Alqhaderi_Aliffianiko"
+        class="mw-redirect" title="User:Alqhaderi Aliffianiko">Alqhaderi Aliffianiko</a>
+      image_sha1: d11eccd26501a4c7bc4aad20df6138fa029eebf7
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-38911278.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/4/4f/1980s_Austin_Metro_1.3_LS_%2814180484350%29.jpg
+    size: 3686448
+    sha256: 877a542a21dc3811aa7d64d60ddc701f54731b0803609e7ff4bad3cce1b56280
+    etag: e31d2737d505f71602618f2e2e276944
+    last_modified: Mon, 16 Mar 2015 11:51:17 GMT
+    metadata:
+      key: eval-image-38911278.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/92622665@N08">Charlie</a>
+        from United Kingdom
+      image_sha1: 519e979fc92865d6f72193193389c29111dfef09
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-43428151.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/1/11/Cemoro-Lawang_Indonesia_Motocycle-plate-01.jpg
+    size: 4742594
+    sha256: 3c801bb7254444759531c06f6ed18d8a36df9041b6ace10eed678d0104a75664
+    etag: d9534166c441017526a75ac4d43c5fd3
+    last_modified: Mon, 21 Sep 2015 07:35:21 GMT
+    metadata:
+      key: eval-image-43428151.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Cccefalon" title="User:Cccefalon">CEphoto,
+        Uwe Aranas</a>
+      image_sha1: 0b882c95faa4ee137ac7afdb5d2e37d4014e2b7c
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-46268695.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/c/c8/Japan%27s_Number_Plates_%286504818967%29.jpg
+    size: 982383
+    sha256: f519aa8950f32a468d23324e821adfed0d3da095a059b5281d48679aad977878
+    etag: d3f74ed92dfc3c62fa0eae0dbffacccc
+    last_modified: Mon, 11 Jan 2016 16:41:07 GMT
+    metadata:
+      key: eval-image-46268695.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/8868801@N03">Iwao</a>
+      image_sha1: 74a81e8fccda8ddaa53d38ce0b5563e2b32ecb62
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-48300969.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/0e/India_-_Targa_Chandigarh.JPG
+    size: 122316
+    sha256: 891dc536a43b1a35499d7383ad73b9e9387a0f36443cf48f4a4b2934375ac33e
+    etag: 1f217dea04554f5001178cd8f3a0bcf9
+    last_modified: Sun, 20 May 2018 07:39:09 GMT
+    metadata:
+      key: eval-image-48300969.jpg
+      attribution: YukioSanjo
+      image_sha1: 5f8500bf9a9b60c2d1427d7aec93e23b9279b9b9
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-49068518.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/6/6b/Bus_licence_plate_Thailand.jpg
+    size: 1512014
+    sha256: 89ccc5cc94b6fa84b2309ad0d6063d2ebf2394dabe57f5ab7b6e9d008280bf98
+    etag: 8d1744b7b3fe252f2124aafbab9dfd49
+    last_modified: Sat, 28 May 2016 13:41:12 GMT
+    metadata:
+      key: eval-image-49068518.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Maxim75" title="User:Maxim75">Maksym
+        Kozlenko</a>
+      image_sha1: e466d511e114b084cdffbeabb78c103fff62e3a0
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-50388187.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/5/54/Turkish_license_plate.jpg
+    size: 739457
+    sha256: e9ac21f76282b21788854c4b2acaf232aae79afbc47fa065eeb08886b83866d6
+    etag: 484480223c74ee7dcfc262e06ac55102
+    last_modified: Fri, 29 Jul 2016 12:39:13 GMT
+    metadata:
+      key: eval-image-50388187.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Fenikals" title="User:Fenikals">Fenikals</a>
+      image_sha1: d58d132193cb4aa5bf56b44df7200b0e711a5eaf
+      kind: image
+      license: Public-Domain
+      license_url: null
+      purpose: evaluation
+  - name: eval-image-55760144.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/a/ab/Europlate_NZ.jpg
+    size: 57953
+    sha256: 46b9eeefcdaf6ca73fdc2cd03c12cfe1257d367494afd36b29554274c7eb8222
+    etag: e9245d14e391fd8e506ff0138ea22417
+    last_modified: Tue, 30 May 2017 19:56:21 GMT
+    metadata:
+      key: eval-image-55760144.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/64583732@N04">Riley</a>
+        from Christchurch, New Zealand
+      image_sha1: 30b126507fe641d9152aa8cd41c08882b8542cf7
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-61391657.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/4/4b/License_Plate_of_Durban_Taxi.jpg
+    size: 1456191
+    sha256: 73e378e52edfb6912455ee445b61007e625328f04d9c6a57c683b491124d1491
+    etag: bf495df2a06579a733310217bca16bfa
+    last_modified: Sun, 30 Jul 2017 18:45:42 GMT
+    metadata:
+      key: eval-image-61391657.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Mhlongokhetho&amp;action=edit&amp;redlink=1"
+        class="new" title="User:Mhlongokhetho (page does not exist)">Khethuthukuthula
+        Mhlongo</a>
+      image_sha1: cf8783b1f70be5e9b238874d8fb68d9687c03eca
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-72236307.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/4/4e/Kenya_license_plate.jpg
+    size: 291654
+    sha256: 4e4d4f1d79ff69c7e85d240ea68022d4e0263b908f5f1adbca5570b179557ee3
+    etag: 61d446c7fae49f71cfb67aa875bc6b1e
+    last_modified: Sat, 01 Sep 2018 16:07:31 GMT
+    metadata:
+      key: eval-image-72236307.jpg
+      attribution: Jerry "Woody"  <a rel="nofollow" class="external free" href="https://www.flickr.com/photos/woodysworld1778/">https://www.flickr.com/photos/woodysworld1778/</a>
+      image_sha1: 54eee6dac17db3dfa9163a615f9895aad04a6e3f
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-74565857.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/6/6b/Japanese_vehicle_registration_plate_black_and_yellow.jpg
+    size: 1510954
+    sha256: e5685fb3134cd173cb2124a92e4bf15dbc18c8b0d62920362b910c87058e6588
+    etag: da661004a3f37d73a1771fd3a774ca33
+    last_modified: Wed, 21 Nov 2018 22:57:40 GMT
+    metadata:
+      key: eval-image-74565857.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Gzzz" title="User:Gzzz">Gzzz</a>
+      image_sha1: d2fff64a82d82f13e70b6f5f27de1d69c3a2a81c
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-74565863.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/0c/Japanese_2_wheel_vehicle_registration_plate_white_and_black.jpg
+    size: 3173379
+    sha256: b3b959926b57a8886504290e54ccb92bc63d630eeaecee7c875974e2e27f6a35
+    etag: 19893e6379b1f5a661de77d2a8a89aa3
+    last_modified: Wed, 21 Nov 2018 22:57:46 GMT
+    metadata:
+      key: eval-image-74565863.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Gzzz" title="User:Gzzz">Gzzz</a>
+      image_sha1: 4f9a4d984f65cf73e1b89439f4ddfd91c548a63e
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-84080599.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/f/f5/Yellow_plated_tourist_vehicle_%28in_India%29_%2850515336%29.jpg
+    size: 108100
+    sha256: 081f794b78c88c50049bcfa9cb066c63dfa07a5535f461eb01ddb87ac9f64b76
+    etag: 291a4fe7f7ac026176fab89a4d065174
+    last_modified: Sun, 17 Nov 2019 21:39:52 GMT
+    metadata:
+      key: eval-image-84080599.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/people/72356975@N00">David
+        Lisbona</a> from Haifa, Israel
+      image_sha1: 0dff6f94da9ff833610eb48b12695e30e0c245e0
+      kind: image
+      license: CC-BY-2.0
+      license_url: https://creativecommons.org/licenses/by/2.0
+      purpose: evaluation
+  - name: eval-image-88493475.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/2/20/A_motorcycle_number_plate.jpg
+    size: 2580423
+    sha256: 83877505ddad5ffa827d92b57e123f37d62db8e2d31f6d6d0fa7c55f1dcc6a41
+    etag: 8e40b0dfb72fce4d4e322422320323f3
+    last_modified: Mon, 23 Mar 2020 19:15:59 GMT
+    metadata:
+      key: eval-image-88493475.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:DaSupremo" title="User:DaSupremo">DaSupremo</a>
+      image_sha1: 79cf2c62ec914f06ba18f542df11e66145f29a0e
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-9490659.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/09/Malaysia_Penang_license_plate.jpg
+    size: 294425
+    sha256: 487da03af3e76bb2b3ebe14083b2ef15f1599ebf5d0bace611cd585ed0585a79
+    etag: f92c720797382941e385029b3bc66f9d
+    last_modified: Thu, 09 Oct 2014 16:32:16 GMT
+    metadata:
+      key: eval-image-9490659.jpg
+      attribution: <a rel="nofollow" class="external text" href="https://www.flickr.com/photos/9816248@N03">Jerry
+        "Woody"</a>
+      image_sha1: fa877a198c1b92580974518459ca9e08771bbf0f
+      kind: image
+      license: CC-BY-SA-2.0
+      license_url: https://creativecommons.org/licenses/by-sa/2.0
+      purpose: evaluation
+  - name: eval-image-9490963.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/9/9b/Malaysia_malacca_license_plate.JPG
+    size: 807978
+    sha256: 96cbe33b5ae20a9a58c9c4f0e569dc7385b6b34f7634dcfd297a74691f78394d
+    etag: 55fa09a89f60d17aea05d2045d14fc93
+    last_modified: Wed, 08 Oct 2014 04:18:41 GMT
+    metadata:
+      key: eval-image-9490963.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+      image_sha1: 5163633f7b07a45f99c65fadea77ebdebde991b1
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-9490989.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/6/62/Malaysia_perak_license_plate.JPG
+    size: 1152847
+    sha256: e82c4d17db68e767fddc8dbfb8cb65765cf3ef4547efa5cff52c2292c3532855
+    etag: 1e159f64a72765e3f105187f8fabbde1
+    last_modified: Fri, 10 Oct 2014 17:04:35 GMT
+    metadata:
+      key: eval-image-9490989.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+      image_sha1: 5197954b19349807fcd7f61e5524dae248e3e64a
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-9512280.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/b/b7/Malaysia_federal_territory_KL_license_plate.jpg
+    size: 36083
+    sha256: c9ec26d0a2cefb4d9468b96de033a5f4a7dc64e5821540ad83b3d1a8cbf39518
+    etag: 1bf21ca8a13b557b72956286e322d4e4
+    last_modified: Fri, 10 Oct 2014 19:35:25 GMT
+    metadata:
+      key: eval-image-9512280.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Slleong" title="User:Slleong">Slleong</a>
+      image_sha1: 5ea99ccaad880adcef087b47d34b7ae69c7ad737
+      kind: image
+      license: CC-BY-SA-3.0
+      license_url: https://creativecommons.org/licenses/by-sa/3.0
+      purpose: evaluation
+  - name: eval-image-95458092.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/0/0d/License_plate_of_Turkey_%28Istanbul%29_US-size.jpg
+    size: 1240120
+    sha256: 3a1d5688d0254ba3eace238f29efca3d9312d33346c7d0a7eae3acea138b18bb
+    etag: b8805138577eddac858c0ed7daa13ad6
+    last_modified: Sun, 25 Oct 2020 18:24:32 GMT
+    metadata:
+      key: eval-image-95458092.jpg
+      attribution: <a href="//commons.wikimedia.org/wiki/User:Walser.FL" title="User:Walser.FL">Walser.FL</a>
+      image_sha1: c7715f5396bbff72e61bc94f9c99411f5140484c
+      kind: image
+      license: CC0-1.0
+      license_url: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+      purpose: evaluation
+  - name: eval-image-99334263.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/f/fa/Nigerian_number_plate_Rivers.jpg
+    size: 2990478
+    sha256: 50ef272b9b72d898c32c5104ed49925acfe45d6a268298d77c89379fe8c823bf
+    etag: ff3fdba422741448baf254b7e9643392
+    last_modified: Sun, 07 Sep 2025 06:27:30 GMT
+    metadata:
+      key: eval-image-99334263.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+        class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+      image_sha1: 6957fd4503750557a27857684d6744d1a6c5384a
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-99334325.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/2/2b/Nigeria_Lagos_License_Plate.jpg
+    size: 2910124
+    sha256: 8c9b281e9729d80aaa592689cbad0d50d1344693c81c3cb4c977ec61e285a12d
+    etag: 2a31507e818c6f67a1373db442411e02
+    last_modified: Thu, 26 Aug 2021 08:10:55 GMT
+    metadata:
+      key: eval-image-99334325.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+        class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+      image_sha1: d30637bb17d8871074e63a7da530d72d7164ed22
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: eval-image-99334443.jpg
+    url: https://upload.wikimedia.org/wikipedia/commons/3/39/Nigeria_Abuja_License_Plate.jpg
+    size: 2993286
+    sha256: a57b4b8a9f9fe5032ef8271207bccf11df481598f4945e4d486993b628e00d36
+    etag: f09339b4c81be0d111d8ac57fb4871bc
+    last_modified: Thu, 26 Aug 2021 08:04:44 GMT
+    metadata:
+      key: eval-image-99334443.jpg
+      attribution: <a href="//commons.wikimedia.org/w/index.php?title=User:Joshua_Doubek&amp;action=edit&amp;redlink=1"
+        class="new" title="User:Joshua Doubek (page does not exist)">Joshua Doubek</a>
+      image_sha1: be6258cb968051bf92b24333ecdb3997b7714523
+      kind: image
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0
+      purpose: evaluation
+  - name: vehicle-stock.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377579042
+    size: 339874
+    sha256: 24bc5f8a228bf14126c55d3ee8e4362c5b04064307edadc2d743f3b4921e7d5b
+    etag: null
+    last_modified: null
+    metadata:
+      key: vehicle-stock.json
+      attribution: en.wikipedia.org contributors, revision 1377579042
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1377579042
+  - name: wiki-AG.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338001799
+    size: 41101
+    sha256: 4e6fe8ecf54973171d3e2f420ae7e309cb005433cbfc09f2f9fd7b4957d0a364
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-AG.json
+      attribution: en.wikipedia.org contributors, revision 1338001799
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1338001799
+  - name: wiki-BQ.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345337205
+    size: 66082
+    sha256: f0f97e2d9f09252f05d4c6caae4faad62f0b383eb8b1b84256f39b3171697fd8
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-BQ.json
+      attribution: en.wikipedia.org contributors, revision 1345337205
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1345337205
+  - name: wiki-BS.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1358279279
+    size: 41387
+    sha256: 6acbdb67ebe74da904465bb7f2cbcd13bcfe6c179c825de46f034de21d06c169
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-BS.json
+      attribution: en.wikipedia.org contributors, revision 1358279279
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1358279279
+  - name: wiki-CA-design.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1373784295
+    size: 107370
+    sha256: de5ebe422dbfdec779b71fdc4d4be1d5aa1033f701263bb2ee2a53e9b55bc4a7
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-CA-design.json
+      attribution: en.wikipedia.org contributors, revision 1373784295
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1373784295
+  - name: wiki-DJ-uk.json
+    url: https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=36058050
+    size: 51903
+    sha256: 89528b6657e85c8e20b8a6a46e2c11730ba41d9e24113fac45135ad9eec767fb
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-DJ-uk.json
+      attribution: uk.wikipedia.org contributors, revision 36058050
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 36058050
+  - name: wiki-DM-uk.json
+    url: https://uk.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=38199368
+    size: 20322
+    sha256: 6cbc75a6d20462ab030e089af3f426ff9f16edef8903437bbb33c22267fd3580
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-DM-uk.json
+      attribution: uk.wikipedia.org contributors, revision 38199368
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 38199368
+  - name: wiki-EH-de.json
+    url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=260305379
+    size: 23245
+    sha256: 7895d32a26588dc27c7e1ccdbd16d2414e4d4acb8276280ffe4071800c685beb
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-EH-de.json
+      attribution: de.wikipedia.org contributors, revision 260305379
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 260305379
+  - name: wiki-EH-en.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338003287
+    size: 39942
+    sha256: d36c6d37f291596dc1a863bf40daad87aab65901cad99f339265066cba6480b7
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-EH-en.json
+      attribution: en.wikipedia.org contributors, revision 1338003287
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1338003287
+  - name: wiki-ER-fr.json
+    url: https://fr.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=222874638
+    size: 31795
+    sha256: a8cc220ad68a7893033e6f352d293d7d363c073b3e0fedf08b1eeff162c8cbe3
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-ER-fr.json
+      attribution: fr.wikipedia.org contributors, revision 222874638
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 222874638
+  - name: wiki-FO.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338668056
+    size: 78348
+    sha256: c38c64dda77710941a62368109911cde35578f25e61d4916312acc2a74da316e
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-FO.json
+      attribution: en.wikipedia.org contributors, revision 1338668056
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1338668056
+  - name: wiki-GB-ni.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1370151084
+    size: 106465
+    sha256: b71fa5f03ebb63ebba636518634080d5319c729170daeaf48ddaf0eb4255c511
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-GB-ni.json
+      attribution: en.wikipedia.org contributors, revision 1370151084
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1370151084
+  - name: wiki-IO-it.json
+    url: https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=151111064
+    size: 387979
+    sha256: ee09a114014bf7054608c03ca5060dadbaef82445c64d4cb64b89107237d3a6b
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-IO-it.json
+      attribution: it.wikipedia.org contributors, revision 151111064
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 151111064
+  - name: wiki-KN.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1338753711
+    size: 32461
+    sha256: 546d030a0adfc880abd04f69ad1d1c86e78b0b2e5d32487838695a3f5b122dd9
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-KN.json
+      attribution: en.wikipedia.org contributors, revision 1338753711
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1338753711
+  - name: wiki-LC.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1376852335
+    size: 38912
+    sha256: 2426ce13b93e145a5654a6293781a1712cf7c96c4eaab057690e81699c5573cd
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-LC.json
+      attribution: en.wikipedia.org contributors, revision 1376852335
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1376852335
+  - name: wiki-MP.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1344455877
+    size: 84558
+    sha256: 19968ecf58531683f1232378beb844c805641cc0d9f26a93b019dbc89810d30b
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-MP.json
+      attribution: en.wikipedia.org contributors, revision 1344455877
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1344455877
+  - name: wiki-MU-de.json
+    url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=223364766
+    size: 17119
+    sha256: 576716c59d43cb4e2b1826764e326008ab5df34e98320df76e6b65df84ce1fd7
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-MU-de.json
+      attribution: de.wikipedia.org contributors, revision 223364766
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 223364766
+  - name: wiki-MV.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1345469488
+    size: 40814
+    sha256: 3297c9da24ac88c5c755b426d48af787b4c97ac6c580546b6c55e9d974fb2217
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-MV.json
+      attribution: en.wikipedia.org contributors, revision 1345469488
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1345469488
+  - name: wiki-NL-current.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377707144
+    size: 126188
+    sha256: f4e4b0191ea5a58d159933e2a790d2be81cb4e397c64db32ea4147a76412d6c6
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-NL-current.json
+      attribution: en.wikipedia.org contributors, revision 1377707144
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1377707144
+  - name: wiki-SJ-no.json
+    url: https://no.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=25912083
+    size: 283636
+    sha256: 49ebeaab0de85318c2585de4fd02dd8ce2f3076e5ec94a4f38404891cbcebe0c
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-SJ-no.json
+      attribution: no.wikipedia.org contributors, revision 25912083
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 25912083
+  - name: wiki-SL-de.json
+    url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=260758379
+    size: 28861
+    sha256: 96e953902e718582740e8accee9184c4f1c11cbb02b702d8415f928cf3467181
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-SL-de.json
+      attribution: de.wikipedia.org contributors, revision 260758379
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 260758379
+  - name: wiki-SS-it.json
+    url: https://it.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=148177462
+    size: 38745
+    sha256: 31dc1d5359badcdd93b1f7da6d0e44bced32bd99f178edfb0ce62c35a019f708
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-SS-it.json
+      attribution: it.wikipedia.org contributors, revision 148177462
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 148177462
+  - name: wiki-US-serials.json
+    url: https://en.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=1377655506
+    size: 588262
+    sha256: 5dc2186339a15350e4ce0e3ee43b00a9a41981d7297ea16cf897856e2aa0f76b
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-US-serials.json
+      attribution: en.wikipedia.org contributors, revision 1377655506
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 1377655506
+  - name: wiki-ZM-de.json
+    url: https://de.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=242232989
+    size: 22402
+    sha256: 9969e5ed89f92a81867a918afcd8538aea28a819fb328477eb848313e8c13769
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-ZM-de.json
+      attribution: de.wikipedia.org contributors, revision 242232989
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 242232989
+  - name: wiki-world-es.json
+    url: https://es.wikipedia.org/w/api.php?action=parse&prop=text%7Crevid%7Csections&format=json&oldid=175169987
+    size: 237712
+    sha256: 5ead9e09740d44f60d020a76276f4dd012f65dda6367f829df6442575c4ef578
+    etag: null
+    last_modified: null
+    metadata:
+      key: wiki-world-es.json
+      attribution: es.wikipedia.org contributors, revision 175169987
+      kind: wikipedia
+      license: CC-BY-SA-4.0
+      license_url: https://creativecommons.org/licenses/by-sa/4.0/
+      revision: 175169987
   metadata:
-    reason: No plate_country artifacts exist in the retained workspace
+    inventory_fingerprint: e2e2cdc2fc2ff302c7e4a03fbd17413135a093792ed633786a8b5e8eb0d06b57
 plates:
   release: 4f48c4674bfd8b675a4c619af1a33374ad90f9aa9cab4b5dbbd8695e42d919fa
   pinned_at: '2026-10-02T16:06:59.180915+00:00'

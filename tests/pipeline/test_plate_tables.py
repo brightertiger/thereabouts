@@ -236,7 +236,15 @@ def test_conflicting_pins_fail_closed(tmp_path: Path, rules: Row) -> None:
     manifest = workspace(root)
     other = root / "other.json"
     other.write_text("{}")
-    extra = [{**file_record(root, other), "name": "countries.csv", "upstream": {}}]
+    extra = [
+        {
+            **file_record(root, other),
+            "name": "countries.csv",
+            "url": "https://example.invalid/other",
+            "retrieved_at": "2026-10-10",
+            "upstream": {},
+        }
+    ]
     with pytest.raises(ValueError, match=r"Conflicting plate evidence: countries\.csv"):
         documents.pool(root, manifest, extra, "plate_country")
 

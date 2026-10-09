@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import cast
 
 from .jsonio import Object, encode
-from .outputs import Hashes, describe
+from .outputs import Hashes, describe, receipt_digests
 from .records import Completion, Output, Recipe, outputs_from_json, recipe_from_json
 
 UNITS_SQL = (
@@ -243,8 +243,9 @@ class Ledger:
         *,
         metadata: Object | None = None,
     ) -> Completion:
-        outputs, receipts = describe(
-            self.root, paths, Hashes(self.inputs_hashes, inputs_hash)
+        outputs = describe(self.root, paths)
+        receipts = receipt_digests(
+            self.root, outputs, Hashes(self.inputs_hashes, inputs_hash)
         )
         return self.record(
             stage, unit_id, inputs_hash, outputs, receipts, metadata=metadata

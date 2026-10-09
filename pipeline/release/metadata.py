@@ -68,6 +68,8 @@ def licences(config: Config, observed: set[str], states: set[str] | None = None)
     result = {}
     for name in sorted(used):
         pin = asdict(pins[name])
+        # Evaluation evidence (plate benchmark files) is pinned but never ships.
+        pin["files"] = licensing.shipped(pin["files"])
         if config.sources[name].kind == BOUNDARIES:
             pin["files"] = [
                 file

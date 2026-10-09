@@ -1,20 +1,19 @@
 """Bounded scheduling and explicit restoration of absent direct inputs."""
 
+import multiprocessing
 from collections.abc import Callable, Sequence
-from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import replace
 from fnmatch import fnmatchcase
 
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
 from .jsonio import digest
-from .outputs import Hashes, describe, role
+from .outputs import Hashes, receipt_digests, role
 from .paths import located
 from .planning import decide
 from .records import Dependency, Output
 from .watch import InputsChanged, changed_message
-
-Described = tuple[tuple[Output, ...], dict[str, str]]
+from .workers import ProcessWorkers, Result, ThreadWorkers, Workers
 
 
 class Executor:
@@ -182,21 +181,33 @@ class Executor:
                     finalize=dependency.stage != stage.name,
                 )
 
+    def workers(self) -> Workers:
+        """Processes when several units run and fork exists; threads otherwise."""
+        resources = self.ctx.config.resources
+        if (
+            resources.workers > 1
+            and resources.executor == "process"
+            and "fork" in multiprocessing.get_all_start_methods()
+        ):
+            return ProcessWorkers(self.ctx, self.stages, resources.workers, self.event)
+        return ThreadWorkers(self.ctx, resources.workers)
+
     def _stage(self, stage: Stage, pending: dict[tuple[str, str], Unit]) -> None:
         """Run ready units; on a failure, an interrupt or an edit, stop scheduling.
 
         Running units are always waited for. Those that finish are recorded,
         except after an edit to hashed inputs, when nothing more is recorded.
-        A second interrupt abandons the wait.
+        A second interrupt abandons the wait and stops every worker.
         """
-        running: dict[Future[Described], Unit] = {}
+        running: dict[int, Unit] = {}
         stop: BaseException | None = None
-        pool = ThreadPoolExecutor(max_workers=self.ctx.config.resources.workers)
+        abandon = False
+        workers = self.workers()
         try:
             while pending or running:
                 if stop is None:
                     try:
-                        self._submit(stage, pending, running, pool)
+                        self._submit(stage, pending, running, workers)
                     except (Exception, KeyboardInterrupt) as error:
                         stop = error
                 if not running:
@@ -204,40 +215,35 @@ class Executor:
                         raise ValueError("No runnable unit; unresolved dependencies")
                     break
                 try:
-                    ready, _ = wait(running, return_when=FIRST_COMPLETED)
+                    stop = self._collect(stage, workers.collect(), running, stop)
                 except KeyboardInterrupt as error:
+                    # Units not yet collected stay running; the next wait drains them.
                     if isinstance(stop, KeyboardInterrupt):
+                        abandon = True
                         raise
                     stop = error
                     self.event(f"interrupted; waiting for {len(running)} units")
-                    continue
-                try:
-                    stop = self._collect(stage, ready, running, stop)
-                except KeyboardInterrupt as error:
-                    # Unprocessed futures stay in `running`; the next wait drains them.
-                    if isinstance(stop, KeyboardInterrupt):
-                        raise
-                    stop = error
         finally:
-            pool.shutdown(wait=False, cancel_futures=True)
+            workers.close(abandon=abandon)
         if stop is not None:
             raise stop
 
     def _collect(
         self,
         stage: Stage,
-        ready: set[Future[Described]],
-        running: dict[Future[Described], Unit],
+        results: list[Result],
+        running: dict[int, Unit],
         stop: BaseException | None,
     ) -> BaseException | None:
-        for future in ready:
-            unit = running.pop(future)
+        for task, outcome in results:
+            unit = running.pop(task)
             name = f"{stage.name}/{unit.recipe.unit_id}"
-            try:
-                outputs, receipts = future.result()
-            except Exception as error:
-                self.event(f"failed {name}: {error}")
-                stop = stop or error
+            if isinstance(outcome, BaseException):
+                notes = "".join(
+                    f"\n{note}" for note in getattr(outcome, "__notes__", [])
+                )
+                self.event(f"failed {name}: {outcome}{notes}")
+                stop = stop or outcome
                 continue
             if not isinstance(stop, InputsChanged):
                 try:
@@ -247,16 +253,23 @@ class Executor:
             if isinstance(stop, InputsChanged):
                 self.event(f"not recorded {name}: hashed inputs changed")
                 continue
+            outputs, receipts = outcome
+            if receipts is None:
+                # Only this process knows every recorded inputs hash.
+                receipts = receipt_digests(self.ctx.root, outputs, self.hashes(unit))
             self._record(unit, outputs, receipts)
             self.event(f"complete {name}")
         return stop
+
+    def hashes(self, unit: Unit) -> Hashes:
+        return Hashes(self.ctx.ledger.inputs_hashes, unit.inputs_hash)
 
     def _submit(
         self,
         stage: Stage,
         pending: dict[tuple[str, str], Unit],
-        running: dict[Future[Described], Unit],
-        pool: ThreadPoolExecutor,
+        running: dict[int, Unit],
+        workers: Workers,
     ) -> None:
         active = set(pending) | {u.key for u in running.values()}
         for key, original in list(pending.items()):
@@ -285,7 +298,7 @@ class Executor:
             # Units of one stage may share parameter objects, such as a policy;
             # the digest is taken before any of them runs.
             parameters = digest(unit.recipe.parameters)
-            running[pool.submit(self._run, stage, unit, parameters)] = unit
+            running[workers.submit(stage, unit, parameters, self.hashes(unit))] = unit
 
     def _record(
         self, unit: Unit, outputs: tuple[Output, ...], receipts: dict[str, str]
@@ -307,30 +320,3 @@ class Executor:
         if unit.key in self.skipped_keys:
             self.skipped_keys.remove(unit.key)
             self.skipped -= 1
-
-    def _run(self, stage: Stage, unit: Unit, parameters: str) -> Described:
-        """Hash outputs in the worker, so recording stays a short serial step."""
-        self.ctx.guard.admit(unit.required_bytes)
-        described: Described | None = None
-        try:
-            described = describe(
-                self.ctx.root,
-                stage.run(self.ctx, unit),
-                Hashes(self.ctx.ledger.inputs_hashes, unit.inputs_hash),
-            )
-            if digest(unit.recipe.parameters) != parameters:
-                raise ValueError(
-                    f"{stage.name}/{unit.recipe.unit_id} changed its recipe "
-                    "parameters; copy them before editing"
-                )
-            return described
-        finally:
-            written = None
-            if described is not None:
-                written = sum(output.size for output in described[0])
-            self.ctx.guard.release(
-                unit.required_bytes,
-                written_bytes=0 if unit.accounts_disk else written,
-            )
-            if unit.accounts_disk:
-                self.ctx.guard.refresh_usage()
