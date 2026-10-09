@@ -399,6 +399,10 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(open, m)?)?;
     #[cfg(feature = "writer")]
     m.add_function(wrap_pyfunction!(write_pack, m)?)?;
+    #[cfg(feature = "writer")]
+    m.add("WRITER_REVISION", writer::WRITER_REVISION)?;
+    #[cfg(feature = "writer")]
+    m.add("CORE_REVISION", writer::CORE_REVISION)?;
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;
     Ok(())

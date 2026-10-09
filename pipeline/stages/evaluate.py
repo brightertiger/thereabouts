@@ -105,4 +105,11 @@ def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
         country_bytes=limits.country_reservation_bytes,
         block_bytes=limits.block_reservation_bytes,
         extra={"review": review},
+        reads={
+            "pilot": (
+                *unit_parameters.CITY_EVIDENCE,
+                ctx.config.engines.evaluation_points,
+                ctx.config.engines.city_review,
+            )
+        },
     )

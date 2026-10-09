@@ -194,4 +194,5 @@ def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
         geography,
         country_bytes=limits.lookup_reservation_bytes,
         block_bytes=limits.block_reservation_bytes,
+        reads={"manifest": (ctx.config.engines.city_review,)},
     )

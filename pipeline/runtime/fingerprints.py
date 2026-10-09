@@ -50,7 +50,24 @@ def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
         result[name] = installed
     if "shapely" in names:
         result["geos"] = geos_version_string
+    if "thereabouts" in names:
+        result["thereabouts_writer"] = writer_revisions()
     return result
+
+
+def writer_revisions() -> str:
+    """The Rust writer's encoding revisions change pack bytes without a release."""
+    from thereabouts import _core
+
+    # Read the module namespace: the client's type stub predates these constants.
+    values = vars(_core)
+    try:
+        core, forward = values["CORE_REVISION"], values["WRITER_REVISION"]
+    except KeyError as error:
+        raise ValueError(
+            "thereabouts._core lacks writer revisions; rebuild the extension"
+        ) from error
+    return f"core {core}, forward {forward}"
 
 
 def identity(

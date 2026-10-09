@@ -207,4 +207,5 @@ def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
         geography,
         country_bytes=limits.country_reservation_bytes,
         block_bytes=limits.block_reservation_bytes,
+        reads={"gate": unit_parameters.RECONCILE_EVIDENCE},
     )
