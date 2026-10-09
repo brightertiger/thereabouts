@@ -8,23 +8,27 @@ use crate::{
 };
 use std::{
     collections::BTreeMap,
-    fs::{self, File, OpenOptions},
+    fs::{self, OpenOptions},
     io::{Read, Write},
     path::{Path, PathBuf},
 };
-use thereabouts_core::format::{manifest, verify};
+use thereabouts_cli_core::archive::Summary;
+use thereabouts_core::format::{
+    manifest::{self, Manifest},
+    verify,
+};
 
 /// Allow for filesystem bookkeeping beyond the download and expanded archive.
 pub const DISK_MARGIN_BYTES: u64 = 64 * 1024 * 1024;
 
-/// Reject an install before downloading when its conservative peak does not fit.
+/// Reject an install before downloading when its conservative peak does not fit:
+/// every compressed download plus its expanded tar stream, which bounds the files.
 pub fn precheck(root: &Path, bytes: u64) -> Result<()> {
     admit(fs2::available_space(root)?, bytes)
 }
 fn admit(available: u64, bytes: u64) -> Result<()> {
     let needed = bytes
-        .checked_mul(2)
-        .and_then(|v| v.checked_add(DISK_MARGIN_BYTES))
+        .checked_add(DISK_MARGIN_BYTES)
         .ok_or_else(|| Error::Usage("Install size overflow".into()))?;
     if available < needed {
         return Err(Error::Usage(format!(
@@ -58,14 +62,13 @@ pub fn install(
     let _lock = store::lock(root)?;
     let mut pin = selection(root, version, requested, source)?;
     let bytes = requested.iter().try_fold(0u64, |sum, name| {
-        sum.checked_add(
-            dataset
-                .packs
-                .get(name)
-                .ok_or_else(|| Error::Integrity("Missing release family".into()))?
-                .bytes,
-        )
-        .ok_or_else(|| Error::Integrity("Install size overflow".into()))
+        let pack = dataset
+            .packs
+            .get(name)
+            .ok_or_else(|| Error::Integrity("Missing release family".into()))?;
+        sum.checked_add(pack.size)
+            .and_then(|sum| sum.checked_add(pack.unpacked_size))
+            .ok_or_else(|| Error::Integrity("Install size overflow".into()))
     })?;
     precheck(root, bytes)?;
     for name in requested {
@@ -141,12 +144,34 @@ fn pointer(root: &Path, path: &Path) -> Result<Pointer> {
         manifest_sha256: manifest::digest(&manifest::artifact_path(path, "manifest.json")?)?,
     })
 }
-fn identity(path: &Path, version: &str, name: &str, pack: &ReleasePack) -> Result<()> {
+fn identity(path: &Path, version: &str, name: &str, pack: &ReleasePack) -> Result<Manifest> {
     let info = verify::verify(path)?;
     if info.data_version != version || info.family != name || info.format_minor != pack.format_minor
     {
         return Err(Error::Integrity(
             "Downloaded pack differs from release index identity".into(),
+        ));
+    }
+    Ok(info)
+}
+/// The archive holds exactly the verified inventory: no stray file is installed.
+fn inventory(summary: &Summary, info: &Manifest) -> Result<()> {
+    let mut expected = info
+        .files
+        .iter()
+        .map(|f| f.path.as_str())
+        .chain(std::iter::once("manifest.json"))
+        .collect::<Vec<_>>();
+    expected.sort_unstable();
+    let mut found = summary
+        .entries
+        .iter()
+        .map(|e| e.path.as_str())
+        .collect::<Vec<_>>();
+    found.sort_unstable();
+    if found != expected {
+        return Err(Error::Integrity(
+            "Archive files differ from the pack manifest".into(),
         ));
     }
     Ok(())
@@ -163,7 +188,7 @@ fn install_one(
         identity(&destination, version, name, pack)?;
         let receipt: ReleasePack =
             store::read_json(&manifest::artifact_path(&destination, ".archive.json")?)?;
-        if receipt.sha256 != pack.sha256 || receipt.bytes != pack.bytes {
+        if receipt.sha256 != pack.sha256 || receipt.size != pack.size {
             return Err(Error::Integrity(
                 "Installed release archive identity changed".into(),
             ));
@@ -178,14 +203,9 @@ fn install_one(
     }
     fs::create_dir_all(&staging)?;
     let result = (|| {
-        archive::extract(&mut File::open(&archive)?, &staging, pack.bytes)?;
-        identity(&staging, version, name, pack)?;
+        let summary = archive::extract(&archive, &staging, pack.unpacked_size)?;
+        inventory(&summary, &identity(&staging, version, name, pack)?)?;
         let receipt = manifest::artifact_path(&staging, ".archive.json")?;
-        if receipt.exists() {
-            return Err(Error::Integrity(
-                "Archive contains reserved installer receipt".into(),
-            ));
-        }
         fs::write(receipt, serde_json::to_vec(pack)?)?;
         if let Some(parent) = destination.parent() {
             fs::create_dir_all(parent)?;
@@ -212,16 +232,16 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
         .append(true)
         .open(&path)?;
     let offset = file.metadata()?.len();
-    if offset > pack.bytes {
+    if offset > pack.size {
         drop(file);
         fs::remove_file(&path)?;
         return Err(Error::Integrity(
             "Partial download exceeds advertised size".into(),
         ));
     }
-    if offset < pack.bytes {
-        let mut input = source.open(&pack.url, offset, pack.bytes)?;
-        let mut remaining = pack.bytes - offset;
+    if offset < pack.size {
+        let mut input = source.open(&pack.url, offset, pack.size)?;
+        let mut remaining = pack.size - offset;
         let mut buffer = vec![0; 65536];
         loop {
             let count = input
@@ -262,10 +282,10 @@ mod tests {
     use super::*;
     #[test]
     fn admission_needs_archive_expansion_and_small_margin_only() {
-        assert!(admit(128 * 1024 * 1024, 1024).is_ok());
+        assert!(admit(128 * 1024 * 1024, 2048).is_ok());
         let needed = DISK_MARGIN_BYTES + 2048;
-        assert!(admit(needed, 1024).is_ok());
-        let error = admit(needed - 1, 1024).unwrap_err();
+        assert!(admit(needed, 2048).is_ok());
+        let error = admit(needed - 1, 2048).unwrap_err();
         assert_eq!(error.exit_code(), 2);
         assert!(error.to_string().contains("Not enough disk"));
     }

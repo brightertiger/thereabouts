@@ -58,6 +58,22 @@ export function openHandle(filename) {
     throw e;
   }
 }
+// Release extraction: the shared WASM reader validates entry names; the host
+// still refuses symlinked or traversing paths and never replaces a file.
+export function createDirectory(root, relative) {
+  fs.mkdirSync(safePath(root, relative), { recursive: true });
+}
+export function createFile(root, relative) {
+  const filename = safePath(root, relative);
+  fs.mkdirSync(path.dirname(filename), { recursive: true });
+  const fd = fs.openSync(filename, "wx");
+  const id = ++sequence;
+  handles.set(id, { fd });
+  return id;
+}
+export function syncHandle(id) {
+  fs.fsyncSync(get(id).fd);
+}
 function get(id) {
   const file = handles.get(id);
   if (!file) throw new Error("Closed host handle");

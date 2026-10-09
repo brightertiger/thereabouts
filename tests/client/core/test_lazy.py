@@ -34,3 +34,17 @@ def test_lazy_payload_validation_and_explicit_verification(tmp_path: Path) -> No
     cell = cell_at(block, 0)
     with Geocoder(target) as geo, pytest.raises(CorruptPackError):
         geo.from_h3(h3.int_to_str(cell))
+
+
+def test_handle_budget_is_configurable_without_changing_answers() -> None:
+    pack = str(FIXTURES / "packs/core-sample")
+    cells = ["881fa44181fffff", "88196b4a8dfffff", "881f1d4887fffff", "invalid"]
+    expected = _core.open(pack)
+    for budget in (0, 1, 2):
+        geo = _core.open(pack, verify=True, max_open_files=budget)
+        for cell in cells:
+            assert geo.from_h3(cell, evidence=True) == expected.from_h3(
+                cell, evidence=True
+            )
+        geo.close()
+    expected.close()

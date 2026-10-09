@@ -116,10 +116,16 @@ export const USAGE = new Set([
 
 // Same 1e-10 absolute numeric tolerance as Rust's conformance runner:
 // WASM and native transcendental functions differ by a few ULPs for H3 centres.
-export function assertResult(assert, actual, expected, label) {
-  if (typeof expected === "number" && !Number.isInteger(expected)) {
-    assert.equal(typeof actual, "number", label);
-    assert.ok(Math.abs(actual - expected) < 1e-10, label);
+// Coordinates come from libm trigonometry, whose last bit differs between
+// x86_64 and ARM; they match within 1e-9 degrees. Everything else is exact.
+export const COORDINATE_TOLERANCE = 1e-9;
+export function assertResult(assert, actual, expected, label, key) {
+  if (
+    (key === "lat" || key === "lon") &&
+    typeof expected === "number" &&
+    typeof actual === "number"
+  ) {
+    assert.ok(Math.abs(actual - expected) <= COORDINATE_TOLERANCE, label);
     return;
   }
   if (expected && typeof expected === "object") {
@@ -129,6 +135,6 @@ export function assertResult(assert, actual, expected, label) {
       label,
     );
     for (const key of Object.keys(expected))
-      assertResult(assert, actual[key], expected[key], label + "." + key);
+      assertResult(assert, actual[key], expected[key], label + "." + key, key);
   } else assert.deepEqual(actual, expected, label);
 }

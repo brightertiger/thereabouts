@@ -97,7 +97,7 @@ pub(crate) struct Trie {
     nodes: Vec<Node>,
 }
 impl Trie {
-    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader) -> Result<Self> {
         let file = FileShard::from_file(reader.open(path)?, 5, &[48, 44, 8, 1])?;
         let bytes = file.section(0)?;
         ensure(!bytes.is_empty(), "Missing trie root")?;

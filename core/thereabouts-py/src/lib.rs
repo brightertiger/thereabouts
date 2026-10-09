@@ -13,23 +13,19 @@ use std::{
     path::Path,
     sync::{Arc, Mutex},
 };
-use thereabouts_core::{Error, format::Pack};
+use thereabouts_core::{
+    Error,
+    format::{Pack, reader::DEFAULT_OPEN_FILES},
+};
 #[cfg(feature = "writer")]
 use thereabouts_writer as writer;
 
 fn error(py: Python<'_>, error: &Error) -> PyErr {
     coded_error(py, error.code(), &error.to_string())
 }
+/// Raise the `thereabouts.errors` class the core's kind table names for this code.
 fn coded_error(py: Python<'_>, code: &str, message: &str) -> PyErr {
-    let name = match code {
-        "data_not_installed" => "DataNotInstalledError",
-        "pack_not_found" => "PackNotFoundError",
-        "writer_input_error" => "WriterInputError",
-        "writer_error" => "WriterError",
-        "incompatible_data" => "IncompatibleDataError",
-        "closed_geocoder" => "ClosedGeocoderError",
-        _ => "CorruptPackError",
-    };
+    let name = thereabouts_core::error::kind(code).class;
     match py
         .import("thereabouts.errors")
         .and_then(|m| m.getattr(name))
@@ -78,7 +74,7 @@ impl Geocoder {
     fn pack(&self, py: Python<'_>) -> PyResult<Arc<Pack>> {
         self.pack
             .lock()
-            .map_err(|_| error(py, &Error::Closed))?
+            .map_err(|e| error(py, &thereabouts_core::error::poisoned("geocoder handle")(e)))?
             .clone()
             .ok_or_else(|| error(py, &Error::Closed))
     }
@@ -311,7 +307,11 @@ impl Geocoder {
         columns::forward(py, names, |name| pack.geocode(name, options))
     }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
-        *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
+        *self
+            .pack
+            .lock()
+            .map_err(|e| error(py, &thereabouts_core::error::poisoned("geocoder handle")(e)))? =
+            None;
         Ok(())
     }
     #[allow(clippy::needless_pass_by_value)] // PyO3 owns each extracted borrow guard.
@@ -325,12 +325,22 @@ impl Geocoder {
     }
 }
 #[pyfunction]
-#[pyo3(signature=(path, *, verify=false, core=None))]
-fn open(py: Python<'_>, path: &str, verify: bool, core: Option<&Geocoder>) -> PyResult<Geocoder> {
+#[pyo3(signature=(path, *, verify=false, core=None, max_open_files=None))]
+fn open(
+    py: Python<'_>,
+    path: &str,
+    verify: bool,
+    core: Option<&Geocoder>,
+    max_open_files: Option<usize>,
+) -> PyResult<Geocoder> {
     let shared = core.map(|c| c.pack(py)).transpose()?;
     let pack = py
         .detach(|| {
-            let pack = Pack::open(Path::new(path), verify)?;
+            let pack = Pack::open_files(
+                Path::new(path),
+                verify,
+                max_open_files.unwrap_or(DEFAULT_OPEN_FILES),
+            )?;
             if let Some(core) = shared {
                 pack.with_core(core)
             } else {
@@ -372,6 +382,50 @@ fn write_pack(
         &serde_json::to_value(manifest).map_err(|e| PyValueError::new_err(e.to_string()))?,
     )
 }
+/// Archive failures keep the core's error class; anything else is an unusable archive.
+#[cfg(feature = "writer")]
+fn archive_error(py: Python<'_>, error: thereabouts_cli_core::error::Error) -> PyErr {
+    match error {
+        thereabouts_cli_core::error::Error::Pack(e) => self::error(py, &e),
+        thereabouts_cli_core::error::Error::Io(e) => e.into(),
+        e => coded_error(py, "corrupt_pack", &e.to_string()),
+    }
+}
+/// Write a deterministic release archive of a verified pack directory.
+#[cfg(feature = "writer")]
+#[pyfunction]
+fn archive_pack(py: Python<'_>, pack_dir: &str, output: &str) -> PyResult<Py<PyAny>> {
+    use thereabouts_cli_core::archive;
+    let created = py
+        .detach(|| archive::create(Path::new(pack_dir), Path::new(output)))
+        .map_err(|e| archive_error(py, e))?;
+    value_to_python(
+        py,
+        &serde_json::json!({
+            "size": created.size,
+            "sha256": created.sha256,
+            "unpacked_size": created.unpacked_size,
+        }),
+    )
+}
+/// List and hash every archive entry without extracting it.
+#[cfg(feature = "writer")]
+#[pyfunction]
+fn inspect_archive(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
+    use thereabouts_cli_core::archive;
+    let summary = py
+        .detach(|| archive::inspect(std::fs::File::open(path)?))
+        .map_err(|e| archive_error(py, e))?;
+    let files = summary
+        .entries
+        .iter()
+        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
+        .collect::<Vec<_>>();
+    value_to_python(
+        py,
+        &serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}),
+    )
+}
 #[pyfunction]
 fn verify_pack(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
     let manifest = py
@@ -398,12 +452,29 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Geocoder>()?;
     m.add_function(wrap_pyfunction!(open, m)?)?;
     #[cfg(feature = "writer")]
-    m.add_function(wrap_pyfunction!(write_pack, m)?)?;
-    #[cfg(feature = "writer")]
-    m.add("WRITER_REVISION", writer::WRITER_REVISION)?;
-    #[cfg(feature = "writer")]
-    m.add("CORE_REVISION", writer::CORE_REVISION)?;
+    {
+        m.add_function(wrap_pyfunction!(write_pack, m)?)?;
+        m.add_function(wrap_pyfunction!(archive_pack, m)?)?;
+        m.add_function(wrap_pyfunction!(inspect_archive, m)?)?;
+        m.add("WRITER_REVISION", writer::WRITER_REVISION)?;
+        m.add("CORE_REVISION", writer::CORE_REVISION)?;
+    }
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;
+    m.add(
+        "ERROR_KINDS",
+        thereabouts_core::error::KINDS
+            .iter()
+            .map(|k| (k.code, k.exit, k.class))
+            .collect::<Vec<_>>(),
+    )?;
+    {
+        use thereabouts_cli_core::transport;
+        m.add("MAX_ARCHIVE_BYTES", transport::MAX_ARCHIVE_BYTES)?;
+        m.add("MAX_UNPACKED_BYTES", transport::MAX_UNPACKED_BYTES)?;
+        m.add("DEFAULT_RELEASE_URL", transport::DEFAULT_RELEASE_URL)?;
+        m.add("INDEX_FORMAT", transport::INDEX_FORMAT)?;
+        m.add("ARCHIVE_SUFFIX", transport::ARCHIVE_SUFFIX)?;
+    }
     Ok(())
 }

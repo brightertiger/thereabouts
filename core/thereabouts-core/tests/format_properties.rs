@@ -79,8 +79,14 @@ proptest! {
         let path=temp.path().join(&file.path);
         let mut bytes=std::fs::read(&path).unwrap();
         let query=if kind=="cells" {
+            // A shard holds many blocks: query the block owning the mutated span,
+            // the first block with keys or the first with a label dictionary.
             let directory=usize::try_from(uint(&bytes,40,8).unwrap()).unwrap();
-            let block=u32::try_from(uint(&bytes,directory,4).unwrap()).unwrap();
+            let blocks=usize::try_from(uint(&bytes,56,8).unwrap()).unwrap();
+            let owner=match mutation { 2 => 4, 3 => 20, _ => 0 };
+            let record=(0..blocks).map(|i| directory+40*i)
+                .find(|r| owner==0 || uint(&bytes,r+owner,4).unwrap()>0).unwrap();
+            let block=u32::try_from(uint(&bytes,record,4).unwrap()).unwrap();
             address::cell_at(block,0).unwrap().to_string()
         } else { "8860140001fffff".into() };
         match mutation {

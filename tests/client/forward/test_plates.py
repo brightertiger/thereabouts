@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from pipeline.engines.plate_country.resolver import Resolver
+from tests.client.conformance.compare import assert_same
 from tests.client.conformance.pack_selection import selection
 from tests.tools.source_fixture import read_source
 from thereabouts import Geocoder
@@ -19,12 +20,10 @@ def test_plate_vectors() -> None:
     with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
             r = case["request"]
-            assert (
-                geo.plate(
-                    r["values"][0], country=r.get("country"), series=r.get("series")
-                ).to_dict()
-                == case["result"]
-            ), case["id"]
+            result = geo.plate(
+                r["values"][0], country=r.get("country"), series=r.get("series")
+            )
+            assert_same(result.to_dict(), case["result"], case["id"])
 
 
 def test_reference_plate_matches() -> None:
