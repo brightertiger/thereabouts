@@ -89,10 +89,7 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
         {
             "schema_version": "cells",
             "completed": True,
-            "builder": unit.identity,
-            "implementation": unit.identity,
             "normalization": {"completed": True, "policy": policy},
-            "inputs_hash": unit.inputs_hash,
             "reference_resolution": ctx.config.h3.cell_resolution,
             "block_resolution": ctx.config.h3.block_resolution,
             "tables": tables,

@@ -1,11 +1,11 @@
 """Publish source inventories and manifests using workspace-relative records."""
 
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 import pyarrow.parquet as pq
 
+from pipeline.config.sources import normalize_settings
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.sources.contract import SourceContext
 
@@ -22,9 +22,17 @@ def inventory_path(ctx: SourceContext) -> Path:
     return ctx.input(str(ctx.pin.metadata.get("inventory_name", "inventory.json")))
 
 
+def cache(ctx: SourceContext, path: Path) -> bool:
+    """Work files other than JSON reports are rebuilt by every run of the unit."""
+    return path.is_relative_to(ctx.work) and path.suffix not in {".json", ".jsonl"}
+
+
 def finish(
     ctx: SourceContext, partitions: list[Path], auxiliary: list[Path]
 ) -> list[Path]:
+    """Record partitions and evidence; regenerable caches are neither recorded
+    outputs nor manifest entries, so their absence never forces a restore."""
+    evidence = [path for path in auxiliary if not cache(ctx, path)]
     records = []
     rows: dict[str, int] = {}
     sizes: dict[str, int] = {}
@@ -47,17 +55,10 @@ def finish(
                 file_record(ctx, ctx.input(item.name)) for item in ctx.pin.files
             ],
             "partitions": records,
-            "auxiliary": [file_record(ctx, path) for path in auxiliary],
+            "auxiliary": [file_record(ctx, path) for path in evidence],
             "rows": rows,
             "bytes": sizes,
-            "configuration": asdict(ctx.settings),
-            "units": [
-                {
-                    "stage": ctx.unit.recipe.stage,
-                    "unit_id": ctx.unit.recipe.unit_id,
-                    "inputs_hash": ctx.unit.inputs_hash,
-                }
-            ],
+            "configuration": normalize_settings(ctx.settings),
         },
     )
-    return [*partitions, *auxiliary, manifest]
+    return [*partitions, *evidence, manifest]

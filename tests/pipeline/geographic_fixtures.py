@@ -8,11 +8,13 @@ import pyarrow.parquet as pq
 
 from pipeline.config import load
 from pipeline.engines.artifact_io import file_record
+from pipeline.runtime.execution import Executor
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.sources.shared.schemas import SCHEMAS
-from pipeline.stages.contract import Context, make_unit
+from pipeline.stages.contract import Context, Stage, make_unit
+from pipeline.stages.registry import ordered, registry
 from tests.pipeline.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
@@ -80,3 +82,26 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
             },
         )
     return ctx, stage
+
+
+GEOGRAPHIC = ("reconcile", "cells", "cities", "normalize_cells", "lookups")
+
+
+def geographic_graph(ctx: Context, normalized: SyntheticStage) -> list[Stage]:
+    """The production geographic stages, with a passing synthetic review gate."""
+    review = SyntheticStage(
+        "evaluate", [Recipe("evaluate", "pilot")], needs=("cells", "cities")
+    )
+    production = [
+        stage
+        for stage in registry(ctx.config)
+        if stage.name in {*GEOGRAPHIC, "plate_country"}
+    ]
+    return ordered([normalized, review, *production])
+
+
+def build(ctx: Context, stages: list[Stage], target: str = "lookups") -> dict[str, int]:
+    """Run what the target needs; the fixture's reconcile pilot gate cannot pass."""
+    executor = Executor(ctx, stages, lambda _: None)
+    executor.execute(target)
+    return {"completed": executor.completed, "skipped": executor.skipped}

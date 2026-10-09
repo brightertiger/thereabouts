@@ -73,7 +73,9 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         return [destination, blocks]
     if action == "block":
         codes = cast(list[str], unit.recipe.parameters["countries"])
-        rows, statistics = build.build(int(key, 16), inputs(ctx, codes, policy), codes)
+        rows, statistics = build.build(
+            int(key, 16), inputs(ctx, codes, policy), codes, log=ctx.log
+        )
         path = root / "cells" / f"{key}.parquet"
         record = parquet(
             ctx.root, path, rows, schemas.CELLS, settings.limits.parquet_batch_rows
@@ -114,7 +116,6 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             path,
             {
                 "completed": True,
-                "inputs_hash": unit.inputs_hash,
                 "tables": tables,
                 "reference_resolution": ctx.config.h3.cell_resolution,
                 "block_resolution": ctx.config.h3.block_resolution,
@@ -129,10 +130,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         path = root / "manifest.json"
         write_json(path, manifest)
         pointer = located(ctx.root, ctx.config.paths.cells) / "base" / "current.json"
-        write_json(
-            pointer,
-            {"inputs_hash": unit.inputs_hash, "manifest": file_record(ctx.root, path)},
-        )
+        write_json(pointer, {"manifest": file_record(ctx.root, path)})
         return [path, pointer]
     raise ValueError(f"Unknown cells action: {action}")
 

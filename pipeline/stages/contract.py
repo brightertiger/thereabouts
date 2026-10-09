@@ -1,5 +1,6 @@
 """The small stage surface; discovery and execution are separate operations."""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Protocol, cast
@@ -22,6 +23,8 @@ class Context:
     verifier: Verifier
     readonly: bool = True
     storage: dict[str, str] = field(default_factory=dict)
+    # Measurements such as timings go to the run log, never into recorded outputs.
+    log: Callable[[str], None] = print
 
 
 @dataclass(frozen=True)

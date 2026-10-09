@@ -52,7 +52,6 @@ def city_products(
         source,
         urban,
         policy,
-        expected["digest"],
         config.engines.limits,
     )
     index = root / "index.sqlite"

@@ -69,7 +69,6 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         {
             "passed": passed,
             "policy_fingerprint": approval.policy_fingerprint,
-            "inputs_hash": unit.inputs_hash,
             "review": asdict(approval),
             "countries": {
                 report["country"]: file_record(ctx.root, item)
