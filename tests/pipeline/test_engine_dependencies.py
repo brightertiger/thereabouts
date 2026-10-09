@@ -11,6 +11,7 @@ from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Dependency
 from pipeline.stages.engine_data import Geography, geography
 from pipeline.stages.engine_recipes import geographic_recipes, lookup_recipes
+from pipeline.stages.sources import PARTITIONS
 
 from .helpers import context
 
@@ -80,15 +81,13 @@ def test_source_roles_and_kinds_do_not_depend_on_source_names(tmp_path: Path) ->
             r.key: r for r in geographic_recipes(ctx, geo) + lookup_recipes(ctx, geo)
         }
         assert recipes["reconcile", "land/world"].dependencies == (
-            Dependency("normalize", "coast", ("normalized/coast/areas/*.parquet",)),
+            Dependency("normalize", "coast", PARTITIONS),
         )
-        urban = Dependency("normalize", "urban", ("normalized/urban/areas/*.parquet",))
+        urban = Dependency("normalize", "urban", PARTITIONS)
         assert urban in recipes["cities", "country/BE"].dependencies
         assert urban in recipes["normalize_cells", "block/block"].dependencies
         assert recipes["lookups", "static/timezone_cells/cells"].dependencies == (
-            Dependency(
-                "normalize", "clock_zones", ("normalized/clock_zones/cells.parquet",)
-            ),
+            Dependency("normalize", "clock_zones", PARTITIONS),
         )
 
 

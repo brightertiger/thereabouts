@@ -10,13 +10,17 @@ from typing import Any, cast
 
 import pytest
 
-from pipeline.runtime.fingerprints import REPOSITORY, native_versions
+from pipeline.config import load
+from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.ledger import Ledger
-from pipeline.stages import parameters
+from pipeline.stages import geographic, parameters, release
 from pipeline.stages.contract import Context, Stage, Unit
+from pipeline.stages.dataset import DatasetStage
+from pipeline.stages.packs import PacksStage
 from pipeline.stages.registry import registry
 
 from .geographic_fixtures import build, geographic_graph, source_receipts
+from .helpers import context
 
 EVIDENCE = (REPOSITORY / "eval", REPOSITORY / "config/reviews")
 CURRENT = threading.local()
@@ -108,6 +112,7 @@ def test_an_edited_data_file_re_identifies_its_readers_only(
     for directory in ("config", "eval"):
         shutil.copytree(REPOSITORY / directory, repository / directory)
     monkeypatch.setattr(parameters, "REPOSITORY", repository)
+    monkeypatch.setattr(geographic, "REPOSITORY", repository)
     before = unit_hashes(tmp_path / "before", repository)
     with (repository / name).open("a") as stream:
         stream.write("\n")
@@ -115,10 +120,22 @@ def test_an_edited_data_file_re_identifies_its_readers_only(
     assert {key for key in before if before[key] != after[key]} == readers
 
 
-def test_pack_identity_follows_writer_revisions() -> None:
+def test_pack_identity_follows_writer_revisions(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from thereabouts import _core
 
-    revisions = native_versions(["thereabouts"], REPOSITORY / "uv.lock")
-    writer = revisions["thereabouts_writer"]
-    assert vars(_core)["CORE_REVISION"] in writer
-    assert vars(_core)["WRITER_REVISION"] in writer
+    assert release.writer_revisions() == {
+        name: str(vars(_core)[name]) for name in release.REVISIONS
+    }
+    settings = {stage.name: stage for stage in load().stages}
+    packs, dataset = PacksStage(settings["packs"]), DatasetStage(settings["dataset"])
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        ctx = context(tmp_path, ledger)
+        ctx.config = load()
+        before = packs.identity(ctx), dataset.identity(ctx)
+        monkeypatch.setattr(
+            release, "writer_revisions", lambda: {"WRITER_REVISION": "x"}
+        )
+        after = packs.identity(ctx), dataset.identity(ctx)
+    assert after[0] != before[0] and after[1] == before[1]

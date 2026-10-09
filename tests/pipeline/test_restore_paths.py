@@ -63,6 +63,9 @@ def test_production_read_patterns_select_recorded_outputs(tmp_path: Path) -> Non
                 record = ledger.get(*dependency.key)
                 assert record is not None
                 for pattern in dependency.paths:
-                    assert selected(record.outputs, (pattern,)), (recipe.key, pattern)
+                    assert selected(record.outputs, (pattern,), record.inputs_hash), (
+                        recipe.key,
+                        pattern,
+                    )
                 narrowed += 1
         assert narrowed >= 4

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import cast
 
 from .jsonio import Object, encode
-from .outputs import describe
+from .outputs import Hashes, describe
 from .records import Completion, Output, Recipe, outputs_from_json, recipe_from_json
 
 UNITS_SQL = (
@@ -65,6 +65,7 @@ class Ledger:
     ) -> None:
         self.root, self.path, self.readonly = root.absolute(), path, readonly
         self.lock = threading.RLock()
+        self.hashes: set[str] | None = None
         if path is None or (readonly and not path.exists()):
             self.db = sqlite3.connect(":memory:", check_same_thread=False)
             self._initialize()
@@ -91,6 +92,12 @@ class Ledger:
             "CREATE TABLE IF NOT EXISTS recipes (stage TEXT NOT NULL, "
             "unit_id TEXT NOT NULL, recipe TEXT NOT NULL, "
             "PRIMARY KEY(stage, unit_id))"
+        )
+        # Every inputs hash ever recorded, including superseded ones: receipts may
+        # still name directories they own.
+        self.db.execute(
+            "CREATE TABLE IF NOT EXISTS inputs_hashes "
+            "(inputs_hash TEXT PRIMARY KEY) WITHOUT ROWID"
         )
         self.db.commit()
 
@@ -191,8 +198,27 @@ class Ledger:
             row["completed_at"],
         )
 
+    @property
+    def inputs_hashes(self) -> set[str]:
+        """Recorded inputs hashes; output directories may be named after them."""
+        with self.lock:
+            if self.hashes is None:
+                table = self.db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE name='inputs_hashes'"
+                ).fetchone()
+                rows = self.db.execute(
+                    "SELECT inputs_hash FROM units"
+                    + (" UNION SELECT inputs_hash FROM inputs_hashes" if table else "")
+                ).fetchall()
+                self.hashes = {str(row[0]) for row in rows}
+            return self.hashes
+
     def store(self, record: Completion) -> None:
         self.writable()
+        self.inputs_hashes.add(record.inputs_hash)
+        self.db.execute(
+            "INSERT OR IGNORE INTO inputs_hashes VALUES(?)", (record.inputs_hash,)
+        )
         self.db.execute(
             "INSERT INTO units VALUES(?,?,?,?,?,?) ON CONFLICT(stage,unit_id) "
             "DO UPDATE SET inputs_hash=excluded.inputs_hash, "
@@ -217,7 +243,9 @@ class Ledger:
         *,
         metadata: Object | None = None,
     ) -> Completion:
-        outputs, receipts = describe(self.root, paths)
+        outputs, receipts = describe(
+            self.root, paths, Hashes(self.inputs_hashes, inputs_hash)
+        )
         return self.record(
             stage, unit_id, inputs_hash, outputs, receipts, metadata=metadata
         )
