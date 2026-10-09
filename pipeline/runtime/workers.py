@@ -177,8 +177,9 @@ def die_with_parent() -> None:
 
 
 def portable(error: BaseException) -> BaseException | None:
+    """The error itself when the parent can rebuild it; its text arrives anyway."""
     try:
-        pickle.dumps(error)
+        pickle.loads(pickle.dumps(error))
     except Exception:
         return None
     return error
@@ -254,6 +255,11 @@ class ProcessWorkers:
     def submit(
         self, stage: Stage, unit: Unit, parameters: str, hashes: Container[str]
     ) -> int:
+        for idle in [w for w in self.workers if w.task is None]:
+            if not idle.process.is_alive():
+                idle.process.join()
+                idle.connection.close()
+                self.workers.remove(idle)
         worker = next((w for w in self.workers if w.task is None), None)
         if worker is None:
             worker = self.start()

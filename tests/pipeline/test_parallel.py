@@ -4,7 +4,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 
@@ -59,11 +59,12 @@ def test_four_workers_record_the_same_outputs_as_one(
 
 
 def source_outputs(
-    root: Path, name: str, workers: int, executor: str
+    root: Path,
+    name: str,
+    payloads: dict[str, tuple[bytes, dict[str, Any]]],
+    workers: int,
+    executor: str,
 ) -> set[tuple[str, str, str]]:
-    payloads = (
-        boundary_payloads(root) if name == "geoboundaries" else land_payloads(root)
-    )
     with Ledger(root, None, readonly=False) as ledger:
         source, stages = source_context(root, ledger, name, payloads)
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
@@ -81,9 +82,13 @@ def source_outputs(
 def test_normalizers_in_worker_processes_match_one_worker(
     tmp_path: Path, name: str
 ) -> None:
-    # Pins name the workspace directory, so both runs use the same leaf name.
-    serial = source_outputs(tmp_path / "serial" / name, name, 1, "thread")
-    assert serial == source_outputs(tmp_path / "process" / name, name, 4, "process")
+    # Both runs read the same archive bytes (ZIP entries carry the time), and
+    # pins name the workspace directory, so both use the same leaf name.
+    build = boundary_payloads if name == "geoboundaries" else land_payloads
+    payloads = build(tmp_path)
+    serial = source_outputs(tmp_path / "serial" / name, name, payloads, 1, "thread")
+    process = source_outputs(tmp_path / "process" / name, name, payloads, 4, "process")
+    assert serial == process
 
 
 def test_prepared_values_are_never_shared_between_threads() -> None:

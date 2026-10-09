@@ -130,6 +130,25 @@ def test_a_child_failure_keeps_its_traceback_and_running_units(
     assert not psutil.Process().children()
 
 
+class Unbuildable(Exception):
+    def __init__(self, code: int, detail: str) -> None:
+        super().__init__(f"{code}: {detail}")
+
+
+def unbuildable(ctx: Context, unit: Unit) -> None:
+    raise Unbuildable(7, "custom failure")
+
+
+def test_an_error_the_parent_cannot_rebuild_keeps_its_text(tmp_path: Path) -> None:
+    stage = ProbeStage("first", [Recipe("first", "odd")], actions={"odd": unbuildable})
+    with (
+        Ledger(tmp_path, None, readonly=False) as ledger,
+        pytest.raises(RuntimeError, match="failed in a worker") as raised,
+    ):
+        run(processes(tmp_path, ledger), [stage])
+    assert "Unbuildable: 7: custom failure" in "".join(raised.value.__notes__)
+
+
 def test_a_killed_worker_is_reported_and_never_recorded(tmp_path: Path) -> None:
     stage = ProbeStage(
         "first",
