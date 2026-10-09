@@ -31,7 +31,7 @@ test("per-read stall interrupts with resume advice; steady bodies outlive the bu
     const read = async () => {
       for await (const chunk of archive(
         new URL(`http://127.0.0.1:${server.address().port}/`),
-        { url: "pack.tar", bytes: 8 },
+        { url: "pack.tar.zst", size: 8 },
         0,
         100,
       ))
