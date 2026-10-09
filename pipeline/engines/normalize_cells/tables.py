@@ -16,10 +16,10 @@ def places(
     output: Path,
     batch_rows: int,
 ) -> None:
-    db.read_parquet(str(base)).create_view("places", replace=True)
+    db.read_parquet(str(base), file_row_number=True).create_view("places", replace=True)
     db.read_parquet(str(mapping)).create_view("mapping", replace=True)
     db.read_parquet(str(canonical)).create_view("cities", replace=True)
-    query = """SELECT p.* EXCLUDE(name,role),
+    query = """SELECT p.* EXCLUDE(name,role,file_row_number),
       coalesce(c.name,p.name) AS name,
       CASE WHEN c.kind IS NOT NULL THEN c.kind
            WHEN p.role='city' THEN 'settlement' ELSE p.role END AS role,
@@ -29,7 +29,8 @@ def places(
            WHEN p.role='city' THEN coalesce(p.settlement_class,'settlement')
            ELSE p.role END AS settlement_kind
       FROM places p LEFT JOIN mapping m USING(place_id)
-      LEFT JOIN cities c USING(place_id)"""
+      LEFT JOIN cities c USING(place_id)
+      ORDER BY p.file_row_number"""
     with atomic_output(output) as temporary:
         db.sql(query).write_parquet(
             str(temporary), compression="zstd", row_group_size=batch_rows

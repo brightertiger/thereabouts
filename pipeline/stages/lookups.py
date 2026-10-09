@@ -120,15 +120,19 @@ def spatial(ctx: Context, unit: Unit, root: Path, kind: str) -> list[Path]:
     destination = root / kind / "joined.parquet"
     try:
         groups = joins.prepare(db, tables)
-        db.read_parquet([str(located(ctx.root, p["path"])) for p in parts]).create_view(
-            "source"
-        )
+        db.read_parquet(
+            [str(located(ctx.root, p["path"])) for p in parts],
+            filename=True,
+            file_row_number=True,
+        ).create_view("source")
         joins.assignments(db, groups, ctx.config.h3)
-        sql = """SELECT s.*, a.country_id,a.state_id,a.city_id,
+        sql = """SELECT s.* EXCLUDE(filename,file_row_number),
+          a.country_id,a.state_id,a.city_id,
           a.cell_country_code, coalesce(a.cell_status,'unlocated') AS cell_status,
           CASE WHEN s.country_code IS NOT NULL AND a.country_id IS NOT NULL
                THEN s.country_code<>a.cell_country_code END AS country_disagrees
-          FROM source s LEFT JOIN assignments a USING(h3_uint64)"""
+          FROM source s LEFT JOIN assignments a USING(h3_uint64)
+          ORDER BY s.filename, s.file_row_number"""
         with atomic_output(destination) as temporary:
             db.sql(sql).write_parquet(
                 str(temporary),
