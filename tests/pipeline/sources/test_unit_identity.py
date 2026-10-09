@@ -114,6 +114,7 @@ def source_hashes(tmp_path: Path, *overrides: str) -> dict[tuple[str, str], str]
         "limits.timeout_seconds=120",
         "limits.backoff_seconds=3",
         "limits.download_bytes=1",
+        "limits.patience_seconds=60",
         "upstream.url=https://mirror.example/allCountries.zip",
     ],
 )
