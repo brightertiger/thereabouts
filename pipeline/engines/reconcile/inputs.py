@@ -8,6 +8,7 @@ import pyarrow.parquet as pq
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import Resources
+from pipeline.engines.query import connection
 from pipeline.engines.store.codec import Row
 from pipeline.runtime.jsonio import atomic_output
 
@@ -17,12 +18,9 @@ from .matching import default_perspective
 def query_engine(
     paths: dict[str, list[str]], work: Path, resources: Resources, limits: EngineLimits
 ) -> duckdb.DuckDBPyConnection:
-    db = duckdb.connect()
-    db.execute("SET memory_limit=?", [resources.duckdb_memory])
-    db.execute("SET threads=?", [resources.duckdb_threads])
-    db.execute("SET preserve_insertion_order=false")
-    db.execute("SET temp_directory=?", [str(work / "spill")])
-    db.execute("SET max_temp_directory_size=?", [f"{limits.duckdb_spill_bytes}B"])
+    db = connection(
+        resources, limits.duckdb_spill_bytes, spill=work / "spill", ordered=False
+    )
     for name, files in paths.items():
         if files:
             # Input positions order every writer, since insertion order is not kept.

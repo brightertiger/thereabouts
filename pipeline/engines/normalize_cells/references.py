@@ -1,15 +1,17 @@
 """Count missing and cross-country normalized catalogue references."""
 
-import duckdb
-
+from pipeline.config.engines import EngineRuntime
 from pipeline.config.schema import Resources
+from pipeline.engines.query import connection
 from pipeline.engines.store.codec import Row
 
 
-def reference_checks(tables: list[Row], resources: Resources) -> Row:
-    db = duckdb.connect()
-    db.execute("SET memory_limit=?", [resources.duckdb_memory])
-    db.execute("SET threads=?", [resources.duckdb_threads])
+def reference_checks(
+    tables: list[Row],
+    resources: Resources,
+    spill_bytes: int = EngineRuntime.duckdb_spill_bytes,
+) -> Row:
+    db = connection(resources, spill_bytes)
     try:
         for kind in ("places", "canonical_cities", "place_to_city"):
             db.read_parquet(

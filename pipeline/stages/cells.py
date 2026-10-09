@@ -64,6 +64,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             ctx.config.resources,
             settings.limits,
             {name: ctx.config.sources[name].kind for name in sources},
+            spill=root / "spill",
         )
         destination = located(ctx.root, settings.country_inventory)
         blocks = located(ctx.root, settings.block_index)
