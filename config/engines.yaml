@@ -46,3 +46,6 @@ spatial_sources:
   airports: airports
   trade_locations: unlocode
   ip_ranges: dbip
+# Sources the lookups `names/world` unit reads, with the partition kinds it uses,
+# for example {geonames: [names, places], overture: [names]}. Empty: no unit.
+name_sources: {}

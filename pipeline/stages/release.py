@@ -5,10 +5,25 @@ from pathlib import Path
 
 from pipeline.config.schema import StageSettings
 from pipeline.runtime.fingerprints import stage_identity
-from pipeline.runtime.jsonio import Object
+from pipeline.runtime.jsonio import Object, digest
 from pipeline.runtime.records import Dependency, Recipe
+from thereabouts.format import CELL_FORMAT_VERSION
 
 from .contract import Context, Unit, make_unit
+
+REVISIONS = ("CORE_REVISION", "WRITER_REVISION")
+
+
+def writer_revisions() -> dict[str, str]:
+    """The Rust writer's encoding revisions change pack bytes without a release."""
+    from thereabouts import _core
+
+    # Read the module namespace: the client's type stub predates these constants.
+    values = vars(_core)
+    revisions = {name: str(values[name]) for name in REVISIONS if name in values}
+    if "WRITER_REVISION" not in revisions:
+        raise ValueError("thereabouts._core lacks WRITER_REVISION; rebuild it")
+    return revisions
 
 
 class ReleaseStage:
@@ -18,7 +33,16 @@ class ReleaseStage:
         self.needs = tuple(settings.needs)
 
     def identity(self, ctx: Context) -> str:
-        return stage_identity(self.settings, ctx.config)
+        value = stage_identity(
+            self.settings,
+            ctx.config,
+            cell_format=CELL_FORMAT_VERSION,
+            read=ctx.watch.read,
+        )
+        if "thereabouts" not in self.settings.native:
+            return value
+        # The writer is Rust, outside every hashed closure; its revisions stand in.
+        return digest({"stage": value, "writer": writer_revisions()})
 
     def unit(
         self,

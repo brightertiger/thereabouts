@@ -19,6 +19,8 @@ from tests.pipeline.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
 
+SOURCES = ("overture", "geonames", "geoboundaries", "osm_land", "ghsl")
+
 
 def partition(root: Path, source: str, kind: str) -> Path:
     """The production layout: normalized/<source>/<kind>/<inputs hash>/<part>."""
@@ -32,6 +34,9 @@ def source_receipts(
 ) -> tuple[Context, SyntheticStage]:
     """ZZ around the origin; `wide` adds country YY east of it and four blocks."""
     config = load()
+    # Only the sources the synthetic normalize stage records are enabled.
+    for name, settings in config.sources.items():
+        settings.enabled = name in SOURCES
     centre = h3.latlng_to_cell(0, 0, 3)
     config.engines.countries = ["YY", "ZZ"] if wide else ["ZZ"]
     config.engines.blocks = (
@@ -62,10 +67,7 @@ def source_receipts(
         divisions=divisions,
         areas=areas,
     )
-    source_names = ["overture", "geonames", "geoboundaries", "osm_land", "ghsl"]
-    stage = SyntheticStage(
-        "normalize", [Recipe("normalize", name) for name in source_names]
-    )
+    stage = SyntheticStage("normalize", [Recipe("normalize", name) for name in SOURCES])
     for recipe in stage.recipes:
         source = recipe.unit_id
         parts, paths = [], []

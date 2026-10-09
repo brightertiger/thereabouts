@@ -11,11 +11,9 @@ from pathlib import Path
 from shapely import geos_version_string
 
 from pipeline.config.schema import Config, StageSettings
-from thereabouts.format import CELL_FORMAT_VERSION
 
-from .code import code_hashes
+from .code import Read, code_hashes
 from .jsonio import digest
-from .watch import WATCH
 
 REPOSITORY = Path(__file__).parents[2]
 # Parts of config sections that tune performance only; outputs never read them.
@@ -35,8 +33,10 @@ def installed_version(name: str) -> str:
     return importlib.metadata.version(name)
 
 
-def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
-    pinned = locked_versions(WATCH.read(lock))
+def native_versions(
+    names: Sequence[str], lock: Path, read: Read = Path.read_bytes
+) -> dict[str, str]:
+    pinned = locked_versions(read(lock))
     result = {}
     for name in names:
         if name == "sqlite3":
@@ -51,24 +51,7 @@ def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
         result[name] = installed
     if "shapely" in names:
         result["geos"] = geos_version_string
-    if "thereabouts" in names:
-        result["thereabouts_writer"] = writer_revisions()
     return result
-
-
-def writer_revisions() -> str:
-    """The Rust writer's encoding revisions change pack bytes without a release."""
-    from thereabouts import _core
-
-    # Read the module namespace: the client's type stub predates these constants.
-    values = vars(_core)
-    try:
-        core, forward = values["CORE_REVISION"], values["WRITER_REVISION"]
-    except KeyError as error:
-        raise ValueError(
-            "thereabouts._core lacks writer revisions; rebuild the extension"
-        ) from error
-    return f"core {core}, forward {forward}"
 
 
 def identity(
@@ -79,10 +62,11 @@ def identity(
     native: Mapping[str, str],
     cell_format: int | None = None,
     repository: Path = REPOSITORY,
+    read: Read = Path.read_bytes,
 ) -> str:
     return digest(
         {
-            "code": code_hashes(packages, repository),
+            "code": code_hashes(packages, repository, read),
             "config": config,
             "pins": pins,
             "native": native,
@@ -107,8 +91,16 @@ def settings_values(config: Config, names: Sequence[str]) -> dict[str, object]:
 
 
 def stage_identity(
-    settings: StageSettings, config: Config, *, repository: Path = REPOSITORY
+    settings: StageSettings,
+    config: Config,
+    *,
+    cell_format: int | None = None,
+    repository: Path = REPOSITORY,
+    read: Read = Path.read_bytes,
 ) -> str:
+    """`cell_format` is the codec version, passed by stages that may declare it."""
+    if settings.cell_format and cell_format is None:
+        raise ValueError(f"Stage {settings.name} needs the cell format version")
     return identity(
         [repository / path for path in settings.packages],
         config={
@@ -116,9 +108,10 @@ def stage_identity(
             **settings_values(config, settings.config),
         },
         pins={},
-        native=native_versions(settings.native, repository / "uv.lock"),
-        cell_format=CELL_FORMAT_VERSION if settings.cell_format else None,
+        native=native_versions(settings.native, repository / "uv.lock", read),
+        cell_format=cell_format if settings.cell_format else None,
         repository=repository,
+        read=read,
     )
 
 
@@ -134,7 +127,9 @@ def closures(
     }
 
 
-def adapter_hashes(module: str, repository: Path = REPOSITORY) -> dict[str, str]:
+def adapter_hashes(
+    module: str, repository: Path = REPOSITORY, read: Read = Path.read_bytes
+) -> dict[str, str]:
     stem = repository.joinpath(*module.split("."))
     path = stem if stem.is_dir() else stem.with_suffix(".py")
-    return code_hashes([path], repository)
+    return code_hashes([path], repository, read)

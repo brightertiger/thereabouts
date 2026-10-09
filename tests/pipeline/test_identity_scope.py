@@ -1,7 +1,15 @@
 """Closure dumps: each stage hashes the configuration code it actually reads."""
 
+import ast
+
 from pipeline.config import Config, load
-from pipeline.runtime.fingerprints import adapter_hashes, closures, stage_identity
+from pipeline.runtime.fingerprints import (
+    REPOSITORY,
+    adapter_hashes,
+    closures,
+    stage_identity,
+)
+from thereabouts.format import CELL_FORMAT_VERSION
 
 STAGES = {
     "download",
@@ -37,7 +45,10 @@ def holding(dump: dict[str, dict[str, str]], name: str) -> set[str]:
 
 
 def identities(config: Config) -> dict[str, str]:
-    return {stage.name: stage_identity(stage, config) for stage in config.stages}
+    return {
+        stage.name: stage_identity(stage, config, cell_format=CELL_FORMAT_VERSION)
+        for stage in config.stages
+    }
 
 
 def test_closure_dump_scopes_configuration_modules() -> None:
@@ -76,3 +87,19 @@ def test_merged_engine_limits_expose_both_sections() -> None:
     settings = load(overrides=["engines.runtime.sqlite_cache_kib=7"]).engines
     assert settings.limits.sqlite_cache_kib == 7
     assert settings.limits.parquet_batch_rows == settings.batches.parquet_batch_rows
+
+
+def test_runtime_does_not_import_the_client_package() -> None:
+    for path in sorted((REPOSITORY / "pipeline/runtime").glob("*.py")):
+        tree = ast.parse(path.read_bytes())
+        names = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        } | {
+            node.module or ""
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+        }
+        assert not [name for name in names if name.partition(".")[0] == "thereabouts"]

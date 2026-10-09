@@ -9,7 +9,6 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import Object
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Recipe
-from pipeline.runtime.watch import WATCH
 
 from .contract import Context
 from .engine_data import Geography
@@ -30,6 +29,8 @@ class Options:
     parameters: Object
     required_bytes: int
     refresh_discovery: bool = False
+    # Repository data files the action reads at run time; the stage hashes them.
+    reads: tuple[str, ...] = ()
 
 
 Configure = Callable[[Recipe], Options]
@@ -79,10 +80,6 @@ def country_policy(value: Object, geography: Geography) -> Policy:
     return select
 
 
-def file_digests(paths: Sequence[str]) -> Object:
-    return {path: WATCH.digest(located(REPOSITORY, path)) for path in sorted(paths)}
-
-
 def prepare(
     policy: Policy,
     geography: Geography,
@@ -93,20 +90,18 @@ def prepare(
     refresh_plan: bool = False,
     reads: Mapping[str, Sequence[str]] | None = None,
 ) -> Configure:
-    """Repository data files an action reads at run time enter its parameters."""
-    digests = {action: file_digests(paths) for action, paths in (reads or {}).items()}
+    """`reads` names the repository data files each action reads at run time."""
 
     def configure(recipe: Recipe) -> Options:
         action = recipe.unit_id.partition("/")[0]
         parameters = {"policy": policy(recipe), **(extra or {})}
-        if action in digests:
-            parameters["reads"] = digests[action]
         if action == "block":
             parameters["countries"] = list(selected_countries(recipe, geography))
         return Options(
             parameters,
             block_bytes if action == "block" else country_bytes,
             refresh_plan and action == "plan",
+            tuple(sorted((reads or {}).get(action, ()))),
         )
 
     return configure

@@ -12,6 +12,7 @@ from pipeline.runtime.outputs import role, selected
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.verification import Verifier
+from pipeline.runtime.watch import Watch
 
 
 @dataclass
@@ -25,6 +26,8 @@ class Context:
     storage: dict[str, str] = field(default_factory=dict)
     # Measurements such as timings go to the run log, never into recorded outputs.
     log: Callable[[str], None] = print
+    # Every file read into an identity or parameter; a run freezes it.
+    watch: Watch = field(default_factory=Watch)
 
 
 @dataclass(frozen=True)
@@ -65,11 +68,11 @@ def dependency_value(ctx: Context, dependency: Dependency) -> object:
     # re-run that only moved identical bytes leaves this value unchanged.
     outputs = sorted(
         (
-            role(output.path),
+            role(output.path, (record.inputs_hash,)),
             output.size,
             receipts.get(output.path, output.sha256),
         )
-        for output in selected(record.outputs, dependency.paths)
+        for output in selected(record.outputs, dependency.paths, record.inputs_hash)
     )
     return {
         "stage": dependency.stage,
