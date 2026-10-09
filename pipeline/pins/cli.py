@@ -3,12 +3,11 @@
 import argparse
 import json
 from collections.abc import Sequence
-from dataclasses import asdict
 from pathlib import Path
 
 from pipeline.config import load
 from pipeline.runtime.fingerprints import REPOSITORY
-from pipeline.runtime.jsonio import digest, write_json
+from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 from pipeline.sources.proposals.http import Custody
 
@@ -21,6 +20,14 @@ LOCK = REPOSITORY / "pins.lock"
 PROPOSAL = REPOSITORY / ".cache/pipeline/pins-proposal.yaml"
 
 
+def payloads(pin: SourcePin) -> list[list[object]]:
+    """The pinned upstream bytes, independent of names, releases and metadata."""
+    return sorted(
+        [item.url, item.size, item.sha256, item.etag, item.last_modified]
+        for item in pin.files
+    )
+
+
 def check(saved: dict[str, SourcePin], names: list[str], root: Path | None) -> None:
     for name in names:
         if name not in saved:
@@ -29,7 +36,9 @@ def check(saved: dict[str, SourcePin], names: list[str], root: Path | None) -> N
         if root and pin.available:
             manifest_path = located(root, f"normalized/{name}/manifest.json")
             observed = from_manifest(root, json.loads(manifest_path.read_bytes()))
-            if digest(asdict(observed)) != digest(asdict(pin)):
+            # Retained manifests predate the proposer-shaped lock (2026-10-09), so
+            # the workspace and the lock must agree on bytes, not on spelling.
+            if payloads(observed) != payloads(pin):
                 raise ValueError(
                     f"Pinned source differs from retained manifest: {name}"
                 )

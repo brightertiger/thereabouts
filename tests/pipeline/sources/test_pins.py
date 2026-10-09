@@ -9,6 +9,7 @@ import yaml
 
 from pipeline.cli import main
 from pipeline.config import load
+from pipeline.pins.cli import check
 from pipeline.pins.lock import read_lock, write_lock
 from pipeline.pins.models import PinFile, SourcePin
 from pipeline.pins.workspace import from_manifest
@@ -184,3 +185,62 @@ def test_proposal_diff_cannot_overwrite_the_lock_without_accept(tmp_path: Path) 
         == 2
     )
     assert lock.read_bytes() == before
+
+
+def test_workspace_check_compares_pinned_bytes_not_their_spelling(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "data"
+    raw = root / "raw/example/snapshot/input.zip"
+    raw.parent.mkdir(parents=True)
+    raw.write_bytes(b"retained bytes")
+    size, sha256 = raw.stat().st_size, sha256_file(raw)
+    record = {"path": str(raw), "size": size, "sha256": sha256}
+    inventory_path = root / "raw/example/inventory.json"
+    write_json(
+        inventory_path,
+        {
+            "source_release": "2026-10-01T18:42:10+00:00",
+            "retrieved_at": "2026-10-01",
+            "files": {
+                "input.zip": {
+                    "path": str(raw),
+                    "url": "https://example.test/input.zip",
+                    "etag": '"v1"',
+                    "range_verified": True,
+                }
+            },
+        },
+    )
+    write_json(
+        root / "normalized/example/manifest.json",
+        {
+            "source": "example",
+            "source_release": "2026-10-01T18:42:10+00:00",
+            "inventory": {
+                "path": str(inventory_path),
+                "size": inventory_path.stat().st_size,
+                "sha256": sha256_file(inventory_path),
+            },
+            "inputs": [record],
+        },
+    )
+    proposed = SourcePin(
+        "fingerprint",
+        "2026-10-01",
+        files=[
+            PinFile(
+                "input.zip",
+                "https://example.test/input.zip",
+                size,
+                sha256,
+                '"v1"',
+                metadata={"key": "input.zip", "license": "CC0-1.0"},
+            )
+        ],
+        metadata={"inventory_fingerprint": "fingerprint", "releases": {}},
+    )
+    check({"example": proposed}, ["example"], root)
+    proposed.files[0].sha256 = "b" * 64
+    with pytest.raises(ValueError, match="differs from retained manifest"):
+        check({"example": proposed}, ["example"], root)

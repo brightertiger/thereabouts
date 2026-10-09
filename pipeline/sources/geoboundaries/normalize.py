@@ -37,7 +37,12 @@ def normalize(ctx: SourceContext) -> list[Path]:
             or "PROJCS" in projection
         ):
             raise ValueError(f"Unexpected boundary CRS: {projection}")
-        pin = {"url": item.url, "archive_sha256": item.sha256, **item.metadata}
+        pin = {
+            "url": item.url,
+            "archive_sha256": item.sha256,
+            "retrieved_at": ctx.pin.pinned_at,
+            **item.metadata,
+        }
         country = (
             ctx.pin.metadata["country_reference"]
             .get(pin["metadata"]["boundaryISO"], {})
