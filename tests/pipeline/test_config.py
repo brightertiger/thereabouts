@@ -41,7 +41,8 @@ def test_profile_and_overrides_have_documented_precedence() -> None:
     result = load(profile="vm", overrides=["paths.root=sample", "resources.workers=2"])
     assert result.paths.root == "sample"
     assert result.resources.workers == 2
-    assert result.resources.duckdb_memory == "3GB"
+    assert result.resources.duckdb_memory == "2GB"
+    assert result.resources.executor == "process"
     assert result.resources.max_workspace == 250_000_000_000
 
 

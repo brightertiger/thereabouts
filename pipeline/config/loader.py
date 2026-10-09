@@ -141,7 +141,13 @@ def validate(config: Config) -> None:
         )
     if not re.fullmatch(r"[1-9][0-9]*(MB|GB)", resources.duckdb_memory):
         raise ValueError("resources.duckdb_memory must be a positive MB or GB size")
-    for name in ("workspace_scan_seconds", "admission_timeout_seconds"):
+    if resources.executor not in {"thread", "process"}:
+        raise ValueError("resources.executor must be thread or process")
+    for name in (
+        "workspace_scan_seconds",
+        "admission_timeout_seconds",
+        "memory_scan_seconds",
+    ):
         value = getattr(resources, name)
         if not math.isfinite(value) or value <= 0:
             raise ValueError(f"resources.{name} must be finite and positive")
