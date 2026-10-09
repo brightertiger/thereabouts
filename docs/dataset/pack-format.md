@@ -35,7 +35,7 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.2.2` for core with names and `0.4.0` for forward families. Forward
+`0.3.0` for core (grouped shards; `0.2.2` before) and `0.4.0` for forward families. Forward
 identity also includes `family` and `core_catalogue`. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
@@ -56,8 +56,15 @@ may have no spatial or catalogue shards. Notices have no binary header.
 A reader rejects other format versions, nonzero required features, another
 unsupported family, and resolutions other than 8/3 before interpreting records. Maximum
 artifact size is 64 MiB; maximum manifest size is 16 MiB. A writer must split
-catalogues before exceeding the artifact limit. The current writer emits one
-resolution-3 block per cell shard and targets 4 MiB catalogue shards.
+catalogues before exceeding the artifact limit. The core writer (revision
+0.3.0) groups many resolution-3 blocks per cells shard, in ascending block
+order, and many places per catalogue shard, each up to a 32 MiB target: half
+the artifact limit, so one more block or place always fits. A complete world
+core (14,847 stored blocks, about 5.9 M places with their evidence, about
+2.8 GB) is therefore about ninety files instead of about 15,400. The
+`shard_bytes` writer option (1 byte to 32 MiB) overrides the target for tests;
+it enters pack identity only when set. Readers since format 2.0 already accept
+multi-block cells shards.
 
 ## Binary container
 
@@ -338,9 +345,23 @@ happen outside the cache mutex. Budget accounting includes owned payload
 capacities and the decoded value; hash-map bookkeeping and in-flight/evicted
 references add small overhead outside that budget. No cache changes wire bytes.
 
-Every shard retains the file handle opened with its validated directory and
-uses positioned reads; replacing its path cannot change the handle's contents.
-In-place mutation of an open shard is unsupported.
+Shards are opened lazily through a bounded least-recently-used pool of host
+file handles shared by the pack: at most 64 idle handles by default
+(`Pack::open_files`, Python `_core.open(path, max_open_files=N)`), plus one per
+in-flight read. Admission captures each artifact's size and, where the host has
+one, its (device, inode) identity; a handle reopened after eviction must match
+both, so a replaced path fails with `corrupt_pack` ("Pack file changed while
+open") instead of mixing two packs. Opening stays cheap: only headers,
+directories and the metadata table are read. Full verification (`verify`, the
+writer's self-check, `data verify --full`) streams shard by shard and closes
+each artifact's handle after checking it, so a world core opens, queries and
+verifies at the macOS default `ulimit -n 256`. In-place mutation of an open
+shard is unsupported. No reader changes the process descriptor limit.
+
+When the process descriptor table is full (EMFILE/ENFILE), the pool first
+closes the pack's idle handles and retries once. A remaining failure is
+`resource_limit` (Python and Node `ResourceLimitError`, CLI exit code 6), whose
+message names the open-file limit; it is never reported as `corrupt_pack`.
 
 SHA-256 and whole-pack structural verification are opt-in at open
 (`Pack::open(path, true)`, Python `Geocoder(path, verify=True)`).
@@ -352,7 +373,8 @@ in unused payloads. Neither lookup nor verification performs network I/O. Missin
 `writer_input_error` (Python `WriterInputError`, a `ValueError` subclass); staging
 IO failures use `writer_error`. A stale stage names the directory to remove
 before retry; failed cleanup never replaces the original export error. Unsupported
-format/family raises `incompatible_data`, damage raises `corrupt_pack`, and
+format/family raises `incompatible_data`, damage raises `corrupt_pack`,
+descriptor exhaustion raises `resource_limit`, and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query
 values are result statuses, not pack exceptions.
 
@@ -1032,6 +1054,14 @@ file. All paths, file sizes, row counts and SHA-256 values remain inventoried.
   resolution-1 parent (at most 49 blocks). Entries cover every physical row
   group. A block entry must have positive rows. Empty files have `blocks: []`,
   `rows: 0` and zero Parquet row groups; they contribute no stored blocks.
+* A coalesced file may also list `empty_blocks: ["<resolution-3 H3 hex>", …]`:
+  covered blocks without stored rows (open ocean inside the release coverage).
+  They are strictly sorted, share the file's resolution-1 parent, never repeat a
+  `blocks` entry or another file's block, and count toward the 49-block limit.
+  The writer emits each as an empty spatial block, exactly as a legacy
+  zero-row block file, so a point there reports `not_found` with evidence
+  `no_land` rather than `outside_coverage`. Legacy files may not carry
+  `empty_blocks`; they record an empty block as a zero-row file.
   The `group=<resolution-1 H3 hex>` parent directory must match every block's
   resolution-1 parent. Per-group row counts must
   match Parquet metadata and sum to the file's declared row count.
@@ -1055,13 +1085,14 @@ identity naturally differs when file packaging changes.
 
 ## Host IO bindings
 
-The native and WASM readers use the same codecs. A host source opens each
-artifact once during admission and returns a retained handle with its captured
-byte length and an exact positioned-read operation. Reads must fill the requested
-range or fail. The host canonicalizes the explicitly selected root, then rejects unsafe paths
-and symlink artifacts below that root. Shards own
-their handles after admission; renaming a pathname does not select another file.
-Dropping the last shard reference closes its handle. Node supplies synchronous
+The native and WASM readers use the same codecs and the same bounded handle
+pool. A host source opens an artifact and returns a handle with its captured
+byte length, its identity where available, and an exact positioned-read
+operation. Reads must fill the requested range or fail. The host canonicalizes
+the explicitly selected root, then rejects unsafe paths and symlink artifacts
+below that root. The pool may close and later reopen a handle; the reopened
+file must match the admitted size and identity. Node maps EMFILE/ENFILE from
+its open call to `resource_limit`. Node supplies synchronous
 fs reads through wasm-bindgen imports; WASM has no filesystem or network calls.
 Metadata and index admission bounds, cache budgets and lazy evidence rules
 are identical across hosts. This binding change does not change pack bytes.
@@ -1073,16 +1104,22 @@ for a prepared dataset. Both legacy per-block inputs and the grouped row-group
 layout above are admitted. Required family tables remain mandatory, including
 explicitly inventoried zero-row tables. Missing plate tables are an input error.
 The release runner builds core first and passes its path as core_pack for each
-forward export. A release index is emitted only after every requested family
-and its archive verify. Archives are deterministic POSIX ustar, with inventoried
-artifacts and manifest.json at the archive root; transport and activation are
+forward export. A release index (format 3) is emitted only after every
+requested family and its archive verify. Archives are deterministic
+zstd-compressed POSIX ustar (`<family>.tar.zst`), with inventoried artifacts and
+manifest.json at the archive root, created by the same Rust module that clients
+extract with (`_core.archive_pack`; `_core.inspect_archive` lists and hashes
+every entry). The transport caps (2 GiB compressed, 16 GiB unpacked) are
+`_core.MAX_ARCHIVE_BYTES` and `_core.MAX_UNPACKED_BYTES`. Publication merges
+the version into the aggregate `packs/index.json`; transport and activation are
 specified in [../clients/cli.md](../clients/cli.md). Dataset Parquet, pack payloads and transport archives
 have separate inventories and digests; one does not substitute for another.
 
 ### Derived-coordinate portability
 
 The point for a reverse/H3 result is computed from its cell centre. Native and
-WASM transcendental math may differ in the final floating-point digits; public
-conformance uses an absolute tolerance of 1e-10 degrees for these derived
-coordinates. This is semantic result equality, not byte-identical serialized
+WASM transcendental math, and x86_64 and ARM libm, may differ in the final
+floating-point digits (about 1.4e-14 degrees observed); public conformance in
+Python, Node and Rust compares every `lat`/`lon` with an absolute tolerance of
+1e-9 degrees and every other field exactly. This is semantic result equality, not byte-identical serialized
 numbers. Stored coordinates retain their specified on-disk precision.

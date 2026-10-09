@@ -186,6 +186,7 @@ Batch and management examples:
 | 3 | Required data is not installed |
 | 4 | Incompatible/corrupt data or transfer/store integrity failure |
 | 5 | One or more batch rows failed; remaining rows were processed |
+| 6 | Resource limit: the process ran out of file descriptors (EMFILE/ENFILE) |
 
 Missing-data diagnostics are the exact command
 thereabouts data install core, or the required forward family name. Human
@@ -195,7 +196,10 @@ interactive removal asks for confirmation; non-interactive removal requires
 deletes all versions of the named family under the install lock; a missing
 family is harmless. Missing data, corrupt data and usage errors are not hidden
 by --quiet. A broken stdout pipe exits 0 without a traceback. Other stream/OS IO failures
-exit 2 without suggesting pack repair. Both Node sinks write all UTF-8 bytes,
+exit 2 without suggesting pack repair. Descriptor exhaustion exits 6 with a
+message naming the open-file limit (`ulimit -n`); it is never reported as
+corrupt data and never suggests reinstalling (Python and Node raise
+`ResourceLimitError`). Both Node sinks write all UTF-8 bytes,
 retrying partial writes, EINTR and EAGAIN while a slow reader drains the pipe.
 
 An invalid scalar query emits its result and exits 2; invalid command arguments
@@ -286,29 +290,33 @@ install is running and that the process is unrelated, then remove that `.lock`
 file and retry. Do not remove a lease while its installer is running.
 
 The source is a directory containing index.json and archives, or a configured
-base URL. The placeholder default is https://thereabouts-releases.invalid;
-no service is currently published. THEREABOUTS_RELEASE_URL configures the
+base URL. The placeholder default (`DEFAULT_RELEASE_URL`, defined once in
+`thereabouts-cli-core::transport` and exported to Python as
+`_core.DEFAULT_RELEASE_URL` and to Node through WASM) is
+https://thereabouts-releases.invalid; no service is currently published. THEREABOUTS_RELEASE_URL configures the
 source for install, remote list and update --check; it may also be a local
 directory. --from overrides it for install. URLs are HTTP(S) base URLs;
-index.json is appended. An archive URL may be absolute or base-relative.
-Local indexes use relative artifact paths.
-The release index schema is:
+index.json is appended. An archive URL may be absolute or base-relative,
+with slashes (`2026.10/core.tar.zst`). Local indexes use relative artifact paths.
+The release index (format 3) is:
 
     {
-      "format": 2,
+      "format": 3,
       "datasets": {
         "2026.10": {
           "packs": {
             "core": {
-              "url": "core.tar",
-              "bytes": 123456,
-              "sha256": "<64 lowercase hexadecimal characters>",
+              "url": "2026.10/core.tar.zst",
+              "size": 523456789,
+              "sha256": "<64 lowercase hexadecimal characters of the archive>",
+              "unpacked_size": 2812345856,
               "format_minor": 2
             },
             "postal": {
-              "url": "postal.tar",
-              "bytes": 234567,
-              "sha256": "<64 lowercase hexadecimal characters>",
+              "url": "2026.10/postal.tar.zst",
+              "size": 23456789,
+              "sha256": "<64 lowercase hexadecimal characters of the archive>",
+              "unpacked_size": 78901248,
               "format_minor": 2
             }
           }
@@ -316,22 +324,47 @@ The release index schema is:
       }
     }
 
-Index JSON is limited to 16 MiB. Archive size is positive and at most 1 GiB.
-Unknown fields are rejected. The default release is the newest whose requested
-families exist and have supported format minors: minor 2 for every family.
-Dotted numeric version components compare numerically; other components
-compare bytewise. Explicit unavailable/incompatible versions fail.
+`size` and `sha256` describe the compressed archive exactly as downloaded;
+`unpacked_size` is the exact length of its decompressed ustar stream. The
+pipeline publishes one index per version (`packs/<version>/index.json`, URLs
+relative to that directory) and merges every published version into the
+aggregate `packs/index.json` (URLs `<version>/<family>.tar.zst`), which is the
+base clients use for install, remote list and `data update --check`.
 
-Archives are uncompressed POSIX ustar: pack blocks are already compressed.
-manifest.json and its inventoried artifacts are at the archive root. Only
-regular files and directories are permitted. Extraction rejects duplicate or
-unsafe paths, links, special files, invalid header checksums, malformed
-lengths, missing two-block terminators and nonzero trailing payload. Expansion
-is bounded by the advertised archive length; archives cannot supply the
-reserved installer .archive.json receipt.
+Index JSON is limited to 16 MiB. The transport caps are defined once in
+`thereabouts-cli-core::transport` and shared by the CLI, Python
+(`_core.MAX_ARCHIVE_BYTES`, `_core.MAX_UNPACKED_BYTES`), Node (through WASM)
+and the release pipeline: `size` is positive and at most 2 GiB, and
+`unpacked_size` is positive and at most 16 GiB. A world core is about 2.8 GB
+unpacked and well under 1 GiB compressed. Unknown fields are ignored at every
+level of the index so it can grow without a client release; required fields
+are still validated, and another `format` fails with `incompatible_data`
+naming the found and supported formats. The default release is the newest
+whose requested families exist and have supported format minors: minor 2 for
+every family. Dotted numeric version components compare numerically; other
+components compare bytewise. Explicit unavailable/incompatible versions fail.
 
-Before download the installer reserves twice the requested archive byte sum
-plus a 64 MiB bookkeeping margin. Insufficient space is an environment error
+Archives (`<family>.tar.zst`) are one zstd frame holding a POSIX ustar stream
+written deterministically: entries sorted by path, mode 0644, zero owner and
+modification time, a fixed compression level and single-threaded encoding, so
+an unchanged pack gives identical archive bytes. manifest.json and its
+inventoried artifacts are at the archive root. One Rust implementation
+(`thereabouts-cli-core::archive`) creates archives for the pipeline and
+extracts them in the CLI, Python and Node (through WASM, pure-Rust zstd).
+Extraction streams download → decompress → untar into staging. It accepts only
+regular files and directories and rejects absolute, `..`, empty-component,
+backslash or colon paths, duplicates, links, devices and other special
+entries, invalid header checksums, malformed lengths, missing two-block
+terminators, nonzero trailing payload and data after the zstd frame. It stops
+as soon as the stream exceeds the declared `unpacked_size` (or the 16 GiB
+cap), so a decompression bomb never fills the disk, and the final length must
+equal `unpacked_size` exactly. Archives cannot supply the reserved installer
+.archive.json receipt, and the extracted files must be exactly the pack
+manifest's inventory plus manifest.json.
+
+Before download the installer reserves, per requested family, the archive
+`size` plus its `unpacked_size` (which bounds the extracted files), plus a
+64 MiB bookkeeping margin. Insufficient space is an environment error
 (exit 2); there is no fixed free-space floor in the product. Partial
 downloads remain in .downloads and resume at their exact byte offset. The native HTTP
 host uses ureq with rustls and certificate verification enabled. Node uses
@@ -350,7 +383,8 @@ have 30-second deadlines; each transport read has a fresh 60-second stall limit.
 There is no total download timeout. Failures retain verified-offset partial bytes
 for the next explicit install to resume. Tests use only loopback HTTP and local directories.
 
-The full archive length and SHA-256 are checked before extraction. Then every
+The full archive length and SHA-256 are checked before extraction; a partial
+or mismatched download is never decompressed. Then every
 pack checksum and structure is verified, and family, dataset version and minor
 format are checked against the index. The pack is renamed from staging into
 its immutable destination on the same filesystem. A receipt records archive
@@ -463,15 +497,17 @@ errors use the shared Rust result and exit mapping.
 Node library conformance asserts all current and synthetic vectors and all
 54 original legacy mappings. The actual bin asserts every representable query;
 NUL values use the same JS runner and typed non-string values remain library
-assertions. Numeric comparison uses the Rust runner's 1e-10 absolute tolerance
-for target-specific transcendental arithmetic in H3 cell centres. No expected
+assertions. Coordinate comparison uses the shared 1e-9 degree absolute
+tolerance for target-specific transcendental arithmetic in H3 cell centres
+(see below); every other field compares exactly. No expected
 geography, statuses or candidate ordering is changed for Node.
 
 ## Building a local release
 
 The pipeline release packs command produces packs/<version>/index.json and
-one deterministic ustar archive per family, after all requested packs verify.
-Pass that version directory to data install --from. Core must be included when
+one deterministic `<family>.tar.zst` archive per family, after all requested
+packs verify. Pass that version directory to data install --from; after
+publication, the aggregate packs/ directory serves every version. Core must be included when
 building forward packs so their catalogue pins have a concrete dependency.
 See [../pipeline/README.md](../pipeline/README.md) for prepared-dataset commands and
 [release.md](release.md) for package artifact workflows.
@@ -495,10 +531,12 @@ that cannot retain readable headers require --fields or --json. A stream keeps
 one header and fixed column widths; values exceeding their allocated width
 use …, including Unicode.
 
-Results are semantically equal across native and WASM hosts. H3-derived cell
-centres can differ in the last floating-point digits because target math
-implementations differ. Compare these latitude/longitude values with absolute
-tolerance 1e-10 degrees, not byte-identical JSON or CSV text. Stored coordinate
+Results are semantically equal across native and WASM hosts and across CPU
+architectures. H3-derived cell centres can differ in the last floating-point
+digits because target math implementations differ (x86_64 and ARM differ by up
+to about 1.4e-14 degrees). Conformance compares every `lat`/`lon` value with
+absolute tolerance 1e-9 degrees (about 0.1 mm), not byte-identical JSON or
+CSV text, in Python, Node and Rust alike. Stored coordinate
 values, IDs, statuses, ordering and other fields retain exact conformance.
 No extra output rounding is applied.
 
