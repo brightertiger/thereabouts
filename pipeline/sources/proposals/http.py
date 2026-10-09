@@ -3,7 +3,7 @@
 import hashlib
 import json
 import tempfile
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -15,6 +15,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from pipeline.config.sources import SourceSettings
+from pipeline.pins.evidence import verify_publisher
 from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import digest, write_json
 from pipeline.runtime.paths import located, validate_relative
@@ -57,16 +58,15 @@ class Head:
         return {}
 
 
-def _now() -> datetime:
-    return datetime.now(UTC)
-
-
 @dataclass
 class Client:
     settings: SourceSettings
     payload_bytes: int = 0
-    clock: Callable[[], datetime] = _now
     custody: Custody | None = field(default_factory=CUSTODY.get)
+
+    def now(self) -> datetime:
+        """The proposal time, which selects time-named releases such as months."""
+        return datetime.now(UTC)
 
     @property
     def patience(self) -> Patience:
@@ -142,7 +142,7 @@ class Client:
             return None
         return located(self.custody.raw, f"{self.settings.name}/proposal-progress.json")
 
-    def kept(self, url: str, head: Head) -> Received | None:
+    def kept(self, objects: Path, url: str, head: Head) -> Received | None:
         """A payload stored by an interrupted proposal, if upstream still matches."""
         path = self.progress()
         if path is None or not path.is_file():
@@ -157,18 +157,17 @@ class Client:
             head.last_modified,
         ]:
             return None
-        with self.objects() as objects:
-            stored = objects / entry["sha256"]
-            if not stored.is_file() or stored.stat().st_size != entry["size"]:
-                return None
-            sha256, md5 = hashlib.sha256(), hashlib.md5()
-            with stored.open("rb") as stream:
-                while block := stream.read(self.settings.limits.read_bytes):
-                    sha256.update(block)
-                    md5.update(block)
-            if sha256.hexdigest() != entry["sha256"]:
-                return None
-            self.mirror(stored, entry["size"], entry["sha256"])
+        stored = objects / entry["sha256"]
+        if not stored.is_file() or stored.stat().st_size != entry["size"]:
+            return None
+        sha256, md5 = hashlib.sha256(), hashlib.md5()
+        with stored.open("rb") as stream:
+            while block := stream.read(self.settings.limits.read_bytes):
+                sha256.update(block)
+                md5.update(block)
+        if sha256.hexdigest() != entry["sha256"]:
+            return None
+        self.mirror(stored, entry["size"], entry["sha256"])
         return Received(entry["size"], entry["sha256"], md5.hexdigest(), False)
 
     def mirror(self, path: Path, size: int, sha256: str) -> None:
@@ -180,44 +179,41 @@ class Client:
             self.patience, lambda: mirror(path, url, size, sha256, limits.read_bytes)
         )
 
-    def store(self, url: str, head: Head, limit: int) -> Received:
+    def store(self, objects: Path, url: str, head: Head, limit: int) -> Received:
         """Stream a payload once, hashing it into the object store and mirror."""
         limits = self.settings.limits
-        with self.objects() as objects:
-            # The part is bound to the validators it was fetched under.
-            part = objects / (
-                digest([url, head.size, head.etag, head.last_modified]) + ".part"
-            )
+        # The part is bound to the validators it was fetched under.
+        part = objects / (
+            digest([url, head.size, head.etag, head.last_modified]) + ".part"
+        )
 
-            def attempt() -> Received:
-                received = receive(
-                    part,
-                    url,
-                    size=head.size,
-                    limit=limit,
-                    headers=head.conditions(),
-                    timeout=limits.timeout_seconds,
-                    chunk_bytes=limits.read_bytes,
-                    etag=head.etag,
-                )
-                publish(part, objects / received.sha256)
-                return received
-
-            received = retrying(
-                self.patience,
-                attempt,
-                lambda: part.stat().st_size if part.exists() else 0,
+        def attempt() -> Received:
+            received = receive(
+                part,
+                url,
+                size=head.size,
+                limit=limit,
+                headers=head.conditions(),
+                timeout=limits.timeout_seconds,
+                chunk_bytes=limits.read_bytes,
+                etag=head.etag,
             )
-            if (path := self.progress()) is not None:
-                entries = json.loads(path.read_bytes()) if path.is_file() else {}
-                entries[url] = {
-                    "size": received.size,
-                    "etag": head.etag,
-                    "last_modified": head.last_modified,
-                    "sha256": received.sha256,
-                }
-                write_json(path, entries)
-            self.mirror(objects / received.sha256, received.size, received.sha256)
+            publish(part, objects / received.sha256)
+            return received
+
+        received = retrying(
+            self.patience, attempt, lambda: part.stat().st_size if part.exists() else 0
+        )
+        if (path := self.progress()) is not None:
+            entries = json.loads(path.read_bytes()) if path.is_file() else {}
+            entries[url] = {
+                "size": received.size,
+                "etag": head.etag,
+                "last_modified": head.last_modified,
+                "sha256": received.sha256,
+            }
+            write_json(path, entries)
+        self.mirror(objects / received.sha256, received.size, received.sha256)
         return received
 
     def pin(self, name: str, url: str, metadata: dict[str, Any]) -> PinFile:
@@ -226,9 +222,18 @@ class Client:
         remaining = self.settings.limits.download_bytes - self.payload_bytes
         if head.size > remaining:
             raise ValueError(f"Proposal exceeds download_bytes before download: {name}")
-        received = self.kept(url, head) or self.store(url, head, remaining)
-        if head.size >= 0 and received.size != head.size:
-            raise ValueError(f"Upstream length changed during proposal: {name}")
+        with self.objects() as objects:
+            received = self.kept(objects, url, head) or self.store(
+                objects, url, head, remaining
+            )
+            if head.size >= 0 and received.size != head.size:
+                raise ValueError(f"Upstream length changed during proposal: {name}")
+            verify_publisher(
+                objects / received.sha256,
+                metadata,
+                self.settings.limits.read_bytes,
+                name,
+            )
         self.payload_bytes += received.size
         result = PinFile(
             name,

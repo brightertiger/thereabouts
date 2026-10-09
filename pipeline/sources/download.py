@@ -5,6 +5,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
+from pipeline.pins.evidence import verify_publisher
 from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.storage.objects import address, backend, mirror
@@ -59,6 +60,7 @@ def acquire(ctx: SourceContext, pin: PinFile, base: str) -> Path:
             headers=conditions(pin) if remote is None else {},
             limits=limits,
         )
+    verify_publisher(target, pin.metadata, limits.read_bytes, pin.name)
     # Existing local files must also be mirrored; a failed mirror leaves no unit
     # completion, while the verified local object is reused on the next attempt.
     retrying(

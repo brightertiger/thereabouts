@@ -96,11 +96,13 @@ def propose(settings: SourceSettings) -> SourcePin:
             "license_url": layer.get("licenseSource", ""),
             "attribution": layer["boundarySource"],
         }
-        payloads.append(
-            client.pin(
-                f"{commit}/{key}.zip", f"{catalog['media']}/{commit}/{suffix}", metadata
-            )
+        pin = client.pin(
+            f"{commit}/{key}.zip", f"{catalog['media']}/{commit}/{suffix}", metadata
         )
+        # Git LFS serves the object id, which is the SHA256 of the payload.
+        if pin.etag != f'"{pin.sha256}"':
+            raise ValueError(f"geoBoundaries LFS object id differs from SHA256: {key}")
+        payloads.append(pin)
     return finish(
         payloads,
         "gbOpen-" + digest({"layers": selected})[:20],
