@@ -129,10 +129,18 @@ pub fn read_with(root: &super::reader::Reader) -> Result<Manifest> {
         "Oversized manifest",
     )?;
     let value: serde_json::Value = serde_json::from_slice(&root.read(&path)?)?;
-    if value
+    let version = value
         .get("format_version")
-        .and_then(serde_json::Value::as_u64)
-        != Some(2)
+        .and_then(serde_json::Value::as_u64);
+    if let Some(found) = version.filter(|v| *v != 2) {
+        return Err(unsupported(
+            "Pack format",
+            &found.to_string(),
+            "2",
+            found > 2,
+        ));
+    }
+    if version.is_none()
         || !matches!(
             value.get("family").and_then(serde_json::Value::as_str),
             Some("core" | "postal" | "airports" | "locode" | "phone" | "ip" | "plates")
@@ -146,7 +154,13 @@ pub fn read_with(root: &super::reader::Reader) -> Result<Manifest> {
     let m: Manifest = serde_json::from_value(value)?;
     compatible_minor(&m)?;
     validate_pin(&m)?;
-    if m.required_features != 0 || m.reference_resolution != 8 || m.block_resolution != 3 {
+    if m.required_features != 0 {
+        return Err(Error::Incompatible(format!(
+            "Pack requires features {:#x} that this client lacks; upgrade the Thereabouts client",
+            m.required_features
+        )));
+    }
+    if m.reference_resolution != 8 || m.block_resolution != 3 {
         return Err(Error::Incompatible(
             "Unsupported pack features or resolutions".into(),
         ));
@@ -223,7 +237,26 @@ pub fn verify_with(root: &super::reader::Reader, m: &Manifest) -> Result<()> {
     Ok(())
 }
 
+/// Name the found and supported versions and which side has to change.
+fn unsupported(what: &str, found: &str, supported: &str, newer: bool) -> Error {
+    Error::Incompatible(format!(
+        "{what} {found} is not supported (this client reads {supported}); {}",
+        if newer {
+            "upgrade the Thereabouts client"
+        } else {
+            "install current data with thereabouts data install"
+        }
+    ))
+}
 fn compatible_minor(m: &Manifest) -> Result<()> {
+    if m.format_minor != 2 {
+        return Err(unsupported(
+            &format!("The {} pack format", m.family),
+            &format!("2.{}", m.format_minor),
+            "2.2",
+            m.format_minor > 2,
+        ));
+    }
     if m.family == "core"
         && (m.format_minor != 2 || m.forward_columns.is_some() || m.plate_columns.is_some())
         || m.family != "core"
@@ -256,6 +289,52 @@ fn compatible_minor(m: &Manifest) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn version_errors_name_both_versions_and_the_side_to_change() {
+        let temp = tempfile::tempdir().unwrap();
+        let source = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tests/fixtures/packs/core-synthetic/manifest.json");
+        let original: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(source).unwrap()).unwrap();
+        for (field, value, expected) in [
+            (
+                "format_version",
+                3,
+                "Pack format 3 is not supported (this client reads 2); upgrade",
+            ),
+            (
+                "format_version",
+                1,
+                "Pack format 1 is not supported (this client reads 2); install current data",
+            ),
+            (
+                "format_minor",
+                3,
+                "core pack format 2.3 is not supported (this client reads 2.2); upgrade",
+            ),
+            (
+                "format_minor",
+                1,
+                "core pack format 2.1 is not supported (this client reads 2.2); install",
+            ),
+            (
+                "required_features",
+                1,
+                "features 0x1 that this client lacks; upgrade",
+            ),
+        ] {
+            let mut manifest = original.clone();
+            manifest[field] = value.into();
+            std::fs::write(
+                temp.path().join("manifest.json"),
+                serde_json::to_vec(&manifest).unwrap(),
+            )
+            .unwrap();
+            let error = read(temp.path()).unwrap_err();
+            assert_eq!(error.code(), "incompatible_data");
+            assert!(error.to_string().contains(expected), "{error}");
+        }
+    }
     #[test]
     fn traversal_and_symlinks_are_rejected() {
         let temp = tempfile::tempdir().unwrap();
