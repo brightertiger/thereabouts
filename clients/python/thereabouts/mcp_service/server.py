@@ -11,7 +11,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import Field, StrictFloat
 
-from ..errors import DataNotInstalledError, GeocoderError
+from ..errors import GeocoderError
 from ..geocoder import Geocoder
 from ..store import active_pack
 from . import dictionary
@@ -69,7 +69,8 @@ def core_pack(geo: Geocoder) -> Path | None:
         return None
     try:
         return active_pack(handles.data_dir, family="core")
-    except DataNotInstalledError:
+    except (GeocoderError, ValueError, OSError):
+        # The dictionary is a reference: a store problem must not break it.
         return None
 
 

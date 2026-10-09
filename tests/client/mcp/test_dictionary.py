@@ -7,6 +7,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Any, cast
 
+import pytest
 from mcp import Client
 from mcp.types import TextResourceContents
 
@@ -171,3 +172,20 @@ def test_creating_a_server_never_touches_the_geocoder_or_the_disk() -> None:
         return {tool.name for tool in await server.list_tools()}
 
     assert "describe" in asyncio.run(names())
+
+
+def test_a_store_problem_falls_back_to_the_packaged_dictionary(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from thereabouts.mcp_service import server
+
+    def broken(*args: object, **kwargs: object) -> Path:
+        raise ValueError("unreadable store")
+
+    monkeypatch.setattr(server, "active_pack", broken)
+    with Geocoder(packs={"postal": FIXTURES / "packs/postal-sample"}) as geo:
+        assert server.core_pack(geo) is None
+        handles = geo._handles
+        handles.explicit = False  # discover through the (broken) store
+        assert server.core_pack(geo) is None
+        assert json.loads(read(geo, URIS[0]).text)["format"].startswith("thereabouts-")
