@@ -28,6 +28,7 @@ fn coded_error(py: Python<'_>, code: &str, message: &str) -> PyErr {
         "writer_error" => "WriterError",
         "incompatible_data" => "IncompatibleDataError",
         "closed_geocoder" => "ClosedGeocoderError",
+        "resource_limit" => "ResourceLimitError",
         _ => "CorruptPackError",
     };
     match py
@@ -401,5 +402,13 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(write_pack, m)?)?;
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;
+    {
+        use thereabouts_cli_core::transport;
+        m.add("MAX_ARCHIVE_BYTES", transport::MAX_ARCHIVE_BYTES)?;
+        m.add("MAX_UNPACKED_BYTES", transport::MAX_UNPACKED_BYTES)?;
+        m.add("DEFAULT_RELEASE_URL", transport::DEFAULT_RELEASE_URL)?;
+        m.add("INDEX_FORMAT", transport::INDEX_FORMAT)?;
+        m.add("ARCHIVE_SUFFIX", transport::ARCHIVE_SUFFIX)?;
+    }
     Ok(())
 }

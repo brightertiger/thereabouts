@@ -24,6 +24,12 @@ export class CorruptPackError extends ThereaboutsError {
     this.exitCode = 4;
   }
 }
+export class ResourceLimitError extends ThereaboutsError {
+  constructor(message, options) {
+    super(message, "resource_limit", options);
+    this.exitCode = 6;
+  }
+}
 export class ClosedGeocoderError extends ThereaboutsError {
   constructor() {
     super("Geocoder is closed", "closed_geocoder");
@@ -42,6 +48,7 @@ export function convert(error) {
       incompatible_data: IncompatibleDataError,
       closed_geocoder: ClosedGeocoderError,
       pack_not_found: PackNotFoundError,
+      resource_limit: ResourceLimitError,
     }[error.code] ?? CorruptPackError;
   return new Type(error.message, { cause: error });
 }
@@ -53,6 +60,8 @@ export function integrity(message) {
 }
 export function atPack(error, filename, family) {
   const converted = convert(error);
+  // Descriptor exhaustion is an environment limit; repair advice would mislead.
+  if (converted instanceof ResourceLimitError) return converted;
   converted.message = `Unusable ${family} pack at ${filename}: ${converted.message}\nthereabouts data verify --full\nthereabouts data remove ${family} --yes && thereabouts data install ${family}`;
   return converted;
 }

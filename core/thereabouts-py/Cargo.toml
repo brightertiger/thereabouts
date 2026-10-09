@@ -19,6 +19,7 @@ workspace = true
 
 [dependencies]
 thereabouts-cli = { path = "../thereabouts-cli" }
+thereabouts-cli-core = { path = "../thereabouts-cli-core" }
 thereabouts-core = { path = "../thereabouts-core" }
 pyo3 = { version = "0.26", features = ["abi3-py311"] }
 numpy = "0.26"

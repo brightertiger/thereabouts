@@ -6,8 +6,6 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::{cmp::Ordering, collections::BTreeMap};
 
-/// Placeholder until the owner publishes a release service.
-pub const DEFAULT_SOURCE: &str = "https://thereabouts-releases.invalid";
 /// Archive and metadata sizes are checked before transfer or allocation.
 pub const MAX_ARCHIVE_BYTES: u64 = 1024 * 1024 * 1024;
 

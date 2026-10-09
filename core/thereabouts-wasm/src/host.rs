@@ -148,7 +148,22 @@ impl io::Seek for File {
 pub(crate) struct Host;
 impl Source for Host {
     fn open(&self, path: &Path) -> thereabouts_core::Result<Arc<dyn ReadAt>> {
-        Ok(Arc::new(File::open(path)?))
+        let name = path
+            .to_str()
+            .ok_or_else(|| io::Error::other("Non-UTF8 path"))?;
+        let id = open_handle(name).map_err(|value| {
+            let code = js_sys::Reflect::get(&value, &"code".into())
+                .ok()
+                .and_then(|v| v.as_string());
+            if matches!(code.as_deref(), Some("EMFILE" | "ENFILE")) {
+                thereabouts_core::Error::ResourceLimit(thereabouts_core::error::file_limit(
+                    &code.unwrap_or_default(),
+                ))
+            } else {
+                failure(value).into()
+            }
+        })?;
+        Ok(Arc::new(File::from_id(id)?))
     }
 }
 impl thereabouts_cli_core::io::Io for Host {

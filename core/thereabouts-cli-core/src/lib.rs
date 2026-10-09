@@ -11,6 +11,7 @@ mod object;
 pub mod render;
 mod table;
 mod table_page;
+pub mod transport;
 use serde::{Deserialize, Serialize};
 use thereabouts_core::result::Status;
 

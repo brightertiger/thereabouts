@@ -146,3 +146,5 @@ export class IncompatibleDataError extends ThereaboutsError {}
 export class CorruptPackError extends ThereaboutsError {}
 export class ClosedGeocoderError extends ThereaboutsError {}
 export class PackNotFoundError extends ThereaboutsError {}
+/** The process ran out of file descriptors; raise the open-file limit. */
+export class ResourceLimitError extends ThereaboutsError {}

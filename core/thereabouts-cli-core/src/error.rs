@@ -34,7 +34,13 @@ impl Error {
     /// Add repair instructions while preserving missing, usage and incompatibility codes.
     #[must_use]
     pub fn at_pack(self, path: &std::path::Path, family: &str) -> Self {
-        if matches!(self, Self::Usage(_) | Self::Missing(_) | Self::Io(_)) {
+        if matches!(
+            self,
+            Self::Usage(_)
+                | Self::Missing(_)
+                | Self::Io(_)
+                | Self::Pack(thereabouts_core::Error::ResourceLimit(_))
+        ) {
             return self;
         }
         let message = format!(
@@ -53,6 +59,7 @@ impl Error {
         match self {
             Self::Usage(_) | Self::Io(_) => 2,
             Self::Missing(_) => 3,
+            Self::Pack(thereabouts_core::Error::ResourceLimit(_)) => 6,
             _ => 4,
         }
     }
@@ -64,8 +71,33 @@ impl From<std::io::Error> for Error {
     fn from(error: std::io::Error) -> Self {
         if error.kind() == std::io::ErrorKind::StorageFull {
             Self::Usage("Not enough disk space to finish the operation".into())
+        } else if thereabouts_core::error::is_file_limit(&error) {
+            Self::Pack(thereabouts_core::Error::ResourceLimit(
+                thereabouts_core::error::file_limit(&error),
+            ))
         } else {
             Self::Io(error)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    #[cfg(not(windows))]
+    fn resource_limits_keep_their_own_exit_code_and_advice() {
+        let error = Error::from(std::io::Error::from_raw_os_error(24));
+        assert_eq!(error.exit_code(), 6);
+        let error = error.at_pack(std::path::Path::new("/store/core"), "core");
+        assert_eq!(error.exit_code(), 6);
+        assert!(!error.to_string().contains("verify --full"));
+        let error = Error::from(thereabouts_core::Error::from(
+            std::io::Error::from_raw_os_error(23),
+        ));
+        assert_eq!(
+            error.at_pack(std::path::Path::new("x"), "core").exit_code(),
+            6
+        );
     }
 }

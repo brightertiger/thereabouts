@@ -7,6 +7,7 @@ from .errors import (
     GeocoderError,
     IncompatibleDataError,
     PackNotFoundError,
+    ResourceLimitError,
     WriterError,
     WriterInputError,
 )
@@ -21,6 +22,7 @@ __all__ = [
     "GeocoderError",
     "IncompatibleDataError",
     "PackNotFoundError",
+    "ResourceLimitError",
     "Result",
     "WriterError",
     "WriterInputError",

@@ -1586,6 +1586,7 @@ dependencies = [
  "pyo3",
  "serde_json",
  "thereabouts-cli",
+ "thereabouts-cli-core",
  "thereabouts-core",
  "thereabouts-writer",
 ]

@@ -31,6 +31,12 @@ class CorruptPackError(GeocoderError):
     code = "corrupt_pack"
 
 
+class ResourceLimitError(GeocoderError, OSError):
+    """The process ran out of file descriptors; raise the open-file limit."""
+
+    code = "resource_limit"
+
+
 class PackNotFoundError(GeocoderError, FileNotFoundError):
     """An explicitly selected pack directory does not exist."""
 

@@ -3,6 +3,12 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+MAX_ARCHIVE_BYTES: int
+MAX_UNPACKED_BYTES: int
+DEFAULT_RELEASE_URL: str
+INDEX_FORMAT: int
+ARCHIVE_SUFFIX: str
+
 class Geocoder:
     def reverse(
         self, lat: float, lon: float, *, evidence: bool = False

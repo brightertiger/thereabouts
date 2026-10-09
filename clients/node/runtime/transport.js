@@ -5,6 +5,7 @@ import { EnvHttpProxyAgent } from "undici";
 import { safePath } from "./host.js";
 import { MAX_METADATA, readJson, component, keys, family } from "./store.js";
 import { integrity, usage, ThereaboutsError } from "./errors.js";
+import { wasm } from "./wasm.js";
 export function interrupted(error) {
   if (error instanceof ThereaboutsError || error.exitCode !== undefined)
     return error;
@@ -12,7 +13,13 @@ export function interrupted(error) {
     `Download interrupted; run the same data install again to resume: ${error.message}`,
   );
 }
-export const DEFAULT_SOURCE = "https://thereabouts-releases.invalid";
+// Caps and the default URL are defined once in Rust and read through WASM.
+const policy = JSON.parse((await wasm()).transport());
+export const DEFAULT_SOURCE = policy.default_release_url,
+  MAX_ARCHIVE_BYTES = policy.max_archive_bytes,
+  MAX_UNPACKED_BYTES = policy.max_unpacked_bytes,
+  INDEX_FORMAT = policy.index_format,
+  ARCHIVE_SUFFIX = policy.archive_suffix;
 export const HEADER_TIMEOUT_MS = 30_000,
   READ_TIMEOUT_MS = 60_000;
 export function source(explicit, env = process.env) {

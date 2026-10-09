@@ -19,7 +19,11 @@ fn core_error(e: Error) -> JsValue {
     error(
         e.code(),
         &e.to_string(),
-        if matches!(e, Error::Input(_)) { 2 } else { 4 },
+        match e {
+            Error::Input(_) => 2,
+            Error::ResourceLimit(_) => 6,
+            _ => 4,
+        },
     )
 }
 #[allow(clippy::needless_pass_by_value)] // map_err consumes the CLI failure.
@@ -159,6 +163,19 @@ pub fn render_rows(rows: &str, format: &str) -> Result<(), JsValue> {
         renderer.row(&row, &mut host::Host).map_err(cli_error)?;
     }
     renderer.finish(&mut host::Host).map_err(cli_error)
+}
+
+/// Transport caps and the default release URL, defined once in the shared CLI core.
+#[wasm_bindgen(js_name = transport)]
+pub fn transport() -> Result<String, JsValue> {
+    use thereabouts_cli_core::transport;
+    json(&serde_json::json!({
+        "max_archive_bytes": transport::MAX_ARCHIVE_BYTES,
+        "max_unpacked_bytes": transport::MAX_UNPACKED_BYTES,
+        "default_release_url": transport::DEFAULT_RELEASE_URL,
+        "index_format": transport::INDEX_FORMAT,
+        "archive_suffix": transport::ARCHIVE_SUFFIX,
+    }))
 }
 
 /// Shared lease bounds; host IO uses the same wire format and recovery algorithm.
