@@ -12,6 +12,8 @@
 - Retired the v1 runtime, Python binary reader, Cython extension and hand-written
   Node reader. Old binary packs require rebuilding; they are not silently converted.
 - Ambiguity keeps agreed flat fields. Reverse reports distance bands.
+- Generated data dictionary (tables, joins, enumerations, tools, result fields),
+  served by the MCP server, plus an executable agent skill in skills/thereabouts.
 - Added wheel, sdist, npm and synthetic pipeline workflows. Publication is gated
   by an explicit manual run on a matching tag and release-environment approval.
 
