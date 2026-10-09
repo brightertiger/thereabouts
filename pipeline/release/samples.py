@@ -433,12 +433,9 @@ def phone(data: Dataset, settings: AcceptanceSettings) -> list[Query]:
 def phone_number(prefix: str, prefixes: set[str]) -> str | None:
     for digit in "0123456789":
         number = prefix + digit * max(1, PHONE_DIGITS - len(prefix))
-        longer = any(
-            len(other) > len(prefix) and number.startswith(other)
-            for other in prefixes
-            if other
-        )
-        if not longer:
+        # Only the number's own prefixes can be longer matches.
+        longer = range(len(prefix) + 1, len(number) + 1)
+        if not any(number[:length] in prefixes for length in longer):
             return number
     return None
 
