@@ -33,8 +33,9 @@ def test_dry_run_idempotence_and_conflicts(tmp_path: Path, backend: str) -> None
     assert preview["upload"] == 1 and not fs.exists(base)
     first = publish([item], destination, "2026.10", settings, dry_run=False)
     assert first["upload"] == 1
-    marker = base + "/2026.10/_SUCCESS"
-    assert fs.exists(marker)
+    marker = base + "/dataset/2026.10/_SUCCESS"
+    assert fs.exists(marker) and not fs.exists(base + "/2026.10/_SUCCESS")
+    assert first["success_paths"] == ["dataset/2026.10/_SUCCESS"]
     second = publish([item], destination, "2026.10", settings, dry_run=False)
     assert second["skip"] == 1 and second["upload"] == 0
     with fs.open(base + "/" + item.remote, "wb") as stream:
@@ -66,7 +67,7 @@ def test_failure_never_writes_success_and_retry_resumes(
     monkeypatch.setattr(fs, "open", interrupted)
     with pytest.raises(OSError, match="interrupted"):
         publish(files, destination, "2026.10", PublishSettings(), dry_run=False)
-    assert not fs.exists(base + "/2026.10/_SUCCESS")
+    assert not fs.exists(base + "/dataset/2026.10/_SUCCESS")
     assert not any(path.endswith("_SUCCESS") for path in writes)
     monkeypatch.setattr(fs, "open", original)
     result = publish(files, destination, "2026.10", PublishSettings(), dry_run=False)
@@ -82,4 +83,43 @@ def test_input_changes_during_upload_never_commit_success(tmp_path: Path) -> Non
     with pytest.raises(ValueError, match="checksum"):
         publish([item], destination, "2026.10", PublishSettings(), dry_run=False)
     fs, base = fsspec.core.url_to_fs(destination)
-    assert not fs.exists(base + "/2026.10/_SUCCESS")
+    assert not fs.exists(base + "/dataset/2026.10/_SUCCESS")
+
+
+def test_success_receipts_sit_under_each_version_prefix(tmp_path: Path) -> None:
+    items = []
+    for remote in ("dataset/2026.10/a.parquet", "packs/2026.10/core.tar.zst"):
+        path = tmp_path / remote.replace("/", "_")
+        path.write_bytes(remote.encode())
+        items.append(Upload(path, remote, path.stat().st_size, sha256_file(path)))
+    destination = f"memory://receipts-{uuid4()}"
+    result = publish(items, destination, "2026.10", PublishSettings(), dry_run=False)
+    fs, base = fsspec.core.url_to_fs(destination)
+    assert result["success_paths"] == [
+        "dataset/2026.10/_SUCCESS",
+        "packs/2026.10/_SUCCESS",
+    ]
+    receipts = {fs.cat(f"{base}/{path}") for path in result["success_paths"]}
+    assert len(receipts) == 1
+    assert not fs.exists(f"{base}/2026.10")
+
+
+def test_owner_decisions_block_a_public_release_only(tmp_path: Path) -> None:
+    notice = tmp_path / "DATA_LICENSES.md"
+    notice.write_text("**OWNER DECISION required before publish.** CC-BY-SA\n")
+    item = Upload(
+        notice,
+        "dataset/2026.10/DATA_LICENSES.md",
+        notice.stat().st_size,
+        sha256_file(notice),
+    )
+    destination = f"memory://owner-{uuid4()}"
+    for dry_run in (True, False):
+        with pytest.raises(ValueError, match="OWNER DECISION text must be resolved"):
+            publish([item], destination, "2026.10", PublishSettings(), dry_run=dry_run)
+    fs, base = fsspec.core.url_to_fs(destination)
+    assert not fs.exists(base)
+    private = PublishSettings(private=True)
+    result = publish([item], destination, "2026.10", private, dry_run=False)
+    assert result["unresolved"] == ["dataset/2026.10/DATA_LICENSES.md"]
+    assert fs.exists(base + "/dataset/2026.10/_SUCCESS")
