@@ -42,7 +42,7 @@ pub(crate) struct Exact {
     offsets: Vec<usize>,
 }
 impl Exact {
-    pub(crate) fn open(path: &Path, reader: &super::reader::Reader<'_>) -> Result<Self> {
+    pub(crate) fn open(path: &Path, reader: &super::reader::Reader) -> Result<Self> {
         let file = FileShard::from_file(reader.open(path)?, 4, &[8, 1, 44, 8, 1])?;
         let bytes = file.section(0)?;
         let keys = file.section(1)?;

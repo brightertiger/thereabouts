@@ -2,11 +2,11 @@
 
 import ast
 import hashlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from functools import lru_cache
 from pathlib import Path
 
-from .watch import WATCH
+Read = Callable[[Path], bytes]
 
 # The loader and validators only parse and check configuration; every value a
 # stage reads is hashed as a declared config section or a unit parameter.
@@ -44,7 +44,10 @@ def imports(module: str, package: bool, source: bytes) -> tuple[str, ...]:
     )
 
 
-def code_hashes(packages: Sequence[Path], repository: Path) -> dict[str, str]:
+def code_hashes(
+    packages: Sequence[Path], repository: Path, read: Read = Path.read_bytes
+) -> dict[str, str]:
+    """Hash a closure; a run passes its watch's `read` so later edits are seen."""
     base = repository / "pipeline"
     root_parts = len(repository.parts)
     base_parts = base.parts
@@ -80,7 +83,7 @@ def code_hashes(packages: Sequence[Path], repository: Path) -> dict[str, str]:
             initializer = modules.get(".".join(parents[:length]))
             if initializer is not None and initializer.name == "__init__.py":
                 pending.append(initializer)
-        source = WATCH.read(path)
+        source = read(path)
         result[name] = hashlib.sha256(source).hexdigest()
         module = name.removesuffix(".py").replace("/", ".")
         is_package = path.name == "__init__.py"

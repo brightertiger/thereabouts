@@ -6,6 +6,9 @@ export {
   CorruptPackError,
   ClosedGeocoderError,
   PackNotFoundError,
+  ResourceLimitError,
+  InvalidInputError,
+  InternalError,
 } from "./errors.js";
 import { Geocoder } from "./geocoder.js";
 let defaultGeocoder;

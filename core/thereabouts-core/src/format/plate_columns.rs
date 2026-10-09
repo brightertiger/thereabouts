@@ -21,7 +21,7 @@ pub(crate) struct PlateColumns {
     tables: BTreeMap<String, Table>,
 }
 impl PlateColumns {
-    pub(crate) fn open(root: &super::reader::Reader<'_>, manifest: &Manifest) -> Result<Self> {
+    pub(crate) fn open(root: &super::reader::Reader, manifest: &Manifest) -> Result<Self> {
         ensure(
             ROLES
                 .iter()

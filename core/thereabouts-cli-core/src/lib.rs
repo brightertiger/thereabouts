@@ -1,5 +1,6 @@
 //! Portable batch, presentation and exit policy shared by native and WASM hosts.
 #![cfg_attr(test, allow(clippy::unwrap_used))]
+pub mod archive;
 pub mod batch;
 mod batch_spool;
 pub mod directory;
@@ -11,6 +12,7 @@ mod object;
 pub mod render;
 mod table;
 mod table_page;
+pub mod transport;
 use serde::{Deserialize, Serialize};
 use thereabouts_core::result::Status;
 

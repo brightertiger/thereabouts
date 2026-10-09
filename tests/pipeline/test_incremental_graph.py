@@ -17,6 +17,7 @@ from pipeline.runtime.records import Dependency, Recipe
 from pipeline.runtime.runner import run
 from pipeline.stages import geographic
 from pipeline.stages.contract import Context, Stage
+from thereabouts.format import CELL_FORMAT_VERSION
 
 from .geographic_fixtures import geographic_graph, source_receipts
 from .helpers import SyntheticStage
@@ -49,7 +50,12 @@ def test_release_settings_edit_reidentifies_release_stages_only(
 
     def identities() -> dict[str, str]:
         return {
-            stage.name: stage_identity(stage, config, repository=repository)
+            stage.name: stage_identity(
+                stage,
+                config,
+                cell_format=CELL_FORMAT_VERSION,
+                repository=repository,
+            )
             for stage in config.stages
         }
 

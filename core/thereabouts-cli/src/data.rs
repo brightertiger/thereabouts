@@ -3,7 +3,6 @@ use crate::{
     args::Data,
     error::{Error, Result},
     http::Http,
-    index::DEFAULT_SOURCE,
     install,
     io::Io,
     store,
@@ -14,12 +13,15 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
+use thereabouts_cli_core::transport::DEFAULT_RELEASE_URL;
 use thereabouts_core::format::{manifest, verify};
 
 pub(crate) fn source(explicit: Option<&str>, io: &dyn Io) -> Result<Box<dyn Source>> {
     let configured = io.env("THEREABOUTS_RELEASE_URL");
-    let value = explicit.or(configured.as_deref()).unwrap_or(DEFAULT_SOURCE);
-    if value == DEFAULT_SOURCE {
+    let value = explicit
+        .or(configured.as_deref())
+        .unwrap_or(DEFAULT_RELEASE_URL);
+    if value == DEFAULT_RELEASE_URL {
         return Err(Error::Usage(
             "No release service is published yet; use --from DIR|URL or THEREABOUTS_RELEASE_URL"
                 .into(),

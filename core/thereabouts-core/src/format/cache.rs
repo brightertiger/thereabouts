@@ -62,6 +62,17 @@ impl<K: Copy + Eq + Hash, V> Cache<K, V> {
         self.append(key, entry);
         Some(value)
     }
+    pub(crate) fn remove(&mut self, key: K) {
+        if let Some(entry) = self.take(key) {
+            self.bytes -= entry.bytes;
+        }
+    }
+    pub(crate) fn clear(&mut self) {
+        self.entries.clear();
+        self.bytes = 0;
+        self.oldest = None;
+        self.newest = None;
+    }
     pub(crate) fn insert(&mut self, key: K, value: V, bytes: usize) -> Arc<V> {
         // Concurrent misses may decode the same immutable value; retain the first.
         if let Some(value) = self.get(key) {
@@ -110,5 +121,13 @@ mod tests {
         assert_eq!(cache.entries.len(), 1);
         assert_eq!(cache.oldest, Some(5));
         assert_eq!(cache.newest, Some(5));
+        cache.insert(6, 66, 0);
+        cache.remove(5);
+        assert_eq!(
+            (cache.bytes, cache.oldest, cache.newest),
+            (0, Some(6), Some(6))
+        );
+        cache.clear();
+        assert!(cache.get(6).is_none() && cache.oldest.is_none());
     }
 }

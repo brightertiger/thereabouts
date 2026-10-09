@@ -16,11 +16,7 @@ fn error(code: &str, message: &str, exit: i32) -> JsValue {
 }
 #[allow(clippy::needless_pass_by_value)] // map_err consumes the core failure.
 fn core_error(e: Error) -> JsValue {
-    error(
-        e.code(),
-        &e.to_string(),
-        if matches!(e, Error::Input(_)) { 2 } else { 4 },
-    )
+    error(e.code(), &e.to_string(), e.exit_code())
 }
 #[allow(clippy::needless_pass_by_value)] // map_err consumes the CLI failure.
 fn cli_error(e: thereabouts_cli_core::error::Error) -> JsValue {
@@ -29,6 +25,17 @@ fn cli_error(e: thereabouts_cli_core::error::Error) -> JsValue {
         return error("EPIPE", &e.to_string(), 0);
     }
     error("cli_error", &e.to_string(), e.exit_code())
+}
+/// Archive refusals are pack integrity failures; descriptor exhaustion keeps its kind.
+#[allow(clippy::needless_pass_by_value)] // map_err consumes the archive failure.
+fn archive_error(e: thereabouts_cli_core::error::Error) -> JsValue {
+    match e {
+        thereabouts_cli_core::error::Error::Pack(e) => core_error(e),
+        thereabouts_cli_core::error::Error::Integrity(message) => {
+            error("corrupt_pack", &message, 4)
+        }
+        e => cli_error(e),
+    }
 }
 fn json<T: serde::Serialize>(value: &T) -> Result<String, JsValue> {
     serde_json::to_string(value).map_err(|e| core_error(e.into()))
@@ -49,7 +56,8 @@ impl Geocoder {
     #[wasm_bindgen(js_name = open)]
     pub fn open(path: &str, verify: bool) -> Result<Self, JsValue> {
         let root = host::root(path).map_err(core_error)?;
-        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify).map_err(core_error)?;
+        let pack = Pack::open_with(&Reader::new(&root, Arc::new(host::Host)), verify)
+            .map_err(core_error)?;
         Ok(Self {
             pack: Some(Arc::new(pack)),
         })
@@ -58,7 +66,7 @@ impl Geocoder {
     #[wasm_bindgen(js_name = openWithCore)]
     pub fn open_with_core(path: &str, verify: bool, core: &Self) -> Result<Self, JsValue> {
         let root = host::root(path).map_err(core_error)?;
-        let pack = Pack::open_with(&Reader::new(&root, &host::Host), verify)
+        let pack = Pack::open_with(&Reader::new(&root, Arc::new(host::Host)), verify)
             .and_then(|p| p.with_core(Arc::clone(core.get().map_err(|_| Error::Closed)?)))
             .map_err(core_error)?;
         Ok(Self {
@@ -80,8 +88,8 @@ impl Geocoder {
     }
     /// Typed dispatch of one explicit forward verb or H3 cell.
     pub fn query(&self, request: &str) -> Result<String, JsValue> {
-        let query: query::Query =
-            serde_json::from_str(request).map_err(|e| core_error(e.into()))?;
+        let query: query::Query = serde_json::from_str(request)
+            .map_err(|e| core_error(Error::Input(format!("Invalid query request: {e}"))))?;
         json(&query.run(self.get()?).map_err(core_error)?)
     }
     /// Stream CSV or NDJSON through the portable parser and renderer.
@@ -139,7 +147,7 @@ pub fn render(
 #[wasm_bindgen(js_name = packInfo)]
 pub fn pack_info(path: &str, full: bool) -> Result<String, JsValue> {
     let root = host::root(path).map_err(core_error)?;
-    let reader = Reader::new(&root, &host::Host);
+    let reader = Reader::new(&root, Arc::new(host::Host));
     let info = if full {
         thereabouts_core::format::verify::verify_with(&reader)
     } else {
@@ -159,6 +167,65 @@ pub fn render_rows(rows: &str, format: &str) -> Result<(), JsValue> {
         renderer.row(&row, &mut host::Host).map_err(cli_error)?;
     }
     renderer.finish(&mut host::Host).map_err(cli_error)
+}
+
+/// Expand a checksum-verified release archive into an empty staging directory through the
+/// shared Rust reader; returns every extracted file with its digest.
+#[wasm_bindgen(js_name = extractArchive)]
+pub fn extract_archive(
+    archive: &str,
+    staging: &str,
+    unpacked_size: f64,
+) -> Result<String, JsValue> {
+    use thereabouts_cli_core::archive;
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let declared = if unpacked_size.is_finite()
+        && (1.0..=9_007_199_254_740_991.0).contains(&unpacked_size)
+        && unpacked_size.fract() == 0.0
+    {
+        unpacked_size as u64
+    } else {
+        return Err(error("corrupt_pack", "Invalid unpacked archive size", 4));
+    };
+    // The download lives in the store, whose own path may pass through a symlink.
+    let input = host::File::open(&host::root(archive).map_err(core_error)?)
+        .map_err(|e| archive_error(e.into()))?;
+    let summary = archive::extract(
+        std::io::BufReader::with_capacity(1 << 20, input),
+        &mut host::Staging { root: staging },
+        declared,
+    )
+    .map_err(archive_error)?;
+    let files = summary
+        .entries
+        .iter()
+        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
+        .collect::<Vec<_>>();
+    json(&serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}))
+}
+
+/// Transport caps and the default release URL, defined once in the shared CLI core.
+#[wasm_bindgen(js_name = transport)]
+pub fn transport() -> Result<String, JsValue> {
+    use thereabouts_cli_core::transport;
+    json(&serde_json::json!({
+        "max_archive_bytes": transport::MAX_ARCHIVE_BYTES,
+        "max_unpacked_bytes": transport::MAX_UNPACKED_BYTES,
+        "default_release_url": transport::DEFAULT_RELEASE_URL,
+        "index_format": transport::INDEX_FORMAT,
+        "archive_suffix": transport::ARCHIVE_SUFFIX,
+    }))
+}
+
+/// The core's failure-kind table: code, exit status and the class Node raises.
+#[wasm_bindgen(js_name = errorKinds)]
+pub fn error_kinds() -> Result<String, JsValue> {
+    json(
+        &thereabouts_core::error::KINDS
+            .iter()
+            .map(|k| serde_json::json!({"code": k.code, "exit": k.exit, "class": k.class}))
+            .collect::<Vec<_>>(),
+    )
 }
 
 /// Shared lease bounds; host IO uses the same wire format and recovery algorithm.

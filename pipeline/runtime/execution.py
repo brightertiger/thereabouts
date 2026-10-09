@@ -8,11 +8,11 @@ from fnmatch import fnmatchcase
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
 from .jsonio import digest
-from .outputs import describe, role
+from .outputs import Hashes, describe, role
 from .paths import located
 from .planning import decide
 from .records import Dependency, Output
-from .watch import WATCH, InputsChanged, changed_message
+from .watch import InputsChanged, changed_message
 
 Described = tuple[tuple[Output, ...], dict[str, str]]
 
@@ -52,9 +52,8 @@ class Executor:
     def identity(self, name: str) -> str:
         return self.identities[name]
 
-    @staticmethod
-    def check() -> None:
-        if names := WATCH.changed():
+    def check(self) -> None:
+        if names := self.ctx.watch.changed():
             raise InputsChanged(changed_message(names))
 
     def refresh(self, unit: Unit) -> Unit:
@@ -69,13 +68,18 @@ class Executor:
         """Absent recorded outputs, limited to those a consuming dependency reads."""
         if dependency is not None and dependency.control:
             return False
-        patterns = dependency.paths if dependency is not None else ()
         record = self.ctx.ledger.get(*unit.key)
-        absent = record.metadata.get("absent_paths", []) if record else []
+        if record is None:
+            return False
+        absent = record.metadata.get("absent_paths", [])
+        patterns = dependency.paths if dependency is not None else ()
         return isinstance(absent, list) and any(
             not located(self.ctx.root, str(path)).exists()
             for path in absent
-            if not patterns or any(fnmatchcase(role(str(path)), p) for p in patterns)
+            if not patterns
+            or any(
+                fnmatchcase(role(str(path), (record.inputs_hash,)), p) for p in patterns
+            )
         )
 
     def execute(
@@ -86,7 +90,7 @@ class Executor:
         requested: Sequence[Unit] | None = None,
         finalize: bool = True,
     ) -> None:
-        with WATCH.frozen():
+        with self.ctx.watch.frozen():
             self._execute(
                 name, materialize=materialize, requested=requested, finalize=finalize
             )
@@ -309,7 +313,11 @@ class Executor:
         self.ctx.guard.admit(unit.required_bytes)
         described: Described | None = None
         try:
-            described = describe(self.ctx.root, stage.run(self.ctx, unit))
+            described = describe(
+                self.ctx.root,
+                stage.run(self.ctx, unit),
+                Hashes(self.ctx.ledger.inputs_hashes, unit.inputs_hash),
+            )
             if digest(unit.recipe.parameters) != parameters:
                 raise ValueError(
                     f"{stage.name}/{unit.recipe.unit_id} changed its recipe "

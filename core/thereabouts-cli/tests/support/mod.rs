@@ -97,39 +97,12 @@ pub fn release(root: &Path) {
     let source =
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/packs/phone-sample");
     let info = manifest::read(&source).unwrap();
-    let mut archive = Vec::new();
-    for name in std::iter::once("manifest.json").chain(info.files.iter().map(|f| f.path.as_str())) {
-        let bytes = fs::read(source.join(name)).unwrap();
-        let mut header = [0u8; 512];
-        header
-            .get_mut(..name.len())
-            .unwrap()
-            .copy_from_slice(name.as_bytes());
-        header
-            .get_mut(124..136)
-            .unwrap()
-            .copy_from_slice(format!("{:011o}\0", bytes.len()).as_bytes());
-        header.get_mut(148..156).unwrap().fill(b' ');
-        *header.get_mut(156).unwrap() = b'0';
-        header
-            .get_mut(257..263)
-            .unwrap()
-            .copy_from_slice(b"ustar\0");
-        let sum: u64 = header.iter().map(|b| u64::from(*b)).sum();
-        header
-            .get_mut(148..156)
-            .unwrap()
-            .copy_from_slice(format!("{sum:06o}\0 ").as_bytes());
-        archive.extend(header);
-        archive.extend(bytes);
-        archive.resize(archive.len().next_multiple_of(512), 0);
-    }
-    archive.resize(archive.len() + 1024, 0);
     fs::create_dir_all(root).unwrap();
-    let file = root.join("phone.tar");
-    fs::write(&file, &archive).unwrap();
-    let index = serde_json::json!({"format":2,"datasets":{info.data_version:{"packs":{"phone":{
-        "url":"phone.tar","bytes":archive.len(),"sha256":manifest::digest(&file).unwrap(),"format_minor":2
+    let created =
+        thereabouts_cli_core::archive::create(&source, &root.join("phone.tar.zst")).unwrap();
+    let index = serde_json::json!({"format":3,"datasets":{info.data_version:{"packs":{"phone":{
+        "url":"phone.tar.zst","size":created.size,"sha256":created.sha256,
+        "unpacked_size":created.unpacked_size,"format_minor":2
     }}}}});
     fs::write(root.join("index.json"), serde_json::to_vec(&index).unwrap()).unwrap();
 }

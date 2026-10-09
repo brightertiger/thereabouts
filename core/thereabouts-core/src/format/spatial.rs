@@ -204,38 +204,66 @@ pub fn decode(bytes: Vec<u8>, places: usize, zones: usize) -> Result<BTreeMap<u3
     }
     Ok(blocks)
 }
-/// Encode sorted blocks using a dictionary only when it saves bytes.
-pub fn encode_blocks(blocks: &BTreeMap<u32, Vec<(u16, Label)>>) -> Result<Vec<u8>> {
-    let (mut directory, mut keys, mut values, mut dictionary) = (vec![], vec![], vec![], vec![]);
-    for (block, rows) in blocks {
+/// Selector width: zero stores labels flat; otherwise one or two bytes index a dictionary.
+fn width(rows: usize, labels: usize) -> usize {
+    let width = if labels <= 256 { 1 } else { 2 };
+    if labels * 20 + rows * width >= rows * 20 {
+        0
+    } else {
+        width
+    }
+}
+/// Bytes one block adds to a shard, excluding the container header and section padding.
+#[must_use]
+pub fn block_bytes(rows: &[(u16, Label)]) -> usize {
+    let labels = rows.iter().map(|(_, l)| *l).collect::<BTreeSet<_>>().len();
+    40 + rows.len() * 2
+        + match width(rows.len(), labels) {
+            0 => rows.len() * 20,
+            width => rows.len() * width + labels * 20,
+        }
+}
+/// Incremental shard encoder: memory follows encoded bytes, not decoded rows.
+#[derive(Debug, Default)]
+pub struct Blocks {
+    directory: Vec<u8>,
+    keys: Vec<u8>,
+    values: Vec<u8>,
+    dictionary: Vec<u8>,
+    last: Option<u32>,
+}
+impl Blocks {
+    /// Append one block; blocks must arrive in ascending order.
+    pub fn push(&mut self, block: u32, rows: &[(u16, Label)]) -> Result<()> {
+        if self.last.is_some_and(|last| last >= block) {
+            return Err(crate::Error::Input("Blocks must be pushed in order".into()));
+        }
+        self.last = Some(block);
         let labels: Vec<_> = rows
             .iter()
             .map(|(_, l)| *l)
             .collect::<BTreeSet<_>>()
             .into_iter()
             .collect();
-        let mut width = if labels.len() <= 256 { 1 } else { 2 };
-        if labels.len() * 20 + rows.len() * width >= rows.len() * 20 {
-            width = 0;
-        }
-        put(&mut directory, u64::from(*block), 4);
-        put(&mut directory, rows.len() as u64, 4);
-        put(&mut directory, keys.len() as u64, 8);
-        put(&mut directory, width as u64, 4);
+        let width = width(rows.len(), labels.len());
+        put(&mut self.directory, u64::from(block), 4);
+        put(&mut self.directory, rows.len() as u64, 4);
+        put(&mut self.directory, self.keys.len() as u64, 8);
+        put(&mut self.directory, width as u64, 4);
         put(
-            &mut directory,
+            &mut self.directory,
             if width == 0 { 0 } else { labels.len() as u64 },
             4,
         );
-        put(&mut directory, values.len() as u64, 8);
-        put(&mut directory, dictionary.len() as u64, 8);
+        put(&mut self.directory, self.values.len() as u64, 8);
+        put(&mut self.directory, self.dictionary.len() as u64, 8);
         for (key, label) in rows {
-            put(&mut keys, u64::from(*key), 2);
+            put(&mut self.keys, u64::from(*key), 2);
             if width == 0 {
-                label.encode(&mut values);
+                label.encode(&mut self.values);
             } else {
                 put(
-                    &mut values,
+                    &mut self.values,
                     labels
                         .binary_search(label)
                         .map_err(|_| crate::Error::Input("Missing encoded label".into()))?
@@ -246,19 +274,41 @@ pub fn encode_blocks(blocks: &BTreeMap<u32, Vec<(u16, Label)>>) -> Result<Vec<u8
         }
         if width != 0 {
             for label in labels {
-                label.encode(&mut dictionary);
+                label.encode(&mut self.dictionary);
             }
         }
+        Ok(())
     }
-    encode(
-        1,
-        &[
-            (&directory, 40),
-            (&keys, 2),
-            (&values, 1),
-            (&dictionary, 20),
-        ],
-    )
+    /// Section bytes accumulated so far.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.directory.len() + self.keys.len() + self.values.len() + self.dictionary.len()
+    }
+    /// True before the first block.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.directory.is_empty()
+    }
+    /// Encode the shard container.
+    pub fn encode(&self) -> Result<Vec<u8>> {
+        encode(
+            1,
+            &[
+                (&self.directory, 40),
+                (&self.keys, 2),
+                (&self.values, 1),
+                (&self.dictionary, 20),
+            ],
+        )
+    }
+}
+/// Encode sorted blocks using a dictionary only when it saves bytes.
+pub fn encode_blocks(blocks: &BTreeMap<u32, Vec<(u16, Label)>>) -> Result<Vec<u8>> {
+    let mut shard = Blocks::default();
+    for (block, rows) in blocks {
+        shard.push(*block, rows)?;
+    }
+    shard.encode()
 }
 
 #[cfg(test)]
@@ -288,5 +338,22 @@ mod tests {
         )]))
         .unwrap();
         assert!(decode(bytes, 0, 1).is_err());
+    }
+    #[test]
+    fn block_sizes_predict_incremental_shards() {
+        let root = h3o::LatLng::new(52.0, 4.0)
+            .unwrap()
+            .to_cell(h3o::Resolution::Three);
+        let block = address::address(root).0;
+        let flat = vec![(1, Label([0; 5])), (2, Label([0, 0, 0, 0, 0]))];
+        let coded: Vec<_> = (1..=300)
+            .map(|k| (k, Label([0, 0, 0, 0, u32::from(k % 3)])))
+            .collect();
+        for rows in [vec![], flat, coded] {
+            let mut shard = Blocks::default();
+            shard.push(block, &rows).unwrap();
+            assert_eq!(shard.len(), block_bytes(&rows));
+            assert!(shard.push(block, &rows).is_err());
+        }
     }
 }

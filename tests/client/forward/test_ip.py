@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.client.conformance.compare import assert_same
 from tests.client.conformance.pack_selection import selection
 from tests.tools.source_fixture import read_source
 from thereabouts import Geocoder
@@ -17,9 +18,8 @@ def test_ip_vectors() -> None:
     bundle = json.loads((FIXTURES / "ip-vectors.json").read_text())
     with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
-            assert geo.ip(case["request"]["values"][0]).to_dict() == case["result"], (
-                case["id"]
-            )
+            result = geo.ip(case["request"]["values"][0])
+            assert_same(result.to_dict(), case["result"], case["id"])
 
 
 def test_independent_interval_boundaries() -> None:

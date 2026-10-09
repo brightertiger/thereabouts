@@ -27,7 +27,12 @@ def outputs(root: Path, workers: int, threads: int) -> set[tuple[str, str, str, 
         ctx.config.resources.duckdb_threads = threads
         build(ctx, geographic_graph(ctx, normalized))
         return {
-            (record.stage, record.unit_id, role(output.path), output.sha256)
+            (
+                record.stage,
+                record.unit_id,
+                role(output.path, (record.inputs_hash,)),
+                output.sha256,
+            )
             for record in ledger.records()
             for output in record.outputs
         }

@@ -13,6 +13,8 @@ pub(crate) struct Block<'a> {
     pub cell: CellIndex,
     pub row_group: Option<usize>,
     pub rows: u64,
+    /// False for a grouped file's covered empty block: nothing is read for it.
+    pub scan: bool,
 }
 fn cell(row: &Value) -> Result<CellIndex> {
     let cell = required(row, "block")?
@@ -29,6 +31,39 @@ fn rows(row: &Value) -> Result<u64> {
         .and_then(Value::as_u64)
         .ok_or_else(|| Error::Input("Missing nonnegative cells row count".into()))
 }
+/// Covered blocks without stored rows; grouped files list them beside their row groups.
+fn covered<'a>(
+    table: &'a Value,
+    empty: &[Value],
+    parent: CellIndex,
+    result: &mut Vec<Block<'a>>,
+) -> Result<()> {
+    let mut previous = None;
+    for value in empty {
+        let cell = value
+            .as_str()
+            .and_then(|text| text.parse::<CellIndex>().ok())
+            .filter(|cell| cell.resolution() == Resolution::Three)
+            .ok_or_else(|| Error::Input("Invalid empty block H3 cell".into()))?;
+        ensure(
+            previous.is_none_or(|last| last < cell),
+            "Empty cells blocks must be sorted and unique",
+        )?;
+        ensure(
+            Some(parent) == cell.parent(Resolution::One),
+            "Cell block parent differs from group path",
+        )?;
+        previous = Some(cell);
+        result.push(Block {
+            table,
+            cell,
+            row_group: None,
+            rows: 0,
+            scan: false,
+        });
+    }
+    Ok(())
+}
 pub(crate) fn blocks(data: &Dataset) -> Result<Vec<Block<'_>>> {
     let mut result = Vec::new();
     let mut seen = BTreeSet::new();
@@ -42,8 +77,14 @@ pub(crate) fn blocks(data: &Dataset) -> Result<Vec<Block<'_>>> {
             let entries = entries
                 .as_array()
                 .ok_or_else(|| Error::Input("Cells blocks must be an array".into()))?;
+            let empty = match table.get("empty_blocks") {
+                None => &[][..],
+                Some(value) => value
+                    .as_array()
+                    .ok_or_else(|| Error::Input("Cells empty_blocks must be an array".into()))?,
+            };
             ensure(
-                entries.len() <= 49,
+                entries.len() + empty.len() <= 49,
                 "A cell group permits at most 49 blocks",
             )?;
             let parent = Path::new(required(table, "path")?)
@@ -86,14 +127,21 @@ pub(crate) fn blocks(data: &Dataset) -> Result<Vec<Block<'_>>> {
                     cell,
                     row_group: Some(index),
                     rows: rows(entry)?,
+                    scan: true,
                 });
             }
+            covered(table, empty, parent, &mut result)?;
         } else {
+            ensure(
+                table.get("empty_blocks").is_none(),
+                "Legacy cells files record empty blocks as zero-row files",
+            )?;
             result.push(Block {
                 table,
                 cell: cell(table)?,
                 row_group: None,
                 rows: rows(table)?,
+                scan: true,
             });
         }
         let entries = result

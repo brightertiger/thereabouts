@@ -8,6 +8,7 @@ from typing import cast
 from pipeline.config.schema import StageSettings
 from pipeline.config.sources import SourceSettings, normalize_settings
 from pipeline.pins.models import SourcePin
+from pipeline.runtime.code import Read
 from pipeline.runtime.fingerprints import REPOSITORY, adapter_hashes, stage_identity
 from pipeline.runtime.jsonio import Object, digest
 from pipeline.runtime.records import Dependency, Recipe
@@ -17,9 +18,13 @@ from pipeline.sources.policy import policy_hashes
 
 from .contract import Context, Unit, make_unit
 
+# A normalize unit's partitions are exactly its Parquet outputs. Consumers depend
+# on those alone, so audits, reports and the manifest never stale or restore them.
+PARTITIONS = ("*.parquet",)
 
-def adapter_digest(module: str) -> str:
-    return digest(adapter_hashes(module, REPOSITORY))
+
+def adapter_digest(module: str, read: Read = Path.read_bytes) -> str:
+    return digest(adapter_hashes(module, REPOSITORY, read))
 
 
 def adapter_context(
@@ -48,7 +53,9 @@ class SourceStage:
         self.needs = tuple(settings.needs)
 
     def identity(self, ctx: Context) -> str:
-        return stage_identity(self.settings, ctx.config, repository=REPOSITORY)
+        return stage_identity(
+            self.settings, ctx.config, repository=REPOSITORY, read=ctx.watch.read
+        )
 
     def units(self, ctx: Context) -> list[Unit]:
         current_identity = self.identity(ctx)
@@ -64,8 +71,8 @@ class SourceStage:
             parameters: Object = {"pin": cast(Object, asdict(pin))}
             if self.name == "normalize":
                 parameters |= {
-                    "adapter": adapter_digest(settings.adapter),
-                    "policies": cast(Object, policy_hashes(settings)),
+                    "adapter": adapter_digest(settings.adapter, ctx.watch.read),
+                    "policies": cast(Object, policy_hashes(settings, ctx.watch.digest)),
                     "settings": cast(Object, normalize_settings(settings)),
                 }
             recipe = Recipe(

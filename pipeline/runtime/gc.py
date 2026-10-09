@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import shutil
 from collections.abc import Iterator, Sequence
 from pathlib import Path, PurePosixPath
@@ -10,7 +11,9 @@ from pipeline.config.schema import Config
 
 from .jsonio import JSON
 from .ledger import Ledger
-from .outputs import HASHED
+
+# Inputs-hash directory names; only these, unreferenced, are collected.
+HASHED = re.compile(r"[0-9a-f]{64}")
 
 
 def embedded(value: JSON, root: Path) -> Iterator[str]:

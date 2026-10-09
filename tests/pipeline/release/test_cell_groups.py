@@ -70,7 +70,7 @@ def test_blocks_span_input_files_and_batches_but_never_row_groups(
             }
 
 
-def test_empty_blocks_have_no_index_entry_or_row_group(tmp_path: Path) -> None:
+def test_empty_blocks_keep_coverage_without_a_row_group(tmp_path: Path) -> None:
     snapshot, config, guard = fixture(tmp_path)
     config.release.countries = ["SG"]
     output = tmp_path / "dataset"
@@ -80,6 +80,9 @@ def test_empty_blocks_have_no_index_entry_or_row_group(tmp_path: Path) -> None:
     assert cells and all(
         record["blocks"] == [] and record["rows"] == 0 for record in cells
     )
+    # Covered blocks without selected rows answer no_land, as legacy files did.
+    covered = [block for record in cells for block in record["empty_blocks"]]
+    assert covered == sorted(config.release.blocks, key=lambda b: int(b, 16))
     assert all(
         pq.read_metadata(output / entry["path"]).num_row_groups == 0 for entry in cells
     )
@@ -99,7 +102,10 @@ def test_mislabelled_input_block_is_rejected(tmp_path: Path) -> None:
     assert not output.exists()
 
 
-@pytest.mark.parametrize("fault", ["missing", "rows", "position", "order", "block"])
+@pytest.mark.parametrize(
+    "fault",
+    ["missing", "rows", "position", "order", "block", "empty_overlap", "empty_parent"],
+)
 def test_invalid_manifest_block_index_refuses(tmp_path: Path, fault: str) -> None:
     snapshot, config, guard = fixture(tmp_path)
     output = tmp_path / "dataset"
@@ -116,6 +122,10 @@ def test_invalid_manifest_block_index_refuses(tmp_path: Path, fault: str) -> Non
             record["blocks"][0]["row_group"] = 1
         elif fault == "order":
             record["blocks"].reverse()
+        elif fault == "empty_overlap":
+            record["empty_blocks"] = [record["blocks"][0]["block"]]
+        elif fault == "empty_parent":
+            record["empty_blocks"] = [f"{h3.latlng_to_cell(0, 0, 3):x}"]
         else:
             record["blocks"][0]["block"] = config.release.blocks[1]
     write_json(output / "manifest.json", manifest)

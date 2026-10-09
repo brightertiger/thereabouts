@@ -25,4 +25,6 @@ tempfile = "3"
 
 [dev-dependencies]
 csv = "1"
+thereabouts-cli-core = { path = "../thereabouts-cli-core", features = ["create"] }
+zstd = "0.13"
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }

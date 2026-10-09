@@ -121,6 +121,3 @@ class Watch:
                 with self.lock:
                     entry.signature = current
         return sorted(result)
-
-
-WATCH = Watch()

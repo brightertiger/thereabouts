@@ -13,6 +13,7 @@ import pyarrow as pa
 import pytest
 
 import thereabouts
+from tests.client.conformance.compare import assert_same
 from thereabouts import (
     ClosedGeocoderError,
     CorruptPackError,
@@ -48,7 +49,7 @@ def test_shared_vectors(bundle: str) -> None:
                 if request["kind"] == "h3"
                 else geo.reverse(lat=values[0], lon=values[1])
             )
-            assert result.to_dict() == case["result"], case["id"]
+            assert_same(result.to_dict(), case["result"], case["id"])
 
 
 def test_public_exports_and_keyword_coordinates() -> None:
@@ -62,6 +63,9 @@ def test_public_exports_and_keyword_coordinates() -> None:
         "CorruptPackError",
         "ClosedGeocoderError",
         "PackNotFoundError",
+        "ResourceLimitError",
+        "InvalidInputError",
+        "InternalError",
         "WriterError",
         "WriterInputError",
     }
