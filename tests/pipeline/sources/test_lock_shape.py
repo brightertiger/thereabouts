@@ -16,8 +16,9 @@ from pipeline.sources.contract import Source
 from .replay import replay
 
 # The pinned bytes before the lock was rewritten into proposer shape (2026-10-09):
-# the digest of every source's (url, size, sha256, etag, last_modified) records.
-PAYLOADS = "3795c8cbdc1cb080d17a20717c9f53a199aa560af1b7bd6005d85fa333ec7a9f"
+# the digest of every source's (url, size, sha256, etag, last_modified) records,
+# plus the plate_country pin added on 2026-10-10.
+PAYLOADS = "dc79ca875343df42c8e0c5475434b2307741ddd461137f2134529da129041d9c"
 
 SOURCES = sorted(name for name, source in load().sources.items() if source.enabled)
 

@@ -1,7 +1,7 @@
 name: plate_country
 adapter: pipeline.sources.plate_country
 kind: registration_country_evidence
-enabled: false
+enabled: true
 upstream:
   url: https://www.wikipedia.org/
 licence:
