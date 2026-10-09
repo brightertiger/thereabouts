@@ -45,3 +45,22 @@ def test_output_ceiling_uses_profile_and_workspace_overrides() -> None:
         ).release.dataset.max_output_bytes
         == 1234
     )
+
+
+def test_plate_licences_are_listed_and_cc_by_sa_awaits_the_owner() -> None:
+    sources = licences(load(), {"plates"})
+    text = licence_text(sources, {"CC-BY-SA-4.0", "CC0-1.0"})
+    for licence in (
+        "CC-BY-SA-4.0",
+        "CC0-1.0",
+        "OGL-UK-3.0",
+        "PDDL-1.0",
+        "LicenseRef-PDL-1.0",
+        "LicenseRef-PD-Poland-Article4",
+        "LicenseRef-PD-Thailand-Section7",
+    ):
+        assert f"| plates | {licence} |" in text
+    assert text.count("OWNER DECISION") == 1
+    assert "plates" in text.split("OWNER DECISION", 1)[1]
+    plain = licence_text(licences(load(), {"codes"}), {"CC-BY-4.0"})
+    assert "OWNER DECISION" not in plain

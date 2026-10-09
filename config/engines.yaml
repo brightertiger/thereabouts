@@ -41,11 +41,13 @@ static_sources:
   phone_prefixes: phone
   timezone_cells: timezones
   zone_tables: timezones
+# Sources the lookups `names/world` unit reads, with the partition kinds it uses:
+# aliases (names) and the feature and ASCII names of linked records (places).
+name_sources:
+  geonames: [names, places]
+  overture: [names]
 spatial_sources:
   postal_codes: postal
   airports: airports
   trade_locations: unlocode
   ip_ranges: dbip
-# Sources the lookups `names/world` unit reads, with the partition kinds it uses,
-# for example {geonames: [names, places], overture: [names]}. Empty: no unit.
-name_sources: {}

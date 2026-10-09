@@ -21,3 +21,12 @@ def test_fine_coarse_outside_and_unlocated_rows() -> None:
     select = Selection(("MY",), (f"{block:x}",), H3())
     assert select.filter("timezone_cells", batch).column(0).to_pylist() == keys[:2]
     assert select.filter("airports", batch).column(0).to_pylist() == [*keys[:2], None]
+
+
+def test_country_subsets_filter_names_and_plates_but_keep_the_policy() -> None:
+    select = Selection(("MY",), (f"{h3.latlng_to_cell(3.1, 101.7, 3):x}",), H3())
+    rows = pa.record_batch({"city_id": ["a", "b"], "country_code": ["MY", "FR"]})
+    for kind in ("names", "plate_formats", "plate_codes", "plate_priors"):
+        assert select.filter(kind, rows).column(0).to_pylist() == ["a"]
+    policy = pa.record_batch({"policy_json": ["{}"]})
+    assert select.filter("plate_policy", policy).num_rows == 1

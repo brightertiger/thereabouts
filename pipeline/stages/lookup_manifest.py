@@ -8,6 +8,7 @@ from pipeline.config import reviews
 from pipeline.engines.artifact_io import file_record
 from pipeline.engines.cells.metrics import measure
 from pipeline.engines.cities.gates import failures, unreviewed
+from pipeline.engines.names import build as names
 from pipeline.engines.normalize_cells.references import reference_checks
 from pipeline.engines.reconcile.common import Row
 from pipeline.runtime.fingerprints import REPOSITORY
@@ -34,6 +35,8 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
                 tables.append(io.table(ctx, dep.stage, dep.unit_id, kind, country=key))
         elif action == "block":
             tables.append(io.table(ctx, dep.stage, dep.unit_id, "cells", block=key))
+        elif action == "names":
+            tables.append(io.table(ctx, dep.stage, dep.unit_id, "names"))
         elif action in {"static", "spatial"}:
             kind = key.partition("/")[0]
             tables.append(io.table(ctx, dep.stage, dep.unit_id, kind))
@@ -50,6 +53,9 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
         grid=ctx.config.h3,
     )
     references = reference_checks(local_tables, ctx.config.resources)
+    references["dangling_names"] = names.dangling(
+        local_tables, root / "spill", ctx.config.resources, ctx.config.engines.limits
+    )
     approval = reviews.load(located(REPOSITORY, ctx.config.engines.city_review), policy)
     failed = failures(reports, named)
     losses = failed["all_boundaries"]

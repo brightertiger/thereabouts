@@ -276,3 +276,8 @@ def test_plates_match_frozen_wikipedia_evidence(
         assert row["code"] == "AA" and row["name_en"] == "North"
         assert row["license"] == "CC-BY-SA-4.0"
         assert rows(source, "plate_survey")[0]["classification"] == "usable_now"
+        documents = {row["name"]: row for row in rows(source, "plate_documents")}
+        assert set(documents) == {"countries.csv", "wiki.json"}
+        wiki_pin = json.loads(documents["wiki.json"]["metadata"])
+        assert wiki_pin["revision"] == 1 and wiki_pin["license"] == "CC-BY-SA-4.0"
+        assert documents["wiki.json"]["path"].startswith("raw/")

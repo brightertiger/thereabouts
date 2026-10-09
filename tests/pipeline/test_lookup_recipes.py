@@ -44,7 +44,11 @@ def test_names_unit_reads_name_source_partitions_and_place_catalogues(
         Dependency("normalize_cells", "places/NL"),
     ]
     assert Dependency("lookups", "names/world") in units["lookups/manifest/current"]
-    assert "lookups/names/world" not in discovered(tmp_path, load(), {"plates"})
+    # G configures names by default; an empty selection removes the unit.
+    assert units == discovered(tmp_path, load(), {"plates"})
+    none = load()
+    none.engines.name_sources = {}
+    assert "lookups/names/world" not in discovered(tmp_path, none, {"plates"})
 
 
 def test_plate_country_follows_the_registration_source(tmp_path: Path) -> None:

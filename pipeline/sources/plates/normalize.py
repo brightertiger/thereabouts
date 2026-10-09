@@ -13,6 +13,7 @@ from pipeline.sources.shared.manifest import finish
 from pipeline.sources.shared.plates_schemas import PlateKind
 from pipeline.sources.shared.writer import PartitionWriter
 
+from . import documents
 from .coverage import reviewed_scopes
 from .reader import records
 
@@ -97,6 +98,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
             formats[country] += 1
             examples[country] += len(row["examples"])
     outputs = [p for writer in writers.values() for p in writer.finish()]
+    outputs.append(documents.write(ctx, inventory["files"]))
     report = dict(
         output_rows=dict(rows),
         survey_classes=dict(classes),
