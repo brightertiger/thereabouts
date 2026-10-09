@@ -6,9 +6,10 @@ from typing import cast
 
 from pipeline.config import policies
 from pipeline.runtime.fingerprints import REPOSITORY
-from pipeline.runtime.jsonio import Object, sha256_file
+from pipeline.runtime.jsonio import Object
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Recipe
+from pipeline.runtime.watch import WATCH
 
 from .contract import Context
 from .engine_data import Geography
@@ -79,7 +80,7 @@ def country_policy(value: Object, geography: Geography) -> Policy:
 
 
 def file_digests(paths: Sequence[str]) -> Object:
-    return {path: sha256_file(located(REPOSITORY, path)) for path in sorted(paths)}
+    return {path: WATCH.digest(located(REPOSITORY, path)) for path in sorted(paths)}
 
 
 def prepare(

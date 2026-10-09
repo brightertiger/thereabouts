@@ -13,6 +13,7 @@ from pipeline.stages.registry import ordered
 from .execution import Executor
 from .jsonio import write_json
 from .paths import located
+from .watch import WATCH
 
 
 @contextmanager
@@ -60,23 +61,25 @@ def run(
                 with lock:
                     stream.write(message + "\n")
 
-            executor = Executor(ctx, stages, event)
-            complete = False
-            previous_log, previous_event = ctx.guard.log, ctx.log
-            ctx.guard.log = ctx.log = event
-            try:
-                for stage in stages:
-                    if stage.name in selected:
-                        executor.execute(stage.name, materialize=only is not None)
-                complete = True
-            finally:
-                ctx.guard.log, ctx.log = previous_log, previous_event
-                write_json(
-                    directory / "summary.json",
-                    {
-                        "complete": complete,
-                        "completed": executor.completed,
-                        "skipped": executor.skipped,
-                    },
-                )
+            with WATCH.frozen():
+                # Identities are computed here, once, inside the frozen watch.
+                executor = Executor(ctx, stages, event)
+                complete = False
+                previous_log, previous_event = ctx.guard.log, ctx.log
+                ctx.guard.log = ctx.log = event
+                try:
+                    for stage in stages:
+                        if stage.name in selected:
+                            executor.execute(stage.name, materialize=only is not None)
+                    complete = True
+                finally:
+                    ctx.guard.log, ctx.log = previous_log, previous_event
+                    write_json(
+                        directory / "summary.json",
+                        {
+                            "complete": complete,
+                            "completed": executor.completed,
+                            "skipped": executor.skipped,
+                        },
+                    )
             return {"completed": executor.completed, "skipped": executor.skipped}

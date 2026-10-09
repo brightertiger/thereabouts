@@ -15,6 +15,7 @@ from thereabouts.format import CELL_FORMAT_VERSION
 
 from .code import code_hashes
 from .jsonio import digest
+from .watch import WATCH
 
 REPOSITORY = Path(__file__).parents[2]
 # Parts of config sections that tune performance only; outputs never read them.
@@ -35,7 +36,7 @@ def installed_version(name: str) -> str:
 
 
 def native_versions(names: Sequence[str], lock: Path) -> dict[str, str]:
-    pinned = locked_versions(lock.read_bytes())
+    pinned = locked_versions(WATCH.read(lock))
     result = {}
     for name in names:
         if name == "sqlite3":
