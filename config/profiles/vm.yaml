@@ -1,11 +1,15 @@
-# Conservative starting profile; raise measured limits for the selected VM.
+# e2-standard-8: 8 vCPUs, 32 GB memory, 15 GB swap, 300 GB pd-balanced disk.
 paths:
   root: /mnt/data
 resources:
-  duckdb_memory: 1GB
+  workers: 6
+  # Each worker's DuckDB connection; ORDER BY keeps outputs independent of threads.
+  duckdb_memory: 3GB
   duckdb_threads: 1
-  workers: 1
-  rss_limit: 2000000000
+  # Per worker: the process may hold rss_limit * workers (27 GB).
+  rss_limit: 4500000000
+  max_workspace: 250000000000
+  disk_floor: 5000000000
 
 storage:
   gcs_raw: gs://pyofflinegeocoder-summer-sector-488705-m8/raw

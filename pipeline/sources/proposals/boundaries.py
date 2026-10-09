@@ -1,6 +1,5 @@
 """Resolve geoBoundaries layers, catalog identity conflicts and immutable commits."""
 
-import hashlib
 import re
 from typing import Any
 
@@ -64,7 +63,7 @@ def layers(client: Client, settings: dict[str, Any]) -> list[dict[str, Any]]:
 def propose(settings: SourceSettings) -> SourcePin:
     client = Client(settings)
     catalog = load(settings).settings
-    reference = client.read(str(catalog["country_reference"]))
+    reference, reference_sha256 = client.document(str(catalog["country_reference"]))
     countries = country_reference(reference, catalog.get("extra_countries", {}))
     selected = layers(client, catalog)
     commits: dict[str, str] = {}
@@ -95,19 +94,21 @@ def propose(settings: SourceSettings) -> SourcePin:
             "original_url": url,
             "license": layer["boundaryLicense"],
             "license_url": layer.get("licenseSource", ""),
-            "attribution": layer["boundarySource"],
+            "attribution": "geoBoundaries; " + layer["boundarySource"],
         }
-        payloads.append(
-            client.pin(
-                f"{commit}/{key}.zip", f"{catalog['media']}/{commit}/{suffix}", metadata
-            )
+        pin = client.pin(
+            f"{commit}/{key}.zip", f"{catalog['media']}/{commit}/{suffix}", metadata
         )
+        # Git LFS serves the object id, which is the SHA256 of the payload.
+        if pin.etag != f'"{pin.sha256}"':
+            raise ValueError(f"geoBoundaries LFS object id differs from SHA256: {key}")
+        payloads.append(pin)
     return finish(
         payloads,
         "gbOpen-" + digest({"layers": selected})[:20],
         {
             "country_reference": countries,
-            "country_reference_sha256": hashlib.sha256(reference).hexdigest(),
+            "country_reference_sha256": reference_sha256,
             "commits": {
                 pin.metadata["key"]: pin.metadata["commit"] for pin in payloads
             },

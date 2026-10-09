@@ -49,6 +49,14 @@ class SourceContext:
         return matches[0]
 
     def input(self, name: str) -> Path:
+        """Pinned names resolve to content-addressed objects; others to raw files.
+
+        Objects use the mirror's `sha256/<checksum>` address, so a new pin with
+        the same logical name and new bytes is a new object.
+        """
+        for item in self.pin.files:
+            if item.name == name:
+                return located(self.raw, f"sha256/{item.sha256}")
         return located(self.raw, name)
 
     def ensure(self, path: Path) -> Path:

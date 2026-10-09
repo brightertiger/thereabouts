@@ -2,8 +2,7 @@ name: plates
 adapter: pipeline.sources.plates
 kind: registration_evidence
 enabled: true
-upstream:
-  url: https://raw.githubusercontent.com/datasets/country-codes/2e9d6498a0456f4afc2f6cf367d1e12a9ed4afe1/README.md
+upstream: {}
 licence:
   id: per-file
   url: https://opendatacommons.org/licenses/pddl/1-0/

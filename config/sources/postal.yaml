@@ -4,7 +4,7 @@ kind: postal
 enabled: true
 upstream:
   proposal: config/proposals/postal.yaml
-  url: https://download.geonames.org/export/zip/CA_full.csv.zip
+  url: https://download.geonames.org/export/zip/
 licence:
   id: CC-BY-4.0
   url: https://creativecommons.org/licenses/by/4.0/

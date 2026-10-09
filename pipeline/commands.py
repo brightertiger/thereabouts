@@ -7,6 +7,7 @@ from pipeline.arguments import Options
 from pipeline.migration.paths import legacy_relative
 from pipeline.migration.simulation import SIMULATION_NOTICE, simulate_handover
 from pipeline.runtime.context import context
+from pipeline.runtime.gc import garbage, remove, size
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.paths import located
@@ -64,6 +65,24 @@ def invalidate(ctx: Context, options: Options) -> int:
         ) as writable:
             removed = writable.invalidate(options.positional[0], options.units)
         print(f"invalidated {removed} units")
+    return 0
+
+
+def collect_garbage(ctx: Context, options: Options) -> int:
+    if not ctx.ledger.migrated:
+        raise ValueError("Migrate the ledger before collecting garbage")
+    with exclusive(located(ctx.root, ctx.config.paths.work) / "pipeline.lock"):
+        # Read the ledger again under the lock, so no writer commits meanwhile.
+        with Ledger(ctx.root, options.ledger, readonly=True) as ledger:
+            paths = garbage(ctx.root, ctx.config, ledger)
+        verb = "would remove" if options.dry_run else "removing"
+        total = 0
+        for path in paths:
+            total += (count := size(path))
+            print(f"{verb} {path.relative_to(ctx.root)} ({count} bytes)")
+        if not options.dry_run:
+            remove(paths)
+        print(f"{verb} {len(paths)} paths, {total} bytes")
     return 0
 
 

@@ -42,9 +42,10 @@ use source::Dataset;
 pub use source::MEMORY_BUDGET_BYTES;
 use std::{collections::BTreeMap, fs, path::Path};
 // Encoding revision is independent of the library release and changes when bytes change.
-const WRITER_REVISION: &str = "0.4.0";
-// Core packs group many blocks and places per shard.
-const CORE_REVISION: &str = "0.3.0";
+/// Forward-pack encoding revision; pipeline pack identities include it.
+pub const WRITER_REVISION: &str = "0.4.0";
+/// Core-pack encoding revision: grouped cells and catalogue shards (0.2.2 before).
+pub const CORE_REVISION: &str = "0.3.0";
 /// Cells and catalogue shards fill up to 32 MiB: about ninety files for a world core,
 /// half the 64 MiB shard ceiling so one more block or place always fits.
 pub const SHARD_TARGET_BYTES: u64 = 32 * 1024 * 1024;

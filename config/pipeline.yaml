@@ -7,12 +7,15 @@ resources:
   duckdb_memory: 1GB
   duckdb_threads: 1
   workers: 1
+  # Resident bytes per worker; the process may hold rss_limit * workers.
   rss_limit: 2000000000
   disk_floor: 5000000000
   max_workspace: 60000000000
   poll_seconds: 10
   ledger_timeout_seconds: 30
   workspace_scan_seconds: 60
+  # Admission fails with a clear error after this wait instead of pausing forever.
+  admission_timeout_seconds: 1800
 h3:
   block_resolution: 3
   cell_resolution: 8

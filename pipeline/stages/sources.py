@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import cast
 
 from pipeline.config.schema import StageSettings
+from pipeline.config.sources import normalize_settings
 from pipeline.pins.models import SourcePin
-from pipeline.runtime.code import code_hashes
-from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
+from pipeline.runtime.fingerprints import REPOSITORY, adapter_hashes, stage_identity
 from pipeline.runtime.jsonio import Object, digest
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.sources.contract import Source, SourceContext
@@ -19,9 +19,7 @@ from .contract import Context, Unit, make_unit
 
 
 def adapter_digest(module: str) -> str:
-    stem = REPOSITORY.joinpath(*module.split("."))
-    path = stem if stem.is_dir() else stem.with_suffix(".py")
-    return digest(code_hashes([path], REPOSITORY))
+    return digest(adapter_hashes(module, REPOSITORY))
 
 
 class SourceStage:
@@ -31,17 +29,7 @@ class SourceStage:
         self.needs = tuple(settings.needs)
 
     def identity(self, ctx: Context) -> str:
-        tree = asdict(ctx.config)
-        return identity(
-            [REPOSITORY / path for path in self.settings.packages],
-            config={
-                "stage": asdict(self.settings),
-                **{name: tree[name] for name in self.settings.config},
-            },
-            pins={},
-            repository=REPOSITORY,
-            native=native_versions(self.settings.native, REPOSITORY / "uv.lock"),
-        )
+        return stage_identity(self.settings, ctx.config, repository=REPOSITORY)
 
     def units(self, ctx: Context) -> list[Unit]:
         current_identity = self.identity(ctx)
@@ -52,18 +40,19 @@ class SourceStage:
             pin = self.pins[name]
             if not pin.available:
                 raise ValueError(f"Enabled source has no reviewed pin: {name}")
+            # Downloads fetch exactly the pinned bytes; transfer limits and upstream
+            # URLs change how, not what. Normalizers hash what they read.
+            parameters: Object = {"pin": cast(Object, asdict(pin))}
+            if self.name == "normalize":
+                parameters |= {
+                    "adapter": adapter_digest(settings.adapter),
+                    "policies": cast(Object, policy_hashes(settings)),
+                    "settings": cast(Object, normalize_settings(settings)),
+                }
             recipe = Recipe(
                 self.name,
                 name,
-                cast(
-                    Object,
-                    {
-                        "source": asdict(settings),
-                        "pin": asdict(pin),
-                        "adapter": adapter_digest(settings.adapter),
-                        "policies": policy_hashes(settings),
-                    },
-                ),
+                parameters,
                 (Dependency("download", name),) if self.name == "normalize" else (),
             )
             unit = make_unit(ctx, recipe, current_identity)

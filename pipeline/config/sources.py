@@ -32,9 +32,23 @@ class SourceLimits:
     parquet_bytes: int = 128_000_000
     chunk_bytes: int = 32_000_000
     read_bytes: int = 1_048_576
-    retries: int = 5
+    # Jittered backoff doubles from backoff_seconds up to timeout_seconds; twenty
+    # retries span about the fifteen minutes of patience a stalled file gets.
+    retries: int = 20
     timeout_seconds: float = 60.0
     backoff_seconds: float = 1.0
+    patience_seconds: float = 900.0
+
+
+# Transfer budgets bound how bytes are fetched, never what normalization makes of
+# them; patience_seconds is the download retry budget.
+DOWNLOAD_LIMITS = (
+    "download_bytes",
+    "retries",
+    "timeout_seconds",
+    "backoff_seconds",
+    "patience_seconds",
+)
 
 
 @dataclass
@@ -49,6 +63,19 @@ class SourceSettings:
     limits: SourceLimits = field(default_factory=SourceLimits)
     options: dict[str, Any] = field(default_factory=dict)
     policies: dict[str, str] = field(default_factory=dict)
+
+
+def normalize_settings(source: SourceSettings) -> dict[str, Any]:
+    """Settings a normalizer reads; upstream URLs and transfer limits are excluded."""
+    values = asdict(source)
+    for name in ("upstream", "enabled"):
+        values.pop(name)
+    values["limits"] = {
+        name: value
+        for name, value in values["limits"].items()
+        if name not in DOWNLOAD_LIMITS
+    }
+    return values
 
 
 def load_sources(directory: Path) -> dict[str, SourceSettings]:
@@ -110,11 +137,20 @@ def validate_source(source: SourceSettings) -> None:
         raise ValueError(
             f"{source.name} requires batch_bytes <= part_bytes <= parquet_bytes"
         )
-    if limits.retries < 0 or limits.backoff_seconds < 0 or limits.timeout_seconds <= 0:
+    if (
+        limits.retries < 0
+        or limits.backoff_seconds < 0
+        or limits.timeout_seconds <= 0
+        or limits.patience_seconds <= 0
+    ):
         raise ValueError(f"Invalid download retry limits for {source.name}")
     if not all(
         math.isfinite(value)
-        for value in (limits.backoff_seconds, limits.timeout_seconds)
+        for value in (
+            limits.backoff_seconds,
+            limits.timeout_seconds,
+            limits.patience_seconds,
+        )
     ):
         raise ValueError(f"Nonfinite download retry limits for {source.name}")
 

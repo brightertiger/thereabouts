@@ -4,7 +4,7 @@ kind: places_and_names
 enabled: true
 upstream:
   proposal: config/proposals/geonames.yaml
-  url: https://download.geonames.org/export/dump/allCountries.zip
+  url: https://download.geonames.org/export/dump/
 licence:
   id: CC-BY-4.0
   url: https://creativecommons.org/licenses/by/4.0/

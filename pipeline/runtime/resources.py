@@ -1,4 +1,4 @@
-"""Admission guard: pause on disk or memory pressure; never delete user data."""
+"""Admission guard: pause on disk or memory pressure, fail after a bounded wait."""
 
 import os
 import shutil
@@ -98,18 +98,34 @@ class ResourceGuard:
     def admit(self, required_bytes: int = 0) -> None:
         if required_bytes < 0:
             raise ValueError("A unit's disk reservation cannot be negative")
+        limits = self.limits
+        started = self.clock()
         while True:
             self.usage()
             with self.lock:
                 free, used, rss = self.free(self.root), self.measured or 0, self.rss()
                 needed = self.reserved + required_bytes
-                if (
-                    free - needed >= self.limits.disk_floor
-                    and used + needed <= self.limits.max_workspace
-                    and rss <= self.limits.rss_limit
-                ):
+                exhausted = [
+                    name
+                    for name, fits in (
+                        ("disk_floor", free - needed >= limits.disk_floor),
+                        ("max_workspace", used + needed <= limits.max_workspace),
+                        ("rss_limit", rss <= limits.rss_limit * limits.workers),
+                    )
+                    if not fits
+                ]
+                if not exhausted:
                     self.reserved += required_bytes
                     return
+            waited = self.clock() - started
+            if waited >= limits.admission_timeout_seconds:
+                raise ValueError(
+                    f"Admission waited {waited:.0f}s on "
+                    f"{', '.join('resources.' + name for name in exhausted)} "
+                    f"(free={free}, workspace={used}, rss={rss}, reserved={needed}); "
+                    "remove superseded outputs with `python -m pipeline gc` or "
+                    "raise the limit"
+                )
             self.log(
                 f"paused: free={free}, workspace={used}, rss={rss}, "
                 f"reserved={needed}; waiting for resource headroom"

@@ -28,12 +28,13 @@ class Options:
     only: str | None
     units: list[str]
     details: bool
+    yes: bool = False
 
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
     result.add_argument(
-        "command", choices=("plan", "status", "run", "invalidate", "migrate")
+        "command", choices=("plan", "status", "run", "invalidate", "migrate", "gc")
     )
     result.add_argument(
         "arguments", nargs="*", help="stage, migration step, or key=value overrides"
@@ -50,6 +51,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument(
         "--details", action="store_true", help="print noncurrent unit explanations"
     )
+    result.add_argument(
+        "--yes", action="store_true", help="confirm deleting completion records"
+    )
     return result
 
 
@@ -63,12 +67,12 @@ def parse(argv: Sequence[str] | None) -> Options:
     stages = registry(config)
     root = Path(config.paths.root).absolute()
     ledger = args.ledger or located(root, config.paths.ledger)
-    if args.command in {"migrate", "invalidate"} and not ledger.exists():
+    if args.command in {"migrate", "invalidate", "gc"} and not ledger.exists():
         raise ValueError("No existing ledger at the configured workspace")
     if args.ledger and args.command not in {"plan", "status"}:
         raise ValueError("--ledger is only for read-only plan/status")
-    if args.dry_run and args.command != "migrate":
-        raise ValueError("--dry-run is only for migrate; use plan for a dry run")
+    if args.dry_run and args.command not in {"migrate", "gc"}:
+        raise ValueError("--dry-run is for migrate and gc; use plan for a run")
     if args.command not in {"invalidate", "migrate"} and positional:
         raise ValueError(f"Unexpected arguments: {positional}")
     if (args.through or args.only) and args.command != "run":
@@ -85,6 +89,13 @@ def parse(argv: Sequence[str] | None) -> Options:
         raise ValueError("invalidate requires one registered stage")
     if args.units and args.command != "invalidate":
         raise ValueError("--units is an invalidate option")
+    if args.yes and args.command != "invalidate":
+        raise ValueError("--yes is an invalidate option")
+    if args.command == "invalidate" and not args.yes:
+        raise ValueError(
+            "invalidate deletes completion records and forces rebuilds; "
+            "pass --yes to confirm"
+        )
     if args.details and args.command != "plan":
         raise ValueError("--details is a plan option")
     if args.report and args.command not in {"plan", "migrate", "status"}:
@@ -109,4 +120,5 @@ def parse(argv: Sequence[str] | None) -> Options:
         args.only,
         args.units or [],
         args.details,
+        args.yes,
     )

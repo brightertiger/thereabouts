@@ -1,6 +1,6 @@
 """Explicit ledger records and independently retained unit recipes."""
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import cast
 
 from .jsonio import JSON, Object
@@ -87,7 +87,3 @@ def recipe_from_json(value: Object) -> Recipe:
             for d in dependencies
         ),
     )
-
-
-def output_json(output: Output) -> Object:
-    return cast(Object, asdict(output))

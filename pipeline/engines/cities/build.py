@@ -23,7 +23,6 @@ def build_country(
     source: Path,
     urban: Urban,
     policy: Row,
-    inputs_hash: str,
     limits: EngineLimits,
 ) -> Row:
     report_path = root / "report.json"
@@ -174,7 +173,6 @@ def build_country(
     table.update(kind="canonical_cities", country=cc)
     report: Row = {
         "country": cc,
-        "digest": inputs_hash,
         "index": file_record(workspace, path),
         "table": table,
         "candidates": len(cities),

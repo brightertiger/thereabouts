@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from collections import Counter
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +26,7 @@ def build(
     *,
     exhaustive: bool = False,
     scalar_samples: int = 0,
+    log: Callable[[str], None] | None = None,
 ) -> tuple[list[Row], Row]:
     if not set(countries) <= inputs.countries.keys():
         raise ValueError("A block touching an unfinished country must wait")
@@ -109,11 +111,15 @@ def build(
         "enumerated": len(fine),
         "labelled": labelled,
         "eligible": int(np.count_nonzero(labels)),
-        "seconds": time.monotonic() - started,
-        "prepare_seconds": prepared - started,
-        "label_seconds": labelled_at - prepared,
-        "production_seconds": production_seconds,
         "resolutions": dict(resolutions),
         "checks": checks,
     }
+    if log is not None:
+        # Timings vary per run, so they are logged rather than recorded.
+        log(
+            f"cells block {h3.int_to_str(root)}: "
+            f"{time.monotonic() - started:.3f}s, prepare {prepared - started:.3f}s, "
+            f"label {labelled_at - prepared:.3f}s, "
+            f"production {production_seconds:.3f}s"
+        )
     return output_rows, stats

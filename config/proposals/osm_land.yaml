@@ -9,4 +9,5 @@ files:
     license_url: https://opendatacommons.org/licenses/odbl/1-0/
 settings:
   release_file: land-polygons-split-4326.zip
-  date_format: '%Y-%m-%dT%H:%M:%S%z'
+  # The date is converted to UTC first, so a literal Z is exact.
+  date_format: '%Y-%m-%dT%H:%M:%SZ'

@@ -75,7 +75,12 @@ def test_real_console_mcp_returns_current_result_json(tmp_path: Path) -> None:
                 "phone",
                 "ip",
                 "plate",
+                "describe",
             }
+            dictionary = (
+                await client.read_resource("thereabouts://dictionary")
+            ).contents
+            assert "thereabouts-data-dictionary-1" in str(dictionary[0])
             value = await client.call_tool("reverse", {"lat": 48.8566, "lon": 2.3522})
             assert not value.is_error
             assert value.structured_content == expected

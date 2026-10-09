@@ -141,11 +141,10 @@ def validate(config: Config) -> None:
         )
     if not re.fullmatch(r"[1-9][0-9]*(MB|GB)", resources.duckdb_memory):
         raise ValueError("resources.duckdb_memory must be a positive MB or GB size")
-    if (
-        not math.isfinite(resources.workspace_scan_seconds)
-        or resources.workspace_scan_seconds <= 0
-    ):
-        raise ValueError("resources.workspace_scan_seconds must be finite and positive")
+    for name in ("workspace_scan_seconds", "admission_timeout_seconds"):
+        value = getattr(resources, name)
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError(f"resources.{name} must be finite and positive")
     if not 0 <= config.h3.block_resolution <= config.h3.cell_resolution <= 15:
         raise ValueError("h3 resolutions must satisfy 0 <= block <= cell <= 15")
     if config.h3.cell_resolution != 8:

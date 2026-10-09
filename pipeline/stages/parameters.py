@@ -1,6 +1,6 @@
 """Compose unit policies and resource reservations without knowing stage names."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import cast
 
@@ -9,11 +9,20 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import Object
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Recipe
+from pipeline.runtime.watch import WATCH
 
 from .contract import Context
 from .engine_data import Geography
 
 Policy = Callable[[Recipe], Object]
+# Evaluation fixtures read by reconciliation and city quality reports at run time.
+RECONCILE_EVIDENCE = ("eval/reconcile/fixtures.json",)
+CITY_EVIDENCE = (
+    "eval/cities/diagnostic_expectations.json",
+    "eval/cities/probes.json",
+    "eval/cities/regressions.json",
+    *RECONCILE_EVIDENCE,
+)
 
 
 @dataclass(frozen=True)
@@ -70,6 +79,10 @@ def country_policy(value: Object, geography: Geography) -> Policy:
     return select
 
 
+def file_digests(paths: Sequence[str]) -> Object:
+    return {path: WATCH.digest(located(REPOSITORY, path)) for path in sorted(paths)}
+
+
 def prepare(
     policy: Policy,
     geography: Geography,
@@ -78,10 +91,16 @@ def prepare(
     block_bytes: int,
     extra: Object | None = None,
     refresh_plan: bool = False,
+    reads: Mapping[str, Sequence[str]] | None = None,
 ) -> Configure:
+    """Repository data files an action reads at run time enter its parameters."""
+    digests = {action: file_digests(paths) for action, paths in (reads or {}).items()}
+
     def configure(recipe: Recipe) -> Options:
         action = recipe.unit_id.partition("/")[0]
         parameters = {"policy": policy(recipe), **(extra or {})}
+        if action in digests:
+            parameters["reads"] = digests[action]
         if action == "block":
             parameters["countries"] = list(selected_countries(recipe, geography))
         return Options(

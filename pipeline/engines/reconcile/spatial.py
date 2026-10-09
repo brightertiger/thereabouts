@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 import sqlite3
+import threading
 from collections import OrderedDict
 from collections.abc import Iterator
 
@@ -11,22 +12,31 @@ import shapely
 from shapely.geometry.base import BaseGeometry
 
 EARTH_M = 6_371_008.8
-_CACHE: OrderedDict[bytes, BaseGeometry] = OrderedDict()
-_CACHE_BYTES = 0
+
+
+class _Decoded(threading.local):
+    """Prepared geometries are per thread: GEOS prepares lazily on first use."""
+
+    def __init__(self) -> None:
+        self.values: OrderedDict[bytes, BaseGeometry] = OrderedDict()
+        self.bytes = 0
+
+
+_DECODED = _Decoded()
 
 
 def decode(wkb: bytes) -> BaseGeometry:
-    global _CACHE_BYTES
-    if wkb in _CACHE:
-        _CACHE.move_to_end(wkb)
-        return _CACHE[wkb]
+    cache = _DECODED
+    if wkb in cache.values:
+        cache.values.move_to_end(wkb)
+        return cache.values[wkb]
     geometry = shapely.from_wkb(wkb)
-    while _CACHE and _CACHE_BYTES + len(wkb) > 32_000_000:
-        previous, _ = _CACHE.popitem(last=False)
-        _CACHE_BYTES -= len(previous)
+    while cache.values and cache.bytes + len(wkb) > 32_000_000:
+        previous, _ = cache.values.popitem(last=False)
+        cache.bytes -= len(previous)
     if len(wkb) <= 32_000_000:
-        _CACHE[wkb] = geometry
-        _CACHE_BYTES += len(wkb)
+        cache.values[wkb] = geometry
+        cache.bytes += len(wkb)
         shapely.prepare(geometry)
     return geometry
 

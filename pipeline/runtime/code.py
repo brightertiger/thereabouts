@@ -6,9 +6,16 @@ from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
 
+from .watch import WATCH
+
+# The loader and validators only parse and check configuration; every value a
+# stage reads is hashed as a declared config section or a unit parameter.
 EXCLUDED = (
     "pipeline/runtime/",
     "pipeline/stages/contract.py",
+    "pipeline/config/__init__.py",
+    "pipeline/config/engine_validation.py",
+    "pipeline/config/loader.py",
     "pipeline/config/schema.py",
 )
 
@@ -73,7 +80,7 @@ def code_hashes(packages: Sequence[Path], repository: Path) -> dict[str, str]:
             initializer = modules.get(".".join(parents[:length]))
             if initializer is not None and initializer.name == "__init__.py":
                 pending.append(initializer)
-        source = path.read_bytes()
+        source = WATCH.read(path)
         result[name] = hashlib.sha256(source).hexdigest()
         module = name.removesuffix(".py").replace("/", ".")
         is_package = path.name == "__init__.py"

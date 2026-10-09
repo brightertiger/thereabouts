@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from pipeline.config import load
 from pipeline.config.schema import StageSettings
 from pipeline.config.sources import SourceSettings
 from pipeline.pins.models import PinFile, SourcePin
@@ -12,6 +13,7 @@ from pipeline.runtime.planning import plan
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.stages import sources
 from pipeline.stages.contract import Stage
+from pipeline.stages.registry import registry
 
 from ..helpers import SyntheticStage, context
 
@@ -89,5 +91,42 @@ def test_source_changes_do_not_invalidate_unrelated_units(
         pins["alpha"].release = "next"
         assert changed() == expected
         pins["alpha"].release = "initial"
+        # Downloads fetch the pin; only normalizers run the adapter.
         (repository / "pipeline/sources/alpha.py").write_text("value = 2\n")
-        assert changed() == expected
+        assert changed() == expected - {("download", "alpha")}
+
+
+def source_hashes(tmp_path: Path, *overrides: str) -> dict[tuple[str, str], str]:
+    config = load(overrides=overrides)
+    stages = [s for s in registry(config) if s.name in {"download", "normalize"}]
+    with Ledger(tmp_path, None, readonly=False) as ledger:
+        ctx = context(tmp_path, ledger)
+        ctx.config = config
+        return {
+            unit.key: unit.inputs_hash for stage in stages for unit in stage.units(ctx)
+        }
+
+
+@pytest.mark.parametrize(
+    "edit",
+    [
+        "limits.retries=9",
+        "limits.timeout_seconds=120",
+        "limits.backoff_seconds=3",
+        "limits.download_bytes=1",
+        "limits.patience_seconds=60",
+        "upstream.url=https://mirror.example/allCountries.zip",
+    ],
+)
+def test_transfer_settings_change_no_unit(tmp_path: Path, edit: str) -> None:
+    base = source_hashes(tmp_path)
+    assert len(base) > 20
+    assert source_hashes(tmp_path, f"sources.geonames.{edit}") == base
+
+
+def test_normalize_settings_change_that_normalizer_only(tmp_path: Path) -> None:
+    base = source_hashes(tmp_path)
+    edited = source_hashes(tmp_path, "sources.geonames.limits.batch_rows=8")
+    assert {key for key in base if base[key] != edited[key]} == {
+        ("normalize", "geonames")
+    }

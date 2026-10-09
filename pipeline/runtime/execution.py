@@ -3,12 +3,18 @@
 from collections.abc import Callable, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import replace
-from pathlib import Path
+from fnmatch import fnmatchcase
 
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
+from .jsonio import digest
+from .outputs import describe, role
 from .paths import located
 from .planning import decide
+from .records import Dependency, Output
+from .watch import WATCH, InputsChanged, changed_message
+
+Described = tuple[tuple[Output, ...], dict[str, str]]
 
 
 class Executor:
@@ -21,10 +27,10 @@ class Executor:
         self.ctx, self.stages, self.event = ctx, stages, event
         self.by_stage = {stage.name: stage for stage in stages}
         self.cache: dict[str, dict[tuple[str, str], Unit]] = {}
-        # Stage identities hash the declared code closure, settings and pins;
-        # recomputing them for each of tens of thousands of refreshed units
-        # dominated start-up, so each pass computes them once per stage.
-        self.identities: dict[str, str] = {}
+        # Identities are fixed once, before any unit runs: the code a process
+        # imported is the code its records describe. Later edits stop the run
+        # at the next unit boundary (see `check`).
+        self.identities = {stage.name: stage.identity(ctx) for stage in stages}
         self.completed = 0
         self.skipped = 0
         self.skipped_keys: set[tuple[str, str]] = set()
@@ -44,9 +50,12 @@ class Executor:
         return self.cache[name]
 
     def identity(self, name: str) -> str:
-        if name not in self.identities:
-            self.identities[name] = self.by_stage[name].identity(self.ctx)
         return self.identities[name]
+
+    @staticmethod
+    def check() -> None:
+        if names := WATCH.changed():
+            raise InputsChanged(changed_message(names))
 
     def refresh(self, unit: Unit) -> Unit:
         return replace(
@@ -56,11 +65,17 @@ class Executor:
             refresh_discovery=unit.refresh_discovery,
         )
 
-    def missing(self, unit: Unit) -> bool:
+    def missing(self, unit: Unit, dependency: Dependency | None = None) -> bool:
+        """Absent recorded outputs, limited to those a consuming dependency reads."""
+        if dependency is not None and dependency.control:
+            return False
+        patterns = dependency.paths if dependency is not None else ()
         record = self.ctx.ledger.get(*unit.key)
         absent = record.metadata.get("absent_paths", []) if record else []
         return isinstance(absent, list) and any(
-            not located(self.ctx.root, str(path)).exists() for path in absent
+            not located(self.ctx.root, str(path)).exists()
+            for path in absent
+            if not patterns or any(fnmatchcase(role(str(path)), p) for p in patterns)
         )
 
     def execute(
@@ -71,8 +86,20 @@ class Executor:
         requested: Sequence[Unit] | None = None,
         finalize: bool = True,
     ) -> None:
+        with WATCH.frozen():
+            self._execute(
+                name, materialize=materialize, requested=requested, finalize=finalize
+            )
+
+    def _execute(
+        self,
+        name: str,
+        *,
+        materialize: bool,
+        requested: Sequence[Unit] | None,
+        finalize: bool,
+    ) -> None:
         self.cache.pop(name, None)
-        self.identities.clear()
         required: dict[tuple[str, str], Unit] = {}
         visiting: set[tuple[str, str]] = set()
         checked: set[tuple[str, str]] = set()
@@ -125,8 +152,7 @@ class Executor:
             if refresh:
                 self._stage(stage, refresh)
                 self.cache.clear()
-                self.identities.clear()
-                self.execute(
+                self._execute(
                     name,
                     materialize=materialize,
                     requested=requested,
@@ -144,7 +170,7 @@ class Executor:
     def restore_inputs(self, stage: Stage, unit: Unit) -> None:
         for dependency in unit.recipe.dependencies:
             upstream = self.discover(dependency.stage)[dependency.key]
-            if self.missing(upstream):
+            if self.missing(upstream, dependency):
                 self.execute(
                     dependency.stage,
                     materialize=True,
@@ -153,78 +179,150 @@ class Executor:
                 )
 
     def _stage(self, stage: Stage, pending: dict[tuple[str, str], Unit]) -> None:
-        running: dict[Future[list[Path]], Unit] = {}
-        with ThreadPoolExecutor(max_workers=self.ctx.config.resources.workers) as pool:
+        """Run ready units; on a failure, an interrupt or an edit, stop scheduling.
+
+        Running units are always waited for. Those that finish are recorded,
+        except after an edit to hashed inputs, when nothing more is recorded.
+        A second interrupt abandons the wait.
+        """
+        running: dict[Future[Described], Unit] = {}
+        stop: BaseException | None = None
+        pool = ThreadPoolExecutor(max_workers=self.ctx.config.resources.workers)
+        try:
             while pending or running:
-                active = set(pending) | {u.key for u in running.values()}
-                for key, original in list(pending.items()):
-                    if len(running) >= self.ctx.config.resources.workers:
-                        break
-                    if any(dep.key in active for dep in original.recipe.dependencies):
-                        continue
-                    unit = self.refresh(original)
-                    if decide(self.ctx, unit).state == "current" and not self.missing(
-                        unit
-                    ):
-                        del pending[key]
-                        active.remove(key)
-                        self.skip(unit.key)
-                        continue
-                    missing = any(
-                        self.missing(self.discover(dep.stage)[dep.key])
-                        for dep in unit.recipe.dependencies
-                    )
-                    if missing:
-                        if running:
-                            continue
-                        self.restore_inputs(stage, unit)
-                        unit = self.refresh(unit)
-                    del pending[key]
-                    self.event(f"running {stage.name}/{unit.recipe.unit_id}")
-                    running[pool.submit(self._run, stage, unit)] = unit
+                if stop is None:
+                    try:
+                        self._submit(stage, pending, running, pool)
+                    except (Exception, KeyboardInterrupt) as error:
+                        stop = error
                 if not running:
-                    if pending:
+                    if pending and stop is None:
                         raise ValueError("No runnable unit; unresolved dependencies")
                     break
-                ready, _ = wait(running, return_when=FIRST_COMPLETED)
-                for future in ready:
-                    unit = running.pop(future)
-                    paths = future.result()
-                    if stage.identity(self.ctx) != unit.identity:
-                        raise ValueError(f"Stage changed during {stage.name}")
-                    with self.ctx.ledger.transaction():
-                        self.ctx.ledger.register(unit.recipe)
-                    self.ctx.ledger.complete(
-                        *unit.key,
-                        unit.inputs_hash,
-                        paths,
-                        metadata={
-                            "identity": unit.identity,
-                            "dependency_hash": unit.dependency_hash,
-                        },
-                    )
-                    self.event(f"complete {stage.name}/{unit.recipe.unit_id}")
-                    self.completed += 1
-                    self.completed_keys.add(unit.key)
-                    if unit.key in self.skipped_keys:
-                        self.skipped_keys.remove(unit.key)
-                        self.skipped -= 1
+                try:
+                    ready, _ = wait(running, return_when=FIRST_COMPLETED)
+                except KeyboardInterrupt as error:
+                    if isinstance(stop, KeyboardInterrupt):
+                        raise
+                    stop = error
+                    self.event(f"interrupted; waiting for {len(running)} units")
+                    continue
+                try:
+                    stop = self._collect(stage, ready, running, stop)
+                except KeyboardInterrupt as error:
+                    # Unprocessed futures stay in `running`; the next wait drains them.
+                    if isinstance(stop, KeyboardInterrupt):
+                        raise
+                    stop = error
+        finally:
+            pool.shutdown(wait=False, cancel_futures=True)
+        if stop is not None:
+            raise stop
 
-    def _run(self, stage: Stage, unit: Unit) -> list[Path]:
+    def _collect(
+        self,
+        stage: Stage,
+        ready: set[Future[Described]],
+        running: dict[Future[Described], Unit],
+        stop: BaseException | None,
+    ) -> BaseException | None:
+        for future in ready:
+            unit = running.pop(future)
+            name = f"{stage.name}/{unit.recipe.unit_id}"
+            try:
+                outputs, receipts = future.result()
+            except Exception as error:
+                self.event(f"failed {name}: {error}")
+                stop = stop or error
+                continue
+            if not isinstance(stop, InputsChanged):
+                try:
+                    self.check()
+                except InputsChanged as error:
+                    stop = error
+            if isinstance(stop, InputsChanged):
+                self.event(f"not recorded {name}: hashed inputs changed")
+                continue
+            self._record(unit, outputs, receipts)
+            self.event(f"complete {name}")
+        return stop
+
+    def _submit(
+        self,
+        stage: Stage,
+        pending: dict[tuple[str, str], Unit],
+        running: dict[Future[Described], Unit],
+        pool: ThreadPoolExecutor,
+    ) -> None:
+        active = set(pending) | {u.key for u in running.values()}
+        for key, original in list(pending.items()):
+            if len(running) >= self.ctx.config.resources.workers:
+                break
+            if any(dep.key in active for dep in original.recipe.dependencies):
+                continue
+            unit = self.refresh(original)
+            if decide(self.ctx, unit).state == "current" and not self.missing(unit):
+                del pending[key]
+                active.remove(key)
+                self.skip(unit.key)
+                continue
+            missing = any(
+                self.missing(self.discover(dep.stage)[dep.key], dep)
+                for dep in unit.recipe.dependencies
+            )
+            if missing:
+                if running:
+                    continue
+                self.restore_inputs(stage, unit)
+                unit = self.refresh(unit)
+            self.check()
+            del pending[key]
+            self.event(f"running {stage.name}/{unit.recipe.unit_id}")
+            # Units of one stage may share parameter objects, such as a policy;
+            # the digest is taken before any of them runs.
+            parameters = digest(unit.recipe.parameters)
+            running[pool.submit(self._run, stage, unit, parameters)] = unit
+
+    def _record(
+        self, unit: Unit, outputs: tuple[Output, ...], receipts: dict[str, str]
+    ) -> None:
+        with self.ctx.ledger.transaction():
+            self.ctx.ledger.register(unit.recipe)
+        self.ctx.ledger.record(
+            *unit.key,
+            unit.inputs_hash,
+            outputs,
+            receipts,
+            metadata={
+                "identity": unit.identity,
+                "dependency_hash": unit.dependency_hash,
+            },
+        )
+        self.completed += 1
+        self.completed_keys.add(unit.key)
+        if unit.key in self.skipped_keys:
+            self.skipped_keys.remove(unit.key)
+            self.skipped -= 1
+
+    def _run(self, stage: Stage, unit: Unit, parameters: str) -> Described:
+        """Hash outputs in the worker, so recording stays a short serial step."""
         self.ctx.guard.admit(unit.required_bytes)
-        outputs: list[Path] | None = None
+        described: Described | None = None
         try:
-            outputs = stage.run(self.ctx, unit)
-            return outputs
+            described = describe(self.ctx.root, stage.run(self.ctx, unit))
+            if digest(unit.recipe.parameters) != parameters:
+                raise ValueError(
+                    f"{stage.name}/{unit.recipe.unit_id} changed its recipe "
+                    "parameters; copy them before editing"
+                )
+            return described
         finally:
             written = None
-            try:
-                if outputs is not None:
-                    written = sum(path.stat().st_size for path in outputs)
-            finally:
-                self.ctx.guard.release(
-                    unit.required_bytes,
-                    written_bytes=0 if unit.accounts_disk else written,
-                )
-                if unit.accounts_disk:
-                    self.ctx.guard.refresh_usage()
+            if described is not None:
+                written = sum(output.size for output in described[0])
+            self.ctx.guard.release(
+                unit.required_bytes,
+                written_bytes=0 if unit.accounts_disk else written,
+            )
+            if unit.accounts_disk:
+                self.ctx.guard.refresh_usage()

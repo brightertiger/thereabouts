@@ -7,18 +7,23 @@ from typing import Any, cast
 from pipeline.config.schema import Config
 from pipeline.runtime.jsonio import digest
 from pipeline.sources.contract import Source
+from pipeline.sources.proposals.http import Custody, keeping
 
 from .models import SourcePin
 
 
-def upstream(config: Config, names: list[str]) -> dict[str, SourcePin]:
+def upstream(
+    config: Config, names: list[str], custody: Custody
+) -> dict[str, SourcePin]:
+    """Propose each source, keeping every payload it hashes in `custody`."""
     result = {}
     for name in names:
         if name not in config.sources:
             raise ValueError(f"Unknown source: {name}")
         settings = config.sources[name]
         adapter = cast(Source, importlib.import_module(settings.adapter))
-        result[name] = adapter.propose(settings)
+        with keeping(custody):
+            result[name] = adapter.propose(settings)
         result[name].validate()
     return result
 

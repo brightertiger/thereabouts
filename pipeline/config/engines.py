@@ -1,17 +1,13 @@
-"""Measured batch and cache limits inherited from the retained geographic engines."""
+"""Engine settings: batch sizes shape outputs and are hashed; runtime knobs are not."""
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 
 
 @dataclass
-class EngineLimits:
-    city_cache_entries: int = 2
-    geometry_cache_entries: int = 24
-    large_geometry_bytes: int = 100_000
+class EngineBatches:
+    """Sizes that shape output bytes or processing order; hashed into identities."""
+
     edge_segments: int = 64
-    nearest_cache_entries: int = 3
-    column_cache_entries: int = 96
-    reader_cache_entries: int = 24
     offshore_batch_rows: int = 128
     state_vote_batch_rows: int = 1024
     parquet_batch_rows: int = 1024
@@ -19,9 +15,21 @@ class EngineLimits:
     extract_row_group_rows: int = 2048
     join_row_group_rows: int = 16384
     mapping_batch_rows: int = 2048
+    allocation_batch_rows: int = 1024
+
+
+@dataclass
+class EngineRuntime:
+    """Caches, spill and admission reservations; no output depends on them."""
+
+    city_cache_entries: int = 2
+    geometry_cache_entries: int = 24
+    large_geometry_bytes: int = 100_000
+    nearest_cache_entries: int = 3
+    column_cache_entries: int = 96
+    reader_cache_entries: int = 24
     sqlite_cache_kib: int = 16384
     locator_cache_kib: int = 2048
-    allocation_batch_rows: int = 1024
     duckdb_spill_bytes: int = 512_000_000
     country_reservation_bytes: int = 256_000_000
     block_reservation_bytes: int = 64_000_000
@@ -29,9 +37,15 @@ class EngineLimits:
 
 
 @dataclass
+class EngineLimits(EngineRuntime, EngineBatches):
+    """The merged view engines receive; configure the two sections instead."""
+
+
+@dataclass
 class EngineSettings:
     minimum_country_coverage: float = 0.995
-    limits: EngineLimits = field(default_factory=EngineLimits)
+    batches: EngineBatches = field(default_factory=EngineBatches)
+    runtime: EngineRuntime = field(default_factory=EngineRuntime)
     reconcile_policy: str = "config/policies/reconcile.yaml"
     city_policies: str = "config/policies/cities"
     city_review: str = "config/reviews/cities-pilot.yaml"
@@ -50,3 +64,7 @@ class EngineSettings:
     # Empty selections mean all discovered countries and resolution-3 blocks.
     countries: list[str] = field(default_factory=list)
     blocks: list[str] = field(default_factory=list)
+
+    @property
+    def limits(self) -> EngineLimits:
+        return EngineLimits(**asdict(self.batches), **asdict(self.runtime))
