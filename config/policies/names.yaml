@@ -1,0 +1,33 @@
+# Alternate names of canonical cities, indexed by the core pack's forward geocoder.
+# Measured on the 2026-10 world inputs (68,923 cities, 768,791 GeoNames aliases);
+# the evidence is recorded in notes/plans/2026-10-10-wr-g-names-plates.md.
+
+# Mappings whose place is the canonical city itself or a declared identity of it.
+# Absorbed settlements and city parts keep their own names.
+linked_methods: [self, identity_alias]
+
+# GeoNames pseudo-language codes: URLs, identifiers, postal, airport, LAU and
+# NUTS codes, pronunciations, abbreviations and French revolutionary names
+# (133,936 rows, 17% of the aliases). None is a name of the city.
+excluded_languages: [abbr, faac, fr_1793, iata, icao, lauc, link, nuts, phon, post,
+  tcid, unlc, wkdt]
+
+# Ranking is by population, so an alternate name that equals another city's name
+# can outrank that city. Share of new keys that collide this way: plain 1.8%,
+# historic 4.6%, short 11.7%, colloquial 6.6%, ended 0%.
+#   keep: always kept; guarded: kept unless another canonical city has the name;
+#   drop: never kept.
+colloquial: drop
+# isHistoric, or a validity end date (a former name such as Bombay).
+historic: guarded
+short: guarded
+# Source name kinds that also need the guard. Overture's `alternate` variant mixes
+# nicknames and abbreviations (Frisco, San Fran; 2.8% collide), and a linked
+# Overture record's `primary` name that differs from the city's often names a
+# merged municipality (Colón, Benito Juárez; 23.8% collide).
+guarded_kinds:
+  overture: [alternate, primary]
+
+# Longest name after NFKC and case folding (15 names exceed it). Token
+# expansions then keep every key within the writer's 128-character limit.
+max_folded_length: 64

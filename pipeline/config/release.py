@@ -24,7 +24,7 @@ class DatasetLimits:
 
 @dataclass
 class PackSettings:
-    families: list[str] = field(default_factory=lambda: list(PACK_FAMILIES[:-1]))
+    families: list[str] = field(default_factory=lambda: list(PACK_FAMILIES))
 
 
 @dataclass

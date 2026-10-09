@@ -22,7 +22,12 @@ class Resolver:
         self.formats = bundle["formats"]
         self.countries = {r["country_code"]: r for r in bundle["countries"]}
         self.priors = {r["country_code"]: r for r in bundle["priors"]}
-        self.default_prior = statistics.median(r["vehicles"] for r in bundle["priors"])
+        # Without observed stock the prior term is absent, as in the packed reader.
+        self.default_prior = (
+            statistics.median(r["vehicles"] for r in bundle["priors"])
+            if bundle["priors"]
+            else None
+        )
         self.geography = Geography(bundle["codes"], self.policy)
         by_script: dict[str, set[str]] = defaultdict(set)
         for rule in self.formats:
@@ -136,7 +141,9 @@ class Resolver:
                 fixed_mark=weight["fixed_mark"] * bool(marks),
                 script=weight["script"] * rarity,
                 specificity=weight["specificity"] * rule["specificity_bits"],
-                log_vehicle_prior=weight["log_vehicle_prior"]
+                log_vehicle_prior=0.0
+                if self.default_prior is None
+                else weight["log_vehicle_prior"]
                 * math.log2(max(1, stock["vehicles"] if stock else self.default_prior)),
                 relaxed_penalty=0 if exact else -weight["relaxed_penalty"],
             )
@@ -155,10 +162,14 @@ class Resolver:
                     score=round(sum(components.values()), 6),
                     score_components=components,
                     prior=stock
-                    or dict(
-                        vehicles=self.default_prior,
-                        imputed=True,
-                        reason="missing_country_stock_use_median",
+                    or (
+                        None
+                        if self.default_prior is None
+                        else dict(
+                            vehicles=self.default_prior,
+                            imputed=True,
+                            reason="missing_country_stock_use_median",
+                        )
                     ),
                     provenance=rule["provenance"],
                 )

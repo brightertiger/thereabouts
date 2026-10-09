@@ -14,13 +14,14 @@
         "places",
         "canonical_cities",
         "place_to_city",
+        "names",
         "countries",
         "subdivisions",
         "timezone_cells",
         "zone_tables"
       ],
       "inputs": "Coordinates in WGS84 degrees; an H3 cell of resolution 0 to 8 as 15 hexadecimal characters; a city name of at most 128 normalized characters.",
-      "notes": "Every other family reads the core pack for city and timezone detail when it is installed. geocode finds towns and cities, never street addresses."
+      "notes": "Every other family reads the core pack for city and timezone detail when it is installed. geocode finds towns and cities by canonical, English or alternate name (the names table), never street addresses."
     },
     "postal": {
       "answers": "Postal code to place.",
@@ -109,6 +110,10 @@
         "plate"
       ],
       "tables": [
+        "plate_formats",
+        "plate_codes",
+        "plate_policy",
+        "plate_priors",
         "places",
         "canonical_cities",
         "place_to_city",
@@ -2034,6 +2039,136 @@
         "ip"
       ]
     },
+    "names": {
+      "description": "Alternate names of canonical cities: every name the core pack's forward geocoder matches for a city beyond its canonical and English names in canonical_cities. Names come from GeoNames alternate names, GeoNames feature and ASCII names, and Overture division names of the city's own place or a declared identity alias, filtered by config/policies/names.yaml.",
+      "grain": "One row per canonical city and distinct name. Names that fold to the same text, or to the city's canonical or English name, are kept once.",
+      "primary_key": [
+        "city_id",
+        "name"
+      ],
+      "relationships": [
+        {
+          "columns": [
+            "city_id"
+          ],
+          "references": {
+            "table": "canonical_cities",
+            "columns": [
+              "city_id"
+            ]
+          },
+          "meaning": "The canonical city the name finds"
+        },
+        {
+          "columns": [
+            "place_id"
+          ],
+          "references": {
+            "table": "places",
+            "columns": [
+              "place_id"
+            ]
+          },
+          "meaning": "The reconciled place whose source record carries the name; the city itself or a declared identity alias"
+        }
+      ],
+      "columns": [
+        {
+          "name": "city_id",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Canonical city/town anchor ID"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The name as published by the source, NFC with collapsed whitespace"
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "How the name relates to the city: english, alternate or ascii",
+          "values": [
+            {
+              "value": "english",
+              "meaning": "An English name (language en or an en- tag) other than the city's name_en"
+            },
+            {
+              "value": "alternate",
+              "meaning": "A name in another language or script, an untagged variant, or another source's name for the city"
+            },
+            {
+              "value": "ascii",
+              "meaning": "The ASCII spelling GeoNames publishes for the city's feature"
+            }
+          ]
+        },
+        {
+          "name": "language",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Language tag from the source (GeoNames ISO 639 codes, Overture BCP 47 tags); null when the source gives none"
+        },
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Country code of the canonical city"
+        },
+        {
+          "name": "place_id",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Reconciled place whose source record carries the name"
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Configured upstream source name"
+        },
+        {
+          "name": "source_id",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The name's source row; a GeoNames alternate-name ID, a GeoNames feature ID for feature and ASCII names, or an Overture name digest"
+        },
+        {
+          "name": "source_release",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Pinned upstream release or inventory identifier"
+        },
+        {
+          "name": "license",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Upstream licence identifier"
+        },
+        {
+          "name": "provenance",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "JSON source evidence and transformation provenance"
+        }
+      ],
+      "used_by": [
+        "core"
+      ]
+    },
     "phone_metadata": {
       "description": "libphonenumber territory metadata: calling code, leading digits and national and international prefixes, with the original territory XML.",
       "grain": "One row per libphonenumber territory, including the non-geographic territory 001.",
@@ -2903,6 +3038,367 @@
         "locode",
         "phone",
         "ip",
+        "plates"
+      ]
+    },
+    "plate_codes": {
+      "description": "Registration-code assertions: a code printed on vehicle plates and the registration unit or entity it names, from pinned national pages, Wikipedia revisions and Wikidata. Every row keeps its source URL and licence.",
+      "grain": "One row per source assertion of a code; a code repeats across sources, series and validity periods.",
+      "primary_key": [],
+      "relationships": [
+        {
+          "columns": [
+            "country_code"
+          ],
+          "references": {
+            "table": "countries",
+            "columns": [
+              "country_code"
+            ]
+          },
+          "meaning": "The country or territory issuing the plates"
+        }
+      ],
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "ISO-like two-letter code of the issuing country or territory"
+        },
+        {
+          "name": "code",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The code as the source spells it, with leading zeros and native script"
+        },
+        {
+          "name": "name_en",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "English label of the registration unit, as published"
+        },
+        {
+          "name": "name_local",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Local-language label of the registration unit, as published"
+        },
+        {
+          "name": "unit_kind",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Source unit kind, such as district, state or registration_office; plate_policy maps it to a place or state level"
+        },
+        {
+          "name": "scope",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Whether the code identifies a registration unit or only associates an entity",
+          "values": [
+            {
+              "value": "registration_unit",
+              "meaning": "The source lists the code as issued by this registration unit"
+            },
+            {
+              "value": "entity_association",
+              "meaning": "Wikidata associates the code with an entity; never used for geography"
+            }
+          ]
+        },
+        {
+          "name": "series_status",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Temporal status of the assertion",
+          "values": [
+            {
+              "value": "current",
+              "meaning": "The source describes the code as in current use"
+            },
+            {
+              "value": "historic",
+              "meaning": "The source describes a former series or allocation"
+            },
+            {
+              "value": "unknown",
+              "meaning": "The source does not establish the status"
+            }
+          ]
+        },
+        {
+          "name": "series_id",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Source series identifier the assertion belongs to"
+        },
+        {
+          "name": "subdivision_scope",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Narrower context the assertion requires, such as a state series"
+        },
+        {
+          "name": "subdivision_codes",
+          "type": "list<element: string>",
+          "nullable": false,
+          "units": "none",
+          "meaning": "ISO 3166-2 identifiers the source gives for the unit; empty when none"
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Configured upstream source name"
+        },
+        {
+          "name": "source_url",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "URL of the pinned document or query the assertion comes from"
+        },
+        {
+          "name": "license",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Licence identifier of that document"
+        }
+      ],
+      "used_by": [
+        "plates"
+      ]
+    },
+    "plate_formats": {
+      "description": "Plate syntax rules: a full-match regular expression per country and series, with the relaxed form that tolerates separators only where the source shows them, the scripts it uses and its specificity. Each rule is checked against its pinned source document when built; rules whose documents are not pinned are left out.",
+      "grain": "One row per source rule; a country has one row per modeled series and source.",
+      "primary_key": [],
+      "relationships": [
+        {
+          "columns": [
+            "country_code"
+          ],
+          "references": {
+            "table": "countries",
+            "columns": [
+              "country_code"
+            ]
+          },
+          "meaning": "The country or territory issuing the plates"
+        }
+      ],
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "ISO-like two-letter code of the issuing country or territory"
+        },
+        {
+          "name": "series_id",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Source series identifier"
+        },
+        {
+          "name": "series_status",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Temporal status of the series as the format policy records it: current, or historic (a former series, which needs an explicit series to supply geography)"
+        },
+        {
+          "name": "pattern",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Full-match regular expression over the normalized plate text"
+        },
+        {
+          "name": "relaxed_pattern",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The pattern with separators optional or varied only at the positions the source shows"
+        },
+        {
+          "name": "code_group",
+          "type": "string",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Name of the capture group holding the registration code; null for series without one"
+        },
+        {
+          "name": "scripts",
+          "type": "list<element: string>",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Script names the pattern uses, from plate_policy script_patterns"
+        },
+        {
+          "name": "fixed_national_marks",
+          "type": "list<element: string>",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Literal national marks within the serial"
+        },
+        {
+          "name": "specificity_bits",
+          "type": "double",
+          "nullable": false,
+          "units": "bits",
+          "meaning": "Information heuristic of the pattern against a 36-character baseline; not a count of valid plates"
+        },
+        {
+          "name": "provenance",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "JSON source fields of the pinned document: URL, licence, attribution, revision, digest and retrieval time"
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Configured upstream source name"
+        },
+        {
+          "name": "source_file",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Pinned file name of the source document"
+        },
+        {
+          "name": "source_url",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "URL of the pinned source document"
+        },
+        {
+          "name": "license",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Licence identifier of that document"
+        }
+      ],
+      "used_by": [
+        "plates"
+      ]
+    },
+    "plate_policy": {
+      "description": "The frozen plate matching and ranking policy (input normalization, code separators, unit-kind levels, script patterns, weights, geographic restrictions and the Unicode decimal digits used for code equality), from config/policies/plate_country/inference.yaml.",
+      "grain": "Exactly one row.",
+      "primary_key": [],
+      "relationships": [],
+      "columns": [
+        {
+          "name": "policy_json",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The policy as one JSON object"
+        }
+      ],
+      "used_by": [
+        "plates"
+      ]
+    },
+    "plate_priors": {
+      "description": "Observed road motor vehicle counts per country, the weak prior that orders candidate countries for a plate without a country. Empty when no vehicle-stock source is pinned; the plates pack then ranks by format evidence alone.",
+      "grain": "One row per country with a published count.",
+      "primary_key": [
+        "country_code"
+      ],
+      "relationships": [
+        {
+          "columns": [
+            "country_code"
+          ],
+          "references": {
+            "table": "countries",
+            "columns": [
+              "country_code"
+            ]
+          },
+          "meaning": "The counted country or territory"
+        }
+      ],
+      "columns": [
+        {
+          "name": "country_code",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "ISO-like two-letter code of the counted country or territory"
+        },
+        {
+          "name": "vehicles",
+          "type": "uint64",
+          "nullable": false,
+          "units": "vehicles",
+          "meaning": "Published road motor vehicle count; definitions and dates differ between countries"
+        },
+        {
+          "name": "year",
+          "type": "int64",
+          "nullable": false,
+          "units": "calendar year",
+          "meaning": "Year of the published count"
+        },
+        {
+          "name": "source_label",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Country label as the source table prints it"
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Configured upstream source name"
+        },
+        {
+          "name": "source_url",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "URL of the pinned source document"
+        },
+        {
+          "name": "license",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Licence identifier of that document"
+        },
+        {
+          "name": "provenance",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "JSON source fields and the table row the count comes from"
+        }
+      ],
+      "used_by": [
         "plates"
       ]
     },
