@@ -10,6 +10,7 @@ from pipeline.content.command import main as digest_main
 from pipeline.migration.command import migrate
 from pipeline.pins.cli import main as pins_main
 from pipeline.release.command import main as release_main
+from pipeline.release.dictionary import main as dictionary_main
 from pipeline.runtime.context import context
 from pipeline.runtime.ledger import Ledger
 
@@ -19,6 +20,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         arguments = list(sys.argv[1:] if argv is None else argv)
         if arguments[:1] == ["release"]:
             return release_main(arguments[1:])
+        if arguments[:1] == ["dictionary"]:
+            return dictionary_main(arguments[1:])
         if arguments[:1] == ["digest"]:
             return digest_main(arguments[1:])
         if arguments[:1] == ["pins"]:

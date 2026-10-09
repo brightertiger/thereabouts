@@ -8,6 +8,8 @@ instead of reaching a released document.
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 from pipeline.runtime.fingerprints import REPOSITORY
 
 TABLE_KEYS = {"description", "grain", "primary_key", "relationships", "columns"}
@@ -103,3 +105,12 @@ def check(description: dict[str, Any], repository: Path = REPOSITORY) -> None:
                 raise ValueError(f"{name}: primary key {key} is not a column")
         for item in table["relationships"]:
             relationship(name, item, columns, description)
+
+
+def load(path: Path, repository: Path = REPOSITORY) -> dict[str, Any]:
+    """Read config/dataset.yaml and reject metadata that does not validate."""
+    value = yaml.safe_load(path.read_text())
+    if not isinstance(value, dict) or not value:
+        raise ValueError("Dataset schema must declare its tables")
+    check(value, repository)
+    return value

@@ -1,0 +1,144 @@
+# Public vocabulary for the data dictionary that the code does not enumerate.
+# Result status, kind and match come from the Rust enums, tool signatures from
+# the MCP server and table columns from config/dataset.yaml; nothing here repeats
+# them. Each evidence reason names the file that spells it, and a test checks that.
+about: >-
+  Thereabouts is an offline geocoder. A Parquet dataset holds the open data;
+  binary packs built from it answer lookups through the Python, Node and
+  command-line clients and the MCP server. This dictionary is generated from
+  the schema file, the client code and the Rust core, so it describes exactly
+  the tables and tools of the build that produced it.
+families:
+  core:
+    answers: Reverse geocoding and city names. A latitude and longitude, or an H3 cell, gives country, subdivision, city and timezone; a town or city name gives the matching cities.
+    tools: [reverse, h3, geocode]
+    tables: [cells, places, canonical_cities, place_to_city, countries, subdivisions, timezone_cells, zone_tables]
+    inputs: Coordinates in WGS84 degrees; an H3 cell of resolution 0 to 8 as 15 hexadecimal characters; a city name of at most 128 normalized characters.
+    notes: Every other family reads the core pack for city and timezone detail when it is installed. geocode finds towns and cities, never street addresses.
+  postal:
+    answers: Postal code to place.
+    tools: [postal]
+    tables: [postal_codes, places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: A code and the country it belongs to. Codes repeat across countries, so the country is required. Spaces are ignored; hyphens and leading zeros are kept.
+    notes: One code can name several places; the result is then ambiguous with ranked candidates.
+  airports:
+    answers: Airport code to airport.
+    tools: [airport]
+    tables: [airports, places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: A code and an optional scheme (iata, icao, gps, local or ident). Without a scheme, IATA then ICAO are searched. The local scheme needs a country.
+    notes: Ambiguous codes return ranked candidates; a country narrows them.
+  locode:
+    answers: UN/LOCODE to trade or transport location (port, airport, rail or road terminal).
+    tools: [locode]
+    tables: [trade_locations, places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: The five-character code (two country letters and three letters or digits), or three characters plus a country.
+    notes: Conflicting or malformed country hints are invalid input.
+  phone:
+    answers: International telephone number to the longest published calling prefix and its country.
+    tools: [phone]
+    tables: [phone_prefixes, phone_metadata, places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: A number in E.164 form with a leading plus and 1 to 15 digits; spaces, hyphens and parentheses after the plus are ignored.
+    notes: This is prefix lookup, not subscriber validation. Shared calling codes such as +1 return one candidate per country.
+  ip:
+    answers: IPv4 or IPv6 address to the published geolocation interval that contains it.
+    tools: [ip]
+    tables: [ip_ranges, places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: A bare address literal; ports, CIDR suffixes and IPv6 zones are invalid.
+    notes: The point is the provider's location for the interval, usually a city centre, not the device.
+  plates:
+    answers: Vehicle registration plate text to the countries, and sometimes the region, whose recorded formats it fits.
+    tools: [plate]
+    tables: [places, canonical_cities, place_to_city, countries, subdivisions]
+    inputs: Plate text and an optional country and series.
+    notes: Format evidence, not a vehicle registry. Without a country the result is usually ambiguous across countries.
+vocabularies:
+  evidence_reason:
+    meaning: Why a lookup produced its answer or its miss. It appears only in evidence and never changes status.
+    values:
+    - value: matched
+      applies_to: [reverse, h3]
+      source: core/thereabouts-core/src/reverse/mod.rs
+      meaning: A stored cell supplied the geography
+    - value: unassigned
+      applies_to: [reverse, h3]
+      source: core/thereabouts-core/src/reverse/mod.rs
+      meaning: A stored cell exists but has no country, subdivision or city; the status is not_found
+    - value: no_land
+      applies_to: [reverse, h3]
+      source: core/thereabouts-core/src/reverse/mod.rs
+      meaning: The cell's block is in the pack but no land is stored at this resolution 8 cell, as in open water. In a subset pack it means no admitted land row, not a global ocean assertion
+    - value: outside_coverage
+      applies_to: [reverse, h3]
+      source: core/thereabouts-core/src/reverse/mod.rs
+      meaning: The cell's block is not in the pack, so the point is outside the pack's coverage
+    - value: no_stored_ancestor
+      applies_to: [reverse, h3]
+      source: core/thereabouts-core/src/reverse/mod.rs
+      meaning: A coarse H3 query (resolution 0 to 7) has no stored cell at or above it
+    - value: name_exact
+      applies_to: [geocode]
+      source: core/thereabouts-core/src/geocode.rs
+      meaning: The normalized query equals a canonical or alternate city name
+    - value: name_prefix
+      applies_to: [geocode]
+      source: core/thereabouts-core/src/geocode.rs
+      meaning: No exact name; the query is the start of a city name
+    - value: name_trigram
+      applies_to: [geocode]
+      source: core/thereabouts-core/src/geocode.rs
+      meaning: No exact or prefix name; an approximate (fuzzy) name match
+    - value: exact_code
+      applies_to: [postal, airport, locode, phone, ip]
+      source: core/thereabouts-core/src/forward.rs
+      meaning: The normalized code or address equals an indexed key or falls in an indexed interval
+    - value: country_from_key
+      applies_to: [postal]
+      source: core/thereabouts-core/src/postal.rs
+      meaning: The postal observation has no linked geography, so its country comes from the country in the lookup key; no subdivision or city is inferred
+    - value: plate_country_inferred
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates.rs
+      meaning: No country was supplied; this candidate country was inferred from format evidence and no finer geography is returned
+    - value: empty_or_too_long_input
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates.rs
+      meaning: The plate text was empty after normalization or longer than the policy maximum
+    - value: known_registration_code
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: The code is a known registration code for the place or places listed in the evidence
+    - value: known_state_code_no_finer_verified_unit
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: The code identifies a state-level registration unit and no finer verified unit
+    - value: unknown_code_or_unverified_temporal_scope
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: The format fits, but the code is not a known registration code or its dates are unverified, so only the country is returned
+    - value: no_matching_format
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: No recorded plate format of the country matches the text
+    - value: subdivision_series_context_required
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: The country issues plates by subdivision series; pass series to narrow the geography
+    - value: non_geographic_or_ambiguous_series
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates_geography.rs
+      meaning: A matching format carries no geographic code or is ambiguous, so no geography is returned
+  rank_basis:
+    meaning: The rule that ordered ambiguous candidates. It is null for reverse lookups and single answers.
+    values:
+    - value: population
+      applies_to: [geocode, postal, airport, locode, phone, ip]
+      source: core/thereabouts-core/src/forward.rs
+      meaning: Candidates are ordered by city population, largest first, with a stable order for ties
+    - value: plate_evidence
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates.rs
+      meaning: Candidate countries are ordered by format evidence and a vehicle-registration prior
+    - value: plate_evidence_without_vehicle_prior
+      applies_to: [plate]
+      source: core/thereabouts-core/src/plates.rs
+      meaning: Candidate countries are ordered by format evidence alone because the pack has no vehicle prior

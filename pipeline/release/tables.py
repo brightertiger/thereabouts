@@ -6,7 +6,6 @@ from typing import IO, Any, Literal, cast
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-import yaml
 from h3.api import basic_int as h3
 
 from pipeline.config.release import DatasetLimits
@@ -14,17 +13,13 @@ from pipeline.engines.artifact_io import file_record
 
 from .budget import Budget, Sink
 from .cell_groups import CellGroups
-from .dataset_schema import check
+from .dataset_schema import load
 from .selection import Selection
 from .source import Row, Snapshot, TableFile
 
 
 def schema_description(path: Path) -> dict[str, Any]:
-    value = yaml.safe_load(path.read_text())
-    if not isinstance(value, dict) or not value:
-        raise ValueError("Dataset schema must declare its tables")
-    check(value)
-    return value
+    return load(path)
 
 
 def groups(
