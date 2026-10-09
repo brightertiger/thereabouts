@@ -9,7 +9,6 @@ from numpy.typing import NDArray
 EARTH_M = 6_371_008.8
 EARTH_RADIUS_KM = 6371.0088
 BOUNDARY_TOLERANCE_DEG = 1e-9
-TIE_TOLERANCE_KM = 1e-9
 
 
 def distance(x: float, y: float, a: float, b: float) -> float:

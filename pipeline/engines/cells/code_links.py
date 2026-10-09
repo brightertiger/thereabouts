@@ -126,11 +126,6 @@ class CodeIndex:
         )
 
 
-def code_map(inputs: Inputs) -> tuple[set[str], dict[str, set[str]]]:
-    index = CodeIndex(inputs)
-    return index.countries, index.codes
-
-
 def linked_rows(
     path: Path,
     kind: str,
