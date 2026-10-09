@@ -77,7 +77,7 @@ Enumerated columns:
 
 ### `canonical_cities`
 
-The cities and towns that can absorb other settlements: the anchors a reverse lookup resolves to. Standalone villages and other rural settlements are in places but not here.
+The cities and towns that can absorb other settlements, the anchors for urban areas. Reverse lookups can also return standalone villages and other rural settlements, which are in places but not here.
 
 - Grain: One row per canonical city or town; city_id is the place identifier of its anchor.
 - Primary key: `city_id`
@@ -224,7 +224,7 @@ Enumerated columns:
 
 ### `ip_ranges`
 
-IPv4 and IPv6 geolocation intervals from DB-IP City Lite, each with a published point joined to the cell geography. The ranges do not overlap.
+IPv4 and IPv6 geolocation intervals from DB-IP City Lite, each with a published point joined to the cell geography. The ip pack writer rejects overlapping intervals.
 
 - Grain: One row per published IP interval, from ip_start to ip_end inclusive.
 - Primary key: none (observations can repeat)
