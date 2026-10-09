@@ -10,6 +10,7 @@ from pipeline.config import load
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, write_json
 from pipeline.runtime.paths import located
+from pipeline.sources.proposals.http import Custody
 
 from .lock import read_lock, write_lock
 from .models import SourcePin
@@ -46,6 +47,10 @@ def main(argv: Sequence[str]) -> int:
         action="store_true",
         help="write the reviewed proposal into pins.lock",
     )
+    parser.add_argument(
+        "--root", type=Path, help="workspace whose raw store keeps proposed payloads"
+    )
+    parser.add_argument("--profile", help="configuration profile naming that workspace")
     inputs = parser.add_mutually_exclusive_group()
     inputs.add_argument("--from-workspace", type=Path)
     inputs.add_argument(
@@ -54,8 +59,9 @@ def main(argv: Sequence[str]) -> int:
         help="candidate lock with explicit versions/checksums; no upstream access",
     )
     args = parser.parse_intermixed_args(argv)
+    workspace = args.root is not None or args.profile is not None
     if args.command == "check":
-        if args.from_file or args.accept or args.proposal != PROPOSAL:
+        if args.from_file or args.accept or args.proposal != PROPOSAL or workspace:
             raise ValueError("Proposal and acceptance options require pins update")
         saved = read_lock(args.lock)
         check(saved, args.sources or sorted(saved), args.from_workspace)
@@ -65,6 +71,8 @@ def main(argv: Sequence[str]) -> int:
         for path in (args.proposal, args.proposal.with_suffix(".diff.json"))
     ):
         raise ValueError("Proposal and diff paths must differ from the lock")
+    if workspace and (args.from_file or args.from_workspace):
+        raise ValueError("--root and --profile apply to upstream proposals only")
     if args.from_workspace:
         root = args.from_workspace.resolve()
         for output in (
@@ -89,12 +97,24 @@ def main(argv: Sequence[str]) -> int:
                     args.from_workspace, json.loads(path.read_bytes())
                 )
         names = args.sources or sorted(proposed)
+    elif not workspace:
+        raise ValueError(
+            "Upstream proposals keep every payload; choose the workspace that "
+            "stores them with --root or --profile"
+        )
     else:
-        config = load()
+        config = load(
+            profile=args.profile,
+            overrides=[f"paths.root={args.root}"] if args.root else [],
+        )
+        root = (args.root or Path(config.paths.root)).absolute()
+        custody = Custody(
+            located(root, config.paths.raw), config.storage.get("gcs_raw", "")
+        )
         names = args.sources or sorted(
             name for name, source in config.sources.items() if source.enabled
         )
-        proposed = upstream(config, names)
+        proposed = upstream(config, names, custody)
     if not names:
         raise ValueError("No source pins were discovered")
     merged, changes = merge(previous, proposed, names)

@@ -24,7 +24,7 @@ def expand(value: Any, variables: dict[str, str]) -> Any:
 
 
 def variables(client: Client, catalog: Catalog) -> dict[str, str]:
-    result = {"month": datetime.now(UTC).strftime("%Y-%m")}
+    result = {"month": client.clock().strftime("%Y-%m")}
     for selector in catalog.selectors:
         url = selector.url.format_map(result)
         if selector.kind == "text":
