@@ -174,6 +174,17 @@ async def run(
     return len(examples)
 
 
+async def run_documents(
+    paths: list[Path], call_tool: CallTool, dataset: str, verify: bool = True
+) -> int:
+    """Run each document in its own namespace, where `DATASET` names the release."""
+    ran = 0
+    for path in paths:
+        namespace: dict[str, Any] = {"DATASET": dataset}
+        ran += await run(parse(path), call_tool, namespace, verify)
+    return ran
+
+
 def mentions(path: Path) -> list[str]:
     """Tool names used by mcp examples, for coverage checks."""
     names = []

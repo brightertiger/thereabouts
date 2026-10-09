@@ -30,7 +30,6 @@ def dataset(tmp_path_factory: pytest.TempPathFactory) -> Path:
 async def execute(dataset: Path, paths: list[Path], verify: bool) -> int:
     """Run each document in its own namespace; the world test reuses this shape."""
     packs = {name: PACKS / f"{name}-sample" for name in FAMILIES}
-    ran = 0
     with Geocoder(packs=packs) as geo:
         async with Client(create_server(geo)) as client:
 
@@ -40,11 +39,7 @@ async def execute(dataset: Path, paths: list[Path], verify: bool) -> int:
                 assert result.structured_content is not None
                 return dict(result.structured_content)
 
-            for path in paths:
-                namespace: dict[str, Any] = {"DATASET": str(dataset)}
-                ran += await examples.run(
-                    examples.parse(path), call_tool, namespace, verify
-                )
+            ran = await examples.run_documents(paths, call_tool, str(dataset), verify)
     return ran
 
 

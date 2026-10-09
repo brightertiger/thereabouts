@@ -74,15 +74,23 @@ def schema_type(schema: Row) -> str:
     return " or ".join(SCHEMA_TYPES[option["type"]] for option in options)
 
 
+def server() -> Any:
+    """The MCP server with no geocoder: registering tools never touches data."""
+    try:
+        from thereabouts.geocoder import Geocoder
+        from thereabouts.mcp_service.server import create_server
+    except ImportError as error:
+        raise ValueError(
+            "The data dictionary reads the MCP server; install it with "
+            "`uv sync --all-extras`"
+        ) from error
+    return create_server(cast(Geocoder, None))
+
+
 def mcp_tools() -> list[Row]:
     """Registered tools, as the server announces them, in registration order."""
-    from thereabouts.geocoder import Geocoder
-    from thereabouts.mcp_service.server import create_server
-
-    # Registering tools never touches the geocoder, so no data is needed.
-    server = create_server(cast(Geocoder, None))
     tools = []
-    for tool in asyncio.run(server.list_tools()):
+    for tool in asyncio.run(server().list_tools()):
         required = set(tool.input_schema.get("required", []))
         parameters = []
         for name, schema in tool.input_schema.get("properties", {}).items():
@@ -107,10 +115,6 @@ def mcp_tools() -> list[Row]:
 
 
 def mcp_resources() -> list[Row]:
-    from thereabouts.geocoder import Geocoder
-    from thereabouts.mcp_service.server import create_server
-
-    server = create_server(cast(Geocoder, None))
     return [
         {
             "uri": str(item.uri),
@@ -118,7 +122,7 @@ def mcp_resources() -> list[Row]:
             "mime_type": item.mime_type,
             "description": item.description,
         }
-        for item in asyncio.run(server.list_resources())
+        for item in asyncio.run(server().list_resources())
     ]
 
 

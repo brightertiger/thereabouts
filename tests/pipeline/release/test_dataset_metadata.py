@@ -16,7 +16,7 @@ ENFORCED_KEYS = {
     "places": "lookups gate duplicate_place_ids == 0; assembly rejects null keys",
     "canonical_cities": "one entry per anchor in the cities build; dangling == 0",
     "place_to_city": "normalize_cells fails if its join changes the row count",
-    "cells": "compaction stores each H3 cell once; assembly rejects null keys",
+    "cells": "stored descendants must equal the land cells (blocks.py); no nulls",
 }
 
 # Every reference the lookups integrity gates check (cells/metrics.py and

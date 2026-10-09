@@ -115,3 +115,14 @@ def test_tool_descriptions_name_the_pack_they_need() -> None:
     for tool in dictionary.build()["tools"]:
         if tool["pack"]:
             assert f"Needs the {tool['pack']} pack" in tool["description"], tool["name"]
+
+
+def test_a_missing_mcp_extra_is_an_actionable_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    monkeypatch.delitem(sys.modules, "thereabouts.mcp_service.server")
+    monkeypatch.setitem(sys.modules, "mcp.server", None)
+    with pytest.raises(ValueError, match="uv sync --all-extras"):
+        surface.mcp_tools()

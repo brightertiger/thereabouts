@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from pipeline.release.dataset_schema import check
+from pipeline.release.dataset_schema import check, public
 
 Description = dict[str, Any]
 
@@ -147,3 +147,15 @@ def test_each_violation_is_named(message: str, change: Any) -> None:
 def test_sources_resolve_against_the_given_repository(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="source file"):
         check(small(), repository=tmp_path)
+
+
+def test_public_schema_drops_repository_paths_and_changes_nothing_else() -> None:
+    description = small()
+    shown = public(description)
+    kind = shown["parents"]["columns"][1]
+    assert "values_from" not in kind and kind["values"] == [
+        {"value": "big", "meaning": "A big parent"},
+        {"value": "small", "meaning": "A small parent"},
+    ]
+    assert "values_from" in description["parents"]["columns"][1]
+    assert shown["children"] == description["children"]

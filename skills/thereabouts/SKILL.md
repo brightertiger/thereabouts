@@ -93,7 +93,7 @@ reverse {"lat": 19.0, "lon": 72.6, "evidence": true}
 }
 ```
 
-**Ambiguity is preserved, never resolved.** A postal code, airport code or plate that fits several places returns `ambiguous`. Do not pick the first candidate; present the ranked list or ask for the missing context (a country narrows most of them). `geocode` takes `prefer="population"` only when the user wants the largest.
+**Ambiguity is preserved, never resolved.** A postal code, airport code or plate that fits several places returns `ambiguous`. Do not pick the first candidate; present the ranked list or ask for the missing context, such as the country of an airport code or a plate. `geocode` takes `prefer="population"` only when the user wants the largest.
 
 ```mcp
 postal {"code": "744301", "country": "IN"}
@@ -214,7 +214,8 @@ def open_dataset(location: str) -> duckdb.DuckDBPyConnection:
         manifest = json.loads((Path(base) / "manifest.json").read_text())
     con = duckdb.connect()
     if remote:
-        con.sql("INSTALL httpfs; LOAD httpfs")
+        con.install_extension("httpfs")
+        con.load_extension("httpfs")
     for name in sorted({t["kind"] for t in manifest["tables"]}):
         files = [f"{base}/{t['path']}" for t in manifest["tables"] if t["kind"] == name]
         listed = ", ".join("'" + f.replace("'", "''") + "'" for f in files)
@@ -257,7 +258,7 @@ place_id,name,role,population
 city:geonames:2971874,Tremblay-en-France,town,35591
 ```
 
-Group by a column and join on the documented keys. Large airports per country:
+Aggregate with ordinary SQL. Large airports per country:
 
 ```sql
 SELECT country_code, count(*) AS airports

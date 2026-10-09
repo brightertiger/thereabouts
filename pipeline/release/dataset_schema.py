@@ -114,3 +114,17 @@ def load(path: Path, repository: Path = REPOSITORY) -> dict[str, Any]:
         raise ValueError("Dataset schema must declare its tables")
     check(value, repository)
     return value
+
+
+def public(description: dict[str, Any]) -> dict[str, Any]:
+    """The schema without repository paths, safe to embed in a released manifest."""
+    return {
+        name: {
+            **table,
+            "columns": [
+                {key: value for key, value in column.items() if key != "values_from"}
+                for column in table["columns"]
+            ],
+        }
+        for name, table in description.items()
+    }
