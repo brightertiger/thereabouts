@@ -7,6 +7,7 @@ from fnmatch import fnmatchcase
 
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
+from .jsonio import digest
 from .outputs import describe, role
 from .paths import located
 from .planning import decide
@@ -261,7 +262,10 @@ class Executor:
             self.check()
             del pending[key]
             self.event(f"running {stage.name}/{unit.recipe.unit_id}")
-            running[pool.submit(self._run, stage, unit)] = unit
+            # Units of one stage may share parameter objects, such as a policy;
+            # the digest is taken before any of them runs.
+            parameters = digest(unit.recipe.parameters)
+            running[pool.submit(self._run, stage, unit, parameters)] = unit
 
     def _record(
         self, unit: Unit, outputs: tuple[Output, ...], receipts: dict[str, str]
@@ -284,12 +288,17 @@ class Executor:
             self.skipped_keys.remove(unit.key)
             self.skipped -= 1
 
-    def _run(self, stage: Stage, unit: Unit) -> Described:
+    def _run(self, stage: Stage, unit: Unit, parameters: str) -> Described:
         """Hash outputs in the worker, so recording stays a short serial step."""
         self.ctx.guard.admit(unit.required_bytes)
         described: Described | None = None
         try:
             described = describe(self.ctx.root, stage.run(self.ctx, unit))
+            if digest(unit.recipe.parameters) != parameters:
+                raise ValueError(
+                    f"{stage.name}/{unit.recipe.unit_id} changed its recipe "
+                    "parameters; copy them before editing"
+                )
             return described
         finally:
             written = None

@@ -27,22 +27,40 @@ def partition(root: Path, source: str, kind: str) -> Path:
     return path
 
 
-def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage]:
+def source_receipts(
+    root: Path, ledger: Ledger, *, wide: bool = False
+) -> tuple[Context, SyntheticStage]:
+    """ZZ around the origin; `wide` adds country YY east of it and four blocks."""
     config = load()
-    config.engines.countries = ["ZZ"]
-    config.engines.blocks = [h3.latlng_to_cell(0, 0, 3)]
+    centre = h3.latlng_to_cell(0, 0, 3)
+    config.engines.countries = ["YY", "ZZ"] if wide else ["ZZ"]
+    config.engines.blocks = (
+        [centre, *sorted(set(h3.grid_ring(centre, 1)))[:3]] if wide else [centre]
+    )
     config.resources.workers = 1
     config.resources.duckdb_memory = "128MB"
     ctx = context(root, ledger)
     ctx.config = config
+    geonames = [place("1", "Town", 0, 0, population=50000)]
+    divisions = [place("town", "Town", 0, 0, source="overture")]
+    areas = [
+        area(
+            "nation", "Nation", "country", (-5, -5, 0.5, 5) if wide else (-5, -5, 5, 5)
+        ),
+        area("town", "Town", "locality", (-0.1, -0.1, 0.1, 0.1)),
+    ]
+    if wide:
+        geonames.append(place("2", "Port", 0.8, 0, population=40000, country="YY"))
+        divisions.append(place("port", "Port", 0.8, 0, source="overture", country="YY"))
+        areas += [
+            area("east", "East", "country", (0.5, -5, 5, 5), country="YY"),
+            area("port", "Port", "locality", (0.7, -0.1, 0.9, 0.1), country="YY"),
+        ]
     extracted = write_inputs(
         root / "normalized" / "fixture",
-        geonames=[place("1", "Town", 0, 0, population=50000)],
-        divisions=[place("town", "Town", 0, 0, source="overture")],
-        areas=[
-            area("nation", "Nation", "country", (-5, -5, 5, 5)),
-            area("town", "Town", "locality", (-0.1, -0.1, 0.1, 0.1)),
-        ],
+        geonames=geonames,
+        divisions=divisions,
+        areas=areas,
     )
     source_names = ["overture", "geonames", "geoboundaries", "osm_land", "ghsl"]
     stage = SyntheticStage(

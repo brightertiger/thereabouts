@@ -113,35 +113,40 @@ class Ledger:
         with self.lock, self.db:
             yield
 
+    # Concurrent units share this connection; every statement holds the lock.
     @property
     def migrated(self) -> bool:
-        return bool(
-            self.db.execute(
-                "SELECT 1 FROM sqlite_master WHERE name='recipes'"
-            ).fetchone()
-        )
+        with self.lock:
+            return bool(
+                self.db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE name='recipes'"
+                ).fetchone()
+            )
 
     def recipes(self, stage: str | None = None) -> list[Recipe]:
         if not self.migrated:
             return []
         sql = "SELECT recipe FROM recipes"
-        rows = self.db.execute(
-            sql + (" WHERE stage=?" if stage else "") + " ORDER BY stage,unit_id",
-            (stage,) if stage else (),
-        )
+        with self.lock:
+            rows = self.db.execute(
+                sql + (" WHERE stage=?" if stage else "") + " ORDER BY stage,unit_id",
+                (stage,) if stage else (),
+            ).fetchall()
         return [recipe_from_json(json.loads(row[0])) for row in rows]
 
     def recipe_stages(self) -> set[str]:
         if not self.migrated:
             return set()
-        return {
-            str(row[0]) for row in self.db.execute("SELECT DISTINCT stage FROM recipes")
-        }
+        with self.lock:
+            rows = self.db.execute("SELECT DISTINCT stage FROM recipes").fetchall()
+        return {str(row[0]) for row in rows}
 
     def recipe(self, stage: str, unit_id: str) -> Recipe | None:
-        row = self.db.execute(
-            "SELECT recipe FROM recipes WHERE stage=? AND unit_id=?", (stage, unit_id)
-        ).fetchone()
+        with self.lock:
+            row = self.db.execute(
+                "SELECT recipe FROM recipes WHERE stage=? AND unit_id=?",
+                (stage, unit_id),
+            ).fetchone()
         return recipe_from_json(json.loads(row[0])) if row else None
 
     def register(self, recipe: Recipe) -> None:
@@ -160,14 +165,20 @@ class Ledger:
             return self._record(row) if row is not None else None
 
     def records(self, stage: str | None = None) -> Iterator[Completion]:
-        rows = self.db.execute(
-            "SELECT * FROM units"
-            + (" WHERE stage=?" if stage else "")
-            + " ORDER BY stage,unit_id",
-            (stage,) if stage else (),
-        )
-        for row in rows:
-            yield self._record(row)
+        with self.lock:
+            cursor = self.db.execute(
+                "SELECT * FROM units"
+                + (" WHERE stage=?" if stage else "")
+                + " ORDER BY stage,unit_id",
+                (stage,) if stage else (),
+            )
+        while True:
+            with self.lock:
+                rows = cursor.fetchmany(1024)
+            if not rows:
+                return
+            for row in rows:
+                yield self._record(row)
 
     @staticmethod
     def _record(row: sqlite3.Row) -> Completion:
