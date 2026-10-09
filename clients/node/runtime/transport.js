@@ -3,8 +3,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { EnvHttpProxyAgent } from "undici";
 import { safePath } from "./host.js";
-import { MAX_METADATA, readJson, component, keys, family } from "./store.js";
-import { integrity, usage, ThereaboutsError } from "./errors.js";
+import { MAX_METADATA, readJson, component, family } from "./store.js";
+import {
+  integrity,
+  usage,
+  IncompatibleDataError,
+  ThereaboutsError,
+} from "./errors.js";
 import { wasm } from "./wasm.js";
 export function interrupted(error) {
   if (error instanceof ThereaboutsError || error.exitCode !== undefined)
@@ -161,20 +166,27 @@ export async function index(origin) {
     for await (const chunk of body(opened, MAX_METADATA)) chunks.push(chunk);
     value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
   }
-  keys(value, ["format", "datasets"]);
-  if (value.format !== 2) throw integrity("Requires release index format 2");
-  keys(value.datasets, Object.keys(value.datasets ?? {}));
+  // Unknown fields are ignored at every level; required fields are validated.
+  object(value);
+  if (value.format !== INDEX_FORMAT)
+    throw new IncompatibleDataError(
+      `Requires release index format ${INDEX_FORMAT}, found ${value.format}; use a matching client`,
+    );
+  object(value.datasets);
   for (const [version, dataset] of Object.entries(value.datasets)) {
     component(version);
-    keys(dataset, ["packs"]);
-    keys(dataset.packs, Object.keys(dataset.packs ?? {}));
+    object(dataset);
+    object(dataset.packs);
     for (const [name, pack] of Object.entries(dataset.packs)) {
       component(name);
-      keys(pack, ["url", "bytes", "sha256", "format_minor"]);
+      object(pack);
       if (
-        !Number.isSafeInteger(pack.bytes) ||
-        pack.bytes < 1 ||
-        pack.bytes > 1024 ** 3 ||
+        !Number.isSafeInteger(pack.size) ||
+        pack.size < 1 ||
+        pack.size > MAX_ARCHIVE_BYTES ||
+        !Number.isSafeInteger(pack.unpacked_size) ||
+        pack.unpacked_size < 1 ||
+        pack.unpacked_size > MAX_UNPACKED_BYTES ||
         typeof pack.url !== "string" ||
         !pack.url ||
         typeof pack.sha256 !== "string" ||
@@ -185,6 +197,10 @@ export async function index(origin) {
     }
   }
   return value;
+}
+function object(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw integrity("Invalid release index");
 }
 export function compareVersions(a, b) {
   const left = a.split("."),
@@ -230,7 +246,7 @@ export async function* archive(
 ) {
   if (typeof origin === "string") {
     const filename = safePath(origin, pack.url);
-    if (fs.statSync(filename).size !== pack.bytes)
+    if (fs.statSync(filename).size !== pack.size)
       throw integrity("Local archive size mismatch");
     yield* fs.createReadStream(filename, { start: offset });
     return;
@@ -251,12 +267,12 @@ export async function* archive(
     response.status !== (offset ? 206 : 200) ||
     (offset &&
       response.headers.get("content-range") !==
-        `bytes ${offset}-${pack.bytes - 1}/${pack.bytes}`) ||
-    (length !== null && length !== String(pack.bytes - offset))
+        `bytes ${offset}-${pack.size - 1}/${pack.size}`) ||
+    (length !== null && length !== String(pack.size - offset))
   ) {
     opened.controller.abort();
     await opened.dispatcher.close();
     throw integrity("Invalid download status, length or resume range");
   }
-  yield* body(opened, pack.bytes - offset, readTimeout);
+  yield* body(opened, pack.size - offset, readTimeout);
 }
