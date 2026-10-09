@@ -8,9 +8,8 @@ import { install, lock, remove } from "../runtime/install.js";
 import { source, select, compareVersions } from "../runtime/transport.js";
 import { active, installed } from "../runtime/store.js";
 import { run } from "../runtime/cli.js";
-import { extract } from "../runtime/archive.js";
-import { Geocoder } from "../runtime/index.js";
-import { release, tar } from "./release.js";
+import { Geocoder, CorruptPackError } from "../runtime/index.js";
+import { release, publish, tar, zstd } from "./release.js";
 import { temporary, console, ROOT } from "./helpers.js";
 async function server(t, handler) {
   const service = http.createServer(handler);
@@ -91,6 +90,9 @@ test("loopback interrupted download resumes with exact Range and integrity verif
     message: /Download interrupted; run the same data install again to resume/,
   });
   assert.equal(active(store), null);
+  // A partial archive is never expanded: no staging directory, no pack.
+  assert.ok(!fs.existsSync(path.join(store, ".staging")));
+  assert.ok(!fs.existsSync(path.join(store, "packs")));
   const partial = path.join(store, ".downloads", fixture.pack.sha256 + ".part");
   assert.equal(fs.statSync(partial).size, 1024);
   await install(store, origin, ["phone"]);
@@ -115,7 +117,7 @@ test("checksum, ignored ranges and atomic version guard preserve existing pins",
     !fs.existsSync(path.join(badRoot, ".downloads", "0".repeat(64) + ".part")),
   );
   const changed = {
-    format: 2,
+    format: 3,
     datasets: { 2099.1: { packs: { core: fixture.pack } } },
   };
   fs.writeFileSync(path.join(origin, "index.json"), JSON.stringify(changed));
@@ -210,27 +212,121 @@ test("placeholder fails before transfer; index ordering and prompts match native
     if (!code) assert.equal(JSON.parse(output).removed, "phone");
   }
 });
-test("strict ustar rejects links, traversal, duplicates, trailers and truncation", (t) => {
-  const root = temporary(t);
-  const invalid = [
-    tar([["../escape", Buffer.from("x")]]),
-    tar([["link", Buffer.alloc(0), "2"]]),
-    tar([
-      ["one", Buffer.from("a")],
-      ["one", Buffer.from("b")],
+test("hostile archives are refused before anything leaves staging", async (t) => {
+  const root = temporary(t),
+    origin = path.join(root, "release"),
+    store = path.join(root, "store"),
+    { plain, version } = release(origin),
+    manifest = fs.readFileSync(
+      path.join(ROOT, "tests/fixtures/packs/phone-sample/manifest.json"),
+    );
+  const bomb = Buffer.concat([
+    tar([["zeros.bin", Buffer.alloc(0)]]).subarray(0, 512),
+  ]);
+  // Rewrite the declared entry size to 1 GiB; RLE blocks supply the zeros.
+  bomb.write((2 ** 30).toString(8).padStart(11, "0") + "\0", 124);
+  bomb.fill(32, 148, 156);
+  bomb.write(
+    bomb
+      .reduce((a, b) => a + b, 0)
+      .toString(8)
+      .padStart(6, "0") + "\0 ",
+    148,
+  );
+  const cases = {
+    traversal: tar([["../escape", Buffer.from("x")]]),
+    absolute: tar([[path.join(root, "absolute"), Buffer.from("x")]]),
+    symlink: tar([["manifest.json", Buffer.alloc(0), "2"]]),
+    hardlink: tar([["manifest.json", Buffer.alloc(0), "1"]]),
+    device: tar([["manifest.json", Buffer.alloc(0), "3"]]),
+    duplicate: tar([
+      ["manifest.json", manifest],
+      ["manifest.json", manifest],
     ]),
-    tar([[".archive.json", Buffer.from("{}")]]),
-    Buffer.alloc(512),
-    Buffer.concat([tar([]), Buffer.from([1])]),
-  ];
-  for (const [i, bytes] of invalid.entries()) {
-    const file = path.join(root, i + ".tar"),
-      out = path.join(root, "out-" + i);
-    fs.writeFileSync(file, bytes);
-    fs.mkdirSync(out);
-    assert.throws(() => extract(file, out, bytes.length));
+    reserved: tar([[".archive.json", Buffer.from("{}")]]),
+    trailer: Buffer.concat([plain, Buffer.from([1])]),
+    truncated: plain.subarray(0, plain.length - 1024),
+    stray: tar([["stray.bin", Buffer.from("unlisted")]]),
+  };
+  for (const [name, bytes] of Object.entries(cases)) {
+    publish(
+      origin,
+      "phone",
+      name === "stray"
+        ? Buffer.concat([plain.subarray(0, plain.length - 1024), bytes])
+        : bytes,
+      version,
+    );
+    await assert.rejects(install(store, origin, ["phone"]), (error) => {
+      assert.ok(error instanceof CorruptPackError, `${name}: ${error.stack}`);
+      return error.exitCode === 4;
+    });
   }
+  // The bomb's stream expands far beyond its declared length.
+  const bytes = zstd(bomb, [[0, 2 ** 30]]);
+  fs.writeFileSync(path.join(origin, "phone.tar.zst"), bytes);
+  const { createHash } = await import("node:crypto");
+  const index = {
+    format: 3,
+    datasets: {
+      [version]: {
+        packs: {
+          phone: {
+            url: "phone.tar.zst",
+            size: bytes.length,
+            sha256: createHash("sha256").update(bytes).digest("hex"),
+            unpacked_size: 1 << 20,
+            format_minor: 2,
+          },
+        },
+      },
+    },
+  };
+  fs.writeFileSync(path.join(origin, "index.json"), JSON.stringify(index));
+  assert.ok(bytes.length < 64 * 1024);
+  await assert.rejects(install(store, origin, ["phone"]), (error) => {
+    assert.match(error.message, /declared unpacked size/);
+    return error.exitCode === 4;
+  });
   assert.ok(!fs.existsSync(path.join(root, "escape")));
+  assert.ok(!fs.existsSync(path.join(root, "absolute")));
+  assert.ok(!fs.existsSync(path.join(store, "packs")));
+  assert.equal(active(store), null);
+  const staging = path.join(store, ".staging");
+  assert.ok(!fs.existsSync(staging) || !fs.readdirSync(staging).length);
+});
+test("unknown index fields are ignored; required fields and caps are enforced", async (t) => {
+  const root = temporary(t),
+    origin = path.join(root, "release"),
+    store = path.join(root, "store"),
+    fixture = release(origin);
+  const value = structuredClone(fixture.index);
+  value.latest = fixture.version;
+  value.datasets[fixture.version].published = "2026-10-09";
+  value.datasets[fixture.version].packs.phone.mirrors = [];
+  fs.writeFileSync(path.join(origin, "index.json"), JSON.stringify(value));
+  await install(store, origin, ["phone"]);
+  for (const [field, bad] of [
+    ["size", 2 ** 31 + 1],
+    ["unpacked_size", 16 * 2 ** 30 + 1],
+    ["unpacked_size", undefined],
+  ]) {
+    const broken = structuredClone(value);
+    broken.datasets[fixture.version].packs.phone[field] = bad;
+    fs.writeFileSync(path.join(origin, "index.json"), JSON.stringify(broken));
+    await assert.rejects(install(path.join(root, "x"), origin, ["phone"]), {
+      exitCode: 4,
+      message: /Invalid release archive identity/,
+    });
+  }
+  fs.writeFileSync(
+    path.join(origin, "index.json"),
+    JSON.stringify({ ...value, format: 2 }),
+  );
+  await assert.rejects(install(path.join(root, "y"), origin, ["phone"]), {
+    exitCode: 4,
+    message: /format 3, found 2/,
+  });
 });
 
 test("two-family failure leaves the old activation untouched; remote list/update are explicit", async (t) => {
@@ -258,7 +354,7 @@ test("two-family failure leaves the old activation untouched; remote list/update
     assert.equal(result.status, 0, result.stderr);
     const parsed = JSON.parse(result.stdout);
     if (args[1] === "update") assert.equal(parsed.update_available, false);
-    else assert.equal(parsed.format, 2);
+    else assert.equal(parsed.format, 3);
   }
 });
 

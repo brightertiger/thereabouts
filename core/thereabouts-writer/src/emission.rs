@@ -9,56 +9,84 @@ use crate::{
 };
 use h3o::{CellIndex, LatLng, Resolution};
 use rusqlite::Connection;
-use std::{collections::BTreeMap, path::Path};
+use std::path::Path;
+/// Many blocks per shard, in ascending block order, up to the byte target.
 pub fn cells(
     data: &Dataset,
     db: &Connection,
     stage: &Path,
     manifest: &mut Manifest,
     metadata: &mut Metadata,
+    target: usize,
 ) -> Result<()> {
-    for (i, input) in crate::cell_layout::blocks(data)?.iter().enumerate() {
+    let mut shard = format::spatial::Blocks::default();
+    let mut count = 0;
+    for input in &crate::cell_layout::blocks(data)? {
         let root = input.cell;
         let block = address::address(root).0;
         let mut rows = vec![];
-        data.scan_block(input, |row| {
-            ensure(rows.len() < 16807, "Too many stored rows in a block")?;
-            let cell = row
-                .required("h3")?
-                .parse::<CellIndex>()
-                .map_err(|_| Error::Input("Invalid dataset H3 cell".into()))?;
-            ensure(
-                cell.resolution() >= Resolution::Three
-                    && cell.resolution() <= Resolution::Eight
-                    && cell.parent(Resolution::Three) == Some(root)
-                    && row.unsigned("h3_uint64")? == Some(u64::from(cell))
-                    && row.unsigned("h3_resolution")?
-                        == Some(u64::from(u8::from(cell.resolution()))),
-                "Dataset H3 columns disagree",
-            )?;
-            let country = catalogue::reference(db, row.text("country_id")?)?;
-            let subdivision = catalogue::reference(db, row.text("state_id")?)?;
-            let city = catalogue::reference(db, row.text("city_id")?)?;
-            rows.push((
-                address::address(cell).1,
-                Label([country, subdivision, city, flags(row)?, 0]),
-            ));
-            Ok(())
-        })?;
+        // A covered block without stored rows still answers no_land.
+        if input.scan {
+            data.scan_block(input, |row| {
+                ensure(rows.len() < 16807, "Too many stored rows in a block")?;
+                let cell = row
+                    .required("h3")?
+                    .parse::<CellIndex>()
+                    .map_err(|_| Error::Input("Invalid dataset H3 cell".into()))?;
+                ensure(
+                    cell.resolution() >= Resolution::Three
+                        && cell.resolution() <= Resolution::Eight
+                        && cell.parent(Resolution::Three) == Some(root)
+                        && row.unsigned("h3_uint64")? == Some(u64::from(cell))
+                        && row.unsigned("h3_resolution")?
+                            == Some(u64::from(u8::from(cell.resolution()))),
+                    "Dataset H3 columns disagree",
+                )?;
+                let country = catalogue::reference(db, row.text("country_id")?)?;
+                let subdivision = catalogue::reference(db, row.text("state_id")?)?;
+                let city = catalogue::reference(db, row.text("city_id")?)?;
+                rows.push((
+                    address::address(cell).1,
+                    Label([country, subdivision, city, flags(row)?, 0]),
+                ));
+                Ok(())
+            })?;
+        }
         rows.sort_unstable();
         let rows = timezones::join(db, block, rows, &mut metadata.timezone_sets)?;
-        let bytes = format::spatial::encode_blocks(&BTreeMap::from([(block, rows)]))?;
-        add(
-            stage,
-            manifest,
-            &format!("cells-{i:05}.bin"),
-            "cells",
-            &bytes,
-        )?;
+        if !shard.is_empty() && shard.len() + format::spatial::block_bytes(&rows) > target {
+            emit_cells(stage, manifest, &mut count, &shard)?;
+            shard = format::spatial::Blocks::default();
+        }
+        shard.push(block, &rows)?;
+    }
+    if !shard.is_empty() {
+        emit_cells(stage, manifest, &mut count, &shard)?;
     }
     Ok(())
 }
-pub fn catalogue(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
+fn emit_cells(
+    stage: &Path,
+    manifest: &mut Manifest,
+    count: &mut usize,
+    shard: &format::spatial::Blocks,
+) -> Result<()> {
+    add(
+        stage,
+        manifest,
+        &format!("cells-{count:05}.bin"),
+        "cells",
+        &shard.encode()?,
+    )?;
+    *count += 1;
+    Ok(())
+}
+pub fn catalogue(
+    db: &Connection,
+    stage: &Path,
+    manifest: &mut Manifest,
+    target: usize,
+) -> Result<()> {
     let mut query = db.prepare_cached("SELECT id FROM ids ORDER BY reference")?;
     let mut places = vec![];
     let mut size = 0;
@@ -84,7 +112,7 @@ pub fn catalogue(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Resu
                 .flatten()
                 .map(|s| s.len() + 8)
                 .sum::<usize>();
-        if size + added > 4 * 1024 * 1024 && !places.is_empty() {
+        if size + added > target && !places.is_empty() {
             add(
                 stage,
                 manifest,

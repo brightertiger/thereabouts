@@ -3,6 +3,15 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+MAX_ARCHIVE_BYTES: int
+MAX_UNPACKED_BYTES: int
+DEFAULT_RELEASE_URL: str
+INDEX_FORMAT: int
+ARCHIVE_SUFFIX: str
+WRITER_REVISION: str
+CORE_REVISION: str
+ERROR_KINDS: list[tuple[str, int, str]]
+
 class Geocoder:
     def reverse(
         self, lat: float, lon: float, *, evidence: bool = False
@@ -79,11 +88,17 @@ class Geocoder:
     def close(self) -> None: ...
 
 def open(
-    path: str, *, verify: bool = False, core: Geocoder | None = None
+    path: str,
+    *,
+    verify: bool = False,
+    core: Geocoder | None = None,
+    max_open_files: int | None = None,
 ) -> Geocoder: ...
 def write_pack(
     dataset_dir: str, family: str, output_dir: str, options: dict[str, Any]
 ) -> dict[str, Any]: ...
+def archive_pack(pack_dir: str, output: str) -> dict[str, Any]: ...
+def inspect_archive(path: str) -> dict[str, Any]: ...
 def verify_pack(path: str) -> dict[str, Any]: ...
 def pack_info(path: str) -> dict[str, Any]: ...
 def data_directory(explicit: str | None = None) -> str: ...

@@ -19,13 +19,15 @@ workspace = true
 
 [dependencies]
 thereabouts-cli = { path = "../thereabouts-cli" }
+thereabouts-cli-core = { path = "../thereabouts-cli-core" }
 thereabouts-core = { path = "../thereabouts-core" }
 pyo3 = { version = "0.26", features = ["abi3-py311"] }
 numpy = "0.26"
 serde_json = "1"
 
 [features]
-writer = ["dep:thereabouts-writer"]
+# The pipeline writes packs and their release archives.
+writer = ["dep:thereabouts-writer", "thereabouts-cli-core/create"]
 
 [dependencies.thereabouts-writer]
 path = "../thereabouts-writer"

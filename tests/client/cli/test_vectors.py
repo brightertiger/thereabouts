@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from tests.client.conformance.compare import assert_same
 from tests.client.conformance.forward_legacy import resolve
 from tests.client.conformance.pack_selection import selection
 from thereabouts import Geocoder, _core
@@ -67,7 +68,7 @@ def test_console_vectors(
             # Numeric values cannot be preserved as typed values in OS argv.
             assert not isinstance(case["request"]["values"][0], str)
             with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
-                assert resolve(geo, case["request"]).to_dict() == case["result"]
+                assert_same(resolve(geo, case["request"]).to_dict(), case["result"])
             with pytest.raises(TypeError):
                 _core.run_cli(["thereabouts", "postal", case["request"]["values"][0]])
             continue
@@ -91,4 +92,4 @@ def test_console_vectors(
             else 0
         )
         assert result.returncode == code, (case["id"], result.stderr)
-        assert json.loads(result.stdout) == expected, case["id"]
+        assert_same(json.loads(result.stdout), expected, case["id"])

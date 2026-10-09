@@ -1,6 +1,7 @@
 """Idempotent, checksum-verified fsspec publication with a final success receipt."""
 
 import hashlib
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,7 @@ from pipeline.runtime.jsonio import encode, sha256_file
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Output
 
+from . import bundle
 from .source import Row
 from .verify import verify_dataset
 
@@ -71,7 +73,7 @@ def inventory(dataset: Path, packs: dict[str, Path], version: str) -> list[Uploa
         for record in records.values():
             path = located(root, record["url"])
             if (
-                path.stat().st_size != record["bytes"]
+                path.stat().st_size != record["size"]
                 or sha256_file(path) != record["sha256"]
             ):
                 raise ValueError("Client archive checksum mismatch")
@@ -79,7 +81,7 @@ def inventory(dataset: Path, packs: dict[str, Path], version: str) -> list[Uploa
                 Upload(
                     path,
                     f"packs/{version}/{path.name}",
-                    record["bytes"],
+                    record["size"],
                     record["sha256"],
                 )
             )
@@ -174,6 +176,7 @@ def publish(
             != hashlib.sha256(receipt).hexdigest()
         ):
             raise ValueError("Success receipt checksum differs")
+    aggregate = aggregate_index(fs, prefix, version, entries, dry_run=dry_run)
     return {
         "version": version,
         "dry_run": dry_run,
@@ -181,5 +184,37 @@ def publish(
         "skip": sum(present for _, _, present in actions),
         "bytes": sum(entry.size for entry, _, present in actions if not present),
         "success_path": f"{version}/_SUCCESS",
+        "aggregate_index": aggregate,
         "files": records,
     }
+
+
+def aggregate_index(
+    fs: Any, prefix: str, version: str, entries: list[Upload], *, dry_run: bool
+) -> str | None:
+    """Merge this version into ``packs/index.json`` once the version is complete.
+
+    The aggregate is the clients' release discovery file and the only mutable
+    object, so it is written after the success receipt and read back to verify.
+    """
+    local = next(
+        (e.local for e in entries if e.remote == f"packs/{version}/index.json"), None
+    )
+    if local is None:
+        return None
+    path = f"{prefix}/packs/index.json"
+    existing = None
+    if fs.exists(path):
+        with fs.open(path, "rb") as stream:
+            existing = json.loads(stream.read())
+    merged = bundle.encode(bundle.merge(existing, version, read_json(local)))
+    if existing is not None and bundle.encode(existing) == merged:
+        return "unchanged"
+    if not dry_run:
+        fs.makedirs(path.rpartition("/")[0], exist_ok=True)
+        with fs.transaction, fs.open(path, "wb") as target:
+            target.write(merged)
+        with fs.open(path, "rb") as stream:
+            if stream.read() != merged:
+                raise ValueError("Aggregate release index changed while writing")
+    return "updated" if existing is not None else "created"

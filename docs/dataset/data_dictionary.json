@@ -897,8 +897,20 @@
         "meaning": "The selected pack requires a different reader or family"
       },
       {
+        "code": "internal_error",
+        "meaning": "A library invariant failed, such as a poisoned lock; please report it"
+      },
+      {
+        "code": "invalid_input",
+        "meaning": "A value could not be encoded or looked up; the pack itself is fine"
+      },
+      {
         "code": "pack_not_found",
         "meaning": "An explicitly selected pack directory does not exist"
+      },
+      {
+        "code": "resource_limit",
+        "meaning": "The process ran out of file descriptors; raise the open-file limit"
       },
       {
         "code": "writer_error",

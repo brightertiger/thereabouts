@@ -13,14 +13,14 @@ import {
   sha256,
 } from "./store.js";
 import { index, select, archive } from "./transport.js";
-import { integrity, usage, DataNotInstalledError } from "./errors.js";
+import { convert, integrity, usage, DataNotInstalledError } from "./errors.js";
 import { wasm } from "./wasm.js";
-import { extract } from "./archive.js";
 export const DISK_MARGIN_BYTES = 64 * 1024 * 1024;
+// Every compressed download plus its expanded tar stream, which bounds the files.
 export function precheck(root, bytes) {
   const stat = fs.statfsSync(root),
     available = stat.bavail * stat.bsize,
-    needed = bytes * 2 + DISK_MARGIN_BYTES;
+    needed = bytes + DISK_MARGIN_BYTES;
   if (!Number.isSafeInteger(needed) || available < needed)
     throw usage(
       `Not enough disk space: need ${needed} bytes, available ${available} bytes`,
@@ -40,6 +40,19 @@ async function identity(filename, version, name, pack) {
     info.format_minor !== pack.format_minor
   )
     throw integrity("Downloaded pack differs from release index identity");
+  return info;
+}
+// The shared Rust reader refuses unsafe entries and stops at the declared size.
+async function extract(filename, staging, pack) {
+  let summary;
+  try {
+    summary = JSON.parse(
+      (await wasm()).extractArchive(filename, staging, pack.unpacked_size),
+    );
+  } catch (e) {
+    throw e.code === "cli_error" ? e : convert(e);
+  }
+  return summary.files.map((f) => f.path).sort();
 }
 async function download(root, origin, pack) {
   const filename = safePath(root, `.downloads/${pack.sha256}.part`);
@@ -47,13 +60,13 @@ async function download(root, origin, pack) {
   const fd = fs.openSync(filename, "a");
   let offset = fs.fstatSync(fd).size;
   try {
-    if (offset > pack.bytes) {
+    if (offset > pack.size) {
       fs.unlinkSync(filename);
       throw integrity("Partial download exceeds advertised size");
     }
-    if (offset < pack.bytes)
+    if (offset < pack.size)
       for await (const bytes of archive(origin, pack, offset)) {
-        if (offset + bytes.length > pack.bytes)
+        if (offset + bytes.length > pack.size)
           throw integrity("Download exceeds advertised size");
         let written = 0;
         while (written < bytes.length)
@@ -61,7 +74,7 @@ async function download(root, origin, pack) {
         offset += bytes.length;
       }
     fs.fsyncSync(fd);
-    if (offset !== pack.bytes)
+    if (offset !== pack.size)
       throw usage(
         "Download interrupted; run the same data install again to resume: incomplete response",
       );
@@ -79,7 +92,7 @@ async function one(root, origin, version, name, pack) {
   if (fs.existsSync(destination)) {
     await identity(destination, version, name, pack);
     const receipt = readJson(safePath(destination, ".archive.json"));
-    if (receipt.sha256 !== pack.sha256 || receipt.bytes !== pack.bytes)
+    if (receipt.sha256 !== pack.sha256 || receipt.size !== pack.size)
       throw integrity("Installed release archive identity changed");
     return pointer(root, destination);
   }
@@ -88,8 +101,11 @@ async function one(root, origin, version, name, pack) {
   fs.rmSync(staging, { recursive: true, force: true });
   fs.mkdirSync(staging, { recursive: true });
   try {
-    extract(filename, staging, pack.bytes);
-    await identity(staging, version, name, pack);
+    const files = await extract(filename, staging, pack),
+      info = await identity(staging, version, name, pack),
+      expected = ["manifest.json", ...info.files.map((f) => f.path)].sort();
+    if (files.join("\n") !== expected.join("\n"))
+      throw integrity("Archive files differ from the pack manifest");
     fs.writeFileSync(safePath(staging, ".archive.json"), JSON.stringify(pack), {
       flag: "wx",
     });
@@ -137,7 +153,11 @@ export async function install(root, origin, requested, version) {
     }
     precheck(
       root,
-      requested.reduce((sum, name) => sum + dataset.packs[name].bytes, 0),
+      requested.reduce(
+        (sum, name) =>
+          sum + dataset.packs[name].size + dataset.packs[name].unpacked_size,
+        0,
+      ),
     );
     for (const name of requested)
       pin.packs[name] = await one(

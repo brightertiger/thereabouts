@@ -107,7 +107,8 @@ def base_inputs(data: Path, inputs: dict[str, str]) -> tuple[dict[str, Any], int
     for part in manifest["partitions"]:
         if part["kind"] != "plate_codes":
             continue
-        path = root / part["path"].split("/normalized/plates/", 1)[1]
+        # Older manifests recorded absolute paths; current ones are data-relative.
+        path = root / part["path"].split("normalized/plates/", 1)[1]
         digest = sha(path)
         if digest != part["sha256"]:
             raise ValueError(f"Corrupt plate input: {path}")

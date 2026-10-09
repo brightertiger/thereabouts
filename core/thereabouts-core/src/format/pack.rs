@@ -81,13 +81,21 @@ impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
     #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
     pub fn open(root: &Path, verify: bool) -> Result<Self> {
+        Self::open_files(root, verify, super::reader::DEFAULT_OPEN_FILES)
+    }
+    /// Open native files, keeping at most `open_files` idle handles (minimum one).
+    pub fn open_files(root: &Path, verify: bool, open_files: usize) -> Result<Self> {
         if !root.exists() {
             return Err(Error::PackNotFound(root.to_owned()));
         }
-        Self::open_with(&super::reader::Reader::native(root), verify)
+        let source = Arc::new(super::reader::Native);
+        Self::open_with(
+            &super::reader::Reader::with_open_files(root, source, open_files),
+            verify,
+        )
     }
-    /// Open through host reads; all shards retain their original handles after admission.
-    pub fn open_with(root: &super::reader::Reader<'_>, verify: bool) -> Result<Self> {
+    /// Open through host reads; shards borrow handles from the reader's bounded pool.
+    pub fn open_with(root: &super::reader::Reader, verify: bool) -> Result<Self> {
         let manifest = if verify {
             super::verify::verify_with(root)?
         } else {
@@ -188,7 +196,7 @@ impl Pack {
         let cached = self
             .address_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+            .map_err(crate::error::poisoned("address cache"))?
             .get(address);
         let selected = if let Some(rows) = cached {
             rows
@@ -203,7 +211,7 @@ impl Pack {
             let bytes = 64 + rows.len() * size_of::<(usize, usize)>();
             self.address_cache
                 .lock()
-                .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+                .map_err(crate::error::poisoned("address cache"))?
                 .insert(address, rows, bytes)
         };
         selected
@@ -260,7 +268,7 @@ impl Pack {
         let cached = self
             .observation_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .map_err(crate::error::poisoned("observation cache"))?
             .get(key);
         if let Some(value) = cached {
             return Ok(value);
@@ -276,7 +284,7 @@ impl Pack {
         Ok(self
             .observation_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .map_err(crate::error::poisoned("observation cache"))?
             .insert(key, value, bytes))
     }
     pub(crate) fn observations(
@@ -304,7 +312,7 @@ impl Pack {
         let mut cache = self
             .block_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+            .map_err(crate::error::poisoned("block cache"))?;
         if let Some(value) = cache.get(block) {
             return Ok(Some(value));
         }
@@ -328,7 +336,7 @@ impl Pack {
         let mut cache = self
             .block_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+            .map_err(crate::error::poisoned("block cache"))?;
         Ok(Some(cache.insert(block, value, bytes)))
     }
     /// Reference zero is null; other references project one record, with opt-in source evidence.
@@ -345,7 +353,7 @@ impl Pack {
         let mut places = self
             .place_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+            .map_err(crate::error::poisoned("place cache"))?;
         if let Some(place) = places.get((reference, evidence)) {
             return Ok(Some(place));
         }
@@ -372,7 +380,7 @@ impl Pack {
         let mut places = self
             .place_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+            .map_err(crate::error::poisoned("place cache"))?;
         Ok(Some(places.insert((reference, evidence), place, bytes)))
     }
 }
@@ -380,7 +388,7 @@ impl Pack {
 fn catalogue_source(
     path: &Path,
     first: usize,
-    reader: &super::reader::Reader<'_>,
+    reader: &super::reader::Reader,
 ) -> Result<CatalogueSource> {
     let shard = FileShard::from_file(reader.open(path)?, 2, &[80, 8, 1])?;
     catalogue::validate_header(&shard)?;
@@ -395,7 +403,7 @@ fn catalogue_source(
 }
 
 fn load_blocks(
-    reader: &super::reader::Reader<'_>,
+    reader: &super::reader::Reader,
     path: &Path,
     blocks: &mut BTreeMap<u32, BlockSource>,
 ) -> Result<()> {

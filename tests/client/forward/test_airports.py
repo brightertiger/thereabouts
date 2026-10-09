@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from tests.client.conformance.compare import assert_same
 from tests.client.conformance.forward_legacy import check, resolve
 from tests.client.conformance.pack_selection import selection
 from tests.tools.source_fixture import read_source
@@ -20,7 +21,9 @@ def test_airport_vectors(name: str) -> None:
     bundle = json.loads((FIXTURES / name).read_text())
     with Geocoder(packs=selection(FIXTURES / bundle["pack"])) as geo:
         for case in bundle["cases"]:
-            assert resolve(geo, case["request"]).to_dict() == case["result"], case["id"]
+            assert_same(
+                resolve(geo, case["request"]).to_dict(), case["result"], case["id"]
+            )
 
 
 def test_airport_legacy_expectations() -> None:

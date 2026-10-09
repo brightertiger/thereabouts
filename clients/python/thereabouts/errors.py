@@ -31,6 +31,24 @@ class CorruptPackError(GeocoderError):
     code = "corrupt_pack"
 
 
+class ResourceLimitError(GeocoderError, OSError):
+    """The process ran out of file descriptors; raise the open-file limit."""
+
+    code = "resource_limit"
+
+
+class InvalidInputError(GeocoderError, ValueError):
+    """A value could not be encoded or looked up; the pack itself is fine."""
+
+    code = "invalid_input"
+
+
+class InternalError(GeocoderError, RuntimeError):
+    """A library invariant failed, such as a poisoned lock; please report it."""
+
+    code = "internal_error"
+
+
 class PackNotFoundError(GeocoderError, FileNotFoundError):
     """An explicitly selected pack directory does not exist."""
 
