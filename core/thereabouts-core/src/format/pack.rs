@@ -81,10 +81,18 @@ impl Pack {
     /// Read headers/directories only; opt in to full hashes and structural verification.
     #[allow(clippy::too_many_lines)] // Admission coordinates typed indexes; codecs and payload IO remain separate.
     pub fn open(root: &Path, verify: bool) -> Result<Self> {
+        Self::open_files(root, verify, super::reader::DEFAULT_OPEN_FILES)
+    }
+    /// Open native files, keeping at most `open_files` idle handles (minimum one).
+    pub fn open_files(root: &Path, verify: bool, open_files: usize) -> Result<Self> {
         if !root.exists() {
             return Err(Error::PackNotFound(root.to_owned()));
         }
-        Self::open_with(&super::reader::Reader::native(root), verify)
+        let source = Arc::new(super::reader::Native);
+        Self::open_with(
+            &super::reader::Reader::with_open_files(root, source, open_files),
+            verify,
+        )
     }
     /// Open through host reads; shards borrow handles from the reader's bounded pool.
     pub fn open_with(root: &super::reader::Reader, verify: bool) -> Result<Self> {

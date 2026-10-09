@@ -15,10 +15,7 @@ use std::{
 };
 use thereabouts_core::{
     Error,
-    format::{
-        Pack,
-        reader::{Native, Reader},
-    },
+    format::{Pack, reader::DEFAULT_OPEN_FILES},
 };
 #[cfg(feature = "writer")]
 use thereabouts_writer as writer;
@@ -343,16 +340,11 @@ fn open(
     let shared = core.map(|c| c.pack(py)).transpose()?;
     let pack = py
         .detach(|| {
-            let pack = match max_open_files {
-                None => Pack::open(Path::new(path), verify)?,
-                Some(_) if !Path::new(path).exists() => {
-                    return Err(Error::PackNotFound(path.into()));
-                }
-                Some(limit) => Pack::open_with(
-                    &Reader::with_open_files(Path::new(path), Arc::new(Native), limit),
-                    verify,
-                )?,
-            };
+            let pack = Pack::open_files(
+                Path::new(path),
+                verify,
+                max_open_files.unwrap_or(DEFAULT_OPEN_FILES),
+            )?;
             if let Some(core) = shared {
                 pack.with_core(core)
             } else {

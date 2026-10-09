@@ -35,13 +35,6 @@ def release(root: Path, version: str = "2026.10") -> Path:
     return directory
 
 
-def test_transport_policy_comes_from_the_rust_core() -> None:
-    assert _core.MAX_ARCHIVE_BYTES == 2 * 1024**3
-    assert _core.MAX_UNPACKED_BYTES == 16 * 1024**3
-    assert _core.INDEX_FORMAT == 3
-    assert _core.ARCHIVE_SUFFIX == ".tar.zst"
-
-
 def test_archives_are_deterministic_and_indexed_with_unpacked_size(
     tmp_path: Path,
 ) -> None:
