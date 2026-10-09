@@ -1,6 +1,7 @@
 """Complete tiny source receipts for exercising the real geographic runner."""
 
 from pathlib import Path
+from typing import Any
 
 import h3
 import pyarrow as pa
@@ -28,7 +29,11 @@ def partition(root: Path, source: str, kind: str) -> Path:
 
 
 def source_receipts(
-    root: Path, ledger: Ledger, *, wide: bool = False
+    root: Path,
+    ledger: Ledger,
+    *,
+    wide: bool = False,
+    names: list[dict[str, Any]] | None = None,
 ) -> tuple[Context, SyntheticStage]:
     """ZZ around the origin; `wide` adds country YY east of it and four blocks."""
     config = load()
@@ -61,6 +66,7 @@ def source_receipts(
         geonames=geonames,
         divisions=divisions,
         areas=areas,
+        names=names,
     )
     source_names = ["overture", "geonames", "geoboundaries", "osm_land", "ghsl"]
     stage = SyntheticStage(

@@ -4,6 +4,9 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Any
 
+from pipeline.config.policies import DIRECTORY, read
+
+PATH = DIRECTORY / "names.yaml"
 TREATMENTS = ("keep", "guarded", "drop")
 
 
@@ -15,6 +18,10 @@ class Policy:
     historic: str
     short: str
     max_folded_length: int
+
+
+def load() -> dict[str, Any]:
+    return read(PATH)
 
 
 def parse(value: dict[str, Any]) -> Policy:

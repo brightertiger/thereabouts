@@ -65,7 +65,7 @@ def code(**more: Any) -> Row:
 
 
 def workspace(root: Path) -> Row:
-    root.mkdir(parents=True)
+    root.mkdir(parents=True, exist_ok=True)
     countries = root / "countries.csv"
     with countries.open("w", newline="") as stream:
         writer = csv.DictWriter(stream, FIELDS)

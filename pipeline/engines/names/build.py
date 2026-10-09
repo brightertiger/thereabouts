@@ -227,3 +227,26 @@ def build(
         },
     )
     return [destination, receipt]
+
+
+def dangling(
+    tables: list[Row], work: Path, resources: Resources, limits: EngineLimits
+) -> int:
+    """Names whose city is not a canonical city; the lookup gate requires none."""
+    names = [r for r in tables if r["kind"] == "names"]
+    if not names:
+        return 0
+    db = query.connect(work, resources, limits)
+    try:
+        view(db, "names", names)
+        view(
+            db,
+            "canonical_cities",
+            [r for r in tables if r["kind"] == "canonical_cities"],
+        )
+        row = db.execute(
+            "SELECT count(*) FROM names n ANTI JOIN canonical_cities c USING(city_id)"
+        ).fetchone()
+    finally:
+        db.close()
+    return int(row[0]) if row else 0
