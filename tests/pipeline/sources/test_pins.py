@@ -67,7 +67,7 @@ def test_lock_requires_explicit_update_and_rejects_unknown_fields(
     assert path.read_bytes() == before
 
 
-def test_workspace_pin_uses_manifest_inventory_and_bound_mirror_custody(
+def test_workspace_pin_uses_manifest_inventory_without_legacy_custody(
     tmp_path: Path,
 ) -> None:
     root = tmp_path / "data"
@@ -116,19 +116,10 @@ def test_workspace_pin_uses_manifest_inventory_and_bound_mirror_custody(
     )
     pin = from_manifest(root, manifest)
     assert pin.release == "used-release"
-    assert pin.metadata["mirror_base"] == "memory://retained/example"
+    # Every pinned object is in the sha256 mirror; legacy prefixes are not pinned.
+    assert not {"mirror_base", "mirror_evidence"} & pin.metadata.keys()
     assert str(root) not in json.dumps(asdict(pin))
     assert pin.files[0].name == "input.zip"
-    write_json(
-        custody,
-        {
-            "offloaded": True,
-            "manifest_sha256": "different",
-            "remote": "memory://retained/example",
-        },
-    )
-    with pytest.raises(ValueError, match="custody does not bind"):
-        from_manifest(root, manifest)
 
 
 @pytest.mark.parametrize(

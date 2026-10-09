@@ -21533,8 +21533,6 @@ geoboundaries:
       ZMB-ADM1: 9469f09592ced973a3448cf66b6100b741b64c0d
       ZWE-ADM0: 9469f09592ced973a3448cf66b6100b741b64c0d
       ZWE-ADM1: 9469f09592ced973a3448cf66b6100b741b64c0d
-    mirror_base: gs://pyofflinegeocoder-summer-sector-488705-m8/raw/geoboundaries
-    mirror_evidence: operator verified count and bytes
 geonames:
   release: '20261001'
   pinned_at: '2026-10-01T16:11:32.494989+00:00'
@@ -21620,8 +21618,6 @@ geonames:
   metadata:
     inventory_fingerprint: 1fee1525ef3a8bbc7af28bca6259379e27293085b8a69e535b3429c9d6776507
     dump_date: '2026-10-01'
-    mirror_base: gs://pyofflinegeocoder-summer-sector-488705-m8/raw/geonames
-    mirror_evidence: operator verified count and bytes
 ghsl:
   release: R2024A-V1.2
   pinned_at: '2026-10-02T06:03:44.760584+00:00'
@@ -21663,8 +21659,6 @@ osm_land:
   metadata:
     inventory_fingerprint: 70f1e2814c19d054d3986852d02e9b6eb6cd51fcf6dec6fdca6b3054a9591334
     dump_date: '2026-10-01'
-    mirror_base: gs://pyofflinegeocoder-summer-sector-488705-m8/raw/osm_land
-    mirror_evidence: operator verified count and bytes
 overture:
   release: 2026-09-23.1
   pinned_at: '2026-10-01T16:13:37.616808+00:00'
@@ -21790,8 +21784,6 @@ overture:
   metadata:
     inventory_fingerprint: e920d255d8bd8822e90d7dcab98ea3bea573bbb30662c47664238fc828ce3a3e
     objects: 9
-    mirror_base: gs://pyofflinegeocoder-summer-sector-488705-m8/raw/overture
-    mirror_evidence: operator verified count and bytes
 phone:
   release: 0ae309f1940227efe688f5eb1815ef45a6fbee8d
   pinned_at: '2026-10-01T18:57:52.746306+00:00'

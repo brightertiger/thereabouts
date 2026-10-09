@@ -176,9 +176,10 @@ with the same name and new bytes is a new object; names that pin identical
 bytes share one. Downloads reuse a verified local object (one that fails
 verification is deleted and fetched again), then restore from
 `storage.gcs_raw/sha256/<sha256>`, then fetch the frozen upstream URL with the
-pinned conditional headers. Historical offload prefixes are retained as
-fallback restore locations, with their original custody evidence; restored
-bytes must match the recorded size and SHA256. Each object is then mirrored;
+pinned conditional headers; restored bytes must match the pinned size and
+SHA256. Every pinned object of the current lock is held in the `sha256/`
+mirror, so the lock records no legacy offload prefixes. Each object is then
+mirrored;
 an existing mirror object is vouched for by its size and the service's MD5 or
 CRC32C rather than read back.
 

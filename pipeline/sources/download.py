@@ -46,18 +46,14 @@ def acquire(ctx: SourceContext, pin: PinFile, base: str) -> Path:
         # The name is the checksum, so a mismatch is damage, never a new version.
         target.unlink()
     if not target.exists():
-        mirrors = [mirror_url(base, pin)]
-        if retained := ctx.pin.metadata.get("mirror_base"):
-            mirrors.append(str(retained).rstrip("/") + "/" + pin.name)
-        remote = next(
-            (url for url in mirrors if retrying(patience, partial(exists, url))), None
-        )
+        remote = mirror_url(base, pin)
+        mirrored = retrying(patience, partial(exists, remote))
         fetch(
-            remote or pin.url,
+            remote if mirrored else pin.url,
             target,
             size=pin.size,
             sha256=pin.sha256,
-            headers=conditions(pin) if remote is None else {},
+            headers={} if mirrored else conditions(pin),
             limits=limits,
         )
     verify_publisher(target, pin.metadata, limits.read_bytes, pin.name)

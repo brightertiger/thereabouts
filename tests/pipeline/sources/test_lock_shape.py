@@ -1,7 +1,6 @@
 """The committed lock is exactly what the proposers produce for unchanged bytes."""
 
 import importlib
-from dataclasses import replace
 from typing import Any, cast
 
 import pytest
@@ -19,8 +18,6 @@ from .replay import replay
 # The pinned bytes before the lock was rewritten into proposer shape (2026-10-09):
 # the digest of every source's (url, size, sha256, etag, last_modified) records.
 PAYLOADS = "3795c8cbdc1cb080d17a20717c9f53a199aa560af1b7bd6005d85fa333ec7a9f"
-# Retained-prefix custody, dropped once the sha256 mirror holds every object.
-CUSTODY = ("mirror_base", "mirror_evidence")
 
 SOURCES = sorted(name for name, source in load().sources.items() if source.enabled)
 
@@ -41,9 +38,6 @@ def test_unchanged_upstream_proposal_keeps_the_committed_pin(
     lock = read_lock(LOCK)
     settings = load().sources[name]
     pin = lock[name]
-    pin = replace(
-        pin, metadata={k: v for k, v in pin.metadata.items() if k not in CUSTODY}
-    )
     replay(pin, settings, facts(name, pin)).install(monkeypatch)
     adapter = cast(Source, importlib.import_module(settings.adapter))
     proposal = adapter.propose(settings)
