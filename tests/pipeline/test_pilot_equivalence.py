@@ -45,7 +45,7 @@ def test_retained_pilot_bytes(tmp_path: Path) -> None:
     config = load(
         overrides=[
             "resources.duckdb_memory=512MB",
-            "engines.limits.duckdb_spill_bytes=128000000",
+            "engines.runtime.duckdb_spill_bytes=128000000",
         ]
     )
     policy = policies.reconcile()

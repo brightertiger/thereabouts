@@ -1,12 +1,11 @@
 """Geographic stage identities and units; execution stays in focused stage modules."""
 
 from collections.abc import Callable
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
 from pipeline.config.schema import StageSettings
-from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
-from thereabouts.format import CELL_FORMAT_VERSION
+from pipeline.runtime.fingerprints import stage_identity
 
 from .contract import Context, Unit, make_unit
 from .engine_data import Geography
@@ -29,17 +28,7 @@ class GeographicStage:
         self.parameters = parameters
 
     def identity(self, ctx: Context) -> str:
-        tree = asdict(ctx.config)
-        return identity(
-            [REPOSITORY / path for path in self.settings.packages],
-            config={
-                "stage": asdict(self.settings),
-                **{key: tree[key] for key in self.settings.config},
-            },
-            pins={},
-            native=native_versions(self.settings.native, REPOSITORY / "uv.lock"),
-            cell_format=CELL_FORMAT_VERSION if self.settings.cell_format else None,
-        )
+        return stage_identity(self.settings, ctx.config)
 
     def units(self, ctx: Context) -> list[Unit]:
         self.discovery.load(ctx)

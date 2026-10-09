@@ -1,13 +1,12 @@
 """Shared identity and discovery mechanics for immutable release stages."""
 
-from dataclasses import asdict, replace
+from dataclasses import replace
 from pathlib import Path
 
 from pipeline.config.schema import StageSettings
-from pipeline.runtime.fingerprints import REPOSITORY, identity, native_versions
+from pipeline.runtime.fingerprints import stage_identity
 from pipeline.runtime.jsonio import Object
 from pipeline.runtime.records import Dependency, Recipe
-from thereabouts.format import CELL_FORMAT_VERSION
 
 from .contract import Context, Unit, make_unit
 
@@ -19,17 +18,7 @@ class ReleaseStage:
         self.needs = tuple(settings.needs)
 
     def identity(self, ctx: Context) -> str:
-        tree = asdict(ctx.config)
-        return identity(
-            [REPOSITORY / path for path in self.settings.packages],
-            config={
-                "stage": asdict(self.settings),
-                **{name: tree[name] for name in self.settings.config},
-            },
-            pins={},
-            native=native_versions(self.settings.native, REPOSITORY / "uv.lock"),
-            cell_format=CELL_FORMAT_VERSION if self.settings.cell_format else None,
-        )
+        return stage_identity(self.settings, ctx.config)
 
     def unit(
         self,

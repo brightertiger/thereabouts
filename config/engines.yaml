@@ -1,13 +1,8 @@
 # Limits match the retained engines; execution uses shared resource admission.
 minimum_country_coverage: 0.995
-limits:
-  city_cache_entries: 2
-  geometry_cache_entries: 24
-  large_geometry_bytes: 100000
+# Batch and row-group sizes shape outputs, so they are part of stage identities.
+batches:
   edge_segments: 64
-  nearest_cache_entries: 3
-  column_cache_entries: 96
-  reader_cache_entries: 24
   offshore_batch_rows: 128
   state_vote_batch_rows: 1024
   parquet_batch_rows: 1024
@@ -15,9 +10,17 @@ limits:
   extract_row_group_rows: 2048
   join_row_group_rows: 16384
   mapping_batch_rows: 2048
+  allocation_batch_rows: 1024
+# Caches, spill and reservations only tune a machine; they are never hashed.
+runtime:
+  city_cache_entries: 2
+  geometry_cache_entries: 24
+  large_geometry_bytes: 100000
+  nearest_cache_entries: 3
+  column_cache_entries: 96
+  reader_cache_entries: 24
   sqlite_cache_kib: 16384
   locator_cache_kib: 2048
-  allocation_batch_rows: 1024
   duckdb_spill_bytes: 512000000
   country_reservation_bytes: 256000000
   block_reservation_bytes: 64000000

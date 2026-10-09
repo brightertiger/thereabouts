@@ -6,9 +6,14 @@ from collections.abc import Sequence
 from functools import lru_cache
 from pathlib import Path
 
+# The loader and validators only parse and check configuration; every value a
+# stage reads is hashed as a declared config section or a unit parameter.
 EXCLUDED = (
     "pipeline/runtime/",
     "pipeline/stages/contract.py",
+    "pipeline/config/__init__.py",
+    "pipeline/config/engine_validation.py",
+    "pipeline/config/loader.py",
     "pipeline/config/schema.py",
 )
 

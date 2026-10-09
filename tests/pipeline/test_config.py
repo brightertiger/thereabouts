@@ -20,7 +20,7 @@ from pipeline.config import load
         "h3.block_resolution=9",
         "h3.block_resolution=2",
         "h3.cell_resolution=9",
-        "engines.limits.reader_cache_entries=0",
+        "engines.runtime.reader_cache_entries=0",
         "engines.countries=[ZZ,ZZ]",
         "engines.blocks=[invalid]",
         "resources.poll_seconds=0",
