@@ -46,7 +46,8 @@ def entities_in_roles(
 ) -> Iterator[tuple[str, str, Entity]]:
     """(id, role, entity) in table order; `role` has no index, so this scans."""
     marks = ",".join("?" * len(roles))
-    query = f"SELECT id,role,data FROM entities WHERE role IN ({marks})"
+    # Only placeholders are interpolated; roles are bound as parameters.
+    query = f"SELECT id,role,data FROM entities WHERE role IN ({marks})"  # noqa: S608
     for identity, role, data in db.execute(query, tuple(roles)):
         yield identity, role, cast(Entity, unpack(data))
 

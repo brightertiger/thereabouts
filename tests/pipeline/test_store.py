@@ -162,14 +162,14 @@ def test_no_artifact_sql_outside_the_store_and_its_producer() -> None:
         "pipeline/release",
         "pipeline/tools",
     ]
-    found = []
+    found: list[str] = []
     for root in roots:
         for path in sorted((REPOSITORY / root).rglob("*.py")):
-            for node in ast.walk(ast.parse(path.read_bytes())):
-                if (
-                    isinstance(node, ast.Constant)
-                    and isinstance(node.value, str)
-                    and ARTIFACT_SQL.search(node.value)
-                ):
-                    found.append(f"{path.relative_to(REPOSITORY)}:{node.lineno}")
+            found.extend(
+                f"{path.relative_to(REPOSITORY)}:{node.lineno}"
+                for node in ast.walk(ast.parse(path.read_bytes()))
+                if isinstance(node, ast.Constant)
+                and isinstance(node.value, str)
+                and ARTIFACT_SQL.search(node.value)
+            )
     assert not found
