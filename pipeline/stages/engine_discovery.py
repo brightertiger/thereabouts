@@ -4,11 +4,11 @@ from dataclasses import asdict
 
 from pipeline.runtime.jsonio import digest
 from pipeline.runtime.paths import located
-from pipeline.runtime.records import Dependency, Recipe
+from pipeline.runtime.records import Recipe
 
 from .contract import Context
 from .engine_data import Geography, geography
-from .engine_recipes import geographic_recipes, lookup_recipes
+from .engine_recipes import geographic_recipes, lookup_recipes, plate_recipe
 
 
 class Discovery:
@@ -47,16 +47,7 @@ class Discovery:
             ctx, self.geography
         ):
             self.recipes.setdefault(recipe.stage, []).append(recipe)
-        source = ctx.config.sources.get(settings.plate_country_source)
-        if source is not None and source.enabled:
-            self.recipes["plate_country"] = [
-                Recipe(
-                    "plate_country",
-                    "world",
-                    dependencies=(
-                        Dependency("normalize", settings.plate_country_source),
-                        Dependency("normalize", settings.registration_source),
-                    ),
-                )
-            ]
+        plates = plate_recipe(ctx)
+        if plates is not None:
+            self.recipes["plate_country"] = [plates]
         self.stamp = stamp

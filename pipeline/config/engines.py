@@ -61,6 +61,8 @@ class EngineSettings:
     reconcile_sources: dict[str, list[str]] = field(default_factory=dict)
     static_sources: dict[str, str] = field(default_factory=dict)
     spatial_sources: dict[str, str] = field(default_factory=dict)
+    # Source -> normalized kinds whose rows name canonical cities.
+    name_sources: dict[str, list[str]] = field(default_factory=dict)
     # Empty selections mean all discovered countries and resolution-3 blocks.
     countries: list[str] = field(default_factory=list)
     blocks: list[str] = field(default_factory=list)

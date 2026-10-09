@@ -211,6 +211,22 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
                     dependencies=dependencies(parents, reads=reads),
                 )
             )
+    names: dict[str, list[str]] = {}
+    for source, kinds in settings.name_sources.items():
+        manifest = source_manifest(ctx, source)
+        published = {p["kind"] for p in manifest["partitions"]} if manifest else set()
+        if published & set(kinds):
+            names[source] = sorted(published & set(kinds))
+    if names:
+        reads = {("normalize", s): partitions(ctx, s, k) for s, k in names.items()}
+        places = {("normalize_cells", "places/" + cc) for cc in geography.countries}
+        recipes.append(
+            Recipe(
+                "lookups",
+                "names/world",
+                dependencies=dependencies(set(reads) | places, reads=reads),
+            )
+        )
     parents = (
         {recipe.key for recipe in recipes}
         | {("normalize_cells", "block/" + b) for b in geography.blocks}
@@ -220,10 +236,32 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             for cc in geography.countries
         }
     )
-    plate_source = ctx.config.sources.get(settings.plate_country_source)
-    if plate_source is not None and plate_source.enabled:
+    if plate_recipe(ctx) is not None:
         parents.add(("plate_country", "world"))
     recipes.append(
         Recipe("lookups", "manifest/current", dependencies=dependencies(parents))
     )
     return recipes
+
+
+def plate_recipe(ctx: Context) -> Recipe | None:
+    """Plate tables need only normalized registration evidence; a pinned
+    plate-country source adds documents and vehicle priors."""
+    settings = ctx.config.engines
+    if source_manifest(ctx, settings.registration_source) is None:
+        return None
+    reads = {
+        ("normalize", settings.registration_source): (
+            *partitions(
+                ctx, settings.registration_source, ["plate_codes", "plate_survey"]
+            ),
+            f"{ctx.config.paths.normalized}/{settings.registration_source}/manifest.json",
+        )
+    }
+    parents = set(reads)
+    source = ctx.config.sources.get(settings.plate_country_source)
+    if source is not None and source.enabled:
+        parents.add(("normalize", settings.plate_country_source))
+    return Recipe(
+        "plate_country", "world", dependencies=dependencies(parents, reads=reads)
+    )

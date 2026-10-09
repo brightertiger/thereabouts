@@ -57,6 +57,7 @@ def validate_sources(
         set(settings.reconcile_sources)
         | set(settings.static_sources.values())
         | set(settings.spatial_sources.values())
+        | set(settings.name_sources)
         | {
             settings.land_source,
             settings.urban_source,
@@ -79,6 +80,9 @@ def validate_sources(
         source = getattr(settings, name)
         if source and sources[source].kind != kind:
             raise ValueError(f"engines.{name} requires source kind {kind}")
+    for name, kinds in settings.name_sources.items():
+        if not set(kinds) <= {"names", "places"}:
+            raise ValueError(f"engines.name_sources.{name} reads names or places only")
     if settings.reconcile_sources and (
         settings.land_source not in settings.reconcile_sources
         or not settings.urban_source
