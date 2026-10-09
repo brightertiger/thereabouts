@@ -13,19 +13,20 @@ from pipeline.pins.models import SourcePin
 
 from .contract import SourceContext
 from .proposals.resolve import propose as propose_pin
-from .shared.lookup_rows import Reject, Row, point
+from .shared.lookup_rows import Row, point
+from .shared.rows import RowRejected
 from .shared.text import InputRow, publish_rows
 
 
 def ip_range(raw: list[str], *, grid: H3) -> Row:
     if len(raw) != 8:
-        raise Reject(f"Expected 8 DB-IP columns, got {len(raw)}")
+        raise RowRejected(f"Expected 8 DB-IP columns, got {len(raw)}")
     try:
         start, end = ipaddress.ip_address(raw[0]), ipaddress.ip_address(raw[1])
         if start.version != end.version or int(start) > int(end):
             raise ValueError("reversed or mixed-family range")
     except ValueError as error:
-        raise Reject(str(error)) from error
+        raise RowRejected(str(error)) from error
     return dict(
         ip_start=str(start),
         ip_end=str(end),

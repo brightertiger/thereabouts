@@ -8,6 +8,7 @@ from pipeline.runtime.jsonio import digest, sha256_file, write_json
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.archives import extract
 from pipeline.sources.shared.manifest import finish
+from pipeline.sources.shared.scratch import scratch_index
 from pipeline.sources.shared.writer import PartitionWriter
 
 from .reader import _build_index, _feature, _publisher_notice, _units
@@ -35,17 +36,16 @@ def normalize(ctx: SourceContext) -> list[Path]:
     projection = shp.with_suffix(".prj").read_text()
     if 'GEOGCS["GCS_WGS_1984"' not in projection or 'UNIT["Degree"' not in projection:
         raise ValueError(f"Unexpected OSM land CRS: {projection}")
-    index = ctx.ensure(directory / "records.sqlite3")
-    reservation = int(ctx.settings.options["index_bytes"])
-    ctx.guard.admit(reservation)
-    written = 0
-    try:
-        count = _build_index(ctx, shp, index)
-        written = index.stat().st_size
-        if written > reservation:
-            raise ValueError("OSM index exceeds configured index_bytes")
-    finally:
-        ctx.guard.release(reservation, written_bytes=written)
+    with scratch_index(
+        ctx,
+        "records.sqlite3",
+        int(ctx.settings.options["index_bytes"]),
+        label="OSM",
+        check="integrity_check",
+    ) as built:
+        count = _build_index(ctx, shp, built.db)
+        built.check_size()
+    index = built.path
     notice = _publisher_notice(ctx, shp, count)
     source_hash = sha256_file(shp)
     evidence = {

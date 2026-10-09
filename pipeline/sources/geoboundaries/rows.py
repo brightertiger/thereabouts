@@ -2,26 +2,21 @@
 
 from __future__ import annotations
 
-import json
 import re
-import unicodedata
 from typing import Any
 
 from shapely.geometry.base import BaseGeometry
 
 from pipeline.sources.shared.geometry import bounds_columns
+from pipeline.sources.shared.rows import canonical_json, clean_text, provenance
 from pipeline.sources.shared.schemas import SCHEMA_HASHES
+
+# Layer attributes spell a missing value as one of these words.
+NULLS = frozenset({"none", "null", "nan"})
 
 
 def _text(value: object) -> str | None:
-    if value is None:
-        return None
-    result = " ".join(unicodedata.normalize("NFC", str(value)).split())
-    return result if result and result.lower() not in {"none", "null", "nan"} else None
-
-
-def _json(value: object) -> str:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False)
+    return clean_text(value, nulls=NULLS)
 
 
 def _row(
@@ -55,29 +50,31 @@ def _row(
     )
     if not license_url.startswith(("http://", "https://")):
         license_url = "https://" + license_url
-    provenance = {
-        "source_url": pin["url"],
-        "license_url": license_url,
-        "attribution": "geoBoundaries; " + str(metadata["boundarySource"]),
-        "layer_metadata": metadata,
-        "source_properties": properties,
-        "commit": pin["commit"],
-        "retrieved_at": pin["retrieved_at"],
-        "archive_sha256": pin["archive_sha256"],
-        "record_index": index,
-        "geometry_part": part,
-        "transformations": transformations,
-        "name_language": None,
-        "schema_hash": SCHEMA_HASHES["areas"],
-        "country_code_mapping": "GeoNames countryInfo ISO3/ISO2; XK user-assigned",
-        "country_reference": {
-            "source_url": "https://download.geonames.org/export/dump/countryInfo.txt",
-            "license": "CC BY 4.0",
-            "license_url": "https://creativecommons.org/licenses/by/4.0/",
-            "attribution": "GeoNames",
+    evidence = provenance(
+        pin["url"],
+        license_url,
+        "geoBoundaries; " + str(metadata["boundarySource"]),
+        {
+            "layer_metadata": metadata,
+            "source_properties": properties,
+            "commit": pin["commit"],
+            "retrieved_at": pin["retrieved_at"],
+            "archive_sha256": pin["archive_sha256"],
+            "record_index": index,
+            "geometry_part": part,
+            "transformations": transformations,
+            "name_language": None,
+            "schema_hash": SCHEMA_HASHES["areas"],
+            "country_code_mapping": "GeoNames countryInfo ISO3/ISO2; XK user-assigned",
+            "country_reference": {
+                "source_url": "https://download.geonames.org/export/dump/countryInfo.txt",
+                "license": "CC BY 4.0",
+                "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                "attribution": "GeoNames",
+            },
+            "layer_unit": unit,
         },
-        "layer_unit": unit,
-    }
+    )
     return {
         "source": "geoboundaries",
         "source_id": identifier,
@@ -96,5 +93,5 @@ def _row(
         "is_territorial": None,
         "source_release": pin["commit"],
         "license": _text(metadata["boundaryLicense"]) or "Unspecified by source",
-        "provenance": _json(provenance),
+        "provenance": canonical_json(evidence, separators=None),
     }

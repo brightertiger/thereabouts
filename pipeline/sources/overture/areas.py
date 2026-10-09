@@ -15,8 +15,9 @@ from pipeline.sources.shared.geometry import (
     repair_geometry,
 )
 from pipeline.sources.shared.geometry import split_geometry as bounded_geometry
+from pipeline.sources.shared.rows import RowRejected, clean_text
 
-from .rows import RowRejectedError, _common, _labels, _provenance, encode, text
+from .rows import _common, _labels, _provenance, encode
 
 
 def areas(
@@ -31,7 +32,7 @@ def areas(
     provenance = _provenance(row, context)
     if geometry.is_empty:
         stats["empty_input"] += 1
-        raise RowRejectedError("empty area geometry")
+        raise RowRejected("empty area geometry")
     invalid = not geometry.is_valid
     if invalid:
         stats["invalid_input"] += 1
@@ -43,7 +44,7 @@ def areas(
             geometry, collection="retain", check_extent=False
         )
     except ValueError as error:
-        raise RowRejectedError(str(error)) from error
+        raise RowRejected(str(error)) from error
     if "make_valid" in changes:
         provenance["transformations"].append("GEOS make_valid")
         stats["repaired_input"] += 1
@@ -75,10 +76,10 @@ def areas(
                 "entity_id": row["division_id"],
                 "kind": row["subtype"],
                 "subtype": row["subtype"],
-                "admin_level": text(row.get("admin_level")),
+                "admin_level": clean_text(row.get("admin_level")),
                 "parent_source_id": parent,
-                "country_code": text(row.get("country")),
-                "subdivision_code": text(row.get("region")),
+                "country_code": clean_text(row.get("country")),
+                "subdivision_code": clean_text(row.get("region")),
                 "name": name,
                 "name_en": english,
                 "geometry": part.wkb,
@@ -90,6 +91,6 @@ def areas(
             emitted += 1
             yield result
     if not emitted:
-        raise RowRejectedError("area has no polygonal components after repair")
+        raise RowRejected("area has no polygonal components after repair")
     stats["output_valid_geometries"] += emitted
     stats["additional_split_parts"] += emitted - 1

@@ -7,8 +7,10 @@ from typing import Any
 import pyarrow as pa
 import shapely
 
+from pipeline.errors import InputIntegrityError
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import repair_geometry, split_geometry
+from pipeline.sources.shared.rows import RowRejected
 from pipeline.sources.shared.schemas import SCHEMAS, validate_table
 from pipeline.sources.shared.writer import PartitionWriter
 
@@ -53,13 +55,13 @@ def _convert(
             or f"{metadata['boundaryID']}:record:{index}"
         )
         if identifier in identifiers:
-            raise ValueError(f"Duplicate upstream shapeID: {identifier}")
+            raise InputIntegrityError(f"Duplicate upstream shapeID: {identifier}")
         identifiers.add(identifier)
         if geometry is not None and not geometry.is_valid:
             report["invalid_input"] += 1
         try:
             if geometry is None:
-                raise ValueError(problem or "Missing geometry")
+                raise RowRejected(problem or "Missing geometry")
             geometry, transformations = repair_geometry(
                 geometry, collection="collect", force_2d=True, clip_roundoff=True
             )
@@ -90,7 +92,7 @@ def _convert(
                 )
             ]
             if not feature_rows:
-                raise ValueError("No polygon rows produced")
+                raise RowRejected("No polygon rows produced")
             for row in feature_rows:
                 validate_table(
                     pa.Table.from_pylist([row], schema=SCHEMAS["areas"]),
