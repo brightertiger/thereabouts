@@ -6,18 +6,11 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from pipeline.runtime.jsonio import atomic_output, sha256_file
-from pipeline.runtime.paths import relative
+# Re-exported for Package G's modules until they import pipeline.files.
+from pipeline.files import file_record as file_record
+from pipeline.runtime.jsonio import atomic_output
 
 from .reconcile.common import Row
-
-
-def file_record(root: Path, path: Path) -> Row:
-    return {
-        "path": relative(root, path),
-        "size": path.stat().st_size,
-        "sha256": sha256_file(path),
-    }
 
 
 def batches(rows: Iterable[Row], size: int) -> Iterator[list[Row]]:

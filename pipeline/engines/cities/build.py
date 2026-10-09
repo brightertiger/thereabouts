@@ -5,8 +5,9 @@ from pathlib import Path
 import shapely
 
 from pipeline.config.engines import EngineLimits
-from pipeline.engines.artifact_io import file_record, parquet
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.reconcile.common import Row, check_database, connect, encode, pack
+from pipeline.files import file_record
 from pipeline.runtime.jsonio import atomic_output, write_json
 
 from .candidates import candidates, divisions

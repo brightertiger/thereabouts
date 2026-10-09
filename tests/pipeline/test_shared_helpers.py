@@ -11,8 +11,8 @@ from pipeline.errors import (
     InputIntegrityError,
     PolicyViolation,
 )
-from pipeline.runtime.jsonio import file_record, sha256_file
-from pipeline.runtime.sqlite import sqlite_readonly
+from pipeline.files import file_record, sqlite_readonly
+from pipeline.runtime.jsonio import sha256_file
 
 
 def test_file_record_is_root_relative(tmp_path: Path) -> None:

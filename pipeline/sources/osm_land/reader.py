@@ -14,8 +14,8 @@ from typing import Any, BinaryIO
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
+from pipeline.files import sqlite_readonly
 from pipeline.runtime.jsonio import sha256_file
-from pipeline.runtime.sqlite import sqlite_readonly
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import check_bounds
 

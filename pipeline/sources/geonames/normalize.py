@@ -8,8 +8,8 @@ from contextlib import closing
 from pathlib import Path
 from typing import BinaryIO, cast
 
+from pipeline.files import sqlite_readonly
 from pipeline.runtime.jsonio import atomic_output, write_json
-from pipeline.runtime.sqlite import sqlite_readonly
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.manifest import finish
 from pipeline.sources.shared.rows import RowRejected, canonical_json

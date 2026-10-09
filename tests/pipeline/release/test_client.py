@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.release import client
 from pipeline.release.assemble import assemble
 from pipeline.release.source import Row

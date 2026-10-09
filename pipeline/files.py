@@ -1,7 +1,20 @@
-"""Read-only connections to immutable SQLite artifacts."""
+"""Records of published local files, and read-only access to immutable SQLite."""
 
 import sqlite3
 from pathlib import Path
+from typing import Any
+
+from pipeline.runtime.jsonio import sha256_file
+from pipeline.runtime.paths import relative
+
+
+def file_record(root: Path, path: Path) -> dict[str, Any]:
+    """A root-relative path with the size and SHA-256 of its current bytes."""
+    return {
+        "path": relative(root, path),
+        "size": path.stat().st_size,
+        "sha256": sha256_file(path),
+    }
 
 
 def sqlite_readonly(

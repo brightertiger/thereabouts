@@ -6,10 +6,10 @@ from collections import Counter
 from pathlib import Path
 from typing import cast
 
-from pipeline.engines.artifact_io import file_record
 from pipeline.engines.reconcile import build, catalog, inputs, land, quality
 from pipeline.engines.reconcile.common import Row, connect
 from pipeline.engines.reconcile.lookup import Locator
+from pipeline.files import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 

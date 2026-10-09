@@ -7,7 +7,7 @@ from pathlib import Path
 import fsspec
 import pytest
 
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.pins.models import PinFile, SourcePin
 from pipeline.release import client, metadata, pins
 from pipeline.release.source import Row

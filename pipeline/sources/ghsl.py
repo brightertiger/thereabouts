@@ -8,7 +8,7 @@ import numpy as np
 import shapely
 from numpy.typing import NDArray
 
-from pipeline.runtime.sqlite import sqlite_readonly
+from pipeline.files import sqlite_readonly
 
 from .contract import SourceContext
 from .shared.archives import extract

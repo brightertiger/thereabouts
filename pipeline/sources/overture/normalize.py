@@ -9,9 +9,9 @@ from typing import Any
 import pyarrow.parquet as pq
 import shapely
 
+from pipeline.files import sqlite_readonly
 from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import atomic_output, digest, encode, write_json
-from pipeline.runtime.sqlite import sqlite_readonly
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import GeometryError
 from pipeline.sources.shared.manifest import finish

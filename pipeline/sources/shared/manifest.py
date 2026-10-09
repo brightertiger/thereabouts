@@ -5,15 +5,15 @@ from typing import Any
 
 import pyarrow.parquet as pq
 
+from pipeline import files
 from pipeline.config.sources import normalize_settings
-from pipeline.runtime import jsonio
 from pipeline.runtime.jsonio import write_json
 from pipeline.sources.contract import SourceContext
 
 
 def file_record(ctx: SourceContext, path: Path) -> dict[str, Any]:
-    """Kept for plate_country until it calls `jsonio.file_record(ctx.root, ...)`."""
-    return jsonio.file_record(ctx.root, path)
+    """Kept for plate_country until it calls `files.file_record(ctx.root, ...)`."""
+    return files.file_record(ctx.root, path)
 
 
 def inventory_path(ctx: SourceContext) -> Path:
@@ -38,7 +38,7 @@ def finish(
         kind = path.relative_to(ctx.normalized).parts[0]
         count = pq.ParquetFile(path).metadata.num_rows
         records.append(
-            {**jsonio.file_record(ctx.root, path), "kind": kind, "rows": count}
+            {**files.file_record(ctx.root, path), "kind": kind, "rows": count}
         )
         rows[kind] = rows.get(kind, 0) + count
         sizes[kind] = sizes.get(kind, 0) + path.stat().st_size
@@ -50,13 +50,13 @@ def finish(
             "schema_version": "1",
             "source": ctx.settings.name,
             "source_release": ctx.pin.release,
-            "inventory": jsonio.file_record(ctx.root, inventory_path(ctx)),
+            "inventory": files.file_record(ctx.root, inventory_path(ctx)),
             "inputs": [
-                jsonio.file_record(ctx.root, ctx.input(item.name))
+                files.file_record(ctx.root, ctx.input(item.name))
                 for item in ctx.pin.files
             ],
             "partitions": records,
-            "auxiliary": [jsonio.file_record(ctx.root, path) for path in evidence],
+            "auxiliary": [files.file_record(ctx.root, path) for path in evidence],
             "rows": rows,
             "bytes": sizes,
             "configuration": normalize_settings(ctx.settings),

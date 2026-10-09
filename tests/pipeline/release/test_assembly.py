@@ -8,7 +8,7 @@ import pytest
 
 from pipeline.cli import main
 from pipeline.config import load
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.release.assemble import assemble
 from pipeline.release.source import external
 from pipeline.release.verify import verify_dataset

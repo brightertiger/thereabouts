@@ -9,8 +9,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import TypeAlias, cast
 
-from .paths import relative
-
 JSON: TypeAlias = "bool | int | float | str | list[JSON] | dict[str, JSON] | None"
 Object: TypeAlias = dict[str, JSON]
 
@@ -32,15 +30,6 @@ def digest(value: object) -> str:
 def sha256_file(path: Path) -> str:
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
-
-
-def file_record(root: Path, path: Path) -> Object:
-    """A root-relative path with the size and SHA-256 of its current bytes."""
-    return {
-        "path": relative(root, path),
-        "size": path.stat().st_size,
-        "sha256": sha256_file(path),
-    }
 
 
 def read_object(path: Path) -> Object:
