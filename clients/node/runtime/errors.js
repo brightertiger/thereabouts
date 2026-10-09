@@ -33,6 +33,20 @@ export class ResourceLimitError extends ThereaboutsError {
 export class ClosedGeocoderError extends ThereaboutsError {
   constructor() {
     super("Geocoder is closed", "closed_geocoder");
+    this.exitCode = 4;
+  }
+}
+export class InvalidInputError extends ThereaboutsError {
+  constructor(message, options) {
+    super(message, "invalid_input", options);
+    this.exitCode = 2;
+  }
+}
+// A library invariant failed (a poisoned lock): a bug, never pack damage.
+export class InternalError extends ThereaboutsError {
+  constructor(message, options) {
+    super(message, "internal_error", options);
+    this.exitCode = 70;
   }
 }
 export class PackNotFoundError extends ThereaboutsError {
@@ -41,15 +55,21 @@ export class PackNotFoundError extends ThereaboutsError {
     this.exitCode = 4;
   }
 }
+// Classes by core failure code; a test checks this against the Rust kind table.
+export const CLASSES = {
+  data_not_installed: DataNotInstalledError,
+  pack_not_found: PackNotFoundError,
+  incompatible_data: IncompatibleDataError,
+  corrupt_pack: CorruptPackError,
+  closed_geocoder: ClosedGeocoderError,
+  invalid_input: InvalidInputError,
+  resource_limit: ResourceLimitError,
+  internal_error: InternalError,
+};
 export function convert(error) {
   if (error instanceof ThereaboutsError) return error;
-  const Type =
-    {
-      incompatible_data: IncompatibleDataError,
-      closed_geocoder: ClosedGeocoderError,
-      pack_not_found: PackNotFoundError,
-      resource_limit: ResourceLimitError,
-    }[error.code] ?? CorruptPackError;
+  if (error.code === "data_not_installed") return new DataNotInstalledError();
+  const Type = CLASSES[error.code] ?? CorruptPackError;
   return new Type(error.message, { cause: error });
 }
 export function usage(message) {

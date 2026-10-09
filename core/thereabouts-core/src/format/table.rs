@@ -120,7 +120,7 @@ impl Table {
         if let Some(data) = self
             .cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
+            .map_err(crate::error::poisoned("table cache"))?
             .get((self.identity, number))
         {
             return Ok(data);
@@ -169,7 +169,7 @@ impl Table {
         Ok(self
             .cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned table cache".into()))?
+            .map_err(crate::error::poisoned("table cache"))?
             .insert((self.identity, number), data, size + size_of::<Data>()))
     }
     fn locate(&self, row: usize) -> Result<(Arc<Data>, usize)> {

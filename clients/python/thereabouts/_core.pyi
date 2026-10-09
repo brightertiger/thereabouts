@@ -8,6 +8,9 @@ MAX_UNPACKED_BYTES: int
 DEFAULT_RELEASE_URL: str
 INDEX_FORMAT: int
 ARCHIVE_SUFFIX: str
+WRITER_REVISION: str
+CORE_REVISION: str
+ERROR_KINDS: list[tuple[str, int, str]]
 
 class Geocoder:
     def reverse(

@@ -32,6 +32,7 @@ impl Error {
     }
 
     /// Add repair instructions while preserving missing, usage and incompatibility codes.
+    /// Environment limits, bugs and invalid input are not pack damage: no repair advice.
     #[must_use]
     pub fn at_pack(self, path: &std::path::Path, family: &str) -> Self {
         if matches!(
@@ -39,7 +40,11 @@ impl Error {
             Self::Usage(_)
                 | Self::Missing(_)
                 | Self::Io(_)
-                | Self::Pack(thereabouts_core::Error::ResourceLimit(_))
+                | Self::Pack(
+                    thereabouts_core::Error::ResourceLimit(_)
+                        | thereabouts_core::Error::Internal(_)
+                        | thereabouts_core::Error::Input(_)
+                )
         ) {
             return self;
         }
@@ -53,13 +58,13 @@ impl Error {
             Self::Integrity(message)
         }
     }
-    /// Status reserved by the public command grammar.
+    /// Status reserved by the public command grammar; core failures use the kind table.
     #[must_use]
-    pub const fn exit_code(&self) -> i32 {
+    pub fn exit_code(&self) -> i32 {
         match self {
             Self::Usage(_) | Self::Io(_) => 2,
             Self::Missing(_) => 3,
-            Self::Pack(thereabouts_core::Error::ResourceLimit(_)) => 6,
+            Self::Pack(error) => error.exit_code(),
             _ => 4,
         }
     }
@@ -99,5 +104,26 @@ mod tests {
             error.at_pack(std::path::Path::new("x"), "core").exit_code(),
             6
         );
+    }
+    #[test]
+    fn bugs_and_invalid_input_are_not_integrity_failures() {
+        for (error, exit) in [
+            (
+                thereabouts_core::Error::Internal("poisoned block cache".into()),
+                70,
+            ),
+            (
+                thereabouts_core::Error::Input("Unknown lookup verb".into()),
+                2,
+            ),
+        ] {
+            let error = Error::Pack(error).at_pack(std::path::Path::new("/store/core"), "core");
+            assert_eq!(error.exit_code(), exit);
+            assert!(!error.to_string().contains("data install"), "{error}");
+        }
+        let corrupt = Error::Pack(thereabouts_core::Error::Corrupt("bad".into()))
+            .at_pack(std::path::Path::new("/store/core"), "core");
+        assert_eq!(corrupt.exit_code(), 4);
+        assert!(corrupt.to_string().contains("verify --full"));
     }
 }

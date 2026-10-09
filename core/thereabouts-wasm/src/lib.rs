@@ -16,15 +16,7 @@ fn error(code: &str, message: &str, exit: i32) -> JsValue {
 }
 #[allow(clippy::needless_pass_by_value)] // map_err consumes the core failure.
 fn core_error(e: Error) -> JsValue {
-    error(
-        e.code(),
-        &e.to_string(),
-        match e {
-            Error::Input(_) => 2,
-            Error::ResourceLimit(_) => 6,
-            _ => 4,
-        },
-    )
+    error(e.code(), &e.to_string(), e.exit_code())
 }
 #[allow(clippy::needless_pass_by_value)] // map_err consumes the CLI failure.
 fn cli_error(e: thereabouts_cli_core::error::Error) -> JsValue {
@@ -96,8 +88,8 @@ impl Geocoder {
     }
     /// Typed dispatch of one explicit forward verb or H3 cell.
     pub fn query(&self, request: &str) -> Result<String, JsValue> {
-        let query: query::Query =
-            serde_json::from_str(request).map_err(|e| core_error(e.into()))?;
+        let query: query::Query = serde_json::from_str(request)
+            .map_err(|e| core_error(Error::Input(format!("Invalid query request: {e}"))))?;
         json(&query.run(self.get()?).map_err(core_error)?)
     }
     /// Stream CSV or NDJSON through the portable parser and renderer.
@@ -223,6 +215,17 @@ pub fn transport() -> Result<String, JsValue> {
         "index_format": transport::INDEX_FORMAT,
         "archive_suffix": transport::ARCHIVE_SUFFIX,
     }))
+}
+
+/// The core's failure-kind table: code, exit status and the class Node raises.
+#[wasm_bindgen(js_name = errorKinds)]
+pub fn error_kinds() -> Result<String, JsValue> {
+    json(
+        &thereabouts_core::error::KINDS
+            .iter()
+            .map(|k| serde_json::json!({"code": k.code, "exit": k.exit, "class": k.class}))
+            .collect::<Vec<_>>(),
+    )
 }
 
 /// Shared lease bounds; host IO uses the same wire format and recovery algorithm.

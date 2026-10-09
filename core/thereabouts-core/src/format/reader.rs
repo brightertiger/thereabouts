@@ -91,7 +91,7 @@ impl Pool {
     fn handles(&self) -> Result<MutexGuard<'_, Cache<usize, Arc<dyn ReadAt>>>> {
         self.handles
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned handle pool".into()))
+            .map_err(crate::error::poisoned("handle pool"))
     }
     /// A full descriptor table first gives back this pack's idle handles.
     fn open(&self, path: &Path) -> Result<Arc<dyn ReadAt>> {

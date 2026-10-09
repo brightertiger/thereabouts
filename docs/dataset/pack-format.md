@@ -374,7 +374,9 @@ in unused payloads. Neither lookup nor verification performs network I/O. Missin
 IO failures use `writer_error`. A stale stage names the directory to remove
 before retry; failed cleanup never replaces the original export error. Unsupported
 format/family raises `incompatible_data`, damage raises `corrupt_pack`,
-descriptor exhaustion raises `resource_limit`, and
+descriptor exhaustion raises `resource_limit`, an unencodable or unknown query
+value raises `invalid_input`, a failed library invariant such as a poisoned lock
+raises `internal_error` (never `corrupt_pack`), and
 using a closed handle raises `closed_geocoder`. Ordinary misses and bad query
 values are result statuses, not pack exceptions.
 

@@ -23,17 +23,9 @@ use thereabouts_writer as writer;
 fn error(py: Python<'_>, error: &Error) -> PyErr {
     coded_error(py, error.code(), &error.to_string())
 }
+/// Raise the `thereabouts.errors` class the core's kind table names for this code.
 fn coded_error(py: Python<'_>, code: &str, message: &str) -> PyErr {
-    let name = match code {
-        "data_not_installed" => "DataNotInstalledError",
-        "pack_not_found" => "PackNotFoundError",
-        "writer_input_error" => "WriterInputError",
-        "writer_error" => "WriterError",
-        "incompatible_data" => "IncompatibleDataError",
-        "closed_geocoder" => "ClosedGeocoderError",
-        "resource_limit" => "ResourceLimitError",
-        _ => "CorruptPackError",
-    };
+    let name = thereabouts_core::error::kind(code).class;
     match py
         .import("thereabouts.errors")
         .and_then(|m| m.getattr(name))
@@ -82,7 +74,7 @@ impl Geocoder {
     fn pack(&self, py: Python<'_>) -> PyResult<Arc<Pack>> {
         self.pack
             .lock()
-            .map_err(|_| error(py, &Error::Closed))?
+            .map_err(|e| error(py, &thereabouts_core::error::poisoned("geocoder handle")(e)))?
             .clone()
             .ok_or_else(|| error(py, &Error::Closed))
     }
@@ -315,7 +307,11 @@ impl Geocoder {
         columns::forward(py, names, |name| pack.geocode(name, options))
     }
     fn close(&self, py: Python<'_>) -> PyResult<()> {
-        *self.pack.lock().map_err(|_| error(py, &Error::Closed))? = None;
+        *self
+            .pack
+            .lock()
+            .map_err(|e| error(py, &thereabouts_core::error::poisoned("geocoder handle")(e)))? =
+            None;
         Ok(())
     }
     #[allow(clippy::needless_pass_by_value)] // PyO3 owns each extracted borrow guard.
@@ -465,6 +461,13 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     }
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;
+    m.add(
+        "ERROR_KINDS",
+        thereabouts_core::error::KINDS
+            .iter()
+            .map(|k| (k.code, k.exit, k.class))
+            .collect::<Vec<_>>(),
+    )?;
     {
         use thereabouts_cli_core::transport;
         m.add("MAX_ARCHIVE_BYTES", transport::MAX_ARCHIVE_BYTES)?;

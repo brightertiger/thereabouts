@@ -148,3 +148,7 @@ export class ClosedGeocoderError extends ThereaboutsError {}
 export class PackNotFoundError extends ThereaboutsError {}
 /** The process ran out of file descriptors; raise the open-file limit. */
 export class ResourceLimitError extends ThereaboutsError {}
+/** A value could not be encoded or looked up; the pack itself is fine. */
+export class InvalidInputError extends ThereaboutsError {}
+/** A library invariant failed, such as a poisoned lock; please report it. */
+export class InternalError extends ThereaboutsError {}

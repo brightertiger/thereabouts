@@ -196,7 +196,7 @@ impl Pack {
         let cached = self
             .address_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+            .map_err(crate::error::poisoned("address cache"))?
             .get(address);
         let selected = if let Some(rows) = cached {
             rows
@@ -211,7 +211,7 @@ impl Pack {
             let bytes = 64 + rows.len() * size_of::<(usize, usize)>();
             self.address_cache
                 .lock()
-                .map_err(|_| Error::Corrupt("Poisoned address cache".into()))?
+                .map_err(crate::error::poisoned("address cache"))?
                 .insert(address, rows, bytes)
         };
         selected
@@ -268,7 +268,7 @@ impl Pack {
         let cached = self
             .observation_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .map_err(crate::error::poisoned("observation cache"))?
             .get(key);
         if let Some(value) = cached {
             return Ok(value);
@@ -284,7 +284,7 @@ impl Pack {
         Ok(self
             .observation_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned observation cache".into()))?
+            .map_err(crate::error::poisoned("observation cache"))?
             .insert(key, value, bytes))
     }
     pub(crate) fn observations(
@@ -312,7 +312,7 @@ impl Pack {
         let mut cache = self
             .block_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+            .map_err(crate::error::poisoned("block cache"))?;
         if let Some(value) = cache.get(block) {
             return Ok(Some(value));
         }
@@ -336,7 +336,7 @@ impl Pack {
         let mut cache = self
             .block_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned block cache".into()))?;
+            .map_err(crate::error::poisoned("block cache"))?;
         Ok(Some(cache.insert(block, value, bytes)))
     }
     /// Reference zero is null; other references project one record, with opt-in source evidence.
@@ -353,7 +353,7 @@ impl Pack {
         let mut places = self
             .place_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+            .map_err(crate::error::poisoned("place cache"))?;
         if let Some(place) = places.get((reference, evidence)) {
             return Ok(Some(place));
         }
@@ -380,7 +380,7 @@ impl Pack {
         let mut places = self
             .place_cache
             .lock()
-            .map_err(|_| Error::Corrupt("Poisoned place cache".into()))?;
+            .map_err(crate::error::poisoned("place cache"))?;
         Ok(Some(places.insert((reference, evidence), place, bytes)))
     }
 }

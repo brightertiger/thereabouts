@@ -187,6 +187,7 @@ Batch and management examples:
 | 4 | Incompatible/corrupt data or transfer/store integrity failure |
 | 5 | One or more batch rows failed; remaining rows were processed |
 | 6 | Resource limit: the process ran out of file descriptors (EMFILE/ENFILE) |
+| 70 | Internal error: a library invariant failed (for example a poisoned lock); a bug to report, never pack damage |
 
 Missing-data diagnostics are the exact command
 thereabouts data install core, or the required forward family name. Human
@@ -199,7 +200,10 @@ by --quiet. A broken stdout pipe exits 0 without a traceback. Other stream/OS IO
 exit 2 without suggesting pack repair. Descriptor exhaustion exits 6 with a
 message naming the open-file limit (`ulimit -n`); it is never reported as
 corrupt data and never suggests reinstalling (Python and Node raise
-`ResourceLimitError`). Both Node sinks write all UTF-8 bytes,
+`ResourceLimitError`). Internal errors (exit 70, `InternalError`) and invalid
+input (exit 2, `InvalidInputError`) likewise carry no repair advice. One Rust
+table (`thereabouts_core::error::KINDS`) gives every failure code its exit
+status and binding class; Python maps through it and Node is tested against it. Both Node sinks write all UTF-8 bytes,
 retrying partial writes, EINTR and EAGAIN while a slow reader drains the pipe.
 
 An invalid scalar query emits its result and exits 2; invalid command arguments

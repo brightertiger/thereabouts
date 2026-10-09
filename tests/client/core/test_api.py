@@ -64,6 +64,8 @@ def test_public_exports_and_keyword_coordinates() -> None:
         "ClosedGeocoderError",
         "PackNotFoundError",
         "ResourceLimitError",
+        "InvalidInputError",
+        "InternalError",
         "WriterError",
         "WriterInputError",
     }
