@@ -7,3 +7,14 @@ files:
     attribution: IP Geolocation by DB-IP https://db-ip.com
     license: CC-BY-4.0
     license_url: https://creativecommons.org/licenses/by/4.0/
+settings:
+  # Reviewed attestations from the publisher's download page, per monthly file.
+  # Proposals and downloads verify the MD5 (of the decompressed CSV, as DB-IP
+  # publishes it) and normalize checks the row count. Add the new month's values
+  # before proposing it; a month without an entry is pinned by SHA256 alone.
+  publisher:
+    dbip-city-lite-2026-10.csv.gz:
+      publisher_count_url: https://db-ip.com/db/download/ip-to-city-lite
+      publisher_md5: 443ac78aef7767e461b9e43317ee168a
+      publisher_md5_covers: decompressed
+      publisher_rows: 7786864

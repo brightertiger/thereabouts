@@ -24,7 +24,7 @@ def expand(value: Any, variables: dict[str, str]) -> Any:
 
 
 def variables(client: Client, catalog: Catalog) -> dict[str, str]:
-    result = {"month": datetime.now(UTC).strftime("%Y-%m")}
+    result = {"month": client.now().strftime("%Y-%m")}
     for selector in catalog.selectors:
         url = selector.url.format_map(result)
         if selector.kind == "text":
@@ -64,6 +64,8 @@ def files(client: Client, catalog: Catalog, values: dict[str, str]) -> list[PinF
                         {**tree.metadata, "key": path, "git_blob": item["sha"]},
                     )
                 )
+    # Reviewed publisher attestations (checksums, row counts) per resolved file.
+    publisher = catalog.settings.get("publisher", {})
     result = []
     for item in candidates:
         name = item.name.format_map(values)
@@ -73,6 +75,7 @@ def files(client: Client, catalog: Catalog, values: dict[str, str]) -> list[PinF
             "attribution": client.settings.licence.attribution,
             "key": name,
             **expand(item.metadata, values),
+            **publisher.get(name, {}),
         }
         result.append(client.pin(name, item.url.format_map(values), metadata))
     return result

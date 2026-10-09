@@ -4,7 +4,7 @@ kind: administrative_areas
 enabled: true
 upstream:
   proposal: config/proposals/geoboundaries.yaml
-  url: https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/41af8f1e141eb6826ab9877e306df6f848b9ff0b/releaseData/gbOpen/CAN/ADM1/geoBoundaries-CAN-ADM1-all.zip
+  url: https://www.geoboundaries.org/
 licence:
   id: per-layer
   url: https://www.geoboundaries.org/

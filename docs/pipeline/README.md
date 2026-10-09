@@ -105,10 +105,11 @@ are enabled. `plate_country` is declared but disabled because the retained
 workspace has no build or payload inventory for it; enabling it requires an
 explicit reviewed pin proposal.
 
-`pins.lock` records exact input names, sizes, SHA256, upstream metadata, and the
-fingerprint of the inventory used by the retained source manifest. It stores no
-duplicate inventory document. Download inventories are reconstructed from those
-file records and metadata. Large plate policies live in
+`pins.lock` records, per source, exactly what its proposer produces: logical
+input names, sizes, SHA256, ETag and Last-Modified validators, the release
+string and the proposer's metadata. An unchanged refresh therefore merges as
+unchanged. It stores no duplicate inventory document. Download inventories are
+reconstructed from those file records and metadata. Large plate policies live in
 `config/policies/plates/`, outside the structured configuration graph, and are
 hashed only into the units that use them. An inventory found later under
 the same raw directory is not assumed to describe the built output. In particular,
@@ -117,8 +118,9 @@ the committed geoBoundaries lock uses the manifest's resolved inventory.
 ```sh
 # Read-only: compare the lock with an already-built workspace's exact manifests.
 .venv/bin/python -m pipeline pins check --from-workspace /path/to/existing/data
-# Resolve upstream and write a candidate lock plus a file-level diff.
-.venv/bin/python -m pipeline pins update ghsl
+# Resolve upstream, keep each payload in the workspace raw store (and the
+# storage.gcs_raw mirror), and write a candidate lock plus a file-level diff.
+.venv/bin/python -m pipeline pins update ghsl --root /path/to/workspace
 # Review .cache/pipeline/pins-proposal.yaml and pins-proposal.diff.json.
 # Accept those exact bytes without contacting upstream again.
 .venv/bin/python -m pipeline pins update ghsl \
@@ -145,12 +147,18 @@ remain the reviewed evidence set in the plate policy, including frozen Wikipedia
 revisions; changing that set requires policy review. The disabled plate-country
 catalog is empty until the owner selects evidence URLs.
 
-Proposals HEAD each payload, then stream it to SHA256 under the configured byte
-and retry limits, without saving payloads. This can read the full upstream source
-size where the publisher has no SHA256; the later download stage still verifies
-and mirrors the accepted pin. Conditional requests and size/ETag checks reject
-an upstream object changing during inspection. Tests use only loopback HTTP.
-No real upstream proposal has been exercised in this implementation session.
+Upstream proposals require the workspace that keeps their payloads (`--root` or
+`--profile`). Each payload is HEADed, then streamed once into
+`raw/<source>/sha256/<sha256>` while it is hashed, and copied to
+`storage.gcs_raw` when one is configured, so the later download is a local or
+mirror restore even if upstream has rewritten the file since. Per-file progress
+(`raw/<source>/proposal-progress.json`) lets an interrupted proposal reuse every
+payload whose strong ETag or Last-Modified and size are unchanged. Conditional
+requests and size/ETag checks reject an upstream object changing during
+inspection. Publisher checksums are verified where they exist: the DB-IP MD5
+reviewed in its catalog, and the geoBoundaries Git LFS object id, which must
+equal the SHA256. Requests name the project and its URL in `User-Agent`. Tests
+use only loopback HTTP. No real upstream proposal has been exercised yet.
 `pins check` without `--from-workspace` checks lock structure and hashes only;
 it does not verify upstream availability or remote mirror custody.
 
@@ -161,13 +169,29 @@ enabled source and publishes its normalized manifest. Configure
 The fsspec GCS driver is pinned in `uv.lock`. No cloud operation was used to test
 this implementation.
 
-Downloads reuse verified local files, then try the mirror, then the frozen
-upstream URL. Each payload is copied to `sha256/<checksum>` in the mirror and
-rehashed before the download unit can complete. Historical offload prefixes are
-retained as fallback restore locations, with their original custody evidence;
-restored bytes must match the recorded size and SHA256. Adoption itself does
-not contact these locations. Interrupted downloads resume at file boundaries,
-not by appending an unverified HTTP response to a partial file.
+Raw inputs are content-addressed: `raw/<source>/sha256/<sha256>`, with
+`raw/<source>/inventory.json` mapping each logical name to its object.
+Normalizers read by logical name through `SourceContext.input`, so a new pin
+with the same name and new bytes is a new object; names that pin identical
+bytes share one. Downloads reuse a verified local object (one that fails
+verification is deleted and fetched again), then restore from
+`storage.gcs_raw/sha256/<sha256>`, then fetch the frozen upstream URL with the
+pinned conditional headers; restored bytes must match the pinned size and
+SHA256. Every pinned object of the current lock is held in the `sha256/`
+mirror, so the lock records no legacy offload prefixes. Each object is then
+mirrored;
+an existing mirror object is vouched for by its size and the service's MD5 or
+CRC32C rather than read back.
+
+Transfers write to a `.part` file while hashing. A body that ends early, a reset
+connection, 408, 429 and 5xx are retried with jittered backoff (doubling from
+`limits.backoff_seconds` up to `limits.timeout_seconds`) until `limits.retries`
+consecutive failures or `limits.patience_seconds` (15 minutes) pass without new
+bytes; any progress resets both. Retries resume the part with HTTP `Range`
+when the publisher answers 206, and restart from byte 0 when it ignores the
+range, answers 416, or the resumed object fails its checksum. Other 4xx
+statuses, such as 404 and 412, fail at once. Mirror reads and writes use the
+same retry rules.
 
 Normalize streams bounded partitions and retains source identities, licences,
 and rejection evidence. GeoNames extraction/index and Overture parent-index

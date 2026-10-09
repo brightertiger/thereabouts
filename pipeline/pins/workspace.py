@@ -101,16 +101,6 @@ def from_manifest(root: Path, manifest: Row) -> SourcePin:
         ).removeprefix(f"raw/{source}/"),
         "inventory_fingerprint": digest(portable(inventory, root)),
     }
-    custody_path = root / "work/offloaded" / f"{source}.json"
-    if custody_path.exists():
-        custody = json.loads(custody_path.read_bytes())
-        if custody.get("offloaded") and custody.get("remote"):
-            if custody.get("manifest_sha256") != digest(manifest):
-                raise ValueError(
-                    f"Mirror custody does not bind {source}'s retained manifest"
-                )
-            metadata["mirror_base"] = custody["remote"]
-            metadata["mirror_evidence"] = custody["verification"]
     if "country_reference" in inventory:
         metadata["country_reference"] = inventory["country_reference"]
     if commits:

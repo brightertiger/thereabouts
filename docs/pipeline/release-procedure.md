@@ -201,8 +201,9 @@ export PIPELINE_VERSION=2026.11
 export PIPELINE_PREVIOUS=2026.10
 export PIPELINE_STAGING=s3://OWNER-STAGING-BUCKET/thereabouts
 
-# Propose first, then review the file-level diff and accept those exact bytes.
-.venv/bin/python -m pipeline pins update
+# Propose first (payloads are kept in the workspace raw store and the mirror),
+# then review the file-level diff and accept those exact bytes.
+.venv/bin/python -m pipeline pins update --root "$PIPELINE_DATA" --profile vm
 .venv/bin/python -m pipeline pins update \
   --from-file .cache/pipeline/pins-proposal.yaml --accept
 

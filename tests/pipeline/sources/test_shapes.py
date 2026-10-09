@@ -58,6 +58,8 @@ def test_boundaries_keep_ids_licences_and_country_mapping(tmp_path: Path) -> Non
             },
         )
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
+        # Proposer-shaped pins record no per-file retrieval time.
+        del source.pin.files[0].metadata["retrieved_at"]
         run(source.runtime, stages)
         [row] = rows(source, "areas")
         assert (row["source_id"], row["country_code"], row["subdivision_code"]) == (
@@ -67,6 +69,7 @@ def test_boundaries_keep_ids_licences_and_country_mapping(tmp_path: Path) -> Non
         )
         assert row["name"] == "Café" and row["license"] == "CC BY-SA 2.0"
         assert json.loads(row["provenance"])["commit"] == "a" * 40
+        assert json.loads(row["provenance"])["retrieved_at"] == source.pin.pinned_at
         assert not list(source.work.rglob("*.shp"))
 
 

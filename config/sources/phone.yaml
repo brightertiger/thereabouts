@@ -4,7 +4,7 @@ kind: phone
 enabled: true
 upstream:
   proposal: config/proposals/phone.yaml
-  url: https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE
+  url: https://github.com/google/libphonenumber
 licence:
   id: Apache-2.0
   url: https://raw.githubusercontent.com/google/libphonenumber/0ae309f1940227efe688f5eb1815ef45a6fbee8d/LICENSE
