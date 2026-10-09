@@ -5,6 +5,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from pipeline.config import Config
+from pipeline.config.release import ReleaseSettings
 from pipeline.engines.artifacts import read_json
 from pipeline.pins.lock import read_lock
 from pipeline.runtime.fingerprints import REPOSITORY
@@ -124,8 +125,14 @@ Logical content SHA256: `{content["sha256"]}`.
 These are geocoding labels, not legal boundary determinations. Sparse source coverage,
 source conflicts, offshore locations and canonical city allocation can produce missing
 or ambiguous results. Source names remain independent of city allocation.
-The spatial subset is not a complete country export. See README.md for exact coverage.
+{coverage(settings)} See README.md for exact coverage.
 """
+
+
+def coverage(settings: ReleaseSettings) -> str:
+    if not settings.countries and not settings.blocks:
+        return "This is the complete configured world export."
+    return "This spatial subset is not a complete country export."
 
 
 def changes(version: str, content: Row, previous: Path | None) -> str:

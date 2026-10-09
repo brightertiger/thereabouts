@@ -13,7 +13,7 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, encode, sync_directory
 from pipeline.runtime.resources import ResourceGuard
 
-from . import closure, metadata, readme
+from . import closure, dictionary, metadata, readme
 from .budget import Budget
 from .selection import Selection
 from .source import Row, Snapshot
@@ -85,6 +85,9 @@ def assemble(
                 snapshot.policy,
                 REPOSITORY / config.release.readme_template,
             ),
+            # Generated from config/dataset.yaml and the client; the core pack
+            # ships the same pair as notices.
+            **dictionary.documents(),
         }
         for name, text in documents.items():
             budget.text(staging / name, text)

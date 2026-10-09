@@ -1,6 +1,7 @@
 """Release content, relocation, byte caps and input verification."""
 
 from pathlib import Path
+from typing import Any
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -9,6 +10,7 @@ import pytest
 from pipeline.cli import main
 from pipeline.config import load
 from pipeline.engines.artifact_io import file_record
+from pipeline.release import dictionary
 from pipeline.release.assemble import assemble
 from pipeline.release.source import external
 from pipeline.release.verify import verify_dataset
@@ -164,3 +166,53 @@ def test_logical_place_key_cannot_be_null_despite_arrow_nullability(
     with pytest.raises(ValueError, match=r"Null logical primary key: places\.place_id"):
         assemble(snapshot, output, config, guard, "identity")
     assert not output.exists()
+
+
+def documents(output: Path) -> dict[str, str]:
+    return {
+        name: (output / name).read_text()
+        for name in ("README.md", "DATASET_CARD.md", "DATA_DICTIONARY.md")
+    }
+
+
+def test_dataset_ships_the_data_dictionary(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    output = tmp_path / "dataset" / "2026.10"
+    assemble(snapshot, output, config, guard, "identity")
+    listed = {record["path"] for record in verify_dataset(output)["files"]}
+    for name, text in dictionary.documents().items():
+        assert name in listed
+        assert (output / name).read_text() == text
+    readme = (output / "README.md").read_text()
+    assert "`DATA_DICTIONARY.md`" in readme or "DATA_DICTIONARY.md  #" in readme
+
+
+def test_subset_and_world_wording(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    subset = documents(assemble_into(snapshot, config, guard, tmp_path / "subset"))
+    assert "This subset contains" in subset["README.md"]
+    assert "spatial subset is not a complete" in subset["DATASET_CARD.md"]
+    config.release.countries, config.release.blocks = [], []
+    world = documents(assemble_into(snapshot, config, guard, tmp_path / "world"))
+    assert "complete configured world export" in world["README.md"]
+    assert "This subset" not in world["README.md"]
+    assert "published subset" not in world["README.md"]
+    assert "subset" not in world["DATASET_CARD.md"]
+    for text in (*subset.values(), *world.values()):
+        assert "<owner-bucket>" not in text
+        assert "Owner-decision placeholders" not in text
+
+
+def test_readme_names_a_configured_s3_destination(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    config.storage["s3_release"] = "s3://open-bucket/thereabouts"
+    readme = assemble_into(snapshot, config, guard, tmp_path / "s3") / "README.md"
+    text = readme.read_text()
+    assert "s3://open-bucket/thereabouts/dataset/2026.10/cells/**/*.parquet" in text
+    assert "dataset/2026.10/_SUCCESS" in text
+
+
+def assemble_into(snapshot: Any, config: Any, guard: Any, root: Path) -> Path:
+    output = root / "dataset" / "2026.10"
+    assemble(snapshot, output, config, guard, "identity")
+    return output

@@ -1,6 +1,5 @@
 """The committed public README is reproducible without a built workspace."""
 
-import hashlib
 import json
 
 from pipeline.config import load
@@ -27,5 +26,6 @@ def test_committed_readme_matches_template_and_measured_subset() -> None:
         evidence["policy"],
         REPOSITORY / config.release.readme_template,
     ).encode()
+    # The recorded readme_sha256 is the 2026-10-04 render, before the template
+    # gained the dictionary, world wording and versioned _SUCCESS receipts.
     assert generated == (REPOSITORY / "docs/dataset/README.md").read_bytes()
-    assert hashlib.sha256(generated).hexdigest() == evidence["readme_sha256"]

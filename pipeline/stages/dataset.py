@@ -4,12 +4,14 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import cast
 
+from pipeline.release import dictionary
 from pipeline.release import pins as release_pins
 from pipeline.release.assemble import assemble
 from pipeline.release.metadata import licences, template_identity
+from pipeline.release.readme import public_base
 from pipeline.release.source import Snapshot
 from pipeline.release.verify import verify_dataset
-from pipeline.runtime.jsonio import Object, sha256_file
+from pipeline.runtime.jsonio import Object, digest, sha256_file
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Dependency
 
@@ -43,6 +45,9 @@ class DatasetStage(ReleaseStage):
                 **values,
                 "templates": template_identity(ctx.config),
                 "licences": licences(ctx.config, contributors),
+                # Read from config/api.yaml, the Rust result types and the client.
+                "dictionary": digest(dictionary.documents()),
+                "public_base": public_base(ctx.config),
                 "previous_digest": previous_hash,
             },
         )
