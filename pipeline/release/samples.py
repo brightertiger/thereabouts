@@ -60,6 +60,8 @@ BUNDLES = {
 VECTORS = REPOSITORY / "tests/fixtures"
 # Expected statuses that depend only on the query, never on the data loaded.
 WORLD_SAFE = {"invalid_input", "unsupported_granularity"}
+# Except these: "ZZ" is invalid only because the sample plates pack lacks it.
+DATA_DEPENDENT = {"plate-033"}
 GEOCODE_LIMIT = 100
 PHONE_DIGITS = 12
 NON_GEOGRAPHIC = "001"
@@ -563,23 +565,20 @@ def vectors(families: Iterable[str]) -> list[Query]:
         for case in json.loads((VECTORS / f"{bundle}-vectors.json").read_text())[
             "cases"
         ]:
-            values = case["request"]["values"]
-            if case["result"]["status"] not in WORLD_SAFE or not all(
-                isinstance(v, str | float | int) and not isinstance(v, bool)
-                for v in values
-            ):
+            request, expected = case["request"], case["result"]
+            if expected["status"] not in WORLD_SAFE or case["id"] in DATA_DEPENDENT:
                 continue
-            if case["request"]["kind"] != "coordinates" and not isinstance(
-                values[0], str
-            ):
+            # Typed non-string values only exist at the library boundary.
+            values = request["values"]
+            if request["kind"] != "coordinates" and not isinstance(values[0], str):
                 continue
             queries.append(
                 Query(
                     f"vectors-{case['id']}",
                     "vectors",
                     family,
-                    case["request"],
-                    {"result": case["result"]},
+                    request,
+                    {"result": expected},
                     evidence=False,
                 )
             )
