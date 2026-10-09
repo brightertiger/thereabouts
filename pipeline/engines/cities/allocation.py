@@ -5,14 +5,13 @@ from typing import cast
 import numpy as np
 from numpy.typing import NDArray
 
+from pipeline.engines.geo.arrays import FloatArray
+from pipeline.engines.geo.sphere import EARTH_M, unit_vectors
 from pipeline.engines.reconcile.common import Row
-from pipeline.engines.reconcile.spatial import EARTH_M
-from pipeline.engines.sphere import unit_vectors
 
 from .radius import assign
 from .urban import Urban
 
-Floats = NDArray[np.float64]
 Objects = NDArray[np.object_]
 
 
@@ -44,7 +43,7 @@ class Allocation:
         self.unbounded = np.array([i not in bounded for i in self.ids], dtype=bool)
 
     def divide(
-        self, coordinates: Floats, ids: Objects, methods: Objects
+        self, coordinates: FloatArray, ids: Objects, methods: Objects
     ) -> NDArray[np.int64]:
         """Fill only unclaimed cells within the same connected urban centre."""
         clusters = self.urban.locate(coordinates)
@@ -73,7 +72,7 @@ class Allocation:
 
     def radii(
         self,
-        coordinates: Floats,
+        coordinates: FloatArray,
         clusters: NDArray[np.int64],
         ids: Objects,
         methods: Objects,
@@ -97,8 +96,8 @@ class Allocation:
         ids[rows[hit]], methods[rows[hit]] = chosen[hit], "town_radius"
 
 
-def spherical_distances(points: Floats, anchors: Floats) -> Floats:
+def spherical_distances(points: FloatArray, anchors: FloatArray) -> FloatArray:
     """Bound the temporary distance matrix to one urban centre and one row batch."""
     squared_chord = np.maximum(0, 2 - 2 * points @ anchors.T)
     half_chord = np.minimum(1, np.sqrt(squared_chord) / 2)
-    return cast(Floats, 2 * EARTH_M * np.arcsin(half_chord))
+    return cast(FloatArray, 2 * EARTH_M * np.arcsin(half_chord))

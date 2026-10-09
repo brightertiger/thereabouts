@@ -9,10 +9,11 @@ import shapely
 from numpy.typing import NDArray
 from shapely import STRtree
 
+from pipeline.engines.geo.arrays import FloatArray
+from pipeline.engines.geo.sphere import EARTH_M
 from pipeline.engines.reconcile.lookup import Locator, entity
-from pipeline.engines.reconcile.spatial import EARTH_M
 
-from .geometry import Areas, Floats, boundaries, geometry, inside
+from .geometry import Areas, boundaries, geometry, inside
 from .nearest import nearest
 from .offshore import Offshore
 from .windows import areas, expanded
@@ -78,7 +79,7 @@ class Oracle:
         return self.codes[answer]
 
     def labels(
-        self, coordinates: Floats, *, offshore: bool = True
+        self, coordinates: FloatArray, *, offshore: bool = True
     ) -> NDArray[np.uint64]:
         self.labelled_points += len(coordinates)
         on_land = inside(self.land, coordinates)
@@ -167,7 +168,9 @@ class Oracle:
             results[i] = self.intern(result)
         return results
 
-    def certify(self, bounds: Floats) -> tuple[NDArray[np.uint64], NDArray[np.bool_]]:
+    def certify(
+        self, bounds: FloatArray
+    ) -> tuple[NDArray[np.uint64], NDArray[np.bool_]]:
         w, s, e, n = bounds.T
         points = np.column_stack(((s + n) / 2, (w + e) / 2))
         rectangles = shapely.box(w - 1e-11, s - 1e-11, e + 1e-11, n + 1e-11)

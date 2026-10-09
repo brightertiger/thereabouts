@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-import math
 import sqlite3
 
-from pipeline.engines.reconcile.spatial import EARTH_M, intersecting
-
-from .geometry import Floats
+from pipeline.engines.geo.arrays import FloatArray
+from pipeline.engines.geo.windows import windows
+from pipeline.engines.reconcile.spatial import intersecting
 
 Bounds = tuple[float, float, float, float]
 Area = tuple[int, str, str, int, bytes, bytes | str]
 
 
-def envelopes(coordinates: Floats) -> list[Bounds]:
+def envelopes(coordinates: FloatArray) -> list[Bounds]:
     groups = [coordinates]
     if coordinates[:, 1].max() - coordinates[:, 1].min() > 180:
         groups = [
@@ -33,17 +32,8 @@ def envelopes(coordinates: Floats) -> list[Bounds]:
 
 
 def expanded(bounds: Bounds, offshore_m: float) -> list[Bounds]:
-    w, s, e, n = bounds
-    dy = math.degrees(offshore_m * 1.02 / EARTH_M) + 1e-4
-    dx = min(
-        360.0, dy / max(1e-8, math.cos(math.radians(min(90, max(abs(s), abs(n)) + dy))))
-    )
-    result = []
-    for shift in (-360, 0, 360):
-        left, right = max(-180, w - dx + shift), min(180, e + dx + shift)
-        if left <= right:
-            result.append((left, right, max(-90, s - dy), min(90, n + dy)))
-    return result
+    """The cell reader's windows: a 2% wider reach plus 1e-4 degrees."""
+    return windows(bounds, offshore_m, pad=1.02, margin=1e-4, epsilon=1e-8, span=360.0)
 
 
 def areas(

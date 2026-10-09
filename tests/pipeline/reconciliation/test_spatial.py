@@ -7,14 +7,11 @@ import pytest
 import shapely
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.geo.sphere import EARTH_M
+from pipeline.engines.geo.windows import windows
 from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.land import Land
-from pipeline.engines.reconcile.spatial import (
-    EARTH_M,
-    create_areas,
-    insert_area,
-    windows,
-)
+from pipeline.engines.reconcile.spatial import create_areas, insert_area
 
 
 def test_offshore_cutoff_overlap_holes_and_dateline(tmp_path: Path) -> None:
@@ -44,7 +41,7 @@ def test_offshore_cutoff_overlap_holes_and_dateline(tmp_path: Path) -> None:
         assert land.project(2.5, 0, 1000) is None
         q = land.project(179.999, 10.5, 1000)
         assert q and q[2] == "offshore" and q[3] < 200
-        assert sum(1 for _ in windows(179.999, 10.5, 1000)) == 2
+        assert sum(1 for _ in windows((179.999, 10.5, 179.999, 10.5), 1000)) == 2
     finally:
         land.close()
 

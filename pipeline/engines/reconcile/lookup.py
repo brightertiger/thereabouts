@@ -11,11 +11,13 @@ from typing import Any
 import shapely
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.geo.sphere import distance
+from pipeline.engines.geo.windows import windows
 
 from .classification import city_order
 from .common import Row, connect, unpack
 from .land import Land
-from .spatial import decode, distance, intersecting, windows
+from .spatial import decode, intersecting
 
 
 def entity(db: sqlite3.Connection, identity: str) -> Row:
@@ -61,7 +63,7 @@ def nearest(
     # when the nearest village is metres away. Exact spherical distance decides.
     for radius in sorted({min(cutoff, n) for n in (1000, 5000, 15000, cutoff)}):
         best: tuple[float, str] | None = None
-        for left, right, bottom, top in windows(x, y, radius):
+        for left, right, bottom, top in windows((x, y, x, y), radius):
             for identity, a, b in db.execute(
                 "SELECT p.entity,p.x,p.y FROM point_bounds r "
                 "JOIN points p ON p.id=r.id "

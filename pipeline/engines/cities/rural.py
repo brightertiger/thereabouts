@@ -9,9 +9,10 @@ import numpy as np
 import shapely
 from numpy.typing import NDArray
 
-from pipeline.engines.cells.geometry import Areas, Floats
+from pipeline.engines.cells.geometry import Areas
 from pipeline.engines.cells.nearest import nearest
 from pipeline.engines.cells.windows import areas, expanded
+from pipeline.engines.geo.arrays import FloatArray
 from pipeline.engines.reconcile.lookup import entity
 
 if TYPE_CHECKING:
@@ -19,7 +20,10 @@ if TYPE_CHECKING:
 
 
 def rural(
-    engine: Engine, db: sqlite3.Connection, coordinates: Floats, projected: Floats
+    engine: Engine,
+    db: sqlite3.Connection,
+    coordinates: FloatArray,
+    projected: FloatArray,
 ) -> tuple[NDArray[np.object_], NDArray[np.object_]]:
     bounds = (
         float(projected[:, 1].min()),

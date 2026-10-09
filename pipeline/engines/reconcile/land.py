@@ -9,18 +9,13 @@ import numpy as np
 import shapely
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.geo.sphere import EARTH_M
+from pipeline.engines.geo.windows import windows
 from pipeline.runtime.jsonio import atomic_output
 from pipeline.runtime.paths import located
 
 from .common import check_database, connect, rows
-from .spatial import (
-    EARTH_M,
-    containing,
-    create_areas,
-    insert_area,
-    intersecting,
-    windows,
-)
+from .spatial import containing, create_areas, insert_area, intersecting
 
 
 def build_land(
@@ -119,7 +114,7 @@ class Land:
         if next(containing(self.db, x, y), None):
             return x, y, "land", 0.0
         best = (math.inf, x, y)
-        for bounds in windows(x, y, cutoff * 1.01):
+        for bounds in windows((x, y, x, y), cutoff * 1.01):
             for _, _, _, _, wkb, _ in intersecting(self.db, bounds):
                 best = min(best, nearest_spherical(wkb, x, y))
         d, a, b = best

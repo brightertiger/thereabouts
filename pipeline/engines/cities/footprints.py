@@ -7,9 +7,9 @@ from typing import Any
 
 import shapely
 
+from pipeline.engines.geo.sphere import distance
 from pipeline.engines.reconcile.classification import city_order
 from pipeline.engines.reconcile.common import Row, unpack
-from pipeline.engines.reconcile.spatial import distance
 
 
 def screen(

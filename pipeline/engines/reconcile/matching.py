@@ -6,8 +6,9 @@ import json
 import sqlite3
 from pathlib import Path
 
+from pipeline.engines.geo.sphere import distance
+
 from .common import Row, encode, key, pack, rows, unpack
-from .spatial import distance
 
 
 def prepare_catalog(db: sqlite3.Connection, root: Path, batch_rows: int) -> None:

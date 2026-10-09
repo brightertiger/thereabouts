@@ -10,16 +10,15 @@ from numpy.typing import NDArray
 from scipy.spatial import cKDTree
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.engines.reconcile.spatial import EARTH_M
-
-from .geometry import Floats, Ints
+from pipeline.engines.geo.arrays import FloatArray, IntArray
+from pipeline.engines.geo.sphere import EARTH_M
 
 
 class Offshore:
     def __init__(
         self,
         shapes: list[BaseGeometry],
-        owner_bounds: Floats,
+        owner_bounds: FloatArray,
         batch_rows: int,
     ) -> None:
         self.batch_rows = batch_rows
@@ -56,14 +55,14 @@ class Offshore:
         radius = angle / 2
         radius[~valid] = np.pi
         bucket = np.ceil(np.log2(np.maximum(1.0, radius * EARTH_M))).astype(np.int64)
-        self.trees: list[tuple[Ints, float, cKDTree]] = []
+        self.trees: list[tuple[IntArray, float, cKDTree]] = []
         for key in np.unique(bucket):
             indices = np.flatnonzero(bucket == key)
             self.trees.append(
                 (indices, float(radius[indices].max()), cKDTree(centre[indices]))
             )
 
-    def pairs(self, vectors: Floats, cutoff: float) -> tuple[Ints, Ints]:
+    def pairs(self, vectors: FloatArray, cutoff: float) -> tuple[IntArray, IntArray]:
         points, segments = [], []
         for indices, radius, tree in self.trees:
             chord = 2 * np.sin(min(np.pi, radius + cutoff / EARTH_M + 1e-12) / 2)
@@ -85,8 +84,8 @@ class Offshore:
         return np.concatenate(points), np.concatenate(segments)
 
     def project(
-        self, coordinates: Floats, cutoff: float
-    ) -> tuple[Floats, NDArray[np.bool_], NDArray[np.bool_]]:
+        self, coordinates: FloatArray, cutoff: float
+    ) -> tuple[FloatArray, NDArray[np.bool_], NDArray[np.bool_]]:
         output = coordinates.copy()
         eligible = np.zeros(len(coordinates), dtype=np.bool_)
         exceptional = np.zeros(len(coordinates), dtype=np.bool_)
@@ -100,8 +99,8 @@ class Offshore:
         return output, eligible, exceptional
 
     def _project(
-        self, coordinates: Floats, cutoff: float
-    ) -> tuple[Floats, NDArray[np.bool_], NDArray[np.bool_]]:
+        self, coordinates: FloatArray, cutoff: float
+    ) -> tuple[FloatArray, NDArray[np.bool_], NDArray[np.bool_]]:
         # Use the scalar query vector construction; source segment vectors use
         # the identical NumPy construction as nearest_spherical().
         vectors = np.array(

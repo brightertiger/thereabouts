@@ -13,11 +13,9 @@ from shapely.geometry.base import BaseGeometry
 
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.cache import Cache
+from pipeline.engines.geo.arrays import FloatArray, IntArray
 from pipeline.engines.reconcile.classification import city_order
 from pipeline.engines.reconcile.common import Row
-
-Floats = NDArray[np.float64]
-Ints = NDArray[np.int64]
 
 
 def _large_geometry(wkb: bytes) -> BaseGeometry:
@@ -105,8 +103,8 @@ class Areas:
         self.rank = np.argsort(self.order)
 
     def winners(
-        self, coordinates: Floats, countries: NDArray[np.object_] | None = None
-    ) -> Ints:
+        self, coordinates: FloatArray, countries: NDArray[np.object_] | None = None
+    ) -> IntArray:
         result = np.full(len(coordinates), -1, dtype=np.int64)
         if not len(self.records) or not len(coordinates):
             return result
@@ -140,7 +138,7 @@ class Areas:
         return result
 
 
-def inside(tree: STRtree, coordinates: Floats) -> NDArray[np.bool_]:
+def inside(tree: STRtree, coordinates: FloatArray) -> NDArray[np.bool_]:
     points = cast(
         NDArray[np.object_], shapely.points(coordinates[:, 1], coordinates[:, 0])
     )

@@ -1,8 +1,7 @@
-"""SQLite R-trees, spherical point distances, and bounded geometry access."""
+"""SQLite R-trees and bounded geometry access."""
 
 from __future__ import annotations
 
-import math
 import sqlite3
 import threading
 from collections import OrderedDict
@@ -10,8 +9,6 @@ from collections.abc import Iterator
 
 import shapely
 from shapely.geometry.base import BaseGeometry
-
-EARTH_M = 6_371_008.8
 
 
 class _Decoded(threading.local):
@@ -39,27 +36,6 @@ def decode(wkb: bytes) -> BaseGeometry:
         cache.bytes += len(wkb)
         shapely.prepare(geometry)
     return geometry
-
-
-def distance(x: float, y: float, a: float, b: float) -> float:
-    dy, dx = math.radians(b - y), math.radians(a - x)
-    h = (
-        math.sin(dy / 2) ** 2
-        + math.cos(math.radians(y)) * math.cos(math.radians(b)) * math.sin(dx / 2) ** 2
-    )
-    return 2 * EARTH_M * math.asin(math.sqrt(min(1.0, h)))
-
-
-def windows(
-    x: float, y: float, radius: float
-) -> Iterator[tuple[float, float, float, float]]:
-    dy = math.degrees(radius / EARTH_M)
-    dx = min(180.0, dy / max(0.000001, math.cos(math.radians(min(90, abs(y) + dy)))))
-    lo, hi = max(-90.0, y - dy), min(90.0, y + dy)
-    for shift in (-360.0, 0.0, 360.0):
-        left, right = max(-180.0, x - dx + shift), min(180.0, x + dx + shift)
-        if left <= right:
-            yield left, right, lo, hi
 
 
 def create_areas(db: sqlite3.Connection) -> None:
