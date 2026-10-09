@@ -1,14 +1,16 @@
 """Run explicit source extraction, country reconciliation and quality units."""
 
 import copy
-import json
 from collections import Counter
 from pathlib import Path
 from typing import cast
 
 from pipeline.engines.reconcile import build, catalog, inputs, land, quality
-from pipeline.engines.reconcile.common import Row, connect
 from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import metadata
+from pipeline.errors import InputIntegrityError
 from pipeline.files import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
@@ -29,10 +31,10 @@ def country_paths(ctx: Context, codes: list[str]) -> dict[str, Path]:
 def country_policy(path: Path, cache_kib: int) -> Row:
     db = connect(path, readonly=True, cache_kib=cache_kib)
     try:
-        value = db.execute("SELECT data FROM metadata WHERE key='policy'").fetchone()
+        value = metadata(db, "policy")
         if value is None:
-            raise ValueError("Country database lacks its resolved policy")
-        result: Row = json.loads(value[0])
+            raise InputIntegrityError("Country database lacks its resolved policy")
+        result: Row = value
         return result
     finally:
         db.close()

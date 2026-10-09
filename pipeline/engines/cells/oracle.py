@@ -11,12 +11,14 @@ from shapely import STRtree
 
 from pipeline.engines.geo.arrays import FloatArray
 from pipeline.engines.geo.sphere import EARTH_M
-from pipeline.engines.reconcile.lookup import Locator, entity
+from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.store.areas import area_bounds, intersecting_any
+from pipeline.engines.store.entities import entity
 
 from .geometry import Areas, boundaries, geometry, inside
 from .nearest import nearest
 from .offshore import Offshore
-from .windows import areas, expanded
+from .windows import expanded
 
 Answer = tuple[str | None, str | None, str | None, str | None, str | None]
 
@@ -41,16 +43,11 @@ class Oracle:
             max(b[1] for b in read_windows),
             max(b[3] for b in read_windows),
         )
-        land_rows = areas(locator.land.db, read_windows)
+        land_rows = intersecting_any(locator.land.db, read_windows)
         land_shapes = [geometry(r[4], locator.limits) for r in land_rows]
         self.land_shapes = land_shapes
         self.land_bounds = np.array(
-            [
-                locator.land.db.execute(
-                    "SELECT xmin,xmax,ymin,ymax FROM area_bounds WHERE id=?", (r[0],)
-                ).fetchone()
-                for r in land_rows
-            ],
+            [area_bounds(locator.land.db, r[0]) for r in land_rows],
             dtype=np.float64,
         ).reshape((-1, 4))
         self.offshore: Offshore | None = None
@@ -59,7 +56,9 @@ class Oracle:
         for role in ("country", "state", "city"):
             shapes, records = [], []
             for cc, db in locator.countries.items():
-                for _, identity, _, priority, wkb, _ in areas(db, read_windows, role):
+                for _, identity, _, priority, wkb, _ in intersecting_any(
+                    db, read_windows, role
+                ):
                     value = entity(db, identity)
                     records.append({**value, "cc": cc, "priority": priority})
                     shapes.append(geometry(wkb, locator.limits))

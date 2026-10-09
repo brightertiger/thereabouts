@@ -15,7 +15,7 @@ from pipeline.config.engines import EngineLimits
 from pipeline.engines.cache import Cache
 from pipeline.engines.geo.arrays import FloatArray, IntArray
 from pipeline.engines.reconcile.classification import city_order
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def _large_geometry(wkb: bytes) -> BaseGeometry:

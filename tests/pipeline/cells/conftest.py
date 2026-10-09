@@ -7,10 +7,13 @@ import pytest
 import shapely
 
 from pipeline.config.engines import EngineLimits
-from pipeline.engines.reconcile.common import Row, connect, pack
-from pipeline.engines.reconcile.entities import add_point, create_entities, save_entity
+from pipeline.engines.reconcile.entities import save_entity
 from pipeline.engines.reconcile.lookup import Locator
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.codec import Row, pack
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import add_point
+from pipeline.engines.store.schema import create_areas, create_entities
 
 
 @pytest.fixture

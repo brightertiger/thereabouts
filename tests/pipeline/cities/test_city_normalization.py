@@ -14,7 +14,7 @@ from pipeline.engines.cities.candidates import eligible
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.footprints import screen
 from pipeline.engines.cities.urban import Urban
-from pipeline.engines.reconcile.common import Row, pack
+from pipeline.engines.store.codec import Row, pack
 
 
 def make_engine(

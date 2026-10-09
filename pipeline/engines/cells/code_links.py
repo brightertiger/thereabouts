@@ -6,8 +6,12 @@ import json
 import re
 from collections.abc import Iterator
 from pathlib import Path
+from typing import cast
 
-from pipeline.engines.reconcile.common import Row, connect, key, rows, unpack
+from pipeline.engines.store.catalog import geonames_class
+from pipeline.engines.store.codec import Row, key, rows
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import entities_in_roles, state_codes
 
 from .inputs import Inputs
 from .phone import PhoneCountries
@@ -44,11 +48,10 @@ class CodeIndex:
         for cc, path in inputs.paths.items():
             db = connect(path, readonly=True, cache_kib=inputs.limits.sqlite_cache_kib)
             try:
-                for identity, role, data in db.execute(
-                    "SELECT id,role,data FROM entities "
-                    "WHERE role IN ('country','state','district')"
+                for identity, role, value in entities_in_roles(
+                    db, ("country", "state", "district")
                 ):
-                    e = unpack(data)
+                    e = cast(Row, value)
                     if role == "country":
                         self.countries.add(cc)
                         if e.get("sovereign"):
@@ -60,17 +63,14 @@ class CodeIndex:
                     if e.get("code"):
                         self.codes.setdefault("iso:" + e["code"], set()).add(identity)
                     administrative_identity = False
-                    if e.get("geonames_id"):
-                        # Administrative GeoNames identity only; a district's
-                        # settlement-seat link is not an ADM1 crosswalk.
-                        found = db.execute(
-                            "SELECT class FROM geonames WHERE id=?", (e["geonames_id"],)
-                        ).fetchone()
-                        if found == ("A",):
-                            administrative_identity = True
-                            self.geonames.setdefault(e["geonames_id"], set()).add(
-                                identity
-                            )
+                    # Administrative GeoNames identity only; a district's
+                    # settlement-seat link is not an ADM1 crosswalk.
+                    if (
+                        e.get("geonames_id")
+                        and geonames_class(db, e["geonames_id"]) == "A"
+                    ):
+                        administrative_identity = True
+                        self.geonames.setdefault(e["geonames_id"], set()).add(identity)
                     if (
                         role == "district"
                         and e.get("source_subtype") == "locality"
@@ -92,8 +92,8 @@ class CodeIndex:
                     for name in names:
                         if key(name):
                             self.names.setdefault((cc, key(name)), set()).add(identity)
-                for identity, data in db.execute("SELECT entity,data FROM state_codes"):
-                    code = unpack(data)["geonames_admin1"]
+                for identity, crosswalk in state_codes(db):
+                    code = crosswalk["geonames_admin1"]
                     if code:
                         self.codes.setdefault(f"geonames:{cc}.{code}", set()).add(
                             identity

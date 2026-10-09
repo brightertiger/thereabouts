@@ -12,7 +12,7 @@ from pipeline.engines.cities import mapping
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.schemas import MAPPING
 from pipeline.engines.cities.urban import Urban
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.runtime.jsonio import sha256_file
 
 

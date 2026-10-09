@@ -4,7 +4,7 @@ import numpy as np
 import shapely
 from numpy.typing import NDArray
 
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 from .footprints import footprint_order
 

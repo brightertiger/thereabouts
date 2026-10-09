@@ -7,22 +7,17 @@ import sqlite3
 from pathlib import Path
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.store.codec import Row, encode
+from pipeline.engines.store.database import check_database, connect
+from pipeline.engines.store.entities import add_point, put_metadata
+from pipeline.engines.store.schema import create_areas, create_entities
 from pipeline.runtime.jsonio import atomic_output
 
 from .areas import assign_areas, state_policy
 from .classification import trusted_city
-from .common import Row, check_database, connect, encode
-from .entities import (
-    add_point,
-    create_entities,
-    ensure_country,
-    fallback_points,
-    make_entity,
-    save_entity,
-)
+from .entities import ensure_country, fallback_points, make_entity, save_entity
 from .hierarchy import attach_parents
 from .matching import division
-from .spatial import create_areas
 
 
 def overture_points(db: sqlite3.Connection, country: str, policy: Row) -> None:
@@ -65,10 +60,8 @@ def build_country(
             assign_areas(db, root, country, policy, state, limits.source_batch_rows)
             ensure_country(db, country, policy)
             attach_parents(db, policy, limits.state_vote_batch_rows)
-            db.execute(
-                "INSERT INTO metadata VALUES('state_policy',?)", (encode(state),)
-            )
-            db.execute("INSERT INTO metadata VALUES('policy',?)", (encode(policy),))
+            put_metadata(db, "state_policy", encode(state))
+            put_metadata(db, "policy", encode(policy))
             db.commit()
         finally:
             db.close()

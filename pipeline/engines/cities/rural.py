@@ -11,9 +11,10 @@ from numpy.typing import NDArray
 
 from pipeline.engines.cells.geometry import Areas
 from pipeline.engines.cells.nearest import nearest
-from pipeline.engines.cells.windows import areas, expanded
+from pipeline.engines.cells.windows import expanded
 from pipeline.engines.geo.arrays import FloatArray
-from pipeline.engines.reconcile.lookup import entity
+from pipeline.engines.store.areas import intersecting_any
+from pipeline.engines.store.entities import entity
 
 if TYPE_CHECKING:
     from .engine import Engine
@@ -32,7 +33,9 @@ def rural(
         float(projected[:, 0].max()),
     )
     shapes, records = [], []
-    for aid, identity, _, priority, blob, _ in areas(db, expanded(bounds, 0), "city"):
+    for aid, identity, _, priority, blob, _ in intersecting_any(
+        db, expanded(bounds, 0), "city"
+    ):
         if aid in engine.rejected:
             continue
         shapes.append(shapely.from_wkb(blob))

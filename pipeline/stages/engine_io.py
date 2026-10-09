@@ -6,7 +6,7 @@ from typing import Any
 
 import pyarrow.parquet as pq
 
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Output
 

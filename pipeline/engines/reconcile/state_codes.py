@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 import sqlite3
 
-from .common import Row, key, unpack
+from pipeline.engines.store.codec import Row, key, unpack
+
 from .state_votes import votes
 
 

@@ -6,7 +6,9 @@ import shapely
 
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.artifact_io import parquet
-from pipeline.engines.reconcile.common import Row, check_database, connect, encode, pack
+from pipeline.engines.store.areas import entity_areas
+from pipeline.engines.store.codec import Row, encode, pack
+from pipeline.engines.store.database import check_database, connect
 from pipeline.files import file_record
 from pipeline.runtime.jsonio import atomic_output, write_json
 
@@ -37,11 +39,7 @@ def build_country(
         for identity in cities:
             if identity.startswith("city:country:"):
                 shapes = [
-                    shapely.from_wkb(b)
-                    for (b,) in db.execute(
-                        "SELECT geometry FROM areas WHERE entity=? AND role='city'",
-                        (identity,),
-                    )
+                    shapely.from_wkb(b) for _, b in entity_areas(db, identity, "city")
                 ]
                 if shapes:
                     fixed.append(

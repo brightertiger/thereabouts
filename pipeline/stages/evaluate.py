@@ -10,7 +10,7 @@ from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.cities.gates import failures, unreviewed
 from pipeline.engines.cities.quality import country_report, named_checks
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.files import file_record
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json

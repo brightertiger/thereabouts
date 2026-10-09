@@ -9,9 +9,10 @@ import shapely
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.geo.sphere import EARTH_M
 from pipeline.engines.geo.windows import windows
-from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.land import Land
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.schema import create_areas
 
 
 def test_offshore_cutoff_overlap_holes_and_dateline(tmp_path: Path) -> None:

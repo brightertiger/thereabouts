@@ -3,7 +3,7 @@
 import duckdb
 
 from pipeline.config.schema import Resources
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def reference_checks(tables: list[Row], resources: Resources) -> Row:

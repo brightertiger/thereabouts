@@ -5,7 +5,7 @@ import pyarrow as pa
 from h3.api import basic_int as h3
 
 from pipeline.config.schema import H3
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 JOIN_GROUP_RESOLUTION = 1
 PARENT_MASK = ((1 << 64) - 1) ^ (15 << 52)

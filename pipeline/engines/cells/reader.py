@@ -11,7 +11,7 @@ import pyarrow.parquet as pq
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 class Reader(Protocol):

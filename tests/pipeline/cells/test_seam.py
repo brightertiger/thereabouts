@@ -12,9 +12,10 @@ from pipeline.engines.cells.planning import Dependencies
 from pipeline.engines.cells.seam import oracle
 from pipeline.engines.cells.windows import envelopes
 from pipeline.engines.hierarchy import descendants, label_block
-from pipeline.engines.reconcile.common import connect, pack
 from pipeline.engines.reconcile.lookup import Locator
-from pipeline.engines.reconcile.spatial import insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.codec import pack
+from pipeline.engines.store.database import connect
 
 
 @pytest.mark.parametrize("latitude", [0, 90, -90])

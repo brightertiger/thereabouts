@@ -5,11 +5,11 @@ from __future__ import annotations
 import json
 
 from pipeline.engines.artifacts import EVALUATION
+from pipeline.engines.store.codec import Row, unpack
 
 from .area_audit import anchor_audit
 from .audit import compact, large_places
 from .classification import trusted_city
-from .common import Row, unpack
 from .coverage import land_coverage, place_coverage
 from .lookup import Locator
 

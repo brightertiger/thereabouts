@@ -6,9 +6,10 @@ import pytest
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
-from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.lookup import Locator
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.schema import create_areas
 from pipeline.runtime.jsonio import sha256_file
 from tests.pipeline.reconciliation.conftest import reconciled
 

@@ -5,6 +5,9 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.codec import Row, pack, rows
+
 from .city_identity import footprints
 from .classification import (
     CITY_STATE_PRIORITY,
@@ -13,11 +16,9 @@ from .classification import (
     area_priority,
     dominated_localities,
 )
-from .common import Row, pack, rows
 from .entities import make_entity, save_entity
 from .matching import default_perspective, division
 from .rollups import selected, targets
-from .spatial import insert_area
 
 
 def state_policy(root: Path, country: str, policy: Row, batch_rows: int) -> Row:

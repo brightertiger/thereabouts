@@ -6,7 +6,7 @@ from typing import cast
 from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cells import build, inventory, places, schemas
 from pipeline.engines.cells.inputs import Inputs
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.files import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located

@@ -105,7 +105,7 @@ def test_geographic_closures_cover_what_their_units_execute(
         "lookups",
     }
     assert "pipeline/engines/cells/build.py" in record.files["cells"]
-    assert "pipeline/engines/reconcile/spatial.py" in record.files["reconcile"]
+    assert "pipeline/engines/store/areas.py" in record.files["reconcile"]
     for name, files in record.files.items():
         assert not uncovered(files, set(dump[name])), name
 

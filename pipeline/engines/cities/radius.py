@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from scipy.spatial import cKDTree
 
 from pipeline.engines.geo.sphere import EARTH_M, unit_vectors
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def assign(

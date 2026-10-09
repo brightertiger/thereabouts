@@ -12,7 +12,8 @@ from numpy.typing import NDArray
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.cells.nearest import nearest
 from pipeline.engines.geo.arrays import FloatArray
-from pipeline.engines.reconcile.common import Row, connect, unpack
+from pipeline.engines.store.codec import Row, unpack
+from pipeline.engines.store.database import connect
 
 from .allocation import Allocation
 from .boundaries import BoundaryIndex

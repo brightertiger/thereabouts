@@ -10,8 +10,9 @@ from h3.api import basic_int as h3
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3, Resources
-from pipeline.engines.reconcile.common import Row, check_database, encode
 from pipeline.engines.reconcile.matching import default_perspective
+from pipeline.engines.store.codec import Row, encode
+from pipeline.engines.store.database import check_database
 from pipeline.runtime.jsonio import atomic_output
 
 from .blocks import describe

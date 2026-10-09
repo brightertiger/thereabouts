@@ -6,8 +6,9 @@ import numpy as np
 import shapely
 
 from pipeline.config.engines import EngineLimits
-from pipeline.engines.reconcile.common import connect
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.schema import create_areas
 from tests.pipeline.cities.test_city_normalization import city, make_engine
 
 

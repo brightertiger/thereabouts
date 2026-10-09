@@ -9,7 +9,7 @@ from h3.api import basic_int as h3
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3, Resources
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def scalar(db: duckdb.DuckDBPyConnection, sql: str) -> int:

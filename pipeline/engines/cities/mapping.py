@@ -4,7 +4,9 @@ from collections.abc import Iterator
 
 import numpy as np
 
-from pipeline.engines.reconcile.common import Row, connect, encode
+from pipeline.engines.store.codec import Row, encode
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import anchored_entities
 
 from .engine import Engine
 
@@ -13,17 +15,7 @@ def rows(engine: Engine, batch_rows: int) -> Iterator[Row]:
     db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     canonical = set(engine.ids)
     try:
-        # A bounded temporary aggregate avoids a point query per catalogue entity.
-        db.execute(
-            "CREATE TEMP TABLE anchors AS SELECT entity,min(id) AS id "
-            "FROM points GROUP BY entity"
-        )
-        db.execute("CREATE INDEX temp.anchor_entity ON anchors(entity)")
-        cursor = db.execute(
-            "SELECT e.id,e.role,p.x,p.y FROM entities e "
-            "LEFT JOIN anchors a ON e.id=a.entity "
-            "LEFT JOIN points p ON p.id=a.id ORDER BY e.id"
-        )
+        cursor = anchored_entities(db)
         while batch := cursor.fetchmany(batch_rows):
             located = [(i, r) for i, r in enumerate(batch) if r[2] is not None]
             spatial: dict[int, tuple[str | None, str | None]] = {}

@@ -9,7 +9,7 @@ import shapely
 
 from pipeline.engines.cities.boundaries import BoundaryIndex
 from pipeline.engines.cities.footprints import screen
-from pipeline.engines.reconcile.common import pack
+from pipeline.engines.store.codec import pack
 from tests.pipeline.cities.test_city_normalization import city
 
 

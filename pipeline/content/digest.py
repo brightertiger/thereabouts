@@ -16,7 +16,7 @@ import pyarrow.parquet as pq
 
 from pipeline.config.content import DigestLimits
 from pipeline.engines.artifacts import read_json
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.runtime.jsonio import digest as fingerprint
 from pipeline.runtime.paths import located
 

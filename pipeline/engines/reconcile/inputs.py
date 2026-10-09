@@ -8,9 +8,9 @@ import pyarrow.parquet as pq
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import Resources
+from pipeline.engines.store.codec import Row
 from pipeline.runtime.jsonio import atomic_output
 
-from .common import Row
 from .matching import default_perspective
 
 

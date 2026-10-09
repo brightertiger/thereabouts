@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .common import Row
+from pipeline.engines.store.codec import Row
 
 
 def compare(

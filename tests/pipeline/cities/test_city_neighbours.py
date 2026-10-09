@@ -13,8 +13,10 @@ from pipeline.engines.cells.schemas import CELLS
 from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.cities.gates import failures
 from pipeline.engines.cities.quality import neighbour_checks
-from pipeline.engines.reconcile.common import Row, connect
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.schema import create_areas
 from tests.pipeline.cities.test_city_normalization import city, make_engine
 
 
@@ -62,7 +64,7 @@ def test_rejecting_a_town_boundary_cannot_hide_its_polygon_losses(
 
 def test_all_boundaries_detect_losses_hidden_by_net_gains(tmp_path: Path) -> None:
     from pipeline.engines.cities.boundary_checks import boundary_checks
-    from pipeline.engines.reconcile.common import pack
+    from pipeline.engines.store.codec import pack
 
     engine = make_engine(tmp_path, [city("town", 0, 20000)], [])
     shape = shapely.box(-0.01, -0.01, 0.01, 0.01)

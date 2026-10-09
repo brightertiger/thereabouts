@@ -5,7 +5,8 @@ import sqlite3
 import shapely
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.engines.reconcile.common import Row, unpack
+from pipeline.engines.store.areas import areas_by_role, entity_areas
+from pipeline.engines.store.codec import Row, unpack
 
 from .urban import Urban
 
@@ -23,9 +24,7 @@ def policy_areas(
         if rule.get("members"):
             members = set(rule["members"])
             found = set()
-            for area, blob, evidence in db.execute(
-                "SELECT id,geometry,evidence FROM areas"
-            ):
+            for area, _, _, blob, evidence in areas_by_role(db):
                 source = unpack(evidence).get("entity_id")
                 if source in members:
                     found.add(source)
@@ -34,17 +33,13 @@ def policy_areas(
             if found != members:
                 raise ValueError(f"Missing pinned policy members: {members - found}")
         else:
-            query = "SELECT id,geometry FROM areas WHERE entity=? AND role=?"
-            parameters: list[str | int] = [
-                rule.get("area_entity", target),
-                rule.get("role", "city"),
-            ]
-            if "priority" in rule:
-                query += " AND priority=?"
-                parameters.append(rule["priority"])
-            for area_entity in rule.get("area_entities", [parameters[0]]):
-                parameters[0] = area_entity
-                found_rows = list(db.execute(query, parameters))
+            role = rule.get("role", "city")
+            for area_entity in rule.get(
+                "area_entities", [rule.get("area_entity", target)]
+            ):
+                found_rows = list(
+                    entity_areas(db, area_entity, role, rule.get("priority"))
+                )
                 if not found_rows:
                     raise ValueError(f"Missing policy area identity: {area_entity}")
                 for area, blob in found_rows:

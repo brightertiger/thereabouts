@@ -5,22 +5,25 @@ from __future__ import annotations
 import json
 from collections.abc import Iterator
 from pathlib import Path
+from typing import cast
 
-from pipeline.engines.reconcile.common import Row, connect, encode, unpack
+from pipeline.engines.store.catalog import wikidata_links
+from pipeline.engines.store.codec import Row, encode
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import country_entity
+from pipeline.engines.store.entities import entities as canonical
 
 
 def entities(path: Path, policy: Row, cache_kib: int) -> Iterator[Row]:
     db = connect(path, readonly=True, cache_kib=cache_kib)
     try:
-        country_row = db.execute(
-            "SELECT data FROM entities WHERE role='country' ORDER BY id LIMIT 1"
-        ).fetchone()
-        country_name = unpack(country_row[0])["name"] if country_row else None
+        country = country_entity(db)
+        country_name = country["name"] if country else None
         wikidata: dict[str, set[str]] = {}
-        for qid, identity in db.execute("SELECT qid,id FROM wikidata"):
+        for qid, identity in wikidata_links(db):
             wikidata.setdefault(identity, set()).add(qid)
-        for (data,) in db.execute("SELECT data FROM entities ORDER BY id"):
-            e = unpack(data)
+        for value in canonical(db):
+            e = cast(Row, value)
             sovereign = e["sovereign"] or policy["sovereigns"].get(e["country_code"])
             if not sovereign:
                 sovereign = [e["country_code"], country_name]

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 @dataclass

@@ -8,7 +8,8 @@ from collections import Counter
 import numpy as np
 import shapely
 
-from .common import Row
+from pipeline.engines.store.codec import Row
+
 from .spatial import decode
 
 

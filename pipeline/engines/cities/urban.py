@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 from shapely.geometry.base import BaseGeometry
 
 from pipeline.engines.geo.sphere import EARTH_M, distance
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 class Urban:

@@ -6,7 +6,7 @@ import json
 import sqlite3
 from typing import Any
 
-from .common import Row, unpack
+from pipeline.engines.store.codec import Row, unpack
 
 # Shared by the scalar and vector oracles. These describe the stored priorities,
 # not the evaluation sample or particular cities.

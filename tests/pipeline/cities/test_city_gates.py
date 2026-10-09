@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from pipeline.engines.cities.gates import failures
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def test_spatial_gate_rejects_footprint_and_neighbour_losses() -> None:

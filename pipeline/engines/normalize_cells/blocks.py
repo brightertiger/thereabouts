@@ -13,7 +13,7 @@ from pipeline.engines.cells.compaction import compact
 from pipeline.engines.cells.reader import interval
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.hierarchy import descendants
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 FIELDS = ("country_id", "state_id", "city_id", "city_method", "land_method")
 

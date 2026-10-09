@@ -4,7 +4,8 @@ from pathlib import Path
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
-from pipeline.engines.reconcile.common import connect, unpack
+from pipeline.engines.store.codec import unpack
+from pipeline.engines.store.database import connect
 from tests.pipeline.reconciliation.conftest import reconciled
 
 from .conftest import area, place, write_inputs
