@@ -56,7 +56,9 @@ def opened(
         fs, name = backend(url)
         with fs.open(name, "rb") as stream:
             stream.seek(offset)
-            yield Response(stream, offset, None, None)
+            total = getattr(stream, "size", None)  # fsspec files know their size
+            length = total - offset if isinstance(total, int) else None
+            yield Response(stream, offset, length, None)
         return
     request = Request(
         url,
