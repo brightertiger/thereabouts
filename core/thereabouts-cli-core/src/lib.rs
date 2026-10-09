@@ -1,5 +1,6 @@
 //! Portable batch, presentation and exit policy shared by native and WASM hosts.
 #![cfg_attr(test, allow(clippy::unwrap_used))]
+pub mod archive;
 pub mod batch;
 mod batch_spool;
 pub mod directory;

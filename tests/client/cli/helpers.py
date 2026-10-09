@@ -6,9 +6,10 @@ import os
 import shutil
 import subprocess
 import sysconfig
-import tarfile
 from pathlib import Path
 from typing import Any
+
+from thereabouts import _core
 
 FIXTURES = Path(__file__).parents[2] / "fixtures"
 CONSOLE = Path(sysconfig.get_path("scripts")) / (
@@ -72,22 +73,20 @@ def install_fixture(root: Path, source: Path) -> None:
 
 
 def release(root: Path, family: str = "phone") -> dict[str, Any]:
+    """A format-3 release directory built by the shared Rust archive writer."""
     source = FIXTURES / "packs" / f"{family}-sample"
     manifest = json.loads((source / "manifest.json").read_text())
     root.mkdir(parents=True, exist_ok=True)
-    archive = root / f"{family}.tar"
-    with tarfile.open(archive, "w", format=tarfile.USTAR_FORMAT) as writer:
-        for name in ["manifest.json", *(f["path"] for f in manifest["files"])]:
-            writer.add(source / name, arcname=name, recursive=False)
+    archive = root / f"{family}{_core.ARCHIVE_SUFFIX}"
+    created = _core.archive_pack(str(source), str(archive))
     index = {
-        "format": 2,
+        "format": _core.INDEX_FORMAT,
         "datasets": {
             manifest["data_version"]: {
                 "packs": {
                     family: {
                         "url": archive.name,
-                        "bytes": archive.stat().st_size,
-                        "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+                        **created,
                         "format_minor": manifest["format_minor"],
                     }
                 }

@@ -394,6 +394,50 @@ fn write_pack(
         &serde_json::to_value(manifest).map_err(|e| PyValueError::new_err(e.to_string()))?,
     )
 }
+/// Archive failures keep the core's error class; anything else is an unusable archive.
+#[cfg(feature = "writer")]
+fn archive_error(py: Python<'_>, error: thereabouts_cli_core::error::Error) -> PyErr {
+    match error {
+        thereabouts_cli_core::error::Error::Pack(e) => self::error(py, &e),
+        thereabouts_cli_core::error::Error::Io(e) => e.into(),
+        e => coded_error(py, "corrupt_pack", &e.to_string()),
+    }
+}
+/// Write a deterministic release archive of a verified pack directory.
+#[cfg(feature = "writer")]
+#[pyfunction]
+fn archive_pack(py: Python<'_>, pack_dir: &str, output: &str) -> PyResult<Py<PyAny>> {
+    use thereabouts_cli_core::archive;
+    let created = py
+        .detach(|| archive::create(Path::new(pack_dir), Path::new(output)))
+        .map_err(|e| archive_error(py, e))?;
+    value_to_python(
+        py,
+        &serde_json::json!({
+            "size": created.size,
+            "sha256": created.sha256,
+            "unpacked_size": created.unpacked_size,
+        }),
+    )
+}
+/// List and hash every archive entry without extracting it.
+#[cfg(feature = "writer")]
+#[pyfunction]
+fn inspect_archive(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
+    use thereabouts_cli_core::archive;
+    let summary = py
+        .detach(|| archive::inspect(std::fs::File::open(path)?))
+        .map_err(|e| archive_error(py, e))?;
+    let files = summary
+        .entries
+        .iter()
+        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
+        .collect::<Vec<_>>();
+    value_to_python(
+        py,
+        &serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}),
+    )
+}
 #[pyfunction]
 fn verify_pack(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
     let manifest = py
@@ -420,7 +464,11 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Geocoder>()?;
     m.add_function(wrap_pyfunction!(open, m)?)?;
     #[cfg(feature = "writer")]
-    m.add_function(wrap_pyfunction!(write_pack, m)?)?;
+    {
+        m.add_function(wrap_pyfunction!(write_pack, m)?)?;
+        m.add_function(wrap_pyfunction!(archive_pack, m)?)?;
+        m.add_function(wrap_pyfunction!(inspect_archive, m)?)?;
+    }
     m.add_function(wrap_pyfunction!(verify_pack, m)?)?;
     m.add_function(wrap_pyfunction!(pack_info, m)?)?;
     {
