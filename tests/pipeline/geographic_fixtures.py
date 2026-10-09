@@ -9,7 +9,7 @@ import pyarrow.parquet as pq
 from pipeline.config import load
 from pipeline.engines.artifact_io import file_record
 from pipeline.runtime.execution import Executor
-from pipeline.runtime.jsonio import write_json
+from pipeline.runtime.jsonio import digest, write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
 from pipeline.sources.shared.schemas import SCHEMAS
@@ -18,6 +18,13 @@ from pipeline.stages.registry import ordered, registry
 from tests.pipeline.reconciliation.conftest import area, place, write_inputs
 
 from .helpers import SyntheticStage, context
+
+
+def partition(root: Path, source: str, kind: str) -> Path:
+    """The production layout: normalized/<source>/<kind>/<inputs hash>/<part>."""
+    path = root / "normalized" / source / kind / digest(source) / "part.parquet"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage]:
@@ -45,8 +52,7 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
         source = recipe.unit_id
         parts, paths = [], []
         if source in {"osm_land", "ghsl"}:
-            path = root / "normalized" / source / "areas.parquet"
-            path.parent.mkdir(parents=True, exist_ok=True)
+            path = partition(root, source, "areas")
             rows = (
                 [area("physical", "Land", "land", (-5, -5, 5, 5), source=source)]
                 if source == "osm_land"
@@ -59,7 +65,8 @@ def source_receipts(root: Path, ledger: Ledger) -> tuple[Context, SyntheticStage
             )
         else:
             for kind in config.engines.reconcile_sources[source]:
-                path = extracted / f"{source}_{kind}.parquet"
+                path = partition(root, source, kind)
+                (extracted / f"{source}_{kind}.parquet").rename(path)
                 paths.append(path)
                 parts.append(
                     {

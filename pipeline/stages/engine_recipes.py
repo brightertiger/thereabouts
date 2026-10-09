@@ -1,20 +1,38 @@
 """Declare country, block and table dependencies from source and block inventories."""
 
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 
+from pipeline.runtime.outputs import role
 from pipeline.runtime.records import Dependency, Recipe
 
 from .contract import Context
 from .engine_data import Geography, source_manifest
 
+Key = tuple[str, str]
+
 
 def dependencies(
-    keys: set[tuple[str, str]], *, evaluation_gate: bool = False
+    keys: set[Key],
+    *,
+    evaluation_gate: bool = False,
+    reads: Mapping[Key, tuple[str, ...]] | None = None,
 ) -> tuple[Dependency, ...]:
+    """Dependencies with `reads` patterns hash and restore only those outputs."""
     return tuple(
-        Dependency(*key, control=evaluation_gate and key[0] == "evaluate")
+        Dependency(
+            *key,
+            paths=(reads or {}).get(key, ()),
+            control=evaluation_gate and key[0] == "evaluate",
+        )
         for key in sorted(keys)
     )
+
+
+def partitions(ctx: Context, source: str, kinds: Iterable[str]) -> tuple[str, ...]:
+    """Role patterns of a source's normalized partitions; caches and audits excluded."""
+    root = ctx.config.paths.normalized
+    return tuple(f"{root}/{source}/{kind}/*.parquet" for kind in sorted(kinds))
 
 
 def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
@@ -24,13 +42,24 @@ def geographic_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
         return []
     recipes: list[Recipe] = []
 
-    def add(stage: str, key: str, parents: set[tuple[str, str]]) -> None:
+    urban = ("normalize", settings.urban_source)
+    reads = {
+        ("normalize", name): partitions(ctx, name, kinds)
+        for name, kinds in settings.reconcile_sources.items()
+    } | {
+        ("normalize", settings.land_source): partitions(
+            ctx, settings.land_source, ["areas"]
+        ),
+        urban: partitions(ctx, settings.urban_source, ["areas"]),
+    }
+
+    def add(stage: str, key: str, parents: set[Key]) -> None:
         recipes.append(
             Recipe(
                 stage,
                 key,
                 dependencies=dependencies(
-                    parents, evaluation_gate=stage == "normalize_cells"
+                    parents, evaluation_gate=stage == "normalize_cells", reads=reads
                 ),
             )
         )
@@ -157,11 +186,16 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             parents = {("normalize", source)}
             if ctx.config.sources[source].kind != "timezones":
                 parents |= countries
+            read: tuple[str, ...] = (role(part["path"]),)
+            if ctx.config.sources[source].kind == "phone":
+                read += partitions(ctx, source, ["phone_metadata"])
             recipes.append(
                 Recipe(
                     "lookups",
                     f"static/{kind}/{Path(part['path']).stem}",
-                    dependencies=dependencies(parents),
+                    dependencies=dependencies(
+                        parents, reads={("normalize", source): read}
+                    ),
                 )
             )
     for kind, source in settings.spatial_sources.items():
@@ -169,8 +203,13 @@ def lookup_recipes(ctx: Context, geography: Geography) -> list[Recipe]:
             parents = {("normalize", source)} | {
                 ("normalize_cells", "block/" + b) for b in geography.blocks
             }
+            reads = {("normalize", source): partitions(ctx, source, [kind])}
             recipes.append(
-                Recipe("lookups", "spatial/" + kind, dependencies=dependencies(parents))
+                Recipe(
+                    "lookups",
+                    "spatial/" + kind,
+                    dependencies=dependencies(parents, reads=reads),
+                )
             )
     parents = (
         {recipe.key for recipe in recipes}

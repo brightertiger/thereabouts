@@ -3,13 +3,14 @@
 from collections.abc import Callable, Sequence
 from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from dataclasses import replace
+from fnmatch import fnmatchcase
 
 from pipeline.stages.contract import Context, Stage, Unit, make_unit
 
-from .outputs import describe
+from .outputs import describe, role
 from .paths import located
 from .planning import decide
-from .records import Output
+from .records import Dependency, Output
 from .watch import WATCH, InputsChanged, changed_message
 
 Described = tuple[tuple[Output, ...], dict[str, str]]
@@ -63,11 +64,17 @@ class Executor:
             refresh_discovery=unit.refresh_discovery,
         )
 
-    def missing(self, unit: Unit) -> bool:
+    def missing(self, unit: Unit, dependency: Dependency | None = None) -> bool:
+        """Absent recorded outputs, limited to those a consuming dependency reads."""
+        if dependency is not None and dependency.control:
+            return False
+        patterns = dependency.paths if dependency is not None else ()
         record = self.ctx.ledger.get(*unit.key)
         absent = record.metadata.get("absent_paths", []) if record else []
         return isinstance(absent, list) and any(
-            not located(self.ctx.root, str(path)).exists() for path in absent
+            not located(self.ctx.root, str(path)).exists()
+            for path in absent
+            if not patterns or any(fnmatchcase(role(str(path)), p) for p in patterns)
         )
 
     def execute(
@@ -162,7 +169,7 @@ class Executor:
     def restore_inputs(self, stage: Stage, unit: Unit) -> None:
         for dependency in unit.recipe.dependencies:
             upstream = self.discover(dependency.stage)[dependency.key]
-            if self.missing(upstream):
+            if self.missing(upstream, dependency):
                 self.execute(
                     dependency.stage,
                     materialize=True,
@@ -243,7 +250,7 @@ class Executor:
                 self.skip(unit.key)
                 continue
             missing = any(
-                self.missing(self.discover(dep.stage)[dep.key])
+                self.missing(self.discover(dep.stage)[dep.key], dep)
                 for dep in unit.recipe.dependencies
             )
             if missing:
