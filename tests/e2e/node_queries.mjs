@@ -33,7 +33,10 @@ for (const query of job.queries) {
     lines.push(JSON.stringify({ id: query.id, result }));
   } catch (error) {
     lines.push(
-      JSON.stringify({ id: query.id, error: `${error.name}: ${error.message}` }),
+      JSON.stringify({
+        id: query.id,
+        error: `${error.name}: ${error.message}`,
+      }),
     );
   }
   latencies.push(performance.now() - started);
@@ -42,7 +45,9 @@ await geo.close();
 latencies.sort((a, b) => a - b);
 const at = (share) =>
   latencies.length
-    ? latencies[Math.min(latencies.length - 1, Math.floor(share * latencies.length))]
+    ? latencies[
+        Math.min(latencies.length - 1, Math.floor(share * latencies.length))
+      ]
     : null;
 lines.push(
   JSON.stringify({

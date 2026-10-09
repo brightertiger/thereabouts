@@ -516,9 +516,21 @@ group, sorted by block. The cells manifest entry's `blocks` list maps each block
 to its zero-based `row_group` and `rows`. Empty blocks are omitted. Buffering is
 bounded by one block's reference-cell count; `row_group_rows` controls other
 tables. The full reader contract is in the dataset README's Cell keys section.
-`config/dataset.yaml` declares all fourteen retained table schemas, their keys,
-column meanings, units and physical nullability. Additional optional plate tables
-must be given reviewed schemas there before release; those sources are disabled.
+`config/dataset.yaml` declares every retained table schema (nineteen, including
+`names` and the four plate tables), their keys, column meanings, units and
+physical nullability. Cell groups must use resolution 1, the writer's only
+layout.
+
+Before any document is written, assembly checks the pack writer's place-reference
+rules (`pipeline/release/closure.py`): every ID that cells, forward tables,
+canonical cities and country, state, city or self-normalized places reach,
+following country, parent, sovereign and normalized city, is one unique place;
+a reached place's mapping equals its normalized city; names name canonical
+cities. A dataset the writer would refuse is never published. At world scale
+the check reads six reference columns of about 6.9 M places (about 25 s and
+3 GB peak in a synthetic measurement). The dataset also carries the generated
+`DATA_DICTIONARY.md` and `data_dictionary.json`; the core pack ships the same
+pair as notices for the MCP server.
 
 Parquet, documents, per-table logical digests and the manifest are built in an
 owned temporary directory, then published together. The output cap applies before
@@ -579,24 +591,42 @@ the packs stage; it never schedules acquisition or geographic stages. Core is
 an explicit prerequisite for every forward family. Its path is supplied as the
 writer's core_pack option, so forward manifests pin its exact catalogue.
 A final index unit depends on every requested family and produces index.json.
-Each family also produces a deterministic POSIX ustar archive. Their hashes and
-sizes are the client release-index records; --from accepts this local directory.
-Publication inventories include the index and archives at packs/<version>/.
+Each family also produces a deterministic `<family>.tar.zst` archive. Their
+hashes and sizes are the client release-index records; --from accepts this
+local directory. Core includes the city-name index, with alternate names; the
+default selection is core plus six forward packs, plates included.
 
-The real snapshot has no plate tables, and normalized/plates_country is absent.
-Plates remains unavailable in this release proof; no empty or invented
-plate pack is substituted. Core includes the city-name index. The default
-six-pack selection is core plus five forward packs. Writer/schema changes must
-update the release identity; client source bytes are not hashed as native versions.
+Before its archive exists, each family unit accepts the pack
+(`pipeline/release/acceptance.py`). A child process at
+`release.acceptance.open_files` (256) opens it with the installed reader,
+verifies it in full and answers seeded samples drawn from the dataset
+(`samples.py`): land cells against their country, state and city IDs; unstored
+cells of covered blocks as `not_found`/`no_land`; canonical and alternate
+names; postal codes, airports by IATA and ICAO, LOCODEs, IPv4 and IPv6 ranges
+and phone prefixes by their own keys and places; plates built from known codes;
+and the shared vectors whose answers do not depend on data. Each check must
+agree on at least its `release.acceptance.minimum` share; otherwise the unit
+fails and leaves `packs/<version>/acceptance/<family>.failed.json`. A passing
+report, `packs/<version>/acceptance/<family>.json`, has no timings (those go to
+the run log), so a rebuild writes the same bytes. Thresholds, sample sizes and
+the vector files are part of the unit parameters.
 
-Publication reads a verified dataset and the configured pack-family manifests.
-Each object is uploaded through an fsspec transaction, re-hashed from the backend,
-and skipped if already present with the correct size and checksum. Conflicting
-objects are refused before uploading; investigate them instead of overwriting a
-published version. The `<version>/_SUCCESS` inventory is committed last.
-`release upload --dry-run` performs inventory and remote checks without creating
-objects or a success marker. The runner's `publish` stage performs the upload;
-`release upload` is its explicit standalone counterpart.
+Publication reads a verified dataset and uploads `dataset/<version>/`, then
+`packs/<version>/` with the archives, the version index and the acceptance
+reports; loose pack artifacts are not uploaded. Each object is uploaded through
+an fsspec transaction, re-hashed from the backend, and skipped if already
+present with the correct size and checksum. Conflicting objects are refused
+before uploading; investigate them instead of overwriting a published version.
+The same inventory receipt is committed last as `dataset/<version>/_SUCCESS` and
+`packs/<version>/_SUCCESS`, then the aggregate `packs/index.json` is merged.
+A published document containing `OWNER DECISION` is refused unless
+`release.publish.private=true`, which is only for a private staging copy and is
+recorded as `unresolved` in the result. `release upload --dry-run` performs
+inventory and remote checks without creating objects or a success marker. The
+runner's `publish` stage performs the upload; `release upload` is its explicit
+standalone counterpart and first requires the workspace ledger to hold completed
+`dataset` and `packs` units whose recorded outputs are exactly the manifest,
+archives, acceptance reports and index being uploaded.
 
 ```sh
 .venv/bin/python -m pipeline release upload --root "$PWD" --version 2026.10 \
@@ -609,11 +639,18 @@ objects or a success marker. The runner's `publish` stage performs the upload;
 ```
 
 The same generic upload implementation supports `memory://` and local files in
-tests. Actual S3 use requires an installed fsspec S3 driver (`s3fs`) compatible with
-the locked fsspec version; that optional driver is not installed or locked in this
-checkout. Its dependency resolution and real multipart behavior remain owner
+tests. `s3fs` (2026.9.0, matching the locked fsspec) is locked in the pipeline
+group for `s3://` destinations; its real multipart behaviour remains owner
 validation before cloud publication. GCS raw-mirror support is separate and uses
-the existing locked `gcsfs` dependency. No remote backend was contacted here.
+the locked `gcsfs` dependency. No remote backend is contacted by tests.
+
+`scripts/vm/e2e.sh RELEASE_DIR [URL]` runs the end-to-end test of spec §9
+(`tests/e2e/world_e2e.py`, marker `world`, deselected by default) over a staged
+release: loopback HTTP install through the Python console, Node and the CLI at
+`ulimit -n 256`, `verify --full`, `update --check`, seeded reverse and forward
+checks, the city points, world-safe vectors per client, cross-client JSON, an MCP
+stdio client and every skill example. It writes a Markdown report.
+`tests/e2e/test_fixture_e2e.py` runs the same driver on a fixture-scale release.
 
 The owner-run [release procedure](release-procedure.md) covers migration and
 symlink removal, GCP provisioning, the monthly pin/build cycle, staging checks and
