@@ -38,6 +38,10 @@ class Resources:
     workspace_scan_seconds: float = 60.0
     # Admission fails after this wait instead of pausing forever.
     admission_timeout_seconds: float = 1800.0
+    # Memory of the process tree is sampled at most this often.
+    memory_scan_seconds: float = 5.0
+    # With workers > 1, units run in forked processes or in threads of this one.
+    executor: str = "process"
 
 
 @dataclass

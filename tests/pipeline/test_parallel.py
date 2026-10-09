@@ -18,13 +18,19 @@ from pipeline.stages.contract import Context, Unit
 
 from .geographic_fixtures import build, geographic_graph, source_receipts
 from .helpers import SyntheticStage, context
+from .sources.fixtures import source_context
+from .test_partition_roles import land_payloads
+from .test_recorded_content import boundary_payloads
 
 
-def outputs(root: Path, workers: int, threads: int) -> set[tuple[str, str, str, str]]:
+def outputs(
+    root: Path, workers: int, threads: int, executor: str = "thread"
+) -> set[tuple[str, str, str, str]]:
     with Ledger(root, None, readonly=False) as ledger:
         ctx, normalized = source_receipts(root, ledger, wide=True)
         ctx.config.resources.workers = workers
         ctx.config.resources.duckdb_threads = threads
+        ctx.config.resources.executor = executor
         build(ctx, geographic_graph(ctx, normalized))
         return {
             (
@@ -38,7 +44,10 @@ def outputs(root: Path, workers: int, threads: int) -> set[tuple[str, str, str, 
         }
 
 
-def test_four_workers_record_the_same_outputs_as_one(tmp_path: Path) -> None:
+@pytest.mark.parametrize("executor", ["thread", "process"])
+def test_four_workers_record_the_same_outputs_as_one(
+    tmp_path: Path, executor: str
+) -> None:
     serial = outputs(tmp_path / "serial", 1, 1)
     assert {key[:2] for key in serial} >= {
         ("normalize_cells", "places/YY"),
@@ -46,7 +55,35 @@ def test_four_workers_record_the_same_outputs_as_one(tmp_path: Path) -> None:
         ("lookups", "manifest/current"),
     }
     assert len({key[1] for key in serial if key[0] == "cells"}) >= 7
-    assert outputs(tmp_path / "parallel", 4, 2) == serial
+    assert outputs(tmp_path / "parallel", 4, 2, executor) == serial
+
+
+def source_outputs(
+    root: Path, name: str, workers: int, executor: str
+) -> set[tuple[str, str, str]]:
+    payloads = (
+        boundary_payloads(root) if name == "geoboundaries" else land_payloads(root)
+    )
+    with Ledger(root, None, readonly=False) as ledger:
+        source, stages = source_context(root, ledger, name, payloads)
+        source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
+        source.runtime.config.resources.workers = workers
+        source.runtime.config.resources.executor = executor
+        run(source.runtime, stages)
+        return {
+            (record.stage, output.path, output.sha256)
+            for record in ledger.records()
+            for output in record.outputs
+        }
+
+
+@pytest.mark.parametrize("name", ["geoboundaries", "osm_land"])
+def test_normalizers_in_worker_processes_match_one_worker(
+    tmp_path: Path, name: str
+) -> None:
+    # Pins name the workspace directory, so both runs use the same leaf name.
+    serial = source_outputs(tmp_path / "serial" / name, name, 1, "thread")
+    assert serial == source_outputs(tmp_path / "process" / name, name, 4, "process")
 
 
 def test_prepared_values_are_never_shared_between_threads() -> None:
