@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import cast
 
 from pipeline.config.schema import StageSettings
+from pipeline.config.sources import normalize_settings
 from pipeline.pins.models import SourcePin
 from pipeline.runtime.fingerprints import REPOSITORY, adapter_hashes, stage_identity
 from pipeline.runtime.jsonio import Object, digest
@@ -39,18 +40,19 @@ class SourceStage:
             pin = self.pins[name]
             if not pin.available:
                 raise ValueError(f"Enabled source has no reviewed pin: {name}")
+            # Downloads fetch exactly the pinned bytes; transfer limits and upstream
+            # URLs change how, not what. Normalizers hash what they read.
+            parameters: Object = {"pin": cast(Object, asdict(pin))}
+            if self.name == "normalize":
+                parameters |= {
+                    "adapter": adapter_digest(settings.adapter),
+                    "policies": cast(Object, policy_hashes(settings)),
+                    "settings": cast(Object, normalize_settings(settings)),
+                }
             recipe = Recipe(
                 self.name,
                 name,
-                cast(
-                    Object,
-                    {
-                        "source": asdict(settings),
-                        "pin": asdict(pin),
-                        "adapter": adapter_digest(settings.adapter),
-                        "policies": policy_hashes(settings),
-                    },
-                ),
+                parameters,
                 (Dependency("download", name),) if self.name == "normalize" else (),
             )
             unit = make_unit(ctx, recipe, current_identity)
