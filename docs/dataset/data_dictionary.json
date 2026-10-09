@@ -219,7 +219,7 @@
     },
     {
       "name": "postal",
-      "description": "Find a postal code in the required source country.\n\nNeeds the postal pack. Spaces are ignored; hyphens and leading zeros are\nkept. A code that names several places is ambiguous: candidates are\nranked by population. A missing or malformed country is invalid_input.",
+      "description": "Find a postal code in the required source country.\n\nNeeds the postal pack. Spaces are ignored; hyphens and leading zeros are\nkept. A code that names several places is ambiguous: candidates are\nranked by population. A malformed country, such as a country name\ninstead of its two-letter code, is invalid_input.",
       "read_only": true,
       "parameters": [
         {

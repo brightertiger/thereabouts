@@ -223,7 +223,8 @@ def create_server(geo: Geocoder) -> MCPServer[None]:
 
         Needs the postal pack. Spaces are ignored; hyphens and leading zeros are
         kept. A code that names several places is ambiguous: candidates are
-        ranked by population. A missing or malformed country is invalid_input.
+        ranked by population. A malformed country, such as a country name
+        instead of its two-letter code, is invalid_input.
         """
         with tool_errors():
             return geo.postal(code, country=country, evidence=evidence).to_dict()
