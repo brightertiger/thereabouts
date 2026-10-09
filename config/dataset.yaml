@@ -1,7 +1,23 @@
 # Public schemas measured from the retained normalized dataset.
 # Nullability is physical Arrow nullability.
 airports:
+  description: Airports and airfields from OurAirports, placed on the H3 grid and joined
+    to the cell geography at their coordinates.
+  grain: One row per airport record in the pinned OurAirports file; duplicate observations
+    are retained.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place of the cell the point falls in; null when the row is
+      unlocated or unassigned
+  - columns: [state_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The first-level subdivision place of that cell; null when none is assigned
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The selected settlement of that cell, a canonical city or a standalone
+      rural settlement; null when none is assigned
   columns:
   - name: source
     type: string
@@ -129,14 +145,42 @@ airports:
     nullable: true
     meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
     units: none
+    values:
+    - value: matched
+      meaning: The point's cell is stored and has a country assignment
+    - value: unassigned
+      meaning: The cell is stored but no country is assigned to it
+    - value: ineligible
+      meaning: The cell is outside the stored land and near-shore coverage
+    - value: pending
+      meaning: No cell data exists for the point's block in this release, so no decision
+        was made
+    - value: unlocated
+      meaning: The row has no coordinates, so there is no cell to join
+    values_from:
+    - pipeline/engines/cells/joins.py
+    - pipeline/engines/cells/reader.py
+    - pipeline/stages/lookups.py
   - name: country_disagrees
     type: bool
     nullable: true
     meaning: Whether source and cell country codes disagree; null if not comparable
     units: none
 canonical_cities:
+  description: 'The cities and towns that can absorb other settlements: the anchors
+    a reverse lookup resolves to. Standalone villages and other rural settlements are
+    in places but not here.'
+  grain: One row per canonical city or town; city_id is the place identifier of its
+    anchor.
   primary_key:
   - city_id
+  relationships:
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The anchor place of the canonical city
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The reconciled place of the canonical city; equal to city_id
   columns:
   - name: city_id
     type: string
@@ -158,6 +202,14 @@ canonical_cities:
     nullable: false
     meaning: Canonical settlement kind
     units: none
+    values:
+    - value: city
+      meaning: 'A city: classified as a city by the source, or with a population of at
+        least 100,000'
+    - value: town
+      meaning: A town that is not classified as a city and has a smaller population
+    values_from:
+    - pipeline/engines/cities/candidates.py
   - name: name
     type: string
     nullable: false
@@ -168,6 +220,22 @@ canonical_cities:
     nullable: false
     meaning: Evidence qualifying this place as a canonical city
     units: none
+    values:
+    - value: typed town/city and seat or population
+      meaning: Classified as a town or city by the source, and either a seat feature code
+        or a population at or above the typed minimum
+    - value: population and active settlement
+      meaning: Population at or above the policy minimum, and a feature code that the
+        policy does not exclude
+    - value: national or first-order seat
+      meaning: A national capital or first-order administrative seat feature code
+    - value: explicit country policy
+      meaning: Named by the country's city policy
+    - value: linked city overrides section code
+      meaning: A source city classification overrides the section feature code that would
+        exclude it
+    values_from:
+    - pipeline/engines/cities/candidates.py
   - name: name_en
     type: string
     nullable: true
@@ -203,9 +271,33 @@ canonical_cities:
     nullable: false
     meaning: Rule used to allocate this canonical settlement
     units: none
+    values:
+    - value: bounded
+      meaning: The city has accepted boundary footprints that own the cells inside them
+    - value: urban_allocation; optional town_radius
+      meaning: 'No boundary: the city receives urban cells by allocation and, when enabled,
+        cells within its town radius'
+    values_from:
+    - pipeline/engines/cities/build.py
 cells:
+  description: 'Reverse-geocoding labels for land and the retained near-shore band on
+    the H3 grid: country, subdivision and city, with the evidence behind each. Cells
+    are losslessly compacted, so a row can stand for many resolution 8 cells.'
+  grain: 'One row per stored H3 cell: a resolution 8 cell, or a coarser ancestor (resolution
+    3 to 7) that stands for all its resolution 8 descendants when they share one label.'
   primary_key:
   - h3_uint64
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place of the cell; null when no country is assigned
+  - columns: [state_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The first-level subdivision place of the cell; null when none is assigned
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The selected settlement of the cell, a canonical city or a standalone rural
+      settlement; null when none is assigned
   columns:
   - name: h3
     type: string
@@ -243,23 +335,80 @@ cells:
     nullable: true
     meaning: 'Country assignment evidence: area, or null when absent'
     units: none
+    values:
+    - value: area
+      meaning: The cell centre lies inside the country's boundary area
+    values_from:
+    - pipeline/engines/normalize_cells/blocks.py
   - name: state_method
     type: string
     nullable: true
     meaning: 'Subdivision assignment evidence: area, or null when absent'
     units: none
+    values:
+    - value: area
+      meaning: The cell centre lies inside the subdivision's boundary area
+    values_from:
+    - pipeline/engines/normalize_cells/blocks.py
   - name: city_method
     type: string
     nullable: true
     meaning: Canonical city allocation rule, including distant-nearest classification
     units: none
+    values:
+    - value: city_polygon
+      meaning: Inside an accepted municipal footprint polygon of a canonical city
+    - value: policy_polygon
+      meaning: Inside an area that country policy assigns to one city
+    - value: urban_allocation
+      meaning: An urban cell outside any footprint, allocated to a canonical city of its
+        urban cluster
+    - value: town_radius
+      meaning: A rural cell within a qualifying town's own radius; an optional rule that
+        policy can disable
+    - value: rural_polygon
+      meaning: Inside the boundary polygon of a standalone rural settlement
+    - value: rural_nearest
+      meaning: No polygon covers the cell; the nearest settlement within the distant threshold
+    - value: rural_nearest_distant
+      meaning: The nearest settlement is farther than the distant threshold and within
+        the nearest cutoff; treat the city as approximate
+    values_from:
+    - core/thereabouts-core/src/reverse/mod.rs
+    - pipeline/engines/cities/engine.py
+    - pipeline/engines/cities/allocation.py
+    - pipeline/engines/cities/footprints.py
+    - pipeline/engines/cities/rural.py
   - name: land_method
     type: string
     nullable: true
     meaning: 'Land eligibility evidence: land or offshore'
     units: none
+    values:
+    - value: land
+      meaning: The cell centre is on land
+    - value: offshore
+      meaning: A retained near-shore water cell whose assignment is projected from nearby
+        land
+    values_from:
+    - pipeline/engines/reconcile/land.py
+    - core/thereabouts-core/src/reverse/mod.rs
 countries:
+  description: Countries and territories with ISO 3166 codes, names, currency, languages,
+    calling code and UN M49 regions, from the pinned country-codes file plus GeoNames
+    country information, linked to the reconciled country place.
+  grain: One row per country or territory record in the pinned sources; observations
+    can repeat.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place named by the row's country code; null when the code matches
+      no place
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The single place the row resolves to; null when the link is ambiguous,
+      unmatched or pending
   columns:
   - name: source
     type: string
@@ -381,18 +530,65 @@ countries:
     nullable: true
     meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
     units: none
+    values:
+    - value: matched
+      meaning: Exactly one candidate place; place_id is set
+    - value: ambiguous
+      meaning: Several candidate places; all are in place_ids and place_id is null
+    - value: unmatched
+      meaning: No candidate place was found
+    - value: pending
+      meaning: The row refers to a country that is expected in the release but was not
+        reconciled in this build
+    values_from:
+    - pipeline/engines/cells/code_links.py
   - name: link_method
     type: string
     nullable: true
     meaning: Rule used for the identifier link
     units: none
+    values:
+    - value: source country code
+      meaning: The row's own country code identifies the country
+    - value: explicit code or administrative crosswalk
+      meaning: The published subdivision code maps to a place through the code crosswalk
+    - value: GeoNames administrative identity
+      meaning: The row's GeoNames identifier identifies the place
+    - value: exact country-scoped administrative alias
+      meaning: The normalized name equals a place alias within the same country
+    - value: source-qualified administrative alias
+      meaning: A name qualified by its source administrative context equals a place alias
+    - value: territory fixed-line prefix language
+      meaning: Candidate countries were narrowed by the territory's fixed-line numbering
+        pattern
+    - value: no numbering-pattern support; retained source candidates
+      meaning: No numbering pattern could narrow the candidates, so every source country
+        is kept
+    values_from:
+    - pipeline/engines/cells/code_links.py
+    - pipeline/engines/cells/phone.py
   - name: place_ids
     type: 'list<element: string>'
     nullable: true
     meaning: All candidate place identifiers; ambiguity is preserved
     units: none
 ip_ranges:
+  description: IPv4 and IPv6 geolocation intervals from DB-IP City Lite, each with a
+    published point joined to the cell geography. The ranges do not overlap.
+  grain: One row per published IP interval, from ip_start to ip_end inclusive.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place of the cell the point falls in; null when the row is
+      unlocated or unassigned
+  - columns: [state_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The first-level subdivision place of that cell; null when none is assigned
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The selected settlement of that cell, a canonical city or a standalone
+      rural settlement; null when none is assigned
   columns:
   - name: source
     type: string
@@ -510,13 +706,42 @@ ip_ranges:
     nullable: true
     meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
     units: none
+    values:
+    - value: matched
+      meaning: The point's cell is stored and has a country assignment
+    - value: unassigned
+      meaning: The cell is stored but no country is assigned to it
+    - value: ineligible
+      meaning: The cell is outside the stored land and near-shore coverage
+    - value: pending
+      meaning: No cell data exists for the point's block in this release, so no decision
+        was made
+    - value: unlocated
+      meaning: The row has no coordinates, so there is no cell to join
+    values_from:
+    - pipeline/engines/cells/joins.py
+    - pipeline/engines/cells/reader.py
+    - pipeline/stages/lookups.py
   - name: country_disagrees
     type: bool
     nullable: true
     meaning: Whether source and cell country codes disagree; null if not comparable
     units: none
 phone_metadata:
+  description: 'libphonenumber territory metadata: calling code, leading digits and
+    national and international prefixes, with the original territory XML.'
+  grain: One row per libphonenumber territory, including the non-geographic territory
+    001.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place named by the row's country code; null when the code matches
+      no place
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The single place the row resolves to; null when the link is ambiguous,
+      unmatched or pending
   columns:
   - name: source
     type: string
@@ -588,18 +813,64 @@ phone_metadata:
     nullable: true
     meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
     units: none
+    values:
+    - value: matched
+      meaning: Exactly one candidate place; place_id is set
+    - value: ambiguous
+      meaning: Several candidate places; all are in place_ids and place_id is null
+    - value: unmatched
+      meaning: No candidate place was found
+    - value: pending
+      meaning: The row refers to a country that is expected in the release but was not
+        reconciled in this build
+    values_from:
+    - pipeline/engines/cells/code_links.py
   - name: link_method
     type: string
     nullable: true
     meaning: Rule used for the identifier link
     units: none
+    values:
+    - value: source country code
+      meaning: The row's own country code identifies the country
+    - value: explicit code or administrative crosswalk
+      meaning: The published subdivision code maps to a place through the code crosswalk
+    - value: GeoNames administrative identity
+      meaning: The row's GeoNames identifier identifies the place
+    - value: exact country-scoped administrative alias
+      meaning: The normalized name equals a place alias within the same country
+    - value: source-qualified administrative alias
+      meaning: A name qualified by its source administrative context equals a place alias
+    - value: territory fixed-line prefix language
+      meaning: Candidate countries were narrowed by the territory's fixed-line numbering
+        pattern
+    - value: no numbering-pattern support; retained source candidates
+      meaning: No numbering pattern could narrow the candidates, so every source country
+        is kept
+    values_from:
+    - pipeline/engines/cells/code_links.py
+    - pipeline/engines/cells/phone.py
   - name: place_ids
     type: 'list<element: string>'
     nullable: true
     meaning: All candidate place identifiers; ambiguity is preserved
     units: none
 phone_prefixes:
+  description: 'libphonenumber geographic prefix descriptions: the place a telephone
+    prefix belongs to, in each published language. Shared calling codes keep every candidate
+    country.'
+  grain: One row per prefix description in one language file, so a prefix repeats once
+    per language.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place named by the row's country code; null when the code matches
+      no place
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The single place the row resolves to; null when the link is ambiguous,
+      unmatched or pending
   columns:
   - name: source
     type: string
@@ -666,19 +937,61 @@ phone_prefixes:
     nullable: true
     meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
     units: none
+    values:
+    - value: matched
+      meaning: Exactly one candidate place; place_id is set
+    - value: ambiguous
+      meaning: Several candidate places; all are in place_ids and place_id is null
+    - value: unmatched
+      meaning: No candidate place was found
+    - value: pending
+      meaning: The row refers to a country that is expected in the release but was not
+        reconciled in this build
+    values_from:
+    - pipeline/engines/cells/code_links.py
   - name: link_method
     type: string
     nullable: true
     meaning: Rule used for the identifier link
     units: none
+    values:
+    - value: source country code
+      meaning: The row's own country code identifies the country
+    - value: explicit code or administrative crosswalk
+      meaning: The published subdivision code maps to a place through the code crosswalk
+    - value: GeoNames administrative identity
+      meaning: The row's GeoNames identifier identifies the place
+    - value: exact country-scoped administrative alias
+      meaning: The normalized name equals a place alias within the same country
+    - value: source-qualified administrative alias
+      meaning: A name qualified by its source administrative context equals a place alias
+    - value: territory fixed-line prefix language
+      meaning: Candidate countries were narrowed by the territory's fixed-line numbering
+        pattern
+    - value: no numbering-pattern support; retained source candidates
+      meaning: No numbering pattern could narrow the candidates, so every source country
+        is kept
+    values_from:
+    - pipeline/engines/cells/code_links.py
+    - pipeline/engines/cells/phone.py
   - name: place_ids
     type: 'list<element: string>'
     nullable: true
     meaning: All candidate place identifiers; ambiguity is preserved
     units: none
 place_to_city:
+  description: The reviewed mapping from every place to the city or standalone settlement
+    that represents it. Use it to roll places up to canonical cities.
+  grain: One row per place; every places row has exactly one mapping row.
   primary_key:
   - place_id
+  relationships:
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The mapped place
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The representing city or settlement; null for non-settlements
   columns:
   - name: place_id
     type: string
@@ -697,14 +1010,43 @@ place_to_city:
     meaning: 'Mapping rule: self, spatial_absorption, policy_part, identity_alias
       or non_settlement'
     units: none
+    values:
+    - value: self
+      meaning: 'The place is its own city: a canonical city, or a settlement that no city
+        absorbs'
+    - value: spatial_absorption
+      meaning: The settlement lies inside a canonical city's extent and maps to that city
+    - value: policy_part
+      meaning: Country policy names the place as a part of a city and maps it there
+    - value: identity_alias
+      meaning: Country policy declares the place another identity of the same city
+    - value: non_settlement
+      meaning: 'A country, state or district: not a settlement, so city_id is null'
+    values_from:
+    - pipeline/engines/cities/mapping.py
   - name: evidence
     type: string
     nullable: true
     meaning: JSON evidence supporting the allocation
     units: none
 places:
+  description: 'The reconciled place catalogue behind every identifier: countries, subdivisions,
+    canonical cities and towns, other settlements and districts, with names, population
+    and provenance. Treat place identifiers as opaque and do not compare them across
+    releases.'
+  grain: One row per reconciled place.
   primary_key:
   - place_id
+  relationships:
+  - columns: [parent_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The parent place (country or subdivision); null when none was selected
+  - columns: [sovereign_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The sovereign country place; null when not applicable
+  - columns: [normalized_city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The city or settlement representing this place, as in place_to_city.city_id
   columns:
   - name: place_id
     type: string
@@ -737,6 +1079,13 @@ places:
     meaning: Recorded source/code status, including user-assigned for XK; codes are
       not invented
     units: none
+    values:
+    - value: source
+      meaning: The code is as published by the source
+    - value: user-assigned
+      meaning: A code assigned by users rather than by ISO, used for Kosovo (XK)
+    values_from:
+    - pipeline/engines/reconcile/entities.py
   - name: parent_id
     type: string
     nullable: true
@@ -747,6 +1096,14 @@ places:
     nullable: true
     meaning: Evidence used to select the parent
     units: none
+    values:
+    - value: GeoNames ADM1 identity crosswalk
+      meaning: The place's GeoNames first-level code identifies exactly one subdivision
+    - value: city anchor in state area
+      meaning: Several subdivisions share the code; the one whose area contains the place's
+        anchor point
+    values_from:
+    - pipeline/engines/reconcile/hierarchy.py
   - name: sovereign_id
     type: string
     nullable: true
@@ -792,11 +1149,30 @@ places:
     nullable: true
     meaning: Reconciled settlement classification
     units: none
+    values:
+    - value: city
+      meaning: Classified as a city by the source
+    - value: town
+      meaning: Classified as a town by the source
+    - value: village
+      meaning: Classified as a village by the source
+    - value: hamlet
+      meaning: Classified as a hamlet by the source
+    values_from:
+    - config/policies/reconcile.yaml
   - name: city_exclusion
     type: string
     nullable: true
     meaning: Reason this place is excluded from canonical city eligibility
     units: none
+    values:
+    - value: insufficient settlement evidence
+      meaning: A locality without enough settlement evidence to be a city or town
+    - value: administrative container of a larger linked settlement
+      meaning: A district that contains a much larger linked settlement
+    values_from:
+    - pipeline/engines/reconcile/areas.py
+    - pipeline/engines/reconcile/build.py
   - name: overture_ids
     type: 'list<element: string>'
     nullable: true
@@ -837,6 +1213,23 @@ places:
     nullable: true
     meaning: Reconciled place role
     units: none
+    values:
+    - value: country
+      meaning: A country
+    - value: state
+      meaning: A first-level subdivision
+    - value: city
+      meaning: A canonical city
+    - value: town
+      meaning: A canonical town
+    - value: settlement
+      meaning: A settlement that is not a canonical city or town
+    - value: district
+      meaning: An administrative district or a locality without settlement evidence
+    values_from:
+    - pipeline/engines/normalize_cells/tables.py
+    - pipeline/engines/cities/candidates.py
+    - pipeline/engines/reconcile/areas.py
   - name: normalized_city_id
     type: string
     nullable: true
@@ -848,13 +1241,69 @@ places:
     nullable: true
     meaning: Rule used to select the normalized settlement identity
     units: none
+    values:
+    - value: self
+      meaning: 'The place is its own city: a canonical city, or a settlement that no city
+        absorbs'
+    - value: spatial_absorption
+      meaning: The settlement lies inside a canonical city's extent and maps to that city
+    - value: policy_part
+      meaning: Country policy names the place as a part of a city and maps it there
+    - value: identity_alias
+      meaning: Country policy declares the place another identity of the same city
+    - value: non_settlement
+      meaning: 'A country, state or district: not a settlement, so city_id is null'
+    values_from:
+    - pipeline/engines/cities/mapping.py
   - name: settlement_kind
     type: string
     nullable: true
     meaning: Canonical settlement classification
     units: none
+    values:
+    - value: country
+      meaning: A country
+    - value: state
+      meaning: A first-level subdivision
+    - value: district
+      meaning: An administrative district
+    - value: city
+      meaning: A canonical city, or a standalone settlement the source classifies as a
+        city
+    - value: town
+      meaning: A canonical town, or a standalone settlement the source classifies as a
+        town
+    - value: city_part
+      meaning: A place that the mapping absorbs into another city
+    - value: village
+      meaning: A standalone settlement classified as a village
+    - value: hamlet
+      meaning: A standalone settlement classified as a hamlet
+    - value: settlement
+      meaning: A standalone settlement without a source class
+    values_from:
+    - pipeline/engines/normalize_cells/tables.py
+    - pipeline/engines/cities/candidates.py
+    - pipeline/engines/reconcile/areas.py
+    - config/policies/reconcile.yaml
 postal_codes:
+  description: GeoNames postal codes with place names, administrative names and a located
+    point joined to the cell geography. Codes keep their spaces and leading zeros.
+  grain: One row per postal-code observation; a code can repeat for different place
+    names or variants.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place of the cell the point falls in; null when the row is
+      unlocated or unassigned
+  - columns: [state_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The first-level subdivision place of that cell; null when none is assigned
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The selected settlement of that cell, a canonical city or a standalone
+      rural settlement; null when none is assigned
   columns:
   - name: source
     type: string
@@ -987,13 +1436,41 @@ postal_codes:
     nullable: true
     meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
     units: none
+    values:
+    - value: matched
+      meaning: The point's cell is stored and has a country assignment
+    - value: unassigned
+      meaning: The cell is stored but no country is assigned to it
+    - value: ineligible
+      meaning: The cell is outside the stored land and near-shore coverage
+    - value: pending
+      meaning: No cell data exists for the point's block in this release, so no decision
+        was made
+    - value: unlocated
+      meaning: The row has no coordinates, so there is no cell to join
+    values_from:
+    - pipeline/engines/cells/joins.py
+    - pipeline/engines/cells/reader.py
+    - pipeline/stages/lookups.py
   - name: country_disagrees
     type: bool
     nullable: true
     meaning: Whether source and cell country codes disagree; null if not comparable
     units: none
 subdivisions:
+  description: First-level administrative divisions as published by GeoNames admin1
+    codes, linked to the reconciled subdivision places.
+  grain: One row per GeoNames first-level division; observations can repeat.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place named by the row's country code; null when the code matches
+      no place
+  - columns: [place_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The single place the row resolves to; null when the link is ambiguous,
+      unmatched or pending
   columns:
   - name: source
     type: string
@@ -1015,6 +1492,11 @@ subdivisions:
     nullable: true
     meaning: Namespace of the published administrative code
     units: none
+    values:
+    - value: GeoNames-admin1
+      meaning: GeoNames country-dot-admin1 codes such as BE.BRU
+    values_from:
+    - pipeline/sources/codes.py
   - name: country_code
     type: string
     nullable: true
@@ -1075,18 +1557,55 @@ subdivisions:
     nullable: true
     meaning: 'Identifier link status: matched, ambiguous, unmatched or pending'
     units: none
+    values:
+    - value: matched
+      meaning: Exactly one candidate place; place_id is set
+    - value: ambiguous
+      meaning: Several candidate places; all are in place_ids and place_id is null
+    - value: unmatched
+      meaning: No candidate place was found
+    - value: pending
+      meaning: The row refers to a country that is expected in the release but was not
+        reconciled in this build
+    values_from:
+    - pipeline/engines/cells/code_links.py
   - name: link_method
     type: string
     nullable: true
     meaning: Rule used for the identifier link
     units: none
+    values:
+    - value: source country code
+      meaning: The row's own country code identifies the country
+    - value: explicit code or administrative crosswalk
+      meaning: The published subdivision code maps to a place through the code crosswalk
+    - value: GeoNames administrative identity
+      meaning: The row's GeoNames identifier identifies the place
+    - value: exact country-scoped administrative alias
+      meaning: The normalized name equals a place alias within the same country
+    - value: source-qualified administrative alias
+      meaning: A name qualified by its source administrative context equals a place alias
+    - value: territory fixed-line prefix language
+      meaning: Candidate countries were narrowed by the territory's fixed-line numbering
+        pattern
+    - value: no numbering-pattern support; retained source candidates
+      meaning: No numbering pattern could narrow the candidates, so every source country
+        is kept
+    values_from:
+    - pipeline/engines/cells/code_links.py
+    - pipeline/engines/cells/phone.py
   - name: place_ids
     type: 'list<element: string>'
     nullable: true
     meaning: All candidate place identifiers; ambiguity is preserved
     units: none
 timezone_cells:
+  description: IANA timezone membership on the H3 grid, derived from timezone-boundary-builder
+    polygons. Membership is independent of land eligibility and zones can overlap.
+  grain: One row per timezone and H3 cell; a cell in overlapping zones has several rows,
+    and cells are stored at resolutions 0 to 8.
   primary_key: []
+  relationships: []
   columns:
   - name: source
     type: string
@@ -1134,7 +1653,23 @@ timezone_cells:
     meaning: JSON source evidence and transformation provenance
     units: none
 trade_locations:
+  description: UN/LOCODE trade and transport locations (ports, airports, rail and road
+    terminals) with codes, function flags and optional coordinates, joined to the cell
+    geography where they have a point.
+  grain: One row per UN/LOCODE entry; observations can repeat.
   primary_key: []
+  relationships:
+  - columns: [country_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The country place of the cell the point falls in; null when the row is
+      unlocated or unassigned
+  - columns: [state_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The first-level subdivision place of that cell; null when none is assigned
+  - columns: [city_id]
+    references: {table: places, columns: [place_id]}
+    meaning: The selected settlement of that cell, a canonical city or a standalone
+      rural settlement; null when none is assigned
   columns:
   - name: source
     type: string
@@ -1277,13 +1812,33 @@ trade_locations:
     nullable: true
     meaning: 'Cell join status: matched, unassigned, ineligible, pending or unlocated'
     units: none
+    values:
+    - value: matched
+      meaning: The point's cell is stored and has a country assignment
+    - value: unassigned
+      meaning: The cell is stored but no country is assigned to it
+    - value: ineligible
+      meaning: The cell is outside the stored land and near-shore coverage
+    - value: pending
+      meaning: No cell data exists for the point's block in this release, so no decision
+        was made
+    - value: unlocated
+      meaning: The row has no coordinates, so there is no cell to join
+    values_from:
+    - pipeline/engines/cells/joins.py
+    - pipeline/engines/cells/reader.py
+    - pipeline/stages/lookups.py
   - name: country_disagrees
     type: bool
     nullable: true
     meaning: Whether source and cell country codes disagree; null if not comparable
     units: none
 zone_tables:
+  description: Rows of the IANA zone tables, linking each timezone identifier to its
+    countries and a representative point.
+  grain: One row per entry of an IANA zone table; a timezone can appear in several tables.
   primary_key: []
+  relationships: []
   columns:
   - name: source
     type: string
@@ -1300,6 +1855,15 @@ zone_tables:
     nullable: true
     meaning: Original timezone table name
     units: none
+    values:
+    - value: zone.tab
+      meaning: One row per timezone and country, as in the classic zone table
+    - value: zone1970.tab
+      meaning: Timezones that agree since 1970 are merged and list all their countries
+    - value: zonenow.tab
+      meaning: Timezones that agree from now on are merged
+    values_from:
+    - pipeline/sources/shared/iana.py
   - name: tzid
     type: string
     nullable: true

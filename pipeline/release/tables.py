@@ -14,6 +14,7 @@ from pipeline.engines.artifact_io import file_record
 
 from .budget import Budget, Sink
 from .cell_groups import CellGroups
+from .dataset_schema import check
 from .selection import Selection
 from .source import Row, Snapshot, TableFile
 
@@ -22,6 +23,7 @@ def schema_description(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text())
     if not isinstance(value, dict) or not value:
         raise ValueError("Dataset schema must declare its tables")
+    check(value)
     return value
 
 
