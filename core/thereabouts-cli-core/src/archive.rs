@@ -328,16 +328,38 @@ mod create {
             self.inner.flush()
         }
     }
-    /// Archive a verified pack directory: sorted paths, then a two-block terminator.
+    /// The envelope needs only the inventory; pack validation is the writer's job.
+    #[derive(serde::Deserialize)]
+    struct Inventory {
+        files: Vec<Member>,
+    }
+    #[derive(serde::Deserialize)]
+    struct Member {
+        path: String,
+        size: u64,
+        sha256: String,
+    }
+    /// Archive a pack directory's inventoried files and manifest.json: sorted paths,
+    /// then a two-block terminator. Every file must match its manifest record.
     pub fn create(pack: &Path, output: &Path) -> Result<Created> {
-        let info = manifest::read(pack)?;
-        let mut members: Vec<(String, Option<(u64, String)>)> = info
+        let saved = manifest::artifact_path(pack, "manifest.json")?;
+        if saved.metadata()?.len() > 16 * 1024 * 1024 {
+            return Err(Error::Integrity("Oversized pack manifest".into()));
+        }
+        let inventory: Inventory = serde_json::from_slice(&std::fs::read(&saved)?)?;
+        let mut members: Vec<(String, Option<(u64, String)>)> = inventory
             .files
-            .iter()
-            .map(|f| (f.path.clone(), Some((f.size, f.sha256.clone()))))
+            .into_iter()
+            .map(|f| (f.path, Some((f.size, f.sha256))))
             .chain(std::iter::once(("manifest.json".to_owned(), None)))
             .collect();
         members.sort();
+        if members
+            .windows(2)
+            .any(|w| w.first().map(|m| &m.0) == w.get(1).map(|m| &m.0))
+        {
+            return Err(Error::Integrity("Duplicate pack manifest path".into()));
+        }
         let file = File::create(output)?;
         let mut sink = Counted {
             inner: BufWriter::new(file.try_clone()?),

@@ -237,3 +237,31 @@ fn creation_refuses_a_pack_that_differs_from_its_manifest() {
         "{error}"
     );
 }
+#[cfg(feature = "create")]
+#[test]
+fn creation_needs_only_the_inventory_and_refuses_duplicates() {
+    let temp = tempfile::tempdir().unwrap();
+    let pack = temp.path().join("pack");
+    std::fs::create_dir(&pack).unwrap();
+    std::fs::write(pack.join("a.bin"), b"alpha").unwrap();
+    let record = serde_json::json!({"path": "a.bin", "size": 5,
+        "sha256": format!("{:x}", Sha256::digest(b"alpha"))});
+    // Any manifest with a file inventory: transport does not interpret the pack.
+    let manifest = serde_json::json!({"format_minor": 2, "files": [record]});
+    std::fs::write(pack.join("manifest.json"), manifest.to_string()).unwrap();
+    let created = create(&pack, &temp.path().join("one.tar.zst")).unwrap();
+    let summary = inspect(std::fs::File::open(temp.path().join("one.tar.zst")).unwrap()).unwrap();
+    assert_eq!(summary.unpacked_size, created.unpacked_size);
+    assert_eq!(
+        summary
+            .entries
+            .iter()
+            .map(|e| e.path.as_str())
+            .collect::<Vec<_>>(),
+        ["a.bin", "manifest.json"]
+    );
+    let manifest = serde_json::json!({"files": [record, record]});
+    std::fs::write(pack.join("manifest.json"), manifest.to_string()).unwrap();
+    let error = create(&pack, &temp.path().join("two.tar.zst")).unwrap_err();
+    assert!(error.to_string().contains("Duplicate"), "{error}");
+}

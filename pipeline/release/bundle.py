@@ -7,7 +7,7 @@ Rust core and read here through ``thereabouts._core``; clients enforce the same 
 import importlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import atomic_output, sha256_file
@@ -25,6 +25,16 @@ def transport() -> Any:
         raise ValueError(
             "Client archives require the merged Rust client (thereabouts._core)"
         ) from error
+
+
+def _codec(action: Any, *args: str) -> Row:
+    """Archive refusals from the Rust codec are release validation failures."""
+    from thereabouts.errors import GeocoderError
+
+    try:
+        return cast(Row, action(*args))
+    except GeocoderError as error:
+        raise ValueError(f"Release archive refused: {error}") from error
 
 
 def members(pack: Path) -> list[Row]:
@@ -64,7 +74,7 @@ def archive(pack: Path, guard: ResourceGuard) -> Path:
     guard.admit(estimate)
     try:
         with atomic_output(target) as temporary:
-            core.archive_pack(str(pack), str(temporary))
+            _codec(core.archive_pack, str(pack), str(temporary))
             verify_archive(temporary, rows)
     finally:
         guard.release(
@@ -78,7 +88,7 @@ def verify_archive(path: Path, rows: list[Row]) -> int:
     core = transport()
     if path.stat().st_size > core.MAX_ARCHIVE_BYTES:
         raise ValueError("Client archive exceeds the compressed size cap")
-    summary = core.inspect_archive(str(path))
+    summary = _codec(core.inspect_archive, str(path))
     expected = {row["path"]: (row["size"], row["sha256"]) for row in rows}
     found = {row["path"]: (row["size"], row["sha256"]) for row in summary["files"]}
     if found != expected or len(summary["files"]) != len(found):

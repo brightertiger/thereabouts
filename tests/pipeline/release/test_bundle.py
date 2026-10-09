@@ -14,7 +14,7 @@ from pipeline.release import bundle
 from pipeline.release.publish import Upload, publish
 from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.resources import ResourceGuard
-from thereabouts import CorruptPackError, _core
+from thereabouts import _core
 
 PACKS = Path(__file__).parents[2] / "fixtures/packs"
 
@@ -73,7 +73,7 @@ def test_archive_refuses_a_pack_that_differs_from_its_manifest(
     content = bytearray(victim.read_bytes())
     content[-1] ^= 1
     victim.write_bytes(bytes(content))
-    with pytest.raises(CorruptPackError, match="differs from its manifest"):
+    with pytest.raises(ValueError, match="differs from its manifest"):
         bundle.archive(pack, guard(tmp_path))
     assert not (tmp_path / "phone.tar.zst").exists()
 
