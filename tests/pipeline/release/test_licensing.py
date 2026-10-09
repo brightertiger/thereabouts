@@ -1,8 +1,15 @@
 """Every pinned licence remains visible in the shipped notices."""
 
+from dataclasses import replace
+
+import pytest
+
 from pipeline.config import load
+from pipeline.pins.lock import read_lock
+from pipeline.release import metadata
 from pipeline.release.licensing import rows
 from pipeline.release.metadata import licence_text, licences
+from pipeline.runtime.fingerprints import REPOSITORY
 
 
 def test_per_file_licences_and_attributions_are_not_hidden() -> None:
@@ -64,3 +71,42 @@ def test_plate_licences_are_listed_and_cc_by_sa_awaits_the_owner() -> None:
     assert "plates" in text.split("OWNER DECISION", 1)[1]
     plain = licence_text(licences(load(), {"codes"}), {"CC-BY-4.0"})
     assert "OWNER DECISION" not in plain
+
+
+def test_evaluation_files_are_pinned_but_never_listed_as_shipped() -> None:
+    def pinned(name: str, **metadata: str) -> dict[str, object]:
+        return {"name": name, "metadata": {"license": "CC-BY-SA-4.0"} | metadata}
+
+    sources = {
+        "plate_country": {
+            "id": "per-source",
+            "attribution": "Wikipedia and Wikimedia Commons contributors",
+            "pin": {
+                "files": [
+                    pinned("vehicle-stock.json", attribution="en.wikipedia.org"),
+                    pinned("eval-commons-DE.json", purpose="evaluation"),
+                    pinned(
+                        "eval-image-1.jpg", purpose="evaluation", license="CC-BY-2.0"
+                    ),
+                ]
+            },
+        }
+    }
+    (row,) = rows(sources)
+    assert row["files"] == ["vehicle-stock.json"]
+    text = licence_text(sources, {"CC-BY-SA-4.0"})
+    assert "eval-" not in text and "CC-BY-2.0" not in text
+    assert "plate_country" in text.split("OWNER DECISION", 1)[1]
+
+
+def test_shipped_source_records_leave_out_evaluation_files(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    lock = read_lock(REPOSITORY / "pins.lock")
+    plates = lock["plates"]
+    extra = replace(plates.files[0], name="eval-image-1.jpg")
+    extra.metadata = {**extra.metadata, "purpose": "evaluation"}
+    lock["plates"] = replace(plates, files=[*plates.files, extra])
+    monkeypatch.setattr(metadata, "read_lock", lambda _: lock)
+    names = [f["name"] for f in licences(load(), {"plates"})["plates"]["pin"]["files"]]
+    assert "eval-image-1.jpg" not in names and len(names) == len(plates.files)
