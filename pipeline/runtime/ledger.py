@@ -4,7 +4,7 @@ import json
 import sqlite3
 import threading
 from collections.abc import Iterator, Sequence
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -21,11 +21,32 @@ UNITS_SQL = (
 )
 
 
+def hot_journal(path: Path) -> bool:
+    journal = Path(str(path) + "-journal")
+    return journal.exists() and journal.stat().st_size > 0
+
+
+def recover(path: Path) -> None:
+    """Roll back a crashed writer's journal; call while holding the writer lock."""
+    if hot_journal(path):
+        with closing(sqlite3.connect(path)) as db:
+            db.execute("SELECT count(*) FROM sqlite_master").fetchone()
+
+
 def read_connection(path: Path) -> sqlite3.Connection:
-    """Require a checkpointed ledger, rather than ignoring a live WAL."""
+    """Require a checkpointed ledger, rather than ignoring a live WAL or journal.
+
+    Immutable reads take no lock, so a journal left by a writer that is
+    committing, or that crashed while committing, would expose torn pages.
+    """
     wal = Path(str(path) + "-wal")
     if wal.exists() and wal.stat().st_size:
         raise ValueError("Ledger has an active WAL; stop/checkpoint its writer first")
+    if hot_journal(path):
+        raise ValueError(
+            "Ledger has a hot rollback journal: a writer is committing or crashed "
+            "while committing; a writer command such as `run` or `gc` rolls it back"
+        )
     return sqlite3.connect(
         path.absolute().as_uri() + "?mode=ro&immutable=1",
         uri=True,

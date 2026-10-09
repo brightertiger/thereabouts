@@ -28,6 +28,7 @@ class Options:
     only: str | None
     units: list[str]
     details: bool
+    yes: bool = False
 
 
 def parser() -> argparse.ArgumentParser:
@@ -49,6 +50,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--report", type=Path)
     result.add_argument(
         "--details", action="store_true", help="print noncurrent unit explanations"
+    )
+    result.add_argument(
+        "--yes", action="store_true", help="confirm deleting completion records"
     )
     return result
 
@@ -85,6 +89,13 @@ def parse(argv: Sequence[str] | None) -> Options:
         raise ValueError("invalidate requires one registered stage")
     if args.units and args.command != "invalidate":
         raise ValueError("--units is an invalidate option")
+    if args.yes and args.command != "invalidate":
+        raise ValueError("--yes is an invalidate option")
+    if args.command == "invalidate" and not args.yes:
+        raise ValueError(
+            "invalidate deletes completion records and forces rebuilds; "
+            "pass --yes to confirm"
+        )
     if args.details and args.command != "plan":
         raise ValueError("--details is a plan option")
     if args.report and args.command not in {"plan", "migrate", "status"}:
@@ -109,4 +120,5 @@ def parse(argv: Sequence[str] | None) -> Options:
         args.only,
         args.units or [],
         args.details,
+        args.yes,
     )
