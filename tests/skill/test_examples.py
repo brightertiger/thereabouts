@@ -9,8 +9,8 @@ from typing import Any
 import pytest
 from mcp import Client
 
-from pipeline.release import dictionary
 from pipeline.runtime.fingerprints import REPOSITORY
+from pipeline.tools import dictionary
 from tests.skill import examples
 from tests.skill.dataset import build
 from thereabouts import Geocoder

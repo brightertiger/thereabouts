@@ -3,9 +3,9 @@
 import pytest
 import yaml
 
-from pipeline.release import dictionary_surface as surface
 from pipeline.release.tables import schema_description
 from pipeline.runtime.fingerprints import REPOSITORY
+from pipeline.tools import dictionary_surface as surface
 
 RESULT = REPOSITORY / "core/thereabouts-core/src/result.rs"
 TOOLS = {"reverse", "h3", "geocode", "postal", "airport", "locode"} | {
@@ -110,7 +110,7 @@ def test_families_match_the_supported_set_and_the_schema() -> None:
 
 
 def test_tool_descriptions_name_the_pack_they_need() -> None:
-    from pipeline.release import dictionary
+    from pipeline.tools import dictionary
 
     for tool in dictionary.build()["tools"]:
         if tool["pack"]:

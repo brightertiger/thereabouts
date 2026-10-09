@@ -9,9 +9,9 @@ import pytest
 import yaml
 
 from pipeline.cli import main as pipeline_main
-from pipeline.release import dictionary
-from pipeline.release.dictionary_markdown import render_tables, render_tools
 from pipeline.runtime.fingerprints import REPOSITORY
+from pipeline.tools import dictionary
+from pipeline.tools.dictionary_markdown import render_tables, render_tools
 
 INPUTS = (
     "config/dataset.yaml",
