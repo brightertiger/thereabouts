@@ -5,9 +5,11 @@ use thereabouts_core::format::{
     manifest::Manifest,
     plates::{Code, Policy, Prior, Rule, Tables},
 };
-// Plate evidence is small compared with spatial/IP data. Admission caps resident
-// typed rows at 64 MiB, leaving space for JSON encoding well within the 2 GiB writer limit.
-const PLATE_EVIDENCE_BYTES: usize = 64 * 1024 * 1024;
+// Plate evidence is small compared with spatial/IP data. The 2026-10 world inputs
+// need about 105 MiB of resident typed rows (143,971 code assertions; Wikidata query
+// URLs average 523 bytes). Admission caps them at 256 MiB, half the 512 MiB
+// working-set ceiling, leaving space for JSON encoding within the 2 GiB writer limit.
+const PLATE_EVIDENCE_BYTES: usize = 256 * 1024 * 1024;
 fn list(row: crate::arrow::Row<'_>, field: &str) -> Result<Vec<String>> {
     row.texts(field)
 }
@@ -110,6 +112,8 @@ pub(crate) fn emit(
             Ok(())
         })?;
     }
+    // An empty table supplies no vehicle prior, exactly like an omitted one.
+    tables.prior_available &= !tables.priors.is_empty();
     crate::plate_columns::emit(db, stage, manifest, &tables, &rule_evidence, &code_evidence)?;
     crate::compact_metadata::plate(metadata, &tables);
     Ok(())
