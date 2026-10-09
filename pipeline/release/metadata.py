@@ -62,6 +62,7 @@ def licence_text(sources: Row, row_licences: set[str]) -> str:
         "",
         licensing.table(sources, include_files=True),
     ]
+    lines += owner_decisions(sources, row_licences)
     lines += [
         "",
         "Licence expressions observed in exported rows: "
@@ -75,6 +76,33 @@ def licence_text(sources: Row, row_licences: set[str]) -> str:
         "contributing to the exported data.",
     ]
     return "\n".join(lines) + "\n"
+
+
+def owner_decisions(sources: Row, row_licences: set[str]) -> list[str]:
+    """Share-alike content in an ODbL database is the owner's call, not ours."""
+    shared = sorted(
+        {
+            row["source"]
+            for row in licensing.rows(sources)
+            if "CC-BY-SA" in row["license"]
+        }
+    )
+    licences = sorted(
+        {row["license"] for row in licensing.rows(sources)} | row_licences
+    )
+    share_alike = [value for value in licences if "CC-BY-SA" in value]
+    if not share_alike:
+        return []
+    return [
+        "",
+        "**OWNER DECISION required before publish.** Content under "
+        + ", ".join(f"`{value}`" for value in share_alike)
+        + " (Wikipedia and Wikimedia pages) is included, from: "
+        + (", ".join(shared) or "exported rows")
+        + ". Whether share-alike content may be part of this ODbL database, and "
+        "under which terms, has not been decided. Do not publish this release "
+        "until the owner decides.",
+    ]
 
 
 def card(config: Config, stats: Row, content: Row) -> str:
