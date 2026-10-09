@@ -15,7 +15,7 @@ from pipeline.runtime.runner import exclusive
 from pipeline.stages.dataset import DatasetStage
 
 from . import pins as release_pins
-from . import prepared, registry
+from . import prepared, proof, registry
 from .assemble import assemble
 from .publish import inventory, publish
 from .source import external
@@ -102,6 +102,7 @@ def main(argv: Sequence[str]) -> int:
         destination = config.storage.get("s3_release")
         if not destination:
             raise ValueError("Configure storage.s3_release before upload")
+        proof.verify(root, config, args.version)
         packs = {
             family: located(root, config.paths.packs) / args.version / family
             for family in config.release.packs.families

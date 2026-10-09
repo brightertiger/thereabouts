@@ -15,7 +15,7 @@ The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.j
 
 ## Cell keys and result semantics
 
-Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-{{group_resolution}} parent selects the coalesced file. The directory `group=<r{{group_resolution}} hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this export has no result, including outside the subset or land coverage.
+Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-{{group_resolution}} parent selects the coalesced file. The directory `group=<r{{group_resolution}} hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this {{scope}} has no result there, including outside its land coverage.
 
 `h3` is lowercase hexadecimal text without `0x`; `h3_uint64` is the same unsigned 64-bit H3 index, with resolution in bits 52–55 and base-cell/child digits in the standard H3 representation. These are global H3 indexes, not a client pack's local integer offsets. `h3_resolution` says how many levels that stored row represents. Resolution 8 is the reference precision; coarser rows encode identical assignments for their descendant centres.
 
@@ -25,7 +25,7 @@ Cell `country_id`, `state_id` and `city_id` link to `places.place_id`. The `cano
 
 IDs carry an entity namespace and its source identity: `country:MY` uses the country code, `state:overture:<uuid>` identifies a subdivision derived from Overture, and `city:geonames:<decimal id>` identifies a GeoNames-derived settlement. Other source namespaces and policy-defined IDs also occur; treat the complete string as opaque. IDs are deterministic for unchanged source identities and policy, but are **not guaranteed stable across monthly versions**. Source merges, removals, role changes and reviewed canonicalization can retire or redirect IDs. Store the release version with an ID, and compare `places` and `place_to_city` across versions before joining historical records; a matching name is not an identity guarantee.
 
-Method columns explain the evidence or fallback used. `city_method = 'rural_nearest_distant'` is the distant-nearest flag: the policy's distant threshold is {{distant_m}} metres, and its nearest-city cutoff is {{nearest_m}} metres. The full method set is `city_polygon`, `policy_polygon`, `urban_allocation`, `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null. Town radius is disabled in this snapshot; consult the exact policy in `manifest.json`. Null city means no qualifying assignment. An identifier lookup with `link_status = 'ambiguous'` preserves candidates in `place_ids`; `place_id` is populated only for a unique match. Spatial observations keep `cell_status` and nullable `country_disagrees`, so source disagreement is visible rather than silently corrected. A subset can omit a referenced catalogue entity outside its declared countries; do not interpret that as an unmatched source observation.
+Method columns explain the evidence or fallback used. `city_method = 'rural_nearest_distant'` is the distant-nearest flag: the policy's distant threshold is {{distant_m}} metres, and its nearest-city cutoff is {{nearest_m}} metres. The full method set is `city_polygon`, `policy_polygon`, `urban_allocation`, `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null. Town radius is disabled in this snapshot; consult the exact policy in `manifest.json`. Null city means no qualifying assignment. An identifier lookup with `link_status = 'ambiguous'` preserves candidates in `place_ids`; `place_id` is populated only for a unique match. Spatial observations keep `cell_status` and nullable `country_disagrees`, so source disagreement is visible rather than silently corrected. Every place reference resolves to a `places` row: assembly refuses a dangling reference, as the client pack writer does.
 
 Timezone membership is independent of eligible land. `timezone_cells` can store resolutions 0–8 and overlapping source memberships; query all ancestors down to resolution 0 for that table. In a spatial subset, a timezone row coarser than resolution 3 is retained whole when it overlaps a selected block, so its represented area can extend outside the subset.
 
@@ -39,7 +39,7 @@ Arrow types and physical nullability below are checked during assembly. “None�
 
 ## Worked coordinate reads
 
-Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use {{latitude}}, {{longitude}}, in the published subset, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors.
+Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use {{latitude}}, {{longitude}}, inside this {{scope}}, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors.
 
 ### DuckDB SQL over local Parquet
 
@@ -74,7 +74,7 @@ print(result)
 connection.close()
 ```
 
-For S3, use `s3://<owner-bucket>/dataset/{{version}}/cells/**/*.parquet` and `s3://<owner-bucket>/dataset/{{version}}/places/**/*.parquet` for the first and third SQL parameters. DuckDB needs its `httpfs` extension and the bucket's region/credentials (or public anonymous access). That remote variant is provided for the future public release; only the local examples were exercised for this subset. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
+{{remote}} The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
 
 ### PyArrow
 
@@ -127,7 +127,7 @@ print(frame.iloc[0][["country_id", "state_id", "city_id", "city_method"]].to_dic
 
 Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positive patch number. A published version is immutable. `CHANGES.md` compares each table's logical digest and row count with the previous version. `content.json` hashes logical values and duplicate counts independently of partitioning, row order, Parquet metadata and compression. A packaging change can change file SHA256 without changing the logical digest.
 
-Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `<version>/_SUCCESS` receipt, written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
+Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `dataset/{{version}}/_SUCCESS` receipt (the same receipt is written to `packs/{{version}}/_SUCCESS`), written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
 The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
 
@@ -163,5 +163,3 @@ Contact: {{contact}}
 Citation: {{citation}}
 
 Public documentation: {{documentation}}
-
-Owner-decision placeholders are intentionally visible and must be replaced before a public release.

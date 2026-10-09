@@ -243,13 +243,20 @@ licences, card and changelog. No stage should silently recreate a published vers
 
 ## Validate staging, then publish the same files
 
-`run --through publish` above targets staging. Require the version's `_SUCCESS`
-receipt and recheck its listed object hashes; inspect per-table row counts,
-`CHANGES.md`, coverage and the generated README. Run the three README examples on
-local files and on the owner's S3 setup. Validate each requested client pack with
-the merged clients, including an ambiguous identifier, a rural result and a
-distant-nearest result. World/cloud/client-pack checks are not substituted by the
-small local subset proof.
+`run --through publish` above targets staging. While `DATA_LICENSES.md` still
+carries an `OWNER DECISION` paragraph (CC BY-SA plate content), staging needs
+`release.publish.private=true`; a public destination refuses it. Require the
+`dataset/<version>/_SUCCESS` and `packs/<version>/_SUCCESS` receipts and recheck
+their listed object hashes; read `packs/<version>/acceptance/*.json` (every pack
+was opened at `ulimit -n 256` and checked against seeded dataset samples before
+it was archived); inspect per-table row counts, `CHANGES.md`, coverage and the
+generated README. Run the end-to-end test over the staged copy:
+
+```sh
+scripts/vm/e2e.sh /path/to/staging   # serves packs/ on loopback; report in its run dir
+```
+
+Run the three README examples on local files and on the owner's S3 setup.
 
 Use a dry run first for any destination:
 
@@ -274,7 +281,10 @@ files** to the public destination (do not rebuild between staging and publicatio
 
 Existing correct objects are skipped. A checksum conflict stops publication;
 resolve the discrepancy explicitly, without replacing a released version. The
-success receipt is last and identifies exactly which dataset/pack files completed.
+success receipts are last and identify exactly which dataset/pack files
+completed. `release upload` refuses to start unless the workspace ledger records
+the dataset, every archive, acceptance report and the index with exactly these
+bytes.
 This task's local demonstration used `release.packs.families=[]` because no real
 writer was available; do not carry that override into a full release accidentally.
 

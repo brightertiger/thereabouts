@@ -8,6 +8,9 @@ citation: 'Rao, U. (2026). Thereabouts offline geocoding dataset. https://github
 documentation: 'https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md'
 update_frequency: Monthly
 region: "OWNER DECISION: release bucket region"
+# AWS Open Data Registry: an organisation, not an individual.
+managed_by: '[Thereabouts project](https://github.com/brightertiger/thereabouts)'
+adx_categories: [Geospatial Data]
 license: ODbL-1.0
 previous_version: ''
 countries: []
@@ -28,7 +31,35 @@ dataset:
   cell_group_resolution: 1
 packs:
   families: [core, postal, airports, locode, phone, ip, plates]
+# Every pack is opened by the real reader in a child process at this open-file
+# limit and checked against seeded samples of the dataset before it is archived.
+acceptance:
+  seed: 20261010
+  open_files: 256
+  land_cells: 10000
+  ocean_points: 1000
+  names: 1000
+  forward_rows: 500
+  failures_kept: 20
+  timeout_seconds: 7200
+  # Share of applicable samples that must agree, per check.
+  minimum:
+    reverse: 1.0
+    ocean: 1.0
+    names: 1.0
+    alternate_names: 1.0
+    postal: 1.0
+    airports_iata: 1.0
+    airports_icao: 1.0
+    locode: 1.0
+    ip_v4: 1.0
+    ip_v6: 1.0
+    phone: 1.0
+    plates: 1.0
+    vectors: 1.0
 publish:
   read_bytes: 1048576
   # S3's minimum multipart part size, also exercised by the local fake.
   multipart_bytes: 5242880
+  # true only for a private staging copy, which may carry OWNER DECISION text.
+  private: false

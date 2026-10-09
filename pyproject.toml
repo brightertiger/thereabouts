@@ -25,6 +25,8 @@ pipeline = [
     "psutil>=7,<8",
     { include-group = "acquire" },
     "scipy>=1.14,<1.17",
+    # The s3:// publication driver; tests publish to memory:// and file:// only.
+    "s3fs>=2026.9,<2027",
 ]
 dev = [
     { include-group = "pipeline" },
@@ -58,8 +60,9 @@ features = ["pyo3/extension-module", "writer"]
 include = ["clients/python/thereabouts/py.typed", "clients/python/thereabouts/_core.pyi"]
 
 [tool.pytest.ini_options]
-addopts = "--basetemp=.cache/pytest"
+addopts = "--basetemp=.cache/pytest -m 'not world'"
 testpaths = ["tests"]
+# World tests need a built world release; run them with `-m world`.
 markers = ["world: requires an explicitly built world pack"]
 
 [tool.ruff]
