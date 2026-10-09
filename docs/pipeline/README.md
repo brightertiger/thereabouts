@@ -411,10 +411,23 @@ and normalize execute frozen source pins, followed by the ported geographic
 engines and release stages. Use execution only on a separate writable workspace,
 never the protected existing workspace used for this redesign.
 
+With `resources.workers` above one, units run in forked worker processes
+(`resources.executor: process`, the default) or in threads of the runner
+(`thread`), where Python-heavy units share one interpreter lock. One worker
+always runs in the runner itself. Worker processes are started per stage and
+only run units: the runner keeps the only ledger connection, every admission
+decision and the run log. A child reads ledger records and asks for admission
+over its pipe, and its log lines reach the run log. The runner records each
+finished unit and computes its receipt digests.
+
 Before each unit starts, the resource guard requires at least 5,000,000,000 free
-disk bytes, the configured workspace allowance and process RSS headroom;
-`resources.rss_limit` is per worker, so the process may hold
-`rss_limit * workers`. It pauses and logs its reason on resource pressure, and
+disk bytes, the configured workspace allowance and memory headroom;
+`resources.rss_limit` is per worker, so the runner and its worker processes may
+hold `rss_limit * workers` together. Memory is summed over the process tree in
+the runner: proportional set size on Linux, so pages a forked worker still
+shares count once, and resident size elsewhere. It is sampled at most once per
+`resources.memory_scan_seconds` (5 seconds by default), because reading it walks
+every page table. Admission pauses and logs its reason on resource pressure, and
 after `resources.admission_timeout_seconds` (30 minutes by default) it fails,
 naming the exhausted limits. Concurrent
 workers share declared disk reservations. Workspace size is measured at most
@@ -425,9 +438,9 @@ refresh the measured total at their unit boundary, including removed scratch
 files. Free disk and RSS are checked before every admission.
 These admission checks do not impose limits on arbitrary stage code.
 The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
-and a 2 GB RSS allowance. The VM profile (e2-standard-8, 32 GB) runs six workers
-with 3 GB DuckDB memory and 4.5 GB RSS each, a 250 GB workspace allowance and the
-5 GB floor. Concurrent units never share an output directory, a prepared GEOS
+and a 2 GB RSS allowance. The VM profile (e2-standard-8, 32 GB) runs seven worker
+processes with 2 GB DuckDB memory and 3.8 GB of memory each, a 250 GB workspace
+allowance and the 5 GB floor. Concurrent units never share an output directory, a prepared GEOS
 geometry or recipe parameters they may edit. Engine-specific limits live in
 `config/engines.yaml`; the completed pilot measurements are in the status report.
 
@@ -437,7 +450,10 @@ watched; when one changes during the run, the run stops scheduling at the next
 unit boundary, records nothing more, and names the file. Restart to rebuild with
 the edited files. A first Ctrl-C, or a failing unit, also stops scheduling; the
 running units finish and those that succeed are recorded. A second Ctrl-C stops
-waiting.
+waiting and terminates worker processes. Workers ignore Ctrl-C themselves and exit
+with the runner. A unit that fails in a worker reports the worker's traceback; a
+worker that dies, for example killed for memory, is reported with its signal,
+and its unit is never recorded.
 
 Run logs and summaries go in `work/runs/<UTC timestamp>/`. Atomic outputs use a
 sibling `.part` file, fsync and replacement; failed publication does not complete

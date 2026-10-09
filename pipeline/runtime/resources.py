@@ -12,8 +12,43 @@ import psutil
 from pipeline.config.schema import Resources
 
 
-def current_rss() -> int:
-    return psutil.Process().memory_info().rss
+def process_memory(pid: int) -> int:
+    """PSS where the kernel reports it, so pages a forked worker still shares
+    with its parent count once across the tree; resident size elsewhere."""
+    try:
+        with open(f"/proc/{pid}/smaps_rollup", "rb") as stream:
+            for line in stream:
+                if line.startswith(b"Pss:"):
+                    return int(line.split()[1]) * 1024
+    except OSError:
+        pass
+    try:
+        return int(psutil.Process(pid).memory_info().rss)
+    except psutil.Error:
+        return 0
+
+
+def tree_memory() -> int:
+    """This process and every descendant, such as unit worker processes."""
+    process = psutil.Process()
+    pids = [process.pid, *(child.pid for child in process.children(recursive=True))]
+    return sum(process_memory(pid) for pid in pids)
+
+
+class Sampled:
+    """Reuse one measurement for an interval: PSS walks every page table."""
+
+    def __init__(
+        self, measure: Callable[[], int], seconds: float, clock: Callable[[], float]
+    ) -> None:
+        self.measure, self.seconds, self.clock = measure, seconds, clock
+        self.value: int | None = None
+        self.at = 0.0
+
+    def __call__(self) -> int:
+        if self.value is None or self.clock() - self.at >= self.seconds:
+            self.value, self.at = self.measure(), self.clock()
+        return self.value
 
 
 def disk_free(root: Path) -> int:
@@ -50,13 +85,16 @@ class ResourceGuard:
         *,
         free: Callable[[Path], int] = disk_free,
         used: Callable[[Path], int] = workspace_bytes,
-        rss: Callable[[], int] = current_rss,
+        rss: Callable[[], int] | None = None,
         sleep: Callable[[float], None] = time.sleep,
         log: Callable[[str], None] = print,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.root, self.limits = root, limits
-        self.free, self.used, self.rss = free, used, rss
+        self.free, self.used = free, used
+        # Memory is summed over the process tree in the process that owns the
+        # guard; worker processes ask it for admission.
+        self.rss = rss or Sampled(tree_memory, limits.memory_scan_seconds, clock)
         self.sleep, self.log = sleep, log
         self.clock = clock
         self.lock = threading.Lock()
@@ -95,41 +133,45 @@ class ResourceGuard:
             self.measured = None
         self.usage()
 
-    def admit(self, required_bytes: int = 0) -> None:
+    def attempt(self, required_bytes: int) -> str | None:
+        """Reserve and return None, or return the limits that leave no headroom."""
         if required_bytes < 0:
             raise ValueError("A unit's disk reservation cannot be negative")
         limits = self.limits
-        started = self.clock()
-        while True:
-            self.usage()
-            with self.lock:
-                free, used, rss = self.free(self.root), self.measured or 0, self.rss()
-                needed = self.reserved + required_bytes
-                exhausted = [
-                    name
-                    for name, fits in (
-                        ("disk_floor", free - needed >= limits.disk_floor),
-                        ("max_workspace", used + needed <= limits.max_workspace),
-                        ("rss_limit", rss <= limits.rss_limit * limits.workers),
-                    )
-                    if not fits
-                ]
-                if not exhausted:
-                    self.reserved += required_bytes
-                    return
-            waited = self.clock() - started
-            if waited >= limits.admission_timeout_seconds:
-                raise ValueError(
-                    f"Admission waited {waited:.0f}s on "
-                    f"{', '.join('resources.' + name for name in exhausted)} "
-                    f"(free={free}, workspace={used}, rss={rss}, reserved={needed}); "
-                    "remove superseded outputs with `python -m pipeline gc` or "
-                    "raise the limit"
+        self.usage()
+        with self.lock:
+            free, used, rss = self.free(self.root), self.measured or 0, self.rss()
+            needed = self.reserved + required_bytes
+            exhausted = [
+                name
+                for name, fits in (
+                    ("disk_floor", free - needed >= limits.disk_floor),
+                    ("max_workspace", used + needed <= limits.max_workspace),
+                    ("rss_limit", rss <= limits.rss_limit * limits.workers),
                 )
-            self.log(
-                f"paused: free={free}, workspace={used}, rss={rss}, "
-                f"reserved={needed}; waiting for resource headroom"
-            )
+                if not fits
+            ]
+            if not exhausted:
+                self.reserved += required_bytes
+                return None
+        return (
+            f"{', '.join('resources.' + name for name in exhausted)} "
+            f"(free={free}, workspace={used}, rss={rss}, reserved={needed})"
+        )
+
+    def refusal(self, waited: float, reason: str) -> str:
+        return (
+            f"Admission waited {waited:.0f}s on {reason}; remove superseded "
+            "outputs with `python -m pipeline gc` or raise the limit"
+        )
+
+    def admit(self, required_bytes: int = 0) -> None:
+        started = self.clock()
+        while (reason := self.attempt(required_bytes)) is not None:
+            waited = self.clock() - started
+            if waited >= self.limits.admission_timeout_seconds:
+                raise ValueError(self.refusal(waited, reason))
+            self.log(f"paused on {reason}; waiting for resource headroom")
             self.sleep(self.limits.poll_seconds)
 
     def release(self, reserved_bytes: int, *, written_bytes: int | None = None) -> None:

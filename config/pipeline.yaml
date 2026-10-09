@@ -16,6 +16,11 @@ resources:
   workspace_scan_seconds: 60
   # Admission fails with a clear error after this wait instead of pausing forever.
   admission_timeout_seconds: 1800
+  # Process-tree memory (PSS on Linux) is sampled at most this often.
+  memory_scan_seconds: 5
+  # With workers > 1, units run in forked worker processes; `thread` keeps them
+  # in this process, where Python-heavy units share one interpreter lock.
+  executor: process
 h3:
   block_resolution: 3
   cell_resolution: 8

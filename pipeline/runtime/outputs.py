@@ -66,17 +66,24 @@ def selected(
     ]
 
 
-def describe(
-    root: Path, paths: Sequence[Path], hashes: Container[str] = ()
-) -> tuple[tuple[Output, ...], dict[str, str]]:
-    outputs, receipts = [], {}
+def describe(root: Path, paths: Sequence[Path]) -> tuple[Output, ...]:
+    outputs = []
     for path in paths:
         name = relative(root, path)
         if path.name.endswith(".part") or not path.is_file():
             raise ValueError(f"Output has not been published: {name}")
         outputs.append(Output(name, path.stat().st_size, sha256_file(path)))
-        if path.suffix == ".json" and (
-            value := receipt_digest(path.read_bytes(), hashes)
+    return tuple(outputs)
+
+
+def receipt_digests(
+    root: Path, outputs: Iterable[Output], hashes: Container[str]
+) -> dict[str, str]:
+    """Location-independent digests of JSON outputs whose paths moved."""
+    receipts = {}
+    for output in outputs:
+        if output.path.endswith(".json") and (
+            value := receipt_digest((root / output.path).read_bytes(), hashes)
         ):
-            receipts[name] = value
-    return tuple(outputs), receipts
+            receipts[output.path] = value
+    return receipts
