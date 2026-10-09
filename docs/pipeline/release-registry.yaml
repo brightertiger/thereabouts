@@ -1,15 +1,17 @@
 Name: Thereabouts offline geocoding dataset
 Description: Canonical places, H3 reverse lookup and source code observations.
-Documentation: 'https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md'
-Contact: 'Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues'
-ManagedBy: 'Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues'
+Documentation: https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md
+Contact: Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues
+ManagedBy: '[Thereabouts project](https://github.com/brightertiger/thereabouts)'
 UpdateFrequency: Monthly
+ADXCategories:
+- Geospatial Data
 Tags:
 - geospatial
 - mapping
 - parquet
 License: https://opendatacommons.org/licenses/odbl/1-0/
-Citation: 'Rao, U. (2026). Thereabouts offline geocoding dataset. https://github.com/brightertiger/thereabouts'
+Citation: Rao, U. (2026). Thereabouts offline geocoding dataset. https://github.com/brightertiger/thereabouts
 Resources:
 - Description: Versioned Parquet datasets and client packs
   ARN: arn:aws:s3:::OWNER-DECISION-BUCKET
@@ -18,5 +20,5 @@ Resources:
 DataAtWork:
   Tutorials:
   - Title: Read Thereabouts Parquet with DuckDB, PyArrow and pandas
-    URL: 'https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md'
-    AuthorName: 'Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues'
+    URL: https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md
+    AuthorName: Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabouts/issues
