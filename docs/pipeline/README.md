@@ -244,8 +244,11 @@ Each geographic stage supplies its own parameter callback. Shared runtime code
 only applies the returned policy, reservation and discovery-refresh decision.
 `config/engines.yaml` names the land, urban-centre, registration and plate-country
 source roles; source `kind` selects place/area inventory and lookup behavior.
-Changing a source's name does not change those decisions. Unknown role references
-and incompatible source kinds fail configuration loading before workspace writes.
+Changing a source's name does not change those decisions. `engines.name_sources`
+names the sources, with their partition kinds, that the `lookups/names/world`
+unit reads alongside every `normalize_cells/places/<cc>`; it is empty, and the
+unit absent, until a names table is built. Unknown role references and
+incompatible source kinds fail configuration loading before workspace writes.
 
 Reconciliation extracts and links each country, builds canonical entities and
 land, then verifies country quality. Cells index resolution-3 blocks, derive
@@ -288,8 +291,10 @@ alone does not rebuild unaffected countries. Country units hash their resolved
 common and country policy; blocks hash the policies of their contributing countries.
 
 The optional `plate_country` stage derives syntax, priors, coverage and an
-inference bundle from normalized pinned evidence. It has zero units while its
-source is disabled. Its resolver preserves ambiguity and verifies bundle/table
+inference bundle from normalized pinned evidence. Its `plate_country/world` unit,
+and the lookups manifest's dependency on it, exist while the registration source
+is enabled. It reads the registration partitions, and the plate-country evidence
+unit only when that source is enabled and has an available pin. Its resolver preserves ambiguity and verifies bundle/table
 checksums before use. The retained workspace has no reviewed plate-country raw
 inventory, so only synthetic inputs exercise this engine here.
 
