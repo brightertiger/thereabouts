@@ -12,7 +12,8 @@ import pytest
 from pipeline.engines.artifact_io import file_record
 from pipeline.engines.artifacts import read_json
 from pipeline.engines.plate_country import build, documents, evidence, formats, priors
-from pipeline.runtime.jsonio import sha256_file, write_json
+from pipeline.runtime.jsonio import sha256_file
+from pipeline.sources.plates.documents import SCHEMA as DOCUMENTS
 from pipeline.sources.shared.plates_schemas import PLATE_SCHEMAS
 from tests.pipeline.sources.test_plate_country_sources import wiki
 
@@ -93,13 +94,24 @@ def workspace(root: Path) -> Row:
             },
         ),
     ]
-    inventory = root / "raw/plates/inventory.json"
-    write_json(
-        inventory,
-        {
-            "pinned_at": "2026-10-01T00:00:00+00:00",
-            "files": {item["name"]: item for item in files},
-        },
+    documents_part = root / "normalized/plates/plate_documents/h/documents.parquet"
+    documents_part.parent.mkdir(parents=True)
+    pq.write_table(
+        pa.Table.from_pylist(
+            [
+                {
+                    "name": item["name"],
+                    "path": item["path"],
+                    "sha256": item["sha256"],
+                    "url": item["url"],
+                    "retrieved_at": "2026-10-01T00:00:00+00:00",
+                    "metadata": json.dumps(item["metadata"]),
+                }
+                for item in files
+            ],
+            schema=DOCUMENTS,
+        ),
+        documents_part,
     )
     part = root / "normalized/plates/plate_codes/h/part.parquet"
     part.parent.mkdir(parents=True)
@@ -108,8 +120,14 @@ def workspace(root: Path) -> Row:
     )
     return {
         "source": "plates",
-        "inventory": file_record(root, inventory),
-        "partitions": [{**file_record(root, part), "kind": "plate_codes", "rows": 1}],
+        "partitions": [
+            {**file_record(root, part), "kind": "plate_codes", "rows": 1},
+            {
+                **file_record(root, documents_part),
+                "kind": "plate_documents",
+                "rows": len(files),
+            },
+        ],
     }
 
 
@@ -206,8 +224,8 @@ def test_writer_tables_from_pinned_evidence_only(tmp_path: Path, rules: Row) -> 
 def test_changed_evidence_bytes_fail_closed(tmp_path: Path, rules: Row) -> None:
     root = tmp_path / "ws"
     manifest = workspace(root)
-    inventory = read_json(root / "raw/plates/inventory.json")
-    page = root / inventory["files"]["wiki-XY.json"]["path"]
+    pins = documents.pool(root, manifest, [], "plate_country")
+    page = Path(pins.pins["wiki-XY.json"]["path"])
     page.write_text(page.read_text().replace("AB-123", "AB-124"))
     with pytest.raises(ValueError, match=r"Corrupt plate evidence: wiki-XY\.json"):
         run(root, manifest)
@@ -223,11 +241,13 @@ def test_conflicting_pins_fail_closed(tmp_path: Path, rules: Row) -> None:
         documents.pool(root, manifest, extra, "plate_country")
 
 
-def test_changed_inventory_fails_closed(tmp_path: Path, rules: Row) -> None:
+def test_missing_document_inventory_fails_closed(tmp_path: Path, rules: Row) -> None:
     root = tmp_path / "ws"
     manifest = workspace(root)
-    (root / "raw/plates/inventory.json").write_text("{}")
-    with pytest.raises(ValueError, match="Corrupt plate evidence"):
+    manifest["partitions"] = [
+        p for p in manifest["partitions"] if p["kind"] != "plate_documents"
+    ]
+    with pytest.raises(ValueError, match="Missing plate document inventory"):
         documents.pool(root, manifest, [], "plate_country")
 
 

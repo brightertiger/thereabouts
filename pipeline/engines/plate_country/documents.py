@@ -4,11 +4,13 @@ A rule or prior whose document is not pinned is skipped and counted, never
 guessed. Every document is checked against its pinned digest before use.
 """
 
+import json
 from collections import Counter
 from pathlib import Path
 from typing import Protocol
 
-from pipeline.engines.artifacts import read_json
+import pyarrow.parquet as pq
+
 from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.paths import located
 
@@ -38,24 +40,22 @@ class Pool:
 
 
 def pool(root: Path, base: Row, extra: list[Row], extra_source: str) -> Pool:
-    """Registration documents from the inventory its normalized manifest names;
-    `extra` holds plate-country receipt records of the same files or new ones."""
-    record = base["inventory"]
-    path = located(root, record["path"])
-    if sha256_file(path) != record["sha256"]:
-        raise ValueError(f"Corrupt plate evidence: {record['path']}")
-    inventory = read_json(path)
-    pins = {
-        name: {
-            **item["metadata"],
-            "url": item["url"],
-            "sha256": item["sha256"],
-            "path": str(located(root, item["path"])),
-            "retrieved_at": inventory["pinned_at"],
-            "source": base["source"],
-        }
-        for name, item in inventory["files"].items()
-    }
+    """Registration documents from its `plate_documents` partition; `extra` holds
+    plate-country receipt records of the same files or new ones."""
+    parts = [p for p in base["partitions"] if p["kind"] == "plate_documents"]
+    if not parts:
+        raise ValueError("Missing plate document inventory")
+    pins: dict[str, Row] = {}
+    for part in parts:
+        for item in pq.read_table(located(root, part["path"])).to_pylist():
+            pins[item["name"]] = {
+                **json.loads(item["metadata"]),
+                "url": item["url"],
+                "sha256": item["sha256"],
+                "path": str(located(root, item["path"])),
+                "retrieved_at": item["retrieved_at"],
+                "source": base["source"],
+            }
     for item in extra:
         pin = {
             **item["upstream"],

@@ -22,6 +22,7 @@ PLATES = {"plate_formats", "plate_codes", "plate_policy", "plate_priors"}
 
 def plates_receipt(ctx: Context, normalized: SyntheticStage, ledger: Ledger) -> None:
     """A normalized `plates` source: inventory, pinned documents and one code."""
+    ctx.config.sources["plates"].enabled = True
     manifest = workspace(ctx.root)
     path = ctx.root / "normalized/plates/manifest.json"
     write_json(path, manifest)
@@ -46,19 +47,18 @@ def test_recipes_declare_name_and_plate_reads(tmp_path: Path) -> None:
         (names,) = [
             r for r in discovery.recipes["lookups"] if r.unit_id == "names/world"
         ]
-        reads = {d.unit_id: d.paths for d in names.dependencies if d.paths}
-        # The fixture's Overture source publishes no names partition.
-        assert reads == {
-            "geonames": (
-                "normalized/geonames/names/*.parquet",
-                "normalized/geonames/places/*.parquet",
-            )
+        normalized_reads = {
+            d.unit_id: d.paths for d in names.dependencies if d.stage == "normalize"
+        }
+        assert normalized_reads == {
+            "geonames": ("*.parquet",),
+            "overture": ("*.parquet",),
         }
         assert ("normalize_cells", "places/ZZ") in {d.key for d in names.dependencies}
         (plates,) = discovery.recipes["plate_country"]
         (dependency,) = plates.dependencies
         assert dependency.key == ("normalize", "plates")
-        assert "normalized/plates/manifest.json" in dependency.paths
+        assert dependency.paths == ("*.parquet",)
         (manifest,) = [
             r for r in discovery.recipes["lookups"] if r.unit_id == "manifest/current"
         ]
