@@ -7,13 +7,10 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from pipeline.config.schema import H3
-from pipeline.config.source_options import Text as Options
-from pipeline.config.sources import SourceSettings
-from pipeline.pins.models import SourcePin
 
 from .contract import SourceContext
-from .proposals.resolve import propose as propose_pin
-from .shared.lookup_rows import Reject, Row, point
+from .shared.lookup_rows import Row, point
+from .shared.rows import RowRejected
 from .shared.text import InputRow, publish_rows
 
 POSTAL_FIELDS = [
@@ -34,7 +31,7 @@ POSTAL_FIELDS = [
 
 def postal(raw: list[str], variant: str, *, grid: H3) -> Row:
     if len(raw) != 12:
-        raise Reject(f"Expected 12 postal columns, got {len(raw)}")
+        raise RowRejected(f"Expected 12 postal columns, got {len(raw)}")
     row = dict(zip(POSTAL_FIELDS, raw, strict=True))
     return {
         **row,
@@ -75,14 +72,6 @@ def normalize(ctx: SourceContext) -> list[Path]:
         lambda row: postal(
             row.raw["fields"],
             str(row.pin.metadata.get("key", row.pin.name)),
-            grid=ctx.runtime.config.h3,
+            grid=ctx.grid,
         ),
     )
-
-
-__all__ = ["Options", "normalize", "propose"]
-
-
-def propose(settings: SourceSettings) -> SourcePin:
-    """Resolve upstream only for an explicit pin proposal."""
-    return propose_pin(settings)

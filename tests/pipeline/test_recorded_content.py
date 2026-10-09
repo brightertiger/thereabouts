@@ -87,16 +87,16 @@ def boundary_payloads(root: Path) -> dict[str, tuple[bytes, dict[str, Any]]]:
 
 def test_forced_boundary_normalization_is_byte_identical(tmp_path: Path) -> None:
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path, ledger, "geoboundaries", boundary_payloads(tmp_path)
         )
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
-        run(source.runtime, stages)
+        run(runtime, stages)
         before = ledger.get("normalize", "geoboundaries")
         assert before is not None
         assert any("/audits/" in output.path for output in before.outputs)
         ledger.invalidate("normalize", ["geoboundaries"])
-        assert run(source.runtime, stages) == {"completed": 1, "skipped": 1}
+        assert run(runtime, stages) == {"completed": 1, "skipped": 1}
         after = ledger.get("normalize", "geoboundaries")
         assert after is not None and after.outputs == before.outputs
         manifest = json.loads((source.normalized / "manifest.json").read_bytes())

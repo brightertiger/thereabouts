@@ -37,7 +37,7 @@ def test_geopackage_header_and_source_evidence(tmp_path: Path) -> None:
     from tests.pipeline.sources.fixtures import source_context
 
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        ctx, _ = source_context(
+        _, ctx, _ = source_context(
             tmp_path, ledger, "ghsl", {"archive.zip": (b"fixture", {})}
         )
         (row,) = records(ctx, path)

@@ -1,5 +1,6 @@
 name: timezones
 adapter: pipeline.sources.timezones
+proposer: pipeline.sources.proposals.resolve
 kind: timezones
 enabled: true
 upstream:

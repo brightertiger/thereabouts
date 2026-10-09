@@ -14,9 +14,9 @@ def normalize(ctx: SourceContext) -> list[Path]:
     outputs: list[Path] = []
     auxiliary: list[Path] = []
     for item in ctx.pin.files:
-        ctx.runtime.guard.admit()
+        ctx.guard.admit()
         key = digest(item.name)
-        directory = ctx.work / ctx.unit.inputs_hash / key
+        directory = ctx.work / ctx.inputs_hash / key
         paths = extract(
             ctx,
             ctx.input(item.name),
@@ -49,7 +49,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
             .get("alpha2")
         )
         partitions, report = _convert(ctx, pin, country, ctx.input(item.name), shp)
-        audit = ctx.normalized / "audits" / ctx.unit.inputs_hash / f"{key}.json"
+        audit = ctx.normalized / "audits" / ctx.inputs_hash / f"{key}.json"
         write_json(ctx.ensure(audit), report)
         outputs.extend(partitions)
         auxiliary.append(audit)

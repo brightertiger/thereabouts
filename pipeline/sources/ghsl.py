@@ -1,6 +1,5 @@
 """Frozen GHSL urban centres converted from Mollweide to WGS84 areas."""
 
-import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
 from typing import cast
@@ -9,17 +8,14 @@ import numpy as np
 import shapely
 from numpy.typing import NDArray
 
-from pipeline.config.source_options import UrbanCentres as Options
-from pipeline.config.sources import SourceSettings
-from pipeline.pins.models import SourcePin
-from pipeline.runtime.jsonio import encode
+from pipeline.runtime.sqlite import sqlite_readonly
 
 from .contract import SourceContext
-from .proposals.resolve import propose as propose_pin
 from .shared.archives import extract
 from .shared.geometry import bounds_columns, repair_geometry
 from .shared.lookup_rows import Row
 from .shared.manifest import finish
+from .shared.rows import canonical_json, provenance
 from .shared.writer import PartitionWriter
 
 
@@ -33,7 +29,7 @@ def inverse_mollweide(xy: NDArray[np.float64]) -> NDArray[np.float64]:
 
 
 def records(ctx: SourceContext, path: Path) -> Iterator[Row]:
-    db = sqlite3.connect(f"{path.absolute().as_uri()}?mode=ro&immutable=1", uri=True)
+    db = sqlite_readonly(path)
     try:
         table, column, srs = db.execute(
             "SELECT table_name,column_name,srs_id FROM gpkg_geometry_columns"
@@ -69,15 +65,17 @@ def records(ctx: SourceContext, path: Path) -> Iterator[Row]:
                 **bounds_columns(geometry),
                 "source_release": ctx.pin.release,
                 "license": ctx.settings.licence.id,
-                "provenance": encode(
-                    {
-                        "source_url": ctx.pin.files[0].url,
-                        "license_url": ctx.settings.licence.url,
-                        "attribution": ctx.settings.licence.attribution,
-                        "upstream": row,
-                        "geometry_changes": ["inverse Mollweide", *changes],
-                    }
-                ).decode(),
+                "provenance": canonical_json(
+                    provenance(
+                        ctx.pin.files[0].url,
+                        ctx.settings.licence.url,
+                        ctx.settings.licence.attribution,
+                        {
+                            "upstream": row,
+                            "geometry_changes": ["inverse Mollweide", *changes],
+                        },
+                    )
+                ),
             }
     finally:
         db.close()
@@ -89,7 +87,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     paths = extract(
         ctx,
         ctx.input(ctx.pin.files[0].name),
-        ctx.work / ctx.unit.inputs_hash,
+        ctx.work / ctx.inputs_hash,
         lambda name: name.endswith(".gpkg"),
     )
     if len(paths) != 1:
@@ -101,11 +99,3 @@ def normalize(ctx: SourceContext) -> list[Path]:
     if writer.count != expected:
         raise ValueError(f"GHSL count differs from pinned {expected} centres")
     return finish(ctx, writer.finish(), paths)
-
-
-__all__ = ["Options", "normalize", "propose"]
-
-
-def propose(settings: SourceSettings) -> SourcePin:
-    """Resolve upstream only for an explicit pin proposal."""
-    return propose_pin(settings)

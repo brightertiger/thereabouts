@@ -10,10 +10,11 @@ import pytest
 import yaml
 
 from pipeline.config import load
-from pipeline.config.sources import SourceSettings
+from pipeline.config.sources import SourceSettings, validate_source
+from pipeline.errors import ConfigError
 from pipeline.pins import cli
 from pipeline.pins.lock import read_lock
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 from pipeline.sources.proposals import catalog
 from pipeline.sources.proposals.http import Client
 
@@ -60,8 +61,8 @@ def test_catalog_adapters_hash_publisher_bytes(
                 "files": [{"name": "input", "url": server.url + "/payload"}],
             },
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        pin = adapter.propose(source)
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        pin = proposer.propose(source)
         assert pin.release == "fixture"
         assert (
             pin.files[0].sha256
@@ -98,8 +99,8 @@ def test_dump_date_is_publisher_evidence(
                 "settings": {"release_file": "dump", "date_format": date_format},
             },
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        assert adapter.propose(source).release == expected
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        assert proposer.propose(source).release == expected
 
 
 def test_latest_commit_release_and_complete_tree(
@@ -146,13 +147,13 @@ def test_latest_commit_release_and_complete_tree(
                 ],
             },
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        result = adapter.propose(source)
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        result = proposer.propose(source)
         assert result.release == commit + "+2026d+2026e"
         assert [p.name for p in result.files] == ["keep/data"]
         server.routes[f"/tree/{commit}"] = Reply(b'{"truncated":true,"tree":[]}')
         with pytest.raises(ValueError, match="Incomplete upstream git tree"):
-            adapter.propose(source)
+            proposer.propose(source)
 
 
 def test_proposal_then_explicit_accept_and_unchanged_refresh(
@@ -199,3 +200,21 @@ def test_changed_etag_and_oversized_payload_refuse_proposals(
         with pytest.raises(ValueError, match="before download"):
             Client(source).pin("input", server.url + "/payload", {})
         assert [r[0] for r in server.requests] == ["HEAD"]
+
+
+def test_every_source_names_its_proposer_in_yaml() -> None:
+    for name, source in load().sources.items():
+        assert source.proposer.startswith("pipeline.sources.proposals."), name
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        assert callable(proposer.propose), name
+        if name in {"plates", "plate_country"}:
+            continue  # Their own wrappers remain until their package drops them.
+        adapter = importlib.import_module(source.adapter)
+        assert not hasattr(adapter, "propose") and not hasattr(adapter, "Options")
+
+
+def test_a_proposer_outside_the_pipeline_is_rejected() -> None:
+    source = load().sources["airports"]
+    source.proposer = "os"
+    with pytest.raises(ConfigError, match="Invalid source proposer"):
+        validate_source(source)

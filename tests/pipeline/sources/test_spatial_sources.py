@@ -50,8 +50,8 @@ def test_geonames_regenerates_caches_and_preserves_reject_accounting(
         ),
     }
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(tmp_path, ledger, "geonames", payloads)
-        assert run(source.runtime, stages) == {"completed": 2, "skipped": 0}
+        runtime, source, stages = source_context(tmp_path, ledger, "geonames", payloads)
+        assert run(runtime, stages) == {"completed": 2, "skipped": 0}
         points, aliases = rows(source, "places"), rows(source, "names")
         assert len(points) == 2 and len(aliases) == 2
         assert points[0]["name"] == "Café" and points[0]["name_en"] == "Current"
@@ -62,7 +62,7 @@ def test_geonames_regenerates_caches_and_preserves_reject_accounting(
         assert not [item for item in record.outputs if "/work/" in f"/{item.path}"]
         cache = next(source.work.rglob("lookup.sqlite3"))
         cache.unlink()
-        assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}
+        assert run(runtime, stages) == {"completed": 0, "skipped": 2}
         audit = json.loads(
             next((source.normalized / "audits").rglob("report.json")).read_bytes()
         )
@@ -78,7 +78,7 @@ def test_geonames_regenerates_caches_and_preserves_reject_accounting(
             "excluded": 1,
             "rejected": 2,
         }
-        assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}
+        assert run(runtime, stages) == {"completed": 0, "skipped": 2}
 
 
 def test_overture_regenerates_parent_index_before_areas(tmp_path: Path) -> None:
@@ -95,7 +95,7 @@ def test_overture_regenerates_parent_index_before_areas(tmp_path: Path) -> None:
         "is_territorial": True,
     }
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "overture",
@@ -104,7 +104,7 @@ def test_overture_regenerates_parent_index_before_areas(tmp_path: Path) -> None:
                 "areas.parquet": (parquet([area]), {"type": "division_area"}),
             },
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         assert len(rows(source, "places")) == 1 and len(rows(source, "names")) == 2
         assert rows(source, "areas")[0]["parent_source_id"] == "parent"
         record = ledger.get("normalize", "overture")
@@ -113,5 +113,5 @@ def test_overture_regenerates_parent_index_before_areas(tmp_path: Path) -> None:
         index = next(source.work.rglob("entities.sqlite3"))
         index.write_bytes(b"corrupt cache")
         ledger.invalidate("normalize", ["overture"])
-        assert run(source.runtime, stages) == {"completed": 1, "skipped": 1}
+        assert run(runtime, stages) == {"completed": 1, "skipped": 1}
         assert index.read_bytes().startswith(b"SQLite format 3")

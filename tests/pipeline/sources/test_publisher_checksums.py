@@ -12,7 +12,7 @@ import pytest
 
 from pipeline.pins.evidence import verify_publisher
 from pipeline.runtime.ledger import Ledger
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 from pipeline.sources.download import download
 from pipeline.sources.proposals.http import Client
 
@@ -80,13 +80,13 @@ def test_dbip_proposal_carries_and_checks_reviewed_publisher_evidence(
         server.routes["/2026-10"] = Reply(ARCHIVE)
         october = datetime(2026, 10, 1, tzinfo=UTC)
         monkeypatch.setattr(Client, "now", lambda self: october)
-        adapter = cast(Source, importlib.import_module(source_settings.adapter))
-        pin = adapter.propose(source_settings)
+        proposer = cast(Proposer, importlib.import_module(source_settings.proposer))
+        pin = proposer.propose(source_settings)
         assert pin.release == "2026-10"
         assert {k: pin.files[0].metadata[k] for k in evidence} == evidence
         server.routes["/2026-10"] = Reply(gzip.compress(b"other\n", mtime=0))
         with pytest.raises(ValueError, match="Publisher MD5 differs"):
-            adapter.propose(source_settings)
+            proposer.propose(source_settings)
 
 
 def test_download_refuses_bytes_that_contradict_the_publisher(tmp_path: Path) -> None:
@@ -140,11 +140,11 @@ def test_geoboundaries_layer_must_be_served_under_its_lfs_object_id(
                 }
             },
         )
-        adapter = cast(Source, importlib.import_module(source_settings.adapter))
+        proposer = cast(Proposer, importlib.import_module(source_settings.proposer))
         with pytest.raises(ValueError, match="LFS object id"):
-            adapter.propose(source_settings)
+            proposer.propose(source_settings)
         server.routes[f"/media/{commit}/layer.zip"] = Reply(b"ZIP fixture")
-        pin = adapter.propose(source_settings)
+        pin = proposer.propose(source_settings)
     assert pin.files[0].etag == '"' + pin.files[0].sha256 + '"'
     assert (
         pin.metadata["country_reference_sha256"]

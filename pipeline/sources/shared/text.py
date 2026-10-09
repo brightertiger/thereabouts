@@ -10,8 +10,9 @@ from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import atomic_output, encode, write_json
 from pipeline.sources.contract import SourceContext
 
-from .lookup_rows import Reject, Row, decorate
+from .lookup_rows import Row, decorate
 from .manifest import finish
+from .rows import RowRejected
 from .schemas import Kind
 from .writer import PartitionWriter
 
@@ -29,7 +30,7 @@ def publish_rows(
 ) -> list[Path]:
     writers: dict[Kind, PartitionWriter] = {}
     counts: Counter[str] = Counter()
-    report_root = ctx.normalized / "audits" / ctx.unit.inputs_hash
+    report_root = ctx.normalized / "audits" / ctx.inputs_hash
     ctx.ensure(report_root).mkdir(parents=True, exist_ok=True)
     rejects_path = ctx.ensure(report_root / "rejects.jsonl")
     # Rejection evidence is streamed too; bad input cannot fill process memory.
@@ -39,7 +40,7 @@ def publish_rows(
             key = str(item.pin.metadata.get("key", item.pin.name))
             try:
                 row = convert(item)
-            except Reject as error:
+            except RowRejected as error:
                 counts["rejected"] += 1
                 rejects.write(
                     encode(

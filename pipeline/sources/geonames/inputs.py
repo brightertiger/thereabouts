@@ -31,7 +31,7 @@ def inputs(ctx: SourceContext) -> tuple[dict[str, Path], list[Path]]:
             extracted = extract(
                 ctx,
                 ctx.input(pin.name),
-                ctx.work / ctx.unit.inputs_hash / "extracted",
+                ctx.work / ctx.inputs_hash / "extracted",
                 lambda name: True,
             )
             for path in extracted:

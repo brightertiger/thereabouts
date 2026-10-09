@@ -167,7 +167,8 @@ candidate before accepting it with `--from-file ... --accept`; running a fresh
 upstream proposal with `--accept` accepts freshly resolved bytes instead.
 An unchanged inspection preserves the previous pin, including its timestamp.
 
-Adapters expose `propose(settings)`. Catalogs in `config/proposals/` declare file
+Each `config/sources/*.yaml` names its `proposer:`, a module whose
+`propose(settings)` resolves upstream. Catalogs in `config/proposals/` declare file
 selections, GitHub commit/release selectors, IANA versions and Overture listing
 prefixes. geoBoundaries resolves every selected layer to a complete commit and
 repairs contradictory ALL records through the country's API. GeoNames and OSM

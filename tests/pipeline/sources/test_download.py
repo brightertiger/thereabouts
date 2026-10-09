@@ -18,15 +18,21 @@ from pipeline.sources import airports
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.download import download, mirror_url
 from pipeline.stages.contract import make_unit
+from pipeline.stages.sources import adapter_context
 from pipeline.storage.objects import backend
 
 from ..helpers import context
 from .fixtures import source_context
 
 
-def fixture(root: Path, ledger: Ledger, payload: bytes) -> SourceContext:
+def fixture(
+    root: Path, ledger: Ledger, payload: bytes, gcs_raw: str | None = None
+) -> SourceContext:
     ctx = context(root, ledger)
-    ctx.storage = {"local": "file://", "gcs_raw": "memory://mirror/" + root.name}
+    ctx.storage = {
+        "local": "file://",
+        "gcs_raw": gcs_raw or "memory://mirror/" + root.name,
+    }
     url = "memory://upstream/" + root.name + "/airports.csv"
     fs, name = backend(url)
     with fs.open(name, "wb") as stream:
@@ -48,7 +54,7 @@ def fixture(root: Path, ledger: Ledger, payload: bytes) -> SourceContext:
         licence=Licence("Public-Domain", "https://example.test/licence", "Synthetic"),
         limits=SourceLimits(download_bytes=len(payload), retries=0, batch_rows=2),
     )
-    return SourceContext(
+    return adapter_context(
         ctx,
         settings,
         selected,
@@ -63,7 +69,7 @@ def test_mirror_restores_missing_local_file_after_upstream_disappears(
         source = fixture(tmp_path, ledger, b"fixed source bytes")
         first = download(source)
         pin = source.pin.files[0]
-        mirror = mirror_url(source.runtime.storage["gcs_raw"], pin)
+        mirror = mirror_url(source.storage["gcs_raw"], pin)
         fs, key = backend(mirror)
         assert fs.exists(key)
         before = fsspec.filesystem("memory").info(key)["created"]
@@ -111,7 +117,7 @@ def test_mirror_failure_leaves_runner_unit_uncommitted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path, ledger, "airports", {"airports.csv": (b"payload", {})}
         )
         module = importlib.import_module("pipeline.sources.download")
@@ -122,10 +128,10 @@ def test_mirror_failure_leaves_runner_unit_uncommitted(
         with monkeypatch.context() as patch:
             patch.setattr(module, "mirror", interrupted)
             with pytest.raises(OSError, match="mirror interrupted"):
-                run(source.runtime, stages[:1])
+                run(runtime, stages[:1])
         assert ledger.get("download", "airports") is None
         assert source.input("airports.csv").read_bytes() == b"payload"
-        assert run(source.runtime, stages[:1]) == {"completed": 1, "skipped": 0}
+        assert run(runtime, stages[:1]) == {"completed": 1, "skipped": 0}
 
 
 @pytest.mark.parametrize("directory", ["raw", "normalized", "work"])
@@ -149,8 +155,8 @@ def test_local_directory_mirror_is_idempotent(tmp_path: Path) -> None:
     root = tmp_path / "workspace"
     root.mkdir()
     with Ledger(root, None, readonly=False) as ledger:
-        source = fixture(root, ledger, b"local mirror fixture")
-        source.runtime.storage["gcs_raw"] = (tmp_path / "mirror").as_uri()
+        mirror = (tmp_path / "mirror").as_uri()
+        source = fixture(root, ledger, b"local mirror fixture", mirror)
         download(source)
         pin = source.pin.files[0]
         mirrored = tmp_path / "mirror/sha256" / pin.sha256

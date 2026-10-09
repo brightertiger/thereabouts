@@ -23,7 +23,7 @@ def extract(
         if not members or len(names) != len(set(names)):
             raise ValueError("Expected distinct selected archive members")
         reservation = sum(member.file_size for member in members)
-        ctx.runtime.guard.admit(reservation)
+        ctx.guard.admit(reservation)
         written = 0
         try:
             outputs = []
@@ -40,4 +40,4 @@ def extract(
                 outputs.append(target)
             return outputs
         finally:
-            ctx.runtime.guard.release(reservation, written_bytes=written)
+            ctx.guard.release(reservation, written_bytes=written)

@@ -1,5 +1,6 @@
 name: overture
 adapter: pipeline.sources.overture
+proposer: pipeline.sources.proposals.overture
 kind: divisions
 enabled: true
 upstream:

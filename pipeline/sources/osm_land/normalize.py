@@ -8,6 +8,7 @@ from pipeline.runtime.jsonio import digest, sha256_file, write_json
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.archives import extract
 from pipeline.sources.shared.manifest import finish
+from pipeline.sources.shared.scratch import scratch_index
 from pipeline.sources.shared.writer import PartitionWriter
 
 from .reader import _build_index, _feature, _publisher_notice, _units
@@ -18,7 +19,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     if len(ctx.pin.files) != 1:
         raise ValueError("Expected one OSM land archive")
     pin = ctx.pin.files[0]
-    directory = ctx.work / ctx.unit.inputs_hash
+    directory = ctx.work / ctx.inputs_hash
     extracted = extract(
         ctx,
         ctx.input(pin.name),
@@ -35,17 +36,16 @@ def normalize(ctx: SourceContext) -> list[Path]:
     projection = shp.with_suffix(".prj").read_text()
     if 'GEOGCS["GCS_WGS_1984"' not in projection or 'UNIT["Degree"' not in projection:
         raise ValueError(f"Unexpected OSM land CRS: {projection}")
-    index = ctx.ensure(directory / "records.sqlite3")
-    reservation = int(ctx.settings.options["index_bytes"])
-    ctx.runtime.guard.admit(reservation)
-    written = 0
-    try:
-        count = _build_index(ctx, shp, index)
-        written = index.stat().st_size
-        if written > reservation:
-            raise ValueError("OSM index exceeds configured index_bytes")
-    finally:
-        ctx.runtime.guard.release(reservation, written_bytes=written)
+    with scratch_index(
+        ctx,
+        "records.sqlite3",
+        int(ctx.settings.options["index_bytes"]),
+        label="OSM",
+        check="integrity_check",
+    ) as built:
+        count = _build_index(ctx, shp, built.db)
+        built.check_size()
+    index = built.path
     notice = _publisher_notice(ctx, shp, count)
     source_hash = sha256_file(shp)
     evidence = {
@@ -60,7 +60,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
         if reader.numRecords != count:
             raise ValueError("OSM SHX and DBF record counts disagree")
         for key, ordinals, extent in _units(ctx, index):
-            ctx.runtime.guard.admit()
+            ctx.guard.admit()
             writer = PartitionWriter(ctx, "areas", key)
             repairs = []
             for ordinal in ordinals:
@@ -72,9 +72,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
                     repairs.append(repair)
             outputs.extend(writer.finish())
             retained += writer.count
-            audit = (
-                ctx.normalized / "audits" / ctx.unit.inputs_hash / f"{digest(key)}.json"
-            )
+            audit = ctx.normalized / "audits" / ctx.inputs_hash / f"{digest(key)}.json"
             write_json(
                 ctx.ensure(audit),
                 {

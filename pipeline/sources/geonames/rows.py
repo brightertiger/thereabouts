@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import math
-import unicodedata
 from collections.abc import Mapping
 from typing import cast
+
+from pipeline.sources.shared.rows import (
+    RowRejected,
+    canonical_json,
+    clean_text,
+    provenance,
+)
 
 from .tsv import fields
 
@@ -14,31 +19,32 @@ Row = dict[str, object]
 
 
 def text(value: str) -> str | None:
-    """Normalize Unicode and whitespace; do not infer language from ASCII."""
-    return unicodedata.normalize("NFC", " ".join(value.split())) or None
+    """Collapse whitespace, then NFC; do not infer language from ASCII."""
+    return clean_text(value, order="split_first")
 
 
 def integer(value: str, field: str, *, positive: bool = False) -> int:
     number = int(value)
     if number < (1 if positive else 0) or number > 2**63 - 1:
-        raise ValueError(f"Invalid {field}: {value}")
+        raise RowRejected(f"Invalid {field}: {value}")
     return number
 
 
-def provenance(pin: Mapping[str, object], extra: Mapping[str, object]) -> str:
-    return json.dumps(
-        {
-            "source_url": str(pin["url"]),
-            "license_url": pin["license_url"],
-            "attribution": pin["attribution"],
-            "input_sha256": pin["sha256"],
-            "retrieved_at": pin["retrieved_at"],
-            "last_modified": pin.get("last_modified"),
-            **extra,
-        },
-        ensure_ascii=False,
-        separators=(",", ":"),
-        allow_nan=False,
+def provenance_json(pin: Mapping[str, object], extra: Mapping[str, object]) -> str:
+    """Insertion-ordered JSON, the spelling GeoNames rows have always carried."""
+    return canonical_json(
+        provenance(
+            str(pin["url"]),
+            pin["license_url"],
+            pin["attribution"],
+            {
+                "input_sha256": pin["sha256"],
+                "retrieved_at": pin["retrieved_at"],
+                "last_modified": pin.get("last_modified"),
+            },
+            extra,
+        ),
+        sort_keys=False,
     )
 
 
@@ -49,7 +55,7 @@ def place(raw: bytes, release: str, pin: Mapping[str, object]) -> Row | None:
     source_id = integer(values[0], "geonameid", positive=True)
     name = text(values[1]) or text(values[2])
     if name is None:
-        raise ValueError("Missing Unicode name and asciiname")
+        raise RowRejected("Missing Unicode name and asciiname")
     latitude, longitude = float(values[4]), float(values[5])
     if not (
         math.isfinite(latitude)
@@ -57,7 +63,7 @@ def place(raw: bytes, release: str, pin: Mapping[str, object]) -> Row | None:
         and -90 <= latitude <= 90
         and -180 <= longitude <= 180
     ):
-        raise ValueError("Invalid WGS84 point")
+        raise RowRejected("Invalid WGS84 point")
     country = text(values[8])
     if country is not None and (
         len(country) != 2
@@ -65,7 +71,7 @@ def place(raw: bytes, release: str, pin: Mapping[str, object]) -> Row | None:
         or not country.isalpha()
         or country != country.upper()
     ):
-        raise ValueError(f"Invalid country code {country}")
+        raise RowRejected(f"Invalid country code {country}")
     population = integer(values[14], "population") if values[14] else None
     extra: Row = {
         "asciiname": values[2],
@@ -99,7 +105,7 @@ def place(raw: bytes, release: str, pin: Mapping[str, object]) -> Row | None:
         "population": population,
         "source_release": release,
         "license": pin["license"],
-        "provenance": provenance(pin, extra),
+        "provenance": provenance_json(pin, extra),
     }
 
 
@@ -109,9 +115,9 @@ def alias(raw: bytes, release: str, pin: Mapping[str, object]) -> Row:
     entity_id = integer(values[1], "geonameid", positive=True)
     name = text(values[3])
     if name is None:
-        raise ValueError("Empty alternate name")
+        raise RowRejected("Empty alternate name")
     if any(flag not in ("", "0", "1") for flag in values[4:8]):
-        raise ValueError("Unexpected alternate-name boolean flag")
+        raise RowRejected("Unexpected alternate-name boolean flag")
     return {
         "source": "geonames",
         "source_id": str(source_id),
@@ -127,7 +133,7 @@ def alias(raw: bytes, release: str, pin: Mapping[str, object]) -> Row:
         "valid_to": text(values[9]),
         "source_release": release,
         "license": pin["license"],
-        "provenance": provenance(
+        "provenance": provenance_json(
             pin,
             {
                 "name_raw": values[3],

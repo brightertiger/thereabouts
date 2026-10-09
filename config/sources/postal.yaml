@@ -1,5 +1,6 @@
 name: postal
 adapter: pipeline.sources.postal
+proposer: pipeline.sources.proposals.resolve
 kind: postal
 enabled: true
 upstream:

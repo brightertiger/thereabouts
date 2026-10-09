@@ -1,5 +1,6 @@
 name: osm_land
 adapter: pipeline.sources.osm_land
+proposer: pipeline.sources.proposals.dated
 kind: land
 enabled: true
 upstream:

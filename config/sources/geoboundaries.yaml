@@ -1,5 +1,6 @@
 name: geoboundaries
 adapter: pipeline.sources.geoboundaries
+proposer: pipeline.sources.proposals.boundaries
 kind: administrative_areas
 enabled: true
 upstream:

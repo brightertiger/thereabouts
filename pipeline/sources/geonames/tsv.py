@@ -4,6 +4,8 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
+from pipeline.sources.shared.rows import RowRejected
+
 
 @dataclass(frozen=True)
 class Chunk:
@@ -39,5 +41,5 @@ def lines(path: Path, chunk: Chunk, line_bytes: int) -> Iterator[tuple[int, byte
 def fields(raw: bytes, count: int) -> list[str]:
     values = raw.decode("utf-8").rstrip("\r\n").split("\t")
     if len(values) != count:
-        raise ValueError(f"Expected {count} fields, got {len(values)}")
+        raise RowRejected(f"Expected {count} fields, got {len(values)}")
     return values

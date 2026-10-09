@@ -17,6 +17,7 @@ from pipeline.sources import download as module
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.download import download, mirror_url
 from pipeline.stages.contract import make_unit
+from pipeline.stages.sources import adapter_context
 from pipeline.storage import objects, transfer
 from pipeline.storage.objects import backend
 
@@ -34,9 +35,11 @@ def pinned(url: str, payload: bytes, name: str = "airports.csv") -> PinFile:
     )
 
 
-def source(root: Path, ledger: Ledger, *files: PinFile) -> SourceContext:
+def source(
+    root: Path, ledger: Ledger, *files: PinFile, gcs_raw: str | None = None
+) -> SourceContext:
     ctx = context(root, ledger)
-    ctx.storage = {"gcs_raw": "memory://objects-mirror/" + root.name}
+    ctx.storage = {"gcs_raw": gcs_raw or "memory://objects-mirror/" + root.name}
     settings = SourceSettings(
         name="airports",
         adapter="pipeline.sources.airports",
@@ -50,7 +53,7 @@ def source(root: Path, ledger: Ledger, *files: PinFile) -> SourceContext:
         ),
     )
     pin = SourcePin("fixture", "2026-10-09", files=list(files))
-    return SourceContext(
+    return adapter_context(
         ctx, settings, pin, make_unit(ctx, Recipe("download", "airports"), "fixture")
     )
 
@@ -117,7 +120,7 @@ def test_upstream_short_body_is_resumed_and_mirrored(tmp_path: Path) -> None:
         assert server.ranges() == [None, "bytes=1000-"]
         assert all(h["If-Match"] == server.etag for _, h in server.requests)
     assert path.read_bytes() == body
-    _, name = backend(mirror_url(ctx.runtime.storage["gcs_raw"], pin))
+    _, name = backend(mirror_url(ctx.storage["gcs_raw"], pin))
     assert fsspec.filesystem("memory").cat_file(name) == body
 
 
@@ -158,8 +161,9 @@ def test_mirror_reads_and_writes_are_retried(
     upload(upstream, b"kept")
     bucket = "/bucket-" + tmp_path.name + "/raw"
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        ctx = source(tmp_path, ledger, pinned(upstream, b"kept"))
-        ctx.runtime.storage["gcs_raw"] = "gs:/" + bucket
+        ctx = source(
+            tmp_path, ledger, pinned(upstream, b"kept"), gcs_raw="gs:/" + bucket
+        )
         stored = bucket + "/sha256/" + ctx.pin.files[0].sha256
         if mode == "rb":
             fsspec.filesystem("memory").rm(upstream.removeprefix("memory:/"))
