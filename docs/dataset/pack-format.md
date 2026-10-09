@@ -35,7 +35,8 @@ Required fields:
 | `files` | Ordered artifact inventory |
 
 `inputs` is `{manifest_sha256, options, writer}`. Writer identity is currently
-`0.3.0` for core (grouped shards; `0.2.2` before) and `0.4.0` for forward families. Forward
+`0.3.1` for core (grouped shards, names included; `0.3.0` grouped only cells and
+catalogue, `0.2.2` grouped none) and `0.4.0` for forward families. Forward
 identity also includes `family` and `core_catalogue`. Options contain `data_version`, `sources`, `attribution`, `notices`
 (a name-to-text object), and `input_provenance`. A subset exporter records its
 source inventory digest, every consumed original file digest, and selection
@@ -57,7 +58,7 @@ A reader rejects other format versions, nonzero required features, another
 unsupported family, and resolutions other than 8/3 before interpreting records. Maximum
 artifact size is 64 MiB; maximum manifest size is 16 MiB. A writer must split
 catalogues before exceeding the artifact limit. The core writer (revision
-0.3.0) groups many resolution-3 blocks per cells shard, in ascending block
+0.3.1) groups many resolution-3 blocks per cells shard, in ascending block
 order, and many places per catalogue shard, each up to a 32 MiB target: half
 the artifact limit, so one more block or place always fits. A complete world
 core (14,847 stored blocks, about 5.9 M places with their evidence, about
@@ -932,8 +933,9 @@ are strictly increasing between entries, and end at their section's record
 count (an empty map has the single offset zero). All keys have rows.
 Writers order records by key, city ID, alternate flag, then source spelling.
 A key may cross shard boundaries; retrieval merges and deduplicates by city.
-Current construction admits at most 4 MiB of input strings plus record overhead
-per shard, within the shared 512 MiB writer admission budget.
+Current construction (core revision 0.3.1) admits up to the 32 MiB shard target
+of input strings plus 128 bytes of record and posting overhead per spelling, within
+the shared 512 MiB writer admission budget.
 
 For each normalized key, prepend ^ and append $, then enumerate unique windows
 of three Unicode scalar values. Each trigram's posting list contains every

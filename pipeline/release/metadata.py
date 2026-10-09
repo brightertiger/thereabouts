@@ -44,10 +44,12 @@ def licences(config: Config, observed: set[str]) -> Row:
     if unknown:
         raise ValueError(f"Unknown contributing sources: {sorted(unknown)}")
     pins = read_lock(REPOSITORY / "pins.lock")
-    return {
-        name: {**asdict(config.sources[name].licence), "pin": asdict(pins[name])}
-        for name in sorted(used)
-    }
+    result = {}
+    for name in sorted(used):
+        pin = asdict(pins[name])
+        pin["files"] = licensing.shipped(pin["files"])
+        result[name] = {**asdict(config.sources[name].licence), "pin": pin}
+    return result
 
 
 def licence_text(sources: Row, row_licences: set[str]) -> str:

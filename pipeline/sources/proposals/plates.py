@@ -1,4 +1,8 @@
-"""Propose the explicitly reviewed plate evidence URLs, preserving per-file licences."""
+"""Propose the explicitly reviewed plate evidence URLs, preserving per-file licences.
+
+Both plate sources use it over their own reviewed inventory. Entries marked
+`base` are pinned by the registration source and are not pinned again.
+"""
 
 from pipeline.config.sources import SourceSettings
 from pipeline.pins.models import SourcePin
@@ -31,5 +35,6 @@ def propose(settings: SourceSettings) -> SourcePin:
             },
         )
         for name, spec in sorted(evidence.items())
+        if not spec.get("base")
     ]
     return finish(files)

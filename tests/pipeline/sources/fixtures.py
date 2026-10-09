@@ -100,6 +100,8 @@ def source_context(
 ) -> tuple[SourceContext, list[SourceStage]]:
     config = load()
     settings = config.sources[name]
+    # The source under test runs whether or not the committed config enables it.
+    settings.enabled = True
     settings.limits = replace(
         settings.limits,
         download_bytes=sum(len(p) for p, _ in payloads.values()),
