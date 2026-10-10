@@ -343,7 +343,11 @@ never altered, except to add a missing asset that no published
 `dataset-manifest.json` or `index.json` names by asset id; otherwise publish a
 patch version (`YYYY.MM.N`). While `DATA_LICENSES.md` carries the CC BY-SA
 `OWNER DECISION` paragraph, a public publish refuses. `release.publish.private=true`
-uploads and verifies the draft and stops there, unpublished. GitHub limits a
+uploads and verifies the draft and stops there, unpublished. Resolving the
+decision changes the release documents, so the next run refuses that draft
+because it holds different files; nothing is released yet, so delete the draft
+on GitHub and rerun. A draft's `index.json` is rebuilt on every run, so it
+always lists every version published before it. GitHub limits a
 release to 1,000 assets, each under 2 GiB; the plan enforces both. The same
 target runs as the `publish` stage (`run --through publish` with
 `release.publish.target=github`), whose unit destination is `github:<repository>`.

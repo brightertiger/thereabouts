@@ -334,6 +334,11 @@ class Publisher:
         size = path.stat().st_size
         if name in assets:
             if not self.matches(assets[name], size, sha256):
+                if release["draft"]:
+                    raise ValueError(
+                        f"Draft {self.plan.tag} holds a different {name}; nothing is "
+                        "released yet, so delete the draft on GitHub and rerun"
+                    )
                 raise ValueError(
                     f"Conflicting asset {name} in {self.plan.tag}; "
                     "a release never changes once uploaded"

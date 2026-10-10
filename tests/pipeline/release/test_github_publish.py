@@ -190,6 +190,13 @@ def test_owner_decisions_block_publication_and_private_stops_at_the_draft(
         assert "dataset/2026.10/DATASET_CARD.md" in result["unresolved"]
         (draft,) = fake.by_tag("v2026.10")
         assert draft.draft and fake.latest is None and not fake.tags
+        # Resolving the decision changes the documents: the old draft must go.
+        resolved = build(tmp_path / "resolved")
+        with pytest.raises(ValueError, match="delete the draft on GitHub and rerun"):
+            publish_to(fake, resolved, tmp_path / "work", monkeypatch)
+        fake.releases.pop(draft.id)
+        result = publish_to(fake, resolved, tmp_path / "work", monkeypatch)
+        assert result["state"] == "published"
 
 
 def test_limits_and_the_token_are_checked_before_any_request(
