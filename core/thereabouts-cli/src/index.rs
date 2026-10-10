@@ -21,12 +21,45 @@ pub struct ReleasePack {
     pub unpacked_size: u64,
     /// Required minor format for this family.
     pub format_minor: u16,
+    /// GitHub asset id, when the release is published on GitHub.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub asset_id: Option<u64>,
+    /// GitHub API URL of the archive, read instead of `url` when a release token is set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_url: Option<String>,
+}
+/// One small release file, such as the dataset install manifest.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ReleaseFile {
+    /// Absolute URL or source-relative path.
+    pub url: String,
+    /// Exact length.
+    pub size: u64,
+    /// Lowercase SHA-256 of the file.
+    pub sha256: String,
+    /// GitHub asset id, when the release is published on GitHub.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub asset_id: Option<u64>,
+    /// GitHub API URL of the file, read instead of `url` when a release token is set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_url: Option<String>,
 }
 /// A coordinated dataset release.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Dataset {
     /// Available family archives.
     pub packs: BTreeMap<String, ReleasePack>,
+    /// The dataset install manifest, when the release ships the Parquet dataset.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dataset: Option<ReleaseFile>,
+}
+/// Largest release index or dataset install manifest a client reads.
+pub const MAX_METADATA_BYTES: u64 = 16 * 1024 * 1024;
+fn digest(value: &str) -> bool {
+    value.len() == 64
+        && value
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 /// Public release index version 3.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -53,17 +86,38 @@ impl Index {
                 if !(1..=MAX_ARCHIVE_BYTES).contains(&pack.size)
                     || !(1..=MAX_UNPACKED_BYTES).contains(&pack.unpacked_size)
                     || pack.url.is_empty()
-                    || pack.sha256.len() != 64
-                    || !pack
-                        .sha256
-                        .bytes()
-                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                    || !digest(&pack.sha256)
                 {
                     return Err(Error::Integrity("Invalid release archive identity".into()));
                 }
             }
+            if let Some(file) = &dataset.dataset
+                && (!(1..=MAX_METADATA_BYTES).contains(&file.size)
+                    || file.url.is_empty()
+                    || !digest(&file.sha256))
+            {
+                return Err(Error::Integrity("Invalid dataset manifest identity".into()));
+            }
         }
         Ok(())
+    }
+    /// Newest release (or the requested one) that ships the Parquet dataset.
+    pub fn select_dataset(&self, version: Option<&str>) -> Result<(&str, &ReleaseFile)> {
+        self.validate()?;
+        if let Some(version) = version {
+            return self
+                .datasets
+                .get_key_value(version)
+                .and_then(shipped)
+                .ok_or_else(|| {
+                    Error::Integrity("Requested release does not ship the dataset".into())
+                });
+        }
+        self.datasets
+            .iter()
+            .filter_map(shipped)
+            .max_by(|(a, _), (b, _)| compare_versions(a, b))
+            .ok_or_else(|| Error::Integrity("No release ships the dataset".into()))
     }
     /// Newest release for which all requested families are supported.
     pub fn select(&self, requested: &[String], version: Option<&str>) -> Result<(&str, &Dataset)> {
@@ -93,6 +147,9 @@ impl Index {
             .map(|(v, d)| (v.as_str(), d))
             .ok_or_else(|| Error::Integrity("No compatible dataset release".into()))
     }
+}
+fn shipped<'a>((name, dataset): (&'a String, &'a Dataset)) -> Option<(&'a str, &'a ReleaseFile)> {
+    dataset.dataset.as_ref().map(|file| (name.as_str(), file))
 }
 /// Compare dotted numeric releases naturally, with byte-order text tie breaking.
 pub(crate) fn compare_versions(a: &str, b: &str) -> Ordering {
@@ -141,6 +198,35 @@ mod tests {
                 .to_string()
                 .contains("format 3")
         );
+    }
+    #[test]
+    fn the_dataset_is_selected_from_releases_that_ship_it() {
+        let file = |size: u64| {
+            serde_json::json!({"url":"https://github.com/o/r/releases/download/v1/dataset-manifest.json",
+                "size":size,"sha256":"b".repeat(64),"asset_id":7,
+                "api_url":"https://api.github.com/repos/o/r/releases/assets/7"})
+        };
+        let index: Index = serde_json::from_value(serde_json::json!({
+            "format": 3,
+            "datasets": {
+                "2026.09": {"packs":{}, "dataset": file(10)},
+                "2026.10": {"packs":{}, "dataset": file(20)},
+                "2026.11": {"packs":{}}
+            }
+        }))
+        .unwrap();
+        let (version, selected) = index.select_dataset(None).unwrap();
+        assert_eq!(
+            (version, selected.size, selected.asset_id),
+            ("2026.10", 20, Some(7))
+        );
+        assert_eq!(index.select_dataset(Some("2026.09")).unwrap().0, "2026.09");
+        assert!(index.select_dataset(Some("2026.11")).is_err());
+        let oversized: Index = serde_json::from_value(serde_json::json!({
+            "format": 3, "datasets": {"2026.10": {"packs":{}, "dataset": file(MAX_METADATA_BYTES + 1)}}
+        }))
+        .unwrap();
+        assert!(oversized.validate().is_err());
     }
     #[test]
     #[allow(clippy::indexing_slicing)]

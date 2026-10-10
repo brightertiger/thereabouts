@@ -492,6 +492,9 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add("MAX_ARCHIVE_BYTES", transport::MAX_ARCHIVE_BYTES)?;
         m.add("MAX_UNPACKED_BYTES", transport::MAX_UNPACKED_BYTES)?;
         m.add("DEFAULT_RELEASE_URL", transport::DEFAULT_RELEASE_URL)?;
+        m.add("GITHUB_API_URL", transport::GITHUB_API_URL)?;
+        m.add("GITHUB_API_VARIABLE", transport::GITHUB_API_VARIABLE)?;
+        m.add("TOKEN_VARIABLES", transport::TOKEN_VARIABLES.to_vec())?;
         m.add("INDEX_FORMAT", transport::INDEX_FORMAT)?;
         m.add("ARCHIVE_SUFFIX", transport::ARCHIVE_SUFFIX)?;
         m.add("DATASET_MANIFEST", thereabouts_cli_core::zip::MANIFEST)?;

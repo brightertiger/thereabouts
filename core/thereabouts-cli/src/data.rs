@@ -13,7 +13,9 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
-use thereabouts_cli_core::transport::DEFAULT_RELEASE_URL;
+use thereabouts_cli_core::transport::{
+    DEFAULT_RELEASE_URL, GITHUB_API_URL, GITHUB_API_VARIABLE, TOKEN_VARIABLES,
+};
 use thereabouts_core::format::{manifest, verify};
 
 pub(crate) fn source(explicit: Option<&str>, io: &dyn Io) -> Result<Box<dyn Source>> {
@@ -21,14 +23,15 @@ pub(crate) fn source(explicit: Option<&str>, io: &dyn Io) -> Result<Box<dyn Sour
     let value = explicit
         .or(configured.as_deref())
         .unwrap_or(DEFAULT_RELEASE_URL);
-    if value == DEFAULT_RELEASE_URL {
-        return Err(Error::Usage(
-            "No release service is published yet; use --from DIR|URL or THEREABOUTS_RELEASE_URL"
-                .into(),
-        ));
-    }
     if value.starts_with("http://") || value.starts_with("https://") {
-        Ok(Box::new(Http::new(value)?))
+        // A token reads private GitHub releases through the API; it goes nowhere else.
+        let token = TOKEN_VARIABLES
+            .iter()
+            .find_map(|name| io.env(name).filter(|v| !v.is_empty()));
+        let api = io
+            .env(GITHUB_API_VARIABLE)
+            .unwrap_or_else(|| GITHUB_API_URL.into());
+        Ok(Box::new(Http::new(value, token, &api)?))
     } else {
         Ok(Box::new(Directory::new(Path::new(value))))
     }

@@ -4,7 +4,7 @@ use crate::{
     error::{Error, Result},
     index::{Index, ReleasePack},
     store::{self, Active, Pointer},
-    transfer::Source,
+    transfer::{Locator, Source},
 };
 use std::{
     collections::BTreeMap,
@@ -240,7 +240,11 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
         ));
     }
     if offset < pack.size {
-        let mut input = source.open(&pack.url, offset, pack.size)?;
+        let remote = Locator {
+            url: &pack.url,
+            api_url: pack.api_url.as_deref(),
+        };
+        let mut input = source.open_file(remote, offset, pack.size)?;
         let mut remaining = pack.size - offset;
         let mut buffer = vec![0; 65536];
         loop {

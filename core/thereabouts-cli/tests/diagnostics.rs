@@ -39,14 +39,25 @@ fn changing_version_cannot_hide_an_active_family() {
 }
 
 #[test]
-fn missing_file_placeholder_and_corrupt_pack_name_the_remedy() {
+fn missing_file_default_release_and_corrupt_pack_name_the_remedy() {
     let temp = tempfile::tempdir().unwrap();
     let mut host = Host::new(temp.path());
+    // The default release is GitHub: with a token, an unsafe API override is refused
+    // before any request, which proves the default without contacting github.com.
+    host.env.insert("GITHUB_TOKEN".into(), "secret".into());
+    host.env.insert(
+        "THEREABOUTS_GITHUB_API_URL".into(),
+        "http://api.example.com".into(),
+    );
     assert_eq!(host.run(&["data", "install", "core"]), 2);
     assert!(
+        host.err.contains("THEREABOUTS_GITHUB_API_URL"),
+        "{}",
         host.err
-            .contains("--from DIR|URL or THEREABOUTS_RELEASE_URL")
     );
+    assert!(!host.err.contains("secret"));
+    host.env.remove("GITHUB_TOKEN");
+    host.env.remove("THEREABOUTS_GITHUB_API_URL");
     install(temp.path(), &["core"]);
     let missing = temp.path().join("absent.csv");
     assert_eq!(host.run(&["reverse", missing.to_str().unwrap()]), 2);
