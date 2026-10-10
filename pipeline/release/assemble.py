@@ -49,6 +49,7 @@ def assemble(
     previous: Path | None = None,
 ) -> list[Path]:
     selection = Selection.from_settings(config.release, config.h3)
+    gates = snapshot.quality_gates
     descriptions = schema_description(REPOSITORY / config.release.schema)
     if output.exists():
         saved = verify_dataset(output)
@@ -88,6 +89,7 @@ def assemble(
                 descriptions,
                 sources,
                 snapshot.policy,
+                gates,
                 REPOSITORY / config.release.readme_template,
             ),
             # Generated from config/dataset.yaml and the client; the core pack
@@ -116,6 +118,9 @@ def assemble(
             },
             "input_manifest_sha256": snapshot.manifest_sha256,
             "logical_sha256": content["sha256"],
+            # Lookups gates this export passed; findings outside the blocking
+            # scope ship as advisory totals, listed in the quality.json record.
+            "quality_gates": gates,
             "tables": tables,
             "files": files,
         }

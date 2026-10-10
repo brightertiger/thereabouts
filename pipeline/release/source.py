@@ -8,6 +8,7 @@ from typing import Any
 import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 
+from pipeline.config.quality_policy import SCOPES
 from pipeline.config.schema import H3
 from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import digest, sha256_file
@@ -15,6 +16,7 @@ from pipeline.runtime.paths import located, validate_relative
 from pipeline.runtime.records import Output
 
 Row = dict[str, Any]
+ADVISORY = ("countries", "boundary_losses", "lost_cells", "footprint_failures")
 
 
 @dataclass(frozen=True)
@@ -125,6 +127,33 @@ class Snapshot:
     @property
     def policy(self) -> Row:
         return dict(self.manifest["normalization"]["policy"])
+
+    @property
+    def quality_gates(self) -> Row | None:
+        """The lookups gate scope and advisory totals with their quality.json record;
+        None for an input written before the gates were scoped."""
+        gates = self.manifest.get("quality_gates")
+        if gates is None:
+            return None
+        advisory = gates.get("advisory") if isinstance(gates, dict) else None
+        if (
+            not isinstance(advisory, dict)
+            or gates.get("blocking_scope") not in SCOPES
+            or not isinstance(gates.get("reviewed_countries"), list)
+            or set(advisory) != set(ADVISORY)
+            or any(type(advisory[key]) is not int for key in ADVISORY)
+        ):
+            raise ValueError("Input quality gates are malformed")
+        if "report" in gates:  # A released dataset read back as input.
+            return dict(gates)
+        reports = [
+            record
+            for record in self.manifest.get("verification_artifacts") or []
+            if Path(record["path"]).name == "quality.json"
+        ]
+        if len(reports) != 1:
+            raise ValueError("Input quality gates need one quality.json record")
+        return {**gates, "report": reports[0]}
 
     @property
     def content_identity(self) -> str:

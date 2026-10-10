@@ -14,6 +14,7 @@ def render(
     descriptions: Row,
     sources: Row,
     policy: Row,
+    gates: Row | None,
     template: Path,
 ) -> str:
     settings = config.release
@@ -95,6 +96,7 @@ def render(
         ),
         "distant_m": str(policy["distant_m"]),
         "nearest_m": str(policy["nearest_m"]),
+        "quality_gates": quality(gates),
         "latitude": str(settings.example_latitude),
         "longitude": str(settings.example_longitude),
         "contact": settings.contact,
@@ -107,6 +109,50 @@ def render(
     if "{{" in value:
         raise ValueError("Unresolved README template placeholder")
     return value
+
+
+def quality(gates: Row | None) -> str:
+    """The lookups quality gates this export passed, and its advisory totals."""
+    if gates is None:
+        return (
+            "The input manifest of this export records no quality-gate summary, so "
+            "`manifest.json.quality_gates` is null."
+        )
+    stop = (
+        "A boundary loss without a reviewed exception, or a city footprint "
+        "failure, stops the build"
+    )
+    if gates["blocking_scope"] == "all":
+        return (
+            f"Blocking scope: `all`. {stop} in every country, as do integrity, "
+            "reference, neighbour and named-point failures. This export has none, "
+            "so it has no advisory findings. `manifest.json.quality_gates` records "
+            "the scope."
+        )
+    reviewed = gates["reviewed_countries"]
+    advisory = gates["advisory"]
+    plural = {
+        "boundary_losses": "" if advisory["boundary_losses"] == 1 else "es",
+        "footprint_failures": "" if advisory["footprint_failures"] == 1 else "s",
+        "countries": "y" if advisory["countries"] == 1 else "ies",
+    }
+    return (
+        f"Blocking scope: `reviewed`. {stop} in the {len(reviewed)} reviewed "
+        f"countries ({', '.join(reviewed)}); integrity, reference, neighbour and "
+        "named-point failures stop it in every country. This export has none. In "
+        "the other countries boundary losses and footprint failures are advisory: "
+        "measured, counted and kept, but not blocking. This export has "
+        f"{advisory['boundary_losses']:,} advisory boundary "
+        f"loss{plural['boundary_losses']} ({advisory['lost_cells']:,} cells) and "
+        f"{advisory['footprint_failures']:,} footprint "
+        f"failure{plural['footprint_failures']} in {advisory['countries']:,} "
+        f"unreviewed countr{plural['countries']}.\n\n"
+        "`manifest.json.quality_gates` holds the scope, the reviewed countries and "
+        "these totals. Every finding, with per-country counts, is listed in the "
+        "pipeline's `quality.json` under `advisory_spatial_gates` and "
+        "`gate_scope.by_country`. That file is not part of this directory; "
+        "`quality_gates.report` gives its pipeline path, byte size and SHA256."
+    )
 
 
 def public_base(config: Config) -> str:
