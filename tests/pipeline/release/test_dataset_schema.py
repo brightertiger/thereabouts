@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from pipeline.release.dataset_schema import check, public
+from pipeline.release.dataset_schema import check, inputs, public
 
 Description = dict[str, Any]
 
@@ -132,6 +132,18 @@ def test_a_small_valid_description_passes() -> None:
             lambda d: d["parents"]["columns"][1].update(values_from=["nowhere.py"]),
         ),
         (
+            "parents: assembled must be a boolean",
+            lambda d: d["parents"].update(assembled="yes"),
+        ),
+        (
+            "parents.kind: assembled must be a boolean",
+            lambda d: d["parents"]["columns"][1].update(assembled=1),
+        ),
+        (
+            "parents: assembled columns must follow every input column",
+            lambda d: d["parents"]["columns"][0].update(assembled=True),
+        ),
+        (
             "enumerations need",
             lambda d: d["parents"]["columns"][0].update(
                 type="bool", values=[{"value": True, "meaning": "yes"}]
@@ -159,3 +171,25 @@ def test_public_schema_drops_repository_paths_and_changes_nothing_else() -> None
     ]
     assert "values_from" in description["parents"]["columns"][1]
     assert shown["children"] == description["children"]
+
+
+def test_inputs_leave_out_what_assembly_computes() -> None:
+    description = small()
+    description["parents"]["columns"].append(
+        {
+            "name": "derived",
+            "type": "string",
+            "nullable": False,
+            "meaning": "Computed by assembly",
+            "units": "none",
+            "assembled": True,
+        }
+    )
+    description["index"] = {
+        **copy.deepcopy(small()["parents"]),
+        "assembled": True,
+        "relationships": [],
+    }
+    check(description)
+    assert inputs(description) == small()
+    assert [c["name"] for c in description["parents"]["columns"]][-1] == "derived"

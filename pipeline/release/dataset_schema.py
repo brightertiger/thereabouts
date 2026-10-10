@@ -2,7 +2,8 @@
 
 The loader reads only each column's name, type and nullability. Everything else
 feeds the data dictionary, so a typo or a dangling reference is rejected here
-instead of reaching a released document.
+instead of reaching a released document. `assembled: true` marks a table or a
+trailing column that release assembly computes; release inputs never carry it.
 """
 
 from pathlib import Path
@@ -13,8 +14,9 @@ import yaml
 from pipeline.runtime.fingerprints import REPOSITORY
 
 TABLE_KEYS = {"description", "grain", "primary_key", "relationships", "columns"}
+TABLE_KEYS |= {"assembled"}
 COLUMN_REQUIRED = ("name", "type", "nullable", "meaning", "units")
-COLUMN_KEYS = {*COLUMN_REQUIRED, "values", "values_from"}
+COLUMN_KEYS = {*COLUMN_REQUIRED, "values", "values_from", "assembled"}
 RELATIONSHIP_KEYS = {"columns", "references", "meaning"}
 ENUMERATED = {"string": str, "int64": int, "uint64": int, "uint8": int}
 
@@ -29,6 +31,13 @@ def unknown(where: str, value: dict[str, Any], allowed: set[str]) -> None:
         raise ValueError(f"{where}: unknown key {extra[0]}")
 
 
+def assembled(where: str, value: dict[str, Any]) -> bool:
+    flag = value.get("assembled", False)
+    if not isinstance(flag, bool):
+        raise ValueError(f"{where}: assembled must be a boolean")
+    return flag
+
+
 def column(table: str, value: dict[str, Any], repository: Path) -> None:
     name = value.get("name")
     where = f"{table}.{name}"
@@ -38,6 +47,7 @@ def column(table: str, value: dict[str, Any], repository: Path) -> None:
             raise ValueError(f"{where}: {key} is required")
     if not isinstance(value["nullable"], bool):
         raise ValueError(f"{where}: nullable must be a boolean")
+    assembled(where, value)
     values = value.get("values")
     sources = value.get("values_from")
     if sources is not None and values is None:
@@ -95,8 +105,15 @@ def check(description: dict[str, Any], repository: Path = REPOSITORY) -> None:
         for key in ("primary_key", "relationships", "columns"):
             if not isinstance(table.get(key), list):
                 raise ValueError(f"{name}: {key} must be a list")
+        assembled(name, table)
         for item in table["columns"]:
             column(name, item, repository)
+        # Appended columns keep every input column at its position.
+        computed = [assembled(name, item) for item in table["columns"]]
+        if computed != sorted(computed):
+            raise ValueError(
+                f"{name}: assembled columns must follow every input column"
+            )
         columns = {c["name"]: c["type"] for c in table["columns"]}
         if len(columns) != len(table["columns"]):
             raise ValueError(f"{name}: duplicate column name")
@@ -114,6 +131,18 @@ def load(path: Path, repository: Path = REPOSITORY) -> dict[str, Any]:
         raise ValueError("Dataset schema must declare its tables")
     check(value, repository)
     return value
+
+
+def inputs(description: dict[str, Any]) -> dict[str, Any]:
+    """The tables and columns release inputs carry: all but what assembly computes."""
+    return {
+        name: {
+            **table,
+            "columns": [c for c in table["columns"] if not c.get("assembled")],
+        }
+        for name, table in description.items()
+        if not table.get("assembled")
+    }
 
 
 def public(description: dict[str, Any]) -> dict[str, Any]:
