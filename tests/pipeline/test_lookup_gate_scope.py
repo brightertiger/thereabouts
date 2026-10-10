@@ -2,17 +2,19 @@
 
 from collections.abc import Sequence
 from pathlib import Path
+from typing import cast
 
 import pytest
 
-from pipeline.config import policies
+from pipeline.config import policies, reviews
 from pipeline.config.reviews import Review
 from pipeline.engines.artifacts import read_json
+from pipeline.engines.names import build as names
 from pipeline.engines.store.codec import Row
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Dependency, Recipe
-from pipeline.stages import lookup_manifest, lookups
+from pipeline.stages import engine_io, lookup_manifest, lookups
 from pipeline.stages.contract import Unit
 from pipeline.stages.engine_data import Geography
 
@@ -26,7 +28,7 @@ def test_only_the_manifest_carries_the_gate_scope(tmp_path: Path) -> None:
         )
         manifest = configure(Recipe("lookups", "manifest/current"))
         spatial = configure(Recipe("lookups", "spatial/postal_codes/BE"))
-    gates = manifest.parameters["gates"]
+    gates = cast(Row, manifest.parameters["gates"])
     assert gates["blocking_scope"] == "reviewed"
     pilots = {
         *policies.reconcile()["pilot"],
@@ -75,19 +77,21 @@ def publish(
 ) -> list[Path]:
     """Publish quality reports alone; table measurements find no errors."""
     root = tmp_path / "lookups"
-    io, names = lookup_manifest.io, lookup_manifest.names
-    monkeypatch.setattr(io, "receipt", lambda *a, **k: reports[a[2].split("/")[1]])
-    monkeypatch.setattr(io, "local", lambda ctx, tables: tables)
+
+    def receipt(ctx: object, stage: str, unit_id: str, suffix: str) -> Row:
+        return reports[unit_id.removeprefix("quality/")]
+
+    monkeypatch.setattr(engine_io, "receipt", receipt)
+    monkeypatch.setattr(engine_io, "local", lambda ctx, tables: tables)
     monkeypatch.setattr(lookup_manifest, "measure", lambda *a, **k: {})
     monkeypatch.setattr(lookup_manifest, "reference_checks", lambda *a: {})
     monkeypatch.setattr(names, "dangling", lambda *a: [])
-    monkeypatch.setattr(lookup_manifest.reviews, "load", lambda *a: Review(True))
+    monkeypatch.setattr(reviews, "load", lambda *a: Review(True))
     monkeypatch.setattr(lookup_manifest, "resolver", lambda *a: lambda loss: [])
-    gates = {"blocking_scope": scope, "reviewed": ["GB"]}
     recipe = Recipe(
         "lookups",
         "manifest/current",
-        {"policy": {}, "gates": gates},
+        {"policy": {}, "gates": {"blocking_scope": scope, "reviewed": ["GB"]}},
         tuple(Dependency("normalize_cells", "quality/" + cc) for cc in reports),
     )
     with Ledger(tmp_path, None, readonly=False) as ledger:
