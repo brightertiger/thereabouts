@@ -8,6 +8,7 @@ from pipeline.config import reviews
 from pipeline.engines.artifact_io import file_record
 from pipeline.engines.cells.metrics import measure
 from pipeline.engines.cities.gates import failures, unreviewed
+from pipeline.engines.cities.origins import resolver
 from pipeline.engines.names import build as names
 from pipeline.engines.normalize_cells.references import reference_checks
 from pipeline.engines.reconcile.common import Row
@@ -60,7 +61,11 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
     failed = failures(reports, named)
     losses = failed["all_boundaries"]
     exceptions = [asdict(item) for item in approval.boundary_exceptions]
-    failed["all_boundaries"] = unreviewed(losses, exceptions)
+    origins = resolver(
+        lambda cc: io.artifact(ctx, "reconcile", "country/" + cc, suffix=".sqlite"),
+        ctx.config.engines.limits.sqlite_cache_kib,
+    )
+    failed["all_boundaries"] = unreviewed(losses, exceptions, origins)
     rows: Counter[str] = Counter()
     sizes: Counter[str] = Counter()
     for table in tables:
