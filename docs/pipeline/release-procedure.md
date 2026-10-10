@@ -241,6 +241,31 @@ Interrupted units resume through the ledger. Check `work/runs/<timestamp>/` for
 logs and completion summaries, and retain the release's manifest, logical digest,
 licences, card and changelog. No stage should silently recreate a published version.
 
+### A repeated key stops the dataset stage
+
+Assembly refuses a release that repeats a key declared in `config/dataset.yaml`.
+The error names the table, its key columns and up to five repeated values; the
+staging directory is discarded, so confirm the duplicates in the lookups inputs.
+Fix the source or its normalization when you can. If the release cannot wait,
+withdraw that table's key. This is a configuration change, not a code change, and
+there is deliberately no skip switch: a release must not declare a key it breaks.
+
+1. In `config/dataset.yaml`, set the table's `primary_key: []`, and reword its
+   `grain` if it promises one row per key.
+2. Delete every relationship whose `references.table` is that table; the schema
+   loader refuses a relationship that does not target a declared key. For
+   `countries`, these are the `country_code` references of `plate_codes`,
+   `plate_formats` and `plate_priors`.
+3. Run `python -m pipeline dictionary` and commit the regenerated files;
+   `dictionary --check` fails until you do. Also remove the table from
+   `ENFORCED_KEYS` in `tests/pipeline/release/test_dataset_metadata.py`, and
+   re-render the committed `docs/dataset/README.md` as `test_readme.py` does.
+4. Rerun the release. The published schema, dictionary and README change, so the
+   dataset stage and the packs rebuild; no upstream unit re-identifies.
+
+Note the withdrawn key in `CHANGELOG.md`, and restore it once the duplicates are
+fixed upstream.
+
 ## Validate staging, then publish the same files
 
 `run --through publish` above targets staging. While `DATA_LICENSES.md` still
