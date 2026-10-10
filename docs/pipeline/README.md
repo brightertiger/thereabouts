@@ -572,8 +572,24 @@ tables. The full reader contract is in the dataset README's Cell keys section.
 physical nullability. Cell groups must use resolution 1, the writer's only
 layout.
 
-Before any document is written, assembly checks the pack writer's place-reference
-rules (`pipeline/release/closure.py`): every ID that cells, forward tables,
+Before any document is written, assembly closes the dataset's place references
+(`pipeline/release/references.py`). Every declared relationship to `places`,
+`canonical_cities` or `countries`, every `place_ids` list and every country code
+the writer looks up as `country:<code>` (`places.country_code`,
+`phone_metadata.territory`, `phone_prefixes.country_codes`) must name an existing
+key. `release.dataset.closure` in `config/release.yaml` decides a missing key:
+`place_aliases` rewrites it to the key that covers it (a list keeps one copy),
+`excluded_places` drops the rows that name it, and `unknown_places` (`fail` by
+default, or `exclude`) handles any other. Rows of cells, `place_to_city` and the
+referenced tables are never dropped, and an existing key is never rewritten. The
+refusal names every missing key per table and column. Rewritten files keep their
+row groups, so cells keep their block index. The manifest's `closure` object
+counts every rewritten and dropped row per table, column and key, and the README
+lists them. The 2026.10 world inputs need two aliases: libphonenumber's `AC`
+(+247) and `TA` (+290), which GeoNames includes in `SH`.
+
+Then assembly checks the pack writer's place-reference rules
+(`pipeline/release/closure.py`): every ID that cells, forward tables,
 canonical cities and country, state, city or self-normalized places reach,
 following country, parent, sovereign and normalized city, is one unique place;
 a reached place's mapping equals its normalized city; names name canonical

@@ -729,7 +729,7 @@ Joins:
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no |  | Configured upstream source name |
 | `source_id` | `string` | no |  | Identifier of the original observation within its source |
-| `territory` | `string` | yes |  | Libphonenumber territory code |
+| `territory` | `string` | yes |  | Libphonenumber territory code. A code with no country place of its own, such as AC or TA, is published as the country that covers it; manifest.json closure counts the rewritten rows |
 | `calling_code` | `string` | yes |  | International telephone calling code, represented as text |
 | `leading_digits` | `string` | yes |  | Libphonenumber leading-digit pattern |
 | `national_prefix` | `string` | yes |  | National telephone prefix |
@@ -781,7 +781,7 @@ Joins:
 | `calling_code` | `string` | yes |  | International telephone calling code, represented as text |
 | `language` | `string` | yes |  | Language of the prefix description |
 | `description` | `string` | yes |  | Source geographic prefix description |
-| `country_codes` | `list<element: string>` | no |  | Associated country codes; list of text codes |
+| `country_codes` | `list<element: string>` | no |  | Associated country codes; list of text codes. A code with no country place of its own is published once, as the country that covers it; manifest.json closure counts the rewritten rows |
 | `source_release` | `string` | no |  | Pinned upstream release or inventory identifier |
 | `license` | `string` | no |  | Upstream licence identifier |
 | `provenance` | `string` | no |  | JSON source evidence and transformation provenance |

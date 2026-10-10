@@ -244,7 +244,7 @@ Layout: `phone_metadata/part.parquet`. Primary key: source, source_id. 1 files, 
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no | none | Configured upstream source name |
 | `source_id` | `string` | no | none | Identifier of the original observation within its source |
-| `territory` | `string` | yes | none | Libphonenumber territory code |
+| `territory` | `string` | yes | none | Libphonenumber territory code. A code with no country place of its own, such as AC or TA, is published as the country that covers it; manifest.json closure counts the rewritten rows |
 | `calling_code` | `string` | yes | none | International telephone calling code, represented as text |
 | `leading_digits` | `string` | yes | none | Libphonenumber leading-digit pattern |
 | `national_prefix` | `string` | yes | none | National telephone prefix |
@@ -271,7 +271,7 @@ Layout: `phone_prefixes/part.parquet`. Primary key: source, source_id. 1 files, 
 | `calling_code` | `string` | yes | none | International telephone calling code, represented as text |
 | `language` | `string` | yes | none | Language of the prefix description |
 | `description` | `string` | yes | none | Source geographic prefix description |
-| `country_codes` | `list<element: string>` | no | none | Associated country codes; list of text codes |
+| `country_codes` | `list<element: string>` | no | none | Associated country codes; list of text codes. A code with no country place of its own is published once, as the country that covers it; manifest.json closure counts the rewritten rows |
 | `source_release` | `string` | no | none | Pinned upstream release or inventory identifier |
 | `license` | `string` | no | none | Upstream licence identifier |
 | `provenance` | `string` | no | none | JSON source evidence and transformation provenance |

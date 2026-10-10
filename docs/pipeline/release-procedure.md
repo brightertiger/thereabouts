@@ -241,6 +241,27 @@ Interrupted units resume through the ledger. Check `work/runs/<timestamp>/` for
 logs and completion summaries, and retain the release's manifest, logical digest,
 licences, card and changelog. No stage should silently recreate a published version.
 
+### A dangling place reference stops the dataset stage
+
+The error lists each missing key by table and column, such as
+`phone_metadata.territory: country:AC`. Confirm it in the lookups inputs and find
+its source before changing configuration. If the target was dropped upstream,
+fix that stage instead. Otherwise decide each key in `release.dataset.closure` of
+`config/release.yaml`:
+
+1. When a real country or place covers the code, as `SH` covers the ISO 3166
+   exceptional reservations `AC` and `TA`, add it to `place_aliases`
+   (`country: {AC: SH}`). The alias target must exist.
+2. When nothing sensible covers it, list it in `excluded_places`; the rows that
+   name it are dropped. Cells, `place_to_city`, `places`, `canonical_cities` and
+   `countries` never lose rows, so a missing key there must be fixed upstream.
+3. Leave `unknown_places: fail`, so that the next unknown code stops the release
+   again instead of passing silently.
+
+This is a configuration change: it re-identifies only the `dataset`, `packs` and
+`publish` units. Check the counts in the manifest's `closure` object and the
+README's Place references section before publishing.
+
 ### A repeated key stops the dataset stage
 
 Assembly refuses a release that repeats a key declared in `config/dataset.yaml`.
