@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from pipeline import arguments
 from pipeline.cli import main
 from pipeline.config import load
 from pipeline.runtime.ledger import Ledger
@@ -87,6 +88,33 @@ def test_a_failure_lets_running_units_finish_and_record(tmp_path: Path) -> None:
         with pytest.raises(ValueError, match="synthetic failure"):
             run(ctx, [stage])
         assert recorded(ledger) == {"slow"}
+
+
+def test_a_failed_unit_makes_the_command_exit_nonzero(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A wrapper sees the failure only in the status of the pipeline process.
+
+    Capture it directly: `cmd; echo $?` after a pipe reports the pipe's last
+    command, and an unescaped `$?` in a tmux command is expanded at launch.
+    """
+    root = tmp_path / "workspace"
+    with writable(root):
+        pass
+    stage = SyntheticStage("download", [Recipe("download", "airports")], fail=True)
+    monkeypatch.setattr(arguments, "registry", lambda config: [stage])
+    assert main(["run", "--root", str(root)]) == 2
+    assert "pipeline: synthetic interruption" in capsys.readouterr().out
+    summary = next((root / "work/runs").glob("*/summary.json"))
+    assert json.loads(summary.read_text())["complete"] is False
+    # The module entry point turns that result into the process exit status.
+    command = [sys.executable, "-m", "pipeline", "run", "--root", str(root)]
+    status = subprocess.run(
+        [*command, "--through", "missing"], capture_output=True, check=False
+    )
+    assert status.returncode == 2
 
 
 def test_invalidate_requires_confirmation(tmp_path: Path) -> None:

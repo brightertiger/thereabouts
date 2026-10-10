@@ -1,3 +1,23 @@
+# Owner review of the city pilot, bound to the exact city policy it examined
+# (policy_fingerprint). Evaluation and the lookups manifest fail on any
+# boundary loss that no exception below matches exactly.
+#
+# A boundary exception credits one examined loss of one original boundary:
+#   country, city_id   the city whose accepted boundary lost cells
+#   lost_cells         how many of its cells another city now answers
+#   lost_to            those cells counted by the city that now answers them
+#   cells              each lost cell the evaluation report lists (its
+#                      loss_examples: the first ten in H3 order), mapped to the
+#                      city that now answers it
+#   boundary_origins   the boundary's source areas as stable upstream records:
+#                      the Overture area's whole-feature source without its
+#                      version (osm:r134579), otherwise <source>:<source_id>,
+#                      with #<part> for a split geometry part above 0. Never the
+#                      reconcile area IDs, which every rebuild renumbers.
+#   reason, reference  the reviewer's explanation and evidence
+# A loss is credited only when every field agrees. The evaluation report lists
+# each remaining loss with its origins. Area numbers inside reference texts are
+# those of the reviewed build, kept as written.
 accepted: true
 review: 'Reviewed final nine-country OFF/ON pilot on the reworked implementation.
   Every nonempty large-city footprint is 100%, 21 named points pass, all six required
@@ -12,9 +32,11 @@ review: 'Reviewed final nine-country OFF/ON pilot on the reworked implementation
   surrounding municipalities remain outside it.'
 minimum_dev_correct: 38
 boundary_exceptions:
-- boundary_references:
-  - '23017'
-  - '23071'
+- boundary_origins:
+  - osm:r134579
+  - osm:w1276063111
+  cells:
+    882ab2cda1fffff: city:geonames:4990512
   city_id: city:geonames:4990510
   country: US
   lost_cells: 1
@@ -26,73 +48,43 @@ boundary_exceptions:
     an examined conflicting-source fringe, not loss from Dearborn main municipal boundary.
   reference: source areas 23017 (OSM r134579), 23071 (w1276063111), 23072; cell 882ab2cda1fffff.
     See GOLDEN_V2.md all-boundaries audit.
-- boundary_references:
-  - '12260'
-  - '12261'
-  - '12265'
-  - '12266'
-  - '12267'
-  - '12268'
-  - '12269'
-  - '12270'
-  - '12271'
-  - '12272'
-  - '12278'
-  - '12279'
-  - '12280'
-  - '12281'
-  - '12282'
-  - '12283'
-  - '12284'
-  - '12285'
-  - '12287'
-  - '12288'
-  - '12289'
-  - '12290'
-  - '12291'
-  - '12292'
-  - '12294'
-  - '12295'
-  - '12296'
-  - '12297'
-  - '12299'
-  - '12300'
-  - '12301'
-  - '12302'
-  - '12606'
-  - '12607'
-  - '12608'
-  - '12609'
-  - '12610'
-  - '12611'
-  - '12612'
-  - '12613'
-  - '12615'
-  - '12616'
-  - '12617'
-  - '12618'
-  - '12619'
-  - '12620'
-  - '12621'
-  - '12622'
-  - '12623'
-  - '12624'
-  - '12625'
-  - '12626'
-  - '12627'
-  - '12628'
-  - '12629'
-  - '12630'
-  - '12633'
-  - '12634'
-  - '12635'
-  - '12636'
-  - '12646'
-  - '12647'
-  - '12648'
-  - '12649'
-  - '12651'
-  - '12652'
+- boundary_origins:
+  - geoboundaries:GBR-ADM2-9080712B13607306368601
+  - geoboundaries:GBR-ADM2-9080712B25883423000924
+  - geoboundaries:GBR-ADM2-9080712B26905607212870
+  - geoboundaries:GBR-ADM2-9080712B27244151555615
+  - geoboundaries:GBR-ADM2-9080712B29790766461311
+  - geoboundaries:GBR-ADM2-9080712B31505825113523
+  - geoboundaries:GBR-ADM2-9080712B32800787628045
+  - geoboundaries:GBR-ADM2-9080712B3334907750367
+  - geoboundaries:GBR-ADM2-9080712B39473788331099
+  - geoboundaries:GBR-ADM2-9080712B40540283796062
+  - geoboundaries:GBR-ADM2-9080712B42809460048540
+  - geoboundaries:GBR-ADM2-9080712B44623990435361
+  - geoboundaries:GBR-ADM2-9080712B45194275403121
+  - geoboundaries:GBR-ADM2-9080712B48606994457952
+  - geoboundaries:GBR-ADM2-9080712B49045247202114
+  - geoboundaries:GBR-ADM2-9080712B52245663238426
+  - geoboundaries:GBR-ADM2-9080712B53792364084436
+  - geoboundaries:GBR-ADM2-9080712B54935279696040
+  - geoboundaries:GBR-ADM2-9080712B54972646687738
+  - geoboundaries:GBR-ADM2-9080712B56158297313901
+  - geoboundaries:GBR-ADM2-9080712B62294642180343
+  - geoboundaries:GBR-ADM2-9080712B6382316371033
+  - geoboundaries:GBR-ADM2-9080712B64588414247228
+  - geoboundaries:GBR-ADM2-9080712B6991151074246
+  - geoboundaries:GBR-ADM2-9080712B71536097625899
+  - geoboundaries:GBR-ADM2-9080712B81123650494794
+  - geoboundaries:GBR-ADM2-9080712B85229688010924
+  - geoboundaries:GBR-ADM2-9080712B85959270461063
+  - geoboundaries:GBR-ADM2-9080712B89177385119631
+  - geoboundaries:GBR-ADM2-9080712B97999030763342
+  - geoboundaries:GBR-ADM2-9080712B98331752183955
+  - geoboundaries:GBR-ADM2-9080712B98999290586969
+  - geoboundaries:GBR-ADM2-9080712B99403255709140
+  cells:
+    88194e684dfffff: city:geonames:2654412
+    88195d368dfffff: city:geonames:2636534
   city_id: city:geonames:2643743
   country: GB
   lost_cells: 2

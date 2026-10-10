@@ -11,6 +11,7 @@ from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.cities.gates import failures, unreviewed
 from pipeline.engines.cities.quality import country_report, named_checks
 from pipeline.engines.store.codec import Row
+from pipeline.engines.store.origins import resolver
 from pipeline.files import file_record
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json
@@ -52,10 +53,19 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
         outputs.append(path)
     named = named_checks(comparison, inputs)
     failed = failures(reports, named)
-    failed["all_boundaries"] = unreviewed(
-        failed["all_boundaries"],
-        [asdict(item) for item in approval.boundary_exceptions],
+    origins = resolver(
+        lambda cc: io.artifact(ctx, "reconcile", "country/" + cc, suffix=".sqlite"),
+        settings.limits.sqlite_cache_kib,
     )
+    # Remaining losses carry their stable origins for the reviewer.
+    failed["all_boundaries"] = [
+        {**loss, "origins": origins(loss)}
+        for loss in unreviewed(
+            failed["all_boundaries"],
+            [asdict(item) for item in approval.boundary_exceptions],
+            origins,
+        )
+    ]
     score = development.score(
         ctx, located(REPOSITORY, settings.evaluation_points), tables, policy, codes
     )
