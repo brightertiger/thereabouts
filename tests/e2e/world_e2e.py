@@ -8,7 +8,9 @@ Excluded from the default run (marker `world`). `scripts/vm/e2e.sh` runs it:
     THEREABOUTS_E2E_WORK=<scratch for stores>  THEREABOUTS_E2E_REPORT=<report.md>
     THEREABOUTS_E2E_LAND / _OCEAN / _NAMES / _FORWARD / _CROSS (sample sizes)
     THEREABOUTS_E2E_WORKSPACE=<pipeline workspace; the plate evaluation examples
-        are read from its pinned plate_country evidence>
+        are read from its pinned plate_country evidence, and the lookups quality
+        gates from the manifest its cells/current.json names, which must be the
+        release's input>
     THEREABOUTS_E2E_PLATE_EXAMPLES=<or a JSON list of {country_code, plate}>
 """
 

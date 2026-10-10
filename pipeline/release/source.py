@@ -15,6 +15,10 @@ from pipeline.runtime.paths import located, validate_relative
 from pipeline.runtime.records import Output
 
 Row = dict[str, Any]
+ADVISORY = ("countries", "boundary_losses", "lost_cells", "footprint_failures")
+# The scopes of config/policies/quality.yaml, repeated so that packs and publish
+# do not hash the policy loaders; a test keeps the two equal.
+SCOPES = ("reviewed", "all")
 
 
 @dataclass(frozen=True)
@@ -55,6 +59,7 @@ class Snapshot:
     manifest: Row
     manifest_sha256: str
     tables: dict[str, list[TableFile]]
+    manifest_path: Path
 
     @classmethod
     def read(cls, root: Path, manifest_path: Path, grid: H3) -> "Snapshot":
@@ -109,7 +114,7 @@ class Snapshot:
                 raise ValueError(f"Invalid input table record: {entry.path}")
             seen.add(entry.path)
             tables[entry.kind].append(entry)
-        return cls(root, value, sha256_file(manifest_path), dict(tables))
+        return cls(root, value, sha256_file(manifest_path), dict(tables), manifest_path)
 
     def path(self, record: TableFile) -> Path:
         return located(self.root, record.path)
@@ -125,6 +130,38 @@ class Snapshot:
     @property
     def policy(self) -> Row:
         return dict(self.manifest["normalization"]["policy"])
+
+    @property
+    def quality_gates(self) -> Row:
+        """The lookups gate scope and advisory totals with their quality.json record.
+
+        Every lookups manifest since the gates were scoped carries them; a release
+        is never assembled without them."""
+        gates = self.manifest.get("quality_gates")
+        if gates is None:
+            raise ValueError(
+                f"Input manifest {self.manifest_path} has no quality_gates; "
+                "rebuild lookups/manifest/current with scoped quality gates"
+            )
+        advisory = gates.get("advisory") if isinstance(gates, dict) else None
+        if (
+            not isinstance(advisory, dict)
+            or gates.get("blocking_scope") not in SCOPES
+            or not isinstance(gates.get("reviewed_countries"), list)
+            or set(advisory) != set(ADVISORY)
+            or any(type(advisory[key]) is not int for key in ADVISORY)
+        ):
+            raise ValueError("Input quality gates are malformed")
+        if "report" in gates:  # A released dataset read back as input.
+            return dict(gates)
+        reports = [
+            record
+            for record in self.manifest.get("verification_artifacts") or []
+            if Path(record["path"]).name == "quality.json"
+        ]
+        if len(reports) != 1:
+            raise ValueError("Input quality gates need one quality.json record")
+        return {**gates, "report": reports[0]}
 
     @property
     def content_identity(self) -> str:

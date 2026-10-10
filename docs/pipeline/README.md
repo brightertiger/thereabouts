@@ -318,7 +318,12 @@ named-point failures stop it in either scope. The unit's `quality.json` holds:
   `boundary_exceptions`, the exceptions applied.
 
 Footprint findings carry their report's `country`. `manifest.json` repeats the
-scope, the reviewed countries and the advisory totals as `quality_gates`.
+scope, the reviewed countries and the advisory totals as `quality_gates`. The
+`dataset` stage copies them into the dataset `manifest.json`, adding the
+`quality.json` record as `report`, and the dataset README summarizes them.
+Assembly, in the stage or `release prepare`, refuses an input manifest without
+`quality_gates`. The world end-to-end test checks both against the workspace's
+lookups manifest.
 
 The optional `plate_country` stage derives syntax, priors, coverage and an
 inference bundle from normalized pinned evidence. Its `plate_country/world` unit,

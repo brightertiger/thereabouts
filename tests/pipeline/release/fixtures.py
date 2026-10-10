@@ -16,6 +16,8 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.resources import ResourceGuard
 
+from .synthetic import gates, quality
+
 # The cells' country and city, closed under the pack writer's reference rule.
 CATALOGUE: dict[str, list[dict[str, Any]]] = {
     "places": [
@@ -120,6 +122,8 @@ def fixture(
             if kind in {"places", "canonical_cities", "place_to_city"}:
                 entry["country"] = "MY"
             tables.append(entry)
+    report = quality(["MY", "SG"])
+    write_json(source / "quality.json", report)
     write_json(
         source / "manifest.json",
         {
@@ -132,6 +136,8 @@ def fixture(
                 "completed": True,
                 "policy": {"distant_m": 25000, "nearest_m": 50000},
             },
+            "verification_artifacts": [file_record(source, source / "quality.json")],
+            "quality_gates": gates(report),
         },
     )
     return external(source, config.h3), config, ResourceGuard(root, config.resources)

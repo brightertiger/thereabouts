@@ -4,7 +4,9 @@
 URL), installs every family through the Python console, the Node client and
 the CLI at `ulimit -n 256`, then checks seeded reverse and forward samples, the
 120 city points, plate examples, the world-safe vectors through each client,
-cross-client JSON equality, the MCP server and every skill example. Each step
+cross-client JSON equality, the MCP server and every skill example. With a
+pipeline workspace it also checks the lookups quality gates behind the release
+against the workspace's `cells/current.json`. Each step
 is recorded with its evidence; a failure never hides the later steps.
 `markdown()` renders the report. The checks are the packs-stage acceptance
 judges (`pipeline/release/acceptance.py`), with a different default seed.
@@ -32,14 +34,16 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
-from pipeline.config import load
+from pipeline.config import load, policies, quality_policy
 from pipeline.config.release import AcceptanceSettings
 from pipeline.engines.artifacts import read_json
+from pipeline.engines.cities import gate_scope
 from pipeline.release import acceptance, samples
 from pipeline.release.samples import Query
 from pipeline.runtime.fingerprints import REPOSITORY
-from pipeline.runtime.jsonio import encode
+from pipeline.runtime.jsonio import encode, sha256_file
 from pipeline.runtime.paths import located
+from pipeline.stages.lookups import QUALITY_POLICY
 from tests.client.cli.test_vectors import USAGE_CASES, arguments
 from tests.skill import examples
 
@@ -49,6 +53,7 @@ NODE = REPOSITORY / "clients/node"
 SKILL = REPOSITORY / "skills/thereabouts"
 DOCUMENTS = [SKILL / "SKILL.md", SKILL / "references/query-recipes.md"]
 TOOLS = {"coordinates": "reverse", "h3": "h3"}
+COUNTS = ("boundary_losses", "lost_cells", "footprint_failures")
 
 
 @dataclass
@@ -67,7 +72,8 @@ class Settings:
     cross_client: int = 1000
     city_points: Path | None = REPOSITORY / "eval/city_points/points.csv"
     plate_examples: Path | None = None
-    # The pipeline workspace whose plate_country pin holds the evaluation files.
+    # The pipeline workspace whose plate_country pin holds the evaluation files
+    # and whose lookups manifest the release was built from.
     workspace: Path | None = None
     timeout: int = 7200
 
@@ -409,6 +415,89 @@ def plate_examples(report: Report, store: Path, accept: AcceptanceSettings) -> N
         }
 
 
+def configured_gates() -> Row:
+    """The blocking scope and reviewed countries the repository config gives."""
+    engines = load().engines
+    scope = quality_policy.load(located(REPOSITORY, QUALITY_POLICY))["gates"]
+    return {
+        "blocking_scope": scope["blocking_scope"],
+        "reviewed_countries": gate_scope.reviewed_countries(
+            policies.cities(located(REPOSITORY, engines.city_policies)),
+            policies.reconcile(located(REPOSITORY, engines.reconcile_policy)),
+            policies.read(located(REPOSITORY, engines.city_review)),
+        ),
+    }
+
+
+def verified(workspace: Path, record: Row) -> Path:
+    path = located(workspace, record["path"])
+    if path.stat().st_size != record["size"] or sha256_file(path) != record["sha256"]:
+        raise AssertionError(f"checksum differs: {record['path']}")
+    return path
+
+
+def lookup_gates(workspace: Path, dataset: Path) -> Row:
+    """The lookups quality gates behind this release (E2 review, section 7)."""
+    released = read_json(dataset / "manifest.json")
+    pointer = located(workspace, load().paths.cells) / "current.json"
+    record = read_json(pointer)["manifest"]
+    manifest = read_json(verified(workspace, record))
+    assert record["sha256"] == released["input_manifest_sha256"], (
+        f"{record['path']} is not this release's input manifest"
+    )
+    gates = manifest["quality_gates"]
+    for key, value in configured_gates().items():
+        assert gates[key] == value, f"{key} differs from the repository config"
+    (report,) = [
+        item
+        for item in manifest["verification_artifacts"]
+        if Path(item["path"]).name == "quality.json"
+    ]
+    quality = read_json(verified(workspace, report))
+    assert released["quality_gates"] == {**gates, "report": report}, (
+        "the release's quality_gates differ from its lookups manifest"
+    )
+    blocking = {k: len(v) for k, v in quality["failed_spatial_gates"].items() if v}
+    assert not blocking, f"blocking findings: {blocking}"
+    advisory = quality["advisory_spatial_gates"]
+    flagged = {f["country"] for found in advisory.values() for f in found}
+    flagged &= set(gates["reviewed_countries"])
+    assert not flagged, f"advisory findings in reviewed countries: {sorted(flagged)}"
+    scope = quality["gate_scope"]
+    rows = {cc: row for cc, row in scope["by_country"].items() if not row["reviewed"]}
+    summed = {
+        "countries": len(rows),
+        **{key: sum(row[key] for row in rows.values()) for key in COUNTS},
+    }
+    listed = gate_scope.totals(gate_scope.counts(advisory))
+    assert scope["advisory"] == gates["advisory"] == summed == listed, (
+        f"advisory totals disagree: gate_scope {scope['advisory']}, manifest "
+        f"{gates['advisory']}, by_country {summed}, findings {listed}"
+    )
+    top = sorted(rows.items(), key=lambda i: (-i[1]["lost_cells"], i[0]))[:20]
+    return {
+        "manifest": record["path"],
+        "quality": report["path"],
+        "blocking_scope": gates["blocking_scope"],
+        "reviewed_countries": len(gates["reviewed_countries"]),
+        "advisory": gates["advisory"],
+        "top": [{"country": cc, **{k: row[k] for k in COUNTS}} for cc, row in top],
+    }
+
+
+def quality_gates(report: Report, dataset: Path) -> None:
+    """The lookups gates behind the release; skipped without a workspace."""
+    with step(report, "quality-gates") as record:
+        if report.settings.workspace is None:
+            record.status = "skip"
+            record.details["reason"] = (
+                "no lookups manifest: set THEREABOUTS_E2E_WORKSPACE to the "
+                "pipeline workspace that built the release"
+            )
+            return
+        record.details = lookup_gates(report.settings.workspace, dataset)
+
+
 def console(
     report: Report, store: Path, queries: list[Query], env: dict[str, str]
 ) -> dict[str, Row]:
@@ -582,6 +671,7 @@ def run(settings: Settings) -> Report:
             timeout_seconds=settings.timeout,
         )
         dataset = settings.release / "dataset" / report.version
+        quality_gates(report, dataset)
         queries = samples.queries(dataset, accept, settings.families)
         lines: dict[str, Row] = {}
         with step(report, "python-queries") as record:
@@ -690,6 +780,27 @@ def markdown(report: Report) -> str:
             ],
         ),
     ]
+    gates = found.get("quality-gates")
+    if gates is not None and gates.status == "pass":
+        d, a = gates.details, gates.details["advisory"]
+        lines += [
+            "",
+            "## Lookups quality gates",
+            "",
+            f"Blocking scope `{d['blocking_scope']}` over "
+            f"{d['reviewed_countries']} reviewed countries: no blocking finding. "
+            f"Advisory in {a['countries']:,} unreviewed countries: "
+            f"{a['boundary_losses']:,} boundary losses ({a['lost_cells']:,} cells) "
+            f"and {a['footprint_failures']:,} footprint "
+            f"failure{'' if a['footprint_failures'] == 1 else 's'}. Lookups "
+            f"manifest `{d['manifest']}`; every finding in `{d['quality']}`.",
+        ]
+        if d["top"]:
+            lines += ["", "Unreviewed countries by lost cells (top 20):", ""]
+            lines += table(
+                ["Country", "Boundary losses", "Lost cells", "Footprint failures"],
+                [[row["country"], *(row[k] for k in COUNTS)] for row in d["top"]],
+            )
     if "sizes" in found and "packs" in found["sizes"].details:
         lines += ["", "## Sizes", ""]
         lines += table(

@@ -56,6 +56,10 @@ Method columns explain the evidence or fallback used. `city_method = 'rural_near
 
 Timezone membership is independent of eligible land. `timezone_cells` can store resolutions 0–8 and overlapping source memberships; query all ancestors down to resolution 0 for that table. In a spatial subset, a timezone row coarser than resolution 3 is retained whole when it overlaps a selected block, so its represented area can extend outside the subset.
 
+## Quality gates
+
+Before export, the pipeline checks every country's city boundaries and footprints. The measured export this page was rendered from predates these gates. A release's `manifest.json.quality_gates` records its blocking scope, its reviewed countries and its advisory totals.
+
 ## Tables and columns
 
 Arrow types and physical nullability below are checked during assembly. “None” for units means an identifier, category, text or dimensionless value. Required logical keys are listed separately from Arrow nullability. Observation tables are keyed by `source` and `source_id`, one row per source record, so duplicate observations of one code or place are retained as separate rows. Assembly refuses a release that repeats any declared key. Counts and bytes are for this exact export, not a world estimate.
@@ -613,7 +617,7 @@ Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positi
 
 Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `dataset/2026.10/_SUCCESS` receipt (the same receipt is written to `packs/2026.10/_SUCCESS`), written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
-The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index and `empty_blocks` defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
+The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `quality_gates`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index and `empty_blocks` defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks; `quality_gates` summarizes the quality gates above.
 
 With Python 3.11 or newer and `DATASET` set, verify local bytes without loading the tables:
 

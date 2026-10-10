@@ -38,10 +38,12 @@ def test_committed_readme_matches_template_and_measured_subset() -> None:
         schema_description(REPOSITORY / config.release.schema),
         licences(config, set(evidence["sources"])),
         evidence["policy"],
+        None,
         REPOSITORY / config.release.readme_template,
     ).encode()
     # The recorded readme_sha256 is the 2026-10-04 render, before the template
-    # gained the dictionary, world wording and versioned _SUCCESS receipts.
+    # gained the dictionary, world wording, versioned _SUCCESS receipts and the
+    # quality gates, which that export's input did not record.
     assert generated == (REPOSITORY / "docs/dataset/README.md").read_bytes()
     # Tables added after that export are documented, without invented counts.
     text = generated.decode()
