@@ -176,11 +176,9 @@ def closure(record: Row | None) -> str:
     aliased, excluded = record["aliased"], record["excluded"]
     if not aliased and not excluded:
         return (
-            "This export needed neither: `manifest.json.closure` lists no alias and "
-            "no exclusion."
+            "This export needed no alias and no exclusion; `manifest.json.closure` "
+            "records the same."
         )
-    rewritten = sum(entry["rows"] for entry in aliased)
-    dropped = sum(entry["rows"] for entry in excluded)
     rows = []
     for entry in [*aliased, *excluded]:
         published = f"`{entry['to']}`" if "to" in entry else "row dropped"
@@ -190,8 +188,9 @@ def closure(record: Row | None) -> str:
         )
     return "\n".join(
         [
-            f"This export rewrote {rewritten:,} row{'' if rewritten == 1 else 's'} "
-            f"and dropped {dropped:,} row{'' if dropped == 1 else 's'}:",
+            "In this export, assembly rewrote or dropped these references; Rows "
+            "counts the rows that name the missing key, as `manifest.json.closure` "
+            "does:",
             "",
             "| Table | Column | Missing key | Published as | Rows |",
             "| --- | --- | --- | --- | --- |",

@@ -84,8 +84,8 @@ def test_the_closure_paragraph_follows_the_manifest_record() -> None:
     assert "predates this record" in closure(None)
     record: dict[str, Any] = {"unknown_places": "fail", "aliased": [], "excluded": []}
     assert closure(record) == (
-        "This export needed neither: `manifest.json.closure` lists no alias and "
-        "no exclusion."
+        "This export needed no alias and no exclusion; `manifest.json.closure` "
+        "records the same."
     )
     record["aliased"] = [
         {
@@ -100,7 +100,7 @@ def test_the_closure_paragraph_follows_the_manifest_record() -> None:
         {"table": "airports", "column": "state_id", "place": "state:x", "rows": 2}
     ]
     text = closure(record)
-    assert text.startswith("This export rewrote 1,234 rows and dropped 2 rows:")
+    assert text.startswith("In this export, assembly rewrote or dropped these")
     assert text.splitlines()[-2:] == [
         "| `phone_prefixes` | `country_codes` | `country:TA` | `country:SH` | 1,234 |",
         "| `airports` | `state_id` | `state:x` | row dropped | 2 |",
