@@ -37,8 +37,7 @@ def gated(
     write_json(path, {"advisory_spatial_gates": {}, "gate_scope": {}})
     value = read_json(root / "manifest.json")
     value["quality_gates"] = gates
-    if report:
-        value["verification_artifacts"] = [file_record(root, path)]
+    value["verification_artifacts"] = [file_record(root, path)] if report else []
     write_json(root / "manifest.json", value)
     return external(root, config.h3)
 
@@ -66,13 +65,17 @@ def test_gates_and_their_report_reach_the_manifest_and_readme(tmp_path: Path) ->
     assert "`quality_gates`" in readme.split("## Versions and integrity")[1]
 
 
-def test_an_input_without_gates_records_null(tmp_path: Path) -> None:
+def test_an_input_without_gates_is_refused_by_path(tmp_path: Path) -> None:
     snapshot, config, guard = fixture(tmp_path)
+    manifest = snapshot.root / "manifest.json"
+    value = read_json(manifest)
+    del value["quality_gates"]
+    write_json(manifest, value)
     output = tmp_path / "dataset/2026.10"
-    assemble(snapshot, output, config, guard, "identity")
-    assert read_json(output / "manifest.json")["quality_gates"] is None
-    section = (output / "README.md").read_text().split("## Quality gates\n")[1]
-    assert "records no quality-gate summary" in section.split("\n## ")[0]
+    with pytest.raises(ValueError, match="has no quality_gates") as error:
+        assemble(external(snapshot.root, config.h3), output, config, guard, "x")
+    assert str(manifest) in str(error.value)
+    assert not output.parent.exists() or not any(output.parent.iterdir())
 
 
 def test_a_release_read_back_keeps_its_report(tmp_path: Path) -> None:
@@ -111,6 +114,8 @@ def test_wording_for_each_scope() -> None:
     every = quality({**clean, "blocking_scope": "all", "reviewed_countries": []})
     assert "`all`" in every and "in every country" in every
     assert "unreviewed" not in every
+    # Only the committed documentation renders without gates.
+    assert "null" not in quality(None) and "predates" in quality(None)
 
 
 def test_release_scopes_are_the_quality_policy_scopes() -> None:

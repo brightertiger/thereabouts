@@ -49,6 +49,7 @@ def assemble(
     previous: Path | None = None,
 ) -> list[Path]:
     selection = Selection.from_settings(config.release, config.h3)
+    # Refuses, before any work, an input without the lookups quality gates.
     gates = snapshot.quality_gates
     descriptions = schema_description(REPOSITORY / config.release.schema)
     if output.exists():

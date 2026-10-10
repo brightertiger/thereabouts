@@ -142,7 +142,8 @@ def gates(report: Row) -> Row:
 def snapshot(root: Path, report: Row | None = None) -> Path:
     """Every table of config/dataset.yaml; cells split by block like lookups.
 
-    With a quality.json `report`, the manifest carries its gates like lookups."""
+    The manifest carries the gates of a quality.json `report` like lookups; by
+    default one with advisory findings outside FR, MY and SG."""
     description = inputs(schema(REPOSITORY / "config/dataset.yaml"))
     records = plate_rows(root)
     rows = ROWS | {"names": names_rows()}
@@ -204,10 +205,10 @@ def snapshot(root: Path, report: Row | None = None) -> Path:
             "policy": {"distant_m": 25000, "nearest_m": 50000},
         },
     }
-    if report is not None:
-        write_json(root / "quality.json", report)
-        manifest["verification_artifacts"] = [file_record(root, root / "quality.json")]
-        manifest["quality_gates"] = gates(report)
+    report = report or quality(["FR", "MY", "SG"])
+    write_json(root / "quality.json", report)
+    manifest["verification_artifacts"] = [file_record(root, root / "quality.json")]
+    manifest["quality_gates"] = gates(report)
     write_json(root / "manifest.json", manifest)
     return root
 

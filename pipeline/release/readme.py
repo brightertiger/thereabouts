@@ -112,11 +112,15 @@ def render(
 
 
 def quality(gates: Row | None) -> str:
-    """The lookups quality gates this export passed, and its advisory totals."""
+    """The lookups quality gates this export passed, and its advisory totals.
+
+    Assembly always passes gates; None renders the committed documentation from
+    measurements recorded before the gates existed."""
     if gates is None:
         return (
-            "The input manifest of this export records no quality-gate summary, so "
-            "`manifest.json.quality_gates` is null."
+            "The measured export this page was rendered from predates these gates. "
+            "A release's `manifest.json.quality_gates` records its blocking scope, "
+            "its reviewed countries and its advisory totals."
         )
     stop = (
         "A boundary loss without a reviewed exception, or a city footprint "

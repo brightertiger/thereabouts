@@ -58,7 +58,7 @@ Timezone membership is independent of eligible land. `timezone_cells` can store 
 
 ## Quality gates
 
-Before export, the pipeline checks every country's city boundaries and footprints. The input manifest of this export records no quality-gate summary, so `manifest.json.quality_gates` is null.
+Before export, the pipeline checks every country's city boundaries and footprints. The measured export this page was rendered from predates these gates. A release's `manifest.json.quality_gates` records its blocking scope, its reviewed countries and its advisory totals.
 
 ## Tables and columns
 

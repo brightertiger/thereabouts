@@ -59,6 +59,7 @@ class Snapshot:
     manifest: Row
     manifest_sha256: str
     tables: dict[str, list[TableFile]]
+    manifest_path: Path
 
     @classmethod
     def read(cls, root: Path, manifest_path: Path, grid: H3) -> "Snapshot":
@@ -113,7 +114,7 @@ class Snapshot:
                 raise ValueError(f"Invalid input table record: {entry.path}")
             seen.add(entry.path)
             tables[entry.kind].append(entry)
-        return cls(root, value, sha256_file(manifest_path), dict(tables))
+        return cls(root, value, sha256_file(manifest_path), dict(tables), manifest_path)
 
     def path(self, record: TableFile) -> Path:
         return located(self.root, record.path)
@@ -131,12 +132,17 @@ class Snapshot:
         return dict(self.manifest["normalization"]["policy"])
 
     @property
-    def quality_gates(self) -> Row | None:
-        """The lookups gate scope and advisory totals with their quality.json record;
-        None for an input written before the gates were scoped."""
+    def quality_gates(self) -> Row:
+        """The lookups gate scope and advisory totals with their quality.json record.
+
+        Every lookups manifest since the gates were scoped carries them; a release
+        is never assembled without them."""
         gates = self.manifest.get("quality_gates")
         if gates is None:
-            return None
+            raise ValueError(
+                f"Input manifest {self.manifest_path} has no quality_gates; "
+                "rebuild lookups/manifest/current with scoped quality gates"
+            )
         advisory = gates.get("advisory") if isinstance(gates, dict) else None
         if (
             not isinstance(advisory, dict)
