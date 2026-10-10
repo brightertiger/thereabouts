@@ -186,7 +186,8 @@ def test_a_repeated_observation_key_is_refused(tmp_path: Path) -> None:
     output = tmp_path / "dataset"
     with pytest.raises(
         ValueError,
-        match=r"Repeated logical primary key: zone_tables \(source, source_id\)",
+        match=r"Repeated logical primary key: zone_tables \(source, source_id\); "
+        r"repeated values: \('timezones', 'one'\)$",
     ):
         assemble(snapshot, output, config, guard, "identity")
     assert not output.exists()
