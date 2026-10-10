@@ -405,8 +405,7 @@ class Publisher:
                 raise ValueError(
                     f"Published release {self.plan.tag} lacks {', '.join(lost)}, which "
                     f"its {generated} names by asset id; a published release cannot be "
-                    "repaired in place, so publish a new version (such as "
-                    f"{self.plan.version}.1)"
+                    "repaired in place, so publish a new patch version (YYYY.MM.N)"
                 )
 
     def run(self, zips: Mapping[str, dataset_zips.Built]) -> Row:

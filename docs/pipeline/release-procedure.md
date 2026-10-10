@@ -348,6 +348,11 @@ release to 1,000 assets, each under 2 GiB; the plan enforces both. The same
 target runs as the `publish` stage (`run --through publish` with
 `release.publish.target=github`), whose unit destination is `github:<repository>`.
 
+GitHub keeps one latest release per repository, and the clients' default URL
+reads `index.json` from it. Publish any other release in this repository (such as
+client code) with "Set as the latest release" unchecked, or the default URL
+stops finding `index.json` until the next dataset release.
+
 Clients read the `releases/latest/download/` and `releases/download/<tag>/`
 redirect routes, not the REST `releases/latest` endpoint, which allows 60
 unauthenticated requests an hour per address. While the repository is private,
