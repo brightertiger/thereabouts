@@ -1,7 +1,7 @@
 import { VERSION } from "./version.js";
 import { inventory, active } from "./store.js";
 import { source, index, select, compareVersions } from "./transport.js";
-import { install, remove } from "./install.js";
+import { install, installDataset, remove } from "./install.js";
 import { wasm } from "./wasm.js";
 import { DataNotInstalledError, usage, atPack } from "./errors.js";
 export async function manage(command, values, options, root, io) {
@@ -9,6 +9,17 @@ export async function manage(command, values, options, root, io) {
     case "data path":
       return { path: root };
     case "data install":
+      if (values.includes("dataset")) {
+        if (values.length !== 1)
+          throw usage(
+            "Install the dataset on its own: thereabouts data install dataset",
+          );
+        return installDataset(
+          root,
+          source(options.from, io.env),
+          options.version,
+        );
+      }
       return {
         installed: await install(
           root,
