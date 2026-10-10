@@ -6,8 +6,8 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from pipeline.config import load
+from pipeline.release import github, prepared, proof, registry
 from pipeline.release import pins as release_pins
-from pipeline.release import prepared, proof, registry
 from pipeline.release.assemble import assemble
 from pipeline.release.publish import inventory, publish
 from pipeline.release.source import external
@@ -98,21 +98,34 @@ def main(argv: Sequence[str]) -> int:
     elif args.command == "packs":
         result = prepared.packs(config, root)
     else:
+        to_github = config.release.publish.target == "github"
         destination = config.storage.get("s3_release")
-        if not destination:
+        if not destination and not to_github:
             raise ValueError("Configure storage.s3_release before upload")
         proof.verify(root, config, args.version)
         packs = {
             family: located(root, config.paths.packs) / args.version / family
             for family in config.release.packs.families
         }
-        result = publish(
-            inventory(dataset, packs, args.version),
-            destination,
-            args.version,
-            config.release.publish,
-            dry_run=args.dry_run,
-        )
+        entries = inventory(dataset, packs, args.version)
+        if to_github:
+            result = github.publish(
+                entries,
+                dataset,
+                args.version,
+                config.release.publish,
+                dry_run=args.dry_run,
+                work=located(root, config.paths.work) / "releases" / args.version,
+                guard=ResourceGuard(root, config.resources),
+            )
+        else:
+            result = publish(
+                entries,
+                destination or "",
+                args.version,
+                config.release.publish,
+                dry_run=args.dry_run,
+            )
     if args.report:
         write_json(args.report, result)
     print(
