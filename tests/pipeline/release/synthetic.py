@@ -13,6 +13,7 @@ from h3.api import basic_int as h3
 
 from pipeline.config import Config, load
 from pipeline.engines.artifact_io import file_record
+from pipeline.engines.cities.gate_scope import counts, totals
 from pipeline.engines.plate_country import formats, tables
 from pipeline.engines.plate_country.documents import Pool
 from pipeline.engines.plate_country.policy import policy
@@ -97,8 +98,51 @@ SOURCES = {
 }
 
 
-def snapshot(root: Path) -> Path:
-    """Every table of config/dataset.yaml; cells split by block like lookups."""
+def quality(reviewed: list[str]) -> Row:
+    """A lookups quality.json in `reviewed` scope with advisory findings only."""
+    outside = [cc for cc in ("DE", "BR", "AU", "ZA") if cc not in reviewed][:2]
+    advisory = {
+        "all_boundaries": [
+            {"country": outside[0], "lost_cells": 40, "place_id": "city:geonames:1"},
+            {"country": outside[1], "lost_cells": 2, "place_id": "city:geonames:2"},
+        ],
+        "footprints": [{"country": outside[1], "city_id": "city:geonames:3"}],
+    }
+    by_country = counts(advisory)
+    return {
+        "failed_spatial_gates": {
+            "all_boundaries": [],
+            "footprints": [],
+            "neighbours": [],
+            "named": [],
+        },
+        "advisory_spatial_gates": advisory,
+        "gate_scope": {
+            "blocking_scope": "reviewed",
+            "reviewed_countries": reviewed,
+            "blocking": totals({}),
+            "advisory": totals(by_country),
+            "by_country": {
+                cc: {"reviewed": False, **row} for cc, row in by_country.items()
+            },
+        },
+    }
+
+
+def gates(report: Row) -> Row:
+    """The lookups manifest's `quality_gates` for a quality.json."""
+    scope = report["gate_scope"]
+    return {
+        "blocking_scope": scope["blocking_scope"],
+        "reviewed_countries": scope["reviewed_countries"],
+        "advisory": scope["advisory"],
+    }
+
+
+def snapshot(root: Path, report: Row | None = None) -> Path:
+    """Every table of config/dataset.yaml; cells split by block like lookups.
+
+    With a quality.json `report`, the manifest carries its gates like lookups."""
     description = inputs(schema(REPOSITORY / "config/dataset.yaml"))
     records = plate_rows(root)
     rows = ROWS | {"names": names_rows()}
@@ -150,28 +194,30 @@ def snapshot(root: Path) -> Path:
             if block:
                 record["block"] = block
             records.append(record)
-    write_json(
-        root / "manifest.json",
-        {
+    manifest: Row = {
+        "completed": True,
+        "tables": records,
+        "reference_resolution": 8,
+        "block_resolution": 3,
+        "normalization": {
             "completed": True,
-            "tables": records,
-            "reference_resolution": 8,
-            "block_resolution": 3,
-            "normalization": {
-                "completed": True,
-                "policy": {"distant_m": 25000, "nearest_m": 50000},
-            },
+            "policy": {"distant_m": 25000, "nearest_m": 50000},
         },
-    )
+    }
+    if report is not None:
+        write_json(root / "quality.json", report)
+        manifest["verification_artifacts"] = [file_record(root, root / "quality.json")]
+        manifest["quality_gates"] = gates(report)
+    write_json(root / "manifest.json", manifest)
     return root
 
 
-def dataset(root: Path) -> tuple[Path, Config]:
+def dataset(root: Path, report: Row | None = None) -> tuple[Path, Config]:
     """Assemble the synthetic snapshot into ``root/dataset/2026.10``."""
     config = load()
     config.release.enabled = True
     config.release.version = "2026.10"
-    source = snapshot(root / "input")
+    source = snapshot(root / "input", report)
     output = root / "dataset/2026.10"
     guard = ResourceGuard(root, config.resources)
     assemble(external(source, config.h3), output, config, guard, "identity")

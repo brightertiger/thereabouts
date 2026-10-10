@@ -1,5 +1,6 @@
 """The end-to-end driver passes on a fixture-scale release built by the pipeline."""
 
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +13,7 @@ from pipeline.release.publish import inventory, publish
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.resources import ResourceGuard
 from tests.pipeline.release.synthetic import dataset as synthetic_dataset
+from tests.pipeline.release.synthetic import quality
 from tests.pipeline.sources import plate_evaluation
 
 from . import driver
@@ -21,7 +23,8 @@ FAMILIES = driver.FAMILIES
 
 def staged(root: Path) -> Path:
     """The packs stage and a private file:// publication, as on the VM."""
-    dataset, config = synthetic_dataset(root)
+    reviewed = driver.configured_gates()["reviewed_countries"]
+    dataset, config = synthetic_dataset(root, quality(reviewed))
     packs = root / "packs/2026.10"
     guard = ResourceGuard(root, config.resources)
     writer = client.binding()
@@ -45,8 +48,16 @@ def staged(root: Path) -> Path:
     return staging
 
 
-def workspace(root: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    """Pinned plate_country evidence holding one Commons evaluation page."""
+def workspace(root: Path, lookups: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Pinned plate_country evidence holding one Commons evaluation page, and the
+    lookups manifest and quality.json the release was assembled from."""
+    root.mkdir(parents=True)
+    shutil.copyfile(lookups / "quality.json", root / "quality.json")
+    shutil.copyfile(lookups / "manifest.json", root / "lookups.json")
+    write_json(
+        root / "cells/current.json",
+        {"manifest": file_record(root, root / "lookups.json")},
+    )
     page = root / "raw/plate_country/sha256/commons"
     write_json(
         page,
@@ -91,6 +102,7 @@ def test_the_driver_passes_on_a_fixture_release(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     staging = staged(tmp_path / "build")
+    lookups = tmp_path / "build/input"
     settings = driver.Settings(
         release=staging,
         work=tmp_path / "work",
@@ -100,7 +112,7 @@ def test_the_driver_passes_on_a_fixture_release(
         forward_rows=10,
         cross_client=40,
         timeout=600,
-        workspace=workspace(tmp_path / "workspace", monkeypatch),
+        workspace=workspace(tmp_path / "workspace", lookups, monkeypatch),
     )
     report = driver.run(settings)
     text = driver.markdown(report)
@@ -118,6 +130,7 @@ def test_the_driver_passes_on_a_fixture_release(
         "mcp",
         "skill",
         "plate-examples",
+        "quality-gates",
     }
     assert {name for name, status in statuses.items() if status == "pass"} >= expected
     plates = report.step("plate-examples").details["splits"]["all"]
@@ -129,6 +142,9 @@ def test_the_driver_passes_on_a_fixture_release(
     assert report.step("install-python").details["update"]["update_available"] is False
     assert "| core |" in text and "## Reverse and forward checks" in text
     assert "## Plate examples" in text
+    gates = report.step("quality-gates").details
+    assert gates["advisory"]["lost_cells"] == 42
+    assert "## Lookups quality gates" in text
     checks = report.step("reverse-and-forward").details["checks"]
     assert checks["reverse"]["agreed"] == checks["reverse"]["applicable"] > 0
 

@@ -8,7 +8,10 @@
 # with python's http.server. Sample sizes default to the spec; override with
 # THEREABOUTS_E2E_LAND, _OCEAN, _NAMES, _FORWARD, _CROSS. The plate evaluation
 # examples are read from the pinned plate_country evidence of the workspace in
-# THEREABOUTS_E2E_WORKSPACE (default /mnt/data, read only). Writes the log and the
+# THEREABOUTS_E2E_WORKSPACE (default /mnt/data, read only), and the lookups
+# quality gates from the manifest its cells/current.json names; that manifest
+# must be the release's input, so run this before lookups runs again (set the
+# variable empty to skip both checks). Writes the log and the
 # Markdown report under E2E_RUN (default /srv/thereabouts/scratch/e2e/<UTC time>).
 set -euo pipefail
 
