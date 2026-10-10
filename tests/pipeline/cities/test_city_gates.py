@@ -169,3 +169,40 @@ def test_origins_resolve_only_for_otherwise_matching_losses() -> None:
         changed,
     ]
     assert calls == ["town"]
+
+
+def test_review_refuses_sequence_ids_and_inconsistent_cells(tmp_path: Path) -> None:
+    from pipeline.config.reviews import load
+    from pipeline.runtime.jsonio import digest, write_json
+
+    settings: Row = {"pilot": ["ZZ"]}
+    exception = dict(REVIEW)
+    gate = tmp_path / "review.yaml"
+
+    def review(**change: object) -> Row:
+        write_json(
+            gate,
+            {
+                "accepted": True,
+                "review": "All measured losses reviewed",
+                "policy_fingerprint": digest(settings),
+                "boundary_exceptions": [{**exception, **change}],
+            },
+        )
+        return load(gate, settings).boundary_exceptions[0].boundary_origins
+
+    assert review() == ["osm:r1", "osm:w2"]
+    with pytest.raises(ValueError, match="sequence IDs"):
+        review(boundary_origins=["23017", "23071"])
+    for bad in (
+        {"boundary_origins": []},
+        {"boundary_origins": ["osm:r1", "osm:r1"]},
+        {"cells": {}},
+        {"cells": {"882ab2cda1fffff": "other"}},
+        {"cells": {"882ab2cda1fffff": "neighbour", "882ab2cda3fffff": "neighbour"}},
+        {"cells": {"not-a-cell": "neighbour"}},
+    ):
+        with pytest.raises(ValueError, match="Incomplete boundary exception"):
+            review(**bad)
+    with pytest.raises(ValueError, match="Invalid review"):
+        review(boundary_references=["23017"])
