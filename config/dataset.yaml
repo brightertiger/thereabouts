@@ -5,7 +5,9 @@ airports:
     to the cell geography at their coordinates.
   grain: One row per airport record in the pinned OurAirports file; duplicate observations
     are retained.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -166,6 +168,54 @@ airports:
     nullable: true
     meaning: Whether source and cell country codes disagree; null if not comparable
     units: none
+blocks:
+  description: 'The block index of the cells table: every covered resolution 3 H3 block,
+    the cells file and Parquet row group that hold its rows, and how much it stores. A
+    reader can route a coordinate to its rows with this table alone, without manifest.json.
+    Release assembly builds it from the cells it writes.'
+  grain: 'One row per covered resolution 3 block, including blocks that store no cells.
+    A block absent from this table is outside the coverage of this export.'
+  assembled: true
+  primary_key:
+  - block
+  relationships: []
+  columns:
+  - name: block
+    type: string
+    nullable: false
+    meaning: Resolution 3 H3 block in lowercase hexadecimal without 0x; equals cells.block
+      of every row it stores
+    units: none
+  - name: cell_group
+    type: string
+    nullable: false
+    meaning: Resolution 1 H3 parent of the block in lowercase hexadecimal; the block's cells
+      file sits in the directory cells/group=<cell_group>/
+    units: none
+  - name: path
+    type: string
+    nullable: false
+    meaning: The cells file that holds the block's rows, relative to the dataset directory;
+      for a block without rows, the file whose manifest entry lists it as empty
+    units: none
+  - name: row_group
+    type: int64
+    nullable: true
+    meaning: Zero-based Parquet row group in path that holds every row of the block; null
+      when the block stores no cells
+    units: none
+  - name: row_count
+    type: int64
+    nullable: false
+    meaning: Cells rows stored for the block; 0 when it stores none, and lookups there
+      then answer that the location is not on land
+    units: rows
+  - name: reference_cells
+    type: int64
+    nullable: false
+    meaning: Resolution 8 cells that the block's stored rows stand for once compacted rows
+      are expanded; at most 16,807
+    units: H3 resolution 8 cells
 canonical_cities:
   description: 'The cities and towns that can absorb other settlements, the anchors
     for urban areas. Reverse lookups can also return standalone villages and other
@@ -298,6 +348,9 @@ cells:
     references: {table: places, columns: [place_id]}
     meaning: The selected settlement of the cell, a canonical city or a standalone rural
       settlement; null when none is assigned
+  - columns: [block]
+    references: {table: blocks, columns: [block]}
+    meaning: The block that routes the cell to its file and Parquet row group
   columns:
   - name: h3
     type: string
@@ -393,13 +446,21 @@ cells:
     values_from:
     - pipeline/engines/reconcile/land.py
     - core/thereabouts-core/src/reverse/mod.rs
+  - name: block
+    type: string
+    nullable: false
+    meaning: Resolution 3 H3 parent of the cell (its block) in lowercase hexadecimal
+      without 0x. Each Parquet row group holds one block, so filtering on block reads one
+      row group
+    units: none
+    assembled: true
 countries:
   description: Countries and territories with ISO 3166 codes, names, currency, languages,
     calling code and UN M49 regions, from the pinned country-codes file plus GeoNames
     country information, linked to the reconciled country place.
-  grain: One row per country or territory record in the pinned sources; observations
-    can repeat.
-  primary_key: []
+  grain: One row per country or territory code in the pinned sources.
+  primary_key:
+  - country_code
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -473,7 +534,8 @@ countries:
   - name: region_code
     type: string
     nullable: true
-    meaning: Source region or subdivision code
+    meaning: UN M49 code of the country's region, the continent level (for example
+      142 for Asia); airports.region_code is an ISO 3166-2 code instead
     units: none
   - name: region_name
     type: string
@@ -577,7 +639,9 @@ ip_ranges:
     published point joined to the cell geography. The ip pack writer rejects overlapping
     intervals.
   grain: One row per published IP interval, from ip_start to ip_end inclusive.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -820,7 +884,9 @@ phone_metadata:
     national and international prefixes, with the original territory XML.'
   grain: One row per libphonenumber territory, including the non-geographic territory
     001.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -949,7 +1015,9 @@ phone_prefixes:
     country.'
   grain: One row per prefix description in one language file, so a prefix repeats once
     per language.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -1630,7 +1698,9 @@ postal_codes:
     point joined to the cell geography. Codes keep their spaces and leading zeros.
   grain: One row per postal-code observation; a code can repeat for different place
     names or variants.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -1799,8 +1869,9 @@ postal_codes:
 subdivisions:
   description: First-level administrative divisions as published by GeoNames admin1
     codes, linked to the reconciled subdivision places.
-  grain: One row per GeoNames first-level division; observations can repeat.
-  primary_key: []
+  grain: One row per GeoNames first-level division code.
+  primary_key:
+  - code
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -1943,7 +2014,9 @@ timezone_cells:
     polygons. Membership is independent of land eligibility and zones can overlap.
   grain: One row per timezone and H3 cell; a cell in overlapping zones has several rows,
     and cells are stored at resolutions 0 to 8.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships: []
   columns:
   - name: source
@@ -1995,8 +2068,11 @@ trade_locations:
   description: UN/LOCODE trade and transport locations (ports, airports, rail and road
     terminals) with codes, function flags and optional coordinates, joined to the cell
     geography where they have a point.
-  grain: One row per UN/LOCODE entry; observations can repeat.
-  primary_key: []
+  grain: One row per UN/LOCODE entry in the pinned files; source_id names its file
+    and row, and a location code can repeat across entries.
+  primary_key:
+  - source
+  - source_id
   relationships:
   - columns: [country_id]
     references: {table: places, columns: [place_id]}
@@ -2176,7 +2252,9 @@ zone_tables:
   description: Rows of the IANA zone tables, linking each timezone identifier to its
     countries and a representative point.
   grain: One row per entry of an IANA zone table; a timezone can appear in several tables.
-  primary_key: []
+  primary_key:
+  - source
+  - source_id
   relationships: []
   columns:
   - name: source

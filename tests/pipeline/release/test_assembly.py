@@ -1,5 +1,6 @@
 """Release content, relocation, byte caps and input verification."""
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,10 @@ def test_coalescing_readme_and_relocation(tmp_path: Path) -> None:
     output = tmp_path / "dataset" / "2026.10"
     paths = assemble(snapshot, output, config, guard, "identity")
     manifest = verify_dataset(output)
-    assert len(manifest["statistics"]) == 19
+    assert len(manifest["statistics"]) == 20
+    # The blocks table indexes packaging; content.json digests logical tables.
+    content = json.loads((output / "content.json").read_text())
+    assert set(content["tables"]) == set(manifest["statistics"]) - {"blocks"}
     cells = [t for t in manifest["tables"] if t["kind"] == "cells"]
     assert len(cells) == 1
     assert cells[0]["rows"] == 2
@@ -164,6 +168,27 @@ def test_logical_place_key_cannot_be_null_despite_arrow_nullability(
     snapshot = external(snapshot.root, config.h3)
     output = tmp_path / "dataset"
     with pytest.raises(ValueError, match=r"Null logical primary key: places\.place_id"):
+        assemble(snapshot, output, config, guard, "identity")
+    assert not output.exists()
+
+
+def test_a_repeated_observation_key_is_refused(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    entry = snapshot.tables["zone_tables"][0]
+    path = snapshot.path(entry)
+    table = pq.read_table(path)
+    pq.write_table(pa.concat_tables([table, table]), path)
+    for record in snapshot.manifest["tables"]:
+        if record["path"] == entry.path:
+            record.update(file_record(snapshot.root, path), rows=2)
+    write_json(snapshot.root / "manifest.json", snapshot.manifest)
+    snapshot = external(snapshot.root, config.h3)
+    output = tmp_path / "dataset"
+    with pytest.raises(
+        ValueError,
+        match=r"Repeated logical primary key: zone_tables \(source, source_id\); "
+        r"repeated values: \('timezones', 'one'\)$",
+    ):
         assemble(snapshot, output, config, guard, "identity")
     assert not output.exists()
 

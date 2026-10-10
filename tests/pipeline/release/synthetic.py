@@ -17,6 +17,7 @@ from pipeline.engines.plate_country import formats, tables
 from pipeline.engines.plate_country.documents import Pool
 from pipeline.engines.plate_country.policy import policy
 from pipeline.release.assemble import assemble
+from pipeline.release.dataset_schema import inputs
 from pipeline.release.dataset_schema import load as schema
 from pipeline.release.source import external
 from pipeline.runtime.fingerprints import REPOSITORY
@@ -98,7 +99,7 @@ SOURCES = {
 
 def snapshot(root: Path) -> Path:
     """Every table of config/dataset.yaml; cells split by block like lookups."""
-    description = schema(REPOSITORY / "config/dataset.yaml")
+    description = inputs(schema(REPOSITORY / "config/dataset.yaml"))
     records = plate_rows(root)
     rows = ROWS | {"names": names_rows()}
     for kind, value in description.items():
@@ -116,6 +117,9 @@ def snapshot(root: Path) -> Path:
         if "source" in defaults:
             defaults["source"] = "geonames"
         filled = [defaults | r for r in rows.get(kind, [])]
+        if "source_id" in defaults:
+            # Observations are keyed by (source, source_id): one id per row.
+            filled = [{**r, "source_id": f"{kind}:{i}"} for i, r in enumerate(filled)]
         if kind in SOURCES:
             filled = [
                 {"source": SOURCES[kind], "source_id": f"{kind}:{i}"}

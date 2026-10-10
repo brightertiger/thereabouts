@@ -1,19 +1,29 @@
 """The client can route every retained block directly to one Parquet row group."""
 
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+from typing import Any
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from h3.api import basic_int as h3
 
+from pipeline.config.schema import H3
 from pipeline.files import file_record
 from pipeline.release.assemble import assemble
+from pipeline.release.cell_groups import represented
 from pipeline.release.source import Snapshot, external
 from pipeline.release.verify import verify_dataset
 from pipeline.runtime.jsonio import write_json
 
 from .fixtures import fixture
+
+Row = dict[str, Any]
+
+
+def blocks_table(output: Path, manifest: Row) -> list[Row]:
+    [entry] = [record for record in manifest["tables"] if record["kind"] == "blocks"]
+    return pq.read_table(output / entry["path"]).to_pylist()
 
 
 def split_blocks(snapshot: Snapshot) -> None:
@@ -62,12 +72,21 @@ def test_blocks_span_input_files_and_batches_but_never_row_groups(
     ]
     with pq.ParquetFile(output / cells[0]["path"]) as file:
         assert file.num_row_groups == 2
+        column = file.schema_arrow.get_field_index("block")
+        assert column == len(file.schema_arrow) - 1
         for entry in cells[0]["blocks"]:
-            keys = file.read_row_group(entry["row_group"])["h3_uint64"].to_pylist()
+            group = file.read_row_group(entry["row_group"])
+            keys = group["h3_uint64"].to_pylist()
             assert len(keys) == len(set(keys)) == entry["rows"]
             assert {f"{h3.cell_to_parent(key, 3):x}" for key in keys} == {
                 entry["block"]
             }
+            assert group["block"].to_pylist() == [entry["block"]] * entry["rows"]
+            # One block per row group: its statistics admit exactly that block.
+            chunk = file.metadata.row_group(entry["row_group"]).column(column)
+            assert chunk.statistics is not None
+            assert chunk.statistics.min == chunk.statistics.max == entry["block"]
+    assert [row["reference_cells"] for row in blocks_table(output, manifest)] == [3, 3]
 
 
 def test_empty_blocks_keep_coverage_without_a_row_group(tmp_path: Path) -> None:
@@ -86,6 +105,93 @@ def test_empty_blocks_keep_coverage_without_a_row_group(tmp_path: Path) -> None:
     assert all(
         pq.read_metadata(output / entry["path"]).num_row_groups == 0 for entry in cells
     )
+    assert blocks_table(output, manifest) == [
+        {
+            "block": block,
+            "cell_group": f"{h3.cell_to_parent(int(block, 16), 1):x}",
+            "path": record["path"],
+            "row_group": None,
+            "row_count": 0,
+            "reference_cells": 0,
+        }
+        for record in cells
+        for block in record["empty_blocks"]
+    ]
+
+
+def test_the_blocks_table_indexes_every_stored_block(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    output = tmp_path / "dataset"
+    assemble(snapshot, output, config, guard, "identity")
+    manifest = verify_dataset(output)
+    [cells] = [record for record in manifest["tables"] if record["kind"] == "cells"]
+    group = PurePosixPath(cells["path"]).parent.name.removeprefix("group=")
+    assert blocks_table(output, manifest) == [
+        {
+            "block": entry["block"],
+            "cell_group": group,
+            "path": cells["path"],
+            "row_group": entry["row_group"],
+            "row_count": entry["rows"],
+            "reference_cells": 1,
+        }
+        for entry in cells["blocks"]
+    ]
+
+
+def test_reference_cells_count_a_pentagon_s_fewer_children() -> None:
+    block = h3.get_pentagons(3)[0]
+    center = h3.cell_to_center_child(block, 5)
+    other = next(c for c in sorted(h3.cell_to_children(block, 5)) if c != center)
+    table = pa.table(
+        {
+            "h3_uint64": pa.array([center, other], pa.uint64()),
+            "h3_resolution": pa.array([5, 5], pa.uint8()),
+        }
+    )
+    grid = H3(cell_resolution=8, block_resolution=3)
+    cells = represented(table, f"{block:x}", grid)
+    assert cells == h3.cell_to_children_size(center, 8) + 7**3 < 2 * 7**3
+
+
+def test_a_repeated_cell_key_is_refused(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    record = snapshot.tables["cells"][0]
+    path = snapshot.root / "cells-repeated.parquet"
+    pq.write_table(pq.read_table(snapshot.path(record)), path)
+    snapshot.manifest["tables"].append(
+        {
+            **file_record(snapshot.root, path),
+            "kind": "cells",
+            "rows": record.rows,
+            "block": record.block,
+        }
+    )
+    write_json(snapshot.root / "manifest.json", snapshot.manifest)
+    snapshot = external(snapshot.root, config.h3)
+    output = tmp_path / "dataset"
+    with pytest.raises(ValueError, match="Repeated cell key"):
+        assemble(snapshot, output, config, guard, "identity")
+    assert not output.exists()
+
+
+def test_a_blocks_table_that_disagrees_with_the_index_refuses(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    output = tmp_path / "dataset"
+    assemble(snapshot, output, config, guard, "identity")
+    manifest = verify_dataset(output)
+    [entry] = [record for record in manifest["tables"] if record["kind"] == "blocks"]
+    path = output / entry["path"]
+    table = pq.read_table(path)
+    rows = table.to_pylist()
+    rows[0]["reference_cells"] += 1
+    pq.write_table(pa.Table.from_pylist(rows, schema=table.schema), path)
+    for record in [*manifest["tables"], *manifest["files"]]:
+        if record["path"] == entry["path"]:
+            record.update(file_record(output, path))
+    write_json(output / "manifest.json", manifest)
+    with pytest.raises(ValueError, match="blocks table"):
+        verify_dataset(output)
 
 
 def test_mislabelled_input_block_is_rejected(tmp_path: Path) -> None:
@@ -130,4 +236,17 @@ def test_invalid_manifest_block_index_refuses(tmp_path: Path, fault: str) -> Non
             record["blocks"][0]["block"] = config.release.blocks[1]
     write_json(output / "manifest.json", manifest)
     with pytest.raises(ValueError, match="Cell"):
+        verify_dataset(output)
+
+
+def test_a_dataset_that_declares_blocks_must_list_the_table(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    output = tmp_path / "dataset"
+    assemble(snapshot, output, config, guard, "identity")
+    manifest = verify_dataset(output)
+    assert "blocks" in manifest["schemas"]
+    for name in ("tables", "files"):
+        manifest[name] = [r for r in manifest[name] if r.get("kind") != "blocks"]
+    write_json(output / "manifest.json", manifest)
+    with pytest.raises(ValueError, match="blocks table"):
         verify_dataset(output)

@@ -9,6 +9,7 @@ from h3.api import basic_int as h3
 
 from pipeline.config import Config, load
 from pipeline.files import file_record
+from pipeline.release.dataset_schema import inputs
 from pipeline.release.source import Snapshot, external
 from pipeline.release.tables import schema_description
 from pipeline.runtime.fingerprints import REPOSITORY
@@ -67,7 +68,7 @@ def fixture(
     source = root / "input"
     source.mkdir()
     tables = []
-    descriptions = schema_description(REPOSITORY / config.release.schema)
+    descriptions = inputs(schema_description(REPOSITORY / config.release.schema))
     for kind, description in descriptions.items():
         fields = []
         for column in description["columns"]:

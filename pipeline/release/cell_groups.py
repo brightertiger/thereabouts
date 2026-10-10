@@ -13,6 +13,41 @@ from pipeline.config.schema import H3
 from .selection import Selection
 from .source import Row
 
+# The column assembly appends to every cells row: the row's resolution-3 parent.
+BLOCK = "block"
+
+
+def represented(table: pa.Table, block: str, grid: H3) -> int:
+    """Reference cells the stored rows stand for once compacted rows are expanded.
+
+    Only a pentagon block holds a pentagon, which has fewer children than 7 per level.
+    """
+    finest = grid.cell_resolution
+    if h3.is_pentagon(int(block, 16)):
+        keys = table.column("h3_uint64").to_pylist()
+        return sum(h3.cell_to_children_size(key, finest) for key in keys)
+    resolution = pc.cast(table.column("h3_resolution"), pa.int64())
+    levels = pc.subtract(pa.scalar(finest, pa.int64()), resolution)
+    return int(pc.sum(pc.power(pa.scalar(7, pa.int64()), levels)).as_py())
+
+
+def index_row(
+    record: Row, block: str, row_group: int | None, rows: int, cells: int
+) -> Row:
+    """One blocks-table row: where a covered block's cells are and how many."""
+    return {
+        BLOCK: block,
+        "cell_group": PurePosixPath(record["path"]).parent.name.removeprefix("group="),
+        "path": record["path"],
+        "row_group": row_group,
+        "row_count": rows,
+        "reference_cells": cells,
+    }
+
+
+def sorted_blocks(rows: list[Row]) -> list[Row]:
+    return sorted(rows, key=lambda row: int(row[BLOCK], 16))
+
 
 def validate_block(batch: pa.RecordBatch, block: str, grid: H3) -> None:
     resolution = batch.column("h3_resolution")
@@ -36,6 +71,8 @@ class CellGroups:
         self.schema = schema
         self.grid = grid
         self.blocks: list[Row] = []
+        # Reference cells per stored block, for the blocks table.
+        self.reference: dict[str, int] = {}
         # Covered blocks without selected rows: ocean answers no_land, not
         # outside_coverage, exactly as a legacy zero-row block file did.
         self.empty_blocks: list[str] = []
@@ -66,18 +103,21 @@ class CellGroups:
             int(block, 16), self.grid.cell_resolution
         ):
             raise ValueError(f"Cell block exceeds its reference cell count: {block}")
-        self.batches.append(batch)
+        column = pa.repeat(pa.scalar(block, pa.string()), batch.num_rows)
+        self.batches.append(batch.append_column(self.schema.field(BLOCK), column))
 
     def finish(self) -> None:
         if not self.rows:
             return
-        self.writer.write_table(
-            pa.Table.from_batches(self.batches, schema=self.schema),
-            row_group_size=self.rows,
-        )
+        table = pa.Table.from_batches(self.batches, schema=self.schema)
+        # A key's block fixes its row group, so per-block uniqueness is global.
+        if pc.count_distinct(table.column("h3_uint64")).as_py() != self.rows:
+            raise ValueError(f"Repeated cell key in block {self.block}")
+        self.writer.write_table(table, row_group_size=self.rows)
         self.blocks.append(
             {"block": self.block, "row_group": len(self.blocks), "rows": self.rows}
         )
+        self.reference[self.block] = represented(table, self.block, self.grid)
         self.batches.clear()
         self.rows = 0
 
@@ -110,7 +150,7 @@ def _block(block: object, grid: H3, previous: int, seen: set[str]) -> int:
     return value
 
 
-def verify_empty(record: Row, grid: H3, seen: set[str]) -> None:
+def verify_empty(record: Row, grid: H3, seen: set[str]) -> list[Row]:
     empty = record.get("empty_blocks", [])
     if not isinstance(empty, list):
         raise ValueError("Cell empty_blocks must be a list")
@@ -119,12 +159,20 @@ def verify_empty(record: Row, grid: H3, seen: set[str]) -> None:
         previous = _block(block, grid, previous, seen)
         _parent(record, previous, grid)
         seen.add(block)
+    return [index_row(record, block, None, 0, 0) for block in empty]
 
 
-def verify_index(record: Row, file: pq.ParquetFile, grid: H3, seen: set[str]) -> None:
+def verify_index(
+    record: Row, file: pq.ParquetFile, grid: H3, seen: set[str]
+) -> list[Row]:
+    """Check one cells file against its manifest index; return its blocks rows."""
     blocks = record.get("blocks")
     if not isinstance(blocks, list) or len(blocks) != file.num_row_groups:
         raise ValueError(f"Cell block index differs from row groups: {record['path']}")
+    # Datasets assembled before the block column existed lack it.
+    names = ["h3_uint64", "h3_resolution"]
+    names += [BLOCK] if BLOCK in file.schema_arrow.names else []
+    rows = []
     previous = -1
     for number, entry in enumerate(blocks):
         if (
@@ -143,9 +191,13 @@ def verify_index(record: Row, file: pq.ParquetFile, grid: H3, seen: set[str]) ->
         if entry["rows"] > h3.cell_to_children_size(value, grid.cell_resolution):
             raise ValueError("Cell row group exceeds its reference cell count")
         _parent(record, value, grid)
-        table = file.read_row_group(number, columns=["h3_uint64", "h3_resolution"])
+        table = file.read_row_group(number, columns=names)
         for batch in table.to_batches():
             validate_block(batch, block, grid)
+        if BLOCK in names and table.column(BLOCK).unique().to_pylist() != [block]:
+            raise ValueError(f"Cell block column differs from its row group: {block}")
+        cells = represented(table, block, grid)
+        rows.append(index_row(record, block, number, entry["rows"], cells))
         previous = value
         seen.add(block)
-    verify_empty(record, grid, seen)
+    return rows + verify_empty(record, grid, seen)

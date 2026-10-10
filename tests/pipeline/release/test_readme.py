@@ -1,12 +1,26 @@
 """The committed public README is reproducible without a built workspace."""
 
+import importlib.util
 import json
+import re
+from pathlib import Path
+
+import pytest
+from h3.api import basic_int as h3
 
 from pipeline.config import load
+from pipeline.release.assemble import assemble
 from pipeline.release.metadata import licences
 from pipeline.release.readme import render
+from pipeline.release.source import external
 from pipeline.release.tables import schema_description
 from pipeline.runtime.fingerprints import REPOSITORY
+from pipeline.runtime.resources import ResourceGuard
+
+from .synthetic import snapshot
+
+# A Paris cell the synthetic dataset stores at resolution 7.
+PARIS = int("871fb4662ffffff", 16)
 
 
 def test_committed_readme_matches_template_and_measured_subset() -> None:
@@ -29,3 +43,35 @@ def test_committed_readme_matches_template_and_measured_subset() -> None:
     # The recorded readme_sha256 is the 2026-10-04 render, before the template
     # gained the dictionary, world wording and versioned _SUCCESS receipts.
     assert generated == (REPOSITORY / "docs/dataset/README.md").read_bytes()
+    # Tables added after that export are documented, without invented counts.
+    text = generated.decode()
+    for name in schema_description(REPOSITORY / config.release.schema):
+        section = text.split(f"### `{name}`\n")[1].split("\n### ")[0]
+        unmeasured = "Not measured in this export." in section
+        assert unmeasured == (name not in evidence["statistics"])
+
+
+def test_worked_examples_answer_from_an_assembled_dataset(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    config = load()
+    config.release.enabled = True
+    config.release.version = "2026.10"
+    latitude, longitude = h3.cell_to_latlng(PARIS)
+    config.release.example_latitude = latitude
+    config.release.example_longitude = longitude
+    output = tmp_path / "dataset/2026.10"
+    source = external(snapshot(tmp_path / "input"), config.h3)
+    assemble(source, output, config, ResourceGuard(tmp_path, config.resources), "x")
+    examples = re.findall(
+        r"```python\n(.*?)```", (output / "README.md").read_text(), re.S
+    )
+    assert len(examples) == 3
+    monkeypatch.setenv("DATASET", str(output))
+    for example in examples:
+        if "import pandas" in example and importlib.util.find_spec("pandas") is None:
+            continue  # pandas hands these filters to the PyArrow reader used above.
+        assert "block" in example
+        exec(compile(example, "README.md", "exec"), {})
+    printed = capsys.readouterr().out
+    assert "city:geonames:2988507" in printed and "Paris" in printed

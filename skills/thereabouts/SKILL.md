@@ -297,6 +297,7 @@ Rules for dataset answers:
 - `canonical_cities` is the set of cities and towns that absorb other settlements. Villages are in `places` only; `place_to_city` maps every place to its city.
 - Observation tables (`airports`, `postal_codes`, `ip_ranges`, `trade_locations`, `phone_prefixes`) repeat on purpose. Count distinct keys when you mean things, not rows.
 - Directory labels such as `country=FR` are file routing, not columns; the helper above drops them.
+- For one point in `cells`, filter `block = '<r3 hex>'` (its resolution 3 parent) first: each block is one Parquet row group, so the query reads one row group instead of every file.
 - Percentages and rankings need a denominator you can state. Say which release and which table you used.
 
 More worked queries, including IP ranges, phone prefixes, timezones, ports and hierarchy roll-ups, are in `references/query-recipes.md`.

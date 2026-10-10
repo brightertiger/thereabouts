@@ -158,8 +158,7 @@ def table_section(name: str, table: Row) -> list[str]:
         table["description"],
         "",
         f"- Grain: {table['grain']}",
-        f"- Primary key: {key}"
-        + ("" if table["primary_key"] else " (observations can repeat)"),
+        f"- Primary key: {key}",
         f"- Feeds packs: {ticks(table['used_by'])}",
         "",
     ]
@@ -201,10 +200,12 @@ def tables(document: Row) -> list[str]:
     lines = [
         "## Dataset tables",
         "",
-        "Plain Parquet files, one directory per table. Partition labels in "
-        "directory names (`country=XX`, `group=...`) are file routing, not columns. "
-        "Observation tables keep duplicates; only the keys listed are guaranteed "
-        "unique.",
+        "Plain Parquet files, one directory per table. Directory labels "
+        "(`country=XX`, `group=...`) route files and are not stored columns; DuckDB "
+        "and PyArrow add them as columns unless Hive partitioning is off. Only the "
+        "keys listed are guaranteed unique, and assembly refuses a release that "
+        "repeats one. Observation tables are keyed by `source` and `source_id`, "
+        "one row per source record, so a code or name can repeat across rows.",
         "",
         *table_index(document),
     ]

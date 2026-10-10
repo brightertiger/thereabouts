@@ -9,14 +9,20 @@ This release is an immutable, measured export of completed normalization outputs
 ```text
 dataset/2026.10/
 ├── airports/part.parquet  # 25 rows; 14,291 bytes
+├── blocks/part.parquet  # not measured in this export
 ├── canonical_cities/country=*/part.parquet  # 408 rows; 34,789 bytes
 ├── cells/group=*/part.parquet  # 22,404 rows; 173,850 bytes
 ├── countries/part.parquet  # 2 rows; 18,584 bytes
 ├── ip_ranges/part.parquet  # 36,547 rows; 1,493,691 bytes
+├── names/part.parquet  # not measured in this export
 ├── phone_metadata/part.parquet  # 2 rows; 26,146 bytes
 ├── phone_prefixes/part.parquet  # 0 rows; 2,063 bytes
 ├── place_to_city/country=*/part.parquet  # 28,063 rows; 417,842 bytes
 ├── places/country=*/part.parquet  # 28,063 rows; 3,919,626 bytes
+├── plate_codes/part.parquet  # not measured in this export
+├── plate_formats/part.parquet  # not measured in this export
+├── plate_policy/part.parquet  # not measured in this export
+├── plate_priors/part.parquet  # not measured in this export
 ├── postal_codes/part.parquet  # 64,317 rows; 1,161,474 bytes
 ├── subdivisions/part.parquet  # 37 rows; 10,370 bytes
 ├── timezone_cells/part.parquet  # 1,473 rows; 21,689 bytes
@@ -32,7 +38,7 @@ dataset/2026.10/
 └── README.md  # this guide
 ```
 
-The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.json` are relative to this directory. Each table entry records its path, SHA256, compressed bytes and row count. Cell partitions group resolution-3 blocks by their resolution-1 parent (up to 49 blocks per group); this changes file packaging only. Country catalogues use `country=<code>` partitions. Other observations share one file per table. Empty tables retain a schema-bearing Parquet file. Partition labels are file routing metadata, not extra stored columns.
+The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.json` are relative to this directory. Each table entry records its path, SHA256, compressed bytes and row count. Cell partitions group resolution-3 blocks by their resolution-1 parent (up to 49 blocks per group); this changes file packaging only. Country catalogues use `country=<code>` partitions. Other observations share one file per table. Empty tables retain a schema-bearing Parquet file. Partition labels route files; they are not stored columns. DuckDB and PyArrow detect `country=` and `group=` directories as Hive partitions and add `country` and `group` columns, so the examples below turn that off (`hive_partitioning=false` in DuckDB). `group` is a reserved SQL word: quote it as `"group"` if you keep the partition column.
 
 ## Cell keys and result semantics
 
@@ -40,7 +46,7 @@ Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3
 
 `h3` is lowercase hexadecimal text without `0x`; `h3_uint64` is the same unsigned 64-bit H3 index, with resolution in bits 52–55 and base-cell/child digits in the standard H3 representation. These are global H3 indexes, not a client pack's local integer offsets. `h3_resolution` says how many levels that stored row represents. Resolution 8 is the reference precision; coarser rows encode identical assignments for their descendant centres.
 
-Each coalesced cells file contains **one Parquet row group per retained resolution-3 block**, ordered by ascending block ID. All rows of a block occupy that single row group, even when the input spans several files or batches. Blocks with no selected rows are omitted; an empty cells file has no row groups. Every cells entry in both `manifest.json.tables` and `manifest.json.files` includes `blocks: [{"block": "<r3 hex>", "row_group": 0, "rows": n}, ...]`. Block IDs are lowercase hexadecimal without `0x`, `row_group` is the zero-based Parquet row-group index, and `rows` is that group's row count. Readers and the client pack writer locate the coordinate's resolution-3 parent in this index, read that row group, then match the stored ancestors described above. The file's `rows` equals the sum of its block counts; no row group contains multiple blocks.
+Each coalesced cells file contains **one Parquet row group per retained resolution-3 block**, ordered by ascending block ID. All rows of a block occupy that single row group, even when the input spans several files or batches. Blocks with no selected rows have no row group; an empty cells file has no row groups. Every cells row stores its block ID in the `block` column, which is therefore constant within a row group: a `block = '<r3 hex>'` filter lets DuckDB, PyArrow and other Parquet readers skip every other row group by its statistics. A filter on `h3_uint64` alone cannot, because H3 integers order by resolution before location and a row group holding several resolutions spans most of the key range. The `blocks` table lists every covered block with the cells file that holds it (`path`), its `row_group`, its `row_count` and the resolution-8 `reference_cells` its rows stand for. A covered block with `row_count` 0 stores no cells, and lookups there find no land; a block missing from `blocks` is outside this subset's coverage. `manifest.json` carries the same index: every cells entry in both `manifest.json.tables` and `manifest.json.files` includes `blocks: [{"block": "<r3 hex>", "row_group": 0, "rows": n}, ...]` and `empty_blocks: ["<r3 hex>", ...]`. Block IDs are lowercase hexadecimal without `0x`, `row_group` is the zero-based Parquet row-group index, and `rows` is that group's row count. Readers and the client pack writer locate the coordinate's resolution-3 parent in this index, read that row group, then match the stored ancestors described above. The file's `rows` equals the sum of its block counts; no row group contains multiple blocks.
 
 Cell `country_id`, `state_id` and `city_id` link to `places.place_id`. The `canonical_cities` table contains eligible city/town anchors that can absorb other settlements; it is not a catalogue of every rural result. Standalone villages and other rural settlements can retain their own place IDs in `city_id`. `places.normalized_city_id` and `place_to_city.city_id` expose the reviewed mapping, including self-mappings and nulls for non-settlements. Source city/municipality strings are retained independently. The selected settlement can differ from the nearest named place or an administrative district. Legacy `city:` ID prefixes do not prove an entity is a city; inspect its `role` and `settlement_kind`.
 
@@ -52,18 +58,18 @@ Timezone membership is independent of eligible land. `timezone_cells` can store 
 
 ## Tables and columns
 
-Arrow types and physical nullability below are checked during assembly. “None” for units means an identifier, category, text or dimensionless value. Required logical keys are listed separately from Arrow nullability. Observation tables have no enforced primary key: duplicate source observations are intentionally retained. Counts and bytes are for this exact export, not a world estimate.
+Arrow types and physical nullability below are checked during assembly. “None” for units means an identifier, category, text or dimensionless value. Required logical keys are listed separately from Arrow nullability. Observation tables are keyed by `source` and `source_id`, one row per source record, so duplicate observations of one code or place are retained as separate rows. Assembly refuses a release that repeats any declared key. Counts and bytes are for this exact export, not a world estimate.
 
 `places.place_id` is a required, non-null logical primary key. Its retained Arrow field is physically nullable, as are some other logical keys; assembly rejects null values in every declared logical primary-key column. “Yes in Arrow; no for the logical key” distinguishes these two contracts without changing the retained field schema.
 
 ### `airports`
 
-Layout: `airports/part.parquet`. Primary key: none; observations can repeat. 1 files, 25 rows, 14,291 compressed bytes.
+Layout: `airports/part.parquet`. Primary key: source, source_id. 1 files, 25 rows, 14,291 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes | none | Configured upstream source name |
-| `source_id` | `string` | yes | none | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key | none | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key | none | Identifier of the original observation within its source |
 | `ident` | `string` | yes | none | OurAirports airport identifier |
 | `iata_code` | `string` | yes | none | IATA airport code, where available |
 | `icao_code` | `string` | yes | none | ICAO airport code, where available |
@@ -88,6 +94,19 @@ Layout: `airports/part.parquet`. Primary key: none; observations can repeat. 1 f
 | `cell_country_code` | `string` | yes | none | Country code assigned by the geographic cell join |
 | `cell_status` | `string` | yes | none | Cell join status: matched, unassigned, ineligible, pending or unlocated |
 | `country_disagrees` | `bool` | yes | none | Whether source and cell country codes disagree; null if not comparable |
+
+### `blocks`
+
+Layout: `blocks/part.parquet`. Primary key: block. Not measured in this export.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `block` | `string` | no | none | Resolution 3 H3 block in lowercase hexadecimal without 0x; equals cells.block of every row it stores |
+| `cell_group` | `string` | no | none | Resolution 1 H3 parent of the block in lowercase hexadecimal; the block's cells file sits in the directory cells/group=<cell_group>/ |
+| `path` | `string` | no | none | The cells file that holds the block's rows, relative to the dataset directory; for a block without rows, the file whose manifest entry lists it as empty |
+| `row_group` | `int64` | yes | none | Zero-based Parquet row group in path that holds every row of the block; null when the block stores no cells |
+| `row_count` | `int64` | no | rows | Cells rows stored for the block; 0 when it stores none, and lookups there then answer that the location is not on land |
+| `reference_cells` | `int64` | no | H3 resolution 8 cells | Resolution 8 cells that the block's stored rows stand for once compacted rows are expanded; at most 16,807 |
 
 ### `canonical_cities`
 
@@ -125,16 +144,17 @@ Layout: `cells/group=*/part.parquet`. Primary key: h3_uint64. 1 files, 22,404 ro
 | `state_method` | `string` | yes | none | Subdivision assignment evidence: area, or null when absent |
 | `city_method` | `string` | yes | none | Canonical city allocation rule, including distant-nearest classification |
 | `land_method` | `string` | yes | none | Land eligibility evidence: land or offshore |
+| `block` | `string` | no | none | Resolution 3 H3 parent of the cell (its block) in lowercase hexadecimal without 0x. Each Parquet row group holds one block, so filtering on block reads one row group |
 
 ### `countries`
 
-Layout: `countries/part.parquet`. Primary key: none; observations can repeat. 1 files, 2 rows, 18,584 compressed bytes.
+Layout: `countries/part.parquet`. Primary key: country_code. 1 files, 2 rows, 18,584 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no | none | Configured upstream source name |
 | `source_id` | `string` | no | none | Identifier of the original observation within its source |
-| `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
+| `country_code` | `string` | yes in Arrow; no for the logical key | none | Source or reconciled ISO-like two-letter country code |
 | `alpha3` | `string` | yes | none | ISO alpha-3 country code |
 | `numeric` | `string` | yes | none | ISO numeric country code represented as text |
 | `name` | `string` | yes | none | Preferred display name |
@@ -144,7 +164,7 @@ Layout: `countries/part.parquet`. Primary key: none; observations can repeat. 1 
 | `tld` | `string` | yes | none | Country internet top-level domain |
 | `continent` | `string` | yes | none | Source continent identifier |
 | `m49` | `string` | yes | none | UN M49 area code |
-| `region_code` | `string` | yes | none | Source region or subdivision code |
+| `region_code` | `string` | yes | none | UN M49 code of the country's region, the continent level (for example 142 for Asia); airports.region_code is an ISO 3166-2 code instead |
 | `region_name` | `string` | yes | none | UN region name |
 | `subregion_code` | `string` | yes | none | UN subregion code |
 | `subregion_name` | `string` | yes | none | UN subregion name |
@@ -161,12 +181,12 @@ Layout: `countries/part.parquet`. Primary key: none; observations can repeat. 1 
 
 ### `ip_ranges`
 
-Layout: `ip_ranges/part.parquet`. Primary key: none; observations can repeat. 1 files, 36,547 rows, 1,493,691 compressed bytes.
+Layout: `ip_ranges/part.parquet`. Primary key: source, source_id. 1 files, 36,547 rows, 1,493,691 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes | none | Configured upstream source name |
-| `source_id` | `string` | yes | none | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key | none | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key | none | Identifier of the original observation within its source |
 | `ip_start` | `string` | yes | none | Inclusive first IP address as text |
 | `ip_end` | `string` | yes | none | Inclusive last IP address as text |
 | `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
@@ -190,9 +210,27 @@ Layout: `ip_ranges/part.parquet`. Primary key: none; observations can repeat. 1 
 | `cell_status` | `string` | yes | none | Cell join status: matched, unassigned, ineligible, pending or unlocated |
 | `country_disagrees` | `bool` | yes | none | Whether source and cell country codes disagree; null if not comparable |
 
+### `names`
+
+Layout: `names/part.parquet`. Primary key: city_id, name. Not measured in this export.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `city_id` | `string` | no | none | Canonical city/town anchor ID |
+| `name` | `string` | no | none | The name as published by the source, NFC with collapsed whitespace |
+| `kind` | `string` | no | none | How the name relates to the city: english, alternate or ascii |
+| `language` | `string` | yes | none | Language tag from the source (GeoNames ISO 639 codes, Overture BCP 47 tags); null when the source gives none |
+| `country_code` | `string` | no | none | Country code of the canonical city |
+| `place_id` | `string` | no | none | Reconciled place whose source record carries the name |
+| `source` | `string` | no | none | Configured upstream source name |
+| `source_id` | `string` | no | none | The name's source row; a GeoNames alternate-name ID, a GeoNames feature ID for feature and ASCII names, or an Overture name digest |
+| `source_release` | `string` | no | none | Pinned upstream release or inventory identifier |
+| `license` | `string` | no | none | Upstream licence identifier |
+| `provenance` | `string` | no | none | JSON source evidence and transformation provenance |
+
 ### `phone_metadata`
 
-Layout: `phone_metadata/part.parquet`. Primary key: none; observations can repeat. 1 files, 2 rows, 26,146 compressed bytes.
+Layout: `phone_metadata/part.parquet`. Primary key: source, source_id. 1 files, 2 rows, 26,146 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -215,7 +253,7 @@ Layout: `phone_metadata/part.parquet`. Primary key: none; observations can repea
 
 ### `phone_prefixes`
 
-Layout: `phone_prefixes/part.parquet`. Primary key: none; observations can repeat. 1 files, 0 rows, 2,063 compressed bytes.
+Layout: `phone_prefixes/part.parquet`. Primary key: source, source_id. 1 files, 0 rows, 2,063 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -282,14 +320,78 @@ Layout: `places/country=*/part.parquet`. Primary key: place_id. 2 files, 28,063 
 | `normalization_method` | `string` | yes | none | Rule used to select the normalized settlement identity |
 | `settlement_kind` | `string` | yes | none | Canonical settlement classification |
 
-### `postal_codes`
+### `plate_codes`
 
-Layout: `postal_codes/part.parquet`. Primary key: none; observations can repeat. 1 files, 64,317 rows, 1,161,474 compressed bytes.
+Layout: `plate_codes/part.parquet`. Primary key: none. Not measured in this export.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes | none | Configured upstream source name |
-| `source_id` | `string` | yes | none | Identifier of the original observation within its source |
+| `country_code` | `string` | no | none | ISO-like two-letter code of the issuing country or territory |
+| `code` | `string` | no | none | The code as the source spells it, with leading zeros and native script |
+| `name_en` | `string` | yes | none | English label of the registration unit, as published |
+| `name_local` | `string` | yes | none | Local-language label of the registration unit, as published |
+| `unit_kind` | `string` | no | none | Source unit kind, such as district, state or registration_office; plate_policy maps it to a place or state level |
+| `scope` | `string` | no | none | Whether the code identifies a registration unit or only associates an entity |
+| `series_status` | `string` | no | none | Temporal status of the assertion |
+| `series_id` | `string` | yes | none | Source series identifier the assertion belongs to |
+| `subdivision_scope` | `string` | yes | none | Narrower context the assertion requires, such as a state series |
+| `subdivision_codes` | `list<element: string>` | no | none | ISO 3166-2 identifiers the source gives for the unit; empty when none |
+| `source` | `string` | no | none | Configured upstream source name |
+| `source_url` | `string` | no | none | URL of the pinned document or query the assertion comes from |
+| `license` | `string` | no | none | Licence identifier of that document |
+
+### `plate_formats`
+
+Layout: `plate_formats/part.parquet`. Primary key: none. Not measured in this export.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `country_code` | `string` | no | none | ISO-like two-letter code of the issuing country or territory |
+| `series_id` | `string` | no | none | Source series identifier |
+| `series_status` | `string` | no | none | Temporal status of the series as the format policy records it: current, or historic (a former series, which needs an explicit series to supply geography) |
+| `pattern` | `string` | no | none | Full-match regular expression over the normalized plate text |
+| `relaxed_pattern` | `string` | no | none | The pattern with separators optional or varied only at the positions the source shows |
+| `code_group` | `string` | yes | none | Name of the capture group holding the registration code; null for series without one |
+| `scripts` | `list<element: string>` | no | none | Script names the pattern uses, from plate_policy script_patterns |
+| `fixed_national_marks` | `list<element: string>` | no | none | Literal national marks within the serial |
+| `specificity_bits` | `double` | no | bits | Information heuristic of the pattern against a 36-character baseline; not a count of valid plates |
+| `provenance` | `string` | no | none | JSON source fields of the pinned document: URL, licence, attribution, revision, digest and retrieval time |
+| `source` | `string` | no | none | Configured upstream source name |
+| `source_file` | `string` | no | none | Pinned file name of the source document |
+| `source_url` | `string` | no | none | URL of the pinned source document |
+| `license` | `string` | no | none | Licence identifier of that document |
+
+### `plate_policy`
+
+Layout: `plate_policy/part.parquet`. Primary key: none. Not measured in this export.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `policy_json` | `string` | no | none | The policy as one JSON object |
+
+### `plate_priors`
+
+Layout: `plate_priors/part.parquet`. Primary key: country_code. Not measured in this export.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `country_code` | `string` | no | none | ISO-like two-letter code of the counted country or territory |
+| `vehicles` | `uint64` | no | vehicles | Published road motor vehicle count; definitions and dates differ between countries |
+| `year` | `int64` | no | calendar year | Year of the published count |
+| `source_label` | `string` | no | none | Country label as the source table prints it |
+| `source` | `string` | no | none | Configured upstream source name |
+| `source_url` | `string` | no | none | URL of the pinned source document |
+| `license` | `string` | no | none | Licence identifier of that document |
+| `provenance` | `string` | no | none | JSON source fields and the table row the count comes from |
+
+### `postal_codes`
+
+Layout: `postal_codes/part.parquet`. Primary key: source, source_id. 1 files, 64,317 rows, 1,161,474 compressed bytes.
+
+| Column | Arrow type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `source` | `string` | yes in Arrow; no for the logical key | none | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key | none | Identifier of the original observation within its source |
 | `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
 | `postal_code` | `string` | yes | none | Postal code as text; preserve spaces and leading zeros |
 | `place_name` | `string` | yes | none | Source postal place name |
@@ -318,13 +420,13 @@ Layout: `postal_codes/part.parquet`. Primary key: none; observations can repeat.
 
 ### `subdivisions`
 
-Layout: `subdivisions/part.parquet`. Primary key: none; observations can repeat. 1 files, 37 rows, 10,370 compressed bytes.
+Layout: `subdivisions/part.parquet`. Primary key: code. 1 files, 37 rows, 10,370 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no | none | Configured upstream source name |
 | `source_id` | `string` | no | none | Identifier of the original observation within its source |
-| `code` | `string` | yes | none | Published entity code |
+| `code` | `string` | yes in Arrow; no for the logical key | none | Published entity code |
 | `code_system` | `string` | yes | none | Namespace of the published administrative code |
 | `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
 | `name` | `string` | yes | none | Preferred display name |
@@ -343,7 +445,7 @@ Layout: `subdivisions/part.parquet`. Primary key: none; observations can repeat.
 
 ### `timezone_cells`
 
-Layout: `timezone_cells/part.parquet`. Primary key: none; observations can repeat. 1 files, 1,473 rows, 21,689 compressed bytes.
+Layout: `timezone_cells/part.parquet`. Primary key: source, source_id. 1 files, 1,473 rows, 21,689 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -359,12 +461,12 @@ Layout: `timezone_cells/part.parquet`. Primary key: none; observations can repea
 
 ### `trade_locations`
 
-Layout: `trade_locations/part.parquet`. Primary key: none; observations can repeat. 1 files, 202 rows, 24,994 compressed bytes.
+Layout: `trade_locations/part.parquet`. Primary key: source, source_id. 1 files, 202 rows, 24,994 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes | none | Configured upstream source name |
-| `source_id` | `string` | yes | none | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key | none | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key | none | Identifier of the original observation within its source |
 | `locode` | `string` | yes | none | UN/LOCODE identifier |
 | `country_code` | `string` | yes | none | Source or reconciled ISO-like two-letter country code |
 | `location` | `string` | yes | none | UN/LOCODE location component |
@@ -395,7 +497,7 @@ Layout: `trade_locations/part.parquet`. Primary key: none; observations can repe
 
 ### `zone_tables`
 
-Layout: `zone_tables/part.parquet`. Primary key: none; observations can repeat. 1 files, 5 rows, 7,964 compressed bytes.
+Layout: `zone_tables/part.parquet`. Primary key: source, source_id. 1 files, 5 rows, 7,964 compressed bytes.
 
 | Column | Arrow type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -418,7 +520,7 @@ Layout: `zone_tables/part.parquet`. Primary key: none; observations can repeat. 
 
 ## Worked coordinate reads
 
-Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use 3.139, 101.6869, inside this subset, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors.
+Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use 3.139, 101.6869, inside this subset, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors and filter on the point's block first, so each reads one row group of one cells file.
 
 ### DuckDB SQL over local Parquet
 
@@ -430,6 +532,7 @@ import h3
 
 root = Path(os.environ["DATASET"])
 cell = h3.latlng_to_cell(3.139, 101.6869, 8)
+block = h3.cell_to_parent(cell, 3)
 keys = [int(h3.cell_to_parent(cell, level), 16) for level in range(3, 9)]
 pattern = str(root / "cells" / "**" / "*.parquet")
 connection = duckdb.connect()
@@ -439,13 +542,13 @@ result = connection.execute(
     """WITH cell AS (
     SELECT country_id, state_id, city_id, city_method
     FROM read_parquet(?, hive_partitioning=false)
-    WHERE h3_uint64 IN (SELECT unnest(?::UBIGINT[]))
+    WHERE block = ? AND h3_uint64 IN (SELECT unnest(?::UBIGINT[]))
     ORDER BY h3_resolution DESC LIMIT 1
   )
   SELECT c.country_id, c.state_id, c.city_id, p.name AS city_name, c.city_method
   FROM cell c LEFT JOIN read_parquet(?, hive_partitioning=false) p
     ON c.city_id = p.place_id""",
-    [pattern, keys, str(root / "places" / "**" / "*.parquet")],
+    [pattern, block, keys, str(root / "places" / "**" / "*.parquet")],
 ).fetchall()
 assert len(result) == 1
 assert result[0][3]  # A catalogue name for this example's selected settlement.
@@ -453,7 +556,7 @@ print(result)
 connection.close()
 ```
 
-A published copy is read the same way: replace the local directory in the first and third SQL parameters with the published `dataset/2026.10/` location. DuckDB needs its `httpfs` extension for remote paths. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
+A published copy is read the same way: replace the local directory in the first and fourth SQL parameters with the published `dataset/2026.10/` location. DuckDB needs its `httpfs` extension for remote paths. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
 
 ### PyArrow
 
@@ -466,11 +569,12 @@ import pyarrow.dataset as ds
 
 root = Path(os.environ["DATASET"])
 cell = h3.latlng_to_cell(3.139, 101.6869, 8)
+block = h3.cell_to_parent(cell, 3)
 keys = pa.array(
     [int(h3.cell_to_parent(cell, level), 16) for level in range(3, 9)], type=pa.uint64()
 )
 table = ds.dataset(root / "cells", format="parquet").to_table(
-    filter=ds.field("h3_uint64").isin(keys),
+    filter=(ds.field("block") == block) & ds.field("h3_uint64").isin(keys),
     columns=["country_id", "state_id", "city_id", "city_method", "h3_resolution"],
 )
 rows = sorted(table.to_pylist(), key=lambda row: row["h3_resolution"], reverse=True)
@@ -490,11 +594,12 @@ import pandas as pd
 
 root = Path(os.environ["DATASET"])
 cell = h3.latlng_to_cell(3.139, 101.6869, 8)
+block = h3.cell_to_parent(cell, 3)
 keys = [int(h3.cell_to_parent(cell, level), 16) for level in range(3, 9)]
 frame = pd.read_parquet(
     root / "cells",
     engine="pyarrow",
-    filters=[("h3_uint64", "in", keys)],
+    filters=[("block", "==", block), ("h3_uint64", "in", keys)],
     columns=["country_id", "state_id", "city_id", "city_method", "h3_resolution"],
 )
 frame = frame.sort_values("h3_resolution", ascending=False)
@@ -504,11 +609,11 @@ print(frame.iloc[0][["country_id", "state_id", "city_id", "city_method"]].to_dic
 
 ## Versions and integrity
 
-Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positive patch number. A published version is immutable. `CHANGES.md` compares each table's logical digest and row count with the previous version. `content.json` hashes logical values and duplicate counts independently of partitioning, row order, Parquet metadata and compression. A packaging change can change file SHA256 without changing the logical digest.
+Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positive patch number. A published version is immutable. `CHANGES.md` compares each table's logical digest and row count with the previous version. `content.json` hashes logical values and duplicate counts independently of partitioning, row order, Parquet metadata and compression. It covers every table except `blocks`, which indexes the packaging of `cells`. A packaging change can change file SHA256 without changing the logical digest.
 
 Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `dataset/2026.10/_SUCCESS` receipt (the same receipt is written to `packs/2026.10/_SUCCESS`), written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
-The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
+The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index and `empty_blocks` defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
 
 With Python 3.11 or newer and `DATASET` set, verify local bytes without loading the tables:
 
@@ -530,6 +635,14 @@ for entry in manifest["files"]:
 print(f"Verified {len(manifest['files'])} files")
 PY
 ```
+
+## Next major schema
+
+This release only adds to the schema: `cells.block`, the `blocks` table and declared keys. The next major schema version is planned to change the following, which will break queries that rely on the current shape.
+
+- **One H3 key per table.** Tables keep a single H3 key column: the hexadecimal `h3` text or a signed `int64`, never both and never unsigned. Athena, BigQuery, Spark and pandas with nulls cannot hold unsigned 64-bit keys. Prefer `h3` and `block` in new queries.
+- **Provenance split.** The per-row `provenance` JSON leaves the main tables. Source-level facts move to a `sources` table, and row-specific evidence to `<table>_evidence` tables keyed by `source` and `source_id`.
+- **`group=` directories renamed.** Cells folders stop using the reserved word `group` as their partition label, or give way to files sorted by `block`. Reach a block's rows through the `block` column or the `blocks` table, not directory names.
 
 ## Licences, contact and citation
 

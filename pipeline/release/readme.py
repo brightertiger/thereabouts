@@ -18,7 +18,7 @@ def render(
 ) -> str:
     settings = config.release
     tree, sections = [], []
-    for kind, counts in stats.items():
+    for kind, schema in descriptions.items():
         layout = (
             f"{kind}/group=*/part.parquet"
             if kind == "cells"
@@ -26,17 +26,23 @@ def render(
             if kind in {"places", "canonical_cities", "place_to_city"}
             else f"{kind}/part.parquet"
         )
+        counts = stats.get(kind)
+        measured = (
+            f"{counts['files']:,} files, {counts['rows']:,} rows, "
+            f"{counts['bytes']:,} compressed bytes."
+            if counts
+            else "Not measured in this export."
+        )
         tree.append(
             f"├── {layout}  # {counts['rows']:,} rows; {counts['bytes']:,} bytes"
+            if counts
+            else f"├── {layout}  # not measured in this export"
         )
-        schema = descriptions[kind]
-        keys = ", ".join(schema["primary_key"]) or "none; observations can repeat"
+        keys = ", ".join(schema["primary_key"]) or "none"
         sections += [
             f"### `{kind}`",
             "",
-            f"Layout: `{layout}`. Primary key: {keys}. "
-            f"{counts['files']:,} files, {counts['rows']:,} rows, "
-            f"{counts['bytes']:,} compressed bytes.",
+            f"Layout: `{layout}`. Primary key: {keys}. {measured}",
             "",
             "| Column | Arrow type | Nullable | Units | Meaning |",
             "| --- | --- | --- | --- | --- |",
@@ -113,13 +119,13 @@ def remote(base: str, version: str) -> str:
     if not base:
         return (
             "A published copy is read the same way: replace the local directory in "
-            "the first and third SQL parameters with the published "
+            "the first and fourth SQL parameters with the published "
             f"`dataset/{version}/` location. DuckDB needs its `httpfs` extension "
             "for remote paths."
         )
     return (
         f"For S3, use `{base}/dataset/{version}/cells/**/*.parquet` and "
-        f"`{base}/dataset/{version}/places/**/*.parquet` for the first and third "
+        f"`{base}/dataset/{version}/places/**/*.parquet` for the first and fourth "
         "SQL parameters. DuckDB needs its `httpfs` extension and the bucket's "
         "region and credentials, or public anonymous access."
     )
