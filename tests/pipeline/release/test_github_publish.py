@@ -254,3 +254,25 @@ def test_each_release_index_lists_every_published_version(
             fake, releases["2026.10"], tmp_path / "work" / "2026.10", monkeypatch
         )
         assert (again["upload"], again["aggregate_index"]) == (0, "kept")
+
+
+def test_a_draft_index_gains_versions_published_after_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    releases = {
+        v: build(tmp_path / v, version=v, families=("phone",))
+        for v in ("2026.10", "2026.11")
+    }
+    with running() as fake:
+        work = tmp_path / "work"
+        draft = publish_to(
+            fake, releases["2026.11"], work / "2026.11", monkeypatch, private=True
+        )
+        assert draft["state"] == "draft"
+        publish_to(fake, releases["2026.10"], work / "2026.10", monkeypatch)
+        result = publish_to(fake, releases["2026.11"], work / "2026.11", monkeypatch)
+        assert (result["state"], result["aggregate_index"]) == ("published", "replaced")
+        latest = fake.releases[fake.latest or 0]
+        assert latest.tag_name == "v2026.11"
+        index = next(a for a in latest.assets if a.name == "index.json")
+        assert sorted(json.loads(index.data)["datasets"]) == ["2026.10", "2026.11"]

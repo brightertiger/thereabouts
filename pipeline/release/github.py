@@ -468,12 +468,14 @@ class Publisher:
     def index(
         self, release: Row, assets: dict[str, Row], entry: Row, ids: dict[str, int]
     ) -> str:
-        """Keep an uploaded index that lists this version exactly; else union and add.
+        """The union of published indexes plus this version.
 
-        Later releases add versions to their own index only, so an uploaded index is
-        checked by this version's entry, not byte for byte.
+        A published release keeps its uploaded index when that lists this version
+        exactly: later releases add versions to their own index only. A draft's index
+        is rebuilt on every run and replaced when it differs, since versions published
+        after the draft was made must appear in it and nothing names it by asset id.
         """
-        if INDEX in assets:
+        if INDEX in assets and not release["draft"]:
             value = self.fetch_json(int(assets[INDEX]["id"]))
             listed = value.get("datasets")
             if (
@@ -490,8 +492,15 @@ class Publisher:
             return "kept"
         indexes = self.published_indexes(release)
         path, digest = self.generated(INDEX, merge(indexes, self.plan.version, entry))
+        state = "updated" if indexes else "created"
+        if INDEX in assets:
+            if self.matches(assets[INDEX], path.stat().st_size, digest):
+                state = "kept"
+            else:
+                self.client.delete_asset(int(assets.pop(INDEX)["id"]))
+                state = "replaced"
         ids[INDEX] = self.ensure(release, assets, INDEX, path, digest)
-        return "updated" if indexes else "created"
+        return state
 
     def confirm(self, release_id: int, state: str, ids: Mapping[str, int]) -> None:
         """Re-read the release: its state, tag and exactly the planned assets."""
