@@ -1,12 +1,14 @@
 """Publish source-evidence code links and spatial joins without dropping rows."""
 
 import shutil
+from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from pipeline.config import policies, quality_policy
 from pipeline.engines import query
 from pipeline.engines.artifact_io import file_record, parquet
 from pipeline.engines.cells import joins
@@ -14,9 +16,11 @@ from pipeline.engines.cells.code_links import CodeIndex, linked_rows
 from pipeline.engines.cells.inputs import Inputs
 from pipeline.engines.cells.phone import PhoneCountries
 from pipeline.engines.cells.schemas import strings
+from pipeline.engines.cities.gate_scope import reviewed_countries
 from pipeline.engines.names.build import build as build_names
 from pipeline.engines.names.policy import load as load_names_policy
 from pipeline.engines.reconcile.common import Row
+from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import Object, atomic_output, write_json
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Recipe
@@ -26,6 +30,9 @@ from . import lookup_manifest, reconcile
 from . import parameters as unit_parameters
 from .contract import Context, Unit
 from .engine_data import Geography, countries, source_manifest
+
+# Read only for the manifest unit; an engines setting would re-identify every stage.
+QUALITY_POLICY = "config/policies/quality.yaml"
 
 
 def static(ctx: Context, unit: Unit, root: Path, key: str) -> list[Path]:
@@ -230,10 +237,25 @@ def parameters(ctx: Context, geography: Geography) -> unit_parameters.Configure:
         return country(recipe)
 
     limits = ctx.config.engines.limits
-    return unit_parameters.prepare(
+    configure = unit_parameters.prepare(
         select,
         geography,
         country_bytes=limits.lookup_reservation_bytes,
         block_bytes=limits.block_reservation_bytes,
         reads={"manifest": (ctx.config.engines.city_review,)},
     )
+    review = policies.read(located(REPOSITORY, ctx.config.engines.city_review))
+    gates = {
+        **quality_policy.load(located(REPOSITORY, QUALITY_POLICY))["gates"],
+        "reviewed": reviewed_countries(
+            policy, unit_parameters.reconciliation(ctx), review
+        ),
+    }
+
+    def scoped(recipe: Recipe) -> unit_parameters.Options:
+        options = configure(recipe)
+        if recipe.unit_id != "manifest/current":
+            return options
+        return replace(options, parameters={**options.parameters, "gates": gates})
+
+    return scoped
