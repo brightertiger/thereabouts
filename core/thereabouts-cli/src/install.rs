@@ -195,7 +195,16 @@ fn install_one(
         }
         return pointer(root, &destination);
     }
-    let archive = download(root, source, pack)?;
+    let archive = download(
+        root,
+        source,
+        &Remote {
+            url: &pack.url,
+            api_url: pack.api_url.as_deref(),
+            size: pack.size,
+            sha256: &pack.sha256,
+        },
+    )?;
     let staging = manifest::artifact_path(root, &format!(".staging/{}", pack.sha256))?;
     // The lock protects this exact staging path; failed extraction is disposable.
     if staging.exists() {
@@ -221,7 +230,15 @@ fn install_one(
     }
     result
 }
-fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<PathBuf> {
+/// One file to download: where, how large and its digest.
+pub(crate) struct Remote<'a> {
+    pub url: &'a str,
+    pub api_url: Option<&'a str>,
+    pub size: u64,
+    pub sha256: &'a str,
+}
+/// Download (or resume) one release file into `.downloads/`, checked by size and digest.
+pub(crate) fn download(root: &Path, source: &dyn Source, pack: &Remote<'_>) -> Result<PathBuf> {
     let path = manifest::artifact_path(root, &format!(".downloads/{}.part", pack.sha256))?;
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
@@ -241,8 +258,8 @@ fn download(root: &Path, source: &dyn Source, pack: &ReleasePack) -> Result<Path
     }
     if offset < pack.size {
         let remote = Locator {
-            url: &pack.url,
-            api_url: pack.api_url.as_deref(),
+            url: pack.url,
+            api_url: pack.api_url,
         };
         let mut input = source.open_file(remote, offset, pack.size)?;
         let mut remaining = pack.size - offset;

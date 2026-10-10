@@ -11,6 +11,7 @@ pub mod transfer;
 mod args;
 mod batch;
 mod data;
+mod dataset;
 mod http;
 mod lease;
 mod query;

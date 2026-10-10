@@ -108,6 +108,23 @@ pub(crate) fn run(command: &Data, root: &Path, no_input: bool, io: &mut dyn Io) 
             version,
             source: origin,
             yes: _,
+        } if packs.iter().any(|name| name == "dataset") => {
+            if packs.len() != 1 {
+                return Err(Error::Usage(
+                    "Install the dataset on its own: thereabouts data install dataset".into(),
+                ));
+            }
+            crate::dataset::install(
+                root,
+                source(origin.as_deref(), io)?.as_ref(),
+                version.as_deref(),
+            )
+        }
+        Data::Install {
+            packs,
+            version,
+            source: origin,
+            yes: _,
         } => {
             let pin = install::install(
                 root,

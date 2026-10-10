@@ -5,7 +5,10 @@ use std::{
     io::{BufReader, Read},
     path::Path,
 };
-use thereabouts_cli_core::archive::{self, Output, Summary};
+use thereabouts_cli_core::{
+    archive::{self, Output, Summary},
+    zip,
+};
 use thereabouts_core::format::manifest;
 
 /// Files are created exclusively below the staging root and synced before verification.
@@ -37,6 +40,14 @@ impl Output for Staging<'_> {
 pub fn extract(archive: &Path, staging: &Path, unpacked_size: u64) -> Result<Summary> {
     archive::extract(
         BufReader::new(File::open(archive)?),
+        &mut Staging { root: staging },
+        unpacked_size,
+    )
+}
+/// Expand a checksum-verified dataset table zip into a staging directory.
+pub fn extract_zip(path: &Path, staging: &Path, unpacked_size: u64) -> Result<Summary> {
+    zip::extract(
+        BufReader::new(File::open(path)?),
         &mut Staging { root: staging },
         unpacked_size,
     )
