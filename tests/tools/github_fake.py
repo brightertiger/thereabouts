@@ -71,8 +71,10 @@ class FakeGithub:
     # bytes, leaving a "starter" asset as GitHub does.
     fail_upload_after: int | None = None
     fail_upload_name: str | None = None
-    # Cut the next object download after this many bytes.
+    # Cut the next object download (of `cut_download_name`, if set) after this many
+    # bytes.
     cut_download_after: int | None = None
+    cut_download_name: str | None = None
     urls: dict[str, str] = field(default_factory=dict)
     lock: threading.Lock = field(default_factory=threading.Lock)
     _ids: Iterator[int] = field(default_factory=lambda: iter(range(1000, 10**9)))
@@ -253,7 +255,9 @@ class Handler(BaseHTTPRequestHandler):
                 "Content-Range", f"bytes {offset}-{len(data) - 1}/{len(data)}"
             )
         self.end_headers()
-        if self.fake.cut_download_after is not None:
+        if self.fake.cut_download_after is not None and (
+            self.fake.cut_download_name in {None, found[1].name}
+        ):
             body = body[: self.fake.cut_download_after]
             self.fake.cut_download_after = None
             self.wfile.write(body)
