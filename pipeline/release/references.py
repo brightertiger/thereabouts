@@ -112,41 +112,44 @@ def defined(directory: Path, tables: list[Row], target: str) -> Strings:
 def referenced(
     directory: Path, tables: list[Row], references: list[Reference]
 ) -> dict[Reference, Strings]:
-    """The distinct keys each reference names, reading each file once."""
+    """The distinct keys that each of one table's references names."""
     parts: dict[Reference, list[Strings]] = defaultdict(list)
-    for table in sorted({r.table for r in references}):
-        same = [r for r in references if r.table == table]
-        for path in files(directory, tables, table):
-            present = set(pq.read_schema(path).names)
-            found = [r for r in same if r.column in present]
-            data = pq.read_table(path, columns=[r.column for r in found])
-            for reference in found:
-                values = identifiers(data[reference.column], reference)
-                parts[reference].append(unique(values))
+    for path in files(directory, tables, references[0].table):
+        present = set(pq.read_schema(path).names)
+        found = [r for r in references if r.column in present]
+        data = pq.read_table(path, columns=[r.column for r in found])
+        for reference in found:
+            values = identifiers(data[reference.column], reference)
+            parts[reference].append(unique(values))
     # The writer publishes the non-geographic calling code without a country.
     excused = pa.array([COUNTRY + NON_GEOGRAPHIC])
     named = {}
     for reference in references:
-        values = unique(pa.chunked_array(parts[reference], pa.string()))
+        values = unique(pa.chunked_array(parts.pop(reference, []), pa.string()))
         named[reference] = absent(values, excused) if reference.code else values
     return named
+
+
+def lacking(values: Strings, known: Strings) -> Strings:
+    """`values` not in `known`, hashing the values rather than millions of keys."""
+    return absent(values, known.filter(pc.is_in(known, value_set=values)))
 
 
 def missing(
     directory: Path, tables: list[Row], references: list[Reference]
 ) -> tuple[dict[Reference, list[str]], dict[str, Strings]]:
-    """Missing keys per reference, with each target's defined keys."""
+    """Missing keys per reference, with each target's defined keys.
+
+    One table's distinct references are held at a time, so the peak is about the
+    places' own keys and edges."""
     keys = {r.target: defined(directory, tables, r.target) for r in references}
-    named = referenced(directory, tables, references)
     found = {}
-    for target, known in keys.items():
-        # One lookup per target table, as it can define millions of keys.
-        same = [r for r in references if r.target == target]
-        lost = absent(unique(pa.chunked_array([named[r] for r in same])), known)
-        for reference in same:
-            values = named[reference].filter(pc.is_in(named[reference], lost))
-            if len(values):
-                found[reference] = sorted(str(value) for value in values.to_pylist())
+    for table in sorted({r.table for r in references}):
+        same = [r for r in references if r.table == table]
+        for reference, values in referenced(directory, tables, same).items():
+            lost = lacking(values, keys[reference.target])
+            if len(lost):
+                found[reference] = sorted(str(value) for value in lost.to_pylist())
     return found, keys
 
 
