@@ -1,25 +1,15 @@
 """Conservative cleaning and point keys shared only by additional lookups."""
 
-import json
 import math
-import unicodedata
 from typing import Any
 
 import h3
 
 from pipeline.config.schema import H3
 
+from .rows import canonical_json, clean_text, provenance
+
 Row = dict[str, Any]
-
-
-class Reject(ValueError):
-    """A structurally unreadable source record, recorded in the rejection audit."""
-
-
-def clean(value: str | None) -> str | None:
-    if value is None:
-        return None
-    return " ".join(unicodedata.normalize("NFC", value).split()) or None
 
 
 def point(
@@ -58,7 +48,7 @@ def decorate(
     error = row.pop("coordinate_error", None)
     for key, value in row.items():
         if isinstance(value, str):
-            row[key] = clean(value)
+            row[key] = clean_text(value)
     country = row.get("country_code")
     if country and (
         len(country) != 2 or not country.isascii() or not country.isalpha()
@@ -71,17 +61,19 @@ def decorate(
         source_id=identity,
         source_release=release,
         license=pin["license"],
-        provenance=json.dumps(
-            {
-                "source_url": pin["url"],
-                "license_url": pin["license_url"],
-                "attribution": pin["attribution"],
-                "retrieved_at": pin["retrieved_at"],
-                "coordinate_error": error,
-                "raw": raw,
-            },
-            ensure_ascii=False,
-            separators=(",", ":"),
+        provenance=canonical_json(
+            provenance(
+                pin["url"],
+                pin["license_url"],
+                pin["attribution"],
+                {
+                    "retrieved_at": pin["retrieved_at"],
+                    "coordinate_error": error,
+                    "raw": raw,
+                },
+            ),
+            sort_keys=False,
+            allow_nan=True,
         ),
     )
     return row

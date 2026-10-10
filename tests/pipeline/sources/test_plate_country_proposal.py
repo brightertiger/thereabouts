@@ -19,7 +19,7 @@ from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.runner import run
 from pipeline.sources import policy as source_policy
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 from pipeline.stages import plate_country
 from pipeline.stages.contract import Context, make_unit
 from pipeline.stages.engine_recipes import plate_recipes
@@ -136,10 +136,10 @@ def test_loopback_pins_build_plate_tables_only_when_the_recipe_lists_them(
         for name, body in payloads.items():
             server.routes["/" + name] = Reply(body)
         settings = inventory(tmp_path, server.url)
-        adapter = cast(Source, importlib.import_module(settings.adapter))
+        proposer = cast(Proposer, importlib.import_module(settings.proposer))
         with monkeypatch.context() as patch:
             patch.setattr(source_policy, "REPOSITORY", tmp_path)
-            pin = adapter.propose(settings)
+            pin = proposer.propose(settings)
     assert [f.name for f in pin.files] == ["vehicle-stock.json", "wiki-QQ.json"]
     assert all(f.url.startswith(server.url) for f in pin.files)
     assert pin.files[0].metadata["revision"] == 123
@@ -147,14 +147,13 @@ def test_loopback_pins_build_plate_tables_only_when_the_recipe_lists_them(
     root = tmp_path / "ws"
     write_json(root / "normalized/plates/manifest.json", workspace(root))
     with Ledger(root, None, readonly=False) as ledger:
-        source, stages = source_context(
+        ctx, _, stages = source_context(
             root,
             ledger,
             "plate_country",
             {f.name: (payloads[f.name], f.metadata) for f in pin.files},
         )
-        run(source.runtime, stages)
-        ctx = source.runtime
+        run(ctx, stages)
         ctx.config.sources["plates"] = load().sources["plates"]
         ctx.config.sources["plate_country"].enabled = True
         unpinned = plate_tables(root, ctx, {"plates"})

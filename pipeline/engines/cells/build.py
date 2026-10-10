@@ -11,8 +11,8 @@ import numpy as np
 from h3.api import basic_int as h3
 
 from pipeline.engines.hierarchy import descendants, label_block
-from pipeline.engines.reconcile.common import Row
 from pipeline.engines.reconcile.lookup import Locator
+from pipeline.engines.store.codec import Row
 
 from .compaction import compact
 from .inputs import Inputs

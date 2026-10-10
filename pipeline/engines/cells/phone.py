@@ -7,7 +7,7 @@ from pathlib import Path
 
 import regex
 
-from pipeline.engines.reconcile.common import Row, rows
+from pipeline.engines.store.codec import Row, rows
 
 
 class PhoneCountries:

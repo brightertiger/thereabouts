@@ -16,8 +16,8 @@ from pipeline.pins.models import PinFile, SourcePin
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.resources import ResourceGuard
 from pipeline.sources.contract import SourceContext
-from pipeline.stages.contract import make_unit
-from pipeline.stages.sources import SourceStage
+from pipeline.stages.contract import Context, make_unit
+from pipeline.stages.sources import SourceStage, adapter_context
 from pipeline.storage.objects import backend
 
 from ..helpers import context
@@ -97,7 +97,8 @@ def source_context(
     ledger: Ledger,
     name: str,
     payloads: dict[str, tuple[bytes, dict[str, Any]]],
-) -> tuple[SourceContext, list[SourceStage]]:
+) -> tuple[Context, SourceContext, list[SourceStage]]:
+    """The runtime context, the adapter's narrow view of it and both stages."""
     config = load()
     settings = config.sources[name]
     # The source under test runs whether or not the committed config enables it.
@@ -135,9 +136,8 @@ def source_context(
     source_pin = SourcePin("synthetic", "2026-10-03", files=files)
     stages = [SourceStage(setting, {name: source_pin}) for setting in config.stages[:2]]
     unit = stages[1].units(ctx)[0]
-    return SourceContext(
-        ctx, settings, source_pin, make_unit(ctx, unit.recipe, unit.identity)
-    ), stages
+    unit = make_unit(ctx, unit.recipe, unit.identity)
+    return ctx, adapter_context(ctx, settings, source_pin, unit), stages
 
 
 def rows(source: SourceContext, kind: str) -> list[dict[str, Any]]:

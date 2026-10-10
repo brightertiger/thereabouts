@@ -1,12 +1,16 @@
 """Atomic, input-keyed country normalization without modifying reconciliation."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 import shapely
 
 from pipeline.config.engines import EngineLimits
-from pipeline.engines.artifact_io import file_record, parquet
-from pipeline.engines.reconcile.common import Row, check_database, connect, encode, pack
+from pipeline.engines.artifact_io import parquet
+from pipeline.engines.store.areas import entity_areas
+from pipeline.engines.store.codec import Row, encode, pack
+from pipeline.engines.store.database import check_database, connect
+from pipeline.files import file_record
 from pipeline.runtime.jsonio import atomic_output, write_json
 
 from .candidates import candidates, divisions
@@ -24,6 +28,8 @@ def build_country(
     urban: Urban,
     policy: Row,
     limits: EngineLimits,
+    *,
+    log: Callable[[str], None] | None = None,
 ) -> Row:
     report_path = root / "report.json"
     db = connect(source, readonly=True, cache_kib=limits.sqlite_cache_kib)
@@ -36,11 +42,7 @@ def build_country(
         for identity in cities:
             if identity.startswith("city:country:"):
                 shapes = [
-                    shapely.from_wkb(b)
-                    for (b,) in db.execute(
-                        "SELECT geometry FROM areas WHERE entity=? AND role='city'",
-                        (identity,),
-                    )
+                    shapely.from_wkb(b) for _, b in entity_areas(db, identity, "city")
                 ]
                 if shapes:
                     fixed.append(
@@ -182,9 +184,9 @@ def build_country(
         "rejected_areas": rejected,
     }
     write_json(report_path, report)
-    print(
-        f"normalize {cc}: {len(cities)} cities/towns, "
-        f"{len(footprints)} footprints, {len(rejected)} rejected areas",
-        flush=True,
-    )
+    if log is not None:
+        log(
+            f"normalize {cc}: {len(cities)} cities/towns, "
+            f"{len(footprints)} footprints, {len(rejected)} rejected areas"
+        )
     return report

@@ -6,7 +6,8 @@ import sqlite3
 
 import shapely
 
-from .common import Row, unpack
+from pipeline.engines.store.codec import Row, unpack
+
 from .spatial import decode
 
 

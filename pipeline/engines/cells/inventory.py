@@ -4,14 +4,15 @@ import json
 import sqlite3
 from pathlib import Path
 
-import duckdb
 import shapely
 from h3.api import basic_int as h3
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3, Resources
-from pipeline.engines.reconcile.common import Row, check_database, encode
+from pipeline.engines.query import connection
 from pipeline.engines.reconcile.matching import default_perspective
+from pipeline.engines.store.codec import Row, encode
+from pipeline.engines.store.database import check_database
 from pipeline.runtime.jsonio import atomic_output
 
 from .blocks import describe
@@ -24,12 +25,11 @@ def inventory(
     resources: Resources,
     limits: EngineLimits,
     kinds: dict[str, str],
+    spill: Path | None = None,
 ) -> Row:
     records: list[tuple[str, float, float, float, float]] = []
     expected: set[str] = set()
-    with duckdb.connect() as db:
-        db.execute("SET memory_limit=?", [resources.duckdb_memory])
-        db.execute("SET threads=?", [resources.duckdb_threads])
+    with connection(resources, limits.duckdb_spill_bytes, spill=spill) as db:
         for source, paths in sources.items():
             if not paths:
                 continue

@@ -6,6 +6,11 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from pipeline.config import load
+from pipeline.release import pins as release_pins
+from pipeline.release import prepared, proof, registry
+from pipeline.release.assemble import assemble
+from pipeline.release.publish import inventory, publish
+from pipeline.release.source import external
 from pipeline.runtime.context import context
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
@@ -13,12 +18,6 @@ from pipeline.runtime.paths import located
 from pipeline.runtime.resources import ResourceGuard
 from pipeline.runtime.runner import exclusive
 from pipeline.stages.dataset import DatasetStage
-
-from . import pins as release_pins
-from . import prepared, proof, registry
-from .assemble import assemble
-from .publish import inventory, publish
-from .source import external
 
 
 def main(argv: Sequence[str]) -> int:

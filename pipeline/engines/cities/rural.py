@@ -9,17 +9,22 @@ import numpy as np
 import shapely
 from numpy.typing import NDArray
 
-from pipeline.engines.cells.geometry import Areas, Floats
+from pipeline.engines.cells.geometry import Areas
 from pipeline.engines.cells.nearest import nearest
-from pipeline.engines.cells.windows import areas, expanded
-from pipeline.engines.reconcile.lookup import entity
+from pipeline.engines.cells.windows import expanded
+from pipeline.engines.geo.arrays import FloatArray
+from pipeline.engines.store.areas import intersecting_any
+from pipeline.engines.store.entities import entity
 
 if TYPE_CHECKING:
     from .engine import Engine
 
 
 def rural(
-    engine: Engine, db: sqlite3.Connection, coordinates: Floats, projected: Floats
+    engine: Engine,
+    db: sqlite3.Connection,
+    coordinates: FloatArray,
+    projected: FloatArray,
 ) -> tuple[NDArray[np.object_], NDArray[np.object_]]:
     bounds = (
         float(projected[:, 1].min()),
@@ -28,7 +33,9 @@ def rural(
         float(projected[:, 0].max()),
     )
     shapes, records = [], []
-    for aid, identity, _, priority, blob, _ in areas(db, expanded(bounds, 0), "city"):
+    for aid, identity, _, priority, blob, _ in intersecting_any(
+        db, expanded(bounds, 0), "city"
+    ):
         if aid in engine.rejected:
             continue
         shapes.append(shapely.from_wkb(blob))

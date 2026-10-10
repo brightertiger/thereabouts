@@ -1,5 +1,6 @@
 name: phone
 adapter: pipeline.sources.phone
+proposer: pipeline.sources.proposals.resolve
 kind: phone
 enabled: true
 upstream:

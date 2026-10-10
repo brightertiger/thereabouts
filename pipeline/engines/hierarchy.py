@@ -7,11 +7,11 @@ import numpy as np
 from h3.api import basic_int as h3
 from numpy.typing import NDArray
 
-from pipeline.geometry.hierarchy import addresses
 from thereabouts.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
 
-from .oracle import FloatArray, Labels
-from .schema import BOUNDARY_TOLERANCE_DEG
+from .addresses import addresses
+from .geo.arrays import FloatArray, Labels
+from .geo.sphere import BOUNDARY_TOLERANCE_DEG
 
 
 class Labeller(Protocol):

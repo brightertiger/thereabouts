@@ -66,11 +66,11 @@ def source_outputs(
     executor: str,
 ) -> set[tuple[str, str, str]]:
     with Ledger(root, None, readonly=False) as ledger:
-        source, stages = source_context(root, ledger, name, payloads)
+        runtime, source, stages = source_context(root, ledger, name, payloads)
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
-        source.runtime.config.resources.workers = workers
-        source.runtime.config.resources.executor = executor
-        run(source.runtime, stages)
+        runtime.config.resources.workers = workers
+        runtime.config.resources.executor = executor
+        run(runtime, stages)
         return {
             (record.stage, output.path, output.sha256)
             for record in ledger.records()

@@ -1,14 +1,13 @@
 """Read source and retained geographic inventories without enumerating recipes."""
 
 import json
-import sqlite3
 from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import duckdb
-
+from pipeline.engines import query
+from pipeline.files import sqlite_readonly
 from pipeline.runtime.paths import located
 
 from .contract import Context
@@ -50,9 +49,8 @@ def countries(ctx: Context) -> list[str]:
         return sorted(settings.countries)
     # Only the narrow country column is needed; no geometry is materialized.
     selected: set[str] = set()
-    with duckdb.connect() as db:
-        db.execute("SET memory_limit=?", [ctx.config.resources.duckdb_memory])
-        db.execute("SET threads=?", [ctx.config.resources.duckdb_threads])
+    limits = settings.limits
+    with query.connection(ctx.config.resources, limits.duckdb_spill_bytes) as db:
         for name in settings.reconcile_sources:
             if name == settings.land_source:
                 continue
@@ -96,9 +94,7 @@ def geography(ctx: Context) -> Geography:
     selected = set(settings.blocks)
     blocks = {}
     if path is not None:
-        with closing(
-            sqlite3.connect(path.absolute().as_uri() + "?mode=ro&immutable=1", uri=True)
-        ) as db:
+        with closing(sqlite_readonly(path)) as db:
             for key, values in db.execute(
                 "SELECT root,countries FROM blocks ORDER BY root"
             ):

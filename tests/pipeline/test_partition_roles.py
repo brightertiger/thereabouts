@@ -32,9 +32,9 @@ def test_partitions_are_exactly_the_parquet_outputs(tmp_path: Path, name: str) -
         else land_payloads(tmp_path)
     )
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(tmp_path, ledger, name, payloads)
+        runtime, source, stages = source_context(tmp_path, ledger, name, payloads)
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
-        run(source.runtime, stages)
+        run(runtime, stages)
         record = ledger.get("normalize", name)
         assert record is not None
         manifest = json.loads((source.normalized / "manifest.json").read_bytes())

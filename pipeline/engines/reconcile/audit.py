@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .common import Row, unpack
+from pipeline.engines.store.codec import Row, unpack
+
 from .evaluation import compare
 from .lookup import Locator
 

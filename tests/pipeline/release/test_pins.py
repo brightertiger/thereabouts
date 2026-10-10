@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.pins.models import PinFile, SourcePin
 from pipeline.release.pins import verify
 from pipeline.runtime.jsonio import write_json

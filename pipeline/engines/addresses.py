@@ -1,20 +1,26 @@
-"""H3 logical addresses; see docs/DESIGN.md, Mmap format."""
+"""H3 cells as a resolution-3 block and a local key below it."""
 
-from typing import overload
+from typing import TypeVar, overload
 
 import numpy as np
 from numpy.typing import NDArray
 
 from thereabouts.format import BLOCK_RESOLUTION, H3_DIGIT_BITS, H3_MAX_RESOLUTION
 
-from .format import (
-    CHILD_RADIX,
-    H3_BASE_MASK,
-    H3_BASE_SHIFT,
-    H3_DIGIT_MASK,
-    Integer,
-    level_offset,
-)
+H3_DIGIT_MASK = (1 << H3_DIGIT_BITS) - 1
+H3_BASE_SHIFT = H3_DIGIT_BITS * H3_MAX_RESOLUTION
+H3_BASE_MASK = 127
+CHILD_RADIX = 7
+
+Integer = TypeVar("Integer", int, NDArray[np.int64])
+
+
+def level_offset(depth: Integer) -> Integer:
+    """First local key at this depth below a resolution-3 block."""
+    result = (CHILD_RADIX**depth - 1) // (CHILD_RADIX - 1)
+    if isinstance(depth, int):
+        return int(result)
+    return result
 
 
 def _addresses(cells: Integer, resolution: int) -> tuple[Integer, Integer]:

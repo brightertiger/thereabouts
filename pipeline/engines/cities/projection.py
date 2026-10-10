@@ -9,8 +9,9 @@ from numpy.typing import NDArray
 
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.cells.offshore import Offshore
-from pipeline.engines.cells.windows import areas, envelopes, expanded
+from pipeline.engines.cells.windows import envelopes, expanded
 from pipeline.engines.reconcile.land import Land
+from pipeline.engines.store.areas import area_bounds, intersecting_any
 from thereabouts.format import BLOCK_RESOLUTION
 
 
@@ -35,16 +36,10 @@ def project(
         for indices in groups.values():
             points = coordinates[indices]
             windows = [w for b in envelopes(points) for w in expanded(b, cutoff)]
-            records = areas(land.db, windows)
+            records = intersecting_any(land.db, windows)
             shapes = [shapely.from_wkb(r[4]) for r in records]
             bounds = np.array(
-                [
-                    land.db.execute(
-                        "SELECT xmin,xmax,ymin,ymax FROM area_bounds WHERE id=?",
-                        (r[0],),
-                    ).fetchone()
-                    for r in records
-                ],
+                [area_bounds(land.db, r[0]) for r in records],
                 dtype=np.float64,
             ).reshape((-1, 4))
             projected, present, exceptional = Offshore(

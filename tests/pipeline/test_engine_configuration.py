@@ -12,7 +12,7 @@ from pipeline.config.schema import H3
 from pipeline.engines.cells.compaction import compact
 from pipeline.engines.cells.reader import Cells, interval
 from pipeline.engines.cities.evaluate import lookup
-from pipeline.engines.reconcile.common import connect
+from pipeline.engines.store.database import connect
 
 
 def test_nondefault_grid_drives_compaction_intervals_and_both_readers(

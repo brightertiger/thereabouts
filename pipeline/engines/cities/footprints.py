@@ -7,9 +7,10 @@ from typing import Any
 
 import shapely
 
+from pipeline.engines.geo.sphere import distance
 from pipeline.engines.reconcile.classification import city_order
-from pipeline.engines.reconcile.common import Row, unpack
-from pipeline.engines.reconcile.spatial import distance
+from pipeline.engines.store.areas import areas_by_role
+from pipeline.engines.store.codec import Row, unpack
 
 
 def screen(
@@ -23,10 +24,7 @@ def screen(
     fixed_ids = {r["city_id"] for r in fixed}
     grouped: dict[str, list[Row]] = defaultdict(list)
     rejected = []
-    for area, identity, priority, blob, data in db.execute(
-        "SELECT id,entity,priority,geometry,evidence FROM areas "
-        "WHERE role='city' ORDER BY id"
-    ):
+    for area, identity, priority, blob, data in areas_by_role(db, "city"):
         identity = rules.get("identity_aliases", {}).get(identity, identity)
         evidence = unpack(data)
         reason = None

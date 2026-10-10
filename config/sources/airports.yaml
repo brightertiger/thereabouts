@@ -1,5 +1,6 @@
 name: airports
 adapter: pipeline.sources.airports
+proposer: pipeline.sources.proposals.resolve
 kind: airports
 enabled: true
 upstream:

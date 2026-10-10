@@ -9,7 +9,8 @@ from h3.api import basic_int as h3
 
 from pipeline.config.engines import EngineLimits
 from pipeline.config.schema import H3, Resources
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.query import connection
+from pipeline.engines.store.codec import Row
 
 
 def scalar(db: duckdb.DuckDBPyConnection, sql: str) -> int:
@@ -30,11 +31,7 @@ def measure(
 ) -> Row:
     if not places or not cells:
         return {"status": "no places or cells yet"}
-    db = duckdb.connect()
-    db.execute("SET memory_limit=?", [resources.duckdb_memory])
-    db.execute("SET threads=?", [resources.duckdb_threads])
-    db.execute("SET temp_directory=?", [str(work / "spill")])
-    db.execute("SET max_temp_directory_size=?", [str(limits.duckdb_spill_bytes) + "B"])
+    db = connection(resources, limits.duckdb_spill_bytes, spill=work / "spill")
     try:
         db.read_parquet(
             [p["path"] for p in places if p["kind"] == "places"]

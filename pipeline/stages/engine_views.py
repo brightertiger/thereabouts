@@ -5,7 +5,7 @@ from collections.abc import Iterator, Mapping
 
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.urban import Urban
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 from . import cities
 from .contract import Context

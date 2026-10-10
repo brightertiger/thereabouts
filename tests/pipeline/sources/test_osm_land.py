@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import sqlite3
 import struct
 import zipfile
 from collections.abc import Iterator
+from contextlib import closing
 from pathlib import Path
 from typing import cast
 
@@ -43,7 +45,7 @@ def _shapefile(path: Path, geometries: list[Polygon]) -> None:
 @pytest.fixture
 def acquired(tmp_path: Path) -> Iterator[SourceContext]:
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        ctx, _ = source_context(
+        _, ctx, _ = source_context(
             tmp_path, ledger, "osm_land", {"land.zip": (b"test", {})}
         )
         yield ctx
@@ -100,7 +102,8 @@ def test_shx_corruption_detected(tmp_path: Path) -> None:
 def test_unit_limits_keep_every_record(tmp_path: Path, acquired: SourceContext) -> None:
     shp, index = tmp_path / "source.shp", tmp_path / "index.sqlite3"
     _shapefile(shp, [box(i / 10, 0, i / 10 + 0.01, 0.01) for i in range(7)])
-    assert osm_land_reader._build_index(acquired, shp, index) == 7
+    with closing(sqlite3.connect(index)) as db:
+        assert osm_land_reader._build_index(acquired, shp, db) == 7
     acquired.settings.options["unit_records"] = 2
     units = list(osm_land_reader._units(acquired, index))
     assert [ordinal for _, records, _ in units for ordinal in records] == list(range(7))

@@ -7,7 +7,7 @@ import pytest
 from pipeline.config import Config
 from pipeline.release import proof
 from pipeline.release.assemble import assemble
-from pipeline.release.command import main
+from pipeline.release_command import main
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe

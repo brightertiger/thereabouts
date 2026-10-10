@@ -4,17 +4,10 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from typing import cast
 
-from .common import Row, encode, pack, unpack
-
-
-def create_entities(db: sqlite3.Connection) -> None:
-    db.executescript("""
-        CREATE TABLE entities (id TEXT PRIMARY KEY, role TEXT, data TEXT);
-        CREATE TABLE points (id INTEGER PRIMARY KEY, entity TEXT, x REAL, y REAL);
-        CREATE VIRTUAL TABLE point_bounds USING rtree(id,xmin,xmax,ymin,ymax);
-        CREATE TABLE metadata (key TEXT PRIMARY KEY, data TEXT);
-    """)
+from pipeline.engines.store.codec import Row, encode, unpack
+from pipeline.engines.store.entities import add_point, find_entity, put_entity
 
 
 def entity_id(row: Row, role: str, country: str, match: Row | None = None) -> str:
@@ -96,11 +89,9 @@ def make_entity(
 
 
 def save_entity(db: sqlite3.Connection, entity: Row) -> None:
-    previous = db.execute(
-        "SELECT data FROM entities WHERE id=?", (entity["id"],)
-    ).fetchone()
+    previous = find_entity(db, entity["id"])
     if previous:
-        old = unpack(previous[0])
+        old = cast(Row, previous)
         # Deterministic preference for explicitly English Overture names. All
         # attached division identities remain discoverable in divisions/areas.
         keep_old = old["name_provenance"] == {
@@ -118,17 +109,7 @@ def save_entity(db: sqlite3.Connection, entity: Row) -> None:
                 }.values()
             )
         entity = chosen
-    db.execute(
-        "INSERT OR REPLACE INTO entities VALUES(?,?,?)",
-        (entity["id"], entity["role"], pack(entity)),
-    )
-
-
-def add_point(db: sqlite3.Connection, entity: str, x: float, y: float) -> None:
-    rowid = db.execute(
-        "INSERT INTO points VALUES(NULL,?,?,?)", (entity, x, y)
-    ).lastrowid
-    db.execute("INSERT INTO point_bounds VALUES(?,?,?,?,?)", (rowid, x, x, y, y))
+    put_entity(db, entity)
 
 
 def fallback_points(db: sqlite3.Connection, country: str, policy: Row) -> None:

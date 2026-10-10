@@ -1,6 +1,6 @@
 """Measured spatial failures and precisely scoped human boundary exceptions."""
 
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def failures(reports: list[Row], named: list[Row]) -> Row:

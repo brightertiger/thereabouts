@@ -6,7 +6,7 @@ from typing import Any, cast
 
 from pipeline.config.schema import Config
 from pipeline.runtime.jsonio import digest
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 from pipeline.sources.proposals.http import Custody, keeping
 
 from .models import SourcePin
@@ -21,9 +21,9 @@ def upstream(
         if name not in config.sources:
             raise ValueError(f"Unknown source: {name}")
         settings = config.sources[name]
-        adapter = cast(Source, importlib.import_module(settings.adapter))
+        proposer = cast(Proposer, importlib.import_module(settings.proposer))
         with keeping(custody):
-            result[name] = adapter.propose(settings)
+            result[name] = proposer.propose(settings)
         result[name].validate()
     return result
 

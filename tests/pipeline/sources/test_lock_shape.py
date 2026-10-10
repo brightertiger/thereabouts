@@ -11,7 +11,7 @@ from pipeline.pins.lock import read_lock
 from pipeline.pins.models import SourcePin
 from pipeline.pins.proposal import merge
 from pipeline.runtime.jsonio import digest
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 
 from .replay import replay
 
@@ -40,8 +40,8 @@ def test_unchanged_upstream_proposal_keeps_the_committed_pin(
     settings = load().sources[name]
     pin = lock[name]
     replay(pin, settings, facts(name, pin)).install(monkeypatch)
-    adapter = cast(Source, importlib.import_module(settings.adapter))
-    proposal = adapter.propose(settings)
+    proposer = cast(Proposer, importlib.import_module(settings.proposer))
+    proposal = proposer.propose(settings)
     merged, changes = merge({name: pin}, {name: proposal}, [name])
     assert changes[name]["changed"] is False, changes[name]
     assert merged[name] is pin

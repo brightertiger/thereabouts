@@ -9,20 +9,17 @@ from scipy.spatial import cKDTree
 
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.cache import Cache
-from pipeline.engines.reconcile.common import connect
-from pipeline.engines.reconcile.spatial import EARTH_M, distance
-from pipeline.engines.sphere import unit_vectors
-
-from .geometry import Floats, Ints
+from pipeline.engines.geo.arrays import FloatArray, IntArray
+from pipeline.engines.geo.sphere import EARTH_M, distance, unit_vectors
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import points
 
 
 class Nearest:
     def __init__(self, path: Path, limits: EngineLimits) -> None:
         db = connect(path, readonly=True, cache_kib=limits.sqlite_cache_kib)
         try:
-            records = db.execute(
-                "SELECT DISTINCT entity,x,y FROM points ORDER BY entity,x,y"
-            ).fetchall()
+            records = points(db)
         finally:
             db.close()
         self.ids = [r[0] for r in records]
@@ -32,7 +29,9 @@ class Nearest:
         self.xyz = unit_vectors(self.coordinates)
         self.tree = cKDTree(self.xyz) if len(records) else None
 
-    def query(self, coordinates: Floats, cutoff: float) -> tuple[Ints, Floats, Floats]:
+    def query(
+        self, coordinates: FloatArray, cutoff: float
+    ) -> tuple[IntArray, FloatArray, FloatArray]:
         n = len(coordinates)
         if self.tree is None:
             return (

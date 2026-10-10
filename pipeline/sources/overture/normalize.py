@@ -9,17 +9,19 @@ from typing import Any
 import pyarrow.parquet as pq
 import shapely
 
+from pipeline.files import sqlite_readonly
 from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import atomic_output, digest, encode, write_json
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import GeometryError
 from pipeline.sources.shared.manifest import finish
+from pipeline.sources.shared.rows import RowRejected
 from pipeline.sources.shared.schemas import Kind
 from pipeline.sources.shared.writer import PartitionWriter
 
 from .areas import areas
 from .index import build_index
-from .rows import RowRejectedError, names, place
+from .rows import names, place
 
 
 def group(
@@ -32,7 +34,7 @@ def group(
     key = f"{pin.name}#row-group={ordinal}"
     kind: Kind = "places" if pin.metadata["type"] == "division" else "areas"
     sink, aliases = PartitionWriter(ctx, kind, key), PartitionWriter(ctx, "names", key)
-    root = ctx.normalized / "audits" / ctx.unit.inputs_hash
+    root = ctx.normalized / "audits" / ctx.inputs_hash
     audit_path = root / f"{digest(key)}.json"
     ctx.ensure(audit_path)
     rejects = ctx.ensure(audit_path.with_suffix(".jsonl"))
@@ -55,7 +57,7 @@ def group(
         for batch in parquet.iter_batches(
             batch_size=batch_size, row_groups=[ordinal], use_threads=False
         ):
-            ctx.runtime.guard.admit()
+            ctx.guard.admit()
             for row in batch.to_pylist():
                 stats["input_rows"] += 1
                 subtypes[row["subtype"]] += 1
@@ -87,7 +89,7 @@ def group(
                             sink.add(area)
                     stats["accepted_features"] += 1
                 except (
-                    RowRejectedError,
+                    RowRejected,
                     GeometryError,
                     shapely.errors.GEOSException,
                 ) as error:
@@ -129,12 +131,8 @@ def normalize(ctx: SourceContext) -> list[Path]:
     index = build_index(ctx)
     outputs: list[Path] = []
     auxiliary = [index]
-    with closing(
-        sqlite3.connect(f"{index.absolute().as_uri()}?mode=ro&immutable=1", uri=True)
-    ) as db:
-        db.execute(
-            f"PRAGMA cache_size=-{int(ctx.settings.options['sqlite_cache_kib'])}"
-        )
+    cache_kib = int(ctx.settings.options["sqlite_cache_kib"])
+    with closing(sqlite_readonly(index, cache_kib)) as db:
         for pin in ctx.pin.files:
             with pq.ParquetFile(ctx.input(pin.name)) as parquet:
                 for ordinal in range(parquet.num_row_groups):

@@ -14,7 +14,8 @@ from typing import Any, BinaryIO
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.runtime.jsonio import atomic_output, sha256_file
+from pipeline.files import sqlite_readonly
+from pipeline.runtime.jsonio import sha256_file
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import check_bounds
 
@@ -76,12 +77,9 @@ def _records(
         raise ValueError("SHP contains bytes/records absent from SHX")
 
 
-def _build_index(ctx: SourceContext, shp: Path, destination: Path) -> int:
-    with (
-        atomic_output(destination) as temporary,
-        closing(sqlite3.connect(temporary)) as db,
-        db,
-    ):
+def _build_index(ctx: SourceContext, shp: Path, db: sqlite3.Connection) -> int:
+    """Fill a spatial batch index in one transaction; returns the record count."""
+    with db:
         db.execute(
             "CREATE TABLE records (ordinal INTEGER PRIMARY KEY, offset INTEGER, "
             "bytes INTEGER, xmin REAL, ymin REAL, xmax REAL, ymax REAL, "
@@ -99,17 +97,13 @@ def _build_index(ctx: SourceContext, shp: Path, destination: Path) -> int:
             )
             count += 1
         db.execute("CREATE INDEX spatial_order ON records (gx, gy, ordinal)")
-        if db.execute("PRAGMA integrity_check").fetchone() != ("ok",):
-            raise ValueError("Invalid OSM spatial work index")
     return count
 
 
 def _units(
     ctx: SourceContext, index: Path
 ) -> Iterator[tuple[str, list[int], list[float]]]:
-    with closing(
-        sqlite3.connect(f"{index.absolute().as_uri()}?mode=ro&immutable=1", uri=True)
-    ) as db:
+    with closing(sqlite_readonly(index)) as db:
         records: list[int] = []
         size, sequence = 0, 0
         cell: tuple[int, int] | None = None

@@ -46,7 +46,7 @@ def test_boundaries_keep_ids_licences_and_country_mapping(tmp_path: Path) -> Non
         "admUnitCount": "1",
     }
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "geoboundaries",
@@ -60,7 +60,7 @@ def test_boundaries_keep_ids_licences_and_country_mapping(tmp_path: Path) -> Non
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
         # Proposer-shaped pins record no per-file retrieval time.
         del source.pin.files[0].metadata["retrieved_at"]
-        run(source.runtime, stages)
+        run(runtime, stages)
         [row] = rows(source, "areas")
         assert (row["source_id"], row["country_code"], row["subdivision_code"]) == (
             "boundary-id",
@@ -79,10 +79,10 @@ def test_land_verifies_publisher_count_and_preserves_overlaps(tmp_path: Path) ->
         b"2 Polygon features\nDate of the data used is 2026-10-01T00:00:00Z\n"
     )
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path, ledger, "osm_land", {"land.zip": (archive(members), {})}
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         result = rows(source, "areas")
         assert len(result) == 2
         assert {row["source_id"] for row in result} == {"shp-record:0", "shp-record:1"}
@@ -106,7 +106,7 @@ def iana() -> bytes:
 def test_timezones_preserve_boundary_and_iana_licences(tmp_path: Path) -> None:
     members = shapes(tmp_path, ["tzid"], [["Synthetic/Zone"]])
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "timezones",
@@ -119,7 +119,7 @@ def test_timezones_preserve_boundary_and_iana_licences(tmp_path: Path) -> None:
                 "tzdata-fixture.tar.gz": (iana(), {"license": "Public-Domain"}),
             },
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         assert rows(source, "timezones")[0]["license"] == "ODbL-1.0"
         assert len(rows(source, "zone_tables")) == 3
         assert {row["license"] for row in rows(source, "zone_tables")} == {
@@ -146,14 +146,14 @@ def test_ghsl_extracts_and_decodes_a_geopackage(tmp_path: Path) -> None:
         )
         db.execute("INSERT INTO centres VALUES(1,?)", (blob,))
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "ghsl",
             {"centres.zip": (archive({path.name: path.read_bytes()}), {})},
         )
         source.settings.options["expected_rows"] = 1
-        run(source.runtime, stages)
+        run(runtime, stages)
         [row] = rows(source, "areas")
         assert row["source_id"] == "1" and row["xmax"] < 0.02
         assert shapely.from_wkb(row["geometry"]).covers(shapely.Point(0, 0))

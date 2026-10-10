@@ -10,13 +10,10 @@ import shapefile
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.config.source_options import Timezones as Options
-from pipeline.config.sources import SourceSettings
-from pipeline.pins.models import PinFile, SourcePin
+from pipeline.pins.models import PinFile
 from pipeline.runtime.jsonio import write_json
 
 from .contract import SourceContext
-from .proposals.resolve import propose as propose_pin
 from .shared.archives import extract
 from .shared.geometry import repair_geometry, split_geometry
 from .shared.h3_cover import cover
@@ -44,7 +41,7 @@ def zone(
         geometry, collection="collect", force_2d=True, clip_roundoff=True
     )
     options = ctx.settings.options
-    resolution = ctx.runtime.config.h3.cell_resolution
+    resolution = ctx.grid.cell_resolution
     cells = cover(geometry, resolution, int(options["cover_batch_rows"]))
     raw = dict(tzid=tzid, repairs=repairs, coverage=options["semantics"])
     provenance = evidence(ctx, pin)
@@ -105,7 +102,7 @@ def zone(
 def normalize(ctx: SourceContext) -> list[Path]:
     options = ctx.settings.options
     pin = ctx.named(str(options["boundary_file"]))
-    directory = ctx.work / ctx.unit.inputs_hash
+    directory = ctx.work / ctx.inputs_hash
     shapes = extract(
         ctx,
         ctx.input(pin.name),
@@ -119,7 +116,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     outputs: list[Path] = []
     with shapefile.Reader(str(shps[0]), encoding="utf-8") as reader:
         for record in reader.iterShapeRecords():
-            ctx.runtime.guard.admit()
+            ctx.guard.admit()
             paths, report = zone(
                 ctx,
                 pin,
@@ -142,9 +139,7 @@ def normalize(ctx: SourceContext) -> list[Path]:
     if len(iana) != 1:
         raise ValueError("Expected one pinned IANA archive")
     pin = iana[0]
-    for index, row in enumerate(
-        zone_rows(ctx.input(pin.name), grid=ctx.runtime.config.h3)
-    ):
+    for index, row in enumerate(zone_rows(ctx.input(pin.name), grid=ctx.grid)):
         writer.add(
             decorate(
                 dict(row),
@@ -161,11 +156,3 @@ def normalize(ctx: SourceContext) -> list[Path]:
         ctx.ensure(report_path), {"zones": reports, "publisher_zones": len(expected)}
     )
     return finish(ctx, outputs, [*shapes, report_path])
-
-
-__all__ = ["Options", "normalize", "propose"]
-
-
-def propose(settings: SourceSettings) -> SourcePin:
-    """Resolve upstream only for an explicit pin proposal."""
-    return propose_pin(settings)

@@ -7,8 +7,10 @@ import shapely
 
 from pipeline.engines.artifacts import EVALUATION
 from pipeline.engines.cells.inputs import Inputs
-from pipeline.engines.cells.quality import display_names
-from pipeline.engines.reconcile.common import Row, connect
+from pipeline.engines.store.areas import areas_by_role, entity_areas
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import entity
 
 from .boundary_checks import boundary_checks
 from .diagnostic import checks
@@ -16,6 +18,24 @@ from .engine import Engine
 from .evaluate import Comparison, measure
 from .regressions import audit
 from .urban import Urban
+
+
+def display_names(inputs: Inputs, answer: Row) -> Row:
+    cc = (answer.get("country_id") or "").removeprefix("country:")
+    if cc not in inputs.paths:
+        return {}
+    db = connect(
+        inputs.paths[cc], readonly=True, cache_kib=inputs.limits.sqlite_cache_kib
+    )
+    try:
+        return {
+            role: entity(db, answer[role + "_id"])["name"]
+            if answer.get(role + "_id")
+            else None
+            for role in ("country", "state", "city")
+        }
+    finally:
+        db.close()
 
 
 def footprint_checks(comparison: Comparison, cc: str, engine: Engine) -> list[Row]:
@@ -50,10 +70,7 @@ def urban_checks(
 ) -> list[Row]:
     db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     try:
-        borders = [
-            shapely.from_wkb(b)
-            for (b,) in db.execute("SELECT geometry FROM areas WHERE role='country'")
-        ]
+        borders = [shapely.from_wkb(area[3]) for area in areas_by_role(db, "country")]
         tree = shapely.STRtree(borders)
         indices = {
             int(i) for i, shape in enumerate(urban.shapes) if len(tree.query(shape))
@@ -108,10 +125,7 @@ def neighbour_checks(
             engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib
         )
         try:
-            source_areas = db.execute(
-                "SELECT id,geometry FROM areas WHERE entity=? AND role='city'",
-                (identity,),
-            ).fetchall()
+            source_areas = list(entity_areas(db, identity, "city"))
         finally:
             db.close()
         owned = sorted(

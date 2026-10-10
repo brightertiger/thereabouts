@@ -14,7 +14,7 @@ from pipeline.engines.cities.candidates import eligible
 from pipeline.engines.cities.engine import Engine
 from pipeline.engines.cities.footprints import screen
 from pipeline.engines.cities.urban import Urban
-from pipeline.engines.reconcile.common import Row, pack
+from pipeline.engines.store.codec import Row, pack
 
 
 def make_engine(
@@ -186,7 +186,7 @@ def test_source_anchor_just_outside_urban_grid_keeps_neighbour_core(
 
 def test_radius_uses_farther_town_when_nearest_radius_does_not_reach() -> None:
     from pipeline.engines.cities.radius import assign
-    from pipeline.engines.sphere import unit_vectors
+    from pipeline.engines.geo.sphere import unit_vectors
 
     coords = np.array([[0.0, 0.0]])
     anchors = unit_vectors(np.array([[0.0, 0.009], [0.0, 0.010]]))

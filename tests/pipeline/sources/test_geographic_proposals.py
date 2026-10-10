@@ -11,7 +11,7 @@ import pytest
 import yaml
 
 from pipeline.sources import policy
-from pipeline.sources.contract import Source
+from pipeline.sources.contract import Proposer
 
 from .proposal_server import Reply, publisher
 from .test_proposals import settings
@@ -62,8 +62,8 @@ def test_overture_lists_latest_and_every_page_with_object_checks(
                 }
             },
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        pin = adapter.propose(source)
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        pin = proposer.propose(source)
         assert pin.release == "2026-09-23.10"
         assert len(pin.files) == 2 and all(
             f.metadata["type"] == "division" for f in pin.files
@@ -72,7 +72,7 @@ def test_overture_lists_latest_and_every_page_with_object_checks(
             b"<ListBucketResult><IsTruncated>true</IsTruncated><NextContinuationToken>next</NextContinuationToken></ListBucketResult>"
         )
         with pytest.raises(ValueError, match="continuation token"):
-            adapter.propose(source)
+            proposer.propose(source)
 
 
 def test_geoboundaries_repairs_identity_and_pins_full_commit(
@@ -116,8 +116,8 @@ def test_geoboundaries_repairs_identity_and_pins_full_commit(
                 }
             },
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        pin = adapter.propose(source)
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        pin = proposer.propose(source)
         assert pin.files[0].name == commit + "/MYS-ADM0.zip"
         assert pin.files[0].metadata["metadata"] == layer
         # Notices credit geoBoundaries and the layer publisher, as rows do.
@@ -130,7 +130,7 @@ def test_geoboundaries_repairs_identity_and_pins_full_commit(
             json.dumps({"sha": "b" * 40}).encode()
         )
         with pytest.raises(ValueError, match="matching full SHA"):
-            adapter.propose(source)
+            proposer.propose(source)
 
 
 def test_plate_proposal_uses_reviewed_urls_and_preserves_licences(
@@ -154,8 +154,8 @@ def test_plate_proposal_uses_reviewed_urls_and_preserves_licences(
                 }
             )
         )
-        adapter = cast(Source, importlib.import_module(source.adapter))
-        pin = adapter.propose(source)
+        proposer = cast(Proposer, importlib.import_module(source.proposer))
+        pin = proposer.propose(source)
         assert pin.files[0].metadata["license"] == "OGL-UK-3.0"
         assert pin.files[0].metadata["kind"] == "reference"
         assert pin.files[0].sha256 != "obsolete"

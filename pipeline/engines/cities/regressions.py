@@ -3,7 +3,9 @@
 import h3
 
 from pipeline.engines.artifacts import EVALUATION, read_json
-from pipeline.engines.reconcile.common import Row, connect
+from pipeline.engines.store.catalog import geonames_point
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
 
 from .engine import Engine
 from .evaluate import Comparison
@@ -17,9 +19,7 @@ def audit(comparison: Comparison, country: str, engine: Engine) -> list[Row]:
         for probe in reference["points"]:
             if probe["country"] != country:
                 continue
-            point = db.execute(
-                "SELECT x,y FROM geonames WHERE id=?", (probe["id"],)
-            ).fetchone()
+            point = geonames_point(db, probe["id"])
             if point is None:
                 result.append(
                     {"probe": probe, "error": "missing acquired GeoNames point"}

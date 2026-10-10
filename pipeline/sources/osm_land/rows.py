@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import shapely
@@ -10,6 +9,7 @@ from shapely.geometry.base import BaseGeometry
 
 from pipeline.sources.contract import SourceContext
 from pipeline.sources.shared.geometry import bounds_columns, repair_geometry
+from pipeline.sources.shared.rows import canonical_json, provenance
 
 
 def _row(
@@ -32,27 +32,31 @@ def _row(
         else None
     )
     source_id = f"shp-record:{ordinal}"
-    provenance = {
-        "source_url": ctx.pin.files[0].url,
-        "license_url": ctx.settings.licence.url,
-        "attribution": inventory["attribution"],
-        "retrieved_at": inventory["retrieved_at"],
-        "input_sha256": input_hash,
-        "shp_record_index": ordinal,
-        **details,
-        "coordinate_transform": "none",
-        "simplification": "none",
-        "repair": audit,
-        "edge_identity": "source_id + WKB polygon/ring/segment ordinal",
-        "boundary_semantics": (
-            "overlapping source split edges; boundary is NOT necessarily coastline"
-        ),
-        "coastline_reconstruction": (
-            "retain only edge portions exposed outside interiors of neighboring "
-            "land polygons; handle +/-180 and polar closure separately"
-        ),
-        "inland_water": "not subtracted by source",
-    }
+    evidence = provenance(
+        ctx.pin.files[0].url,
+        ctx.settings.licence.url,
+        inventory["attribution"],
+        {
+            "retrieved_at": inventory["retrieved_at"],
+            "input_sha256": input_hash,
+            "shp_record_index": ordinal,
+        },
+        details,
+        {
+            "coordinate_transform": "none",
+            "simplification": "none",
+            "repair": audit,
+            "edge_identity": "source_id + WKB polygon/ring/segment ordinal",
+            "boundary_semantics": (
+                "overlapping source split edges; boundary is NOT necessarily coastline"
+            ),
+            "coastline_reconstruction": (
+                "retain only edge portions exposed outside interiors of neighboring "
+                "land polygons; handle +/-180 and polar closure separately"
+            ),
+            "inland_water": "not subtracted by source",
+        },
+    )
     return {
         "source": ctx.settings.name,
         "source_id": source_id,
@@ -65,5 +69,5 @@ def _row(
         "is_territorial": False,
         "source_release": ctx.pin.release,
         "license": ctx.settings.licence.id,
-        "provenance": json.dumps(provenance, sort_keys=True, allow_nan=False),
+        "provenance": canonical_json(evidence, separators=None, ensure_ascii=True),
     }, audit

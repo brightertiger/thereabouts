@@ -8,7 +8,7 @@ from pathlib import Path
 from pipeline.config import Config
 from pipeline.content.digest import table_digest
 from pipeline.content.sorting import WIDTH
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, encode, sync_directory
 from pipeline.runtime.resources import ResourceGuard

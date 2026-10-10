@@ -8,7 +8,9 @@ import h3
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cities.evaluate import Comparison
 from pipeline.engines.normalize_cells.score import grade
-from pipeline.engines.reconcile.common import Row, connect, unpack
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import find_entity
 
 from . import cities
 from .contract import Context
@@ -49,11 +51,9 @@ def score(
         )
         try:
             for identity in ids:
-                row = db.execute(
-                    "SELECT data FROM entities WHERE id=?", (identity,)
-                ).fetchone()
-                if row:
-                    names[identity] = {**unpack(row[0]), "wikidata_ids": []}
+                value = find_entity(db, identity)
+                if value:
+                    names[identity] = {**value, "wikidata_ids": []}
         finally:
             db.close()
     return {

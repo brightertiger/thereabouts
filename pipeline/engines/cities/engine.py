@@ -11,7 +11,9 @@ from numpy.typing import NDArray
 
 from pipeline.config.engines import EngineLimits
 from pipeline.engines.cells.nearest import nearest
-from pipeline.engines.reconcile.common import Row, connect, unpack
+from pipeline.engines.geo.arrays import FloatArray
+from pipeline.engines.store.codec import Row, unpack
+from pipeline.engines.store.database import connect
 
 from .allocation import Allocation
 from .boundaries import BoundaryIndex
@@ -20,7 +22,6 @@ from .rural import rural
 from .urban import Urban
 
 Objects = NDArray[np.object_]
-Floats = NDArray[np.float64]
 
 
 class Engine:
@@ -77,13 +78,13 @@ class Engine:
         )
 
     def polygons(
-        self, coordinates: Floats, tolerance: float = 0.0
+        self, coordinates: FloatArray, tolerance: float = 0.0
     ) -> NDArray[np.int64]:
         """Choose an accepted boundary without expanding over nearby settlements."""
         return self.boundaries.query(coordinates, tolerance)
 
     def overlay(
-        self, coordinates: Floats, radius: bool, tolerance: float = 0.0
+        self, coordinates: FloatArray, radius: bool, tolerance: float = 0.0
     ) -> tuple[Objects, Objects]:
         """Known municipal limits win; inference fills the remaining urban cells."""
         ids = np.full(len(coordinates), None, dtype=object)
@@ -104,7 +105,7 @@ class Engine:
 
     def apply(
         self,
-        coordinates: Floats,
+        coordinates: FloatArray,
         before: Objects,
         before_methods: Objects,
         radius: bool,

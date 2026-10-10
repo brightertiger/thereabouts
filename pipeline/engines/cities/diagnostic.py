@@ -5,7 +5,9 @@ from collections import Counter
 import h3
 
 from pipeline.engines.artifacts import EVALUATION, read_json
-from pipeline.engines.reconcile.common import Row, connect, unpack
+from pipeline.engines.store.catalog import geonames_places
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.database import connect
 
 from .engine import Engine
 from .evaluate import Comparison
@@ -14,13 +16,7 @@ from .evaluate import Comparison
 def checks(comparison: Comparison, engine: Engine) -> Row:
     db = connect(engine.source, readonly=True, cache_kib=engine.limits.sqlite_cache_kib)
     try:
-        places = [
-            unpack(b)
-            for (b,) in db.execute(
-                "SELECT data FROM geonames WHERE class='P' "
-                "AND population>=15000 ORDER BY id"
-            )
-        ]
+        places = list(geonames_places(db, "P", 15000))
     finally:
         db.close()
     cells = [

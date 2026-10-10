@@ -11,7 +11,7 @@ from pipeline.cli import main
 from pipeline.config.content import DigestLimits
 from pipeline.content.digest import digest_dataset
 from pipeline.engines.artifacts import read_json
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 from pipeline.runtime.jsonio import write_json
 
 

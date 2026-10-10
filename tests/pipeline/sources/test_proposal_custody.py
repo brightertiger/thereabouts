@@ -12,10 +12,10 @@ from pipeline.pins.lock import read_lock
 from pipeline.pins.proposal import upstream
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Recipe
-from pipeline.sources.contract import SourceContext
 from pipeline.sources.download import download
 from pipeline.sources.proposals.http import Client, Custody, keeping
 from pipeline.stages.contract import make_unit
+from pipeline.stages.sources import adapter_context
 from pipeline.storage.transfer import USER_AGENT
 
 from ..helpers import context
@@ -56,7 +56,7 @@ def test_upstream_rewritten_after_proposal_downloads_the_kept_bytes(
             ctx = context(workspace, ledger)
             ctx.storage = dict(config.storage)
             unit = make_unit(ctx, Recipe("download", "airports"), "fixture")
-            target = SourceContext(ctx, source, pin, unit)
+            target = adapter_context(ctx, source, pin, unit)
             assert download(target)[0] == stored
             stored.unlink()
             assert download(target)[0] == stored

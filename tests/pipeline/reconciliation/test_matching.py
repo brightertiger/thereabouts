@@ -6,12 +6,12 @@ from pathlib import Path
 from pipeline.config.engines import EngineLimits
 from pipeline.config.policies import reconcile as policy
 from pipeline.engines.reconcile.classification import trusted_city
-from pipeline.engines.reconcile.common import connect
 from pipeline.engines.reconcile.matching import (
     default_perspective,
     link,
     prepare_catalog,
 )
+from pipeline.engines.store.database import connect
 
 from .conftest import place, write_inputs
 

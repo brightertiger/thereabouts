@@ -51,7 +51,7 @@ class PartitionWriter:
         if not self.rows:
             return
         table = pa.Table.from_pylist(
-            self.rows, schema=schema_for(self.kind, self.ctx.runtime.config.h3)
+            self.rows, schema=schema_for(self.kind, self.ctx.grid)
         )
         if (
             self.tables
@@ -68,11 +68,11 @@ class PartitionWriter:
         path = (
             self.ctx.normalized
             / self.kind
-            / self.ctx.unit.inputs_hash
+            / self.ctx.inputs_hash
             / f"{digest(self.key)}-{len(self.outputs):05d}.parquet"
         )
         path = self.ctx.ensure(path)
-        guard = self.ctx.runtime.guard
+        guard = self.ctx.guard
         reservation = self.size * 2
         guard.admit(reservation)
         written = 0
@@ -83,7 +83,7 @@ class PartitionWriter:
                 self.ctx.settings.name,
                 self.ctx.settings.limits,
                 self.tables,
-                grid=self.ctx.runtime.config.h3,
+                grid=self.ctx.grid,
             )
             written = path.stat().st_size
             self.outputs.append(path)

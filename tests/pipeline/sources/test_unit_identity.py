@@ -116,6 +116,7 @@ def source_hashes(tmp_path: Path, *overrides: str) -> dict[tuple[str, str], str]
         "limits.download_bytes=1",
         "limits.patience_seconds=60",
         "upstream.url=https://mirror.example/allCountries.zip",
+        "proposer=pipeline.sources.proposals.resolve",
     ],
 )
 def test_transfer_settings_change_no_unit(tmp_path: Path, edit: str) -> None:

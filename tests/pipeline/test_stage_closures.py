@@ -105,7 +105,7 @@ def test_geographic_closures_cover_what_their_units_execute(
         "lookups",
     }
     assert "pipeline/engines/cells/build.py" in record.files["cells"]
-    assert "pipeline/engines/reconcile/spatial.py" in record.files["reconcile"]
+    assert "pipeline/engines/store/areas.py" in record.files["reconcile"]
     for name, files in record.files.items():
         assert not uncovered(files, set(dump[name])), name
 
@@ -114,14 +114,14 @@ def test_source_closures_cover_downloads_and_normalizers(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     with Ledger(tmp_path, None, readonly=False) as ledger, executed() as record:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path, ledger, "geoboundaries", boundary_payloads(tmp_path)
         )
         source.pin.metadata["country_reference"] = {"GBR": {"alpha2": "GB"}}
         for stage in stages:
             monkeypatch.setattr(stage, "run", record.wrap(stage.name, stage.run))
-        run(source.runtime, stages)
-        dump = closures(source.runtime.config)
+        run(runtime, stages)
+        dump = closures(runtime.config)
     adapter = set(adapter_hashes(source.settings.adapter))
     assert set(record.files) == {"download", "normalize"}
     assert "pipeline/sources/geoboundaries/convert.py" in record.files["normalize"]

@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import sqlite3
 
-from .common import Row, pack, unpack
+from pipeline.engines.store.codec import Row, unpack
+from pipeline.engines.store.entities import put_state_code, update_entity
+from pipeline.engines.store.schema import create_state_codes
+
 from .spatial import containing
 from .state_codes import state_crosswalk
 
@@ -21,9 +24,9 @@ def attach_parents(
         if code:
             by_code.setdefault(code, []).append(identity)
     # Store the crosswalk as data in the canonical artifact, with its evidence.
-    db.execute("CREATE TABLE state_codes(entity TEXT PRIMARY KEY, data BLOB)")
+    create_state_codes(db)
     for identity, match in crosswalk.items():
-        db.execute("INSERT INTO state_codes VALUES(?,?)", (identity, pack(match)))
+        put_state_code(db, identity, match)
     for identity, data in db.execute(
         "SELECT id,data FROM entities WHERE role IN ('city','district')"
     ):
@@ -44,4 +47,4 @@ def attach_parents(
         if selected:
             row["parent"] = selected
             row["parent_method"] = method
-            db.execute("UPDATE entities SET data=? WHERE id=?", (pack(row), identity))
+            update_entity(db, identity, row)

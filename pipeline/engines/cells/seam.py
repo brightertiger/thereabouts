@@ -7,16 +7,16 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
+from pipeline.engines.geo.arrays import FloatArray
 from pipeline.engines.reconcile.lookup import Locator
 
-from .geometry import Floats
 from .oracle import Answer, Oracle
 from .windows import envelopes
 
 
 class SeamOracle:
     def __init__(
-        self, locator: Locator, paths: dict[str, Path], coordinates: Floats
+        self, locator: Locator, paths: dict[str, Path], coordinates: FloatArray
     ) -> None:
         self.parts = [Oracle(locator, paths, b) for b in envelopes(coordinates)]
         self.answers: list[Answer] = [(None, None, None, None, None)]
@@ -37,14 +37,16 @@ class SeamOracle:
             mapping.append(self.codes[answer])
         return np.array(mapping, dtype=np.uint64)[labels]
 
-    def labels(self, coordinates: Floats) -> NDArray[np.uint64]:
+    def labels(self, coordinates: FloatArray) -> NDArray[np.uint64]:
         result = np.zeros(len(coordinates), dtype=np.uint64)
         for index, part in enumerate(self.parts):
             selected = coordinates[:, 1] < 0 if index == 0 else coordinates[:, 1] >= 0
             result[selected] = self.translated(part, part.labels(coordinates[selected]))
         return result
 
-    def certify(self, bounds: Floats) -> tuple[NDArray[np.uint64], NDArray[np.bool_]]:
+    def certify(
+        self, bounds: FloatArray
+    ) -> tuple[NDArray[np.uint64], NDArray[np.bool_]]:
         labels = np.zeros(len(bounds), dtype=np.uint64)
         uniform = np.zeros(len(bounds), dtype=np.bool_)
         for index, part in enumerate(self.parts):
@@ -56,7 +58,7 @@ class SeamOracle:
 
 
 def oracle(
-    locator: Locator, paths: dict[str, Path], coordinates: Floats
+    locator: Locator, paths: dict[str, Path], coordinates: FloatArray
 ) -> Oracle | SeamOracle:
     bounds = envelopes(coordinates)
     return (

@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 import sqlite3
 
-from .common import Row, unpack
+from pipeline.engines.store.codec import Row, unpack
+
 from .entities import make_entity
 from .matching import division
 

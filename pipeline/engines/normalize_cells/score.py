@@ -3,7 +3,7 @@
 import unicodedata
 from collections import Counter
 
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def normalized_name(value: str | None) -> str:

@@ -1,5 +1,6 @@
 name: geonames
 adapter: pipeline.sources.geonames
+proposer: pipeline.sources.proposals.dated
 kind: places_and_names
 enabled: true
 upstream:

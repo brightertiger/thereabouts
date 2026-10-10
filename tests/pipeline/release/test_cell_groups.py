@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import pytest
 from h3.api import basic_int as h3
 
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.release.assemble import assemble
 from pipeline.release.source import Snapshot, external
 from pipeline.release.verify import verify_dataset

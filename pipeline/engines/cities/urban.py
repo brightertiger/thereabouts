@@ -8,8 +8,8 @@ import shapely
 from numpy.typing import NDArray
 from shapely.geometry.base import BaseGeometry
 
-from pipeline.engines.reconcile.common import Row
-from pipeline.engines.reconcile.spatial import distance
+from pipeline.engines.geo.sphere import EARTH_M, distance
+from pipeline.engines.store.codec import Row
 
 
 class Urban:
@@ -51,7 +51,7 @@ class Urban:
         result = self.locate(coordinates)
         for i in np.flatnonzero(result < 0):
             y, x = coordinates[i]
-            dy = np.rad2deg(edge_m / 6371008.8)
+            dy = np.rad2deg(edge_m / EARTH_M)
             dx = dy / max(0.001, np.cos(np.deg2rad(y)))
             candidates = self.tree.query(shapely.box(x - dx, y - dy, x + dx, y + dy))
             nearby = []

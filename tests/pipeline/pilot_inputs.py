@@ -10,8 +10,9 @@ from pipeline.config import Config
 from pipeline.engines.cells.windows import expanded
 from pipeline.engines.hierarchy import descendants
 from pipeline.engines.reconcile import build, catalog, inputs
-from pipeline.engines.reconcile.common import connect
-from pipeline.engines.reconcile.spatial import create_areas, insert_area
+from pipeline.engines.store.areas import insert_area
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.schema import create_areas
 from pipeline.migration.paths import legacy_relative
 from pipeline.runtime.paths import located
 

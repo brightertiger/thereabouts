@@ -3,10 +3,11 @@
 from pathlib import Path
 from typing import cast
 
-from pipeline.engines.artifact_io import file_record, parquet
+from pipeline.engines.artifact_io import parquet
 from pipeline.engines.cells import build, inventory, places, schemas
 from pipeline.engines.cells.inputs import Inputs
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
+from pipeline.files import file_record
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
 
@@ -63,6 +64,7 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
             ctx.config.resources,
             settings.limits,
             {name: ctx.config.sources[name].kind for name in sources},
+            spill=root / "spill",
         )
         destination = located(ctx.root, settings.country_inventory)
         blocks = located(ctx.root, settings.block_index)

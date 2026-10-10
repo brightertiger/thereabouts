@@ -5,7 +5,7 @@ from __future__ import annotations
 import shapely
 from shapely import STRtree
 
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 from .windows import expanded
 

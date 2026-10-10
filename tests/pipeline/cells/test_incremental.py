@@ -15,7 +15,7 @@ from pipeline.engines.cells import joins
 from pipeline.engines.cells.metrics import measure
 from pipeline.engines.cells.reader import Cells
 from pipeline.engines.cells.schemas import CELLS
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 
 def table(root: Path, cell: str, rows: list[Row]) -> Row:

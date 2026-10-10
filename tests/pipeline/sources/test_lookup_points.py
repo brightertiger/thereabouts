@@ -14,8 +14,9 @@ from pipeline.sources.dbip import ip_range
 from pipeline.sources.phone import prefix
 from pipeline.sources.postal import postal
 from pipeline.sources.shared.iana import coordinates
-from pipeline.sources.shared.lookup_rows import Reject, decorate, point
+from pipeline.sources.shared.lookup_rows import decorate, point
 from pipeline.sources.shared.lookup_schemas import LOOKUP_SCHEMAS
+from pipeline.sources.shared.rows import RowRejected
 from pipeline.sources.shared.schemas import validate_table
 from pipeline.sources.unlocode import trade
 
@@ -79,7 +80,7 @@ def test_postal_variants_and_closed_airports_are_not_filtered() -> None:
     row = postal(raw, "allCountries.zip", grid=H3())
     assert row["accuracy"] == "6" and row["postal_code"] == "560001"
     assert row["admin2_name"] == "Bengaluru"
-    with pytest.raises(Reject):
+    with pytest.raises(RowRejected):
         postal(raw[:-1], "bad", grid=H3())
     result = airport(
         {
@@ -108,7 +109,7 @@ def test_ranges_preserve_both_address_families(start: str, end: str) -> None:
     assert row["ip_start"] == start and row["ip_end"] == end
     assert len(row["ip_start_packed"]) == 16
     assert row["ip_start_packed"] <= row["ip_end_packed"]
-    with pytest.raises(Reject):
+    with pytest.raises(RowRejected):
         ip_range([end, start, "NA", "US", "", "", "0", "0"], grid=H3())
 
 

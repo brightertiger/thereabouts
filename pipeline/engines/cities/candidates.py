@@ -3,16 +3,20 @@
 import json
 import sqlite3
 from collections import Counter, defaultdict
+from typing import cast
 
 import shapely
 
-from pipeline.engines.reconcile.common import Row, unpack
+from pipeline.engines.store.areas import entity_areas
+from pipeline.engines.store.catalog import divisions as store_divisions
+from pipeline.engines.store.catalog import geonames_place, geonames_point
+from pipeline.engines.store.codec import Row
+from pipeline.engines.store.entities import entities_in_roles, entity_point
 
 
 def divisions(db: sqlite3.Connection) -> dict[str, Row]:
     result = {}
-    for identity, link, blob in db.execute("SELECT id,link,data FROM divisions"):
-        row = unpack(blob)
+    for identity, link, row in store_divisions(db):
         upstream = json.loads(row["provenance"])["upstream"]
         result[identity] = {
             "id": identity,
@@ -58,8 +62,8 @@ def candidates(
     counts: Counter[str] = Counter()
     forced = {r["city_id"] for r in rules.get("footprints", [])}
     forced.update(rules.get("independent", []))
-    for identity, blob in db.execute("SELECT id,data FROM entities WHERE role='city'"):
-        entity = unpack(blob)
+    for identity, _, value in entities_in_roles(db, ("city",)):
+        entity = cast(Row, value)
         gid = entity.get("geonames_id")
         ds = (
             linked.get(gid, [])
@@ -78,18 +82,13 @@ def candidates(
             if code in settings["seat_codes"]:
                 counts["weak_seats_without_absorption"] += 1
             continue
-        point = db.execute("SELECT x,y FROM geonames WHERE id=?", (gid,)).fetchone()
+        point = geonames_point(db, gid)
         if point is None:
-            point = db.execute(
-                "SELECT x,y FROM points WHERE entity=? ORDER BY id LIMIT 1", (identity,)
-            ).fetchone()
+            point = entity_point(db, identity)
         if point is None and reason == "explicit country policy":
-            area = db.execute(
-                "SELECT geometry FROM areas WHERE entity=? AND role='city' LIMIT 1",
-                (identity,),
-            ).fetchone()
+            area = next(entity_areas(db, identity, "city"), None)
             if area:
-                shape = shapely.from_wkb(area[0])
+                shape = shapely.from_wkb(area[1])
                 if shape is None:
                     raise ValueError("City policy area has null geometry")
                 anchor = shape.representative_point()
@@ -98,11 +97,9 @@ def candidates(
             counts["candidate_without_anchor"] += 1
             continue
         # GeoNames city names avoid accidentally selecting a linked village label.
-        raw = db.execute("SELECT data FROM geonames WHERE id=?", (gid,)).fetchone()
+        place = geonames_place(db, gid)
         name = (
-            entity["name"]
-            if classes & {"city", "town"} or not raw
-            else unpack(raw[0])["name"]
+            entity["name"] if classes & {"city", "town"} or not place else place["name"]
         )
         output[identity] = {
             "city_id": identity,

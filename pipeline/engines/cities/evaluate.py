@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from pipeline.engines.cache import Cache
 from pipeline.engines.cells.reader import Cells
-from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.codec import Row
 
 from .engine import Engine
 

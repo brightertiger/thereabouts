@@ -8,9 +8,11 @@ import sqlite3
 import numpy as np
 import shapely
 
-from .common import Row
+from pipeline.engines.store.areas import intersecting
+from pipeline.engines.store.codec import Row
+
 from .land import Land
-from .spatial import decode, intersecting
+from .spatial import decode
 
 
 def place_coverage(db: sqlite3.Connection) -> Row:

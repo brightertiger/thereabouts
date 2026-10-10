@@ -6,39 +6,26 @@ import json
 import sqlite3
 from pathlib import Path
 
-from .common import Row, encode, key, pack, rows, unpack
-from .spatial import distance
+from pipeline.engines.geo.sphere import distance
+from pipeline.engines.store.catalog import (
+    put_division,
+    put_geonames,
+    put_names,
+    put_wikidata,
+)
+from pipeline.engines.store.codec import Row, encode, key, rows, unpack
+from pipeline.engines.store.schema import create_catalog
 
 
 def prepare_catalog(db: sqlite3.Connection, root: Path, batch_rows: int) -> None:
-    db.executescript("""
-        CREATE TABLE geonames (id TEXT PRIMARY KEY, class TEXT, code TEXT,
-          admin1 TEXT, population INTEGER, x REAL, y REAL, data TEXT);
-        CREATE TABLE names (name TEXT, id TEXT, PRIMARY KEY(name,id)) WITHOUT ROWID;
-        CREATE TABLE wikidata (qid TEXT, id TEXT, PRIMARY KEY(qid,id)) WITHOUT ROWID;
-        CREATE TABLE divisions (id TEXT PRIMARY KEY, subtype TEXT, link TEXT,
-          method TEXT, distance_m REAL, data TEXT, issue TEXT);
-        CREATE INDEX gn_xy ON geonames(x,y);
-    """)
+    create_catalog(db)
     for row in rows(root / "geonames_places.parquet", batch_rows):
-        db.execute(
-            "INSERT INTO geonames VALUES(?,?,?,?,?,?,?,?)",
-            (
-                row["source_id"],
-                row["feature_class"],
-                row["feature_code"],
-                row["admin1_code"],
-                row["population"],
-                row["longitude"],
-                row["latitude"],
-                pack(row),
-            ),
-        )
+        put_geonames(db, row)
         provenance = json.loads(row["provenance"])
         aliases = {row["name"], row["name_en"], provenance.get("asciiname")}
         aliases.update(provenance.get("alternate_names_untyped", "").split(","))
-        db.executemany(
-            "INSERT OR IGNORE INTO names VALUES(?,?)",
+        put_names(
+            db,
             (
                 (name, row["source_id"])
                 for name in sorted({key(a) for a in aliases})
@@ -49,10 +36,7 @@ def prepare_catalog(db: sqlite3.Connection, root: Path, batch_rows: int) -> None
         if not row["is_historic"] and not row["valid_to"]:
             qid = row["name"].rsplit("/", 1)[-1]
             if qid.startswith("Q") and qid[1:].isdigit():
-                db.execute(
-                    "INSERT OR IGNORE INTO wikidata VALUES(?,?)",
-                    (qid, row["entity_source_id"]),
-                )
+                put_wikidata(db, qid, row["entity_source_id"])
     db.commit()
 
 
@@ -126,18 +110,7 @@ def link_divisions(
         if not default_perspective(row):
             continue
         linked, method, metres, issue = link(db, row, policy)
-        db.execute(
-            "INSERT INTO divisions VALUES(?,?,?,?,?,?,?)",
-            (
-                row["source_id"],
-                row["subtype"],
-                linked,
-                method,
-                metres,
-                pack(row),
-                issue,
-            ),
-        )
+        put_division(db, row, linked, method, metres, issue)
     db.commit()
 
 

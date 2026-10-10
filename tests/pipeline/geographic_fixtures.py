@@ -8,7 +8,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from pipeline.config import load
-from pipeline.engines.artifact_io import file_record
+from pipeline.files import file_record
 from pipeline.runtime.execution import Executor
 from pipeline.runtime.jsonio import digest, write_json
 from pipeline.runtime.ledger import Ledger

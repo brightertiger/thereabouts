@@ -11,6 +11,8 @@ from typing import Any, cast
 from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException
 
+from pipeline.errors import ConfigError
+
 
 @dataclass
 class Licence:
@@ -55,6 +57,8 @@ DOWNLOAD_LIMITS = (
 class SourceSettings:
     name: str = ""
     adapter: str = ""
+    # A module whose propose(settings) resolves upstream into a SourcePin.
+    proposer: str = ""
     options_schema: str = ""
     kind: str = ""
     enabled: bool = True
@@ -66,9 +70,9 @@ class SourceSettings:
 
 
 def normalize_settings(source: SourceSettings) -> dict[str, Any]:
-    """Settings a normalizer reads; upstream URLs and transfer limits are excluded."""
+    """Settings a normalizer reads; how upstream is found and fetched is excluded."""
     values = asdict(source)
-    for name in ("upstream", "enabled"):
+    for name in ("upstream", "proposer", "enabled"):
         values.pop(name)
     values["limits"] = {
         name: value
@@ -102,6 +106,8 @@ def load_sources(directory: Path) -> dict[str, SourceSettings]:
 def validate_source(source: SourceSettings) -> None:
     if not re.fullmatch(r"pipeline\.sources\.[a-z][a-z0-9_.]*", source.adapter):
         raise ValueError(f"Invalid source adapter: {source.adapter}")
+    if not re.fullmatch(r"pipeline\.sources\.[a-z][a-z0-9_.]*", source.proposer):
+        raise ConfigError(f"Invalid source proposer: {source.proposer!r}")
     if not source.kind or not all(
         (source.licence.id, source.licence.url, source.licence.attribution)
     ):
@@ -160,12 +166,13 @@ def resolve_options(source: SourceSettings) -> None:
     if not module.startswith("pipeline.") or not name:
         raise ValueError(f"{source.name}.options_schema must name a pipeline dataclass")
     try:
-        if importlib.util.find_spec(source.adapter) is None:
-            raise ImportError(source.adapter)
+        for path in (source.adapter, source.proposer):
+            if importlib.util.find_spec(path) is None:
+                raise ImportError(path)
         schema = getattr(importlib.import_module(module), name)
     except (ImportError, AttributeError) as error:
         raise ValueError(
-            f"Cannot load {source.name} adapter or options schema: {error}"
+            f"Cannot load {source.name} adapter, proposer or options schema: {error}"
         ) from error
     if not isinstance(schema, type) or not is_dataclass(schema):
         raise ValueError(f"{source.options_schema} must declare a dataclass")

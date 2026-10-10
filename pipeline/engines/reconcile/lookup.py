@@ -6,24 +6,21 @@ import math
 import sqlite3
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import shapely
 
 from pipeline.config.engines import EngineLimits
+from pipeline.engines.geo.sphere import distance
+from pipeline.engines.geo.windows import windows
+from pipeline.engines.store.areas import intersecting
+from pipeline.engines.store.codec import Row, unpack
+from pipeline.engines.store.database import connect
+from pipeline.engines.store.entities import entity
 
 from .classification import city_order
-from .common import Row, connect, unpack
 from .land import Land
-from .spatial import decode, distance, intersecting, windows
-
-
-def entity(db: sqlite3.Connection, identity: str) -> Row:
-    value = db.execute("SELECT data FROM entities WHERE id=?", (identity,)).fetchone()
-    if value is None:
-        raise ValueError(f"Dangling canonical identity: {identity}")
-    result: Row = unpack(value[0])
-    return result
+from .spatial import decode
 
 
 def covering(db: sqlite3.Connection, x: float, y: float, role: str) -> list[Row]:
@@ -33,7 +30,7 @@ def covering(db: sqlite3.Connection, x: float, y: float, role: str) -> list[Row]
         geometry = decode(wkb)
         if not geometry.covers(point):
             continue
-        value = entity(db, identity)
+        value = cast(Row, entity(db, identity))
         provenance = unpack(evidence)
         value["boundary_source"] = provenance["source"]
         value["boundary_source_id"] = provenance["source_id"]
@@ -61,7 +58,7 @@ def nearest(
     # when the nearest village is metres away. Exact spherical distance decides.
     for radius in sorted({min(cutoff, n) for n in (1000, 5000, 15000, cutoff)}):
         best: tuple[float, str] | None = None
-        for left, right, bottom, top in windows(x, y, radius):
+        for left, right, bottom, top in windows((x, y, x, y), radius):
             for identity, a, b in db.execute(
                 "SELECT p.entity,p.x,p.y FROM point_bounds r "
                 "JOIN points p ON p.id=r.id "
@@ -72,7 +69,7 @@ def nearest(
                 if d <= radius and (best is None or (d, identity) < best):
                     best = d, identity
         if best:
-            return entity(db, best[1]), best[0]
+            return cast(Row, entity(db, best[1])), best[0]
     return None, None
 
 

@@ -40,7 +40,7 @@ def test_country_fallback_and_geonames_subdivisions_are_retained(
         "nl,fr,de",
     ]
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "codes",
@@ -53,7 +53,7 @@ def test_country_fallback_and_geonames_subdivisions_are_retained(
                 "admin1CodesASCII.txt": (b"BE.01\tBrussels\tBrussels\t2800866\n", {}),
             },
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         [country] = rows(source, "countries")
         assert country["name"] == "Belgium" and country["numeric"] == "056"
         assert country["license"] == "PDDL-1.0 AND CC-BY-4.0"
@@ -82,7 +82,7 @@ def test_subdivisions_carry_no_lgpl_rows_or_iso_codes(tmp_path: Path) -> None:
         ),
     }
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "codes",
@@ -94,7 +94,7 @@ def test_subdivisions_carry_no_lgpl_rows_or_iso_codes(tmp_path: Path) -> None:
                 for item in pin.files
             },
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         subdivisions = rows(source, "subdivisions")
     assert [row["code"] for row in subdivisions] == ["FR.84", "FR.11"]
     assert {row["code_system"] for row in subdivisions} == {"GeoNames-admin1"}
@@ -107,7 +107,7 @@ def test_shared_phone_calling_code_preserves_all_territories(tmp_path: Path) -> 
         b'<territory id="CA" countryCode="1"/></territories></phoneNumberMetadata>'
     )
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "phone",
@@ -116,7 +116,7 @@ def test_shared_phone_calling_code_preserves_all_territories(tmp_path: Path) -> 
                 "resources/geocoding/en/1.txt": (b"# fixture\n1202|Washington\n", {}),
             },
         )
-        run(source.runtime, stages)
+        run(runtime, stages)
         [row] = rows(source, "phone_prefixes")
         assert row["calling_code"] == "1" and row["country_codes"] == ["US", "CA"]
         assert row["language"] == "en"
@@ -187,9 +187,9 @@ def test_points_use_configured_resolution_and_preserve_country(
     resolution: int,
 ) -> None:
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(tmp_path, ledger, name, payloads)
-        source.runtime.config.h3.cell_resolution = resolution
-        run(source.runtime, stages)
+        runtime, source, stages = source_context(tmp_path, ledger, name, payloads)
+        runtime.config.h3.cell_resolution = resolution
+        run(runtime, stages)
         [row] = rows(source, kind)
         assert row["country_code"] == "BE" and row["h3_resolution"] == resolution
         for path in (source.normalized / kind).rglob("*.parquet"):
@@ -200,7 +200,7 @@ def test_points_use_configured_resolution_and_preserve_country(
             )
         if name == "dbip":
             assert row["ip_start_packed"] == b"\0" * 12 + b"\x01\x00\x00\x00"
-        assert run(source.runtime, stages) == {"completed": 0, "skipped": 2}
+        assert run(runtime, stages) == {"completed": 0, "skipped": 2}
 
 
 def test_plates_match_frozen_wikipedia_evidence(
@@ -219,7 +219,7 @@ def test_plates_match_frozen_wikipedia_evidence(
         }
     ).encode()
     with Ledger(tmp_path, None, readonly=False) as ledger:
-        source, stages = source_context(
+        runtime, source, stages = source_context(
             tmp_path,
             ledger,
             "plates",
@@ -271,7 +271,7 @@ def test_plates_match_frozen_wikipedia_evidence(
             path = tmp_path / f"{name}.yaml"
             path.write_text(yaml.safe_dump(value))
             source.settings.policies[name] = path.name
-        run(source.runtime, stages)
+        run(runtime, stages)
         [row] = rows(source, "plate_codes")
         assert row["code"] == "AA" and row["name_en"] == "North"
         assert row["license"] == "CC-BY-SA-4.0"
