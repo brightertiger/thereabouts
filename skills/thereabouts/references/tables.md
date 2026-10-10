@@ -4,7 +4,7 @@
 
 ## Dataset tables
 
-Plain Parquet files, one directory per table. Partition labels in directory names (`country=XX`, `group=...`) are file routing, not columns. Observation tables keep duplicates; only the keys listed are guaranteed unique.
+Plain Parquet files, one directory per table. Directory labels (`country=XX`, `group=...`) route files and are not stored columns; DuckDB and PyArrow add them as columns unless Hive partitioning is off. Only the keys listed are guaranteed unique, and assembly refuses a release that repeats one. Observation tables are keyed by `source` and `source_id`, one row per source record, so a code or name can repeat across rows.
 
 | Table | Grain | Key | Feeds packs |
 | --- | --- | --- | --- |
@@ -216,7 +216,7 @@ Joins:
 | `tld` | `string` | yes |  | Country internet top-level domain |
 | `continent` | `string` | yes |  | Source continent identifier |
 | `m49` | `string` | yes |  | UN M49 area code |
-| `region_code` | `string` | yes |  | Source region or subdivision code |
+| `region_code` | `string` | yes |  | UN M49 code of the country's region, the continent level (for example 142 for Asia); airports.region_code is an ISO 3166-2 code instead |
 | `region_name` | `string` | yes |  | UN region name |
 | `subregion_code` | `string` | yes |  | UN subregion code |
 | `subregion_name` | `string` | yes |  | UN subregion name |
@@ -546,7 +546,7 @@ Enumerated columns:
 Registration-code assertions: a code printed on vehicle plates and the registration unit or entity it names, from pinned national pages, Wikipedia revisions and Wikidata. Every row keeps its source URL and licence.
 
 - Grain: One row per source assertion of a code; a code repeats across sources, series and validity periods.
-- Primary key: none (observations can repeat)
+- Primary key: none
 - Feeds packs: `plates`
 
 Joins:
@@ -584,7 +584,7 @@ Enumerated columns:
 Plate syntax rules: a full-match regular expression per country and series, with the relaxed form that tolerates separators only where the source shows them, the scripts it uses and its specificity. Each rule is checked against its pinned source document when built; rules whose documents are not pinned are left out.
 
 - Grain: One row per source rule; a country has one row per modeled series and source.
-- Primary key: none (observations can repeat)
+- Primary key: none
 - Feeds packs: `plates`
 
 Joins:
@@ -613,7 +613,7 @@ Joins:
 The frozen plate matching and ranking policy (input normalization, code separators, unit-kind levels, script patterns, weights, geographic restrictions and the Unicode decimal digits used for code equality), from config/policies/plate_country/inference.yaml.
 
 - Grain: Exactly one row.
-- Primary key: none (observations can repeat)
+- Primary key: none
 - Feeds packs: `plates`
 
 | Column | Type | Nullable | Units | Meaning |

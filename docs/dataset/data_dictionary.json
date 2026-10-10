@@ -1726,7 +1726,7 @@
           "type": "string",
           "nullable": true,
           "units": "none",
-          "meaning": "Source region or subdivision code"
+          "meaning": "UN M49 code of the country's region, the continent level (for example 142 for Asia); airports.region_code is an ISO 3166-2 code instead"
         },
         {
           "name": "region_name",
