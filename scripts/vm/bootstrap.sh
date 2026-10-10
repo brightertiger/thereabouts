@@ -50,6 +50,11 @@ sudo apt-get install -y --no-install-recommends \
   libfreetype-dev libfontconfig1-dev libjpeg-dev libpng-dev libtiff-dev \
   liblcms2-dev libopenjp2-7-dev zlib1g-dev
 
+step "keep tmux jobs alive when no ssh session is open"
+# tmux 3.4 puts every pane in a systemd --user scope; without lingering the user
+# manager stops at the last logout and kills them (lost a world build on 2026-10-10).
+sudo loginctl enable-linger "$USER"
+
 step "rustup, toolchain ${PIPELINE_RUST_TOOLCHAIN}, wasm32 target"
 if [[ ! -x "$HOME/.cargo/bin/rustup" ]]; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |
