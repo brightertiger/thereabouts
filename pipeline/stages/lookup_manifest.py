@@ -3,10 +3,12 @@
 from collections import Counter
 from dataclasses import asdict
 from pathlib import Path
+from typing import cast
 
 from pipeline.config import reviews
 from pipeline.engines.artifact_io import file_record
 from pipeline.engines.cells.metrics import measure
+from pipeline.engines.cities.gate_scope import counts, scoped, totals
 from pipeline.engines.cities.gates import failures, unreviewed
 from pipeline.engines.names import build as names
 from pipeline.engines.normalize_cells.references import reference_checks
@@ -21,6 +23,7 @@ from .contract import Context, Unit
 
 
 def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
+    gates = cast(Row, unit.recipe.parameters["gates"])
     tables, reports, named = [], [], []
     for dep in unit.recipe.dependencies:
         action, _, key = dep.unit_id.partition("/")
@@ -29,7 +32,9 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
             tables.extend(receipt["tables"])
         elif action == "quality":
             report = io.receipt(ctx, dep.stage, dep.unit_id, suffix=".json")
-            reports.append(report)
+            # Footprint rows do not name their country; their report does.
+            footprints = [{**f, "country": key} for f in report["footprints"]]
+            reports.append({**report, "footprints": footprints})
             named.extend(report["named"])
         elif action == "places":
             for kind in ("places", "canonical_cities", "place_to_city"):
@@ -66,6 +71,12 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
         ctx.config.engines.limits.sqlite_cache_kib,
     )
     failed["all_boundaries"] = unreviewed(losses, exceptions, origins)
+    blocking, advisory = scoped(failed, gates)
+    advisories = totals(counts(advisory))
+    scope = {
+        "blocking_scope": gates["blocking_scope"],
+        "reviewed_countries": gates["reviewed"],
+    }
     rows: Counter[str] = Counter()
     sizes: Counter[str] = Counter()
     for table in tables:
@@ -80,7 +91,17 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
             "integrity": integrity,
             "normalization_integrity": references,
             "named": named,
-            "failed_spatial_gates": failed,
+            "failed_spatial_gates": blocking,
+            "advisory_spatial_gates": advisory,
+            "gate_scope": {
+                **scope,
+                "blocking": totals(counts(blocking)),
+                "advisory": advisories,
+                "by_country": {
+                    cc: {"reviewed": cc in gates["reviewed"], **row}
+                    for cc, row in counts(failed).items()
+                },
+            },
             "boundary_losses": losses,
             "boundary_exceptions": exceptions,
         },
@@ -90,7 +111,15 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
         for key, value in integrity.items()
         if key != "represented_r8_centres" and value
     }
-    if errors or any(references.values()) or any(failed.values()):
+    if advisories["countries"]:
+        ctx.log(
+            f"Advisory spatial findings in {advisories['countries']} unreviewed "
+            f"countries: {advisories['boundary_losses']} boundary losses "
+            f"({advisories['lost_cells']} cells), "
+            f"{advisories['footprint_failures']} footprint failures; "
+            f"see {quality.relative_to(ctx.root)}"
+        )
+    if errors or any(references.values()) or any(blocking.values()):
         raise ValueError(
             f"Stored dataset gate failed; inspect {quality.relative_to(ctx.root)}"
         )
@@ -106,6 +135,7 @@ def publish(ctx: Context, unit: Unit, root: Path, policy: Row) -> list[Path]:
             "tables": tables,
             "policy": policy,
             "verification_artifacts": [file_record(ctx.root, quality)],
+            "quality_gates": {**scope, "advisory": advisories},
         },
     )
     pointer = located(ctx.root, ctx.config.paths.cells) / "current.json"
