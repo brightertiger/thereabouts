@@ -282,7 +282,10 @@ is `config/policies/cities/common.yaml` plus country files. The
 city-part and independent-neighbour conventions. Their exact resolved
 canonical fingerprints match the previous JSON; tests cover every two-letter
 country projection. `config/reviews/cities-pilot.yaml` retains the historical
-owner approval and two precisely scoped boundary exceptions. Editing the policy
+owner approval and two precisely scoped boundary exceptions. An exception names
+its boundary by stable upstream origins (`osm:r134579`), never by reconcile area
+IDs, which every rebuild renumbers, and lists each lost cell with the city that
+now answers it; the file header documents the format. Editing the policy
 requires a matching reviewed fingerprint. Review validation occurs before any
 writable workspace opens. Evaluation fixtures live under `eval/`, outside build
 identities; changing a fixture alone does not regenerate geographic data.
