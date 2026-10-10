@@ -58,3 +58,43 @@ def test_publication_is_public_unless_declared_private() -> None:
     config = load()
     assert config.release.publish.private is False
     assert load(overrides=["release.publish.private=true"]).release.publish.private
+
+
+def test_closure_aliases_only_exceptional_reservations_by_default() -> None:
+    rules = load().release.dataset.closure
+    # Anything not listed refuses the release, so a new code never passes silently.
+    assert rules.unknown_places == "fail"
+    assert rules.place_aliases == {
+        "country": {"AC": "SH", "TA": "SH", "DG": "IO", "EA": "ES", "IC": "ES"}
+    }
+    assert rules.excluded_places == {}
+
+
+@pytest.mark.parametrize(
+    ("override", "message"),
+    [
+        ("release.dataset.closure.unknown_places=drop", "fail or exclude"),
+        ("release.dataset.closure.place_aliases.country.ZZ=ZZ", "to itself"),
+        ("release.dataset.closure.place_aliases.country.ZZ=AC", "chain"),
+        ("release.dataset.closure.place_aliases.country.Zz=SH", "two-letter"),
+        ("release.dataset.closure.place_aliases.Country.ZZ=SH", "place kind"),
+        ("release.dataset.closure.place_aliases.state.x=''", "empty"),
+        ("release.dataset.closure.excluded_places.country=[AC]", "both"),
+        ("release.dataset.closure.excluded_places.country=[ZZ,ZZ]", "twice"),
+    ],
+)
+def test_closure_rules_are_validated(override: str, message: str) -> None:
+    with pytest.raises(ValueError, match=message):
+        load(overrides=[override])
+
+
+def test_closure_rules_accept_other_place_kinds() -> None:
+    rules = load(
+        overrides=[
+            "release.dataset.closure.unknown_places=exclude",
+            "release.dataset.closure.place_aliases.state.overture:old=overture:new",
+            "release.dataset.closure.excluded_places.city=[geonames:1]",
+        ]
+    ).release.dataset.closure
+    assert rules.place_aliases["state"] == {"overture:old": "overture:new"}
+    assert rules.excluded_places["city"] == ["geonames:1"]

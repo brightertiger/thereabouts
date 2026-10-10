@@ -142,3 +142,14 @@ def test_self_normalized_places_are_seeds(tmp_path: Path) -> None:
     )
     with pytest.raises(ValueError, match="Dangling dataset place reference: x:1"):
         closure.check(tmp_path, write(tmp_path, tables))
+
+
+def test_every_dangling_reference_is_named(tmp_path: Path) -> None:
+    tables = closed()
+    tables["cells"][0].update(city_id="city:missing")
+    tables["postal_codes"][0].update(state_id="state:gone")
+    with pytest.raises(ValueError) as error:
+        closure.check(tmp_path, write(tmp_path, tables))
+    assert str(error.value) == (
+        "Dangling dataset place reference: city:missing, state:gone"
+    )

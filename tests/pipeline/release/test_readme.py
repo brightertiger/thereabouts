@@ -4,6 +4,7 @@ import importlib.util
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import pytest
 from h3.api import basic_int as h3
@@ -11,7 +12,7 @@ from h3.api import basic_int as h3
 from pipeline.config import load
 from pipeline.release.assemble import assemble
 from pipeline.release.metadata import licences
-from pipeline.release.readme import render
+from pipeline.release.readme import closure, render
 from pipeline.release.source import external
 from pipeline.release.tables import schema_description
 from pipeline.runtime.fingerprints import REPOSITORY
@@ -38,12 +39,12 @@ def test_committed_readme_matches_template_and_measured_subset() -> None:
         schema_description(REPOSITORY / config.release.schema),
         licences(config, set(evidence["sources"])),
         evidence["policy"],
-        None,
+        {},
         REPOSITORY / config.release.readme_template,
     ).encode()
     # The recorded readme_sha256 is the 2026-10-04 render, before the template
     # gained the dictionary, world wording, versioned _SUCCESS receipts and the
-    # quality gates, which that export's input did not record.
+    # quality gates and place closure, which that export did not record.
     assert generated == (REPOSITORY / "docs/dataset/README.md").read_bytes()
     # Tables added after that export are documented, without invented counts.
     text = generated.decode()
@@ -77,3 +78,30 @@ def test_worked_examples_answer_from_an_assembled_dataset(
         exec(compile(example, "README.md", "exec"), {})
     printed = capsys.readouterr().out
     assert "city:geonames:2988507" in printed and "Paris" in printed
+
+
+def test_the_closure_paragraph_follows_the_manifest_record() -> None:
+    assert "predates this record" in closure(None)
+    record: dict[str, Any] = {"unknown_places": "fail", "aliased": [], "excluded": []}
+    assert closure(record) == (
+        "This export needed no alias and no exclusion; `manifest.json.closure` "
+        "records the same."
+    )
+    record["aliased"] = [
+        {
+            "table": "phone_prefixes",
+            "column": "country_codes",
+            "place": "country:TA",
+            "to": "country:SH",
+            "rows": 1234,
+        }
+    ]
+    record["excluded"] = [
+        {"table": "airports", "column": "state_id", "place": "state:x", "rows": 2}
+    ]
+    text = closure(record)
+    assert text.startswith("In this export, assembly rewrote or dropped these")
+    assert text.splitlines()[-2:] == [
+        "| `phone_prefixes` | `country_codes` | `country:TA` | `country:SH` | 1,234 |",
+        "| `airports` | `state_id` | `state:x` | row dropped | 2 |",
+    ]

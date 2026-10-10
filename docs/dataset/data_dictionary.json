@@ -2302,7 +2302,7 @@
           "type": "string",
           "nullable": true,
           "units": "none",
-          "meaning": "Libphonenumber territory code"
+          "meaning": "Libphonenumber territory code. A code with no country place of its own, such as AC or TA, is published as the country that covers it; manifest.json closure counts the rewritten rows"
         },
         {
           "name": "calling_code",
@@ -2529,7 +2529,7 @@
           "type": "list<element: string>",
           "nullable": false,
           "units": "none",
-          "meaning": "Associated country codes; list of text codes"
+          "meaning": "Associated country codes; list of text codes. A code with no country place of its own is published once, as the country that covers it; manifest.json closure counts the rewritten rows"
         },
         {
           "name": "source_release",

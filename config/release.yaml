@@ -29,6 +29,25 @@ dataset:
   row_group_rows: 16384
   compression: zstd
   cell_group_resolution: 1
+  # Place keys, as <kind>:<code>, that inputs refer to but no place row defines.
+  # An alias publishes the reference as the key that covers it; an exclusion drops
+  # the rows that refer to it; any other missing key does unknown_places (fail or
+  # exclude). Aliases and exclusions never touch a key that exists. The manifest's
+  # closure object and the README count every rewritten or dropped row.
+  closure:
+    unknown_places: fail
+    place_aliases:
+      # ISO 3166 exceptional reservations inside a GeoNames country. libphonenumber
+      # uses AC (+247) and TA (+290); GeoNames has neither, and SH is "Saint
+      # Helena, Ascension and Tristan da Cunha". DG, EA and IC are unused by the
+      # 2026.10 inputs.
+      country:
+        'AC': 'SH'
+        'TA': 'SH'
+        'DG': 'IO'
+        'EA': 'ES'
+        'IC': 'ES'
+    excluded_places: {}
 packs:
   families: [core, postal, airports, locode, phone, ip, plates]
 # Every pack is opened by the real reader in a child process at this open-file

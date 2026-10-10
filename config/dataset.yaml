@@ -910,7 +910,9 @@ phone_metadata:
   - name: territory
     type: string
     nullable: true
-    meaning: Libphonenumber territory code
+    meaning: Libphonenumber territory code. A code with no country place of its own,
+      such as AC or TA, is published as the country that covers it; manifest.json
+      closure counts the rewritten rows
     units: none
   - name: calling_code
     type: string
@@ -1061,7 +1063,9 @@ phone_prefixes:
   - name: country_codes
     type: 'list<element: string>'
     nullable: false
-    meaning: Associated country codes; list of text codes
+    meaning: Associated country codes; list of text codes. A code with no country
+      place of its own is published once, as the country that covers it;
+      manifest.json closure counts the rewritten rows
     units: none
   - name: source_release
     type: string

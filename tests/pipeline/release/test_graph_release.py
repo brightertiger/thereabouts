@@ -48,7 +48,11 @@ def address(text: str) -> bytes:
 # One observation per lookup kind, all in ZZ at the synthetic town (0, 0).
 LOOKUPS: dict[str, dict[str, list[Row]]] = {
     "codes": {
-        "countries": [{"country_code": "ZZ", "alpha3": "ZZZ", "name": "Zedland"}],
+        "countries": [
+            {"country_code": "ZZ", "alpha3": "ZZZ", "name": "Zedland"},
+            # The plates source's country; plate codes must name a countries row.
+            {"country_code": "XY", "alpha3": "XYZ", "name": "Example"},
+        ],
         "subdivisions": [],
     },
     "phone": {

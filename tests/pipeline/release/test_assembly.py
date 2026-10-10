@@ -193,6 +193,68 @@ def test_a_repeated_observation_key_is_refused(tmp_path: Path) -> None:
     assert not output.exists()
 
 
+def test_missing_place_keys_are_aliased_or_excluded_and_counted(
+    tmp_path: Path,
+) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    entry = snapshot.tables["postal_codes"][0]
+    path = snapshot.path(entry)
+    schema = pq.read_schema(path)
+    rows = [
+        {"source": "postal", "source_id": str(number), "country_code": "MY"}
+        | {"country_id": country}
+        for number, country in enumerate(["country:XA", "country:XB", "country:MY"])
+    ]
+    pq.write_table(pa.Table.from_pylist(rows, schema=schema), path)
+    for record in snapshot.manifest["tables"]:
+        if record["path"] == entry.path:
+            record.update(file_record(snapshot.root, path), rows=3)
+    write_json(snapshot.root / "manifest.json", snapshot.manifest)
+    snapshot = external(snapshot.root, config.h3)
+    output = tmp_path / "dataset" / "2026.10"
+    with pytest.raises(ValueError, match=r"postal_codes\.country_id: country:XA, co"):
+        assemble(snapshot, output, config, guard, "identity")
+    closure = config.release.dataset.closure
+    closure.place_aliases = {"country": {"XA": "MY"}}
+    closure.excluded_places = {"country": ["XB"]}
+    assemble(snapshot, output, config, guard, "identity")
+    manifest = verify_dataset(output)
+    assert manifest["closure"] == {
+        "unknown_places": "fail",
+        "aliased": [
+            {
+                "table": "postal_codes",
+                "column": "country_id",
+                "place": "country:XA",
+                "to": "country:MY",
+                "rows": 1,
+            }
+        ],
+        "excluded": [
+            {
+                "table": "postal_codes",
+                "column": "country_id",
+                "place": "country:XB",
+                "rows": 1,
+            }
+        ],
+        "places": 2,
+        "reached": 2,
+    }
+    [postal] = [t for t in manifest["tables"] if t["kind"] == "postal_codes"]
+    assert postal["rows"] == manifest["statistics"]["postal_codes"]["rows"] == 2
+    published = pq.read_table(output / postal["path"])
+    assert published["country_id"].to_pylist() == ["country:MY", "country:MY"]
+    assert published["source_id"].to_pylist() == ["0", "2"]
+    readme = (output / "README.md").read_text()
+    assert "| `postal_codes` | `country_id` | `country:XA` | `country:MY` | 1 |" in (
+        readme
+    )
+    assert "| `postal_codes` | `country_id` | `country:XB` | row dropped | 1 |" in (
+        readme
+    )
+
+
 def documents(output: Path) -> dict[str, str]:
     return {
         name: (output / name).read_text()

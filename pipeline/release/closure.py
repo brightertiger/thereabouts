@@ -37,6 +37,8 @@ EDGES = ("parent_id", "sovereign_id", "normalized_city_id")
 SEED_ROLES = ["country", "state", "city"]
 # A published non-geographic calling code with no country place.
 NON_GEOGRAPHIC = "001"
+# Dangling references named in an error.
+SHOWN = 20
 
 
 def files(directory: Path, tables: list[Row], kind: str) -> list[Path]:
@@ -71,6 +73,13 @@ def first(values: Values) -> str:
     return sorted(str(value) for value in values.to_pylist())[0]
 
 
+def every(values: Values) -> str:
+    """The values, sorted, for an error message; long lists are cut short."""
+    names = sorted(str(value) for value in values.to_pylist())
+    more = f" and {len(names) - SHOWN} more" if len(names) > SHOWN else ""
+    return ", ".join(names[:SHOWN]) + more
+
+
 def countries(codes: Iterator[str | None]) -> Strings:
     """The writer's country place for each code; the non-geographic code has none."""
     found = {f"country:{code}" for code in codes if code and code != NON_GEOGRAPHIC}
@@ -98,7 +107,9 @@ def seeds(directory: Path, tables: list[Row]) -> Iterator[Strings]:
 
 
 def check(directory: Path, tables: list[Row]) -> dict[str, int]:
-    """Raise on the first reference the writer would refuse; count the closure."""
+    """Raise on the references the writer would refuse; count the closure.
+
+    Dangling references are named together, from the first frontier that has any."""
     places = read(
         directory, tables, "places", ["place_id", "role", "country_code", *EDGES]
     )
@@ -124,7 +135,7 @@ def check(directory: Path, tables: list[Row]) -> dict[str, int]:
     while len(frontier):
         dangling = absent(frontier, identifiers)
         if len(dangling):
-            raise ValueError(f"Dangling dataset place reference: {first(dangling)}")
+            raise ValueError(f"Dangling dataset place reference: {every(dangling)}")
         rows = places.filter(pc.field("place_id").isin(frontier))
         following = unique(
             pa.chunked_array(

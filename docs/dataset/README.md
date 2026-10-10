@@ -60,6 +60,10 @@ Timezone membership is independent of eligible land. `timezone_cells` can store 
 
 Before export, the pipeline checks every country's city boundaries and footprints. The measured export this page was rendered from predates these gates. A release's `manifest.json.quality_gates` records its blocking scope, its reviewed countries and its advisory totals.
 
+## Place references
+
+Every place reference resolves to an existing key: each `country_id`, `state_id`, `city_id`, `place_id` and `place_ids` value, each place's parent, sovereign and normalized city, each phone and plate country code, and each name's canonical city. A few source codes name a territory that has no place of its own. ISO 3166 exceptionally reserves `AC` for Ascension Island and `TA` for Tristan da Cunha, for example, and GeoNames includes both in `SH`, Saint Helena, Ascension and Tristan da Cunha. The release configuration publishes such a reference as the place that covers it, or drops the rows that make it; any other missing key stops the release. Rows are counted per table, column and key. The measured export this page was rendered from predates this record. A release's `manifest.json.closure` lists every reference that assembly rewrote or dropped.
+
 ## Tables and columns
 
 Arrow types and physical nullability below are checked during assembly. “None” for units means an identifier, category, text or dimensionless value. Required logical keys are listed separately from Arrow nullability. Observation tables are keyed by `source` and `source_id`, one row per source record, so duplicate observations of one code or place are retained as separate rows. Assembly refuses a release that repeats any declared key. Counts and bytes are for this exact export, not a world estimate.
@@ -240,7 +244,7 @@ Layout: `phone_metadata/part.parquet`. Primary key: source, source_id. 1 files, 
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no | none | Configured upstream source name |
 | `source_id` | `string` | no | none | Identifier of the original observation within its source |
-| `territory` | `string` | yes | none | Libphonenumber territory code |
+| `territory` | `string` | yes | none | Libphonenumber territory code. A code with no country place of its own, such as AC or TA, is published as the country that covers it; manifest.json closure counts the rewritten rows |
 | `calling_code` | `string` | yes | none | International telephone calling code, represented as text |
 | `leading_digits` | `string` | yes | none | Libphonenumber leading-digit pattern |
 | `national_prefix` | `string` | yes | none | National telephone prefix |
@@ -267,7 +271,7 @@ Layout: `phone_prefixes/part.parquet`. Primary key: source, source_id. 1 files, 
 | `calling_code` | `string` | yes | none | International telephone calling code, represented as text |
 | `language` | `string` | yes | none | Language of the prefix description |
 | `description` | `string` | yes | none | Source geographic prefix description |
-| `country_codes` | `list<element: string>` | no | none | Associated country codes; list of text codes |
+| `country_codes` | `list<element: string>` | no | none | Associated country codes; list of text codes. A code with no country place of its own is published once, as the country that covers it; manifest.json closure counts the rewritten rows |
 | `source_release` | `string` | no | none | Pinned upstream release or inventory identifier |
 | `license` | `string` | no | none | Upstream licence identifier |
 | `provenance` | `string` | no | none | JSON source evidence and transformation provenance |
@@ -617,7 +621,7 @@ Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positi
 
 Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `dataset/2026.10/_SUCCESS` receipt (the same receipt is written to `packs/2026.10/_SUCCESS`), written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
-The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `quality_gates`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index and `empty_blocks` defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks; `quality_gates` summarizes the quality gates above.
+The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `quality_gates`, `closure`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index and `empty_blocks` defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks; `quality_gates` summarizes the quality gates above; `closure` lists the place references above that assembly rewrote or dropped, with the place rows and the places the pack writer reaches.
 
 With Python 3.11 or newer and `DATASET` set, verify local bytes without loading the tables:
 
