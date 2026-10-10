@@ -14,6 +14,11 @@ resources:
   max_workspace: 250000000000
   disk_floor: 5000000000
 
+engines:
+  runtime:
+    # World-scale spatial joins (postal) spill well past the 512 MB default; not hashed.
+    duckdb_spill_bytes: 40000000000
+
 storage:
   gcs_raw: gs://pyofflinegeocoder-summer-sector-488705-m8/raw
 release:
