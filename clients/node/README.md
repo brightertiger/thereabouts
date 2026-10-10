@@ -79,11 +79,15 @@ MCP host (THEREABOUTS_PYTHON overrides the default python3 executable).
 
 The store is shared with Python/native: packs/<family>/<dataset-version>
 and active.json, with old family pointers still discoverable. Discovery uses
-dataDir, THEREABOUTS_DATA, then the platform user-data directory. No release
-service is published: explicitly configure --from or THEREABOUTS_RELEASE_URL.
+dataDir, THEREABOUTS_DATA, then the platform user-data directory. The default
+release is the project's GitHub releases; THEREABOUTS_RELEASE_TOKEN (or
+GITHUB_TOKEN) reads them while the repository is private, and --from or
+THEREABOUTS_RELEASE_URL selects another source. `data install dataset` restores
+the Parquet dataset under dataset/<version>/.
 Install uses Node fetch, exact Range resume, sha256, strict ustar extraction,
 WASM pack verification and atomic activation. An interrupted transfer resumes
-on the next explicit install. HTTPS redirects cannot downgrade. The only
+on the next explicit install. Redirects cannot downgrade from HTTPS, and the
+token goes only to the GitHub API origin, never across a redirect. The only
 runtime npm dependency is undici for environment proxy support; there are no
 native add-ons or platform packages.
 

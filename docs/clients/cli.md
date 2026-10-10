@@ -30,6 +30,7 @@ global options may appear before or after a command.
 | phone | NUMBER; --country CC | Telephone prefix context |
 | plate | TEXT; --country CC --series NAME | Registration format context |
 | data install | PACK…; --version V --from URL\|DIR --yes | Explicit install transaction |
+| data install dataset | --version V --from URL\|DIR | Restore the Parquet dataset to dataset/<version>/ |
 | data list | --remote | Local inventory or available releases |
 | data verify | --full | Sizes; hashes with --full |
 | data remove | PACK; --yes | Remove the named family |
@@ -293,15 +294,21 @@ fails closed: inspect `<data-dir>/.lock` and the named process, confirm that no
 install is running and that the process is unrelated, then remove that `.lock`
 file and retry. Do not remove a lease while its installer is running.
 
-The source is a directory containing index.json and archives, or a configured
-base URL. The placeholder default (`DEFAULT_RELEASE_URL`, defined once in
+The source is a directory containing index.json and archives, or a base URL.
+The default (`DEFAULT_RELEASE_URL`, defined once in
 `thereabouts-cli-core::transport` and exported to Python as
 `_core.DEFAULT_RELEASE_URL` and to Node through WASM) is
-https://thereabouts-releases.invalid; no service is currently published. THEREABOUTS_RELEASE_URL configures the
+https://github.com/brightertiger/thereabouts/releases/latest/download/, which
+GitHub redirects to the newest published release's assets;
+`.../releases/download/v<version>/` reads one release. THEREABOUTS_RELEASE_URL configures the
 source for install, remote list and update --check; it may also be a local
 directory. --from overrides it for install. URLs are HTTP(S) base URLs;
 index.json is appended. An archive URL may be absolute or base-relative,
 with slashes (`2026.10/core.tar.zst`). Local indexes use relative artifact paths.
+A directory holding a downloaded GitHub release is a source too: absolute URLs
+in its index name files by their last path segment. Clients use these download
+routes, not GitHub's REST `releases/latest` endpoint, whose unauthenticated
+limit is 60 requests an hour per address.
 The release index (format 3) is:
 
     {
@@ -334,6 +341,16 @@ pipeline publishes one index per version (`packs/<version>/index.json`, URLs
 relative to that directory) and merges every published version into the
 aggregate `packs/index.json` (URLs `<version>/<family>.tar.zst`), which is the
 base clients use for install, remote list and `data update --check`.
+
+Releases published to GitHub use absolute `url`s
+(`https://github.com/<owner>/<repo>/releases/download/v<version>/<asset>`) and add
+`asset_id` and `api_url`
+(`https://api.github.com/repos/<owner>/<repo>/releases/assets/<id>`) to each
+pack, plus a `dataset` entry per version naming the dataset install manifest
+(`url`, `size`, `sha256`, `asset_id`, `api_url`; at most 16 MiB). Each GitHub
+release's `index.json` lists every version published so far, so
+`releases/latest/download/index.json` is the newest aggregate. Clients that
+predate these fields ignore them.
 
 Index JSON is limited to 16 MiB. The transport caps are defined once in
 `thereabouts-cli-core::transport` and shared by the CLI, Python
@@ -378,8 +395,10 @@ with Content-Range: bytes N-(total-1)/total. If supplied, Content-Length must
 equal the remaining advertised length. Ignored/mismatched ranges fail and
 retain the partial file for retry. No bytes are appended before these checks.
 Requests use Accept-Encoding: identity; encoded responses are rejected.
-HTTPS requests follow at most five HTTPS-only redirects; downgrade to HTTP is
-rejected. HTTP sources (including loopback tests) do not follow redirects.
+Redirects are followed by the client, at most five: HTTPS anywhere, plain HTTP
+only from loopback to loopback (tests), never HTTPS to HTTP. Every hop repeats
+the Range and Accept-Encoding headers and none carries credentials. An archive
+URL under an HTTPS index must itself be HTTPS.
 HTTPS_PROXY/HTTP_PROXY/ALL_PROXY and NO_PROXY use native ureq environment semantics.
 Node honors HTTPS_PROXY/HTTP_PROXY and NO_PROXY through undici; ALL_PROXY is
 used as a fallback when HTTP_PROXY/HTTPS_PROXY are absent. Connections and headers
@@ -400,6 +419,47 @@ atomically only after all requested packs verify. A failed transaction keeps
 the previous pin. Already verified, unactivated directories may remain for a
 retry; failed extraction staging is removed. Archive hash failures discard their
 partial archive. No lookup contacts the index or any transfer source.
+
+### Private GitHub releases and tokens
+
+A token in THEREABOUTS_RELEASE_TOKEN, else GITHUB_TOKEN, is used only when the
+release URL has GitHub's shape (`<host>/<owner>/<repo>/releases/latest/download/`
+or `.../releases/download/<tag>/`). Private repositories serve no public download
+route, so the client then reads `GET /repos/<owner>/<repo>/releases/latest` (or
+`/releases/tags/<tag>`), finds the `index.json` asset in the release or on its
+asset pages, and downloads it and every file through
+`GET /repos/<owner>/<repo>/releases/assets/<id>` with
+`Accept: application/octet-stream`, using each entry's `api_url`. The token is
+sent as `Authorization: Bearer` only to the API origin: https://api.github.com,
+or THEREABOUTS_GITHUB_API_URL (HTTPS, or plain HTTP on loopback, for GitHub
+Enterprise and tests). An `api_url` on any other origin is ignored, and GitHub's
+redirect to its object host never carries the token. A fine-grained token with
+**Contents: Read** on the repository is enough; authenticated requests count
+against the token's 5,000-an-hour limit. Without a token, or for any other
+release URL, no credential is sent.
+
+### Dataset install
+
+`thereabouts data install dataset [--version V] [--from URL|DIR]` restores the
+Parquet dataset to `<data-dir>/dataset/<version>/`. The CLI, the Python console
+and Node share this contract, and `dataset` is installed on its own. The newest
+version (or V) whose index entry has `dataset` is selected. Its
+`dataset-manifest.json` (format 1, `_core.DATASET_MANIFEST`) lists `archives`
+(`name`, `table`, `size`, `sha256`, `unpacked_size`, `url`, `asset_id`,
+`api_url`, and `files` with each member's `path`, `size` and `sha256`) and
+`files` (the top-level documents, each with `path`, `size`, `sha256`, `url`,
+`asset_id` and `api_url`). Each table ships as `dataset-<table>.zip`, split into
+`dataset-<table>-001.zip`, `-002`… when one zip would exceed GitHub's 2 GiB
+asset limit. The zips are stored (Parquet is already compressed), without zip64,
+data descriptors, extra fields or comments. One Rust reader
+(`thereabouts-cli-core::zip`) extracts them in every client: the pack path
+rules, CRC-32 and SHA-256 per entry, the declared unpacked size as a bound, and
+only the exact layout the pipeline writes; anything else is an integrity
+failure (exit 4). Downloads resume in `.downloads`, and each file is checked by
+size and SHA-256 before use. Space for every zip plus its unpacked size is
+reserved first. The tree is assembled in staging, checked file by file against
+the manifest (exact inventory, sizes and digests) and renamed into place only
+when complete. An existing version is verified, never replaced.
 
 ## MCP
 
