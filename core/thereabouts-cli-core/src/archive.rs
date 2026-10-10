@@ -40,7 +40,7 @@ pub trait Output {
     fn file(&mut self, path: &str, content: &mut dyn Read, size: u64) -> Result<()>;
 }
 /// Inspection writes nothing; it only hashes the entries.
-struct Discard;
+pub(crate) struct Discard;
 impl Output for Discard {
     fn directory(&mut self, _: &str) -> Result<()> {
         Ok(())
@@ -111,7 +111,7 @@ impl<R: Read> Read for Hashing<'_, R> {
         Ok(count)
     }
 }
-fn integrity(error: Error) -> Error {
+pub(crate) fn integrity(error: Error) -> Error {
     match error {
         Error::Io(error) if error.kind() == io::ErrorKind::InvalidData => {
             Error::Integrity(error.to_string())
@@ -231,6 +231,11 @@ fn parse(header: &[u8; BLOCK]) -> Result<(String, u8, u64)> {
         format!("{prefix}/{name}")
     };
     let path = path.trim_end_matches('/');
+    checked_path(path)?;
+    Ok((path.to_owned(), header[156], octal(field(124, 136)?)?))
+}
+/// The entry path rules every release archive shares: relative, normalized, portable.
+pub(crate) fn checked_path(path: &str) -> Result<()> {
     if path.is_empty()
         || path.starts_with('/')
         || path.contains(['\\', ':', '\0'])
@@ -239,7 +244,7 @@ fn parse(header: &[u8; BLOCK]) -> Result<(String, u8, u64)> {
     {
         return Err(Error::Integrity("Unsafe or reserved archive path".into()));
     }
-    Ok((path.to_owned(), header[156], octal(field(124, 136)?)?))
+    Ok(())
 }
 fn text(bytes: &[u8]) -> Result<&str> {
     let end = bytes.iter().position(|b| *b == 0).unwrap_or(bytes.len());

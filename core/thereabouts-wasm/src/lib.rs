@@ -169,6 +169,25 @@ pub fn render_rows(rows: &str, format: &str) -> Result<(), JsValue> {
     renderer.finish(&mut host::Host).map_err(cli_error)
 }
 
+/// A declared unpacked size from JavaScript: a positive safe integer.
+fn declared_size(value: f64) -> Result<u64, JsValue> {
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    if value.is_finite() && (1.0..=9_007_199_254_740_991.0).contains(&value) && value.fract() == 0.0
+    {
+        Ok(value as u64)
+    } else {
+        Err(error("corrupt_pack", "Invalid unpacked archive size", 4))
+    }
+}
+/// Every extracted file with its digest, as the installers compare them.
+fn extracted(summary: &thereabouts_cli_core::archive::Summary) -> Result<String, JsValue> {
+    let files = summary
+        .entries
+        .iter()
+        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
+        .collect::<Vec<_>>();
+    json(&serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}))
+}
 /// Expand a checksum-verified release archive into an empty staging directory through the
 /// shared Rust reader; returns every extracted file with its digest.
 #[wasm_bindgen(js_name = extractArchive)]
@@ -178,15 +197,7 @@ pub fn extract_archive(
     unpacked_size: f64,
 ) -> Result<String, JsValue> {
     use thereabouts_cli_core::archive;
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    let declared = if unpacked_size.is_finite()
-        && (1.0..=9_007_199_254_740_991.0).contains(&unpacked_size)
-        && unpacked_size.fract() == 0.0
-    {
-        unpacked_size as u64
-    } else {
-        return Err(error("corrupt_pack", "Invalid unpacked archive size", 4));
-    };
+    let declared = declared_size(unpacked_size)?;
     // The download lives in the store, whose own path may pass through a symlink.
     let input = host::File::open(&host::root(archive).map_err(core_error)?)
         .map_err(|e| archive_error(e.into()))?;
@@ -196,12 +207,22 @@ pub fn extract_archive(
         declared,
     )
     .map_err(archive_error)?;
-    let files = summary
-        .entries
-        .iter()
-        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
-        .collect::<Vec<_>>();
-    json(&serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}))
+    extracted(&summary)
+}
+/// Expand a checksum-verified dataset table zip into a staging directory through the
+/// shared Rust reader; returns every extracted file with its digest.
+#[wasm_bindgen(js_name = extractZip)]
+pub fn extract_zip(zip: &str, staging: &str, unpacked_size: f64) -> Result<String, JsValue> {
+    let declared = declared_size(unpacked_size)?;
+    let input = host::File::open(&host::root(zip).map_err(core_error)?)
+        .map_err(|e| archive_error(e.into()))?;
+    let summary = thereabouts_cli_core::zip::extract(
+        std::io::BufReader::with_capacity(1 << 20, input),
+        &mut host::Staging { root: staging },
+        declared,
+    )
+    .map_err(archive_error)?;
+    extracted(&summary)
 }
 
 /// Transport caps and the default release URL, defined once in the shared CLI core.
@@ -214,6 +235,8 @@ pub fn transport() -> Result<String, JsValue> {
         "default_release_url": transport::DEFAULT_RELEASE_URL,
         "index_format": transport::INDEX_FORMAT,
         "archive_suffix": transport::ARCHIVE_SUFFIX,
+        "dataset_manifest": thereabouts_cli_core::zip::MANIFEST,
+        "dataset_manifest_format": thereabouts_cli_core::zip::MANIFEST_FORMAT,
     }))
 }
 
