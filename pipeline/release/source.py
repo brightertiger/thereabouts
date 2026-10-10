@@ -8,7 +8,6 @@ from typing import Any
 import pyarrow.parquet as pq
 from h3.api import basic_int as h3
 
-from pipeline.config.quality_policy import SCOPES
 from pipeline.config.schema import H3
 from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import digest, sha256_file
@@ -17,6 +16,9 @@ from pipeline.runtime.records import Output
 
 Row = dict[str, Any]
 ADVISORY = ("countries", "boundary_losses", "lost_cells", "footprint_failures")
+# The scopes of config/policies/quality.yaml, repeated so that packs and publish
+# do not hash the policy loaders; a test keeps the two equal.
+SCOPES = ("reviewed", "all")
 
 
 @dataclass(frozen=True)

@@ -5,9 +5,10 @@ from typing import Any
 
 import pytest
 
-from pipeline.config import Config
+from pipeline.config import Config, quality_policy
 from pipeline.engines.artifacts import read_json
 from pipeline.files import file_record
+from pipeline.release import source
 from pipeline.release.assemble import assemble
 from pipeline.release.readme import quality
 from pipeline.release.source import Snapshot, external
@@ -110,3 +111,7 @@ def test_wording_for_each_scope() -> None:
     every = quality({**clean, "blocking_scope": "all", "reviewed_countries": []})
     assert "`all`" in every and "in every country" in every
     assert "unreviewed" not in every
+
+
+def test_release_scopes_are_the_quality_policy_scopes() -> None:
+    assert source.SCOPES == quality_policy.SCOPES
