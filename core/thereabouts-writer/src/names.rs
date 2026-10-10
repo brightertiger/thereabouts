@@ -12,9 +12,9 @@ use thereabouts_core::{
     },
     name_normalization::{Policy, normalize},
 };
-// Matches the forward writer's 4 MiB input batches; leaves room for both FST
-// builders and Unicode trigram postings inside the shared 512 MiB admission budget.
-const NAME_INPUT_BYTES: usize = 4 * 1024 * 1024;
+// Names shards fill to the core pack's shard target like cells and catalogue
+// shards. Each entry counts its key and name plus 128 bytes for its record and
+// trigram postings; encoded shards stay near the target, under the 64 MiB limit.
 pub(crate) fn emit(
     data: &Dataset,
     db: &Connection,
@@ -91,6 +91,8 @@ fn insert(
     ])
 }
 fn output(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> {
+    let target = usize::try_from(crate::SHARD_TARGET_BYTES)
+        .map_err(|_| Error::Input("Shard target exceeds the address space".into()))?;
     let mut query=db.prepare("SELECT key,city,name,alternate FROM names ORDER BY key COLLATE BINARY,city COLLATE BINARY,alternate,name COLLATE BINARY")?;
     let mut entries = Vec::new();
     let mut size = 0;
@@ -109,7 +111,7 @@ fn output(db: &Connection, stage: &Path, manifest: &mut Manifest) -> Result<()> 
         // Canonical cities are already final; keep their published identity.
         places[2] = catalogue::reference(db, Some(&city))?;
         let bytes = key.len() + name.len() + 128;
-        if size + bytes > NAME_INPUT_BYTES && !entries.is_empty() {
+        if size + bytes > target && !entries.is_empty() {
             add(
                 stage,
                 manifest,

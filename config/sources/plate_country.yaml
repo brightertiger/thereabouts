@@ -1,16 +1,21 @@
 name: plate_country
 adapter: pipeline.sources.plate_country
-proposer: pipeline.sources.proposals.resolve
+proposer: pipeline.sources.proposals.plates
 kind: registration_country_evidence
-enabled: false
+enabled: true
 upstream:
-  proposal: config/proposals/plate_country.yaml
-  url: https://www.worldlicenseplates.com/
+  url: https://www.wikipedia.org/
 licence:
   id: per-source
-  url: https://www.worldlicenseplates.com/
-  attribution: See each reviewed plate-country source
+  url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: Wikipedia and Wikimedia Commons contributors; every pinned file keeps
+    its revision, licence and attribution
 limits:
-  download_bytes: 0
+  # Two retained releases of capacity; the reviewed files total 73,303,719 bytes
+  # (2026-10-10 fetch).
+  download_bytes: 146607438
 options: {}
+policies:
+  # Reviewed inventory; entries marked base are pinned by the plates source.
+  sources: config/policies/plate_country/sources.yaml
 options_schema: pipeline.config.source_options.Text

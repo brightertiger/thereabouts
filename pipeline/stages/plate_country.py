@@ -19,13 +19,12 @@ def run(ctx: Context, unit: Unit) -> list[Path]:
     base = source_manifest(ctx, settings.registration_source)
     if base is None:
         raise ValueError("Missing normalized registration evidence")
+    # The recipe lists plate-country evidence only when that source is enabled
+    # and pinned; otherwise the tables come from the registration pin alone.
     extra: list[Row] = []
-    source = ctx.config.sources.get(settings.plate_country_source)
-    if source is not None and source.enabled:
-        evidence = io.receipt(
-            ctx, "normalize", settings.plate_country_source, suffix="sources.json"
-        )
-        extra = evidence["sources"]
+    evidence = ("normalize", settings.plate_country_source)
+    if any(dep.key == evidence for dep in unit.recipe.dependencies):
+        extra = io.receipt(ctx, *evidence, suffix="sources.json")["sources"]
     pins = documents.pool(ctx.root, base, extra, settings.plate_country_source)
     output = (
         located(ctx.root, ctx.config.paths.cells) / "plate_country" / unit.inputs_hash

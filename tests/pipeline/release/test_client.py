@@ -10,8 +10,10 @@ from pipeline.release import client
 from pipeline.release.assemble import assemble
 from pipeline.release.source import Row
 from pipeline.runtime.jsonio import write_json
+from thereabouts.mcp_service.dictionary import from_pack, notices
 
 from .fixtures import fixture
+from .synthetic import dataset as synthetic_dataset
 
 
 def test_client_call_signature_and_checksum_validation(tmp_path: Path) -> None:
@@ -61,3 +63,21 @@ def test_missing_binding_has_actionable_error(monkeypatch: pytest.MonkeyPatch) -
     monkeypatch.setattr(importlib, "import_module", missing)
     with pytest.raises(ValueError, match="merged Rust client"):
         client.binding()
+
+
+def test_core_pack_ships_the_dataset_dictionary_as_notices(tmp_path: Path) -> None:
+    dataset, _ = synthetic_dataset(tmp_path)
+    packs = tmp_path / "packs"
+    writer = client.binding()
+    for family in ("core", "postal"):
+        client.write(dataset, family, packs / family, "2026.10", writer)
+    assert set(notices(packs / "core")) == {
+        "DATA_LICENSES.md",
+        "DATA_DICTIONARY.md",
+        "data_dictionary.json",
+    }
+    loaded = from_pack(packs / "core")
+    assert loaded is not None and loaded.source == "pack"
+    assert loaded.json_text == (dataset / "data_dictionary.json").read_text()
+    assert loaded.markdown_text == (dataset / "DATA_DICTIONARY.md").read_text()
+    assert set(notices(packs / "postal")) == {"DATA_LICENSES.md"}

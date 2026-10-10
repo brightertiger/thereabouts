@@ -24,6 +24,8 @@ dataset/2026.10/
 ├── zone_tables/part.parquet  # 5 rows; 7,964 bytes
 ├── manifest.json  # file checksums, rows, schema, pins and policy
 ├── content.json  # partition-independent logical table digests
+├── DATA_DICTIONARY.md  # tables, keys, relationships and coded values
+├── data_dictionary.json  # the same dictionary, with the MCP tools, as JSON
 ├── DATA_LICENSES.md  # licences and attribution for contributing sources
 ├── DATASET_CARD.md  # purpose, coverage and measured statistics
 ├── CHANGES.md  # comparison with the previous logical digest
@@ -34,7 +36,7 @@ The tree lists every logical entry; `*` denotes partitions. Paths in `manifest.j
 
 ## Cell keys and result semantics
 
-Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-1 parent selects the coalesced file. The directory `group=<r1 hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this export has no result, including outside the subset or land coverage.
+Convert a WGS84 latitude/longitude to an H3 resolution-8 index. Its resolution-3 **parent** is the block; its resolution-1 parent selects the coalesced file. The directory `group=<r1 hex>` contains that parent's lowercase hexadecimal H3 index, without `0x` (for example, `group=81653ffffffffff`). Do not independently quantize the coordinate at a coarser resolution: H3 grids at different resolutions do not exactly nest geometrically. Stored cells are losslessly compacted: look for the resolution-8 index and then its ancestors down to resolution 3, choosing the finest match. No match means this subset has no result there, including outside its land coverage.
 
 `h3` is lowercase hexadecimal text without `0x`; `h3_uint64` is the same unsigned 64-bit H3 index, with resolution in bits 52–55 and base-cell/child digits in the standard H3 representation. These are global H3 indexes, not a client pack's local integer offsets. `h3_resolution` says how many levels that stored row represents. Resolution 8 is the reference precision; coarser rows encode identical assignments for their descendant centres.
 
@@ -44,7 +46,7 @@ Cell `country_id`, `state_id` and `city_id` link to `places.place_id`. The `cano
 
 IDs carry an entity namespace and its source identity: `country:MY` uses the country code, `state:overture:<uuid>` identifies a subdivision derived from Overture, and `city:geonames:<decimal id>` identifies a GeoNames-derived settlement. Other source namespaces and policy-defined IDs also occur; treat the complete string as opaque. IDs are deterministic for unchanged source identities and policy, but are **not guaranteed stable across monthly versions**. Source merges, removals, role changes and reviewed canonicalization can retire or redirect IDs. Store the release version with an ID, and compare `places` and `place_to_city` across versions before joining historical records; a matching name is not an identity guarantee.
 
-Method columns explain the evidence or fallback used. `city_method = 'rural_nearest_distant'` is the distant-nearest flag: the policy's distant threshold is 25000 metres, and its nearest-city cutoff is 50000 metres. The full method set is `city_polygon`, `policy_polygon`, `urban_allocation`, `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null. Town radius is disabled in this snapshot; consult the exact policy in `manifest.json`. Null city means no qualifying assignment. An identifier lookup with `link_status = 'ambiguous'` preserves candidates in `place_ids`; `place_id` is populated only for a unique match. Spatial observations keep `cell_status` and nullable `country_disagrees`, so source disagreement is visible rather than silently corrected. A subset can omit a referenced catalogue entity outside its declared countries; do not interpret that as an unmatched source observation.
+Method columns explain the evidence or fallback used. `city_method = 'rural_nearest_distant'` is the distant-nearest flag: the policy's distant threshold is 25000 metres, and its nearest-city cutoff is 50000 metres. The full method set is `city_polygon`, `policy_polygon`, `urban_allocation`, `town_radius`, `rural_polygon`, `rural_nearest`, `rural_nearest_distant`, or null. Town radius is disabled in this snapshot; consult the exact policy in `manifest.json`. Null city means no qualifying assignment. An identifier lookup with `link_status = 'ambiguous'` preserves candidates in `place_ids`; `place_id` is populated only for a unique match. Spatial observations keep `cell_status` and nullable `country_disagrees`, so source disagreement is visible rather than silently corrected. Every place reference resolves to a `places` row: assembly refuses a dangling reference, as the client pack writer does.
 
 Timezone membership is independent of eligible land. `timezone_cells` can store resolutions 0–8 and overlapping source memberships; query all ancestors down to resolution 0 for that table. In a spatial subset, a timezone row coarser than resolution 3 is retained whole when it overlaps a selected block, so its represented area can extend outside the subset.
 
@@ -416,7 +418,7 @@ Layout: `zone_tables/part.parquet`. Primary key: none; observations can repeat. 
 
 ## Worked coordinate reads
 
-Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use 3.139, 101.6869, in the published subset, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors.
+Install `duckdb`, `h3`, `pyarrow` and `pandas` in your analysis environment. Set `DATASET` to this directory. These three examples use 3.139, 101.6869, inside this subset, and print the matched cell's country, state, canonical city and method. All three query the same stored H3 ancestors.
 
 ### DuckDB SQL over local Parquet
 
@@ -451,7 +453,7 @@ print(result)
 connection.close()
 ```
 
-For S3, use `s3://<owner-bucket>/dataset/2026.10/cells/**/*.parquet` and `s3://<owner-bucket>/dataset/2026.10/places/**/*.parquet` for the first and third SQL parameters. DuckDB needs its `httpfs` extension and the bucket's region/credentials (or public anonymous access). That remote variant is provided for the future public release; only the local examples were exercised for this subset. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
+A published copy is read the same way: replace the local directory in the first and third SQL parameters with the published `dataset/2026.10/` location. DuckDB needs its `httpfs` extension for remote paths. The name join uses `places`, which includes rural settlements; join `canonical_cities` separately for eligible city/town anchor details.
 
 ### PyArrow
 
@@ -504,7 +506,7 @@ print(frame.iloc[0][["country_id", "state_id", "city_id", "city_method"]].to_dic
 
 Versions use `YYYY.MM[.patch]`: the monthly release and, when required, a positive patch number. A published version is immutable. `CHANGES.md` compares each table's logical digest and row count with the previous version. `content.json` hashes logical values and duplicate counts independently of partitioning, row order, Parquet metadata and compression. A packaging change can change file SHA256 without changing the logical digest.
 
-Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `<version>/_SUCCESS` receipt, written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
+Before using a downloaded release, verify every `manifest.json.files` entry by its byte size and SHA256; every Parquet entry also has its row count. The manifest itself is committed by the publication's `dataset/2026.10/_SUCCESS` receipt (the same receipt is written to `packs/2026.10/_SUCCESS`), written only after every dataset and requested pack object verifies. A directory without that remote receipt may be an incomplete upload. Locally assembled datasets are complete when their verified `manifest.json` is present. SHA256 detects corruption; it is not an authenticity signature.
 
 The manifest's top-level keys are `schema_version`, `completed`, `data_root`, `version`, `inputs_hash`, `reference_resolution`, `block_resolution`, `normalization`, `sources`, `statistics`, `schemas`, `selection`, `input_manifest_sha256`, `logical_sha256`, `tables` and `files`. `tables` is the Parquet inventory; `files` also covers the generated documents and logical digest. File entries contain `path`, `size` (bytes) and `sha256`; table entries add `kind` and `rows`, and cells entries add the `blocks` row-group index defined above. `sources` ships the exact pins and their per-file licence metadata. `schemas` describes columns and logical keys; `normalization` records the applied policy; `selection` declares subset countries and blocks.
 
@@ -544,38 +546,6 @@ PY
 | geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikimedia |
 | geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikimedia Commons |
 | geoboundaries | CC0 1.0 Universal (CC0 1.0) Public Domain Dedication | geoBoundaries; geoBoundaries, Wikipedia |
-| geoboundaries | Creative Commons Attribution 2.5 Generic | geoBoundaries; geoBoundaries, Wikimedia |
-| geoboundaries | Creative Commons Attribution 2.5 Generic | geoBoundaries; geoBoundaries, Wikimedia Commons |
-| geoboundaries | Creative Commons Attribution 2.5 India (CC BY 2.5 IN) | geoBoundaries; DataMeet India community, Election Commission of India |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Disaster Management and Mitigation Unit (DMMU) Zambia, OCHA ROSEA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Government of Senegal, OCHA ROWCA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Government of Sierra Leone, OCHA ROWCA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Information Management Working Group (IMWG), OCHA ROSEA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Instituto Brasileiro de Geografia e Estatística (IBGE) |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Instituto Nacional de Estadística y Geografía (INEGI) |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; La Biblioteca del Congreso Nacional de Chile (BCN), OCHA ROLAC |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; National Mapping and Resource Information Authority (NAMRIA), Philippines Statistics Authority (PSA), OCHA Philippines |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA Philippines, National Mapping and Resource Information Authority |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA ROP, Federated States of Micronesia Division of Statistics, 2010 Census of Population and Housing and Secretariat of the Pacific Community, Statistics for Development Division |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA ROSEA, South African Municipal Demarcation Board |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; OCHA Venezuela, Instituto Nacional de Estadística |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Papua New Guinea National Statistics Office, OCHA ROAP |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; South Sudan Information Management Working Group (IMWG), National Bureau of Statistics (NBS), and OCHA, OCHA South Sudan |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Survey Department of Nepal, OCHA FISS |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; UNHCR, OCHA FISS |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; UNMIL, OCHA ROWCA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; United National Development Programme (UNDP), OCHA Somalia |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; United Nations Cartographic Section (UNCS) and United Nations Office for the Coordination of Humanitarian Affairs (UNOCHA), OCHA ROSC |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme and OCHA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme, OCHA ROAP |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; World Food Programme, OCHA ROWCA |
-| geoboundaries | Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO) | geoBoundaries; Zimbabwe National Statistics Agency (ZIMSTAT www.zimstat.co.zw) Central Statistics Office, OCHA ROSEA |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; ISTAT, National Institute of Statistics |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; StatSilk, geoBoundaries |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, CIESIN |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Erik Frohne |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Wikimedia |
-| geoboundaries | Creative Commons Attribution 3.0 License | geoBoundaries; geoBoundaries, Wikimedia Commons; credit to author 'Babbage' |
 | geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Eurostat- European Commission |
 | geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; GeoBoundaries, World Bank |
 | geoboundaries | Creative Commons Attribution 4.0 (CC BY 4.0) | geoBoundaries; Kartverket |
@@ -622,23 +592,6 @@ PY
 | geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster 2 polygon from Sentinel-2 10m Land Cover where Image Year = 2022 / exclude gridcode = 1 (water) / dissolve |
 | geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster2polygon from Sentinel-2 10m Land Cover where Image Year = 2021 / exclude gridcode = 1 (water) / dissolve / erase adm0 overlap / processed by IMB |
 | geoboundaries | Creative Commons Attribution 4.0 International (CC BY 4.0) | geoBoundaries; raster2polygon from Sentinel-2 10m Land Cover where Image Year = 2021 / exclude gridcode = 1 (water) / dissolve / processed by IMB |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; Federal Office for Metrology and Survey, Austria, Derived from ADM4 layer |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OSM Boundaries |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; Open Street Map |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Geofabrik |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Wambacher |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; OpenStreetMap, Wikipedia |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; geoBoundaries, Federal Office for Metrology and Survey, Austria |
-| geoboundaries | Creative Commons Attribution-ShareAlike 2.0 | geoBoundaries; geoBoundaries, Open Street Map, Converted Lines into Polygon Layer |
-| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Digitizedhttps, Digitizedhttps |
-| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; GeoBoundaries, Wikipedia |
-| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Princeton University Library |
-| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; Wikipedia |
-| geoboundaries | Creative Commons Attribution-ShareAlike 3.0 Unported | geoBoundaries; geoBoundaries, Wikipedia |
-| geoboundaries | Data license Germany - Attribution - Version 2.0 | geoBoundaries; Federal Agency for Cartography and Geodesy |
-| geoboundaries | Etalab Open License 2.0 | geoBoundaries; Institut national de l'information géographique et forestière (IGN-F) |
-| geoboundaries | Federal Office of Topography swisstopo License | geoBoundaries; Federal Office of Topography swisstopo |
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; DG Territory |
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; IPUMS DHS |
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; Open Africa, Code for Ethiopia |
@@ -647,11 +600,6 @@ PY
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; OpenStreetMap, Wambachers |
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; Urban Redevelopment Authority, derived from ADM 3 |
 | geoboundaries | Open Data Commons Open Database License 1.0 | geoBoundaries; geoBoundaries, OpenStreetMap |
-| geoboundaries | Open Government Canada 2.0 | geoBoundaries; Statistics Canada (StatCan) |
-| geoboundaries | Open Government Licence v3.0 | geoBoundaries; Open Data Soft, World Food Programme |
-| geoboundaries | Open Government Licence v3.0 | geoBoundaries; OpenDataSoft, WFPGeoNode |
-| geoboundaries | Other - Humanitarian | geoBoundaries; Wiki Commons Media |
-| geoboundaries | Pixabay License for Content | geoBoundaries; geoBoundaries, Pixabay |
 | geoboundaries | Public Domain | geoBoundaries; GeoBolivia, Derived from ADM3 layer |
 | geoboundaries | Public Domain | geoBoundaries; Natural Earth |
 | geoboundaries | Public Domain | geoBoundaries; Natural Earth, geoBoundaries |
@@ -688,5 +636,3 @@ Contact: Ujjwal Rao (brightertiger), https://github.com/brightertiger/thereabout
 Citation: Rao, U. (2026). Thereabouts offline geocoding dataset. https://github.com/brightertiger/thereabouts
 
 Public documentation: https://github.com/brightertiger/thereabouts/blob/main/docs/dataset/README.md
-
-Owner-decision placeholders are intentionally visible and must be replaced before a public release.

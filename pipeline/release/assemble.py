@@ -13,7 +13,7 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, encode, sync_directory
 from pipeline.runtime.resources import ResourceGuard
 
-from . import metadata, readme
+from . import closure, dictionary, metadata, readme
 from .budget import Budget
 from .selection import Selection
 from .source import Row, Snapshot
@@ -67,7 +67,11 @@ def assemble(
         tables, observed, row_licences = assemble_tables(
             snapshot, staging, selection, config.release.dataset, descriptions, budget
         )
-        sources = metadata.licences(config, observed)
+        # A dataset the pack writer would refuse is never published.
+        closure.check(staging, tables)
+        sources = metadata.licences(
+            config, observed, metadata.boundary_states(staging, tables)
+        )
         stats = metadata.statistics(tables)
         content = logical_content(staging, tables, config, guard)
         documents = {
@@ -83,6 +87,9 @@ def assemble(
                 snapshot.policy,
                 REPOSITORY / config.release.readme_template,
             ),
+            # Generated from config/dataset.yaml and the client; the core pack
+            # ships the same pair as notices.
+            **dictionary.documents(),
         }
         for name, text in documents.items():
             budget.text(staging / name, text)

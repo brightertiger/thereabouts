@@ -160,7 +160,6 @@ def test_no_artifact_sql_outside_the_store_and_its_producer() -> None:
         "pipeline/stages",
         "pipeline/content",
         "pipeline/release",
-        "pipeline/tools",
     ]
     found: list[str] = []
     for root in roots:

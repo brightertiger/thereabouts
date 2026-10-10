@@ -18,6 +18,8 @@ from . import bundle
 from .source import Row
 from .verify import verify_dataset
 
+PLACEHOLDER = b"OWNER DECISION"
+
 
 @dataclass(frozen=True)
 class Upload:
@@ -28,73 +30,76 @@ class Upload:
 
 
 def inventory(dataset: Path, packs: dict[str, Path], version: str) -> list[Upload]:
+    """Dataset files, then each archive, its acceptance report and the index.
+
+    Loose pack artifacts are never uploaded: clients install the archives.
+    """
     manifest = verify_dataset(dataset)
     entries = []
-    for prefix, root, records in [
-        (f"dataset/{version}", dataset, manifest["files"]),
-        *[
-            (
-                f"packs/{version}/{family}",
-                directory,
-                read_json(directory / "manifest.json")["files"],
-            )
-            for family, directory in sorted(packs.items())
-        ],
-    ]:
-        files = [
-            *records,
-            {
-                "path": "manifest.json",
-                "size": (root / "manifest.json").stat().st_size,
-                "sha256": sha256_file(root / "manifest.json"),
-            },
-        ]
-        seen = set()
-        for record in files:
-            output = Output(record["path"], record["size"], record["sha256"])
-            if output.path in seen:
-                raise ValueError(f"Duplicate publication path: {output.path}")
-            seen.add(output.path)
-            path = located(root, output.path)
-            if path.stat().st_size != output.size or sha256_file(path) != output.sha256:
-                raise ValueError(f"Local publication input changed: {output.path}")
-            entries.append(
-                Upload(path, f"{prefix}/{output.path}", output.size, output.sha256)
-            )
+    records = [
+        *manifest["files"],
+        {
+            "path": "manifest.json",
+            "size": (dataset / "manifest.json").stat().st_size,
+            "sha256": sha256_file(dataset / "manifest.json"),
+        },
+    ]
+    seen = set()
+    for record in records:
+        output = Output(record["path"], record["size"], record["sha256"])
+        if output.path in seen:
+            raise ValueError(f"Duplicate publication path: {output.path}")
+        seen.add(output.path)
+        path = located(dataset, output.path)
+        if path.stat().st_size != output.size or sha256_file(path) != output.sha256:
+            raise ValueError(f"Local publication input changed: {output.path}")
+        entries.append(
+            Upload(path, f"dataset/{version}/{output.path}", output.size, output.sha256)
+        )
     if packs:
         roots = {path.parent for path in packs.values()}
         if len(roots) != 1:
             raise ValueError("Client packs must share one release directory")
         root = next(iter(roots))
         index = read_json(root / "index.json")
-        records = index["datasets"][version]["packs"]
-        if set(records) != set(packs):
+        packed = index["datasets"][version]["packs"]
+        if set(packed) != set(packs):
             raise ValueError("Release index differs from requested families")
-        for record in records.values():
+        for family, record in sorted(packed.items()):
             path = located(root, record["url"])
             if (
                 path.stat().st_size != record["size"]
                 or sha256_file(path) != record["sha256"]
             ):
                 raise ValueError("Client archive checksum mismatch")
-            entries.append(
+            report = root / "acceptance" / f"{family}.json"
+            if not report.is_file() or read_json(report).get("passed") is not True:
+                raise ValueError(f"Client pack lacks a passed acceptance: {family}")
+            entries += [
                 Upload(
                     path,
                     f"packs/{version}/{path.name}",
                     record["size"],
                     record["sha256"],
-                )
-            )
-        path = root / "index.json"
-        entries.append(
-            Upload(
-                path,
-                f"packs/{version}/index.json",
-                path.stat().st_size,
-                sha256_file(path),
-            )
-        )
+                ),
+                upload(report, f"packs/{version}/acceptance/{report.name}"),
+            ]
+        entries.append(upload(root / "index.json", f"packs/{version}/index.json"))
     return entries
+
+
+def upload(path: Path, remote: str) -> Upload:
+    return Upload(path, remote, path.stat().st_size, sha256_file(path))
+
+
+def placeholders(entries: list[Upload]) -> list[str]:
+    """Published documents still carrying an unresolved owner decision."""
+    return [
+        entry.remote
+        for entry in entries
+        if entry.remote.endswith((".md", ".json"))
+        and PLACEHOLDER in entry.local.read_bytes()
+    ]
 
 
 def remote_hash(fs: Any, path: str, read_bytes: int) -> str:
@@ -113,6 +118,13 @@ def publish(
     *,
     dry_run: bool,
 ) -> Row:
+    unresolved = placeholders(entries)
+    if unresolved and not settings.private:
+        raise ValueError(
+            "OWNER DECISION text must be resolved before a public release: "
+            + ", ".join(unresolved)
+            + "; set release.publish.private=true only for a private staging copy"
+        )
     fs, base = fsspec.core.url_to_fs(destination)
     prefix = base.rstrip("/")
     records = [
@@ -120,11 +132,16 @@ def publish(
         for item in entries
     ]
     receipt = encode({"version": version, "files": records}) + b"\n"
-    marker = f"{prefix}/{version}/_SUCCESS"
-    if fs.exists(marker):
-        with fs.open(marker, "rb") as stream:
-            if stream.read() != receipt:
-                raise ValueError("Published version already has a different inventory")
+    # One receipt under each version prefix, so a consumer of either tree sees it.
+    trees = sorted({item.remote.split("/", 2)[0] for item in entries})
+    markers = [f"{prefix}/{tree}/{version}/_SUCCESS" for tree in trees]
+    for marker in markers:
+        if fs.exists(marker):
+            with fs.open(marker, "rb") as stream:
+                if stream.read() != receipt:
+                    raise ValueError(
+                        "Published version already has a different inventory"
+                    )
     actions = []
     for entry in entries:
         path = f"{prefix}/{entry.remote}"
@@ -167,15 +184,16 @@ def publish(
                 raise ValueError(
                     f"Publication changed before completion: {entry.remote}"
                 )
-        if not fs.exists(marker):
-            fs.makedirs(marker.rpartition("/")[0], exist_ok=True)
-            with fs.transaction, fs.open(marker, "wb") as target:
-                target.write(receipt)
-        if (
-            remote_hash(fs, marker, settings.read_bytes)
-            != hashlib.sha256(receipt).hexdigest()
-        ):
-            raise ValueError("Success receipt checksum differs")
+        for marker in markers:
+            if not fs.exists(marker):
+                fs.makedirs(marker.rpartition("/")[0], exist_ok=True)
+                with fs.transaction, fs.open(marker, "wb") as target:
+                    target.write(receipt)
+            if (
+                remote_hash(fs, marker, settings.read_bytes)
+                != hashlib.sha256(receipt).hexdigest()
+            ):
+                raise ValueError("Success receipt checksum differs")
     aggregate = aggregate_index(fs, prefix, version, entries, dry_run=dry_run)
     return {
         "version": version,
@@ -183,8 +201,9 @@ def publish(
         "upload": sum(not present for _, _, present in actions),
         "skip": sum(present for _, _, present in actions),
         "bytes": sum(entry.size for entry, _, present in actions if not present),
-        "success_path": f"{version}/_SUCCESS",
+        "success_paths": [f"{tree}/{version}/_SUCCESS" for tree in trees],
         "aggregate_index": aggregate,
+        "unresolved": unresolved,
         "files": records,
     }
 

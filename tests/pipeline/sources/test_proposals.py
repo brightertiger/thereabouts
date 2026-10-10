@@ -44,7 +44,6 @@ def settings(
         "postal",
         "timezones",
         "unlocode",
-        "plate_country",
     ],
 )
 def test_catalog_adapters_hash_publisher_bytes(

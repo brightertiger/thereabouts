@@ -15,8 +15,43 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.resources import ResourceGuard
 
+# The cells' country and city, closed under the pack writer's reference rule.
+CATALOGUE: dict[str, list[dict[str, Any]]] = {
+    "places": [
+        {"place_id": "country:MY", "role": "country", "country_code": "MY"},
+        {
+            "place_id": "city:one",
+            "role": "city",
+            "country_code": "MY",
+            "parent_id": "country:MY",
+            "normalized_city_id": "city:one",
+            "name": "One",
+        },
+    ],
+    "canonical_cities": [
+        {
+            "city_id": "city:one",
+            "place_id": "city:one",
+            "country_code": "MY",
+            "kind": "city",
+            "name": "One",
+            "eligibility": "fixture",
+            "latitude": 3.139,
+            "longitude": 101.6869,
+            "source_ids": "[]",
+            "footprint_references": "[]",
+            "allocation_rule": "fixture",
+        }
+    ],
+    "place_to_city": [
+        {"place_id": "city:one", "city_id": "city:one", "method": "self"}
+    ],
+}
 
-def fixture(root: Path) -> tuple[Snapshot, Config, ResourceGuard]:
+
+def fixture(
+    root: Path, *, closed: bool = True
+) -> tuple[Snapshot, Config, ResourceGuard]:
     config = load()
     config.release.enabled = True
     config.release.version = "2026.10"
@@ -59,6 +94,8 @@ def fixture(root: Path) -> tuple[Snapshot, Config, ResourceGuard]:
                         "city_method": "rural_nearest_distant",
                     }
                 )
+        elif kind in CATALOGUE and closed:
+            values = CATALOGUE[kind]
         elif kind == "zone_tables":
             values = [
                 {

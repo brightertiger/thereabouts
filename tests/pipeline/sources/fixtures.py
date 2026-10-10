@@ -101,6 +101,8 @@ def source_context(
     """The runtime context, the adapter's narrow view of it and both stages."""
     config = load()
     settings = config.sources[name]
+    # The source under test runs whether or not the committed config enables it.
+    settings.enabled = True
     settings.limits = replace(
         settings.limits,
         download_bytes=sum(len(p) for p, _ in payloads.values()),

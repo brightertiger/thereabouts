@@ -9,7 +9,7 @@ import pytest
 
 from pipeline.files import file_record
 from pipeline.pins.models import PinFile, SourcePin
-from pipeline.release import client, metadata, pins
+from pipeline.release import acceptance, client, metadata, pins
 from pipeline.release.source import Row
 from pipeline.runtime.context import context
 from pipeline.runtime.jsonio import write_json
@@ -84,7 +84,7 @@ def test_release_through_publish_commits_and_resumes(
     monkeypatch.setattr(metadata, "read_lock", lambda path: {"timezones": pin})
     monkeypatch.setattr(pins, "read_lock", lambda path: {"timezones": pin})
     fs, base = fsspec.core.url_to_fs(config.storage["s3_release"])
-    marker = f"{base}/2026.10/_SUCCESS"
+    marker = f"{base}/dataset/2026.10/_SUCCESS"
     calls = []
 
     def writer(directory: str, family: str, target: str, options: Row) -> Row:
@@ -101,6 +101,14 @@ def test_release_through_publish_commits_and_resumes(
         return result
 
     monkeypatch.setattr(client, "binding", lambda: writer)
+
+    def accepted(dataset: Path, packs: Path, family: str, *args: object) -> Path:
+        # The synthetic client output is not a pack; acceptance has its own tests.
+        report = packs / "acceptance" / f"{family}.json"
+        write_json(report, {"family": family, "passed": True})
+        return report
+
+    monkeypatch.setattr(acceptance, "accept", accepted)
     settings = {stage.name: stage for stage in config.stages}
     lookups = Lookups("lookups", [Recipe("lookups", "manifest/current")])
     stages: list[Stage] = [
@@ -123,9 +131,25 @@ def test_release_through_publish_commits_and_resumes(
         paths = {entry["path"] for entry in receipt["files"]}
         assert {
             "dataset/2026.10/manifest.json",
-            "packs/2026.10/core/manifest.json",
-            "packs/2026.10/postal/manifest.json",
+            "dataset/2026.10/data_dictionary.json",
+            "packs/2026.10/core.tar.zst",
+            "packs/2026.10/postal.tar.zst",
+            "packs/2026.10/acceptance/core.json",
+            "packs/2026.10/acceptance/postal.json",
+            "packs/2026.10/index.json",
         } <= paths
+        # Archives only: no loose pack artifact is published.
+        assert not [
+            p
+            for p in paths
+            if p.startswith(("packs/2026.10/core/", "packs/2026.10/postal/"))
+        ]
+        assert fs.cat(f"{base}/packs/2026.10/_SUCCESS") == fs.cat(marker)
+        assert not fs.exists(f"{base}/2026.10/_SUCCESS")
+        aggregate = json.loads(fs.cat(f"{base}/packs/index.json"))
+        assert aggregate["datasets"]["2026.10"]["packs"]["core"]["url"] == (
+            "2026.10/core.tar.zst"
+        )
         local = json.loads((root / "work/releases/2026.10/publish.json").read_text())
         assert local["files"] == receipt["files"]
         assert all(decision.state == "current" for decision in plan(ctx, stages))

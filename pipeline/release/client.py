@@ -9,6 +9,7 @@ from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.paths import located
 
+from .dictionary import JSON_NAME, MARKDOWN_NAME
 from .source import Row
 from .verify import verify_dataset
 
@@ -31,11 +32,20 @@ def write(
     dataset: Path, family: str, output: Path, version: str, writer: Writer
 ) -> list[Path]:
     manifest = verify_dataset(dataset)
+    notices = {"DATA_LICENSES.md": (dataset / "DATA_LICENSES.md").read_text()}
+    if family == "core":
+        # The MCP server reads the installed core pack's dictionary first.
+        listed = {record["path"] for record in manifest["files"]}
+        notices |= {
+            name: (dataset / name).read_text()
+            for name in (MARKDOWN_NAME, JSON_NAME)
+            if name in listed
+        }
     options = {
         "data_version": version,
         "sources": manifest["sources"],
-        "attribution": (dataset / "DATA_LICENSES.md").read_text(),
-        "notices": {"DATA_LICENSES.md": (dataset / "DATA_LICENSES.md").read_text()},
+        "attribution": notices["DATA_LICENSES.md"],
+        "notices": notices,
         "input_provenance": {
             "dataset_manifest_sha256": sha256_file(dataset / "manifest.json")
         },

@@ -10,7 +10,7 @@ import pyarrow.parquet as pq
 from pipeline.files import file_record as file_record
 from pipeline.runtime.jsonio import atomic_output
 
-from .reconcile.common import Row
+from .store.codec import Row
 
 
 def batches(rows: Iterable[Row], size: int) -> Iterator[list[Row]]:

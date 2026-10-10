@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pipeline.config import load
 from pipeline.release import pins as release_pins
-from pipeline.release import prepared, registry
+from pipeline.release import prepared, proof, registry
 from pipeline.release.assemble import assemble
 from pipeline.release.publish import inventory, publish
 from pipeline.release.source import external
@@ -101,6 +101,7 @@ def main(argv: Sequence[str]) -> int:
         destination = config.storage.get("s3_release")
         if not destination:
             raise ValueError("Configure storage.s3_release before upload")
+        proof.verify(root, config, args.version)
         packs = {
             family: located(root, config.paths.packs) / args.version / family
             for family in config.release.packs.families

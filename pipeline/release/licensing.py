@@ -5,11 +5,17 @@ from collections import defaultdict
 from .source import Row
 
 
+def shipped(files: list[Row]) -> list[Row]:
+    """Pinned files whose content can reach a release; evaluation evidence (the
+    plate benchmark's Commons metadata and photographs) is pinned but never does."""
+    return [file for file in files if file["metadata"].get("purpose") != "evaluation"]
+
+
 def rows(sources: Row) -> list[Row]:
     result = []
     for name, source in sorted(sources.items()):
         grouped: dict[tuple[str, str], list[Row]] = defaultdict(list)
-        for file in source["pin"]["files"]:
+        for file in shipped(source["pin"]["files"]):
             metadata = file["metadata"]
             boundary = metadata.get("metadata", {})
             licence = metadata.get("license") or boundary.get("boundaryLicense")

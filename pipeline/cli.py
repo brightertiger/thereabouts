@@ -15,12 +15,12 @@ from pipeline.commands import (
 from pipeline.content.command import main as digest_main
 from pipeline.migration.command import migrate
 from pipeline.pins.cli import main as pins_main
+from pipeline.release.dictionary import main as dictionary_main
 from pipeline.release_command import main as release_main
 from pipeline.runtime.context import context
 from pipeline.runtime.ledger import Ledger, hot_journal, recover
 from pipeline.runtime.paths import located
 from pipeline.runtime.runner import exclusive
-from pipeline.tools.dictionary import main as dictionary_main
 
 WRITERS = {"run", "invalidate", "gc", "migrate"}
 

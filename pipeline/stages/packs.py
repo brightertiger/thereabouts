@@ -1,8 +1,11 @@
-"""Build core before forward packs, then publish a complete local release index."""
+"""Build core before forward packs, accept each with the real reader, then index."""
 
+from dataclasses import asdict
 from pathlib import Path
+from typing import cast
 
-from pipeline.release import bundle, client
+from pipeline.release import acceptance, bundle, client, samples
+from pipeline.runtime.jsonio import Object
 from pipeline.runtime.paths import located
 from pipeline.runtime.records import Dependency
 
@@ -18,11 +21,16 @@ class PacksStage(ReleaseStage):
         families = ctx.config.release.packs.families
         if families and "core" not in families:
             raise ValueError("Forward pack releases must include the core family")
+        checks: Object = {
+            # Thresholds, sample sizes and the shared vectors decide acceptance.
+            "acceptance": cast(Object, asdict(ctx.config.release.acceptance)),
+            "vectors": samples.vectors_digest(),
+        }
         units = [
             self.unit(
                 ctx,
                 f"{version}/{family}",
-                {"family": family, "version": version},
+                {"family": family, "version": version, **checks},
                 (Dependency("dataset", version),)
                 + (
                     ()
@@ -55,4 +63,8 @@ class PacksStage(ReleaseStage):
         dataset = located(ctx.root, ctx.config.paths.dataset) / version
         output = root / family
         paths = client.write(dataset, family, output, version, client.binding())
-        return [*paths, bundle.archive(output, ctx.guard)]
+        # A pack the reader cannot serve correctly is never archived.
+        report = acceptance.accept(
+            dataset, root, family, version, ctx.config.release.acceptance, ctx.log
+        )
+        return [*paths, report, bundle.archive(output, ctx.guard)]
