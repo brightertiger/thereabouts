@@ -1,0 +1,14 @@
+# Which measured spatial failures stop the stored dataset (lookups/manifest/current).
+# Only that unit reads this file, as a parameter, so an edit re-runs it alone.
+#
+# gates.blocking_scope
+#   reviewed  boundary losses and footprint failures stop the manifest only in a
+#             reviewed country: one in the reconcile policy pilot or the city policy
+#             pilot, one with its own city policy file, or one named by a boundary
+#             exception in config/reviews/cities-pilot.yaml. Every other country's
+#             findings are advisory: quality.json lists each one with per-country
+#             counts and manifest.json carries their totals.
+#   all       every country's boundary losses and footprint failures stop it.
+# Integrity, reference, neighbour and named-point failures stop it in either scope.
+gates:
+  blocking_scope: reviewed

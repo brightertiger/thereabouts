@@ -294,6 +294,32 @@ the run. Its receipt is not consumed as geographic data, so a changed review
 alone does not rebuild unaffected countries. Country units hash their resolved
 common and country policy; blocks hash the policies of their contributing countries.
 
+`config/policies/quality.yaml` sets `gates.blocking_scope` for the lookups
+manifest, the cross-country gate over every `normalize_cells` quality report.
+Its value and the reviewed countries are parameters of
+`lookups/manifest/current` alone, so editing it re-runs only that unit. A
+reviewed country is one in the reconcile policy `pilot` or the city policy
+`pilot`, one with its own city policy file, or one named by a boundary exception
+in `config/reviews/cities-pilot.yaml`. With `reviewed`, the default, an
+uncredited boundary loss or a footprint failure stops the manifest only in a
+reviewed country. Every other country's findings are advisory: they are kept,
+the run log reports their totals and the manifest is still written. With `all`,
+every country's findings stop it. Integrity, reference, neighbour and
+named-point failures stop it in either scope. The unit's `quality.json` holds:
+
+- `failed_spatial_gates`: the findings that stop the manifest, by kind
+  (`all_boundaries`, `footprints`, `neighbours`, `named`);
+- `advisory_spatial_gates`: unreviewed countries' `all_boundaries` and
+  `footprints` findings;
+- `gate_scope`: the scope, the reviewed countries, blocking and advisory totals
+  (`countries`, `boundary_losses`, `lost_cells`, `footprint_failures`) and the
+  same counts `by_country` with a `reviewed` flag;
+- `boundary_losses`, every measured loss before exceptions are credited, and
+  `boundary_exceptions`, the exceptions applied.
+
+Footprint findings carry their report's `country`. `manifest.json` repeats the
+scope, the reviewed countries and the advisory totals as `quality_gates`.
+
 The optional `plate_country` stage derives syntax, priors, coverage and an
 inference bundle from normalized pinned evidence. Its `plate_country/world` unit,
 and the lookups manifest's dependency on it, exist while the registration source
