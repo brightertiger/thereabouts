@@ -9,7 +9,7 @@ from pipeline.engines.artifacts import read_json
 from pipeline.runtime.jsonio import sha256_file
 from pipeline.runtime.paths import located
 
-from .cell_groups import verify_index
+from .cell_groups import sorted_blocks, verify_index
 from .source import Row
 
 
@@ -23,6 +23,7 @@ def verify_dataset(root: Path) -> Row:
         raise ValueError("Incomplete release manifest")
     seen = set()
     seen_blocks: set[str] = set()
+    index: list[Row] = []
     grid = H3(
         cell_resolution=manifest["reference_resolution"],
         block_resolution=manifest["block_resolution"],
@@ -41,8 +42,17 @@ def verify_dataset(root: Path) -> Row:
             raise ValueError(f"Release row count mismatch: {record['path']}")
         if record.get("kind") == "cells":
             with pq.ParquetFile(path) as file:
-                verify_index(record, file, grid, seen_blocks)
+                index += verify_index(record, file, grid, seen_blocks)
     for table in manifest["tables"]:
         if table not in manifest["files"]:
             raise ValueError("Release table is not in the verified file inventory")
+    # Datasets assembled before the blocks table have none to compare.
+    listed = [t for t in manifest["tables"] if t["kind"] == "blocks"]
+    stored = [
+        row
+        for table in listed
+        for row in pq.read_table(located(root, table["path"])).to_pylist()
+    ]
+    if listed and stored != sorted_blocks(index):
+        raise ValueError("The blocks table differs from the cells block index")
     return manifest

@@ -1,5 +1,6 @@
 """Release content, relocation, byte caps and input verification."""
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,10 @@ def test_coalescing_readme_and_relocation(tmp_path: Path) -> None:
     output = tmp_path / "dataset" / "2026.10"
     paths = assemble(snapshot, output, config, guard, "identity")
     manifest = verify_dataset(output)
-    assert len(manifest["statistics"]) == 19
+    assert len(manifest["statistics"]) == 20
+    # The blocks table indexes packaging; content.json digests logical tables.
+    content = json.loads((output / "content.json").read_text())
+    assert set(content["tables"]) == set(manifest["statistics"]) - {"blocks"}
     cells = [t for t in manifest["tables"] if t["kind"] == "cells"]
     assert len(cells) == 1
     assert cells[0]["rows"] == 2

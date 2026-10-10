@@ -1180,6 +1180,59 @@
         "airports"
       ]
     },
+    "blocks": {
+      "description": "The block index of the cells table: every covered resolution 3 H3 block, the cells file and Parquet row group that hold its rows, and how much it stores. A reader can route a coordinate to its rows with this table alone, without manifest.json. Release assembly builds it from the cells it writes.",
+      "grain": "One row per covered resolution 3 block, including blocks that store no cells. A block absent from this table is outside the coverage of this export.",
+      "primary_key": [
+        "block"
+      ],
+      "relationships": [],
+      "columns": [
+        {
+          "name": "block",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Resolution 3 H3 block in lowercase hexadecimal without 0x; equals cells.block of every row it stores"
+        },
+        {
+          "name": "cell_group",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Resolution 1 H3 parent of the block in lowercase hexadecimal; the block's cells file sits in the directory cells/group=<cell_group>/"
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "The cells file that holds the block's rows, relative to the dataset directory; for a block without rows, the file whose manifest entry lists it as empty"
+        },
+        {
+          "name": "row_group",
+          "type": "int64",
+          "nullable": true,
+          "units": "none",
+          "meaning": "Zero-based Parquet row group in path that holds every row of the block; null when the block stores no cells"
+        },
+        {
+          "name": "row_count",
+          "type": "int64",
+          "nullable": false,
+          "units": "rows",
+          "meaning": "Cells rows stored for the block; 0 when it stores none, and lookups there then answer that the location is not on land"
+        },
+        {
+          "name": "reference_cells",
+          "type": "int64",
+          "nullable": false,
+          "units": "H3 resolution 8 cells",
+          "meaning": "Resolution 8 cells that the block's stored rows stand for once compacted rows are expanded; at most 16,807"
+        }
+      ],
+      "used_by": []
+    },
     "canonical_cities": {
       "description": "The cities and towns that can absorb other settlements, the anchors for urban areas. Reverse lookups can also return standalone villages and other rural settlements, which are in places but not here.",
       "grain": "One row per canonical city or town; city_id is the place identifier of its anchor.",
@@ -1399,6 +1452,18 @@
             ]
           },
           "meaning": "The selected settlement of the cell, a canonical city or a standalone rural settlement; null when none is assigned"
+        },
+        {
+          "columns": [
+            "block"
+          ],
+          "references": {
+            "table": "blocks",
+            "columns": [
+              "block"
+            ]
+          },
+          "meaning": "The block that routes the cell to its file and Parquet row group"
         }
       ],
       "columns": [
@@ -1523,6 +1588,13 @@
               "meaning": "A retained near-shore water cell whose assignment is projected from nearby land"
             }
           ]
+        },
+        {
+          "name": "block",
+          "type": "string",
+          "nullable": false,
+          "units": "none",
+          "meaning": "Resolution 3 H3 parent of the cell (its block) in lowercase hexadecimal without 0x. Each Parquet row group holds one block, so filtering on block reads one row group"
         }
       ],
       "used_by": [

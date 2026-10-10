@@ -73,7 +73,9 @@ def assemble(
             config, observed, metadata.boundary_states(staging, tables)
         )
         stats = metadata.statistics(tables)
-        content = logical_content(staging, tables, config, guard)
+        # Assembled tables index the packaging; content.json stays layout-free.
+        logical = [t for t in tables if not descriptions[t["kind"]].get("assembled")]
+        content = logical_content(staging, logical, config, guard)
         documents = {
             "content.json": encode(content).decode() + "\n",
             "DATA_LICENSES.md": metadata.licence_text(sources, row_licences),

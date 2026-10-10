@@ -9,6 +9,7 @@ Plain Parquet files, one directory per table. Partition labels in directory name
 | Table | Grain | Key | Feeds packs |
 | --- | --- | --- | --- |
 | [`airports`](#airports) | One row per airport record in the pinned OurAirports file; duplicate observations are retained. | none | `airports` |
+| [`blocks`](#blocks) | One row per covered resolution 3 block, including blocks that store no cells. A block absent from this table is outside the coverage of this export. | `block` | none |
 | [`canonical_cities`](#canonical_cities) | One row per canonical city or town; city_id is the place identifier of its anchor. | `city_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`cells`](#cells) | One row per stored H3 cell: a resolution 8 cell, or a coarser ancestor (resolution 3 to 7) that stands for all its resolution 8 descendants when they share one label. | `h3_uint64` | `core` |
 | [`countries`](#countries) | One row per country or territory record in the pinned sources; observations can repeat. | none | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
@@ -80,6 +81,23 @@ Enumerated columns:
   - `pending`: No cell data exists for the point's block in this release, so no decision was made
   - `unlocated`: The row has no coordinates, so there is no cell to join
 
+### `blocks`
+
+The block index of the cells table: every covered resolution 3 H3 block, the cells file and Parquet row group that hold its rows, and how much it stores. A reader can route a coordinate to its rows with this table alone, without manifest.json. Release assembly builds it from the cells it writes.
+
+- Grain: One row per covered resolution 3 block, including blocks that store no cells. A block absent from this table is outside the coverage of this export.
+- Primary key: `block`
+- Feeds packs: none
+
+| Column | Type | Nullable | Units | Meaning |
+| --- | --- | --- | --- | --- |
+| `block` | `string` | no |  | Resolution 3 H3 block in lowercase hexadecimal without 0x; equals cells.block of every row it stores |
+| `cell_group` | `string` | no |  | Resolution 1 H3 parent of the block in lowercase hexadecimal; the block's cells file sits in the directory cells/group=<cell_group>/ |
+| `path` | `string` | no |  | The cells file that holds the block's rows, relative to the dataset directory; for a block without rows, the file whose manifest entry lists it as empty |
+| `row_group` | `int64` | yes |  | Zero-based Parquet row group in path that holds every row of the block; null when the block stores no cells |
+| `row_count` | `int64` | no | rows | Cells rows stored for the block; 0 when it stores none, and lookups there then answer that the location is not on land |
+| `reference_cells` | `int64` | no | H3 resolution 8 cells | Resolution 8 cells that the block's stored rows stand for once compacted rows are expanded; at most 16,807 |
+
 ### `canonical_cities`
 
 The cities and towns that can absorb other settlements, the anchors for urban areas. Reverse lookups can also return standalone villages and other rural settlements, which are in places but not here.
@@ -137,6 +155,7 @@ Joins:
 - `cells.country_id` → `places.place_id`: The country place of the cell; null when no country is assigned
 - `cells.state_id` → `places.place_id`: The first-level subdivision place of the cell; null when none is assigned
 - `cells.city_id` → `places.place_id`: The selected settlement of the cell, a canonical city or a standalone rural settlement; null when none is assigned
+- `cells.block` → `blocks.block`: The block that routes the cell to its file and Parquet row group
 
 | Column | Type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
@@ -150,6 +169,7 @@ Joins:
 | `state_method` | `string` | yes |  | Subdivision assignment evidence: area, or null when absent |
 | `city_method` | `string` | yes |  | Canonical city allocation rule, including distant-nearest classification |
 | `land_method` | `string` | yes |  | Land eligibility evidence: land or offshore |
+| `block` | `string` | no |  | Resolution 3 H3 parent of the cell (its block) in lowercase hexadecimal without 0x. Each Parquet row group holds one block, so filtering on block reads one row group |
 
 Enumerated columns:
 

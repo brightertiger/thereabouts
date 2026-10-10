@@ -400,6 +400,8 @@ def build(root: Path) -> Path:
         parts: dict[str, list[Row]] = {}
         for row in ROWS.get(name, []):
             filled = {key: DEFAULTS[kind] for key, kind in required.items()} | row
+            if name == "cells":
+                filled["block"] = f"{h3.cell_to_parent(filled['h3_uint64'], 3):x}"
             parts.setdefault(partition(name, filled, countries), []).append(filled)
         for label in parts or {""}:
             path = (

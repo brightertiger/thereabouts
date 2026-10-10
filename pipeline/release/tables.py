@@ -12,10 +12,14 @@ from pipeline.config.release import DatasetLimits
 from pipeline.engines.artifact_io import file_record
 
 from .budget import Budget, Sink
-from .cell_groups import CellGroups
-from .dataset_schema import load, public
+from .cell_groups import BLOCK, CellGroups, index_row, sorted_blocks
+from .dataset_schema import inputs, load, public
 from .selection import Selection
 from .source import Row, Snapshot, TableFile
+
+# What assembly computes: columns appended to an input table, and whole tables.
+APPENDED = {"cells": (BLOCK,)}
+BLOCKS = "blocks"
 
 
 def schema_description(path: Path) -> dict[str, Any]:
@@ -48,7 +52,9 @@ def groups(
     return dict(result)
 
 
-def validate_schema(schema: pa.Schema, description: Row, kind: str) -> None:
+def validate_schema(
+    schema: pa.Schema, description: Row, kind: str, what: str = "Input"
+) -> None:
     actual = [
         {"name": f.name, "type": str(f.type), "nullable": f.nullable} for f in schema
     ]
@@ -57,7 +63,59 @@ def validate_schema(schema: pa.Schema, description: Row, kind: str) -> None:
         for column in description["columns"]
     ]
     if actual != expected:
-        raise ValueError(f"Input schema differs from config/dataset.yaml: {kind}")
+        raise ValueError(f"{what} schema differs from config/dataset.yaml: {kind}")
+
+
+def field(column: Row) -> pa.Field:
+    kind = pa.type_for_alias(column["type"])
+    return pa.field(column["name"], kind, nullable=column["nullable"])
+
+
+def published(schema: pa.Schema, description: Row, kind: str) -> pa.Schema:
+    """The input schema with the columns assembly appends, in declared order."""
+    extra = [column for column in description["columns"] if column.get("assembled")]
+    if tuple(column["name"] for column in extra) != APPENDED.get(kind, ()):
+        raise ValueError(f"No assembly rule computes the declared columns of {kind}")
+    return pa.schema([*schema, *map(field, extra)])
+
+
+def parquet(sink: Sink, schema: pa.Schema, limits: DatasetLimits) -> pq.ParquetWriter:
+    return pq.ParquetWriter(
+        cast(IO[bytes], sink),
+        schema,
+        compression=cast(Literal["zstd", "snappy"], limits.compression),
+    )
+
+
+def block_index(
+    output: Path,
+    tables: list[Row],
+    reference: dict[str, int],
+    description: Row,
+    limits: DatasetLimits,
+    budget: Budget,
+) -> Row:
+    """The manifest's cell block index, published as the blocks table."""
+    rows = []
+    for table in tables:
+        if table["kind"] != "cells":
+            continue
+        for entry in table["blocks"]:
+            block, stored = entry[BLOCK], entry["rows"]
+            cells = reference[block]
+            rows.append(index_row(table, block, entry["row_group"], stored, cells))
+        rows += [index_row(table, block, None, 0, 0) for block in table["empty_blocks"]]
+    schema = pa.schema(map(field, description["columns"]))
+    path = output / BLOCKS / "part.parquet"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with Sink(path, budget) as sink, parquet(sink, schema, limits) as writer:
+        if rows:
+            writer.write_table(
+                pa.Table.from_pylist(sorted_blocks(rows), schema=schema),
+                row_group_size=limits.row_group_rows,
+            )
+    validate_schema(pq.read_schema(path), description, BLOCKS, "Written")
+    return {**file_record(output, path), "kind": BLOCKS, "rows": len(rows)}
 
 
 def assemble_tables(
@@ -68,28 +126,26 @@ def assemble_tables(
     descriptions: Row,
     budget: Budget,
 ) -> tuple[list[Row], set[str], set[str]]:
-    if set(snapshot.tables) != set(descriptions):
+    expected = inputs(descriptions)
+    if set(snapshot.tables) != set(expected):
         raise ValueError("Dataset schema and input table names differ")
+    if set(descriptions) - set(expected) != {BLOCKS}:
+        raise ValueError("No assembly rule builds the declared assembled tables")
     tables: list[Row] = []
     sources: set[str] = set()
     row_licences: set[str] = set()
+    reference: dict[str, int] = {}
     for relative, records in groups(snapshot, selection, limits).items():
         kind = relative.split("/")[0]
         schema = pq.read_schema(snapshot.verify(snapshot.tables[kind][0]))
-        validate_schema(schema, descriptions[kind], kind)
+        validate_schema(schema, expected[kind], kind)
+        schema = published(schema, descriptions[kind], kind)
         path = output / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         rows = 0
         pending: list[pa.RecordBatch] = []
         pending_rows = 0
-        with (
-            Sink(path, budget) as sink,
-            pq.ParquetWriter(
-                cast(IO[bytes], sink),
-                schema,
-                compression=cast(Literal["zstd", "snappy"], limits.compression),
-            ) as writer,
-        ):
+        with Sink(path, budget) as sink, parquet(sink, schema, limits) as writer:
             cell_groups = (
                 CellGroups(writer, schema, selection.grid) if kind == "cells" else None
             )
@@ -97,7 +153,7 @@ def assemble_tables(
                 before = rows
                 original = snapshot.verify(record)
                 with pq.ParquetFile(original) as file:
-                    validate_schema(file.schema_arrow, descriptions[kind], kind)
+                    validate_schema(file.schema_arrow, expected[kind], kind)
                     for batch in file.iter_batches(batch_size=limits.batch_rows):
                         selected = selection.filter(kind, batch)
                         if not selected.num_rows:
@@ -144,9 +200,14 @@ def assemble_tables(
                 )
         if pq.read_metadata(path).num_rows != rows:
             raise ValueError(f"Written row count differs: {relative}")
+        validate_schema(pq.read_schema(path), descriptions[kind], kind, "Written")
         entry: Row = {**file_record(output, path), "kind": kind, "rows": rows}
         if cell_groups is not None:
             entry["blocks"] = cell_groups.blocks
             entry["empty_blocks"] = cell_groups.empty_blocks
+            reference |= cell_groups.reference
         tables.append(entry)
+    tables.append(
+        block_index(output, tables, reference, descriptions[BLOCKS], limits, budget)
+    )
     return tables, sources, row_licences

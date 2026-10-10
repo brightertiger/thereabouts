@@ -19,6 +19,7 @@ ENFORCED_KEYS = {
     "cells": "stored descendants must equal the land cells (blocks.py); no nulls",
     "names": "the names engine keeps one row per city and folded name",
     "plate_priors": "the plate tables reject a repeated country, as the reader does",
+    "blocks": "assembly writes one row per covered block; verify matches the index",
 }
 
 # Every reference the lookups integrity gates check (cells/metrics.py and
