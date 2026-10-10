@@ -109,18 +109,27 @@ def defined(directory: Path, tables: list[Row], target: str) -> Strings:
     return prefixed(keys) if target == "countries" else keys
 
 
-def referenced(directory: Path, tables: list[Row], reference: Reference) -> Strings:
-    name = reference.column
-    parts = [
-        unique(identifiers(pq.read_table(path, columns=[name])[name], reference))
-        for path in files(directory, tables, reference.table)
-        if name in pq.read_schema(path).names
-    ]
-    found = unique(pa.chunked_array(parts, pa.string()))
+def referenced(
+    directory: Path, tables: list[Row], references: list[Reference]
+) -> dict[Reference, Strings]:
+    """The distinct keys each reference names, reading each file once."""
+    parts: dict[Reference, list[Strings]] = defaultdict(list)
+    for table in sorted({r.table for r in references}):
+        same = [r for r in references if r.table == table]
+        for path in files(directory, tables, table):
+            present = set(pq.read_schema(path).names)
+            found = [r for r in same if r.column in present]
+            data = pq.read_table(path, columns=[r.column for r in found])
+            for reference in found:
+                values = identifiers(data[reference.column], reference)
+                parts[reference].append(unique(values))
     # The writer publishes the non-geographic calling code without a country.
-    return (
-        absent(found, pa.array([COUNTRY + NON_GEOGRAPHIC])) if reference.code else found
-    )
+    excused = pa.array([COUNTRY + NON_GEOGRAPHIC])
+    named = {}
+    for reference in references:
+        values = unique(pa.chunked_array(parts[reference], pa.string()))
+        named[reference] = absent(values, excused) if reference.code else values
+    return named
 
 
 def missing(
@@ -128,7 +137,7 @@ def missing(
 ) -> tuple[dict[Reference, list[str]], dict[str, Strings]]:
     """Missing keys per reference, with each target's defined keys."""
     keys = {r.target: defined(directory, tables, r.target) for r in references}
-    named = {r: referenced(directory, tables, r) for r in references}
+    named = referenced(directory, tables, references)
     found = {}
     for target, known in keys.items():
         # One lookup per target table, as it can define millions of keys.
