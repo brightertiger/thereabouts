@@ -8,8 +8,10 @@ import pyarrow.parquet as pq
 import pytest
 from h3.api import basic_int as h3
 
+from pipeline.config.schema import H3
 from pipeline.files import file_record
 from pipeline.release.assemble import assemble
+from pipeline.release.cell_groups import represented
 from pipeline.release.source import Snapshot, external
 from pipeline.release.verify import verify_dataset
 from pipeline.runtime.jsonio import write_json
@@ -135,6 +137,21 @@ def test_the_blocks_table_indexes_every_stored_block(tmp_path: Path) -> None:
         }
         for entry in cells["blocks"]
     ]
+
+
+def test_reference_cells_count_a_pentagon_s_fewer_children() -> None:
+    block = h3.get_pentagons(3)[0]
+    center = h3.cell_to_center_child(block, 5)
+    other = next(c for c in sorted(h3.cell_to_children(block, 5)) if c != center)
+    table = pa.table(
+        {
+            "h3_uint64": pa.array([center, other], pa.uint64()),
+            "h3_resolution": pa.array([5, 5], pa.uint8()),
+        }
+    )
+    grid = H3(cell_resolution=8, block_resolution=3)
+    cells = represented(table, f"{block:x}", grid)
+    assert cells == h3.cell_to_children_size(center, 8) + 7**3 < 2 * 7**3
 
 
 def test_a_repeated_cell_key_is_refused(tmp_path: Path) -> None:

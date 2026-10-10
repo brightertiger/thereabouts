@@ -13,8 +13,8 @@ import yaml
 
 from pipeline.runtime.fingerprints import REPOSITORY
 
-TABLE_KEYS = {"description", "grain", "primary_key", "relationships", "columns"}
-TABLE_KEYS |= {"assembled"}
+TABLE_REQUIRED = ("description", "grain", "primary_key", "relationships", "columns")
+TABLE_KEYS = {*TABLE_REQUIRED, "assembled"}
 COLUMN_REQUIRED = ("name", "type", "nullable", "meaning", "units")
 COLUMN_KEYS = {*COLUMN_REQUIRED, "values", "values_from", "assembled"}
 RELATIONSHIP_KEYS = {"columns", "references", "meaning"}
