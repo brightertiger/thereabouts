@@ -349,8 +349,10 @@ Releases published to GitHub use absolute `url`s
 pack, plus a `dataset` entry per version naming the dataset install manifest
 (`url`, `size`, `sha256`, `asset_id`, `api_url`; at most 16 MiB). Each GitHub
 release's `index.json` lists every version published so far, so
-`releases/latest/download/index.json` is the newest aggregate. Clients that
-predate these fields ignore them.
+`releases/latest/download/index.json` is the newest aggregate. A patch to an
+older version published after a newer one (say `2026.09.1` after `2026.10`) is
+listed by its own release's index, not by latest's, until a newer release is
+published. Clients that predate these fields ignore them.
 
 Index JSON is limited to 16 MiB. The transport caps are defined once in
 `thereabouts-cli-core::transport` and shared by the CLI, Python
@@ -397,8 +399,10 @@ retain the partial file for retry. No bytes are appended before these checks.
 Requests use Accept-Encoding: identity; encoded responses are rejected.
 Redirects are followed by the client, at most five: HTTPS anywhere, plain HTTP
 only from loopback to loopback (tests), never HTTPS to HTTP. Every hop repeats
-the Range and Accept-Encoding headers and none carries credentials. An archive
-URL under an HTTPS index must itself be HTTPS.
+the Range and Accept-Encoding headers. A hop carries the release token only while
+it stays on the GitHub API origin, so a redirect to GitHub's object host never
+does; without a token no hop carries credentials. An archive URL under an HTTPS
+index must itself be HTTPS.
 HTTPS_PROXY/HTTP_PROXY/ALL_PROXY and NO_PROXY use native ureq environment semantics.
 Node honors HTTPS_PROXY/HTTP_PROXY and NO_PROXY through undici; ALL_PROXY is
 used as a fallback when HTTP_PROXY/HTTPS_PROXY are absent. Connections and headers
