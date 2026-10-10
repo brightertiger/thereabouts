@@ -14,9 +14,11 @@ def render(
     descriptions: Row,
     sources: Row,
     policy: Row,
-    gates: Row | None,
+    recorded: Row,
     template: Path,
 ) -> str:
+    """`recorded` holds the manifest's `quality_gates` and `closure`, or neither
+    for the committed page rendered from older measurements."""
     settings = config.release
     tree, sections = [], []
     for kind, schema in descriptions.items():
@@ -96,7 +98,8 @@ def render(
         ),
         "distant_m": str(policy["distant_m"]),
         "nearest_m": str(policy["nearest_m"]),
-        "quality_gates": quality(gates),
+        "quality_gates": quality(recorded.get("quality_gates")),
+        "closure": closure(recorded.get("closure")),
         "latitude": str(settings.example_latitude),
         "longitude": str(settings.example_longitude),
         "contact": settings.contact,
@@ -156,6 +159,44 @@ def quality(gates: Row | None) -> str:
         "pipeline's `quality.json` under `advisory_spatial_gates` and "
         "`gate_scope.by_country`. That file is not part of this directory; "
         "`quality_gates.report` gives its pipeline path, byte size and SHA256."
+    )
+
+
+def closure(record: Row | None) -> str:
+    """The references assembly rewrote or dropped, from the manifest's record.
+
+    None renders the committed documentation from measurements recorded before
+    assembly kept the record."""
+    if record is None:
+        return (
+            "The measured export this page was rendered from predates this record. "
+            "A release's `manifest.json.closure` lists every reference that assembly "
+            "rewrote or dropped."
+        )
+    aliased, excluded = record["aliased"], record["excluded"]
+    if not aliased and not excluded:
+        return (
+            "This export needed neither: `manifest.json.closure` lists no alias and "
+            "no exclusion."
+        )
+    rewritten = sum(entry["rows"] for entry in aliased)
+    dropped = sum(entry["rows"] for entry in excluded)
+    rows = []
+    for entry in [*aliased, *excluded]:
+        published = f"`{entry['to']}`" if "to" in entry else "row dropped"
+        rows.append(
+            f"| `{entry['table']}` | `{entry['column']}` | `{entry['place']}` | "
+            f"{published} | {entry['rows']:,} |"
+        )
+    return "\n".join(
+        [
+            f"This export rewrote {rewritten:,} row{'' if rewritten == 1 else 's'} "
+            f"and dropped {dropped:,} row{'' if dropped == 1 else 's'}:",
+            "",
+            "| Table | Column | Missing key | Published as | Rows |",
+            "| --- | --- | --- | --- | --- |",
+            *rows,
+        ]
     )
 
 

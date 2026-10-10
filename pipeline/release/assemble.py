@@ -13,7 +13,7 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, encode, sync_directory
 from pipeline.runtime.resources import ResourceGuard
 
-from . import closure, dictionary, keys, metadata, readme
+from . import closure, dictionary, keys, metadata, readme, references
 from .budget import Budget
 from .selection import Selection
 from .source import Row, Snapshot
@@ -69,8 +69,14 @@ def assemble(
         tables, observed, row_licences = assemble_tables(
             snapshot, staging, selection, config.release.dataset, descriptions, budget
         )
-        # A dataset the pack writer would refuse is never published.
-        closure.check(staging, tables)
+        # Missing place keys are aliased, excluded or refused as configured, and
+        # a dataset the pack writer would refuse is never published.
+        rules = config.release.dataset.closure
+        changes = references.plan(staging, tables, descriptions, rules)
+        tables = references.apply(
+            staging, tables, changes, descriptions, config.release.dataset, budget
+        )
+        closed = references.record(rules, changes, closure.check(staging, tables))
         keys.check(staging, tables, descriptions, config.content, guard)
         sources = metadata.licences(
             config, observed, metadata.boundary_states(staging, tables)
@@ -90,7 +96,7 @@ def assemble(
                 descriptions,
                 sources,
                 snapshot.policy,
-                gates,
+                {"quality_gates": gates, "closure": closed},
                 REPOSITORY / config.release.readme_template,
             ),
             # Generated from config/dataset.yaml and the client; the core pack
@@ -122,6 +128,8 @@ def assemble(
             # Lookups gates this export passed; findings outside the blocking
             # scope ship as advisory totals, listed in the quality.json record.
             "quality_gates": gates,
+            # Place references rewritten or dropped to close the dataset.
+            "closure": closed,
             "tables": tables,
             "files": files,
         }
