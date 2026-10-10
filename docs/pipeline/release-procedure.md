@@ -313,6 +313,92 @@ bytes.
 This task's local demonstration used `release.packs.families=[]` because no real
 writer was available; do not carry that override into a full release accidentally.
 
+## Publish to GitHub Releases
+
+The owner's chosen host is GitHub Releases of `brightertiger/thereabouts`
+(`release.publish.target=github`; settings under `release.publish.github` in
+`config/release.yaml`). Clients default to
+https://github.com/brightertiger/thereabouts/releases/latest/download/. A release
+`v<version>` holds flat assets; each archive carries its own directory
+structure, and installation rebuilds the local tree:
+
+| Asset | Content |
+|---|---|
+| `<family>.tar.zst` | Pack archives |
+| `acceptance-<family>.json` | Acceptance reports |
+| `manifest.json`, `README.md`, `DATA_LICENSES.md`, `DATASET_CARD.md`, `CHANGES.md`, `DATA_DICTIONARY.md`, `data_dictionary.json`, `content.json` | The dataset's top-level documents |
+| `dataset-<table>.zip`, or `-001`, `-002`… past 2 GiB | Each dataset table as stored zips of `<table>/…` |
+| `dataset-manifest.json` | Every zip with its members, and every document, for `data install dataset` |
+| `index.json` | Format 3 with absolute URLs, `asset_id` and `api_url`, listing every published version |
+
+The publisher reads its token only from `GITHUB_TOKEN`: a fine-grained personal
+access token limited to this repository with **Contents: Read and write**, the
+only permission release uploads need. Never put it in configuration or reports.
+
+```sh
+.venv/bin/python -m pipeline release upload --root "$PIPELINE_DATA" \
+  --version "$PIPELINE_VERSION" release.publish.target=github --dry-run \
+  --report .cache/pipeline/github-upload-plan.json
+# Owner executes after reviewing that plan, with GITHUB_TOKEN exported:
+.venv/bin/python -m pipeline release upload --root "$PIPELINE_DATA" \
+  --version "$PIPELINE_VERSION" release.publish.target=github \
+  --report .cache/pipeline/github-upload.json
+```
+
+The dry run is offline. It needs no token and lists every asset with its size
+(zip digests appear once the zips are built). `release upload` still requires
+the ledger proof first. The upload then:
+
+1. writes the table zips under `work/releases/<version>/zips/`. They are
+   deterministic, so a rerun gives the same bytes, and each is read back by the
+   clients' Rust reader;
+2. finds the release for the tag, or creates a **draft**. GitHub creates the tag
+   `v<version>` at publication from the default branch unless it already exists,
+   so create it on the release commit first if that matters;
+3. deletes incomplete uploads in the draft, refuses unexpected or conflicting
+   assets, uploads only missing ones and verifies each by size and the SHA-256
+   digest GitHub reports (downloading and hashing it when GitHub reports none);
+4. uploads `dataset-manifest.json`, then `index.json`, the union of every
+   published release's index plus this version;
+5. publishes the draft last, marked latest only when no published release has a
+   newer version, then re-reads it to confirm every asset.
+
+Rerun the same command to resume an interrupted upload. A published release is
+never altered, except to add a missing asset that no published
+`dataset-manifest.json` or `index.json` names by asset id; otherwise publish a
+patch version (`YYYY.MM.N`). While `DATA_LICENSES.md` carries the CC BY-SA
+`OWNER DECISION` paragraph, a public publish refuses. `release.publish.private=true`
+uploads and verifies the draft and stops there, unpublished. Resolving the
+decision changes the release documents, so the next run refuses that draft
+because it holds different files; nothing is released yet, so delete the draft
+on GitHub and rerun. A draft's `index.json` is rebuilt on every run, so it
+always lists every version published before it. GitHub limits a
+release to 1,000 assets, each under 2 GiB; the plan enforces both. The same
+target runs as the `publish` stage (`run --through publish` with
+`release.publish.target=github`), whose unit destination is `github:<repository>`.
+
+GitHub keeps one latest release per repository, and the clients' default URL
+reads `index.json` from it. Publish any other release in this repository (such as
+client code) with "Set as the latest release" unchecked, or the default URL
+stops finding `index.json` until the next dataset release.
+
+Clients read the `releases/latest/download/` and `releases/download/<tag>/`
+redirect routes, not the REST `releases/latest` endpoint, which allows 60
+unauthenticated requests an hour per address. While the repository is private,
+those routes return 404, so clients need `THEREABOUTS_RELEASE_TOKEN` (or
+`GITHUB_TOKEN`) with **Contents: Read**. They then read the index and assets
+through the API and send the token only to `api.github.com`.
+
+**The later public switch.** Make the repository public in its settings. Nothing
+is republished: the same assets become reachable through the public download
+routes, and clients stop needing a token. Afterwards, check
+`thereabouts data list --remote` without a token.
+
+**Optional Hugging Face mirror.** For analysts, the dataset tree
+(`dataset/<version>/`, as `thereabouts data install dataset` restores it) can be
+mirrored to a Hugging Face dataset repository, tagged per version with the same
+files. That mirror is not automated here and is not a client source.
+
 Finally fill and validate [release-registry.yaml](release-registry.yaml) against
 the current upstream registry schema, confirm public anonymous reads and licence
 notices, and use [the registry PR draft](release-registry-pr.md) for the owner's

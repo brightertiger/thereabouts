@@ -57,6 +57,8 @@ fn source(root: &Path) -> (Directory, String) {
         sha256: created.sha256,
         unpacked_size: created.unpacked_size,
         format_minor: 2,
+        asset_id: None,
+        api_url: None,
     };
     publish(root, &version, pack);
     (Directory::new(root), version)
@@ -68,6 +70,7 @@ fn publish(root: &Path, version: &str, pack: ReleasePack) {
             version.to_owned(),
             Dataset {
                 packs: BTreeMap::from([("phone".into(), pack)]),
+                dataset: None,
             },
         )]),
     };
@@ -103,6 +106,8 @@ fn hostile(root: &Path, version: &str, plain: &[u8], unpacked_size: u64) {
         sha256: manifest::digest(&file).unwrap(),
         unpacked_size,
         format_minor: 2,
+        asset_id: None,
+        api_url: None,
     };
     publish(root, version, pack);
 }

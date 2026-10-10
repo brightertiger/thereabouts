@@ -1115,7 +1115,8 @@ manifest.json at the archive root, created by the same Rust module that clients
 extract with (`_core.archive_pack`; `_core.inspect_archive` lists and hashes
 every entry). The transport caps (2 GiB compressed, 16 GiB unpacked) are
 `_core.MAX_ARCHIVE_BYTES` and `_core.MAX_UNPACKED_BYTES`. Publication merges
-the version into the aggregate `packs/index.json`; transport and activation are
+the version into the aggregate `packs/index.json` (on GitHub Releases, into each
+release's `index.json`, with absolute URLs and asset ids); transport and activation are
 specified in [../clients/cli.md](../clients/cli.md). Dataset Parquet, pack payloads and transport archives
 have separate inventories and digests; one does not substitute for another.
 

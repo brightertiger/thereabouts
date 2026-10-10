@@ -11,7 +11,12 @@ def test_python_exports_the_rust_transport_policy() -> None:
     assert _core.MAX_UNPACKED_BYTES == 16 * 1024**3
     assert _core.INDEX_FORMAT == 3
     assert _core.ARCHIVE_SUFFIX == ".tar.zst"
-    assert _core.DEFAULT_RELEASE_URL.startswith("https://")
+    assert _core.DEFAULT_RELEASE_URL == (
+        "https://github.com/brightertiger/thereabouts/releases/latest/download/"
+    )
+    assert _core.GITHUB_API_URL == "https://api.github.com"
+    assert _core.TOKEN_VARIABLES == ["THEREABOUTS_RELEASE_TOKEN", "GITHUB_TOKEN"]
+    assert _core.DATASET_MANIFEST == "dataset-manifest.json"
 
 
 def test_node_reads_the_same_values_as_python() -> None:

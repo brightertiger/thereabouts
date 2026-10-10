@@ -174,8 +174,20 @@ test("exclusive file lease serializes Node and native installs and releases on c
   await install(store, origin, ["phone"]);
   await remove(store, "phone");
 });
-test("placeholder fails before transfer; index ordering and prompts match native policy", async (t) => {
-  assert.throws(() => source(undefined, {}), /--from.*THEREABOUTS_RELEASE_URL/);
+test("the GitHub default resolves without transfer; index ordering and prompts match native policy", async (t) => {
+  assert.equal(
+    source(undefined, {}).href,
+    "https://github.com/brightertiger/thereabouts/releases/latest/download/",
+  );
+  // A token never goes to a plain-HTTP API outside loopback.
+  assert.throws(
+    () =>
+      source(undefined, {
+        GITHUB_TOKEN: "secret",
+        THEREABOUTS_GITHUB_API_URL: "http://api.example.com",
+      }),
+    (e) => e.exitCode === 2 && !e.message.includes("secret"),
+  );
   for (const url of [
     "http://name:secret@127.0.0.1/",
     "http://127.0.0.1/#fragment",

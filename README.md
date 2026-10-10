@@ -28,10 +28,15 @@ thereabouts --data-dir ./store data install core postal airports \
   --from /path/to/release --yes
 ~~~
 
-Alternatively install a wheel produced by the Python workflow. A local release
-directory contains index.json and family tar archives. The default public
-release endpoint is still a placeholder; select --from or THEREABOUTS_RELEASE_URL.
-No import, lookup or missing-data error downloads anything.
+Alternatively install a wheel produced by the Python workflow. Without --from,
+data comes from the project's GitHub releases
+(https://github.com/brightertiger/thereabouts/releases/latest/download/). While
+that repository is private, set THEREABOUTS_RELEASE_TOKEN (or GITHUB_TOKEN) to a
+token that can read it. --from or THEREABOUTS_RELEASE_URL selects another release:
+a local directory with index.json and the family archives, or an HTTPS base URL.
+`thereabouts data install dataset` restores the Parquet dataset under
+`<data-dir>/dataset/<version>/`. No import, lookup or missing-data error
+downloads anything.
 
 For Node, build a package from this checkout (Rust's wasm32-unknown-unknown
 target and wasm-bindgen-cli 0.2.129 are required):

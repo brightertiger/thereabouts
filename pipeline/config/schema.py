@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from .content import DigestLimits
 from .engines import EngineSettings
-from .release import ReleaseSettings
+from .publication import Release
 from .sources import SourceSettings
 
 DISK_FLOOR = 5_000_000_000
@@ -67,7 +67,7 @@ class Config:
     h3: H3 = field(default_factory=H3)
     storage: dict[str, str] = field(default_factory=lambda: {"local": "file://"})
     content: DigestLimits = field(default_factory=DigestLimits)
-    release: ReleaseSettings = field(default_factory=ReleaseSettings)
+    release: Release = field(default_factory=Release)
     engines: EngineSettings = field(default_factory=EngineSettings)
     sources: dict[str, SourceSettings] = field(default_factory=dict)
     stages: list[StageSettings] = field(default_factory=list)

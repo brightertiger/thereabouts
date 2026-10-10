@@ -426,6 +426,24 @@ fn inspect_archive(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
         &serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}),
     )
 }
+/// List and hash every entry of a dataset table zip with the clients' reader.
+#[cfg(feature = "writer")]
+#[pyfunction]
+fn inspect_zip(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
+    use thereabouts_cli_core::zip;
+    let summary = py
+        .detach(|| zip::inspect(std::fs::File::open(path)?))
+        .map_err(|e| archive_error(py, e))?;
+    let files = summary
+        .entries
+        .iter()
+        .map(|e| serde_json::json!({"path": e.path, "size": e.size, "sha256": e.sha256}))
+        .collect::<Vec<_>>();
+    value_to_python(
+        py,
+        &serde_json::json!({"unpacked_size": summary.unpacked_size, "files": files}),
+    )
+}
 #[pyfunction]
 fn verify_pack(py: Python<'_>, path: &str) -> PyResult<Py<PyAny>> {
     let manifest = py
@@ -456,6 +474,7 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(write_pack, m)?)?;
         m.add_function(wrap_pyfunction!(archive_pack, m)?)?;
         m.add_function(wrap_pyfunction!(inspect_archive, m)?)?;
+        m.add_function(wrap_pyfunction!(inspect_zip, m)?)?;
         m.add("WRITER_REVISION", writer::WRITER_REVISION)?;
         m.add("CORE_REVISION", writer::CORE_REVISION)?;
     }
@@ -473,8 +492,17 @@ fn _core(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add("MAX_ARCHIVE_BYTES", transport::MAX_ARCHIVE_BYTES)?;
         m.add("MAX_UNPACKED_BYTES", transport::MAX_UNPACKED_BYTES)?;
         m.add("DEFAULT_RELEASE_URL", transport::DEFAULT_RELEASE_URL)?;
+        m.add("GITHUB_API_URL", transport::GITHUB_API_URL)?;
+        m.add("GITHUB_API_VARIABLE", transport::GITHUB_API_VARIABLE)?;
+        m.add("TOKEN_VARIABLES", transport::TOKEN_VARIABLES.to_vec())?;
         m.add("INDEX_FORMAT", transport::INDEX_FORMAT)?;
         m.add("ARCHIVE_SUFFIX", transport::ARCHIVE_SUFFIX)?;
+        m.add("DATASET_MANIFEST", thereabouts_cli_core::zip::MANIFEST)?;
+        m.add(
+            "DATASET_MANIFEST_FORMAT",
+            thereabouts_cli_core::zip::MANIFEST_FORMAT,
+        )?;
+        m.add("MAX_ZIP_ENTRIES", thereabouts_cli_core::zip::MAX_ENTRIES)?;
     }
     Ok(())
 }

@@ -12,7 +12,13 @@ import {
   readJson,
   sha256,
 } from "./store.js";
-import { index, select, archive } from "./transport.js";
+import {
+  index,
+  select,
+  selectDataset,
+  archive,
+  DATASET_MANIFEST_FORMAT,
+} from "./transport.js";
 import { convert, integrity, usage, DataNotInstalledError } from "./errors.js";
 import { wasm } from "./wasm.js";
 export const DISK_MARGIN_BYTES = 64 * 1024 * 1024;
@@ -54,6 +60,7 @@ async function extract(filename, staging, pack) {
   }
   return summary.files.map((f) => f.path).sort();
 }
+// Download (or resume) one release file ({url, api_url?, size, sha256}).
 async function download(root, origin, pack) {
   const filename = safePath(root, `.downloads/${pack.sha256}.part`);
   fs.mkdirSync(path.dirname(filename), { recursive: true });
@@ -186,6 +193,155 @@ export async function remove(root, name) {
       recursive: true,
       force: true,
     });
+  } finally {
+    await release();
+  }
+}
+function datasetFiles(listed, version) {
+  if (
+    !listed ||
+    listed.format !== DATASET_MANIFEST_FORMAT ||
+    listed.version !== version ||
+    !Array.isArray(listed.archives) ||
+    !Array.isArray(listed.files)
+  )
+    throw integrity("Dataset manifest differs from the release index");
+  const expected = new Map(),
+    names = new Set();
+  const add = (member, nested) => {
+    if (
+      typeof member?.path !== "string" ||
+      member.path.includes("/") !== nested ||
+      !Number.isSafeInteger(member.size) ||
+      member.size < 0 ||
+      !/^[a-f\d]{64}$/.test(member.sha256) ||
+      expected.has(member.path)
+    )
+      throw integrity("Invalid dataset manifest entry");
+    if (
+      member.path
+        .split("/")
+        .some((part) => !part || part === "." || part === "..") ||
+      /[\\:]/.test(member.path)
+    )
+      throw integrity("Unsafe dataset path");
+    expected.set(member.path, member);
+  };
+  for (const item of listed.archives) {
+    if (
+      typeof item?.name !== "string" ||
+      names.has(item.name) ||
+      !Array.isArray(item.files) ||
+      !item.files.length ||
+      item.files.reduce((sum, f) => sum + f.size, 0) !== item.unpacked_size ||
+      !Number.isSafeInteger(item.size) ||
+      !/^[a-f\d]{64}$/.test(item.sha256)
+    )
+      throw integrity("Invalid dataset archive identity");
+    names.add(item.name);
+    for (const member of item.files) add(member, true);
+  }
+  for (const document of listed.files) add(document, false);
+  return expected;
+}
+function listing(root, relative = "", found = new Map()) {
+  for (const entry of fs.readdirSync(path.join(root, relative), {
+    withFileTypes: true,
+  })) {
+    const name = relative ? `${relative}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) listing(root, name, found);
+    else if (entry.isFile()) found.set(name, path.join(root, name));
+    else throw integrity("Dataset holds a link or special file");
+  }
+  return found;
+}
+// The tree holds exactly the promised files with their sizes and digests.
+function verifyTree(root, expected) {
+  const found = listing(root);
+  if (
+    [...found.keys()].sort().join("\n") !==
+    [...expected.keys()].sort().join("\n")
+  )
+    throw integrity("Dataset files differ from the dataset manifest");
+  for (const [name, filename] of found) {
+    const member = expected.get(name);
+    if (
+      fs.statSync(filename).size !== member.size ||
+      sha256(filename) !== member.sha256
+    )
+      throw integrity(
+        `Dataset file differs from the dataset manifest: ${name}`,
+      );
+  }
+}
+const key = (f) => `${f.path}\0${f.size}\0${f.sha256}`;
+// Restore dataset/<version>/ from the release's table zips, all or nothing.
+export async function installDataset(root, origin, version) {
+  const [selected, file] = selectDataset(await index(origin), version),
+    release = await lock(root);
+  try {
+    const described = await download(root, origin, file),
+      listed = readJson(described),
+      expected = datasetFiles(listed, selected),
+      destination = safePath(root, `dataset/${selected}`);
+    const summary = (installed) => ({
+      dataset: {
+        version: selected,
+        path: destination,
+        files: expected.size,
+        bytes: [...expected.values()].reduce((sum, m) => sum + m.size, 0),
+        installed,
+      },
+    });
+    if (fs.existsSync(destination)) {
+      verifyTree(destination, expected);
+      fs.rmSync(described, { force: true });
+      return summary(false);
+    }
+    precheck(
+      root,
+      listed.archives.reduce((s, a) => s + a.size + a.unpacked_size, 0) +
+        listed.files.reduce((s, d) => s + d.size, 0),
+    );
+    const staging = safePath(root, `.staging/dataset-${selected}`),
+      fetched = [described];
+    fs.rmSync(staging, { recursive: true, force: true });
+    fs.mkdirSync(staging, { recursive: true });
+    try {
+      for (const item of listed.archives) {
+        const filename = await download(root, origin, item);
+        fetched.push(filename);
+        let extracted;
+        try {
+          extracted = JSON.parse(
+            (await wasm()).extractZip(filename, staging, item.unpacked_size),
+          );
+        } catch (e) {
+          throw e.code === "cli_error" ? e : convert(e);
+        }
+        if (
+          extracted.files.map(key).sort().join("\n") !==
+          item.files.map(key).sort().join("\n")
+        )
+          throw integrity(
+            `Dataset archive differs from the dataset manifest: ${item.name}`,
+          );
+      }
+      for (const document of listed.files) {
+        const filename = await download(root, origin, document);
+        fetched.push(filename);
+        const target = safePath(staging, document.path);
+        if (fs.existsSync(target)) throw integrity("Duplicate dataset file");
+        fs.copyFileSync(filename, target);
+      }
+      verifyTree(staging, expected);
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.renameSync(staging, destination);
+    } finally {
+      fs.rmSync(staging, { recursive: true, force: true });
+    }
+    for (const filename of fetched) fs.rmSync(filename, { force: true });
+    return summary(true);
   } finally {
     await release();
   }

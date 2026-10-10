@@ -243,7 +243,7 @@
     },
     {
       "name": "data install",
-      "about": "Install selected pack families.",
+      "about": "Install selected pack families, or the Parquet dataset with `dataset`.",
       "args": "PACK\u2026",
       "options": [
         {

@@ -12,9 +12,10 @@ python -m pip install .
 thereabouts --data-dir ./store data install core postal airports --from ./release --yes
 ~~~
 
-No data is bundled. The default release URL is a placeholder; use an explicit
-local release directory or configured release URL. Opening and querying never
-download data.
+No data is bundled. `data install` reads the project's GitHub releases by
+default (set THEREABOUTS_RELEASE_TOKEN or GITHUB_TOKEN while the repository is
+private), or an explicit local release directory or release URL; `data install
+dataset` restores the Parquet dataset. Opening and querying never download data.
 
 ~~~python
 from thereabouts import Geocoder

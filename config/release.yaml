@@ -63,3 +63,18 @@ publish:
   multipart_bytes: 5242880
   # true only for a private staging copy, which may carry OWNER DECISION text.
   private: false
+  # fsspec writes storage.s3_release; github uploads a draft GitHub release and
+  # publishes it last. The GitHub token comes only from the GITHUB_TOKEN environment
+  # variable, never from configuration. A private GitHub publish stops at the draft.
+  target: fsspec
+  github:
+    repository: brightertiger/thereabouts
+    # Releases are tagged <tag_prefix><version>, such as v2026.10.
+    tag_prefix: v
+    api_url: https://api.github.com
+    upload_url: https://uploads.github.com
+    web_url: https://github.com
+    # GitHub limits: 1,000 assets per release, each under 2 GiB.
+    max_assets: 1000
+    max_asset_bytes: 2147483647
+    timeout_seconds: 300

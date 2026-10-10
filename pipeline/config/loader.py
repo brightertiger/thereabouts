@@ -16,6 +16,7 @@ from thereabouts.format import BLOCK_RESOLUTION
 
 from .engine_validation import validate as validate_engines
 from .engine_validation import validate_sources
+from .publication import validate as validate_publication
 from .release import validate as validate_release
 from .schema import DISK_FLOOR, Config
 from .sources import load_sources, resolve_options, validate_source
@@ -118,6 +119,7 @@ def validate(config: Config) -> None:
         resolve_options(source)
     config.content.validate()
     validate_release(config.release, config.h3.block_resolution)
+    validate_publication(config.release.publish)
     validate_engines(config.engines, config.h3.block_resolution)
     if any("engines" in stage.config for stage in config.stages):
         validate_sources(config.engines, config.sources)

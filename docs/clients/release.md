@@ -60,7 +60,8 @@ Nothing is published on a normal push, pull request or unapproved tag.
 
 The code licence is MIT; review the data redistribution requirements described
 in docs/licenses.md before approving artifacts.
-Configure the release endpoint and publish verified data separately. Its local
+Data is published separately, to GitHub Releases by default (see
+docs/pipeline/release-procedure.md). Its local
 index and archive layout is specified in cli.md; dataset and pack manifests
 remain separate inventories. The MY/SG proof includes core plus five forward
 packs because the real plate tables are unavailable.
