@@ -1,8 +1,8 @@
-"""Stable upstream identities of the build-local source areas a boundary names.
+"""Stable upstream identities of a reconcile country artifact's stored areas.
 
-Area IDs in a reconcile country database are insertion sequence numbers, so any
-rebuild renumbers them. Reviews name a boundary by the upstream records of its
-areas instead; those survive a rebuild of the same evidence.
+Area IDs are insertion sequence numbers, so any rebuild renumbers them. Reviews
+name a city boundary by the upstream records of its areas instead; those survive
+a rebuild of the same evidence. Only gate code imports this module.
 """
 
 import json

@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 import shapely
 
-from pipeline.engines.cities.origins import boundary_origins, origin, resolver
 from pipeline.engines.store.areas import insert_area
 from pipeline.engines.store.codec import Row, pack
+from pipeline.engines.store.origins import boundary_origins, origin, resolver
 from pipeline.engines.store.schema import create_areas
 
 KIB = 1024

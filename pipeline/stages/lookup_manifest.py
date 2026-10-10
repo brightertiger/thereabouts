@@ -8,10 +8,10 @@ from pipeline.config import reviews
 from pipeline.engines.artifact_io import file_record
 from pipeline.engines.cells.metrics import measure
 from pipeline.engines.cities.gates import failures, unreviewed
-from pipeline.engines.cities.origins import resolver
 from pipeline.engines.names import build as names
 from pipeline.engines.normalize_cells.references import reference_checks
 from pipeline.engines.reconcile.common import Row
+from pipeline.engines.store.origins import resolver
 from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import write_json
 from pipeline.runtime.paths import located
