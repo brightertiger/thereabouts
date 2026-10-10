@@ -11,7 +11,7 @@ import hashlib
 import http.client
 import json
 import ssl
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, BinaryIO
@@ -237,13 +237,29 @@ class Client:
 
     def download(self, asset_id: int) -> tuple[int, str]:
         """Stream an asset through its object-host redirect; returns size, SHA-256."""
-        url = f"{self.releases_url}/assets/{asset_id}"
         digest = hashlib.sha256()
+        count = self.stream(asset_id, digest.update)
+        return count, digest.hexdigest()
+
+    def fetch(self, asset_id: int, limit: int) -> bytes:
+        """A small asset's bytes, refusing more than `limit`."""
+        chunks: list[bytes] = []
+        count = self.stream(asset_id, chunks.append, limit)
+        if count > limit:
+            raise GithubError(f"GitHub asset {asset_id} exceeds {limit} bytes")
+        return b"".join(chunks)
+
+    def stream(
+        self, asset_id: int, sink: Callable[[bytes], object], limit: int | None = None
+    ) -> int:
+        url = f"{self.releases_url}/assets/{asset_id}"
         count = 0
         with self.opened("GET", url, accept=BINARY) as response:
             if response.status != 200:
                 raise self.failure("GET", url, response, response.read(1 << 16))
             while chunk := response.read(self.read_bytes):
-                digest.update(chunk)
                 count += len(chunk)
-        return count, digest.hexdigest()
+                if limit is not None and count > limit:
+                    break
+                sink(chunk)
+        return count

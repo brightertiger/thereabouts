@@ -67,8 +67,10 @@ class FakeGithub:
     tags: set[str] = field(default_factory=set)
     latest: int | None = None
     requests: list[Request] = field(default_factory=list)
-    # Interrupt the next upload after this many body bytes, leaving a "starter" asset.
+    # Interrupt the next upload (of `fail_upload_name`, if set) after this many body
+    # bytes, leaving a "starter" asset as GitHub does.
     fail_upload_after: int | None = None
+    fail_upload_name: str | None = None
     # Cut the next object download after this many bytes.
     cut_download_after: int | None = None
     urls: dict[str, str] = field(default_factory=dict)
@@ -414,7 +416,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         asset = Asset(next(self.fake._ids), name, b"", "starter")
         release.assets.append(asset)
-        if self.fake.fail_upload_after is not None:
+        if self.fake.fail_upload_after is not None and (
+            self.fake.fail_upload_name in {None, name}
+        ):
             asset.data = self.rfile.read(self.fake.fail_upload_after)
             self.fake.fail_upload_after = None
             self.close_connection = True

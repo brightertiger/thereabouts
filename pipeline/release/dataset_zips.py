@@ -16,6 +16,7 @@ import struct
 import zlib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NamedTuple
 
 from pipeline.runtime.jsonio import atomic_output, sha256_file
 from pipeline.runtime.paths import located
@@ -50,6 +51,11 @@ class Member:
     def cost(self) -> int:
         """Bytes this member adds: local header, name, data and central record."""
         return LOCAL_BYTES + CENTRAL_BYTES + 2 * len(self.encoded) + self.size
+
+
+class Built(NamedTuple):
+    path: Path
+    sha256: str
 
 
 @dataclass(frozen=True)
@@ -113,7 +119,7 @@ def build(
     directory: Path,
     guard: ResourceGuard | None = None,
     read_bytes: int = 1 << 20,
-) -> dict[str, Path]:
+) -> dict[str, Built]:
     """Write (or reuse) every zip under `directory`, each checked by the Rust reader."""
     written = {}
     for item in zips:
@@ -128,8 +134,7 @@ def build(
             finally:
                 if guard is not None:
                     guard.release(item.size)
-        verify(target, item)
-        written[item.name] = target
+        written[item.name] = Built(target, verify(target, item))
     return written
 
 

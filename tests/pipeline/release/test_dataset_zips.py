@@ -8,6 +8,7 @@ import pytest
 
 from pipeline.release import dataset_zips
 from pipeline.release.dataset_zips import Member, build, plan
+from pipeline.runtime.jsonio import sha256_file
 from thereabouts import _core
 
 FILES = {
@@ -38,7 +39,7 @@ def test_one_zip_per_table_rebuilds_the_tree(tmp_path: Path) -> None:
     ]
     written = build(zips, tmp_path / "dataset", tmp_path / "out")
     for item in zips:
-        path = written[item.name]
+        path = written[item.name].path
         assert path.stat().st_size == item.size
         summary = _core.inspect_zip(str(path))
         assert summary["unpacked_size"] == item.unpacked_size
@@ -55,11 +56,12 @@ def test_zips_are_byte_identical_on_rewrite_and_reused(tmp_path: Path) -> None:
     zips = plan(members, 2**31 - 1)
     first = build(zips, tmp_path / "dataset", tmp_path / "a")
     second = build(zips, tmp_path / "dataset", tmp_path / "b")
-    for name, path in first.items():
-        assert path.read_bytes() == second[name].read_bytes()
-    stamp = first["dataset-cells.zip"].stat().st_mtime_ns
+    for name, built in first.items():
+        assert built.path.read_bytes() == second[name].path.read_bytes()
+        assert built.sha256 == second[name].sha256 == sha256_file(built.path)
+    stamp = first["dataset-cells.zip"].path.stat().st_mtime_ns
     build(zips, tmp_path / "dataset", tmp_path / "a")
-    assert first["dataset-cells.zip"].stat().st_mtime_ns == stamp
+    assert first["dataset-cells.zip"].path.stat().st_mtime_ns == stamp
 
 
 def test_a_large_table_splits_under_the_asset_cap(tmp_path: Path) -> None:
@@ -73,7 +75,7 @@ def test_a_large_table_splits_under_the_asset_cap(tmp_path: Path) -> None:
     found = sorted(
         row["path"]
         for z in cells
-        for row in _core.inspect_zip(str(written[z.name]))["files"]
+        for row in _core.inspect_zip(str(written[z.name].path))["files"]
     )
     assert found == sorted(p for p in FILES if p.startswith("cells/"))
 
@@ -101,7 +103,7 @@ def test_a_tampered_zip_on_disk_is_refused(tmp_path: Path) -> None:
     members = dataset(tmp_path / "dataset")
     zips = plan(members, 2**31 - 1)
     written = build(zips, tmp_path / "dataset", tmp_path / "out")
-    path = written["dataset-places.zip"]
+    path = written["dataset-places.zip"].path
     data = bytearray(path.read_bytes())
     data[dataset_zips.LOCAL_BYTES + len("places/country=MY/part.parquet")] ^= 1
     path.write_bytes(bytes(data))
