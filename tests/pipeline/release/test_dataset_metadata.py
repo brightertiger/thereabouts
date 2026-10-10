@@ -20,6 +20,17 @@ ENFORCED_KEYS = {
     "names": "the names engine keeps one row per city and folded name",
     "plate_priors": "the plate tables reject a repeated country, as the reader does",
     "blocks": "assembly writes one row per covered block; verify matches the index",
+    # source_id names the source file and row; keys.py refuses a repeated key.
+    "airports": "keys.py; measured unique on the 2026-10-02 world build",
+    "postal_codes": "keys.py; measured unique on the 2026-10-02 world build",
+    "ip_ranges": "keys.py; measured unique on the 2026-10-02 world build",
+    "trade_locations": "keys.py; measured unique on the 2026-10-02 world build",
+    "phone_metadata": "keys.py; measured unique on the 2026-10-02 world build",
+    "phone_prefixes": "keys.py; measured unique on the 2026-10-02 world build",
+    "timezone_cells": "keys.py; measured unique on the 2026-10-02 world build",
+    "zone_tables": "keys.py; measured unique on the 2026-10-02 world build",
+    "countries": "keys.py; the plate tables' country_code references need a key",
+    "subdivisions": "keys.py; measured unique on the 2026-10-02 world build",
 }
 
 # Every reference the lookups integrity gates check (cells/metrics.py and

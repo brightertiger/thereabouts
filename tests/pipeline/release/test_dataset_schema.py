@@ -106,6 +106,10 @@ def test_a_small_valid_description_passes() -> None:
             lambda d: d["parents"]["columns"][0].update(type="int64"),
         ),
         (
+            "children: relationship must reference the key of parents",
+            lambda d: d["parents"].update(primary_key=[]),
+        ),
+        (
             "relationship meaning",
             lambda d: d["children"]["relationships"][0].update(meaning=""),
         ),

@@ -389,33 +389,33 @@ Plain Parquet files, one directory per table. Partition labels in directory name
 
 | Table | Grain | Key | Feeds packs |
 | --- | --- | --- | --- |
-| [`airports`](#airports) | One row per airport record in the pinned OurAirports file; duplicate observations are retained. | none | `airports` |
+| [`airports`](#airports) | One row per airport record in the pinned OurAirports file; duplicate observations are retained. | `source`, `source_id` | `airports` |
 | [`blocks`](#blocks) | One row per covered resolution 3 block, including blocks that store no cells. A block absent from this table is outside the coverage of this export. | `block` | none |
 | [`canonical_cities`](#canonical_cities) | One row per canonical city or town; city_id is the place identifier of its anchor. | `city_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`cells`](#cells) | One row per stored H3 cell: a resolution 8 cell, or a coarser ancestor (resolution 3 to 7) that stands for all its resolution 8 descendants when they share one label. | `h3_uint64` | `core` |
-| [`countries`](#countries) | One row per country or territory record in the pinned sources; observations can repeat. | none | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
-| [`ip_ranges`](#ip_ranges) | One row per published IP interval, from ip_start to ip_end inclusive. | none | `ip` |
+| [`countries`](#countries) | One row per country or territory code in the pinned sources. | `country_code` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
+| [`ip_ranges`](#ip_ranges) | One row per published IP interval, from ip_start to ip_end inclusive. | `source`, `source_id` | `ip` |
 | [`names`](#names) | One row per canonical city and distinct name. Names that fold to the same text, or to the city's canonical or English name, are kept once. | `city_id`, `name` | `core` |
-| [`phone_metadata`](#phone_metadata) | One row per libphonenumber territory, including the non-geographic territory 001. | none | `phone` |
-| [`phone_prefixes`](#phone_prefixes) | One row per prefix description in one language file, so a prefix repeats once per language. | none | `phone` |
+| [`phone_metadata`](#phone_metadata) | One row per libphonenumber territory, including the non-geographic territory 001. | `source`, `source_id` | `phone` |
+| [`phone_prefixes`](#phone_prefixes) | One row per prefix description in one language file, so a prefix repeats once per language. | `source`, `source_id` | `phone` |
 | [`place_to_city`](#place_to_city) | One row per place; every places row has exactly one mapping row. | `place_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`places`](#places) | One row per reconciled place. | `place_id` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
 | [`plate_codes`](#plate_codes) | One row per source assertion of a code; a code repeats across sources, series and validity periods. | none | `plates` |
 | [`plate_formats`](#plate_formats) | One row per source rule; a country has one row per modeled series and source. | none | `plates` |
 | [`plate_policy`](#plate_policy) | Exactly one row. | none | `plates` |
 | [`plate_priors`](#plate_priors) | One row per country with a published count. | `country_code` | `plates` |
-| [`postal_codes`](#postal_codes) | One row per postal-code observation; a code can repeat for different place names or variants. | none | `postal` |
-| [`subdivisions`](#subdivisions) | One row per GeoNames first-level division; observations can repeat. | none | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
-| [`timezone_cells`](#timezone_cells) | One row per timezone and H3 cell; a cell in overlapping zones has several rows, and cells are stored at resolutions 0 to 8. | none | `core` |
-| [`trade_locations`](#trade_locations) | One row per UN/LOCODE entry; observations can repeat. | none | `locode` |
-| [`zone_tables`](#zone_tables) | One row per entry of an IANA zone table; a timezone can appear in several tables. | none | `core` |
+| [`postal_codes`](#postal_codes) | One row per postal-code observation; a code can repeat for different place names or variants. | `source`, `source_id` | `postal` |
+| [`subdivisions`](#subdivisions) | One row per GeoNames first-level division code. | `code` | `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates` |
+| [`timezone_cells`](#timezone_cells) | One row per timezone and H3 cell; a cell in overlapping zones has several rows, and cells are stored at resolutions 0 to 8. | `source`, `source_id` | `core` |
+| [`trade_locations`](#trade_locations) | One row per UN/LOCODE entry in the pinned files; source_id names its file and row, and a location code can repeat across entries. | `source`, `source_id` | `locode` |
+| [`zone_tables`](#zone_tables) | One row per entry of an IANA zone table; a timezone can appear in several tables. | `source`, `source_id` | `core` |
 
 ### `airports`
 
 Airports and airfields from OurAirports, placed on the H3 grid and joined to the cell geography at their coordinates.
 
 - Grain: One row per airport record in the pinned OurAirports file; duplicate observations are retained.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `airports`
 
 Joins:
@@ -426,8 +426,8 @@ Joins:
 
 | Column | Type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes |  | Configured upstream source name |
-| `source_id` | `string` | yes |  | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key |  | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key |  | Identifier of the original observation within its source |
 | `ident` | `string` | yes |  | OurAirports airport identifier |
 | `iata_code` | `string` | yes |  | IATA airport code, where available |
 | `icao_code` | `string` | yes |  | ICAO airport code, where available |
@@ -574,8 +574,8 @@ Enumerated columns:
 
 Countries and territories with ISO 3166 codes, names, currency, languages, calling code and UN M49 regions, from the pinned country-codes file plus GeoNames country information, linked to the reconciled country place.
 
-- Grain: One row per country or territory record in the pinned sources; observations can repeat.
-- Primary key: none (observations can repeat)
+- Grain: One row per country or territory code in the pinned sources.
+- Primary key: `country_code`
 - Feeds packs: `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates`
 
 Joins:
@@ -587,7 +587,7 @@ Joins:
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no |  | Configured upstream source name |
 | `source_id` | `string` | no |  | Identifier of the original observation within its source |
-| `country_code` | `string` | yes |  | Source or reconciled ISO-like two-letter country code |
+| `country_code` | `string` | yes in Arrow; no for the logical key |  | Source or reconciled ISO-like two-letter country code |
 | `alpha3` | `string` | yes |  | ISO alpha-3 country code |
 | `numeric` | `string` | yes |  | ISO numeric country code represented as text |
 | `name` | `string` | yes |  | Preferred display name |
@@ -633,7 +633,7 @@ Enumerated columns:
 IPv4 and IPv6 geolocation intervals from DB-IP City Lite, each with a published point joined to the cell geography. The ip pack writer rejects overlapping intervals.
 
 - Grain: One row per published IP interval, from ip_start to ip_end inclusive.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `ip`
 
 Joins:
@@ -644,8 +644,8 @@ Joins:
 
 | Column | Type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes |  | Configured upstream source name |
-| `source_id` | `string` | yes |  | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key |  | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key |  | Identifier of the original observation within its source |
 | `ip_start` | `string` | yes |  | Inclusive first IP address as text |
 | `ip_end` | `string` | yes |  | Inclusive last IP address as text |
 | `country_code` | `string` | yes |  | Source or reconciled ISO-like two-letter country code |
@@ -717,7 +717,7 @@ Enumerated columns:
 libphonenumber territory metadata: calling code, leading digits and national and international prefixes, with the original territory XML.
 
 - Grain: One row per libphonenumber territory, including the non-geographic territory 001.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `phone`
 
 Joins:
@@ -765,7 +765,7 @@ Enumerated columns:
 libphonenumber geographic prefix descriptions: the place a telephone prefix belongs to, in each published language. Shared calling codes keep every candidate country.
 
 - Grain: One row per prefix description in one language file, so a prefix repeats once per language.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `phone`
 
 Joins:
@@ -1029,7 +1029,7 @@ Joins:
 GeoNames postal codes with place names, administrative names and a located point joined to the cell geography. Codes keep their spaces and leading zeros.
 
 - Grain: One row per postal-code observation; a code can repeat for different place names or variants.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `postal`
 
 Joins:
@@ -1040,8 +1040,8 @@ Joins:
 
 | Column | Type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes |  | Configured upstream source name |
-| `source_id` | `string` | yes |  | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key |  | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key |  | Identifier of the original observation within its source |
 | `country_code` | `string` | yes |  | Source or reconciled ISO-like two-letter country code |
 | `postal_code` | `string` | yes |  | Postal code as text; preserve spaces and leading zeros |
 | `place_name` | `string` | yes |  | Source postal place name |
@@ -1081,8 +1081,8 @@ Enumerated columns:
 
 First-level administrative divisions as published by GeoNames admin1 codes, linked to the reconciled subdivision places.
 
-- Grain: One row per GeoNames first-level division; observations can repeat.
-- Primary key: none (observations can repeat)
+- Grain: One row per GeoNames first-level division code.
+- Primary key: `code`
 - Feeds packs: `core`, `postal`, `airports`, `locode`, `phone`, `ip`, `plates`
 
 Joins:
@@ -1094,7 +1094,7 @@ Joins:
 | --- | --- | --- | --- | --- |
 | `source` | `string` | no |  | Configured upstream source name |
 | `source_id` | `string` | no |  | Identifier of the original observation within its source |
-| `code` | `string` | yes |  | Published entity code |
+| `code` | `string` | yes in Arrow; no for the logical key |  | Published entity code |
 | `code_system` | `string` | yes |  | Namespace of the published administrative code |
 | `country_code` | `string` | yes |  | Source or reconciled ISO-like two-letter country code |
 | `name` | `string` | yes |  | Preferred display name |
@@ -1134,7 +1134,7 @@ Enumerated columns:
 IANA timezone membership on the H3 grid, derived from timezone-boundary-builder polygons. Membership is independent of land eligibility and zones can overlap.
 
 - Grain: One row per timezone and H3 cell; a cell in overlapping zones has several rows, and cells are stored at resolutions 0 to 8.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `core`
 
 | Column | Type | Nullable | Units | Meaning |
@@ -1153,8 +1153,8 @@ IANA timezone membership on the H3 grid, derived from timezone-boundary-builder 
 
 UN/LOCODE trade and transport locations (ports, airports, rail and road terminals) with codes, function flags and optional coordinates, joined to the cell geography where they have a point.
 
-- Grain: One row per UN/LOCODE entry; observations can repeat.
-- Primary key: none (observations can repeat)
+- Grain: One row per UN/LOCODE entry in the pinned files; source_id names its file and row, and a location code can repeat across entries.
+- Primary key: `source`, `source_id`
 - Feeds packs: `locode`
 
 Joins:
@@ -1165,8 +1165,8 @@ Joins:
 
 | Column | Type | Nullable | Units | Meaning |
 | --- | --- | --- | --- | --- |
-| `source` | `string` | yes |  | Configured upstream source name |
-| `source_id` | `string` | yes |  | Identifier of the original observation within its source |
+| `source` | `string` | yes in Arrow; no for the logical key |  | Configured upstream source name |
+| `source_id` | `string` | yes in Arrow; no for the logical key |  | Identifier of the original observation within its source |
 | `locode` | `string` | yes |  | UN/LOCODE identifier |
 | `country_code` | `string` | yes |  | Source or reconciled ISO-like two-letter country code |
 | `location` | `string` | yes |  | UN/LOCODE location component |
@@ -1209,7 +1209,7 @@ Enumerated columns:
 Rows of the IANA zone tables, linking each timezone identifier to its countries and a representative point.
 
 - Grain: One row per entry of an IANA zone table; a timezone can appear in several tables.
-- Primary key: none (observations can repeat)
+- Primary key: `source`, `source_id`
 - Feeds packs: `core`
 
 | Column | Type | Nullable | Units | Meaning |

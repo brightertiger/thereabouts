@@ -172,6 +172,26 @@ def test_logical_place_key_cannot_be_null_despite_arrow_nullability(
     assert not output.exists()
 
 
+def test_a_repeated_observation_key_is_refused(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    entry = snapshot.tables["zone_tables"][0]
+    path = snapshot.path(entry)
+    table = pq.read_table(path)
+    pq.write_table(pa.concat_tables([table, table]), path)
+    for record in snapshot.manifest["tables"]:
+        if record["path"] == entry.path:
+            record.update(file_record(snapshot.root, path), rows=2)
+    write_json(snapshot.root / "manifest.json", snapshot.manifest)
+    snapshot = external(snapshot.root, config.h3)
+    output = tmp_path / "dataset"
+    with pytest.raises(
+        ValueError,
+        match=r"Repeated logical primary key: zone_tables \(source, source_id\)",
+    ):
+        assemble(snapshot, output, config, guard, "identity")
+    assert not output.exists()
+
+
 def documents(output: Path) -> dict[str, str]:
     return {
         name: (output / name).read_text()

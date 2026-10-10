@@ -93,6 +93,10 @@ def relationship(
             raise ValueError(f"{table}: relationship names unknown column")
         if columns[mine] != remote[theirs]:
             raise ValueError(f"{table}: relationship column type differs: {mine}")
+    if other != tables[target["table"]]["primary_key"]:
+        raise ValueError(
+            f"{table}: relationship must reference the key of {target['table']}"
+        )
 
 
 def check(description: dict[str, Any], repository: Path = REPOSITORY) -> None:

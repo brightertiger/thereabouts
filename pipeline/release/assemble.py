@@ -13,7 +13,7 @@ from pipeline.runtime.fingerprints import REPOSITORY
 from pipeline.runtime.jsonio import digest, encode, sync_directory
 from pipeline.runtime.resources import ResourceGuard
 
-from . import closure, dictionary, metadata, readme
+from . import closure, dictionary, keys, metadata, readme
 from .budget import Budget
 from .selection import Selection
 from .source import Row, Snapshot
@@ -69,6 +69,7 @@ def assemble(
         )
         # A dataset the pack writer would refuse is never published.
         closure.check(staging, tables)
+        keys.check(staging, tables, descriptions, config.content, guard)
         sources = metadata.licences(
             config, observed, metadata.boundary_states(staging, tables)
         )

@@ -117,6 +117,9 @@ def snapshot(root: Path) -> Path:
         if "source" in defaults:
             defaults["source"] = "geonames"
         filled = [defaults | r for r in rows.get(kind, [])]
+        if "source_id" in defaults:
+            # Observations are keyed by (source, source_id): one id per row.
+            filled = [{**r, "source_id": f"{kind}:{i}"} for i, r in enumerate(filled)]
         if kind in SOURCES:
             filled = [
                 {"source": SOURCES[kind], "source_id": f"{kind}:{i}"}

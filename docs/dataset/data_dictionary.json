@@ -931,7 +931,10 @@
     "airports": {
       "description": "Airports and airfields from OurAirports, placed on the H3 grid and joined to the cell geography at their coordinates.",
       "grain": "One row per airport record in the pinned OurAirports file; duplicate observations are retained.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -1603,8 +1606,10 @@
     },
     "countries": {
       "description": "Countries and territories with ISO 3166 codes, names, currency, languages, calling code and UN M49 regions, from the pinned country-codes file plus GeoNames country information, linked to the reconciled country place.",
-      "grain": "One row per country or territory record in the pinned sources; observations can repeat.",
-      "primary_key": [],
+      "grain": "One row per country or territory code in the pinned sources.",
+      "primary_key": [
+        "country_code"
+      ],
       "relationships": [
         {
           "columns": [
@@ -1876,7 +1881,10 @@
     "ip_ranges": {
       "description": "IPv4 and IPv6 geolocation intervals from DB-IP City Lite, each with a published point joined to the cell geography. The ip pack writer rejects overlapping intervals.",
       "grain": "One row per published IP interval, from ip_start to ip_end inclusive.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -2244,7 +2252,10 @@
     "phone_metadata": {
       "description": "libphonenumber territory metadata: calling code, leading digits and national and international prefixes, with the original territory XML.",
       "grain": "One row per libphonenumber territory, including the non-geographic territory 001.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -2440,7 +2451,10 @@
     "phone_prefixes": {
       "description": "libphonenumber geographic prefix descriptions: the place a telephone prefix belongs to, in each published language. Shared calling codes keep every candidate country.",
       "grain": "One row per prefix description in one language file, so a prefix repeats once per language.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -3477,7 +3491,10 @@
     "postal_codes": {
       "description": "GeoNames postal codes with place names, administrative names and a located point joined to the cell geography. Codes keep their spaces and leading zeros.",
       "grain": "One row per postal-code observation; a code can repeat for different place names or variants.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -3735,8 +3752,10 @@
     },
     "subdivisions": {
       "description": "First-level administrative divisions as published by GeoNames admin1 codes, linked to the reconciled subdivision places.",
-      "grain": "One row per GeoNames first-level division; observations can repeat.",
-      "primary_key": [],
+      "grain": "One row per GeoNames first-level division code.",
+      "primary_key": [
+        "code"
+      ],
       "relationships": [
         {
           "columns": [
@@ -3958,7 +3977,10 @@
     "timezone_cells": {
       "description": "IANA timezone membership on the H3 grid, derived from timezone-boundary-builder polygons. Membership is independent of land eligibility and zones can overlap.",
       "grain": "One row per timezone and H3 cell; a cell in overlapping zones has several rows, and cells are stored at resolutions 0 to 8.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [],
       "columns": [
         {
@@ -4031,8 +4053,11 @@
     },
     "trade_locations": {
       "description": "UN/LOCODE trade and transport locations (ports, airports, rail and road terminals) with codes, function flags and optional coordinates, joined to the cell geography where they have a point.",
-      "grain": "One row per UN/LOCODE entry; observations can repeat.",
-      "primary_key": [],
+      "grain": "One row per UN/LOCODE entry in the pinned files; source_id names its file and row, and a location code can repeat across entries.",
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [
         {
           "columns": [
@@ -4305,7 +4330,10 @@
     "zone_tables": {
       "description": "Rows of the IANA zone tables, linking each timezone identifier to its countries and a representative point.",
       "grain": "One row per entry of an IANA zone table; a timezone can appear in several tables.",
-      "primary_key": [],
+      "primary_key": [
+        "source",
+        "source_id"
+      ],
       "relationships": [],
       "columns": [
         {
