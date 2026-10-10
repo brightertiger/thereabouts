@@ -81,9 +81,9 @@ def test_blocks_span_input_files_and_batches_but_never_row_groups(
             }
             assert group["block"].to_pylist() == [entry["block"]] * entry["rows"]
             # One block per row group: its statistics admit exactly that block.
-            statistics = file.metadata.row_group(entry["row_group"]).column(column)
-            assert statistics.statistics.min == entry["block"]
-            assert statistics.statistics.max == entry["block"]
+            chunk = file.metadata.row_group(entry["row_group"]).column(column)
+            assert chunk.statistics is not None
+            assert chunk.statistics.min == chunk.statistics.max == entry["block"]
     assert [row["reference_cells"] for row in blocks_table(output, manifest)] == [3, 3]
 
 

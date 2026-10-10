@@ -66,7 +66,7 @@ def validate_schema(
         raise ValueError(f"{what} schema differs from config/dataset.yaml: {kind}")
 
 
-def field(column: Row) -> pa.Field:
+def field(column: Row) -> "pa.Field[pa.DataType]":
     kind = pa.type_for_alias(column["type"])
     return pa.field(column["name"], kind, nullable=column["nullable"])
 

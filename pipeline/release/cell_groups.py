@@ -26,8 +26,9 @@ def represented(table: pa.Table, block: str, grid: H3) -> int:
     if h3.is_pentagon(int(block, 16)):
         keys = table.column("h3_uint64").to_pylist()
         return sum(h3.cell_to_children_size(key, finest) for key in keys)
-    counts = pc.value_counts(table.column("h3_resolution")).to_pylist()
-    return sum(item["counts"] * 7 ** (finest - item["values"]) for item in counts)
+    resolution = pc.cast(table.column("h3_resolution"), pa.int64())
+    levels = pc.subtract(pa.scalar(finest, pa.int64()), resolution)
+    return int(pc.sum(pc.power(pa.scalar(7, pa.int64()), levels)).as_py())
 
 
 def index_row(

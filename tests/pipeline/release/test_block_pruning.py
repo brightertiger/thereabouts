@@ -76,6 +76,7 @@ def blank_other_row_groups(path: Path, keep: int) -> None:
                     if chunk.has_dictionary_page
                     else chunk.data_page_offset
                 )
+                assert start is not None
                 stream.seek(start)
                 stream.write(bytes(chunk.total_compressed_size))
 
@@ -103,9 +104,10 @@ def test_a_point_lookup_reads_only_its_block_row_group(tmp_path: Path) -> None:
         for entry in cells["blocks"]:
             group = file.metadata.row_group(entry["row_group"])
             keyed = group.column(key).statistics
+            blocked = group.column(block).statistics
+            assert keyed is not None and blocked is not None
             # Key statistics admit the lookup in every row group, not only its own.
             assert any(keyed.min <= value <= keyed.max for value in keys)
-            blocked = group.column(block).statistics
             assert blocked.min == blocked.max == entry["block"]
     blank_other_row_groups(path, target["row_group"])
 
