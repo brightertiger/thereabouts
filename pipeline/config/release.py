@@ -29,6 +29,22 @@ ACCEPTANCE_CHECKS = (
 )
 
 
+# What assembly does with a reference to a place key that does not exist.
+UNKNOWN_PLACES = ("fail", "exclude")
+
+
+@dataclass
+class ClosureRules:
+    """Place keys, as `<kind>:<code>`, that the inputs refer to but never define.
+
+    An alias rewrites references to the key that covers it, an exclusion drops
+    the referring rows, and any other missing key does `unknown_places`."""
+
+    unknown_places: str = "fail"
+    place_aliases: dict[str, dict[str, str]] = field(default_factory=dict)
+    excluded_places: dict[str, list[str]] = field(default_factory=dict)
+
+
 @dataclass
 class DatasetLimits:
     max_output_bytes: int = II("resources.max_workspace")
@@ -36,6 +52,7 @@ class DatasetLimits:
     row_group_rows: int = 16384
     compression: str = "zstd"
     cell_group_resolution: int = 1
+    closure: ClosureRules = field(default_factory=ClosureRules)
 
 
 @dataclass
@@ -139,6 +156,7 @@ def validate(settings: ReleaseSettings, block_resolution: int) -> None:
     if limits.cell_group_resolution != 1:
         # The pack writer reads cells only from group=<r1> partitions.
         raise ValueError("Cell groups must use H3 resolution 1")
+    validate_closure(limits.closure)
     if not set(settings.packs.families) <= set(PACK_FAMILIES) or len(
         set(settings.packs.families)
     ) != len(settings.packs.families):
@@ -157,6 +175,31 @@ def validate(settings: ReleaseSettings, block_resolution: int) -> None:
     ):
         if not math.isfinite(value) or abs(value) > maximum:
             raise ValueError("Release example coordinate is outside WGS84 bounds")
+
+
+def validate_closure(rules: ClosureRules) -> None:
+    if rules.unknown_places not in UNKNOWN_PLACES:
+        raise ValueError("Closure unknown_places must be fail or exclude")
+    for kind in {*rules.place_aliases, *rules.excluded_places}:
+        if not re.fullmatch(r"[a-z]+", kind):
+            raise ValueError(f"Closure place kind must be lowercase letters: {kind}")
+    for kind in sorted({*rules.place_aliases, *rules.excluded_places}):
+        aliases = rules.place_aliases.get(kind, {})
+        excluded = list(rules.excluded_places.get(kind, []))
+        for code in [*aliases, *aliases.values(), *excluded]:
+            if not code or code != code.strip():
+                raise ValueError(f"Closure {kind} code is empty or padded")
+            if kind == "country" and not re.fullmatch(r"[A-Z]{2}", code):
+                raise ValueError(f"Closure country codes are two-letter codes: {code}")
+        if len(set(excluded)) != len(excluded):
+            raise ValueError(f"Closure excludes a {kind} code twice")
+        for source, target in aliases.items():
+            if source == target:
+                raise ValueError(f"Closure aliases {kind}:{source} to itself")
+            if target in aliases:
+                raise ValueError(f"Closure alias {kind}:{source} would chain")
+            if source in excluded:
+                raise ValueError(f"Closure both aliases and excludes {kind}:{source}")
 
 
 def validate_acceptance(settings: AcceptanceSettings) -> None:
