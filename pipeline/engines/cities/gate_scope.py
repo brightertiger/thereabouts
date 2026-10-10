@@ -6,9 +6,9 @@ other countries' findings are advisory: recorded and counted, never dropped.
 Neighbour and named-point failures test human fixtures and always block.
 """
 
+from pipeline.config.quality_policy import SCOPES
 from pipeline.engines.store.codec import Row
 
-SCOPES = ("reviewed", "all")
 # Failure kinds measured per country; each finding names its country.
 SCOPED = ("all_boundaries", "footprints")
 
