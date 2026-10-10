@@ -237,3 +237,16 @@ def test_invalid_manifest_block_index_refuses(tmp_path: Path, fault: str) -> Non
     write_json(output / "manifest.json", manifest)
     with pytest.raises(ValueError, match="Cell"):
         verify_dataset(output)
+
+
+def test_a_dataset_that_declares_blocks_must_list_the_table(tmp_path: Path) -> None:
+    snapshot, config, guard = fixture(tmp_path)
+    output = tmp_path / "dataset"
+    assemble(snapshot, output, config, guard, "identity")
+    manifest = verify_dataset(output)
+    assert "blocks" in manifest["schemas"]
+    for name in ("tables", "files"):
+        manifest[name] = [r for r in manifest[name] if r.get("kind") != "blocks"]
+    write_json(output / "manifest.json", manifest)
+    with pytest.raises(ValueError, match="blocks table"):
+        verify_dataset(output)

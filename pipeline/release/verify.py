@@ -46,8 +46,10 @@ def verify_dataset(root: Path) -> Row:
     for table in manifest["tables"]:
         if table not in manifest["files"]:
             raise ValueError("Release table is not in the verified file inventory")
-    # Datasets assembled before the blocks table have none to compare.
+    # Datasets assembled before the blocks table neither declare nor list it.
     listed = [t for t in manifest["tables"] if t["kind"] == "blocks"]
+    if "blocks" in manifest.get("schemas", {}) and not listed:
+        raise ValueError("The manifest declares a blocks table but lists none")
     stored = [
         row
         for table in listed
