@@ -131,9 +131,7 @@ def boundary_states(directory: Path, tables: list[Row]) -> set[str]:
     return {countries[code] for code in states}
 
 
-def licence_text(
-    sources: Row, row_licences: set[str], share_alike: str = ""
-) -> str:
+def licence_text(sources: Row, row_licences: set[str], share_alike: str = "") -> str:
     lines = [
         "# Data licences and attribution",
         "",
