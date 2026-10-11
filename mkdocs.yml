@@ -68,6 +68,7 @@ nav:
       - Pack format: dataset/pack-format.md
       - Data dictionary: dataset/DATA_DICTIONARY.md
       - Code packs: dataset/code-packs.md
+  - Changelog: changelog.md
   - Maintainers:
       - Client release: clients/release.md
       - Client status: clients/status.md

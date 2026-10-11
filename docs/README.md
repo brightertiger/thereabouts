@@ -20,7 +20,7 @@
 
 ## Maintainers
 
-- [Contributing](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md) — toolchain, tests and what needs no pipeline data.
+- [Contributing](https://github.com/brightertiger/thereabouts/blob/main/.github/CONTRIBUTING.md) — toolchain, tests and what needs no pipeline data.
 - [Client status](clients/status.md) — generated state, conformance and measurements.
 - [Client release](clients/release.md) — building and releasing the Python and Node packages.
 - [Recorded measurements](https://github.com/brightertiger/thereabouts/tree/main/) — evidence read by benchmarks, tests and these guides.

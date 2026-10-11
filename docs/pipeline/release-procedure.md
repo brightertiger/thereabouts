@@ -260,7 +260,7 @@ there is deliberately no skip switch: a release must not declare a key it breaks
 4. Rerun the release. The published schema, dictionary and README change, so the
    dataset stage and the packs rebuild; no upstream unit re-identifies.
 
-Note the withdrawn key in `CHANGELOG.md`, and restore it once the duplicates are
+Note the withdrawn key in `docs/changelog.md`, and restore it once the duplicates are
 fixed upstream.
 
 ## Validate staging, then publish the same files

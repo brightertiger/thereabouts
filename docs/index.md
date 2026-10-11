@@ -141,7 +141,7 @@ CC BY-SA sources. Details are in [docs/licenses.md](licenses.md).
 
 The first public release is in preparation. Packages and data are not yet
 published, so the install commands above apply once the release is out. Until
-then, build from this checkout as described in [CONTRIBUTING.md](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md).
+then, build from this checkout as described in [CONTRIBUTING.md](https://github.com/brightertiger/thereabouts/blob/main/.github/CONTRIBUTING.md).
 
 ## Roadmap
 
@@ -152,4 +152,5 @@ developed on a branch for a later release.
 
 - [Examples](https://github.com/brightertiger/thereabouts/blob/main/examples/README.md)
 - [Documentation index](https://github.com/brightertiger/thereabouts/blob/main/docs/README.md)
-- [Contributing](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md)
+- [Contributing](https://github.com/brightertiger/thereabouts/blob/main/.github/CONTRIBUTING.md)
+- [Changelog](changelog.md)

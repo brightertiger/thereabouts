@@ -138,7 +138,7 @@ CC BY-SA sources. Details are in [docs/licenses.md](docs/licenses.md).
 
 The first public release is in preparation. Packages and data are not yet
 published, so the install commands above apply once the release is out. Until
-then, build from this checkout as described in [CONTRIBUTING.md](CONTRIBUTING.md).
+then, build from this checkout as described in [the contributing guide](.github/CONTRIBUTING.md).
 
 ## Roadmap
 
@@ -149,4 +149,5 @@ developed on a branch for a later release.
 
 - [Examples](examples/README.md)
 - [Documentation index](docs/README.md)
-- [Contributing](CONTRIBUTING.md)
+- [Contributing](.github/CONTRIBUTING.md)
+- [Changelog](docs/changelog.md)

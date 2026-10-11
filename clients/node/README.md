@@ -101,4 +101,4 @@ remove a live installer's lease. No coordination socket is used.
 
 [Node guide](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/node.md), [installing data](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/data-install.md),
 [command line](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/cli.md), [MCP server](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/mcp.md) and
-[contributing](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md).
+[contributing](https://github.com/brightertiger/thereabouts/blob/main/.github/CONTRIBUTING.md).
