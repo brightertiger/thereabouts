@@ -36,5 +36,14 @@
   "bin": {
     "thereabouts": "./bin/thereabouts.js"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brightertiger/thereabouts.git",
+    "directory": "clients/node"
+  },
+  "homepage": "https://brightertiger.github.io/thereabouts/",
+  "bugs": {
+    "url": "https://github.com/brightertiger/thereabouts/issues"
+  }
 }
