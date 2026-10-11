@@ -87,7 +87,9 @@ def assemble(
         content = logical_content(staging, logical, config, guard)
         documents = {
             "content.json": encode(content).decode() + "\n",
-            "DATA_LICENSES.md": metadata.licence_text(sources, row_licences),
+            "DATA_LICENSES.md": metadata.licence_text(
+                sources, row_licences, config.release.share_alike
+            ),
             "DATASET_CARD.md": metadata.card(config, stats, content),
             "CHANGES.md": metadata.changes(config.release.version, content, previous),
             "README.md": readme.render(

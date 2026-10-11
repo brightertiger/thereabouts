@@ -100,6 +100,10 @@ class ReleaseSettings:
     managed_by: str = "OWNER DECISION: managing organisation"
     adx_categories: list[str] = field(default_factory=lambda: ["Geospatial Data"])
     license: str = "ODbL-1.0"
+    # The owner's decided terms for share-alike (CC BY-SA) source content. Empty
+    # leaves the OWNER DECISION paragraph in DATA_LICENSES.md, which blocks a
+    # public release.
+    share_alike: str = ""
     previous_version: str = ""
     countries: list[str] = field(default_factory=list)
     blocks: list[str] = field(default_factory=list)

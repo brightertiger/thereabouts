@@ -12,6 +12,12 @@ region: "OWNER DECISION: release bucket region"
 managed_by: '[Thereabouts project](https://github.com/brightertiger/thereabouts)'
 adx_categories: [Geospatial Data]
 license: ODbL-1.0
+# Decided 2026-10-11: ship the plate evidence under its own licence.
+share_alike: >-
+  The plate tables (plate_formats, plate_codes, plate_priors) and the plates pack
+  are adaptations of that material and are distributed under CC BY-SA 4.0, with the
+  attribution listed above, alongside the ODbL 1.0 database. Redistribute those
+  tables and that pack under CC BY-SA 4.0; the rest of the database stays under ODbL 1.0.
 previous_version: ''
 countries: []
 blocks: []

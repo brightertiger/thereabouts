@@ -76,6 +76,10 @@ def test_plate_licences_are_listed_and_cc_by_sa_awaits_the_owner() -> None:
     assert "plates" in text.split("OWNER DECISION", 1)[1]
     plain = licence_text(licences(load(), {"codes"}), {"CC-BY-4.0"})
     assert "OWNER DECISION" not in plain
+    decided = licence_text(sources, {"CC-BY-SA-4.0"}, "Plates ship under CC BY-SA 4.0.")
+    assert "OWNER DECISION" not in decided
+    assert "**Share-alike content.**" in decided
+    assert "from: plates. Plates ship under CC BY-SA 4.0." in decided
 
 
 EXCLUDED = (

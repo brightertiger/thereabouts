@@ -131,7 +131,9 @@ def boundary_states(directory: Path, tables: list[Row]) -> set[str]:
     return {countries[code] for code in states}
 
 
-def licence_text(sources: Row, row_licences: set[str]) -> str:
+def licence_text(
+    sources: Row, row_licences: set[str], share_alike: str = ""
+) -> str:
     lines = [
         "# Data licences and attribution",
         "",
@@ -143,7 +145,7 @@ def licence_text(sources: Row, row_licences: set[str]) -> str:
         "",
         licensing.table(sources, include_files=True),
     ]
-    lines += owner_decisions(sources, row_licences)
+    lines += owner_decisions(sources, row_licences, share_alike)
     lines += modifications(sources, row_licences)
     lines += [
         "",
@@ -216,8 +218,14 @@ def apache(sources: Row, row_licences: set[str]) -> list[str]:
     ]
 
 
-def owner_decisions(sources: Row, row_licences: set[str]) -> list[str]:
-    """Share-alike content in an ODbL database is the owner's call, not ours."""
+def owner_decisions(
+    sources: Row, row_licences: set[str], decision: str = ""
+) -> list[str]:
+    """Share-alike content in an ODbL database is the owner's call, not ours.
+
+    ``decision`` holds the owner's decided terms; empty leaves the blocking
+    OWNER DECISION paragraph in place.
+    """
     shared = sorted(
         {
             row["source"]
@@ -231,13 +239,20 @@ def owner_decisions(sources: Row, row_licences: set[str]) -> list[str]:
     share_alike = [value for value in licences if "CC-BY-SA" in value]
     if not share_alike:
         return []
-    return [
-        "",
-        "**OWNER DECISION required before publish.** Content under "
+    included = (
+        "Content under "
         + ", ".join(f"`{value}`" for value in share_alike)
         + " (Wikipedia and Wikimedia pages) is included, from: "
         + (", ".join(shared) or "exported rows")
-        + ". Whether share-alike content may be part of this ODbL database, and "
+        + ". "
+    )
+    if decision.strip():
+        return ["", "**Share-alike content.** " + included + decision.strip()]
+    return [
+        "",
+        "**OWNER DECISION required before publish.** "
+        + included
+        + "Whether share-alike content may be part of this ODbL database, and "
         "under which terms, has not been decided. Do not publish this release "
         "until the owner decides.",
     ]
