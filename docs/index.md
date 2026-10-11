@@ -151,5 +151,5 @@ developed on a branch for a later release.
 ## More
 
 - [Examples](https://github.com/brightertiger/thereabouts/blob/main/examples/README.md)
-- [Documentation index](README.md)
+- [Documentation index](https://github.com/brightertiger/thereabouts/blob/main/docs/README.md)
 - [Contributing](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md)

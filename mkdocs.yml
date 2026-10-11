@@ -7,6 +7,9 @@ repo_url: https://github.com/brightertiger/thereabouts
 repo_name: brightertiger/thereabouts
 edit_uri: edit/main/docs/
 docs_dir: docs
+# The folder index for GitHub readers; the site's home page is index.md.
+exclude_docs: |
+  README.md
 
 theme:
   name: material
@@ -66,7 +69,6 @@ nav:
       - Data dictionary: dataset/DATA_DICTIONARY.md
       - Code packs: dataset/code-packs.md
   - Maintainers:
-      - Documentation index: README.md
       - Client release: clients/release.md
       - Client status: clients/status.md
       - Pipeline guide: pipeline/README.md
