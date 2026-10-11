@@ -136,9 +136,12 @@ CC BY-SA sources. Details are in [docs/licenses.md](docs/licenses.md).
 
 ## Status
 
-The first public release is in preparation. Packages and data are not yet
-published, so the install commands above apply once the release is out. Until
-then, build from this checkout as described in [the contributing guide](.github/CONTRIBUTING.md).
+Clients 0.1.0 are on [PyPI](https://pypi.org/project/thereabouts/) and
+[npm](https://www.npmjs.com/package/thereabouts). Dataset and packs release
+2026.10 is published on this repository's
+[GitHub Releases](https://github.com/brightertiger/thereabouts/releases), where
+`thereabouts data install` finds it. Releases are monthly. To build from source,
+see [the contributing guide](.github/CONTRIBUTING.md).
 
 ## Roadmap
 
