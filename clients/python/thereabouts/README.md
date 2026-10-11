@@ -1,21 +1,21 @@
 # Thereabouts for Python
 
-Offline geographic context through the shared Thereabouts Rust core.
-Python 3.11+; abi3 wheels; NumPy is the only mandatory Python dependency.
-Version 0.1.0 is a release draft, not yet published. The PyPI 0.0.1 placeholder
-is superseded only when the owner publishes 0.1.0. Code licensing is pending.
-
-Install a release wheel or build with Rust 1.99 using:
+Offline geographic context through the shared Thereabouts Rust core: coordinates,
+H3 cells, town names, postal codes, airports, UN/LOCODEs, phone numbers, IP
+addresses and vehicle plates. Python 3.11+; abi3 wheels; NumPy is the only
+mandatory dependency. The code is MIT licensed.
 
 ~~~sh
-python -m pip install .
-thereabouts --data-dir ./store data install core postal airports --from ./release --yes
+pip install thereabouts            # add the MCP server with: pip install "thereabouts[mcp]"
+thereabouts data install core postal airports
 ~~~
 
 No data is bundled. `data install` reads the project's GitHub releases by
 default (set THEREABOUTS_RELEASE_TOKEN or GITHUB_TOKEN while the repository is
-private), or an explicit local release directory or release URL; `data install
-dataset` restores the Parquet dataset. Opening and querying never download data.
+private), or an explicit local release directory or URL with `--from`;
+`data install dataset` restores the Parquet dataset. Opening and querying never
+download data. The families are core, postal, airports, locode, phone, ip and
+plates; core is the largest (about 460 MB to download).
 
 ~~~python
 from thereabouts import Geocoder
@@ -62,10 +62,12 @@ all derived from GeocoderError. Missing data names the exact install command.
 The thereabouts console provides reverse, h3, geocode, postal, airport, locode,
 phone, ip, plate, data management, info and optional MCP. Install the mcp extra
 to run thereabouts mcp. Table, JSON, NDJSON and CSV output share Rust logic
-with Node. See the repository's docs/clients/cli.md and docs/dataset/pack-format.md for the
-normative contracts, and docs/clients/status.md for coverage and measurements.
+with Node. Guides in the repository: [Python client](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/python.md),
+[installing data](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/data-install.md),
+[command line](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/cli.md) and
+[MCP server](https://github.com/brightertiger/thereabouts/blob/main/docs/clients/mcp.md).
 
 The MCP server also describes the dataset. Its read-only describe tool and the
 thereabouts://dictionary resources (JSON, and /markdown) serve the data
 dictionary of the installed core pack, or the copy packaged with this client.
-The repository's skills/thereabouts teaches agents to use both.
+The repository's [skills/thereabouts](https://github.com/brightertiger/thereabouts/blob/main/skills/thereabouts/SKILL.md) teaches agents to use both.

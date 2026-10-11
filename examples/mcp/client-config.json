@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "thereabouts": {
+      "command": "thereabouts",
+      "args": ["--data-dir", "/absolute/path/to/your/store", "mcp"]
+    }
+  }
+}

@@ -38,9 +38,9 @@ an AWS identity allowed to create and read the release objects. Replace all
 `OWNER DECISION` placeholders before a public release. Keep the database under
 ODbL 1.0 and preserve the generated per-source attribution.
 
-## Apply migration on the existing laptop workspace
+## Apply migration on the existing workspace
 
-Do this once, before moving the workspace to the VM. Stop and checkpoint old
+Do this once, before moving the workspace to the build machine. Stop and checkpoint old
 builders first. Keep the main checkout and its data in place until verification
 passes. The [migration contract](README.md#migration-and-its-boundary) describes the
 approved repair classes; inspect the fresh dry-run report for its file inventory. The current proposal repairs 588
@@ -54,7 +54,7 @@ from a fresh dry run rather than using a stale list.
 
 ```sh
 set -eu
-PIPELINE_DATA=/Users/ujjwal/Downloads/solo/thereabouts/data
+PIPELINE_DATA="$PWD/data"
 mkdir -p data/pipeline-work/tmp .cache/pipeline
 export TMPDIR="$PWD/data/pipeline-work/tmp"
 export UV_CACHE_DIR="$PWD/data/pipeline-work/cache"
@@ -101,67 +101,43 @@ A simulation checks mapping and recorded hashes only; application must be follow
 by the ordinary on-disk plan with zero stale/new units. If native versions differ,
 investigate the identity change; do not use handover to conceal it.
 
-Only after those checks pass, remove the obsolete checkout-name symlink. The
-read-only inspection for this task found the relative target `thereabouts`:
-
-```sh
-.venv/bin/python - <<'PY'
-from pathlib import Path
-link = Path('/Users/ujjwal/Downloads/solo/PyOfflineGeocoder')
-expected = Path('/Users/ujjwal/Downloads/solo/thereabouts')
-if not link.is_symlink() or link.resolve() != expected.resolve():
-    raise SystemExit('Unexpected path or target; leave it untouched')
-link.unlink()  # Removes only the symlink, never its target.
-PY
-.venv/bin/python -m pipeline migrate check --root "$PIPELINE_DATA"
-.venv/bin/python -m pipeline plan --root "$PIPELINE_DATA"
-```
+Only after those checks pass, remove the obsolete checkout-name symlink if one
+still exists. Confirm first that it is a symbolic link whose target is the current
+checkout, and remove only the link, never its target. Then repeat `migrate check`
+and `plan` against the workspace.
 
 These are owner application instructions, not actions taken by this agent.
 
-## Prepare the GCP VM
+## Prepare the build machine
 
-The requested machine is `e2-standard-8` (32 GB memory), with a 300 GB persistent
-boot disk. `scripts/setup_pipeline_vm.sh` reads the raw-mirror bucket's location
-when the owner executes it and chooses a zone in that region. It refuses a
-multi-region/dual-region location instead of guessing. The bucket region was not
-queried during this task. Provisioning creates billable resources.
+The release build runs on a Linux machine with about 32 GB of memory and a 300 GB
+persistent disk, provisioned by the owner. Provisioning creates billable
+resources. The machine's service account needs read access to the raw-mirror
+bucket and permission to create objects in it for accepted pins; grant those at
+the bucket level, because the VM's access scope alone does not provide them.
 
-```sh
-export PIPELINE_GCP_PROJECT=OWNER_PROJECT
-export PIPELINE_SERVICE_ACCOUNT=OWNER_SERVICE_ACCOUNT_EMAIL
-# Optional: choose a specific zone in the bucket's region.
-# export PIPELINE_VM_ZONE=REGION-ZONE
-scripts/setup_pipeline_vm.sh
-```
-
-The service account needs access to read the existing GCS raw mirror and create
-new mirrored objects for accepted pins; assign those bucket-scoped permissions
-before running the pipeline. VM OAuth scope does not grant those IAM permissions.
-Inspect startup logs and `/srv/thereabouts/SETUP_PENDING.txt`. The startup script
-installs base tools and uv 0.6.14 but does not clone a repository or run a stage.
-Assign `/srv/thereabouts` and `/mnt/data` to the intended login user, install the
-reviewed merged checkout there, and install the Rust toolchain required by its
-`core/Cargo.toml` (the inspected branch declares Rust 1.99). With the owner's
-reviewed rustup installation, that is `rustup toolchain install 1.99.0 --profile
-minimal` and a checkout-local `rustup override set 1.99.0`. Then run
-`uv sync --all-extras --locked` from the checkout to build the client extension.
-Rust installer access and Linux compilation were not exercised here.
-The checkout pins Python 3.12.8. Record SQLite/GEOS and other native versions before
-comparing identities with the laptop.
+Install base tools and uv, give the intended login user ownership of the
+workspace and data directories, and install the reviewed merged checkout there.
+Install the Rust toolchain that `core/Cargo.toml` requires (the inspected branch
+declares Rust 1.99), for example `rustup toolchain install 1.99.0 --profile
+minimal` and a checkout-local `rustup override set 1.99.0`. Enable systemd
+lingering for the login user (`loginctl enable-linger`) and run long jobs in
+tmux, so that a closed ssh session does not stop the user manager and kill them.
+Then run `uv sync --all-extras --locked` from the checkout to build the client
+extension. The checkout pins Python 3.12.8. Record SQLite, GEOS and other native
+versions before comparing identities with another machine.
 
 Before rebuilding plate evidence, check `pdftotext -v` against the pinned
-`25.11.0` in `config/sources/plates.yaml`. The Ubuntu package installed by startup
-may differ; provide the reviewed extractor instead of relabelling its version.
-No Linux dependency installation or PDF extraction was tested here.
+`25.11.0` in `config/sources/plates.yaml`. The distribution package may differ;
+provide the reviewed extractor instead of relabelling its version.
 
-Transfer the **migrated** workspace to `/mnt/data` while writers are stopped.
+Transfer the **migrated** workspace to the data disk while writers are stopped.
 Use an owner-controlled copy that preserves relative symlinks and file bytes;
-never use a destructive `--delete` against the laptop workspace. Keep the laptop
-copy until the VM's read-only `migrate check` and `plan` verify the copied data.
-Missing caches intentionally stay absent. The GCS raw mirror supplies raw
-payloads, not a substitute for the retained normalized/geo outputs and ledger.
-This transfer is an owner action and was not performed here.
+never use a destructive `--delete` against the source workspace. Keep the source
+copy until the new machine's read-only `migrate check` and `plan` verify the
+copied data. Missing caches intentionally stay absent. The raw mirror supplies
+raw payloads, not a substitute for the retained normalized and geographic outputs
+and ledger. This transfer is an owner action.
 
 The VM profile starts with the measured conservative one-worker, 1 GB DuckDB,
 2 GB process budgets. Increase them only after measuring the VM; 32 GB installed
@@ -169,7 +145,7 @@ RAM is not a measured per-stage requirement. Keep at least 5 GB free. Derive a
 workspace allowance from the copied workspace and currently available disk:
 
 ```sh
-export PIPELINE_DATA=/mnt/data
+export PIPELINE_DATA=/path/to/data-disk
 export TMPDIR="$PIPELINE_DATA/work/tmp"
 export UV_CACHE_DIR="$PIPELINE_DATA/work/uv-cache"
 mkdir -p "$TMPDIR" "$UV_CACHE_DIR"
@@ -193,7 +169,7 @@ allowance does not reserve the entire disk or override the 5 GB floor.
 Keep the previous release locally for `CHANGES.md` and its verification. Choose a
 new `YYYY.MM` version, or a positive `.patch` suffix for a corrected release; never
 reuse a published version. Commit reviewed pin/policy changes before starting.
-Run from the merged checkout on the prepared VM, not the protected laptop copy.
+Run from the merged checkout on the prepared build machine, not the protected original copy.
 
 ```sh
 set -eu
@@ -296,11 +272,11 @@ carries an `OWNER DECISION` paragraph (CC BY-SA plate content), staging needs
 their listed object hashes; read `packs/<version>/acceptance/*.json` (every pack
 was opened at `ulimit -n 256` and checked against seeded dataset samples before
 it was archived); inspect per-table row counts, `CHANGES.md`, coverage and the
-generated README. Run the end-to-end test over the staged copy:
-
-```sh
-scripts/vm/e2e.sh /path/to/staging   # serves packs/ on loopback; report in its run dir
-```
+generated README. Run the end-to-end test over the staged copy. It is `tests/e2e/world_e2e.py` (marker
+`world`, deselected by default). Set `THEREABOUTS_E2E_RELEASE` to the staging root
+that holds `dataset/` and `packs/`, and `THEREABOUTS_E2E_REPORT` to the report
+path, then run `uv run pytest -m world tests/e2e/world_e2e.py`. It serves `packs/`
+on loopback and installs from it with each client.
 
 Run the three README examples on local files and on the owner's S3 setup.
 
@@ -424,5 +400,4 @@ Finally fill and validate [release-registry.yaml](release-registry.yaml) against
 the current upstream registry schema, confirm public anonymous reads and licence
 notices, and use [the registry PR draft](release-registry-pr.md) for the owner's
 submission to `awslabs/open-data-registry`. No registry PR was opened here. Retain
-measurement logs and choose VM shutdown/deletion separately; the provisioning
-script deliberately has no destructive cleanup command.
+measurement logs and shut down or delete the build machine separately.

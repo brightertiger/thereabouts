@@ -235,7 +235,7 @@ Normalize streams bounded partitions and retains source identities, licences,
 and rejection evidence. GeoNames extraction/index and Overture parent-index
 caches are regenerated before row conversion and remain tracked normalize
 outputs. Plate parsing rules now live in YAML. PDF evidence requires the
-configured Poppler `pdftotext` version (25.11.0 was measured on this laptop);
+configured Poppler `pdftotext` version (25.11.0 was measured on the development machine);
 this is a prerequisite for future PDF normalization, not evidence of the version
 used by every historical build.
 
@@ -472,7 +472,7 @@ refresh the measured total at their unit boundary, including removed scratch
 files. Free disk and RSS are checked before every admission.
 These admission checks do not impose limits on arbitrary stage code.
 The laptop profile defaults to one worker, one DuckDB thread, 1 GB DuckDB memory
-and a 2 GB RSS allowance. The VM profile (e2-standard-8, 32 GB) runs seven worker
+and a 2 GB RSS allowance. The VM profile (a 32 GB, eight-vCPU machine) runs seven worker
 processes with 2 GB DuckDB memory and 3.8 GB of memory each, a 250 GB workspace
 allowance and the 5 GB floor. Concurrent units never share an output directory, a prepared GEOS
 geometry or recipe parameters they may edit. Engine-specific limits live in
@@ -546,8 +546,7 @@ pin. The source YAML records that measured baseline. This is a capacity allowanc
 for one release up to twice the retained size, not a prediction of upstream growth;
 review the proposal's sizes before accepting a larger release. Disabled
 `plate_country` remains at zero until its inputs are chosen. The VM profile sets
-`storage.gcs_raw` to the retained raw-mirror bucket; no bucket access was made
-while validating these changes.
+`storage.gcs_raw` to the retained raw-mirror location.
 
 ## Versioned releases
 
@@ -625,10 +624,10 @@ For the measured read-only subset:
   'release.blocks=[836505fffffffff,836500fffffffff,836526fffffffff]' \
   release.dataset.max_output_bytes=412318215 resources.max_workspace=3000000000 \
   'release.packs.families=[]' --report data/pipeline-work/release-prepare.json
-.venv/bin/python scripts/verify_dataset_readme.py data/dataset/2026.10
 ```
 
-The example runner needs the reader's optional `pandas`, `pyarrow`, `duckdb` and
+The release's README examples can be run against the exported dataset by an
+example runner, which needs the reader's optional `pandas`, `pyarrow`, `duckdb` and
 `h3` packages. Pandas is not a pipeline runtime dependency. This task tested it
 using worktree-local copies of already-installed pandas 2.2.2 and NumPy 1.26.4;
 the pipeline environment retains its locked NumPy 2.3.5. No package was fetched.
@@ -711,15 +710,16 @@ group for `s3://` destinations; its real multipart behaviour remains owner
 validation before cloud publication. GCS raw-mirror support is separate and uses
 the locked `gcsfs` dependency. No remote backend is contacted by tests.
 
-`scripts/vm/e2e.sh RELEASE_DIR [URL]` runs the end-to-end test of spec §9
-(`tests/e2e/world_e2e.py`, marker `world`, deselected by default) over a staged
-release: loopback HTTP install through the Python console, Node and the CLI at
-`ulimit -n 256`, `verify --full`, `update --check`, seeded reverse and forward
-checks, the city points, world-safe vectors per client, cross-client JSON, an MCP
-stdio client and every skill example. It writes a Markdown report.
+The end-to-end test of spec §9 is `tests/e2e/world_e2e.py` (marker `world`,
+deselected by default). Pointed at a staged release through
+`THEREABOUTS_E2E_RELEASE`, it serves the packs over loopback HTTP and checks:
+installation through the Python console, Node and the CLI at `ulimit -n 256`,
+`verify --full`, `update --check`, seeded reverse and forward checks, the city
+points, world-safe vectors per client, cross-client JSON, an MCP stdio client and
+every skill example. It writes a Markdown report.
 `tests/e2e/test_fixture_e2e.py` runs the same driver on a fixture-scale release.
 
 The owner-run [release procedure](release-procedure.md) covers migration and
-symlink removal, GCP provisioning, the monthly pin/build cycle, staging checks and
-registry submission. The VM scripts and registry PR text are drafts for future
-execution; no VM or cloud publication was performed during this task.
+symlink removal, preparing the build machine, the monthly pin/build cycle, staging
+checks and registry submission. The registry PR text is a draft for future
+execution.

@@ -1,0 +1,48 @@
+id,group,lat,lon,expected_city,accepted_names,expected_country
+dhaka-01,large-city,23.737500,90.394500,Dhaka,ঢাকা|Dacca,BD
+dhaka-03,large-city,23.762220,90.378610,Dhaka,ঢাকা|Dacca,BD
+dhaka-06,large-city,23.870900,90.397400,Dhaka,ঢাকা|Dacca,BD
+istanbul-02,large-city,41.036940,28.985830,Istanbul,İstanbul,TR
+istanbul-05,large-city,41.176390,28.985000,Istanbul,İstanbul,TR
+mumbai-01,large-city,18.939800,72.835400,Mumbai,मुंबई|Bombay,IN
+mumbai-04,large-city,19.130436,72.874133,Mumbai,मुंबई|Bombay,IN
+mumbai-06,large-city,19.250100,72.859300,Mumbai,मुंबई|Bombay,IN
+delhi-03,large-city,28.655830,77.240830,Delhi,दिल्ली|دہلی|Dilli,IN
+delhi-05,large-city,28.597124,77.033374,Delhi,दिल्ली|دہلی|Dilli,IN
+kolkata-02,large-city,22.585000,88.359200,Kolkata,কলকাতা|Calcutta,IN
+kolkata-04,large-city,22.540560,88.395830,Kolkata,কলকাতা|Calcutta,IN
+tianjin-01,large-city,39.134720,117.203060,Tianjin,天津|天津市|Tientsin,CN
+tianjin-03,large-city,39.101110,117.164720,Tianjin,天津|天津市|Tientsin,CN
+tianjin-06,large-city,39.124440,117.346110,Tianjin,天津|天津市|Tientsin,CN
+shanghai-02,large-city,31.223493,121.445314,Shanghai,上海|上海市,CN
+shanghai-05,large-city,31.196306,121.316139,Shanghai,上海|上海市,CN
+tokyo-01,large-city,35.680830,139.766940,Tokyo,東京|東京都|Tōkyō|Tokio,JP
+tokyo-04,large-city,35.676110,139.699170,Tokyo,東京|東京都|Tōkyō|Tokio,JP
+tokyo-06,large-city,35.705979,139.903741,Tokyo,東京|東京都|Tōkyō|Tokio,JP
+london-03,large-city,51.519400,-0.126900,London,Greater London,GB
+london-05,large-city,51.598890,-0.238610,London,Greater London,GB
+new-york-02,large-city,40.671306,-73.963750,New York,New York City|City of New York|NYC,US
+new-york-04,large-city,40.850280,-73.878330,New York,New York City|City of New York|NYC,US
+howrah-01,neighbour,22.581615,88.337350,Howrah,হাওড়া|Haora|Hāora,IN
+howrah-03,neighbour,22.588330,88.296110,Howrah,হাওড়া|Haora|Hāora,IN
+noida-02,neighbour,28.574700,77.356100,Noida,नोएडा,IN
+noida-04,neighbour,28.578395,77.317635,Noida,नोएडा,IN
+thane-03,neighbour,19.256900,72.982000,Thane,ठाणे|Thana,IN
+navi-mumbai-01,neighbour,19.033600,73.018100,Navi Mumbai,नवी मुंबई|New Bombay,IN
+navi-mumbai-04,neighbour,19.063200,72.998800,Navi Mumbai,नवी मुंबई|New Bombay,IN
+yokohama-02,neighbour,35.509874,139.614537,Yokohama,横浜|横浜市|Yokohama-shi,JP
+petaling-jaya-01,neighbour,3.103890,101.645000,Petaling Jaya,PJ|八打灵再也,MY
+petaling-jaya-03,neighbour,3.112500,101.603890,Petaling Jaya,PJ|八打灵再也,MY
+oak-park-02,town,41.892778,-87.795081,Oak Park,Village of Oak Park,US
+evanston-02,town,42.053200,-87.675300,Evanston,City of Evanston,US
+st-andrews-01,town,56.341382,-2.794369,St Andrews,St. Andrews|Saint Andrews|Cill Rìmhinn,GB
+bayeux-01,town,49.275560,-0.703330,Bayeux,,FR
+paraty-02,town,-23.218841,-44.712113,Paraty,Parati,BR
+swakopmund-02,town,-22.673610,14.535280,Swakopmund,Tsoaxaub|Otjozondjii,NA
+oamaru-01,town,-45.101447,170.969363,Oamaru,Ōamaru,NZ
+castle-combe-01,rural,51.493000,-2.229000,Castle Combe,,GB
+reine-01,rural,67.932400,13.088700,Reine,,NO
+monsanto-01,rural,40.039000,-7.114000,Monsanto,Monsanto da Beira,PT
+hogsback-01,rural,-32.598000,26.938000,Hogsback,,ZA
+nundle-01,rural,-31.467000,151.133000,Nundle,,AU
+ocracoke-01,rural,35.108972,-75.986056,Ocracoke,Ocracoke Village,US

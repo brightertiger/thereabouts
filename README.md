@@ -1,126 +1,152 @@
 # Thereabouts
 
-Thereabouts adds geographic context to coordinates, H3 cells, town and city
-names, postal codes, airports, UN/LOCODEs, telephone numbers, IP addresses and
-vehicle plates. Queries run offline against explicitly installed data.
+Thereabouts adds geographic context to a place reference without a network
+call or an API key. Give it a coordinate, an H3 cell, a town name, a postal
+code, an airport code, a UN/LOCODE, a phone number, an IP address or a vehicle
+plate. It returns the country, subdivision, city and timezone it belongs to,
+with an explicit status when there is no answer or several. Queries run offline
+against data you install once. One Rust core serves the Python and Node
+libraries, the command line and an MCP server, and the same data is published
+as an open Parquet dataset.
 
-The product has three parts:
+## What you can look up
 
-- **Dataset:** versioned Parquet tables with canonical places, source observations,
-  H3 cell assignments, provenance and licence notices.
-- **Clients:** Python 3.11+, Node 22/24 and a command line, backed by one Rust core.
-  Small binary packs serve queries without loading a world database into memory.
-- **Pipeline:** explicit, resumable acquisition and geographic stages, followed
-  by dataset preparation and pack export. It is maintained in this repository.
+| You have | Call | Data pack |
+| --- | --- | --- |
+| latitude and longitude | `reverse` | core |
+| an H3 cell (resolution 0 to 8) | `h3` / `from_h3` / `fromH3` | core |
+| a town or city name | `geocode` | core |
+| a postal code and its country | `postal` | postal |
+| an airport code (IATA, ICAO, GPS, local) | `airport` | airports |
+| a UN/LOCODE | `locode` | locode |
+| an international phone number | `phone` | phone |
+| an IPv4 or IPv6 address | `ip` | ip |
+| a vehicle registration plate | `plate` | plates |
 
-This is the **0.1.0 release draft**. The owner has not published these artifacts.
-The existing PyPI/npm 0.0.1 placeholders do not contain this client.
-Code is released under the [MIT licence](LICENSE); data notices are separate, see [docs/licenses.md](docs/licenses.md).
+Geocoding finds towns and cities, not street addresses. A phone result is a
+calling-code prefix, an IP result is the provider's location for the range, and
+a plate result is format evidence, not a vehicle register.
 
-## Install and add data
-
-From a checkout with Rust 1.99 and Python 3.11+:
-
-~~~sh
-python -m pip install .
-thereabouts --version
-thereabouts --data-dir ./store data install core postal airports \
-  --from /path/to/release --yes
-~~~
-
-Alternatively install a wheel produced by the Python workflow. Without --from,
-data comes from the project's GitHub releases
-(https://github.com/brightertiger/thereabouts/releases/latest/download/). While
-that repository is private, set THEREABOUTS_RELEASE_TOKEN (or GITHUB_TOKEN) to a
-token that can read it. --from or THEREABOUTS_RELEASE_URL selects another release:
-a local directory with index.json and the family archives, or an HTTPS base URL.
-`thereabouts data install dataset` restores the Parquet dataset under
-`<data-dir>/dataset/<version>/`. No import, lookup or missing-data error
-downloads anything.
-
-For Node, build a package from this checkout (Rust's wasm32-unknown-unknown
-target and wasm-bindgen-cli 0.2.129 are required):
+## Install
 
 ~~~sh
-cd clients/node
-npm ci --ignore-scripts
-npm pack
-npm install /path/to/thereabouts-0.1.0.tgz
+pip install thereabouts            # Python 3.11+, installs the thereabouts command
+pip install "thereabouts[mcp]"     # adds the MCP server
+npm install thereabouts            # Node 22 or 24, ESM, WebAssembly, no compiler needed
 ~~~
 
-The installed npm package includes WASM; consumers need no Rust compiler.
-Both clients read the same store and dataset-version pin.
+The npm package also provides `npx thereabouts`, the same command line. Nothing
+is bundled: you install data explicitly, and no lookup ever downloads anything.
 
-## Python
+## Install data
+
+~~~sh
+thereabouts data install core postal airports
+thereabouts data list
+~~~
+
+Packs download from this repository's GitHub Releases, are checked by SHA-256
+and are activated atomically. While the repository is private, set
+`THEREABOUTS_RELEASE_TOKEN` (or `GITHUB_TOKEN`) to a token with read access to
+it. `--from DIR_OR_URL` installs from a local directory or another URL, and
+`--data-dir` or `THEREABOUTS_DATA` chooses the store. See
+[data installation](docs/clients/data-install.md).
+
+| Pack | Answers | Download | Unpacked |
+| --- | --- | ---: | ---: |
+| `core` | reverse, H3 cells, city names, timezones | 460 MB | 2.9 GB |
+| `postal` | postal codes | 31 MB | 42 MB |
+| `ip` | IPv4 and IPv6 addresses | 34 MB | 42 MB |
+| `airports` | airport codes | 3.3 MB | 6.4 MB |
+| `locode` | UN/LOCODE | 3.3 MB | 6.5 MB |
+| `phone` | phone calling-code prefixes | 1.2 MB | 4.4 MB |
+| `plates` | vehicle plate formats | 1.2 MB | 3.8 MB |
+
+Sizes are from the world build of release 2026.10. Forward packs work alone;
+with `core` installed they also return the canonical city and timezone.
+
+## Quick start
+
+Python:
 
 ~~~python
 from thereabouts import Geocoder
 
-with Geocoder(data_dir="./store") as geo:
-    result = geo.reverse(lat=48.8566, lon=2.3522)
-    print(result.status, result.city, result.country, result.timezone)
+with Geocoder() as geo:
+    r = geo.reverse(lat=48.8566, lon=2.3522)
+    print(r.status, r.city.name, r.country.code, r.timezone)
     print(geo.geocode("Paris", country="FR").to_dict())
     print(geo.postal("75001", country="FR").to_dict())
     print(geo.airport("CDG").to_dict())
 ~~~
 
-Use keyword arguments for coordinates. reverse_many streams named coordinate
-objects; reverse_columns accepts NumPy arrays. Results are frozen dataclasses.
-[Python details](clients/python/thereabouts/README.md).
-
-## Node
+Node:
 
 ~~~js
 import { Geocoder } from "thereabouts";
 
-const geo = await Geocoder.open({ dataDir: "./store" });
+const geo = await Geocoder.open();
 try {
-  console.log(await geo.reverse({ lat: 48.8566, lon: 2.3522 }));
+  const r = await geo.reverse({ lat: 48.8566, lon: 2.3522 });
+  console.log(r.status, r.city?.name, r.country?.code, r.timezone);
   console.log(await geo.geocode("Paris", { country: "FR" }));
-  for await (const result of geo.reverseMany([{ lat: 48.8566, lon: 2.3522 }])) {
-    console.log(result.country);
-  }
+  console.log(await geo.airport("CDG"));
 } finally {
   await geo.close();
 }
 ~~~
 
-Results use the same snake_case JSON fields as Python and the CLI.
-[Node details](clients/node/README.md).
-
-## Command line
+Command line:
 
 ~~~sh
-thereabouts --data-dir ./store reverse --lat 48.8566 --lon 2.3522 --json
-thereabouts --data-dir ./store geocode "Paris" --country FR
-thereabouts --data-dir ./store reverse points.csv --csv
-thereabouts --data-dir ./store data verify --full
+thereabouts reverse --lat 48.8566 --lon 2.3522 --json
+thereabouts geocode "Paris" --country FR
+thereabouts airport CDG
+thereabouts reverse points.csv --csv      # batch: input columns kept, results appended
 ~~~
 
-Explicit verbs select the input type. Tables are the TTY default; piped output
-defaults to NDJSON. CSV/NDJSON batches preserve input columns and append results.
-The optional Python MCP extra exposes the same lookup verbs.
-[Normative grammar and store contract](docs/clients/cli.md).
+Results use the same fields in every client. Check `status` first: `matched`,
+`ambiguous` (ranked `candidates`), `not_found`, `invalid_input` or
+`unsupported_granularity`. Add evidence to see why an answer or a miss happened.
+Guides: [Python](docs/clients/python.md), [Node](docs/clients/node.md),
+[command line](docs/clients/cli.md).
 
-## Semantics and coverage
+## MCP server and agent skill
 
-Geocode finds towns and cities, not street addresses. Ambiguous queries retain
-the flat fields shared by all ranked candidates. Reverse uses the dataset's
-stored H3 ancestor and method; nearest results report a distance band, not an
-invented exact distance. Missing or unsupported input has an explicit status.
-Evidence is optional and never replaces provenance in the dataset.
+`thereabouts mcp` runs a read-only MCP server on stdio with one tool per lookup
+plus `describe` for the dataset tables; setup for Claude Desktop, Claude Code and
+other clients is in [the MCP guide](docs/clients/mcp.md). The skill in
+[`skills/thereabouts`](skills/thereabouts/SKILL.md) teaches an agent to pick the
+right tool, read statuses correctly and answer questions about many places with
+DuckDB over the dataset.
 
-Core includes reverse and city-name lookup. Each forward family is a separate
-pack. Matching core data adds canonical city and timezone detail; standalone
-forward packs retain their own source fields. Coverage depends on the selected
-release: committed samples and the MY/SG release proof are subsets.
+## Dataset
 
-## Build and release
+The same data is available as versioned Parquet tables (places, cells, names,
+postal codes, airports, IP ranges and more) with provenance and licence notices,
+restored by `thereabouts data install dataset` or read straight from the
+release. See the [dataset guide](docs/dataset/README.md) and the
+[data dictionary](docs/dataset/DATA_DICTIONARY.md).
 
-Start with [pipeline operations](docs/pipeline/README.md),
-[the dataset](docs/dataset/README.md), [pack format 2.2](docs/dataset/pack-format.md),
-[client status and measurements](docs/clients/status.md), and
-[release engineering](docs/clients/release.md).
-The [documentation index](docs/README.md) lists every current document.
-The [0.1.0 changelog](CHANGELOG.md) describes the migration from the retired readers.
-Data notices are separate from the MIT code licence.
+## Licences
+
+Code is MIT, see [LICENSE](LICENSE). Data carries its own notices: the dataset
+is ODbL 1.0 with per-source attribution, and the plates data derives from
+CC BY-SA sources. Details are in [docs/licenses.md](docs/licenses.md).
+
+## Status
+
+The first public release is in preparation. Packages and data are not yet
+published, so the install commands above apply once the release is out. Until
+then, build from this checkout as described in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Roadmap
+
+Native coordinate frames (UTM/MGRS, geohash, plus codes, ECEF, NMEA and WKT) are
+developed on a branch for a later release.
+
+## More
+
+- [Examples](examples/README.md)
+- [Documentation index](docs/README.md)
+- [Contributing](CONTRIBUTING.md)

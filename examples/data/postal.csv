@@ -1,0 +1,12 @@
+code,country,expected_city
+75001,FR,Paris
+75008,FR,Paris
+10001,US,New York
+90210,US,Beverly Hills
+60601,US,Chicago
+1000,BE,Brussels
+10115,DE,Berlin
+80331,DE,Munich
+00100,IT,Rome
+28001,ES,Madrid
+2000,AU,Sydney

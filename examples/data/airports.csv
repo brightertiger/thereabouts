@@ -1,0 +1,14 @@
+code,scheme,expected_country,expected_name_contains
+CDG,iata,FR,Charles de Gaulle
+LHR,iata,GB,Heathrow
+JFK,iata,US,Kennedy
+HND,iata,JP,Haneda
+SIN,iata,SG,Changi
+DXB,iata,AE,Dubai
+SYD,iata,AU,Kingsford Smith
+BOM,iata,IN,Chhatrapati Shivaji
+LFPG,icao,FR,Charles de Gaulle
+EGLL,icao,GB,Heathrow
+KJFK,icao,US,Kennedy
+RJTT,icao,JP,Haneda
+YSSY,icao,AU,Kingsford Smith

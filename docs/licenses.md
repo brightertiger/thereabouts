@@ -12,6 +12,13 @@ licence; distributing code under MIT does not relicense the data. Review the
 assembled release notices and source restrictions before redistributing any
 dataset or pack.
 
+**Plates data:** the vehicle-plate format evidence (`plate_formats`, `plate_codes`,
+`plate_priors` and the `plates` pack) is derived from Wikimedia Commons material
+licensed CC BY-SA 4.0. Those tables and that pack carry the attribution and the
+share-alike condition of that licence; the release's DATA_LICENSES.md lists the
+source files and revisions. Users who redistribute adapted plate data must do so
+under CC BY-SA 4.0.
+
 **Decided 2026-10-04:** the `subdivisions` table is sourced from GeoNames
 administrative codes (CC BY 4.0) only; the LGPL-2.1 iso-codes (pycountry) input
 was removed so that no LGPL rows remain inside the ODbL database.
