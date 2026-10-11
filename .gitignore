@@ -235,3 +235,6 @@ node_modules/
 
 # Local specifications, reviews and working notes.
 /notes/
+
+# Operator scripts (VM bootstrap, delivery, e2e driver) stay local.
+scripts/

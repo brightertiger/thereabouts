@@ -118,7 +118,6 @@ max-args = 7
 "pipeline/stages/lookup_manifest.py" = ["PERF401"]
 "pipeline/stages/lookups.py" = ["PERF401"]
 "pipeline/storage/transfer.py" = ["PLR0913"]
-"scripts/vm/seed_mirror.py" = ["PERF401"]
 "tests/e2e/driver.py" = ["C901"]
 "tests/pipeline/pilot_inputs.py" = ["S608"]
 "tests/pipeline/reconciliation/conftest.py" = ["PLR0913"]
