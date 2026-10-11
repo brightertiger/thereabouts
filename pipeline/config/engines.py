@@ -49,7 +49,7 @@ class EngineSettings:
     reconcile_policy: str = "config/policies/reconcile.yaml"
     city_policies: str = "config/policies/cities"
     city_review: str = "config/reviews/cities-pilot.yaml"
-    evaluation_points: str = "eval/city_points/points.csv"
+    evaluation_points: str = "examples/ground-truth/city_points/points.csv"
     country_inventory: str = "work/cells/countries.json"
     block_index: str = "work/cells/blocks.sqlite"
     retained_country_inventory: str = "work/golden/countries.json"

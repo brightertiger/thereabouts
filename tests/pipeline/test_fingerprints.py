@@ -30,7 +30,7 @@ def test_identity_is_portable_and_excludes_tests_and_client_code(
 
     baseline = calculate(first)
     assert baseline == calculate(moved)
-    for name in ("tests", "eval", "docs", "clients/python/thereabouts"):
+    for name in ("tests", "examples/ground-truth", "docs", "clients/python/thereabouts"):
         directory = first / name
         directory.mkdir(parents=True)
         (directory / "fixture.py").write_text("changed = True\n")

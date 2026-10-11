@@ -50,7 +50,7 @@ def test_inventory_proposes_exactly_what_the_plates_pin_lacks() -> None:
         assert spec["kind"] == "wikipedia"
         assert f"oldid={spec['revision']}" in spec["download_url"]
     evaluation = yaml.safe_load(
-        (REPOSITORY / "eval/plate_country/evaluation.yaml").read_text()
+        (REPOSITORY / "examples/ground-truth/plate_country/evaluation.yaml").read_text()
     )
     pages: dict[str, set[str]] = defaultdict(set)
     for rule in evaluation:

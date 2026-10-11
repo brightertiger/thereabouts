@@ -26,6 +26,6 @@
 - [Recorded measurements](../tests/benchmarks/measurements/) — evidence read by benchmarks, tests and these guides.
 - [Pipeline guide](pipeline/README.md) — stages, configuration and commands.
 - [City policy](pipeline/city-policy.md) — city granularity and footprint conventions.
-- [`eval/`](../eval/) — evaluation ground truth read by the evaluate stage.
+- [`examples/ground-truth/`](../examples/ground-truth/) — evaluation ground truth read by the evaluate stage and the examples.
 - [Release procedure](pipeline/release-procedure.md) — building, staging and publishing a monthly release.
 - [Registry submission](pipeline/release-registry-pr.md) and [registry metadata](pipeline/release-registry.yaml) — draft release registration.

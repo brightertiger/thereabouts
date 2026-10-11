@@ -15,11 +15,11 @@ from .engine_data import Geography
 
 Policy = Callable[[Recipe], Object]
 # Evaluation fixtures read by reconciliation and city quality reports at run time.
-RECONCILE_EVIDENCE = ("eval/reconcile/fixtures.json",)
+RECONCILE_EVIDENCE = ("examples/ground-truth/reconcile/fixtures.json",)
 CITY_EVIDENCE = (
-    "eval/cities/diagnostic_expectations.json",
-    "eval/cities/probes.json",
-    "eval/cities/regressions.json",
+    "examples/ground-truth/cities/diagnostic_expectations.json",
+    "examples/ground-truth/cities/probes.json",
+    "examples/ground-truth/cities/regressions.json",
     *RECONCILE_EVIDENCE,
 )
 

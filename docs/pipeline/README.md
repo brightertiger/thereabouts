@@ -110,7 +110,7 @@ rows by input position, so `duckdb_threads` cannot change a byte.
 
 A unit hashes its own id, that identity, its parameters and the outputs it reads
 upstream. Repository data files a unit reads at run time are parameters too: the
-`eval/**` fixtures for the reconcile gate, `normalize_cells` quality and
+`examples/ground-truth/**` fixtures for the reconcile gate, `normalize_cells` quality and
 `evaluate`, and `config/reviews/cities-pilot.yaml` for `evaluate` and
 `lookups/manifest/current`. Each upstream output enters as its **role**, its size
 and its SHA256. The output contract is that a unit may name directories after
@@ -202,7 +202,8 @@ it does not verify upstream availability or remote mirror custody.
 
 On a separate writable workspace, `run --through normalize` downloads every
 enabled source and publishes its normalized manifest. Configure
-`storage.gcs_raw=gs://BUCKET/raw` for future production execution; local tests use
+`storage.gcs_raw=gs://BUCKET/raw` for production execution (the `vm` profile reads it
+from the `THEREABOUTS_GCS_RAW` environment variable); local tests use
 `storage.gcs_raw=file:///absolute/path/to/a/mirror` or `memory://mirror`.
 The fsspec GCS driver is pinned in `uv.lock`. No cloud operation was used to test
 this implementation.
@@ -287,7 +288,7 @@ its boundary by stable upstream origins (`osm:r134579`), never by reconcile area
 IDs, which every rebuild renumbers, and lists each lost cell with the city that
 now answers it; the file header documents the format. Editing the policy
 requires a matching reviewed fingerprint. Review validation occurs before any
-writable workspace opens. Evaluation fixtures live under `eval/`, outside build
+writable workspace opens. Evaluation fixtures live under `examples/ground-truth/`, outside build
 identities; changing a fixture alone does not regenerate geographic data.
 Evaluation is an execution prerequisite for normalization: a failed gate stops
 the run. Its receipt is not consumed as geographic data, so a changed review

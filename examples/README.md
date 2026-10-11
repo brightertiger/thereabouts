@@ -58,9 +58,9 @@ places returns ranked `candidates`. Read `match` as well: `contained` is inside 
 
 ## Where the expected answers come from
 
-The city points and plates in `data/` are taken from the evaluation ground truth in `eval/`
-(`eval/city_points/points.csv` and `eval/plate_country/evaluation.yaml`), which is not moved or
-changed. The postal codes, airports, UN/LOCODEs, phone numbers and IP addresses are
+The city points and plates in `data/` are taken from the evaluation ground truth in
+`ground-truth/` (`city_points/points.csv` and `plate_country/evaluation.yaml`), which the
+pipeline's evaluate stage reads and which is not changed. The postal codes, airports, UN/LOCODEs, phone numbers and IP addresses are
 hand-picked, well-known examples, not evaluation data. Expected answers are a first-run
 smoke check: the batch examples print `MISMATCH` rows instead of failing, and a given release
 can legitimately differ, especially for coverage subsets.

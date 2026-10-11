@@ -93,7 +93,7 @@ Matching should accept the expected name or a listed alias, with Unicode normali
 Run from the repository root:
 
 ```sh
-python3 eval/city_points/validate.py
+python3 examples/ground-truth/city_points/validate.py
 ```
 
 This reads only this directory, uses no network or project code, and writes `validation.json` here. It checks the schema, parsing, required fields, aliases, IDs, coordinate bounds, duplicates, frozen group/split counts, per-city roles, required named subunits, README totals, matching cached query coordinates, all 120 country codes, and proximity to the returned map features. It records unresolved boundary verification explicitly. It is an integrity audit, not a substitute for the desk review or an accuracy score. `assemble_coordinates.py` and `assemble.py` can reconstruct the CSVs from the frozen selection files without network access; the other research scripts are collection provenance, not required to use the set.

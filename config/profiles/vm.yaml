@@ -20,7 +20,7 @@ engines:
     duckdb_spill_bytes: 40000000000
 
 storage:
-  gcs_raw: gs://pyofflinegeocoder-summer-sector-488705-m8/raw
+  gcs_raw: ${oc.env:THEREABOUTS_GCS_RAW,''}
 release:
   dataset:
     max_output_bytes: ${resources.max_workspace}

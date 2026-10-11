@@ -22,7 +22,7 @@ from pipeline.stages.registry import registry
 from .geographic_fixtures import build, geographic_graph, source_receipts
 from .helpers import context
 
-EVIDENCE = (REPOSITORY / "eval", REPOSITORY / "config/reviews")
+EVIDENCE = (REPOSITORY / "examples/ground-truth", REPOSITORY / "config/reviews")
 CURRENT = threading.local()
 OPENED: dict[tuple[str, str], set[str]] = defaultdict(set)
 
@@ -85,7 +85,7 @@ def unit_hashes(tmp_path: Path, repository: Path) -> dict[tuple[str, str], str]:
     ("name", "readers"),
     [
         (
-            "eval/cities/probes.json",
+            "examples/ground-truth/cities/probes.json",
             {("evaluate", "pilot"), ("normalize_cells", "quality/ZZ")},
         ),
         (
@@ -93,7 +93,7 @@ def unit_hashes(tmp_path: Path, repository: Path) -> dict[tuple[str, str], str]:
             {("evaluate", "pilot"), ("lookups", "manifest/current")},
         ),
         (
-            "eval/reconcile/fixtures.json",
+            "examples/ground-truth/reconcile/fixtures.json",
             {
                 ("evaluate", "pilot"),
                 ("normalize_cells", "quality/ZZ"),
@@ -109,7 +109,7 @@ def test_an_edited_data_file_re_identifies_its_readers_only(
     readers: set[tuple[str, str]],
 ) -> None:
     repository = tmp_path / "repository"
-    for directory in ("config", "eval"):
+    for directory in ("config", "examples/ground-truth"):
         shutil.copytree(REPOSITORY / directory, repository / directory)
     monkeypatch.setattr(parameters, "REPOSITORY", repository)
     monkeypatch.setattr(geographic, "REPOSITORY", repository)

@@ -15,7 +15,7 @@ from pipeline.engines.plate_country.sources import source_fields
 from pipeline.runtime.jsonio import sha256_file, write_json
 from pipeline.sources.plates.html import Document
 
-FIXTURES = Path(__file__).parents[3] / "eval/plate_country"
+FIXTURES = Path(__file__).parents[3] / "examples/ground-truth/plate_country"
 
 
 def policy(name: str) -> Any:
