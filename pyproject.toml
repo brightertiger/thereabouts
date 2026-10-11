@@ -6,6 +6,10 @@ build-backend = "maturin"
 name = "thereabouts"
 version = "0.1.0"
 description = "Offline geographic context from a shared Rust core"
+authors = [
+    {name = "Ujjwal Singh Rao", email = "ujjwalsrao@gmail.com"},
+    {name = "Ricky Singh", email = "rickragv@gmail.com"},
+]
 readme = "clients/python/thereabouts/README.md"
 license = "MIT"
 license-files = ["LICENSE"]
