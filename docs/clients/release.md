@@ -1,8 +1,8 @@
 # Client release engineering
 
-Version 0.1.0 is a draft. No registry release or remote workflow was executed.
-The owner publishes 0.1.0 to supersede the old 0.0.1 placeholders; an existing
-immutable registry version is not overwritten.
+Version 0.1.0 is the first published client release; it supersedes the old
+0.0.1 registry placeholders. An existing immutable registry version is never
+overwritten.
 
 ## Artifacts
 

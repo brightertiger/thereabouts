@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased: dataset schema
+## Dataset 2026.10 — 2026-10-11
 
 - `cells.block` holds each row's resolution-3 block as lowercase hex. It is
   constant per Parquet row group, so `WHERE block = ?` reads one row group in
@@ -18,7 +18,7 @@
   table and `<table>_evidence` tables; cells `group=` directories renamed or
   replaced by files sorted by `block`.
 
-## 0.1.0 — draft, unpublished
+## 0.1.0 — 2026-10-11
 
 - One Rust core owns format 2.2, results, reverse and all forward lookups.
 - Python abi3 bindings and Node ESM/WASM expose the same result semantics.
