@@ -5,7 +5,7 @@ from typing import Any
 
 from pipeline.runtime.jsonio import read_object
 
-EVALUATION = Path(__file__).parents[2] / "examples" / "ground-truth"
+EVALUATION = Path(__file__).parents[2] / "eval"
 
 
 def read_json(path: Path) -> dict[str, Any]:

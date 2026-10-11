@@ -70,7 +70,7 @@ class Settings:
     names: int = 1000
     forward_rows: int = 500
     cross_client: int = 1000
-    city_points: Path | None = REPOSITORY / "examples/ground-truth/city_points/points.csv"
+    city_points: Path | None = REPOSITORY / "eval/city_points/points.csv"
     plate_examples: Path | None = None
     # The pipeline workspace whose plate_country pin holds the evaluation files
     # and whose lookups manifest the release was built from.

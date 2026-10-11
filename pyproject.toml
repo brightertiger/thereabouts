@@ -69,7 +69,7 @@ markers = ["world: requires an explicitly built world pack"]
 src = [".", "clients/python"]
 target-version = "py311"
 line-length = 88
-extend-exclude = ["docs", "graft", "data", "examples/ground-truth", "notes"]
+extend-exclude = ["docs", "graft", "data", "eval", "examples/ground-truth", "notes"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "C90", "PLR0913", "PERF", "S608"]
@@ -132,7 +132,7 @@ max-args = 7
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["clients/python", "pipeline", "tests", "scripts"]
+files = ["clients/python", "pipeline", "tests"]
 
 # SciPy spatial and the build-only pyshp reader do not ship typing.
 [[tool.mypy.overrides]]

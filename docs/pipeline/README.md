@@ -288,7 +288,9 @@ its boundary by stable upstream origins (`osm:r134579`), never by reconcile area
 IDs, which every rebuild renumbers, and lists each lost cell with the city that
 now answers it; the file header documents the format. Editing the policy
 requires a matching reviewed fingerprint. Review validation occurs before any
-writable workspace opens. Evaluation fixtures live under `examples/ground-truth/`, outside build
+writable workspace opens. Evaluation fixtures live under `examples/ground-truth/` (the root `eval`
+symlink keeps the recorded stage identities valid until the next full source
+refresh, when the code paths move too), outside build
 identities; changing a fixture alone does not regenerate geographic data.
 Evaluation is an execution prerequisite for normalization: a failed gate stops
 the run. Its receipt is not consumed as geographic data, so a changed review
