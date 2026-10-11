@@ -148,6 +148,20 @@ see [the contributing guide](.github/CONTRIBUTING.md).
 Native coordinate frames (UTM/MGRS, geohash, plus codes, ECEF, NMEA and WKT) are
 developed on a branch for a later release.
 
+## Citation
+
+If you use Thereabouts in research, cite the software:
+
+```bibtex
+@misc{thereabouts,
+  author       = {Rao, Ujjwal Singh and Singh, Ricky},
+  title        = {Thereabouts: offline geographic context from a shared Rust core},
+  year         = {2026},
+  howpublished = {\url{https://github.com/brightertiger/thereabouts}},
+  note         = {Version 0.1.0}
+}
+```
+
 ## More
 
 - [Examples](examples/README.md)
