@@ -32,13 +32,17 @@ def line(result) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--data-dir", default=None, help="store directory (default: the client's default store)")
+    parser.add_argument(
+        "--data-dir",
+        default=None,
+        help="store directory (default: the client's default store)",
+    )
     args = parser.parse_args()
 
     try:
         geo = Geocoder(data_dir=args.data_dir)
     except DataNotInstalledError as exc:
-        raise SystemExit(f"Data missing: {exc}")
+        raise SystemExit(f"Data missing: {exc}") from exc
 
     with geo:
         print("== reverse(lat=, lon=) ==")
@@ -65,11 +69,17 @@ def main() -> None:
 
         print("\n== reverse_many: named lat/lon mappings, results in order ==")
         points = [{"lat": lat, "lon": lon} for _, lat, lon in PLACES[:3]]
-        for point, result in zip(points, geo.reverse_many(points)):
+        for point, result in zip(points, geo.reverse_many(points), strict=True):
             print(point, "->", result.city.name if result.city else None)
 
         print("\n== the full JSON contract of one result ==")
-        print(json.dumps(geo.reverse(lat=48.8584, lon=2.2945).to_dict(), indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                geo.reverse(lat=48.8584, lon=2.2945).to_dict(),
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
 
 
 if __name__ == "__main__":
