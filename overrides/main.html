@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block extrahead %}
+  {{ super() }}
+  {% if page.is_homepage and config.extra.site_verification %}
+  <meta name="google-site-verification" content="{{ config.extra.site_verification }}" />
+  {% endif %}
+{% endblock %}

@@ -6,6 +6,7 @@ on:
     paths:
       - "docs/**"
       - "mkdocs.yml"
+      - "overrides/**"
       - "README.md"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
@@ -24,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOOGLE_ANALYTICS_KEY: ${{ vars.GOOGLE_ANALYTICS_KEY }}
+      GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
