@@ -16,7 +16,8 @@ def test_names_and_plates_through_assemble_and_writer(tmp_path: Path) -> None:
     assert manifest["statistics"]["names"]["rows"] == 1
     assert manifest["statistics"]["plate_policy"]["rows"] == 1
     notices = (dataset / "DATA_LICENSES.md").read_text()
-    assert "`CC-BY-SA-4.0`" in notices and "OWNER DECISION" in notices
+    assert "`CC-BY-SA-4.0`" in notices and "**Share-alike content.**" in notices
+    assert "OWNER DECISION" not in notices
     packs = tmp_path / "packs"
     writer = client.binding()
     for family in ("core", "plates"):

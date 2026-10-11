@@ -1,7 +1,8 @@
 """Tests use committed synthetic inputs or loopback servers; never upstream data."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture(autouse=True)
@@ -11,8 +12,15 @@ def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
     install(monkeypatch)
 
 
+@pytest.hookimpl(tryfirst=True)
 def pytest_configure(config: pytest.Config) -> None:
-    """Create the parent of --basetemp; pytest makes only the last directory."""
+    """Resolve --basetemp and create its parent before the tmp plugin reads it.
+
+    pytest makes only the last directory of basetemp, and a relative basetemp
+    (as in addopts) would make tmp_path relative to the current directory.
+    """
     basetemp = config.getoption("basetemp", default=None)
     if basetemp:
-        Path(basetemp).parent.mkdir(parents=True, exist_ok=True)
+        absolute = Path(basetemp).resolve()
+        absolute.parent.mkdir(parents=True, exist_ok=True)
+        config.option.basetemp = str(absolute)

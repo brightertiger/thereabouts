@@ -20,7 +20,9 @@ engines:
     duckdb_spill_bytes: 40000000000
 
 storage:
-  gcs_raw: ${oc.env:THEREABOUTS_GCS_RAW,''}
+  # The raw-mirror bucket comes from the environment; the fallback is an empty
+  # in-memory mirror so the profile loads without it.
+  gcs_raw: ${oc.env:THEREABOUTS_GCS_RAW,memory://raw-mirror}
 release:
   dataset:
     max_output_bytes: ${resources.max_workspace}
