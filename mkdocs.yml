@@ -12,24 +12,15 @@ exclude_docs: |
   README.md
 
 theme:
-  name: material
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.top
-    - search.suggest
-    - content.code.copy
-  palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
+  name: readthedocs
+  navigation_depth: 4
+  collapse_navigation: false
+  sticky_navigation: true
+  titles_only: false
+  include_homepage_in_sidebar: true
+  highlightjs: true
+  analytics:
+    gtag: !ENV [GOOGLE_ANALYTICS_KEY, ""]
 
 plugins:
   - search
@@ -39,20 +30,6 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-  - pymdownx.superfences
-  - pymdownx.highlight
-  - pymdownx.tabbed:
-      alternate_style: true
-
-extra:
-  analytics:
-    provider: google
-    property: !ENV [GOOGLE_ANALYTICS_KEY, ""]
-  consent:
-    title: Cookie consent
-    description: >-
-      This site uses cookies to measure visits and improve the documentation.
-      You can accept or reject analytics cookies.
 
 nav:
   - Home: index.md
