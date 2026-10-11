@@ -65,4 +65,5 @@ jobs:
           name: node-package-24
           path: artifact
       # Owner configures npm trusted publishing; there are no repository tokens.
-      - run: npm publish artifact/thereabouts-0.1.0.tgz --provenance --access public
+      # A bare "dir/file" argument is parsed as a GitHub shorthand; ./ makes it a path.
+      - run: npm publish ./artifact/thereabouts-0.1.0.tgz --provenance --access public
