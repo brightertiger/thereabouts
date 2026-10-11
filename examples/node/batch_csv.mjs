@@ -45,7 +45,8 @@ const countries = (r) => {
 };
 
 function verdict(r, expected) {
-  if (expected === "") return r.status === "not_found" ? "ok" : "MISMATCH";
+  // reserved ranges: not_found, or (release 2026.10) matched with no country
+  if (expected === "") return r.status === "not_found" || countries(r).size === 0 ? "ok" : "MISMATCH";
   if (r.status === "matched" && countries(r).has(expected)) return "ok";
   if (r.status === "ambiguous" && countries(r).has(expected)) return "ok (ambiguous)";
   return "MISMATCH";
@@ -67,18 +68,18 @@ async function* cityPoints(geo, rows) {
   }
 }
 
-const forward = (call, key, expectedLabel) =>
+const forward = (call, key, expectedLabel, countryKey = "expected_country") =>
   async function* (geo, rows) {
     for (const row of rows) {
       const r = await call(geo, row);
       const got = `${r.status}: ${place(r)}/${[...countries(r)].sort().join(",") || "-"}`;
-      yield [row[key], row[expectedLabel], got, verdict(r, row.expected_country)];
+      yield [row[key], row[expectedLabel], got, verdict(r, row[countryKey])];
     }
   };
 
 const FAMILIES = {
   "city_points.csv": cityPoints,
-  "postal.csv": forward((g, r) => g.postal(r.code, { country: r.country }), "code", "expected_city"),
+  "postal.csv": forward((g, r) => g.postal(r.code, { country: r.country }), "code", "expected_city", "country"),
   "airports.csv": forward((g, r) => g.airport(r.code, { scheme: r.scheme }), "code", "expected_name_contains"),
   "locode.csv": forward((g, r) => g.locode(r.code), "code", "expected_name"),
   "phone.csv": forward((g, r) => g.phone(r.number), "number", "expected_country"),

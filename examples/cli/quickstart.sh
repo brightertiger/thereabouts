@@ -62,7 +62,8 @@ run phone "+32 2 555 1234" --fields status,kind,country.code,city.name
 # ip: IPv4 or IPv6 literal. The location belongs to the provider's range, not the device.
 # Expect: kind "ip_range", country.code "US" (city is the range's city, e.g. Mountain View).
 run ip 8.8.8.8 --fields status,kind,country.code,city.name
-# A documentation address is outside every published range. Expect: status "not_found".
+# A documentation address has no country. Release 2026.10 answers status "matched" with
+# country null (older text said not_found); either way there is no country to trust.
 run ip 192.0.2.1 --fields status,kind,country.code
 
 # plate: registration format evidence. Pass --country to keep the context exact.

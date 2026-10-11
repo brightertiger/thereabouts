@@ -12,7 +12,7 @@ example script compares against.
 | `airports.csv` | 13 | airports | Hand-picked IATA and ICAO codes of major airports. Not part of the evaluation. The airport's own `city` is the canonical settlement, not the postal town: Paris-Charles de Gaulle reports Tremblay-en-France. |
 | `locode.csv` | 10 | locode | Hand-picked UN/LOCODEs of major ports. Not part of the evaluation. |
 | `phone.csv` | 9 | phone | Hand-picked E.164 numbers using numbers reserved for illustration where one exists. A phone result is a calling-code prefix, not proof the number exists. `+1` is shared by several countries and may be `ambiguous`. |
-| `ip.csv` | 9 | ip | Public resolvers with a well-known country, plus the documentation (RFC 5737, RFC 3849), private and loopback ranges, which should be `not_found`. An IP result is the provider's range location, not the device. |
+| `ip.csv` | 9 | ip | Public resolvers with a well-known country, plus the documentation (RFC 5737, RFC 3849), private and loopback ranges, which carry no country: release 2026.10 answers `matched` with no country and no city, not `not_found`. An IP result is the provider's range location, not the device. |
 
 The expected answers are a smoke check for a first run. Some rows will differ from the
 expectation on a given release, and the examples print a mismatch instead of failing.

@@ -1,10 +1,10 @@
 address,expected_country,note
 8.8.8.8,US,Google Public DNS
-2001:4860:4860::8888,US,Google Public DNS over IPv6
+2001:4860:4860::8888,CA,Google Public DNS over IPv6 (provider range lists Montreal)
 9.9.9.9,US,Quad9 resolver
-192.0.2.1,,RFC 5737 documentation range; expect not_found
-198.51.100.7,,RFC 5737 documentation range; expect not_found
-203.0.113.5,,RFC 5737 documentation range; expect not_found
-2001:db8::1,,RFC 3849 documentation range; expect not_found
-10.0.0.1,,RFC 1918 private; expect not_found
-127.0.0.1,,loopback; expect not_found
+192.0.2.1,,RFC 5737 documentation range; expect no country
+198.51.100.7,,RFC 5737 documentation range; expect no country
+203.0.113.5,,RFC 5737 documentation range; expect no country
+2001:db8::1,,RFC 3849 documentation range; expect no country
+10.0.0.1,,RFC 1918 private; expect no country
+127.0.0.1,,loopback; expect no country

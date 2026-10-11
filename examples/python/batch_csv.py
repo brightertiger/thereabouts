@@ -23,7 +23,8 @@ def countries(result) -> set[str]:
 
 def verdict(result, expected_country: str) -> str:
     if expected_country == "":
-        return "ok" if result.status == "not_found" else "MISMATCH"
+        # reserved ranges: not_found, or (release 2026.10) matched with no country
+        return "ok" if result.status == "not_found" or not countries(result) else "MISMATCH"
     if result.status == "matched" and expected_country in countries(result):
         return "ok"
     if result.status == "ambiguous" and expected_country in countries(result):
@@ -47,17 +48,17 @@ def city_points(geo, rows):
         yield row["id"], row["expected_city"], f"{got}/{code}", "ok" if ok else "MISMATCH"
 
 
-def forward(call, key, expected_label):
+def forward(call, key, expected_label, country_key="expected_country"):
     def run(geo, rows):
         for row in rows:
             result = call(geo, row)
-            yield row[key], row[expected_label], f"{result.status}: {place(result)}/{','.join(sorted(countries(result))) or '-'}", verdict(result, row["expected_country"])
+            yield row[key], row[expected_label], f"{result.status}: {place(result)}/{','.join(sorted(countries(result))) or '-'}", verdict(result, row[country_key])
     return run
 
 
 FAMILIES = {
     "city_points.csv": city_points,
-    "postal.csv": forward(lambda g, r: g.postal(r["code"], country=r["country"]), "code", "expected_city"),
+    "postal.csv": forward(lambda g, r: g.postal(r["code"], country=r["country"]), "code", "expected_city", country_key="country"),
     "airports.csv": forward(lambda g, r: g.airport(r["code"], scheme=r["scheme"]), "code", "expected_name_contains"),
     "locode.csv": forward(lambda g, r: g.locode(r["code"]), "code", "expected_name"),
     "phone.csv": forward(lambda g, r: g.phone(r["number"]), "number", "expected_country"),
