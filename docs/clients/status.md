@@ -121,7 +121,7 @@ verified, not seven packs. No fabricated or empty substitute was produced.
 The existing plate sample and all plate vectors still pass.
 The proof outputs are scratch; results, input hashes and pack-manifest hashes
 are retained in
-[CLIENT_RELEASE_MEASUREMENTS.json](../../tests/benchmarks/measurements/CLIENT_RELEASE_MEASUREMENTS.json).
+[CLIENT_RELEASE_MEASUREMENTS.json](https://github.com/brightertiger/thereabouts/blob/main/tests/benchmarks/measurements/CLIENT_RELEASE_MEASUREMENTS.json).
 Reproduce with tests.benchmarks.release_path and a new worktree-local output directory.
 
 ## Conformance and qualification

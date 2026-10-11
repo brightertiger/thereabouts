@@ -3,7 +3,7 @@
 This is the normative grammar for the Rust CLI and the Node command
 tree. The console entry and python -m thereabouts invoke the same Rust
 run(argv, io) function. Both hosts use the JSON command description in
-[grammar.json](../../core/thereabouts-cli-core/src/grammar/grammar.json) through its shared argument parser,
+[grammar.json](https://github.com/brightertiger/thereabouts/blob/main/core/thereabouts-cli-core/src/grammar/grammar.json) through its shared argument parser,
 help renderer and diagnostic policy; WASM exports the description verbatim.
 Native clap provides typed dispatch after shared validation. Node calls
 thereabouts-cli-core through WASM for batch parsing, rendering, field projection

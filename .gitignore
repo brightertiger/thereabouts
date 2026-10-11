@@ -238,3 +238,6 @@ node_modules/
 
 # Operator scripts (VM bootstrap, delivery, e2e driver) stay local.
 scripts/
+
+# Built documentation site
+/site/

@@ -1,6 +1,6 @@
 # Licences
 
-**Code:** MIT, decided by the owner on 2026-10-04; the text is in [LICENSE](../LICENSE).
+**Code:** MIT, decided by the owner on 2026-10-04; the text is in [LICENSE](https://github.com/brightertiger/thereabouts/blob/main/LICENSE).
 Python (`pyproject.toml`), npm (`clients/node/package.json`) and every Cargo crate
 (`core/Cargo.toml` workspace package) declare it. MIT has no express patent-grant
 clause; retain the copyright and permission notices in redistributions.

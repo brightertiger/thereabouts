@@ -7,8 +7,8 @@
 - [Command line](clients/cli.md) — command grammar, output formats, batch input and exit codes.
 - [Installing data](clients/data-install.md) — packs, sources, the store layout and the offline guarantee.
 - [MCP server](clients/mcp.md) — setup for Claude Desktop, Claude Code and other clients, tools and resources.
-- [Agent skill](../skills/thereabouts/SKILL.md) — teaches an agent to use the MCP tools and the dataset.
-- [Examples](../examples/README.md) — runnable usage examples.
+- [Agent skill](https://github.com/brightertiger/thereabouts/blob/main/skills/thereabouts/SKILL.md) — teaches an agent to use the MCP tools and the dataset.
+- [Examples](https://github.com/brightertiger/thereabouts/blob/main/examples/README.md) — runnable usage examples.
 - [Licences](licenses.md) — code licence and separate data obligations.
 
 ## Dataset
@@ -20,12 +20,12 @@
 
 ## Maintainers
 
-- [Contributing](../CONTRIBUTING.md) — toolchain, tests and what needs no pipeline data.
+- [Contributing](https://github.com/brightertiger/thereabouts/blob/main/CONTRIBUTING.md) — toolchain, tests and what needs no pipeline data.
 - [Client status](clients/status.md) — generated state, conformance and measurements.
 - [Client release](clients/release.md) — building and releasing the Python and Node packages.
-- [Recorded measurements](../tests/benchmarks/measurements/) — evidence read by benchmarks, tests and these guides.
+- [Recorded measurements](https://github.com/brightertiger/thereabouts/tree/main/) — evidence read by benchmarks, tests and these guides.
 - [Pipeline guide](pipeline/README.md) — stages, configuration and commands.
 - [City policy](pipeline/city-policy.md) — city granularity and footprint conventions.
-- [`examples/ground-truth/`](../examples/ground-truth/) — evaluation ground truth read by the evaluate stage and the examples.
+- [`examples/ground-truth/`](https://github.com/brightertiger/thereabouts/tree/main/) — evaluation ground truth read by the evaluate stage and the examples.
 - [Release procedure](pipeline/release-procedure.md) — building, staging and publishing a monthly release.
 - [Registry submission](pipeline/release-registry-pr.md) and [registry metadata](pipeline/release-registry.yaml) — draft release registration.

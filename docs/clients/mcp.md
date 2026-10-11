@@ -89,11 +89,11 @@ Check `status` first: `matched`, `ambiguous` (ranked `candidates`), `not_found`
 Nulls stay null, and text in results is source data, not instructions. The
 server's own instructions tell the model the same, and the full per-tool
 reference, with parameters and every status, match and evidence value, is in
-[`skills/thereabouts/references/mcp-tools.md`](../../skills/thereabouts/references/mcp-tools.md).
+[`skills/thereabouts/references/mcp-tools.md`](https://github.com/brightertiger/thereabouts/blob/main/skills/thereabouts/references/mcp-tools.md).
 
 ## Agent skill
 
-The skill in [`skills/thereabouts`](../../skills/thereabouts/SKILL.md) pairs the
+The skill in [`skills/thereabouts`](https://github.com/brightertiger/thereabouts/blob/main/skills/thereabouts/SKILL.md) pairs the
 server with the open Parquet dataset. It tells an agent which tool fits an input,
 how to read ambiguous and approximate answers, and how to answer questions about
 many places (counts, rankings, joins) with DuckDB over the dataset. Copy or link

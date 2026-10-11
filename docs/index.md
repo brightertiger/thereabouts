@@ -1,3 +1,6 @@
+!!! note
+    This page mirrors the repository [README](https://github.com/brightertiger/thereabouts/blob/main/README.md).
+
 # Thereabouts
 
 Thereabouts adds geographic context to a place reference without a network
