@@ -13,6 +13,7 @@ exclude_docs: |
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.tabs
     - navigation.sections
@@ -45,6 +46,7 @@ markdown_extensions:
       alternate_style: true
 
 extra:
+  site_verification: !ENV [GOOGLE_SITE_VERIFICATION, ""]
   analytics:
     provider: google
     property: !ENV [GOOGLE_ANALYTICS_KEY, ""]
