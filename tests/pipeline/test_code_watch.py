@@ -14,7 +14,7 @@ from pipeline.runtime.fingerprints import REPOSITORY, stage_identity
 from pipeline.runtime.ledger import Ledger
 from pipeline.runtime.records import Dependency, Recipe
 from pipeline.runtime.runner import run
-from pipeline.runtime.watch import InputsChanged, Watch
+from pipeline.runtime.watch import InputsChanged, Watch, name
 from pipeline.stages.contract import Context, Stage, Unit
 
 from .helpers import HashedStage, context
@@ -150,7 +150,7 @@ def test_frozen_reads_refuse_changed_bytes(tmp_path: Path) -> None:
     with watch.frozen():
         assert watch.read(path) == b"value = 1\n"
         path.write_text("value = 22\n")
-        assert watch.changed() == [str(path)]
+        assert watch.changed() == [name(path)]
         with pytest.raises(InputsChanged):
             watch.read(path)
     assert watch.read(path) == b"value = 22\n"
